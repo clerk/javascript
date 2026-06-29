@@ -43,6 +43,13 @@ export interface EnterpriseConnectionTestRuns {
    * own. Pass `{ armPolling: true }` after the user kicks off a run.
    */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
+  /**
+   * Revalidates ONLY the success probe and resolves with the freshly-fetched
+   * answer. Lets the Test step pick up a run completed in another tab the moment
+   * the user clicks Continue — gating on the fresh result rather than the stale
+   * `hasSuccessfulTestRun` captured at render — without a manual "Refresh logs".
+   */
+  revalidateHasSuccessfulTestRun: () => Promise<boolean>;
 }
 
 /**
@@ -113,6 +120,14 @@ export const useEnterpriseConnectionTestRuns = (
     [revalidateProbe, revalidateList],
   );
 
+  const revalidateHasSuccessfulTestRun = useCallback(async () => {
+    // The probe is the success-filtered query, so a non-empty fresh page is the
+    // up-to-date "has a successful run" answer. `armPolling: false`: this is a
+    // one-shot check on Continue, never a polling arm.
+    const { data } = await revalidateProbe({ armPolling: false });
+    return (data?.length ?? 0) > 0;
+  }, [revalidateProbe]);
+
   return {
     hasSuccessfulTestRun: (successfulTestRuns?.length ?? 0) > 0,
     isLoading: isProbeLoading || isListLoading,
@@ -123,5 +138,6 @@ export const useEnterpriseConnectionTestRuns = (
     page,
     setPage,
     refresh,
+    revalidateHasSuccessfulTestRun,
   };
 };

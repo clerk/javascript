@@ -44,6 +44,18 @@ export type UseOrganizationEnterpriseConnectionTestRunsParams = {
   keepPreviousData?: boolean;
 };
 
+/**
+ * The freshly-fetched page surfaced by `revalidate`, read straight from the
+ * cache once the refetch settles. Lets a caller gate on the up-to-date result
+ * synchronously after `await`, instead of waiting for the hook to re-render with
+ * the new React state (whose value is still the pre-refetch one inside the
+ * caller's closure).
+ */
+export type UseOrganizationEnterpriseConnectionTestRunsRevalidateResult = {
+  data: EnterpriseConnectionTestRunResource[] | undefined;
+  totalCount: number | undefined;
+};
+
 export type UseOrganizationEnterpriseConnectionTestRunsReturn = {
   data: EnterpriseConnectionTestRunResource[] | undefined;
   totalCount: number | undefined;
@@ -55,7 +67,7 @@ export type UseOrganizationEnterpriseConnectionTestRunsReturn = {
    */
   isPolling: boolean;
   /**
-   * Force a refetch.
+   * Force a refetch, resolving with the freshly-fetched page once it settles.
    *
    * By default this also arms polling when the list is currently empty, so a run
    * kicked off elsewhere is picked up as it lands. Pass `{ armPolling: false }`
@@ -64,7 +76,7 @@ export type UseOrganizationEnterpriseConnectionTestRunsReturn = {
    * `revalidate()` (or `revalidate({ armPolling: true })`) after a run is kicked
    * off.
    */
-  revalidate: (options?: RevalidateTestRunsOptions) => Promise<void>;
+  revalidate: (options?: RevalidateTestRunsOptions) => Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult>;
 };
 
 export type RevalidateTestRunsOptions = {
@@ -149,7 +161,7 @@ function useOrganizationEnterpriseConnectionTestRuns(
   }, [shouldPoll, hasRows]);
 
   const revalidate = useCallback(
-    async (options?: RevalidateTestRunsOptions) => {
+    async (options?: RevalidateTestRunsOptions): Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult> => {
       // Arm polling only when the caller opts in (the default) AND there is
       // nothing in the list yet. An entry/pagination refetch passes
       // `armPolling: false` so an empty list on entry never arms polling on its
@@ -159,9 +171,20 @@ function useOrganizationEnterpriseConnectionTestRuns(
       if (armPolling && !hasRows) {
         setShouldPoll(true);
       }
+      // `invalidateQueries` awaits the refetch it triggers, so by the time it
+      // resolves the cache already holds the fresh page. Read it back from the
+      // cache by the exact `queryKey` (not the broader `invalidationKey`) and
+      // resolve with it, so a caller can gate on the up-to-date result right
+      // after `await` — this hook's own `data` state is still the pre-refetch
+      // value inside the caller's closure until a re-render lands.
       await queryClient.invalidateQueries({ queryKey: invalidationKey });
+      const fresh = queryClient.getQueryData<{
+        data?: EnterpriseConnectionTestRunResource[];
+        total_count?: number;
+      }>(queryKey);
+      return { data: fresh?.data, totalCount: fresh?.total_count };
     },
-    [queryClient, invalidationKey, hasRows],
+    [queryClient, invalidationKey, queryKey, hasRows],
   );
 
   const isPolling = queryEnabled && shouldPoll && !hasRows;
