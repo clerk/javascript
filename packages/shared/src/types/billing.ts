@@ -974,8 +974,7 @@ export type GetCreditHistoryParams = {
  */
 export interface BillingCreditLedgerResource {
   id: string;
-  amount: number;
-  currency: string;
+  amount: BillingMoneyAmount;
   sourceType: string;
   sourceId: string;
   createdAt: Date;

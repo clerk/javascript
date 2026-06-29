@@ -942,8 +942,7 @@ export interface BillingCreditBalanceJSON {
 export interface BillingCreditLedgerJSON {
   object: 'commerce_credit_ledger';
   id: string;
-  amount: number;
-  currency: string;
+  amount: BillingMoneyAmountJSON;
   source_type: string;
   source_id: string;
   created_at: number;

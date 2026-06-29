@@ -1,14 +1,13 @@
-import type { BillingCreditLedgerJSON, BillingCreditLedgerResource } from '@clerk/shared/types';
+import type { BillingCreditLedgerJSON, BillingCreditLedgerResource, BillingMoneyAmount } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
+import { billingMoneyAmountFromJSON } from '@/utils/billing';
 
 import { BaseResource } from './internal';
 
 export class BillingCreditLedger extends BaseResource implements BillingCreditLedgerResource {
   id!: string;
-  payerId!: string;
-  amount!: number;
-  currency!: string;
+  amount!: BillingMoneyAmount;
   sourceType!: string;
   sourceId!: string;
   createdAt!: Date;
@@ -24,8 +23,7 @@ export class BillingCreditLedger extends BaseResource implements BillingCreditLe
     }
 
     this.id = data.id;
-    this.amount = data.amount;
-    this.currency = data.currency;
+    this.amount = billingMoneyAmountFromJSON(data.amount);
     this.sourceType = data.source_type;
     this.sourceId = data.source_id;
     this.createdAt = unixEpochToDate(data.created_at);

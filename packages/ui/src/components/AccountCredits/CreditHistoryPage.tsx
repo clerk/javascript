@@ -107,13 +107,11 @@ export const CreditHistoryPage = (): JSX.Element => {
                 <Td sx={t => ({ padding: t.space.$3 })}>
                   <Text
                     variant='subtitle'
-                    sx={{ color: entry.amount >= 0 ? undefined : 'inherit' }}
+                    sx={{ color: entry.amount.amount >= 0 ? undefined : 'inherit' }}
                   >
-                    {`${entry.amount >= 0 ? '+' : '-'}${$({
-                      amount: Math.abs(entry.amount),
-                      amountFormatted: '',
-                      currency: entry.currency,
-                      currencySymbol: '',
+                    {`${entry.amount.amount >= 0 ? '+' : '-'}${$({
+                      ...entry.amount,
+                      amount: Math.abs(entry.amount.amount),
                     })}`}
                   </Text>
                 </Td>
