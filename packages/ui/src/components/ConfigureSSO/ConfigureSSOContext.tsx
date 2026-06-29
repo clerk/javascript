@@ -25,6 +25,7 @@ export interface ConfigureSSOData {
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
+  onExit?: () => void;
 }
 
 interface ConfigureSSOProviderProps {
@@ -35,6 +36,7 @@ interface ConfigureSSOProviderProps {
   contentRef: React.RefObject<HTMLDivElement>;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
   organizationDomainMutations: OrganizationDomainMutations;
+  onExit?: () => void;
 }
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
@@ -48,6 +50,7 @@ export const ConfigureSSOProvider = ({
   contentRef,
   enterpriseConnectionMutations,
   organizationDomainMutations,
+  onExit,
   children,
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const value = React.useMemo<ConfigureSSOData>(
@@ -59,6 +62,7 @@ export const ConfigureSSOProvider = ({
       organizationDomains,
       enterpriseConnectionMutations,
       organizationDomainMutations,
+      onExit,
     }),
     [
       contentRef,
@@ -68,6 +72,7 @@ export const ConfigureSSOProvider = ({
       testRuns,
       organizationDomains,
       enterpriseConnection,
+      onExit,
     ],
   );
 

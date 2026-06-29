@@ -94,6 +94,7 @@ export const TestConfigurationStep = (): JSX.Element => {
             <Col gap={3}>
               <Text
                 as='p'
+                colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
               />
 

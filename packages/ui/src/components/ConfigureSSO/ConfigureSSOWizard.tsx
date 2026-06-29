@@ -6,48 +6,56 @@ import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
-import {
-  ConfigureStep,
-  ConfirmationStep,
-  OrganizationDomainsStep,
-  SelectProviderStep,
-  TestConfigurationStep,
-} from './steps';
+import { ActivateStep, ConfigureStep, OrganizationDomainsStep, TestConfigurationStep } from './steps';
 
-export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'>;
+export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
+  title?: React.ReactNode;
+  forceInitialStep?: boolean;
+};
 
-/** Pure, data-injected ConfigureSSO flow — hosts own fetching, loading, and permission gating. */
-export const ConfigureSSOWizard = (props: ConfigureSSOWizardProps): JSX.Element => {
+export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
   const { organizationEnterpriseConnection: c, organizationDomains } = props;
 
   const allDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'verify-domain', label: 'Verify domain' },
-      { id: 'select-provider', guard: () => allDomainsVerified },
-      { id: 'configure', label: 'Configure', guard: () => c.hasConnection },
-      { id: 'test', label: 'Test', guard: () => c.hasMinimumConfiguration || c.isActive },
-      { id: 'confirmation', label: 'Confirmation', guard: () => c.hasSuccessfulTestRun || c.isActive },
+      { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
+      {
+        id: 'configure',
+        label: 'Connection',
+        isReachable: () => allDomainsVerified || c.hasConnection,
+        isComplete: () => c.hasMinimumConfiguration || c.isActive,
+      },
+      {
+        id: 'test',
+        label: 'Test',
+        isReachable: () => c.hasMinimumConfiguration || c.isActive,
+        isComplete: () => c.hasSuccessfulTestRun || c.isActive,
+      },
+      {
+        id: 'activate',
+        label: 'Activate',
+        isReachable: () => c.hasSuccessfulTestRun || c.isActive,
+        isComplete: () => c.isActive,
+      },
     ],
     [c, allDomainsVerified],
   );
 
-  // Each step owns a `CardStateProvider` so card errors stay scoped to their step and clear when it unmounts.
+  const initialStepId = forceInitialStep ? steps[0].id : undefined;
+
   return (
     <ConfigureSSOProvider {...props}>
-      <Wizard steps={steps}>
-        <ConfigureSSOHeader />
+      <Wizard
+        steps={steps}
+        initialStepId={initialStepId}
+      >
+        <ConfigureSSOHeader title={title} />
 
         <Wizard.Match id='verify-domain'>
           <CardStateProvider>
             <OrganizationDomainsStep />
-          </CardStateProvider>
-        </Wizard.Match>
-
-        <Wizard.Match id='select-provider'>
-          <CardStateProvider>
-            <SelectProviderStep />
           </CardStateProvider>
         </Wizard.Match>
 
@@ -63,9 +71,9 @@ export const ConfigureSSOWizard = (props: ConfigureSSOWizardProps): JSX.Element 
           </CardStateProvider>
         </Wizard.Match>
 
-        <Wizard.Match id='confirmation'>
+        <Wizard.Match id='activate'>
           <CardStateProvider>
-            <ConfirmationStep />
+            <ActivateStep />
           </CardStateProvider>
         </Wizard.Match>
       </Wizard>

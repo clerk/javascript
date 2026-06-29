@@ -684,6 +684,7 @@ export type ElementsConfig = {
   enterpriseConnectionButtonText: WithOptions;
 
   configureSSOHeader: WithOptions;
+  configureSSOHeaderBackButton: WithOptions;
   configureSSOMobileNavbar: WithOptions;
   configureSSOStepper: WithOptions;
   configureSSOStepperItem: WithOptions<string, ActiveState>;
@@ -716,11 +717,12 @@ export type ElementsConfig = {
   configureSSOVerifyDomainErrorSubtitle: WithOptions;
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
-  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified'>;
+  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
+  configureSSOVerifyDomainCardExpired: WithOptions;
   configureSSOEmailVerificationForm: WithOptions<string>;
   configureSSOEmailVerificationIcon: WithOptions<string>;
   configureSSOEmailVerificationTitle: WithOptions<string>;
@@ -752,19 +754,25 @@ export type ElementsConfig = {
   configureSSOTestRunParsedUserInfo: WithOptions;
   configureSSOTestError: WithOptions;
 
-  configureSSOConfirmationStatusBadge: WithOptions<string>;
-  configureSSOConfirmationDomainLink: WithOptions;
-  configureSSOConfirmationConfigDetailsLabel: WithOptions;
-  configureSSOConfirmationConfigDetailsValue: WithOptions;
-  configureSSOConfirmationConfigDetailsLink: WithOptions;
-  configureSSOConfirmationInactiveBanner: WithOptions;
-  configureSSOConfirmationReconfigureButton: WithOptions;
-  configureSSOConfirmationResetButton: WithOptions;
+  configureSSOActivate: WithOptions;
+  configureSSOActivateIcon: WithOptions;
+  configureSSOActivateTitle: WithOptions;
+  configureSSOActivateSubtitle: WithOptions;
+  configureSSOActivateButton: WithOptions;
+  configureSSOActivateSkipButton: WithOptions;
 
   configureSSOResetConnectionDialog: WithOptions;
   configureSSOResetConnectionDialogCancelButton: WithOptions;
   configureSSOResetConnectionDialogConfirmationInput: WithOptions;
   configureSSOResetConnectionDialogSubmitButton: WithOptions;
+
+  configureSSOChangeProviderDialog: WithOptions;
+  configureSSOChangeProviderDialogCancelButton: WithOptions;
+  configureSSOChangeProviderDialogConfirmButton: WithOptions;
+
+  configureSSORemoveDomainDialog: WithOptions;
+  configureSSORemoveDomainDialogCancelButton: WithOptions;
+  configureSSORemoveDomainDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;

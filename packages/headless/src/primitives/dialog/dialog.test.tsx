@@ -223,7 +223,12 @@ describe('Dialog', () => {
       const user = userEvent.setup();
       render(
         <>
-          <button onClick={onBackgroundClick}>Background button</button>
+          <button
+            type='button'
+            onClick={onBackgroundClick}
+          >
+            Background button
+          </button>
           <Dialog.Root modal={false}>
             <Dialog.Trigger>Open dialog</Dialog.Trigger>
             <Dialog.Backdrop />

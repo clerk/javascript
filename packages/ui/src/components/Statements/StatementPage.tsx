@@ -24,7 +24,7 @@ export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const { t, translateError } = useLocalizations();
+  const { t, translateError, $ } = useLocalizations();
   const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
@@ -98,8 +98,8 @@ export const StatementPage = () => {
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}
-                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
-                        secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
+                        description={`${item.subscriptionItem.amount ? $(item.subscriptionItem.amount) : ''} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
+                        secondaryTitle={$(item.amount)}
                       />
                       <Statement.SectionContentDetailsList>
                         <Statement.SectionContentDetailsListItem
@@ -143,7 +143,7 @@ export const StatementPage = () => {
                         {item.totals?.discounts?.proration && item.totals.discounts.proration.amount.amount > 0 ? (
                           <Statement.SectionContentDetailsListItem
                             label={localizationKeys('billing.proratedDiscount')}
-                            value={`(${item.totals.discounts.proration.amount.currencySymbol}${item.totals.discounts.proration.amount.amountFormatted})`}
+                            value={`(${$(item.totals.discounts.proration.amount)})`}
                           />
                         ) : null}
                         {item.subscriptionItem.credits &&
@@ -153,7 +153,7 @@ export const StatementPage = () => {
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__proratedCredit`,
                             )}
-                            value={`(${item.subscriptionItem.credits.proration.amount.currencySymbol}${item.subscriptionItem.credits.proration.amount.amountFormatted})`}
+                            value={`(${$(item.subscriptionItem.credits.proration.amount)})`}
                           />
                         ) : null}
                         {item.subscriptionItem.credits &&
@@ -163,7 +163,7 @@ export const StatementPage = () => {
                             label={localizationKeys(
                               `${localizationRoot}.billingPage.statementsSection.itemCaption__payerCredit`,
                             )}
-                            value={`(${item.subscriptionItem.credits.payer.appliedAmount.currencySymbol}${item.subscriptionItem.credits.payer.appliedAmount.amountFormatted})`}
+                            value={`(${$(item.subscriptionItem.credits.payer.appliedAmount)})`}
                           />
                         ) : null}
                       </Statement.SectionContentDetailsList>
@@ -175,7 +175,7 @@ export const StatementPage = () => {
           </Statement.Body>
           <Statement.Footer
             label={localizationKeys(`${localizationRoot}.billingPage.statementsSection.totalPaid`)}
-            value={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
+            value={$(statement.totals.grandTotal)}
           />
         </Statement.Root>
       )}

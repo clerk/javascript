@@ -71,6 +71,31 @@ describe('ConfigureSSO', () => {
     });
   });
 
+  describe('standalone mount header', () => {
+    it('renders the stepper without a back control (no host title / onExit)', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [verifiedDomain]);
+
+      const { findByText, queryByRole } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText(/select your identity provider/i);
+
+      // The standalone wizard is mounted without `title`/`onExit`, so the header
+      // exposes no "Security" back control.
+      expect(queryByRole('button', { name: 'Security' })).not.toBeInTheDocument();
+    });
+  });
+
   describe('in a personal workspace', () => {
     it('renders the wizard without checking the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -133,7 +158,7 @@ describe('ConfigureSSO', () => {
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
-    it('short-circuits to the confirmation step for an active connection', async () => {
+    it('short-circuits to the activate step for an active connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
@@ -152,7 +177,7 @@ describe('ConfigureSSO', () => {
           active: true,
           // Owned by the active organization (matches the membership above), so
           // the domain is not "taken by another org" and the machine can
-          // short-circuit to confirmation.
+          // short-circuit to activate.
           organizationId: 'Org1',
           domains: ['clerk.com'],
           samlConnection: {
@@ -170,8 +195,8 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      // An active connection lands on confirmation even if never tested.
-      await findByText(/configuration/i);
+      // An active connection lands on the activate-step's already-active variant.
+      await findByText(/sso connection is active/i);
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
@@ -204,7 +229,7 @@ describe('ConfigureSSO', () => {
         } as any,
       ]);
       mockOrganizationDomains(fixtures, [verifiedDomain]);
-      // No successful run yet, so the confirmation guard fails and the
+      // No successful run yet, so the activate guard fails and the
       // furthest-reachable step is `test`.
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
         data: [],
@@ -214,12 +239,12 @@ describe('ConfigureSSO', () => {
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
       // Configured + inactive + no successful run ⇒ lands on the test step, not
-      // confirmation.
+      // activate.
       await findByText(/test your sso connection/i);
-      expect(queryByText(/configuration details/i)).not.toBeInTheDocument();
+      expect(queryByText(/sso connection configured/i)).not.toBeInTheDocument();
     });
 
-    it('mounts on confirmation for a configured-but-inactive connection that has a successful test run', async () => {
+    it('mounts on activate for a configured-but-inactive connection that has a successful test run', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
@@ -247,10 +272,10 @@ describe('ConfigureSSO', () => {
         } as any,
       ]);
       mockOrganizationDomains(fixtures, [verifiedDomain]);
-      // A successful run satisfies the confirmation guard (`hasSuccessfulTestRun`)
+      // A successful run satisfies the activate guard (`hasSuccessfulTestRun`)
       // even though the connection is still inactive — the success-filtered probe
       // returns a row, so the furthest-reachable step clears `test` and lands on
-      // confirmation. Distinct from the active short-circuit above (here
+      // activate. Distinct from the active short-circuit above (here
       // `active: false`, so it is the test run — not activation — that carries the
       // wizard past the test step).
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
@@ -260,9 +285,8 @@ describe('ConfigureSSO', () => {
 
       const { findByText, queryByText } = render(<ConfigureSSO />, { wrapper });
 
-      // Lands on confirmation (the inactive badge + configuration details render),
-      // not the test step.
-      await findByText(/configuration details/i);
+      // Lands on the activate step (not-active variant: "SSO connection configured" renders).
+      await findByText(/sso connection configured/i);
       expect(queryByText(/test your sso connection/i)).not.toBeInTheDocument();
     });
   });

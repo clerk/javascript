@@ -7,4 +7,9 @@ A controlled block that composes a trigger button, a confirmation dialog, and a 
 <Story
   name='Default'
   storyModule={DestructiveStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  ]}
 />

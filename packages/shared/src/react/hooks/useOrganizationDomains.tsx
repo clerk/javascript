@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { logger } from '../../logger';
 import type { GetDomainsParams } from '../../types/organization';
@@ -24,6 +24,11 @@ export type UseOrganizationDomainsParams = {
    * Filter the returned domains by enrollment mode.
    */
   enrollmentMode?: OrganizationEnrollmentMode;
+  /**
+   * Invoked from the ownership-verification poll whenever an `attempt` resolves
+   * one or more domains as `verified`.
+   */
+  onOwnershipVerified?: (verifiedDomains: OrganizationDomainResource[]) => void | Promise<void>;
 };
 
 export type UseOrganizationDomainsReturn = {
@@ -59,10 +64,13 @@ export type UseOrganizationDomainsReturn = {
  * @internal
  */
 function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseOrganizationDomainsReturn {
-  const { keepPreviousData = true, enabled = true, enrollmentMode } = params;
+  const { keepPreviousData = true, enabled = true, enrollmentMode, onOwnershipVerified } = params;
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
+
+  const onOwnershipVerifiedRef = useRef(onOwnershipVerified);
+  onOwnershipVerifiedRef.current = onOwnershipVerified;
 
   const { queryKey, stableKey, authenticated } = useOrganizationDomainsCacheKeys({
     organizationId: organization?.id ?? null,
@@ -129,10 +137,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   const unverifiedOwnershipDomainIds = useMemo(
     () =>
       (response?.data ?? [])
-        .filter(
-          (domain: OrganizationDomainResource) =>
-            domain.ownershipVerification && domain.ownershipVerification.status !== 'verified',
-        )
+        .filter((domain: OrganizationDomainResource) => domain.ownershipVerification?.status === 'unverified')
         .map((domain: OrganizationDomainResource) => domain.id),
     [response?.data],
   );
@@ -167,6 +172,14 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       // Refetch the domains list after every attempt so the UI reflects the
       // latest ownership status
       await revalidate();
+      if (cancelled) {
+        return;
+      }
+
+      const verifiedDomains = result?.data.filter(domain => domain.ownershipVerification?.status === 'verified') ?? [];
+      if (verifiedDomains.length) {
+        await onOwnershipVerifiedRef.current?.(verifiedDomains);
+      }
       if (cancelled) {
         return;
       }

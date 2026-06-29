@@ -257,6 +257,11 @@ export interface Clerk {
   version: string | undefined;
 
   /**
+   * The version of `@clerk/ui` that is currently loaded, or `undefined` if the prebuilt UI has not been loaded yet.
+   */
+  uiVersion: string | undefined;
+
+  /**
    * If present, contains information about the SDK that the host application is using.
    * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
@@ -282,6 +287,16 @@ export interface Clerk {
    * @internal
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+
+  /**
+   * @internal
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (static defaults ∪ the customer extension).
+   * Disallowed protocols and scheme-relative inputs (`//host`) are rejected with a console warning.
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
+   */
+  __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
 
   frontendApi: string;
 
