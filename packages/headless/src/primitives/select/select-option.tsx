@@ -14,7 +14,7 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 
 export function SelectOption(props: SelectOptionProps) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const { activeIndex, selectedValue, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
+  const { activeIndex, selectedValue, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
     useSelectContext();
 
   const displayLabel = label ?? value;
@@ -30,6 +30,12 @@ export function SelectOption(props: SelectOptionProps) {
       map.delete(value);
     };
   }, [value, displayLabel, valueToLabelRef]);
+
+  useEffect(() => {
+    if (isSelected) {
+      setSelectedIndex(index);
+    }
+  }, [index, isSelected, setSelectedIndex]);
 
   const combinedRef = useMergeRefs([itemRef, isSelected ? selectedItemRef : null]);
 

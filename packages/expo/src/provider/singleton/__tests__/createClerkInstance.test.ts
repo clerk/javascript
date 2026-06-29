@@ -15,10 +15,6 @@ vi.mock('react-native', () => {
     Platform: {
       OS: 'ios',
     },
-    NativeModules: {},
-    TurboModuleRegistry: {
-      get: vi.fn(),
-    },
   };
 });
 

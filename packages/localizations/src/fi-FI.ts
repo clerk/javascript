@@ -680,8 +680,8 @@ export const fiFI: LocalizationResource = {
         messageLabel: 'Sähköpostisi käyttää osoitetta {{domain}}. Haluatko lisätä sen?',
       },
       formButtonPrimary__add: 'Lisää',
-      formFieldInputPlaceholder__domain: 'Kirjoita verkkotunnuksesi tähän ja aloita napsauttamalla Lisää',
-      formFieldLabel__domain: 'Verkkotunnukset',
+      formFieldInputPlaceholder__domain: 'Lisää verkkotunnus',
+      formFieldLabel__domain: 'Verkkotunnus',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

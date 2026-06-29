@@ -674,8 +674,8 @@ export const trTR: LocalizationResource = {
         messageLabel: 'E-postanız {{domain}} kullanıyor. Eklemek ister misiniz?',
       },
       formButtonPrimary__add: 'Ekle',
-      formFieldInputPlaceholder__domain: 'Alan adınızı buraya yazın ve başlamak için Ekle düğmesine tıklayın',
-      formFieldLabel__domain: 'Alan adları',
+      formFieldInputPlaceholder__domain: 'Alan adı ekle',
+      formFieldLabel__domain: 'Alan adı',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

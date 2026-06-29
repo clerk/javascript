@@ -674,7 +674,7 @@ export const mnMN: LocalizationResource = {
         messageLabel: 'Таны имэйл {{domain}}-г ашиглаж байна. Үүнийг нэмэх үү?',
       },
       formButtonPrimary__add: 'Нэмэх',
-      formFieldInputPlaceholder__domain: 'Домэйнээ энд бичээд эхлэхийн тулд нэмэх дээр дарна уу',
+      formFieldInputPlaceholder__domain: 'Домэйн нэмэх',
       formFieldLabel__domain: 'Домэйн',
       removeDomainDialog: {
         cancelButton: undefined,

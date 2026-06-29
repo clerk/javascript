@@ -674,9 +674,8 @@ export const elGR: LocalizationResource = {
         messageLabel: 'Το email σας χρησιμοποιεί {{domain}}. Θέλετε να το προσθέσετε;',
       },
       formButtonPrimary__add: 'Προσθήκη',
-      formFieldInputPlaceholder__domain:
-        'Πληκτρολογήστε τον τομέα σας εδώ και κάντε κλικ στο «Προσθήκη» για να ξεκινήσετε',
-      formFieldLabel__domain: 'Τομείς',
+      formFieldInputPlaceholder__domain: 'Προσθήκη τομέα',
+      formFieldLabel__domain: 'Τομέας',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

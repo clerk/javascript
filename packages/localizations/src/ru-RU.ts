@@ -674,8 +674,8 @@ export const ruRU: LocalizationResource = {
         messageLabel: 'Ваша электронная почта использует {{domain}}. Хотите добавить его?',
       },
       formButtonPrimary__add: 'Добавить',
-      formFieldInputPlaceholder__domain: 'Введите домен здесь и нажмите «Добавить», чтобы начать',
-      formFieldLabel__domain: 'Домены',
+      formFieldInputPlaceholder__domain: 'Добавить домен',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,

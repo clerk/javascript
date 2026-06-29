@@ -288,6 +288,16 @@ export interface Clerk {
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
+  /**
+   * @internal
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (static defaults ∪ the customer extension).
+   * Disallowed protocols and scheme-relative inputs (`//host`) are rejected with a console warning.
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
+   */
+  __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
