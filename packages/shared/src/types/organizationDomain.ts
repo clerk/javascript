@@ -226,9 +226,7 @@ export type CreateOrganizationDomainParams = {
   enrollmentMode?: OrganizationEnrollmentMode;
 };
 
-/**
- * The `OrganizationDomainBulkOwnershipVerificationError` object is a single [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains) that could not be processed during a bulk ownership verification flow. A failed domain is reported here instead of causing the entire batch to fail.
- */
+/** @inline */
 export interface OrganizationDomainBulkOwnershipVerificationError {
   /**
    * The unique identifier of the domain that could not be processed.

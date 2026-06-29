@@ -671,15 +671,25 @@ function renderPropertiesFormatTable(args) {
 }
 
 /**
- * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at, or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType` and a union arm — covers `T | null` / `T | undefined`. Used to decide whether to expand nested rows for a property whose type is rendered inline as `\{ … \}`.
+ * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at, or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType`, `ArrayType`, and a union arm — covers `T | null` / `T | undefined` / `T[]`. Used to decide whether to expand nested rows for a property whose type is rendered inline as `\{ … \}`.
  *
- * Union-arm reflection: when TypeDoc has already inlined a `@inline` reference inside a union (`PublicOrganizationDataJSON | null` → `ReflectionType | null`), the arm shows up as a `ReflectionType` carrying the synthesized `TypeLiteral` declaration. Match those too so the children expand the same way a bare `ReferenceType` arm would. Direct (non-union) `ReflectionType` is not handled here — typedoc-plugin-markdown's `getFlattenedDeclarations` already flattens that case in `propertiesTable`, and double-handling would produce duplicate child rows.
+ * Union-arm reflection: when TypeDoc has already inlined a `@inline` reference inside a union (`PublicOrganizationDataJSON | null` → `ReflectionType | null`), the arm shows up as a `ReflectionType` carrying the synthesized `TypeLiteral` declaration. Match those too so the children expand the same way a bare `ReferenceType` arm would.
+ *
+ * Array element: `errors: Foo[]` where `Foo` is `@inline` should expand the same as `errors: Foo` — readers want to see the element shape per row. Unwrap `ArrayType.elementType` (which, like the union arm, may have already been collapsed by TypeDoc to a `ReflectionType`) before the reference/reflection checks.
+ *
+ * Direct (non-array, non-union) `ReflectionType` is intentionally NOT handled here — typedoc-plugin-markdown's `getFlattenedDeclarations` already flattens that case in `propertiesTable`, and double-handling would produce duplicate child rows. The flag `viaContainer` records whether we passed through an array/union (where `getFlattenedDeclarations` does NOT walk further), so the final `ReflectionType` check only fires in that case.
  *
  * @param {import('typedoc').Type | undefined} t
  */
 function getInlineClassOrInterfaceTarget(t) {
   let bare = /** @type {import('typedoc').Type | undefined} */ (unwrapOptional(t));
+  let viaContainer = false;
+  if (bare?.type === 'array') {
+    bare = /** @type {import('typedoc').ArrayType} */ (bare).elementType;
+    viaContainer = true;
+  }
   if (bare && bare.type === 'union') {
+    viaContainer = true;
     const u = /** @type {import('typedoc').UnionType} */ (bare);
     bare = u.types.find(arm => {
       if (arm.type === 'reference') {
@@ -696,9 +706,11 @@ function getInlineClassOrInterfaceTarget(t) {
       }
       return false;
     });
-    if (bare?.type === 'reflection') {
-      return /** @type {import('typedoc').ReflectionType} */ (bare).declaration;
-    }
+  }
+  if (viaContainer && bare?.type === 'reflection') {
+    const d = /** @type {import('typedoc').ReflectionType} */ (bare).declaration;
+    if (!d?.children?.some(c => c.kindOf(ReflectionKind.Property))) return undefined;
+    return d;
   }
   if (!bare || bare.type !== 'reference') return undefined;
   const decl = /** @type {import('typedoc').ReferenceType} */ (bare).reflection;
