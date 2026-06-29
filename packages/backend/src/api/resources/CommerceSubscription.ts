@@ -10,45 +10,30 @@ import type { BillingSubscriptionJSON } from './JSON';
  */
 export class BillingSubscription {
   constructor(
-    /**
-     * The unique identifier for the Subscription.
-     */
+    /** The unique identifier for the Subscription. */
     readonly id: string,
-    /**
-     * The current status of the Subscription.
-     */
+    /** The current status of the Subscription. */
     readonly status: BillingSubscriptionJSON['status'],
-    /**
-     * The ID of the payer for this Subscription.
-     */
+    /** The ID of the payer for this Subscription. */
     readonly payerId: string,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription was created.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription was created. */
     readonly createdAt: number,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription was last updated.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription was last updated. */
     readonly updatedAt: number,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription became active.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription became active. */
     readonly activeAt: number | null,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription became past due.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription became past due. */
     readonly pastDueAt: number | null,
-    /**
-     * All of the Subscription Items in this Subscription.
-     */
+    /** All of the Subscription Items in this Subscription. */
     readonly subscriptionItems: BillingSubscriptionItem[],
-    /**
-     * Information about the next scheduled payment for this Subscription. If present, contains the amount of the next payment and the Unix timestamp (milliseconds) of when the next payment is scheduled.
-     */
-    readonly nextPayment: { date: number; amount: BillingMoneyAmount } | null,
-    /**
-     * Whether the payer is eligible for a free trial.
-     */
+    /** Information about the next scheduled payment for this Subscription. */
+    readonly nextPayment: {
+      /** The Unix timestamp (milliseconds) of when the next payment is scheduled. */
+      date: number;
+      /** The amount of the next payment. */
+      amount: BillingMoneyAmount;
+    } | null,
+    /** Whether the payer is eligible for a free trial. */
     readonly eligibleForFreeTrial: boolean,
   ) {}
 

@@ -102,6 +102,7 @@ const LINK_REPLACEMENTS = [
   ['confirm-checkout-params', '/docs/reference/types/billing-checkout-resource#parameters'],
   ['billing-payment-method-resource', '/docs/reference/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/types/billing-payer-resource'],
+  ['billing-plan-price', '/docs/reference/types/billing-plan-price'],
   ['billing-plan-resource', '/docs/reference/types/billing-plan-resource'],
   ['billing-plan-unit-price', '/docs/reference/types/billing-plan-unit-price'],
   ['billing-plan-unit-price-tier', '/docs/reference/types/billing-plan-unit-price-tier'],
@@ -218,6 +219,10 @@ function getCatchAllReplacements() {
     {
       pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
       replace: '[LocalizationResource](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?Machine`?(?![\]\w`])/g,
+      replace: '[Machine](/docs/reference/backend/types/backend-machine)',
     },
     {
       pattern: /(?<![\[\w`#])`?PasskeyResource`?(?![\]\w`])/g,

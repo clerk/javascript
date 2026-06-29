@@ -13,41 +13,23 @@ export class OrganizationMembership {
   }
 
   constructor(
-    /**
-     * The unique identifier for the membership.
-     */
+    /** The unique identifier for the membership. */
     readonly id: string,
-    /**
-     * The Role of the user.
-     */
+    /** The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) of the user. */
     readonly role: OrganizationMembershipRole,
-    /**
-     * The Permissions granted to the user in the Organization.
-     */
+    /** The [Permissions](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) granted to the user in the Organization. */
     readonly permissions: string[],
-    /**
-     * Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API.
-     */
+    /** Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API. */
     readonly publicMetadata: OrganizationMembershipPublicMetadata = {},
-    /**
-     * Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}.
-     */
+    /** Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}. */
     readonly privateMetadata: OrganizationMembershipPrivateMetadata = {},
-    /**
-     * The date when the membership was first created.
-     */
+    /** The Unix timestamp when the membership was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the membership was last updated.
-     */
+    /** The Unix timestamp when the membership was last updated. */
     readonly updatedAt: number,
-    /**
-     * The Organization that the user is a member of.
-     */
+    /** The Organization that the user is a member of. */
     readonly organization: Organization,
-    /**
-     * Public information about the user that this membership belongs to.
-     */
+    /** Public information about the user that this membership belongs to. */
     readonly publicUserData?: OrganizationMembershipPublicUserData | null,
   ) {}
 

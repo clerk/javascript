@@ -10,69 +10,37 @@ import type { BillingPlanJSON } from './JSON';
  */
 export class BillingPlan {
   constructor(
-    /**
-     * The unique identifier for the Plan.
-     */
+    /** The unique identifier for the Plan. */
     readonly id: string,
-    /**
-     * The name of the Plan.
-     */
+    /** The name of the Plan. */
     readonly name: string,
-    /**
-     * The URL-friendly identifier of the Plan.
-     */
+    /** The URL-friendly identifier of the Plan. */
     readonly slug: string,
-    /**
-     * The description of the Plan.
-     */
+    /** The description of the Plan. */
     readonly description: string | null,
-    /**
-     * Whether the Plan is the default Plan.
-     */
+    /** Whether the Plan is the default Plan. */
     readonly isDefault: boolean,
-    /**
-     * Whether the Plan is recurring.
-     */
+    /** Whether the Plan is recurring. */
     readonly isRecurring: boolean,
-    /**
-     * Whether the Plan has a base fee.
-     */
+    /** Whether the Plan has a base fee. */
     readonly hasBaseFee: boolean,
-    /**
-     * Whether the Plan is displayed in the `<PriceTable/>` component.
-     */
+    /** Whether the Plan is displayed in the [`<PricingTable />`](https://clerk.com/docs/nextjs/reference/components/billing/pricing-table) component. */
     readonly publiclyVisible: boolean,
-    /**
-     * The monthly fee of the Plan.
-     */
+    /** The monthly fee of the Plan. */
     readonly fee: BillingMoneyAmount | null,
-    /**
-     * The annual fee of the Plan.
-     */
+    /** The annual fee of the Plan. */
     readonly annualFee: BillingMoneyAmount | null,
-    /**
-     * The annual fee of the Plan on a monthly basis.
-     */
+    /** The annual fee of the Plan on a monthly basis. */
     readonly annualMonthlyFee: BillingMoneyAmount | null,
-    /**
-     * The type of payer for the Plan.
-     */
+    /** The type of payer for the Plan. */
     readonly forPayerType: 'org' | 'user',
-    /**
-     * The [Features](https://clerk.com/docs/reference/backend/types/feature) the Plan offers.
-     */
+    /** The [Features](https://clerk.com/docs/reference/backend/types/feature) the Plan offers. */
     readonly features: Feature[],
-    /**
-     * The URL of the Plan's avatar image.
-     */
+    /** The URL of the Plan's avatar image. */
     readonly avatarUrl: string | null,
-    /**
-     * Number of free trial days for this plan.
-     */
+    /** The number of free trial days for this plan. */
     readonly freeTrialDays: number | null,
-    /**
-     * Whether free trial is enabled for this plan.
-     */
+    /** Whether free trial is enabled for this plan. */
     readonly freeTrialEnabled: boolean,
   ) {}
 

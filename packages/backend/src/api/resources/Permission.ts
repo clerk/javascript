@@ -5,29 +5,17 @@ import type { PermissionJSON } from './JSON';
  */
 export class Permission {
   constructor(
-    /**
-     * The unique identifier for the permission.
-     */
+    /** The unique identifier for the permission. */
     readonly id: string,
-    /**
-     * The name of the permission.
-     */
+    /** The name of the permission. */
     readonly name: string,
-    /**
-     * The unique key of the permission, in the format `org:feature:action`.
-     */
+    /** The unique key of the permission, in the format `org:feature:action`. */
     readonly key: string,
-    /**
-     * A description of the permission.
-     */
+    /** A description of the permission. */
     readonly description: string,
-    /**
-     * The date when the permission was first created.
-     */
+    /** The Unix timestamp when the permission was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the permission was last updated.
-     */
+    /** The Unix timestamp when the permission was last updated. */
     readonly updatedAt: number,
   ) {}
 

@@ -7,9 +7,7 @@ The Backend `RedirectUrl` object represents a redirect URL in your application. 
  */
 export class RedirectUrl {
   constructor(
-    /**
-     * The unique identifier for the redirect URL.
-     */
+    /** The unique identifier for the redirect URL. */
     readonly id: string,
     /**
      * The full URL value prefixed with `https://` or a custom scheme.
@@ -17,13 +15,9 @@ export class RedirectUrl {
      * @example my-app://oauth-callback
      */
     readonly url: string,
-    /**
-     * The date when the redirect URL was first created.
-     */
+    /** The Unix timestamp when the redirect URL was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the redirect URL was last updated.
-     */
+    /** The Unix timestamp when the redirect URL was last updated. */
     readonly updatedAt: number,
   ) {}
 

@@ -7,32 +7,20 @@ import type { AllowlistIdentifierJSON } from './JSON';
 export class AllowlistIdentifier {
   constructor(
     /**
-     * A unique ID for the allowlist identifier.
+     * The unique identifier for the allowlist identifier.
      */
     readonly id: string,
-    /**
-     * The identifier that was added to the allowlist.
-     */
+    /** The identifier that was added to the allowlist. */
     readonly identifier: string,
-    /**
-     * The type of the allowlist identifier.
-     */
+    /** The type of the allowlist identifier. */
     readonly identifierType: AllowlistIdentifierType,
-    /**
-     * The date when the allowlist identifier was first created.
-     */
+    /** The Unix timestamp when the allowlist identifier was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the allowlist identifier was last updated.
-     */
+    /** The Unix timestamp when the allowlist identifier was last updated. */
     readonly updatedAt: number,
-    /**
-     * The ID of the instance that this allowlist identifier belongs to.
-     */
+    /** The ID of the instance that this allowlist identifier belongs to. */
     readonly instanceId?: string,
-    /**
-     * The ID of the invitation sent to the identifier.
-     */
+    /** The ID of the invitation sent to the identifier. */
     readonly invitationId?: string,
   ) {}
 

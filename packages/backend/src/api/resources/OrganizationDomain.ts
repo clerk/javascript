@@ -27,9 +27,9 @@ export class OrganizationDomain {
     readonly totalPendingInvitations: number,
     /** The total number of pending suggestions for the domain. */
     readonly totalPendingSuggestions: number,
-    /** The date when the domain was created. */
+    /** The Unix timestamp when the domain was created. */
     readonly createdAt: number,
-    /** The date when the domain was last updated. */
+    /** The Unix timestamp when the domain was last updated. */
     readonly updatedAt: number,
     /** The email address used to verify the domain. */
     readonly affiliationEmailAddress: string | null,

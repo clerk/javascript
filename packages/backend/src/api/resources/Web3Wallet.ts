@@ -8,17 +8,11 @@ import { Verification } from './Verification';
  */
 export class Web3Wallet {
   constructor(
-    /**
-     * The unique ID for the Web3 wallet.
-     */
+    /** The unique ID for the Web3 wallet. */
     readonly id: string,
-    /**
-     * The Web3 wallet address, made up of 0x + 40 hexadecimal characters.
-     */
+    /** The Web3 wallet address, made up of 0x + 40 hexadecimal characters. */
     readonly web3Wallet: string,
-    /**
-     * An object holding information on the verification of this Web3 wallet.
-     */
+    /** An object holding information on the verification of this Web3 wallet. */
     readonly verification: Verification | null,
   ) {}
 

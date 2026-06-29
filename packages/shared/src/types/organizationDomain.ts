@@ -1,7 +1,7 @@
 import type { ClerkResource } from './resource';
 
 /**
- * Holds the verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains).
+ * The `OrganizationDomainVerification` object holds the affiliation verification details of an Organization's [Verified Domain](/docs/guides/organizations/add-members/verified-domains). Affiliation proves that the current user controls an email address that belongs to the domain.
  */
 export interface OrganizationDomainVerification {
   /**
@@ -222,20 +222,13 @@ export interface OrganizationDomainBulkOwnershipVerificationError {
 }
 
 /**
- * The partial-success result of a bulk ownership verification flow
- * (`prepareOwnershipVerification`/`attemptOwnershipVerification`). Each
- * requested domain lands in either `data` (with its current ownership state)
- * or `errors`.
+ * The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](/docs/reference/types/organization-resource#prepare-ownership-verification) or [`attemptOwnershipVerification()`](/docs/reference/types/organization-resource#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
  */
 export interface OrganizationDomainsBulkOwnershipVerificationResource {
   /**
-   * The Verified Domains that were processed successfully. After
-   * `prepareOwnershipVerification`, each domain's `ownershipVerification`
-   * carries the `txtRecordName` and `txtRecordValue` to publish.
+   * The Verified Domains that were processed successfully. After [`prepareOwnershipVerification()`](/docs/reference/types/organization-resource#prepare-ownership-verification), each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` to publish.
    */
   data: OrganizationDomainResource[];
-  /**
-   * The per-domain failures that were skipped without failing the whole batch.
-   */
+  /** The domains that could not be processed. Each entry identifies the domain and the reason it was skipped, while the remaining domains in the batch are still processed. */
   errors: OrganizationDomainBulkOwnershipVerificationError[];
 }

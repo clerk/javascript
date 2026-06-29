@@ -2,93 +2,51 @@ import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
  * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
- * @deprecated Use `EnterpriseConnection` instead.
+ * @deprecated Use [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) instead.
  */
 export class SamlConnection {
   constructor(
-    /**
-     * The unique identifier for the connection.
-     */
+    /** The unique identifier for the connection. */
     readonly id: string,
-    /**
-     * The name to use as a label for the connection.
-     */
+    /** The name to use as a label for the connection. */
     readonly name: string,
-    /**
-     * The domain of your Organization. Sign in flows using an email with this domain will use the connection.
-     */
+    /** The domain of your Organization. Sign in flows using an email with this domain will use the connection. */
     readonly domain: string,
-    /**
-     * The Organization ID of the Organization.
-     */
+    /** The Organization ID of the Organization. */
     readonly organizationId: string | null,
-    /**
-     * The Entity ID as provided by the Identity Provider (IdP).
-     */
+    /** The Entity ID as provided by the Identity Provider (IdP). */
     readonly idpEntityId: string | null,
-    /**
-     * The Single-Sign On URL as provided by the Identity Provider (IdP).
-     */
+    /** The Single-Sign On URL as provided by the Identity Provider (IdP). */
     readonly idpSsoUrl: string | null,
-    /**
-     * The X.509 certificate as provided by the Identity Provider (IdP).
-     */
+    /** The X.509 certificate as provided by the Identity Provider (IdP). */
     readonly idpCertificate: string | null,
-    /**
-     * The URL which serves the Identity Provider (IdP) metadata. If present, it takes priority over the corresponding individual properties.
-     */
+    /** The URL which serves the Identity Provider (IdP) metadata. If present, it takes priority over the corresponding individual properties. */
     readonly idpMetadataUrl: string | null,
-    /**
-     * The XML content of the Identity Provider (IdP) metadata file. If present, it takes priority over the corresponding individual properties.
-     */
+    /** The XML content of the Identity Provider (IdP) metadata file. If present, it takes priority over the corresponding individual properties. */
     readonly idpMetadata: string | null,
-    /**
-     * The Assertion Consumer Service (ACS) URL of the connection.
-     */
+    /** The Assertion Consumer Service (ACS) URL of the connection. */
     readonly acsUrl: string,
-    /**
-     * The Entity ID as provided by the Service Provider (Clerk).
-     */
+    /** The Entity ID as provided by the Service Provider (Clerk). */
     readonly spEntityId: string,
-    /**
-     * The metadata URL as provided by the Service Provider (Clerk).
-     */
+    /** The metadata URL as provided by the Service Provider (Clerk). */
     readonly spMetadataUrl: string,
-    /**
-     * Indicates whether the connection is active or not.
-     */
+    /** Whether the connection is active or not. */
     readonly active: boolean,
-    /**
-     * The Identity Provider (IdP) of the connection.
-     */
+    /** The Identity Provider (IdP) of the connection. */
     readonly provider: string,
-    /**
-     * The number of users associated with the connection.
-     */
+    /** The number of users associated with the connection. */
     readonly userCount: number,
-    /**
-     * Indicates whether the connection syncs user attributes between the Service Provider (SP) and Identity Provider (IdP) or not.
-     */
+    /** Whether the connection syncs user attributes between the Service Provider (SP) and Identity Provider (IdP) or not. */
     readonly syncUserAttributes: boolean,
-    /**
-     * Indicates whether users with an email address subdomain are allowed to use this connection in order to authenticate or not.
-     */
+    /** Whether users with an email address subdomain are allowed to use this connection in order to authenticate or not. */
     readonly allowSubdomains: boolean,
-    /**
-     * Indicates whether the connection allows Identity Provider (IdP) initiated flows or not.
-     */
+    /** Whether the connection allows Identity Provider (IdP) initiated flows or not. */
     readonly allowIdpInitiated: boolean,
-    /**
-     * The date when the connection was first created.
-     */
+    /** The Unix timestamp when the connection was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the SAML connection was last updated.
-     */
+    /** The Unix timestamp when the connection was last updated. */
     readonly updatedAt: number,
-    /**
-     * Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties.
-     */
+    /** Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties. */
     readonly attributeMapping: AttributeMapping,
   ) {}
   static fromJSON(data: SamlConnectionJSON): SamlConnection {

@@ -10,85 +10,47 @@ import type { BillingSubscriptionItemJSON } from './JSON';
  */
 export class BillingSubscriptionItem {
   constructor(
-    /**
-     * The unique identifier for the Subscription Item.
-     */
+    /** The unique identifier for the Subscription Item. */
     readonly id: string,
-    /**
-     * The status of the Subscription Item.
-     */
+    /** The status of the Subscription Item. */
     readonly status: BillingSubscriptionItemJSON['status'],
-    /**
-     * The period of the Plan associated with this Subscription Item.
-     */
+    /** The period of the Plan associated with this Subscription Item. */
     readonly planPeriod: 'month' | 'annual',
-    /**
-     * The Unix timestamp (milliseconds) of when the current period starts.
-     */
+    /** The Unix timestamp (milliseconds) of when the current period starts. */
     readonly periodStart: number,
-    /**
-     * Information about the next scheduled payment for this Subscription Item. If present, contains the amount of the next payment and the Unix timestamp (milliseconds) of when the next payment is scheduled.
-     */
+    /** Information about the next scheduled payment for this Subscription Item. */
     readonly nextPayment:
       | {
-          /**
-           * The amount of the next payment.
-           */
+          /** The amount of the next payment. */
           amount: number;
-          /**
-           * The Unix timestamp (milliseconds) of when the next payment is scheduled.
-           */
+          /** The Unix timestamp (milliseconds) of when the next payment is scheduled. */
           date: number;
         }
       | null
       | undefined,
-    /**
-     * The current amount for the Subscription Item.
-     */
+    /** The current amount for the Subscription Item. */
     readonly amount: BillingMoneyAmount | undefined,
-    /**
-     * The Plan associated with this Subscription Item.
-     */
+    /** The Plan associated with this Subscription Item. */
     readonly plan: BillingPlan | null,
-    /**
-     * The ID of the Plan associated with this Subscription Item.
-     */
+    /** The ID of the Plan associated with this Subscription Item. */
     readonly planId: string | null,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription Item was created.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription Item was created. */
     readonly createdAt: number,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription Item was last updated.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription Item was last updated. */
     readonly updatedAt: number,
-    /**
-     * The Unix timestamp (milliseconds) of when the current period ends.
-     */
+    /** The Unix timestamp (milliseconds) of when the current period ends. */
     readonly periodEnd: number | null,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription Item was canceled.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription Item was canceled. */
     readonly canceledAt: number | null,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription Item became past due.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription Item became past due. */
     readonly pastDueAt: number | null,
-    /**
-     * The Unix timestamp (milliseconds) of when the Subscription Item ended.
-     */
+    /** The Unix timestamp (milliseconds) of when the Subscription Item ended. */
     readonly endedAt: number | null,
-    /**
-     * The ID of the payer for this Subscription Item.
-     */
+    /** The ID of the payer for this Subscription Item. */
     readonly payerId: string | undefined,
-    /**
-     * Whether this Subscription Item is currently in a free trial period.
-     */
+    /** Whether this Subscription Item is currently in a free trial period. */
     readonly isFreeTrial?: boolean,
-    /**
-     * The lifetime amount paid for this Subscription Item.
-     */
+    /** The lifetime amount paid for this Subscription Item. */
     readonly lifetimePaid?: BillingMoneyAmount,
   ) {}
 

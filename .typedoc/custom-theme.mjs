@@ -673,6 +673,8 @@ function renderPropertiesFormatTable(args) {
 /**
  * Resolve a property's type to the `@inline` class/interface declaration it ultimately points at, or `undefined` if the type isn't (or doesn't unwrap to) one. Unwraps `OptionalType` and a union arm — covers `T | null` / `T | undefined`. Used to decide whether to expand nested rows for a property whose type is rendered inline as `\{ … \}`.
  *
+ * Union-arm reflection: when TypeDoc has already inlined a `@inline` reference inside a union (`PublicOrganizationDataJSON | null` → `ReflectionType | null`), the arm shows up as a `ReflectionType` carrying the synthesized `TypeLiteral` declaration. Match those too so the children expand the same way a bare `ReferenceType` arm would. Direct (non-union) `ReflectionType` is not handled here — typedoc-plugin-markdown's `getFlattenedDeclarations` already flattens that case in `propertiesTable`, and double-handling would produce duplicate child rows.
+ *
  * @param {import('typedoc').Type | undefined} t
  */
 function getInlineClassOrInterfaceTarget(t) {
@@ -680,14 +682,23 @@ function getInlineClassOrInterfaceTarget(t) {
   if (bare && bare.type === 'union') {
     const u = /** @type {import('typedoc').UnionType} */ (bare);
     bare = u.types.find(arm => {
-      if (arm.type !== 'reference') return false;
-      const refl = /** @type {import('typedoc').ReferenceType} */ (arm).reflection;
-      if (!refl || !isInlineModifierWithoutStandalonePage(refl)) return false;
-      return (
-        /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Class) ||
-        /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Interface)
-      );
+      if (arm.type === 'reference') {
+        const refl = /** @type {import('typedoc').ReferenceType} */ (arm).reflection;
+        if (!refl || !isInlineModifierWithoutStandalonePage(refl)) return false;
+        return (
+          /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Class) ||
+          /** @type {{ kindOf?: (k: number) => boolean }} */ (refl).kindOf?.(ReflectionKind.Interface)
+        );
+      }
+      if (arm.type === 'reflection') {
+        const d = /** @type {import('typedoc').ReflectionType} */ (arm).declaration;
+        return Boolean(d?.children?.some(c => c.kindOf(ReflectionKind.Property)));
+      }
+      return false;
     });
+    if (bare?.type === 'reflection') {
+      return /** @type {import('typedoc').ReflectionType} */ (bare).declaration;
+    }
   }
   if (!bare || bare.type !== 'reference') return undefined;
   const decl = /** @type {import('typedoc').ReferenceType} */ (bare).reflection;

@@ -6,57 +6,31 @@ import { Verification } from './Verification';
  */
 export class EnterpriseAccountConnection {
   constructor(
-    /**
-     * The unique identifier for this enterprise connection.
-     */
+    /** The unique identifier for this enterprise connection. */
     readonly id: string,
-    /**
-     * Whether the connection is currently active.
-     */
+    /** Whether the connection is currently active. */
     readonly active: boolean,
-    /**
-     * Whether IdP-initiated SSO is allowed.
-     */
+    /** Whether IdP-initiated SSO is allowed. */
     readonly allowIdpInitiated: boolean,
-    /**
-     * Whether subdomains are allowed for this connection.
-     */
+    /** Whether subdomains are allowed for this connection. */
     readonly allowSubdomains: boolean,
-    /**
-     * Whether additional identifications are disabled for users authenticating via this connection.
-     */
+    /** Whether additional identifications are disabled for users authenticating via this connection. */
     readonly disableAdditionalIdentifications: boolean,
-    /**
-     * The domain associated with this connection.
-     */
+    /** The domain associated with this connection. */
     readonly domain: string,
-    /**
-     * The public URL of the connection's logo, if available.
-     */
+    /** The public URL of the connection's logo, if available. */
     readonly logoPublicUrl: string | null,
-    /**
-     * The name of the enterprise connection.
-     */
+    /** The name of the enterprise connection. */
     readonly name: string,
-    /**
-     * The SSO protocol used (e.g., `saml` or `oauth`).
-     */
+    /** The SSO protocol used (e.g., `saml` or `oauth`). */
     readonly protocol: string,
-    /**
-     * The SSO provider (e.g., `saml_custom`, `saml_okta`).
-     */
+    /** The SSO provider (e.g., `saml_custom`, `saml_okta`). */
     readonly provider: string,
-    /**
-     * Whether user attributes are synced from the IdP.
-     */
+    /** Whether user attributes are synced from the IdP. */
     readonly syncUserAttributes: boolean,
-    /**
-     * The date when this connection was created.
-     */
+    /** The Unix timestamp when this connection was created. */
     readonly createdAt: number,
-    /**
-     * The date when this connection was last updated.
-     */
+    /** The Unix timestamp when this connection was last updated. */
     readonly updatedAt: number,
   ) {}
 

@@ -19,29 +19,17 @@ export class Verification {
      * </ul>
      */
     readonly status: VerificationStatus,
-    /**
-     * The strategy pertaining to the parent sign-up or sign-in attempt.
-     */
+    /** The strategy pertaining to the parent sign-up or sign-in attempt. */
     readonly strategy: string,
-    /**
-     * The redirect URL for an external verification.
-     */
+    /** The redirect URL for an external verification. */
     readonly externalVerificationRedirectURL: URL | null = null,
-    /**
-     * The number of attempts related to the verification.
-     */
+    /** The number of attempts related to the verification. */
     readonly attempts: number | null = null,
-    /**
-     * The time the verification will expire at.
-     */
+    /** The Unix timestamp when the verification will expire. */
     readonly expireAt: number | null = null,
-    /**
-     * The [nonce](https://en.wikipedia.org/wiki/Cryptographic_nonce) pertaining to the verification.
-     */
+    /** The [nonce](https://en.wikipedia.org/wiki/Cryptographic_nonce) pertaining to the verification. */
     readonly nonce: string | null = null,
-    /**
-     * The message that will be presented to the user's Web3 wallet for signing during authentication. This follows the [Sign-In with Ethereum (SIWE) protocol format](https://docs.login.xyz/general-information/siwe-overview/eip-4361#example-message-to-be-signed), which typically includes details like the requesting service, wallet address, terms acceptance, nonce, timestamp, and any additional resources.
-     */
+    /** The message that will be presented to the user's Web3 wallet for signing during authentication. This follows the [Sign-In with Ethereum (SIWE) protocol format](https://docs.login.xyz/general-information/siwe-overview/eip-4361#example-message-to-be-signed), which typically includes details like the requesting service, wallet address, terms acceptance, nonce, timestamp, and any additional resources. */
     readonly message: string | null = null,
   ) {}
 
@@ -66,7 +54,7 @@ export class OrganizationDomainVerification {
     readonly strategy: string,
     /** The number of verification attempts that have been made. */
     readonly attempts: number | null = null,
-    /** The date and time when the current verification attempt expires. */
+    /** The Unix timestamp when the current verification attempt expires. */
     readonly expireAt: number | null = null,
   ) {}
 

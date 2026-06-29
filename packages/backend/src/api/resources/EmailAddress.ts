@@ -11,21 +11,13 @@ import { Verification } from './Verification';
  */
 export class EmailAddress {
   constructor(
-    /**
-     * The unique identifier for the email address.
-     */
+    /** The unique identifier for the email address. */
     readonly id: string,
-    /**
-     * The value of the email address.
-     */
+    /** The value of the email address. */
     readonly emailAddress: string,
-    /**
-     * An object holding information on the verification of the email address.
-     */
+    /** An object holding information on the verification of the email address. */
     readonly verification: Verification | null,
-    /**
-     * An array of objects containing information about any identifications that might be linked to the email address.
-     */
+    /** An array of objects containing information about any identifications that might be linked to the email address. */
     readonly linkedTo: IdentificationLink[],
   ) {}
 

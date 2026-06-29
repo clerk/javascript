@@ -5,37 +5,21 @@ import type { SessionActivityJSON, SessionJSON } from './JSON';
  */
 export class SessionActivity {
   constructor(
-    /**
-     * The unique identifier for the session activity record.
-     */
+    /** The unique identifier for the session activity record. */
     readonly id: string,
-    /**
-     * Will be set to `true` if the session activity came from a mobile device. Set to `false` otherwise.
-     */
+    /** Whether the session activity came from a mobile device. */
     readonly isMobile: boolean,
-    /**
-     * The IP address from which this session activity originated.
-     */
+    /** The IP address from which this session activity originated. */
     readonly ipAddress?: string,
-    /**
-     * The city from which this session activity occurred. Resolved by IP address geo-location.
-     */
+    /** The city from which this session activity occurred. Resolved by IP address geo-location. */
     readonly city?: string,
-    /**
-     * The country from which this session activity occurred. Resolved by IP address geo-location.
-     */
+    /** The country from which this session activity occurred. Resolved by IP address geo-location. */
     readonly country?: string,
-    /**
-     * The version of the browser from which this session activity occurred.
-     */
+    /** The version of the browser from which this session activity occurred. */
     readonly browserVersion?: string,
-    /**
-     * The name of the browser from which this session activity occurred.
-     */
+    /** The name of the browser from which this session activity occurred. */
     readonly browserName?: string,
-    /**
-     * The type of the device which was used in this session activity.
-     */
+    /** The type of the device which was used in this session activity. */
     readonly deviceType?: string,
   ) {}
 
@@ -58,53 +42,29 @@ export class SessionActivity {
  */
 export class Session {
   constructor(
-    /**
-     * The unique identifier for the `Session`.
-     */
+    /** The unique identifier for the `Session`. */
     readonly id: string,
-    /**
-     * The ID of the client associated with the `Session`.
-     */
+    /** The ID of the client associated with the `Session`. */
     readonly clientId: string,
-    /**
-     * The ID of the user associated with the `Session`.
-     */
+    /** The ID of the user associated with the `Session`. */
     readonly userId: string,
-    /**
-     * The current state of the `Session`.
-     */
+    /** The current state of the `Session`. */
     readonly status: string,
-    /**
-     * The time the session was last active on the [`Client`](https://clerk.com/docs/reference/backend/types/backend-client).
-     */
+    /** The time the session was last active on the [`Client`](https://clerk.com/docs/reference/backend/types/backend-client). */
     readonly lastActiveAt: number,
-    /**
-     * The date when the `Session` will expire.
-     */
+    /** The Unix timestamp when the `Session` will expire. */
     readonly expireAt: number,
-    /**
-     * The date when the `Session` will be abandoned.
-     */
+    /** The Unix timestamp when the `Session` will be abandoned. */
     readonly abandonAt: number,
-    /**
-     * The date when the `Session` was first created.
-     */
+    /** The Unix timestamp when the `Session` was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the `Session` was last updated.
-     */
+    /** The Unix timestamp when the `Session` was last updated. */
     readonly updatedAt: number,
-    /**
-     * The ID of the last active Organization.
-     */
+    /** The ID of the last [Active Organization](!active-organization). */
     readonly lastActiveOrganizationId?: string,
-    /**
-     * An object that provides additional information about this session, focused around user activity data.
-     */
+    /** An object that provides additional information about this session, focused around user activity data. */
     readonly latestActivity?: SessionActivity,
-    /**
-     * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
-     */
+    /** The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation). */
     readonly actor: Record<string, unknown> | null = null,
   ) {}
 

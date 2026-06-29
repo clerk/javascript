@@ -7,33 +7,19 @@ import type { WaitlistEntryJSON } from './JSON';
  */
 export class WaitlistEntry {
   constructor(
-    /**
-     * The unique identifier for the waitlist entry.
-     */
+    /** The unique identifier for the waitlist entry. */
     readonly id: string,
-    /**
-     * The email address to add to the waitlist.
-     */
+    /** The email address to add to the waitlist. */
     readonly emailAddress: string,
-    /**
-     * The status of the waitlist entry.
-     */
+    /** The status of the waitlist entry. */
     readonly status: WaitlistEntryStatus,
-    /**
-     * The invitation associated with the waitlist entry.
-     */
+    /** The invitation associated with the waitlist entry. */
     readonly invitation: Invitation | null,
-    /**
-     * The Unix timestamp when the waitlist entry was created.
-     */
+    /** The Unix timestamp when the waitlist entry was created. */
     readonly createdAt: number,
-    /**
-     * The Unix timestamp when the waitlist entry was last updated.
-     */
+    /** The Unix timestamp when the waitlist entry was last updated. */
     readonly updatedAt: number,
-    /**
-     * Whether the waitlist entry is locked.
-     */
+    /** Whether the waitlist entry is locked. */
     readonly isLocked?: boolean,
   ) {}
 
