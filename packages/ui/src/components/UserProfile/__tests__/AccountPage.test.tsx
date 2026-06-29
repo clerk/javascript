@@ -68,6 +68,40 @@ describe('AccountPage', () => {
       expect(queryByText(/Enterprise Accounts/i)).not.toBeInTheDocument();
     });
 
+    it('shows sections for attributes disabled for sign-up but used for first factor', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ enabled: false, used_for_first_factor: true });
+        f.withPhoneNumber({ enabled: false, used_for_first_factor: true });
+        f.withUsername({ enabled: false, used_for_first_factor: true });
+        f.withUser({
+          first_name: 'George',
+          last_name: 'Clerk',
+          email_addresses: ['test@clerk.com'],
+          phone_numbers: ['+11234567890'],
+          username: 'georgeclerk',
+        });
+      });
+
+      render(<AccountPage />, { wrapper });
+      screen.getByText(/Email addresses/i);
+      screen.getByText(/Phone numbers/i);
+      screen.getByText('georgeclerk');
+    });
+
+    it('shows phone section when disabled for sign-up but used for second factor', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ enabled: false, used_for_first_factor: false, used_for_second_factor: true });
+        f.withUser({
+          first_name: 'George',
+          last_name: 'Clerk',
+          phone_numbers: ['+11234567890'],
+        });
+      });
+
+      render(<AccountPage />, { wrapper });
+      screen.getByText(/Phone numbers/i);
+    });
+
     it('shows the connected accounts of the user', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });

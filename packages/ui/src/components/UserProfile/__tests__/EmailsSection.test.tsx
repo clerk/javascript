@@ -95,6 +95,42 @@ describe('EmailSection', () => {
     });
   });
 
+  describe('Add email with attribute disabled for sign-up but used for sign-in', () => {
+    const disabledForSignUpConfig = createFixtures.config(f => {
+      f.withEmailAddress({ enabled: false, used_for_first_factor: true });
+      f.withUser({ username: 'georgeclerk' });
+    });
+
+    it('renders add email screen', async () => {
+      const { wrapper } = await createFixtures(disabledForSignUpConfig);
+
+      const { getByRole, userEvent, getByLabelText, findByRole } = render(<EmailsSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add email address' }));
+      await findByRole('heading', { name: /Add email address/i });
+      getByLabelText(/email address/i);
+    });
+
+    it('can add an email and reach the verification screen', async () => {
+      const { wrapper, fixtures } = await createFixtures(disabledForSignUpConfig);
+
+      const { getByRole, userEvent, getByLabelText, findByRole } = render(<EmailsSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add email address' }));
+      await findByRole('heading', { name: /Add email address/i });
+
+      fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(
+        Promise.resolve({
+          emailAddress: 'test+2@clerk.com',
+          prepareVerification: vi.fn().mockReturnValueOnce(Promise.resolve({} as any)),
+        } as any),
+      );
+
+      await userEvent.type(getByLabelText(/email address/i), 'test+2@clerk.com');
+      await userEvent.click(getByRole('button', { name: /add$/i }));
+      expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.com' });
+      await findByRole('heading', { name: /Verify email address/i });
+    });
+  });
+
   describe('Remove email', () => {
     it('Renders remove screen', async () => {
       const { wrapper } = await createFixtures(withEmails);
