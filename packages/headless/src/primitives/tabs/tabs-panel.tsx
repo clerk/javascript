@@ -16,7 +16,7 @@ export interface TabsPanelProps extends ComponentProps<'div'> {
 
 export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(function TabsPanel(props, ref) {
   const { render, value: panelValue, shouldForceMount, ...otherProps } = props;
-  const { value: selectedValue, tabsId, direction } = useTabsContext();
+  const { value: selectedValue, tabsId, direction, orientation } = useTabsContext();
 
   const isSelected = selectedValue === panelValue;
   const tabId = `${tabsId}-tab-${panelValue}`;
@@ -50,6 +50,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     'data-cl-slot': 'tabs-panel',
     id: panelId,
     role: 'tabpanel' as const,
+    'data-orientation': orientation,
     'aria-labelledby': tabId,
     tabIndex: 0,
     ...inertProps(!isSelected),

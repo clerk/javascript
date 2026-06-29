@@ -39,6 +39,15 @@ click-only alternative for cases that don't want keyboard roving. Any part accep
 for polymorphic rendering — pass a function that receives the part's computed props and spreads
 them onto your element.
 
+Use `orientation='vertical'` on `Tabs.Root` for stacked navigation. The styled Mosaic tabs recipe
+switches the tab list and selected tab treatment automatically from the primitive's orientation
+state.
+
+<Story
+  name='Stacked'
+  storyModule={TabsStories}
+/>
+
 ## Parts
 
 | Part             | Slot             | Description                                                  |

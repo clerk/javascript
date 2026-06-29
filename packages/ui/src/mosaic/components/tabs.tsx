@@ -25,6 +25,12 @@ export const tabsRecipe = defineSlotRecipe(theme => ({
       flexDirection: 'row',
       gap: theme.spacing(4),
       borderBottom: `1px solid ${theme.alpha('primary', 10)}`,
+      '&[aria-orientation="vertical"]': {
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        gap: theme.spacing(1),
+        borderBottom: 'none',
+      },
     },
     tab: {
       appearance: 'none',
@@ -42,6 +48,19 @@ export const tabsRecipe = defineSlotRecipe(theme => ({
       transition: 'color 150ms',
       '&[data-cl-selected]': {
         color: theme.color.primary,
+      },
+      '[aria-orientation="vertical"] &': {
+        justifyContent: 'flex-start',
+        textAlign: 'start',
+        borderRadius: theme.rounded.md,
+        paddingInline: theme.spacing(3),
+        transition: 'background-color 150ms, color 150ms',
+        '&[data-cl-selected]': {
+          backgroundColor: theme.alpha('primary', 10),
+        },
+        '&:hover': {
+          backgroundColor: theme.alpha('primary', 5),
+        },
       },
       '&[data-cl-disabled]': {
         opacity: 0.5,
@@ -72,18 +91,27 @@ export const tabsRecipe = defineSlotRecipe(theme => ({
     },
     panel: {
       paddingBlock: theme.spacing(4),
+      '&[data-orientation="vertical"]': {
+        paddingBlock: 0,
+      },
       '&[data-cl-hidden]': {
         display: 'none',
       },
     },
     // The headless indicator positions itself (`position`, `left`, `width`) via
-    // inline style tracking the active tab; the recipe only supplies the visual
-    // underline at the bottom of the list and the slide transition.
+    // inline style for horizontal tabs, or (`top`, `height`) for vertical tabs;
+    // the recipe only supplies the visual rail/underline and the slide transition.
     indicator: {
       bottom: 0,
       height: '2px',
       backgroundColor: theme.color.primary,
       transition: 'left 150ms ease-out, width 150ms ease-out',
+      '[aria-orientation="vertical"] &': {
+        right: 0,
+        bottom: 'auto',
+        width: '2px',
+        transition: 'top 150ms ease-out, height 150ms ease-out',
+      },
     },
   },
 }));
