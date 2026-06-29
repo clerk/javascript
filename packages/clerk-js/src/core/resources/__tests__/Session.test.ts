@@ -74,6 +74,29 @@ describe('Session', () => {
       ]);
     });
 
+    it('updates the active session token state on getToken without active organization', async () => {
+      const setSessionToken = vi.fn();
+      BaseResource.clerk = clerkMock({
+        __internal_state: { __internal_setSessionToken: setSessionToken } as any,
+      });
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken();
+
+      expect(setSessionToken).toHaveBeenCalledTimes(1);
+      expect(setSessionToken.mock.calls[0]?.[0].getRawString()).toBe(mockJwt);
+    });
+
     it('hydrates token cache from lastActiveToken', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
@@ -199,8 +222,10 @@ describe('Session', () => {
     });
 
     it('does not dispatch token:update if template is provided', async () => {
+      const setSessionToken = vi.fn();
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
+        __internal_state: { __internal_setSessionToken: setSessionToken } as any,
       });
 
       const session = new Session({
@@ -217,6 +242,7 @@ describe('Session', () => {
       await session.getToken({ template: 'foobar' });
 
       expect(dispatchSpy).toHaveBeenCalledTimes(0);
+      expect(setSessionToken).not.toHaveBeenCalled();
     });
 
     it('dispatches token:update when provided organization ID matches current active organization', async () => {
@@ -241,7 +267,10 @@ describe('Session', () => {
     });
 
     it('does not dispatch token:update when provided organization ID does not match current active organization', async () => {
-      BaseResource.clerk = clerkMock();
+      const setSessionToken = vi.fn();
+      BaseResource.clerk = clerkMock({
+        __internal_state: { __internal_setSessionToken: setSessionToken } as any,
+      });
 
       const session = new Session({
         status: 'active',
@@ -257,6 +286,7 @@ describe('Session', () => {
       await session.getToken({ organizationId: 'anotherOrganization' });
 
       expect(dispatchSpy).toHaveBeenCalledTimes(0);
+      expect(setSessionToken).not.toHaveBeenCalled();
     });
 
     describe('with offline browser and network failure', () => {
@@ -654,7 +684,10 @@ describe('Session', () => {
       });
 
       it('uses refreshed token after timer-triggered refresh succeeds', async () => {
-        BaseResource.clerk = clerkMock();
+        const setSessionToken = vi.fn();
+        BaseResource.clerk = clerkMock({
+          __internal_state: { __internal_setSessionToken: setSessionToken } as any,
+        });
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
 
         const newMockJwt =
@@ -686,6 +719,8 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
+        expect(setSessionToken).toHaveBeenCalled();
+        expect(setSessionToken.mock.calls.at(-1)?.[0].getRawString()).toBe(newMockJwt);
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
