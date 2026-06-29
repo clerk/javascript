@@ -175,6 +175,32 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
+  it('(d) latches after the first settle: a mid-session test-runs cold-load no longer raises the page-level isLoading', () => {
+    // (a) Initial load WITH a configured connection present: test-runs are part
+    // of the first skeleton, so the page-level isLoading gates on them.
+    connectionsState.data = [configuredConnection('ent_1')];
+    testRunsState.isLoading = true;
+
+    const { result, rerender } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.isLoading).toBe(true);
+
+    // The first load settles (the test-runs probe resolves) → the skeleton drops.
+    testRunsState.isLoading = false;
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    // (b) A later (mid-session reconfigure) test-runs cold-load flips the
+    // underlying loading flag back on, but the page-level isLoading stays down —
+    // test-runs are strictly table-level after the first settle, never the
+    // global skeleton again.
+    testRunsState.isLoading = true;
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+    // The table-level signal is still available for the Test step to consume.
+    expect(result.current.testRuns.isLoading).toBe(true);
+  });
+
   it('keeps the global skeleton up while the connection source itself is loading', () => {
     connectionsState.isLoading = true;
 
