@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.ClerkConfigurationOptions
 import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
@@ -25,6 +26,9 @@ import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
+private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
+private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
+private const val HOST_SDK = "expo"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -107,6 +111,18 @@ class ClerkExpoModule : Module() {
 
     private val reactContext: Context?
         get() = appContext.reactContext
+
+    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+        val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
+        val customHeaders = buildMap {
+            put(HOST_SDK_HEADER, HOST_SDK)
+            if (hostSdkVersion.isNotEmpty()) {
+                put(HOST_SDK_VERSION_HEADER, hostSdkVersion)
+            }
+        }
+
+        return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
+    }
 
     private fun startClientStateObserver() {
         if (clientStateObserverJob != null) {
@@ -209,7 +225,7 @@ class ClerkExpoModule : Module() {
                             .apply()
                     }
 
-                    Clerk.initialize(context, pubKey)
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
                     startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
@@ -261,7 +277,7 @@ class ClerkExpoModule : Module() {
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
                 if (activePublishableKey != null && activePublishableKey != pubKey) {
-                    Clerk.switchConfiguration(context, pubKey)
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     loadThemeFromAssets(context)
