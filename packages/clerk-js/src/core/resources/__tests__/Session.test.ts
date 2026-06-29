@@ -2291,6 +2291,19 @@ describe('Session', () => {
           last_active_token: { object: 'token', jwt },
         }) as SessionJSON;
 
+      const sessionJsonWithOrg = (org: string | null, jwt: string): SessionJSON =>
+        ({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: org,
+          actor: null,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+          last_active_token: { object: 'token', jwt },
+        }) as SessionJSON;
+
       it('keeps the fresher cached token when fromJSON carries a strictly-staler last_active_token', async () => {
         const high = createJwtWithOiat(NOW, NOW + 30);
         const low = createJwtWithOiat(NOW, NOW);
@@ -2418,6 +2431,84 @@ describe('Session', () => {
 
         expect(session.lastActiveToken?.getRawString()).toBe(legacy);
         expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(legacy);
+      });
+
+      it('keeps the held lastActiveToken when a strictly-staler same-context token arrives and the cache slot is empty', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const session = makeSession();
+
+        (session as any).fromJSON(sessionJsonWith(high));
+        await flush();
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+
+        SessionTokenCache.clear();
+
+        (session as any).fromJSON(sessionJsonWith(low));
+        await flush();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('rejects a wrong-org last_active_token even when the active-org cache slot is empty', async () => {
+        const orgBToken = createJwtWithOiat(NOW, NOW + 30, { org: 'org_B' });
+        const orgAToken = createJwtWithOiat(NOW, NOW + 60, { org: 'org_A' });
+        const session = makeSession({ last_active_organization_id: 'org_B' } as Partial<SessionJSON>);
+        const orgBJson = (jwt: string) =>
+          ({
+            status: 'active',
+            id: 'session_1',
+            object: 'session',
+            user: createUser({}),
+            last_active_organization_id: 'org_B',
+            actor: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+            last_active_token: { object: 'token', jwt },
+          }) as SessionJSON;
+
+        (session as any).fromJSON(orgBJson(orgBToken));
+        await flush();
+        expect(session.lastActiveToken?.getRawString()).toBe(orgBToken);
+
+        SessionTokenCache.clear();
+
+        (session as any).fromJSON(orgBJson(orgAToken));
+        await flush();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(orgBToken);
+      });
+
+      it('with no same-context baseline, adopts a wrong-org token instead of clearing it (cookie guard handles removal)', async () => {
+        const orgAToken = createJwtWithOiat(NOW, NOW + 30, { org: 'org_A' });
+        const session = makeSession({ last_active_organization_id: 'org_B' } as Partial<SessionJSON>);
+
+        (session as any).fromJSON(sessionJsonWithOrg('org_B', orgAToken));
+        await flush();
+
+        // A falsy lastActiveToken is read downstream as a sign-out and drops __session, so the
+        // wrong-org token is adopted here and dropped later by the cookie guard instead. It must
+        // not pollute the active org-B cache slot.
+        expect(session.lastActiveToken?.getRawString()).toBe(orgAToken);
+        const tokenId = TokenId.build('session_1', undefined, 'org_B');
+        expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken).toBeUndefined();
+      });
+
+      it('does not let a leftover previous-org token veto a fresh active-org token', async () => {
+        const prevOrgHigh = createJwtWithOiat(NOW, NOW + 60, { org: 'org_A' });
+        const newOrgLow = createJwtWithOiat(NOW, NOW + 30, { org: 'org_B' });
+        const session = makeSession({ last_active_organization_id: 'org_A' } as Partial<SessionJSON>);
+
+        (session as any).fromJSON(sessionJsonWithOrg('org_A', prevOrgHigh));
+        await flush();
+        expect(session.lastActiveToken?.getRawString()).toBe(prevOrgHigh);
+
+        SessionTokenCache.clear();
+
+        (session as any).fromJSON(sessionJsonWithOrg('org_B', newOrgLow));
+        await flush();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(newOrgLow);
       });
     });
   });

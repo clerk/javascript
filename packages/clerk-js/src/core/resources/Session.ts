@@ -219,15 +219,21 @@ export class Session extends BaseResource implements SessionResource {
     const tokenId = this.#getCacheId();
     const current = SessionTokenCache.get({ tokenId })?.entry.resolvedToken ?? null;
 
-    // A token whose explicit org claim differs from the active org is stale-context: it must
-    // not win lastActiveToken over a cached active-context token, nor be written into the
-    // active cache slot that getToken() reads. A token with no org claim is legacy/personal
-    // and counts as same-context.
-    const incomingOrg = tokenOrgId(incoming);
-    const sameContext = !incomingOrg || normalizeOrgId(incomingOrg) === normalizeOrgId(this.lastActiveOrganizationId);
+    // Tokens are kept monotonic against a freshness baseline: the active-org cache slot, or the
+    // token we already hold when that slot is empty (evicted, or an in-flight fetch leaves
+    // resolvedToken null). The baseline must be same-context (its org claim matches the active
+    // org, or it has none) so a leftover previous-org token cannot veto a fresh active-org token.
+    const isSameContext = (orgClaim: string) =>
+      !orgClaim || normalizeOrgId(orgClaim) === normalizeOrgId(this.lastActiveOrganizationId);
+    const sameContext = isSameContext(tokenOrgId(incoming));
+    const held = current ?? this.lastActiveToken;
+    const baseline = held && isSameContext(tokenOrgId(held)) ? held : null;
 
-    if (current && (!sameContext || isStrictlyStalerJwt(incoming, current))) {
-      this.lastActiveToken = current;
+    // With a same-context baseline, drop a wrong-org or strictly-staler incoming token. With no
+    // baseline, adopt it anyway: a bad token is still dropped downstream by the cookie guard,
+    // whereas an empty lastActiveToken reads as a sign-out and clears __session.
+    if (baseline && (!sameContext || isStrictlyStalerJwt(incoming, baseline))) {
+      this.lastActiveToken = baseline;
       return;
     }
 
