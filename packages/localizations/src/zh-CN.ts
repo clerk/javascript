@@ -673,7 +673,7 @@ export const zhCN: LocalizationResource = {
         messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
       },
       formButtonPrimary__add: '添加',
-      formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
+      formFieldInputPlaceholder__domain: '添加域名',
       formFieldLabel__domain: '域名',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1713,6 +1713,9 @@ export const zhCN: LocalizationResource = {
     action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
+    label__userButtonPopover: '账户面板',
+    label__accountActions: '账户操作',
+    label__activeSessions: '活跃会话',
   },
   userProfile: {
     apiKeysPage: {

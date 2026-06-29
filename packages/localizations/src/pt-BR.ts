@@ -209,9 +209,9 @@ export const ptBR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Mudar de plano',
     switchToAnnual: 'Mudar para anual',
-    switchToAnnualWithAnnualPrice: 'Mudar para anual {{currency}}{{price}} / ano',
+    switchToAnnualWithAnnualPrice: 'Mudar para anual {{price}} / ano',
     switchToMonthly: 'Mudar para mensal',
-    switchToMonthlyWithPrice: 'Mudar para mensal {{currency}}{{price}} / mês',
+    switchToMonthlyWithPrice: 'Mudar para mensal {{price}} / mês',
     totalDue: 'Total devido',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total devido hoje',
@@ -680,8 +680,8 @@ export const ptBR: LocalizationResource = {
         messageLabel: 'Seu e-mail usa {{domain}}. Deseja adicioná-lo?',
       },
       formButtonPrimary__add: 'Adicionar',
-      formFieldInputPlaceholder__domain: 'Digite seu domínio aqui e clique em Adicionar para começar',
-      formFieldLabel__domain: 'Domínios',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
+      formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1752,6 +1752,9 @@ export const ptBR: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
+    label__userButtonPopover: 'Painel da conta',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
   },
   userProfile: {
     apiKeysPage: {

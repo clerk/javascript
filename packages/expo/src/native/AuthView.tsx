@@ -1,11 +1,12 @@
-import { type ComponentProps, type ReactElement, useCallback } from 'react';
+import { type ReactElement, useCallback } from 'react';
+import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
 
-type AuthNativeEvent = Parameters<NonNullable<ComponentProps<typeof NativeClerkAuthView>['onAuthEvent']>>[0];
+type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.

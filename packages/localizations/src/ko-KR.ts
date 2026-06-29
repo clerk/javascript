@@ -207,9 +207,9 @@ export const koKR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: '이 플랜으로 전환',
     switchToAnnual: '연간 결제로 변경',
-    switchToAnnualWithAnnualPrice: '연간 {{currency}}{{price}} / 년으로 변경',
+    switchToAnnualWithAnnualPrice: '연간 {{price}} / 년으로 변경',
     switchToMonthly: '월간 결제로 변경',
-    switchToMonthlyWithPrice: '월간 {{currency}}{{price}} / 월로 변경',
+    switchToMonthlyWithPrice: '월간 {{price}} / 월로 변경',
     totalDue: '총 결제 금액',
     totalDuePerPeriod: undefined,
     totalDueToday: '오늘 결제 금액',
@@ -677,7 +677,7 @@ export const koKR: LocalizationResource = {
         messageLabel: '이메일이 {{domain}}을(를) 사용합니다. 추가하시겠습니까?',
       },
       formButtonPrimary__add: '추가',
-      formFieldInputPlaceholder__domain: '여기에 도메인을 입력하고 추가를 클릭하여 시작하세요',
+      formFieldInputPlaceholder__domain: '도메인 추가',
       formFieldLabel__domain: '도메인',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -1729,6 +1729,9 @@ export const koKR: LocalizationResource = {
     action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
+    label__userButtonPopover: '계정 패널',
+    label__accountActions: '계정 작업',
+    label__activeSessions: '활성 세션',
   },
   userProfile: {
     apiKeysPage: {

@@ -1,7 +1,13 @@
 {
   "platforms": ["apple", "android"],
   "apple": {
-    "modules": ["ClerkGoogleSignInModule"]
+    "modules": [
+      "ClerkExpoModule",
+      "ClerkAuthViewModule",
+      "ClerkUserProfileViewModule",
+      "ClerkUserButtonViewModule",
+      "ClerkGoogleSignInModule"
+    ]
   },
   "android": {
     "modules": [

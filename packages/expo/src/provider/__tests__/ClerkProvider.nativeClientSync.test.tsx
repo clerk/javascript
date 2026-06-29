@@ -89,7 +89,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
       addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      removeListeners: vi.fn(),
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
   };
@@ -233,6 +232,9 @@ describe('ClerkProvider native client sync', () => {
 
     await waitFor(() => {
       expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();

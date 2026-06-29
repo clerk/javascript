@@ -674,8 +674,8 @@ export const skSK: LocalizationResource = {
         messageLabel: 'Váš e-mail používa {{domain}}. Chcete ho pridať?',
       },
       formButtonPrimary__add: 'Pridať',
-      formFieldInputPlaceholder__domain: 'Sem zadajte svoju doménu a kliknutím na pridať začnite',
-      formFieldLabel__domain: 'Domény',
+      formFieldInputPlaceholder__domain: 'Pridať doménu',
+      formFieldLabel__domain: 'Doména',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1741,6 +1741,9 @@ export const skSK: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
+    label__userButtonPopover: 'Panel účtu',
+    label__accountActions: 'Akcie účtu',
+    label__activeSessions: 'Aktívne relácie',
   },
   userProfile: {
     apiKeysPage: {
