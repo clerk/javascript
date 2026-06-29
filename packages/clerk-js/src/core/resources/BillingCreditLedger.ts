@@ -1,7 +1,7 @@
 import type { BillingCreditLedgerJSON, BillingCreditLedgerResource, BillingMoneyAmount } from '@clerk/shared/types';
 
-import { unixEpochToDate } from '@/utils/date';
 import { billingMoneyAmountFromJSON } from '@/utils/billing';
+import { unixEpochToDate } from '@/utils/date';
 
 import { BaseResource } from './internal';
 
