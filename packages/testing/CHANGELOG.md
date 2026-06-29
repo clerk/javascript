@@ -1,5 +1,17 @@
 # @clerk/testing
 
+## 2.2.0
+
+### Minor Changes
+
+- Increase peer dependency range for Cypress to include v15 ([#9003](https://github.com/clerk/javascript/pull/9003)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`a8c727c`](https://github.com/clerk/javascript/commit/a8c727c6ad44121204c1fcc95ee356199643a8a9), [`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/backend@3.8.5
+  - @clerk/shared@4.22.1
+
 ## 2.1.7
 
 ### Patch Changes

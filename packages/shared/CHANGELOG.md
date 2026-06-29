@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.22.1
+
+### Patch Changes
+
+- Fix missing redirect URL protocol validation for Clerk UI browser navigations, including the multi-session add-account flow. ([#8961](https://github.com/clerk/javascript/pull/8961)) by [@jacekradko](https://github.com/jacekradko)
+
+  Internal browser navigations now consistently honor configured redirect protocols and fail closed across mixed ClerkJS/UI bundle versions.
+
 ## 4.22.0
 
 ### Minor Changes
