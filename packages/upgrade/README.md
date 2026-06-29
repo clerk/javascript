@@ -62,6 +62,7 @@ Fill out the prompts and the CLI will:
 - `--dir` — directory to scan (default: current working directory)
 - `--glob` — glob of files for codemods (default: `**/*.(js|jsx|ts|tsx|mjs|cjs)`)
 - `--ignore` — extra globs to ignore during scans (repeatable)
+- `--skip-gitignore` — ignore `.gitignore` files and scan files they would normally exclude
 - `--release` — target release (e.g., `core-3`); otherwise auto-selected from installed versions
 - `--skip-upgrade` — skip installing/updating packages
 - `--skip-codemods` — skip codemod execution
