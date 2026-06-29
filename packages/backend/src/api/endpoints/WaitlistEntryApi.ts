@@ -40,7 +40,7 @@ export type WaitlistEntryInviteParams = {
 /** @generateWithEmptyComment */
 export class WaitlistEntryAPI extends AbstractAPI {
   /**
-   * Gets a list of waitlist entries for the instance. The list is returned in descending order by creation date, by default.
+   * Gets a list of waitlist entries for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`WaitlistEntry`](https://clerk.com/docs/reference/backend/types/backend-waitlist-entry) objects and a `totalCount` property containing the total number of waitlist entries for the instance.
    */
   public async list(params: WaitlistEntryListParams = {}) {

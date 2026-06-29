@@ -97,7 +97,7 @@ export class M2MTokenApi extends AbstractAPI {
   }
 
   /**
-   * Gets a list of M2M tokens for the given machine. This endpoint can be authenticated by either a Machine Secret Key or by a Clerk [Secret Key](!secret-key).
+   * Gets a list of M2M tokens for the given machine. By default, the list is returned in descending order by creation date (newest first). This endpoint can be authenticated by either a Machine Secret Key or by a Clerk [Secret Key](!secret-key).
    * - When fetching M2M tokens with a Machine Secret Key, only tokens associated with the authenticated machine can be retrieved.
    * - When fetching M2M tokens with a Clerk Secret Key, tokens for any machine in the instance can be retrieved.
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`M2MToken`](https://clerk.com/docs/reference/backend/types/backend-m2m-token) objects and a `totalCount` property containing the total number of M2M tokens for the machine.

@@ -61,7 +61,7 @@ export type UpdateAPIKeyParams = {
 /** @generateWithEmptyComment */
 export class APIKeysAPI extends AbstractAPI {
   /**
-   * Gets a list of API keys for the given user or Organization.
+   * Gets a list of API keys for the given user or Organization. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`APIKey`](https://clerk.com/docs/reference/backend/types/backend-api-key) objects and a `totalCount` property containing the total number of API keys for the user or Organization.
    */
   async list(queryParams: GetAPIKeyListParams) {

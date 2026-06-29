@@ -19,7 +19,7 @@ export type AllowlistIdentifierCreateParams = {
 /** @generateWithEmptyComment */
 export class AllowlistIdentifierAPI extends AbstractAPI {
   /**
-   * Gets the list of allowlist identifiers for the instance.
+   * Gets the list of allowlist identifiers for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`AllowlistIdentifier`](https://clerk.com/docs/reference/backend/types/backend-allowlist-identifier) objects and a `totalCount` property containing the total number of allowlist identifiers for the instance.
    */
   public async getAllowlistIdentifierList(params: ClerkPaginationRequest = {}) {

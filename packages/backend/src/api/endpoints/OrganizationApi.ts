@@ -288,7 +288,7 @@ export type DeleteOrganizationDomainParams = {
 /** @generateWithEmptyComment */
 export class OrganizationAPI extends AbstractAPI {
   /**
-   * Gets the list of Organizations for the instance.
+   * Gets the list of Organizations for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization) objects and a `totalCount` property containing the total number of Organizations for the instance.
    */
   public async getOrganizationList(params?: GetOrganizationListParams) {
@@ -461,7 +461,7 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the list of Organization memberships for the specified Organization.
+   * Gets the list of Organization memberships for the specified Organization. By default, the list is returned in descending order by creation date (newest first).
    *
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`OrganizationMembership`](https://clerk.com/docs/reference/backend/types/backend-organization-membership) objects and a `totalCount` property containing the total number of Organization memberships for the Organization.
    *
@@ -480,7 +480,7 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the list of Organization memberships for the instance.
+   * Gets the list of Organization memberships for the instance. By default, the list is returned in descending order by creation date (newest first).
    *
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`OrganizationMembership`](https://clerk.com/docs/reference/backend/types/backend-organization-membership) objects and a `totalCount` property containing the total number of Organization memberships for the instance.
    *
@@ -634,7 +634,7 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the list of [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) for the given Organization.
+   * Gets the list of [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) for the given Organization. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`OrganizationDomain`](https://clerk.com/docs/reference/backend/types/backend-organization-domain) objects and a `totalCount` property containing the total number of Verified Domains for the Organization.
    */
   public async getOrganizationDomainList(params: GetOrganizationDomainListParams) {

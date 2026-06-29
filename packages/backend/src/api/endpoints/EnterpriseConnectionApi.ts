@@ -145,7 +145,7 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the list of enterprise connections for the instance.
+   * Gets the list of enterprise connections for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) objects and a `totalCount` property containing the total number of enterprise connections for the instance.
    */
   public async getEnterpriseConnectionList(params: EnterpriseConnectionListParams = {}) {

@@ -46,7 +46,7 @@ export type CreateSessionParams = {
 /** @generateWithEmptyComment */
 export class SessionAPI extends AbstractAPI {
   /**
-   * Gets a list of sessions for either the specified client or user. Requires either `clientId` or `userId` to be provided.
+   * Gets a list of sessions for either the specified client or user. Requires either `clientId` or `userId` to be provided. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`Session`](https://clerk.com/docs/reference/backend/types/backend-session) objects and a `totalCount` property containing the total number of sessions.
    */
   public async getSessionList(params: SessionListParams = {}) {

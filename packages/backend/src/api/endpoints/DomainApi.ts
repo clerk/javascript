@@ -29,7 +29,7 @@ export type UpdateDomainParams = Partial<Pick<AddDomainParams, 'name' | 'proxy_u
 /** @generateWithEmptyComment */
 export class DomainAPI extends AbstractAPI {
   /**
-   * Gets the list of domains for the instance.
+   * Gets the list of domains for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`Domain`](https://clerk.com/docs/reference/backend/types/domain) objects and a `totalCount` property containing the total number of domains for the instance.
    */
   public async list() {

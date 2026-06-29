@@ -40,7 +40,7 @@ export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
 /** @generateWithEmptyComment */
 export class OAuthApplicationsApi extends AbstractAPI {
   /**
-   * Gets a list of OAuth applications for the instance.
+   * Gets a list of OAuth applications for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @param params - The parameters to get the OAuth applications with.
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) objects and a `totalCount` property containing the total number of OAuth applications.
    */

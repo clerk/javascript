@@ -77,7 +77,7 @@ export type GetInvitationListParams = ClerkPaginationRequest<{
 /** @generateWithEmptyComment */
 export class InvitationAPI extends AbstractAPI {
   /**
-   * Gets a list of non-revoked invitations for the instance, sorted by descending creation date.
+   * Gets a list of non-revoked invitations for the instance, sorted by descending creation date. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`Invitation`](https://clerk.com/docs/reference/backend/types/backend-invitation) objects and a `totalCount` property containing the total number of invitations.
    */
   public async getInvitationList(params: GetInvitationListParams = {}) {

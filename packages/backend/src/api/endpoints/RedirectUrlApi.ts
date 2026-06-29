@@ -14,7 +14,7 @@ export type CreateRedirectUrlParams = {
 /** @generateWithEmptyComment */
 export class RedirectUrlAPI extends AbstractAPI {
   /**
-   * Gets a list of whitelisted redirect URLs for the instance.
+   * Gets a list of whitelisted redirect URLs for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`RedirectUrl`](https://clerk.com/docs/reference/backend/types/backend-redirect-url) objects and a `totalCount` property containing the total number of redirect URLs.
    */
   public async getRedirectUrlList() {

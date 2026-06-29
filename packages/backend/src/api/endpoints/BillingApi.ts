@@ -38,7 +38,7 @@ export type ExtendSubscriptionItemFreeTrialParams = {
 /** @generateWithEmptyComment */
 export class BillingAPI extends AbstractAPI {
   /**
-   * Gets the list of Billing Plans for the instance.
+   * Gets the list of Billing Plans for the instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`BillingPlan`](https://clerk.com/docs/reference/backend/types/billing-plan) objects and a `totalCount` property containing the total number of Billing Plans for the instance.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */

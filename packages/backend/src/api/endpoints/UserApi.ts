@@ -417,7 +417,7 @@ type UserID = {
 /** @generateWithEmptyComment */
 export class UserAPI extends AbstractAPI {
   /**
-   * Retrieves the list of users in your instance.
+   * Retrieves the list of users in your instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
   public async getUserList(params: UserListParams = {}) {
@@ -664,7 +664,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Gets a list of the given user's Organization memberships.
+   * Gets a list of the given user's Organization memberships. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationMembership`](https://clerk.com/docs/reference/backend/types/backend-organization-membership) objects, and a `totalCount` property that indicates the total number of Organization memberships for the user.
    */
   public async getOrganizationMembershipList(params: GetOrganizationMembershipListParams) {
@@ -679,7 +679,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Gets a list of the given user's Organization invitations.
+   * Gets a list of the given user's Organization invitations. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property than contains an array of [`OrganizationInvitation`](https://clerk.com/docs/reference/backend/types/backend-organization-invitation) objects, and a `totalCount` property that indicates the total number of Organization invitations for the user.
    */
   public async getOrganizationInvitationList(params: GetOrganizationInvitationListParams) {
