@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
 import { environmentConfig } from '../models/environment';
+import { resolveInstanceConfig, STAGING_API_URL } from './instanceKeys';
 
 const getInstanceKeys = () => {
   let keys: Record<string, { pk: string; sk: string }>;
@@ -37,9 +38,6 @@ const getInstanceKeys = () => {
 
 export const instanceKeys = getInstanceKeys();
 
-const STAGING_API_URL = 'https://api.clerkstage.dev';
-const STAGING_KEY_PREFIX = 'clerkstage-';
-
 /**
  * Check whether an env config is ready for staging tests.
  * In non-staging mode, always returns true.
@@ -54,28 +52,25 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
 /**
  * Sets PK/SK from the instance keys map and handles staging environment swapping.
  * When E2E_STAGING=1 is set, swaps PK/SK to staging keys (looked up as `clerkstage-<keyName>`)
- * and adds CLERK_API_URL. If the staging key doesn't exist, removes any inherited CLERK_API_URL
- * so the config falls back to production and is filtered from long-running apps by isStagingReady.
- * In non-staging mode, sets the production PK/SK and returns.
+ * and adds CLERK_API_URL. If the staging key doesn't exist, the env is given placeholder keys
+ * (never the production keys) and any inherited CLERK_API_URL is cleared, so it is filtered from
+ * long-running apps by isStagingReady and any code path that bypasses that filter fails fast
+ * instead of driving the production instance from staging CI. In non-staging mode, sets the
+ * production PK/SK and returns. See `resolveInstanceConfig` in ./instanceKeys.
  */
 function withInstanceKeys(keyName: string, env: EnvironmentConfig): EnvironmentConfig {
-  const keys = instanceKeys.get(keyName)!;
-  env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+  const cfg = resolveInstanceConfig(keyName, instanceKeys, process.env.E2E_STAGING === '1');
 
-  if (process.env.E2E_STAGING !== '1') return env;
-
-  const stagingKeyName = STAGING_KEY_PREFIX + keyName;
-  if (!instanceKeys.has(stagingKeyName)) {
-    // Remove staging API URL if inherited from parent clone to prevent
-    // production keys from being used against the staging API
+  if (cfg.clearApiUrl) {
     env.privateVariables.delete('CLERK_API_URL');
-    return env;
   }
-  const stagingKeys = instanceKeys.get(stagingKeyName)!;
-  return env
-    .setEnvVariable('private', 'CLERK_SECRET_KEY', stagingKeys.sk)
-    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', stagingKeys.pk)
-    .setEnvVariable('private', 'CLERK_API_URL', STAGING_API_URL);
+  env
+    .setEnvVariable('private', 'CLERK_SECRET_KEY', cfg.sk)
+    .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', cfg.pk);
+  if (cfg.apiUrl) {
+    env.setEnvVariable('private', 'CLERK_API_URL', cfg.apiUrl);
+  }
+  return env;
 }
 
 const base = environmentConfig()
