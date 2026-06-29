@@ -8,6 +8,7 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertIssuerClaim,
   assertSubClaim,
 } from '../assertions';
 
@@ -227,6 +228,43 @@ describe('assertAuthorizedPartiesClaim(azp?, authorizedParties?)', () => {
 
   it('does not throw if azp is included in authorizedParties', () => {
     expect(() => assertAuthorizedPartiesClaim('azp', ['azp'])).not.toThrow();
+  });
+});
+
+describe('assertIssuerClaim(iss, issuer?)', () => {
+  const iss = 'https://clerk.example.com';
+
+  it('does not throw if no issuer is provided (opt-in)', () => {
+    expect(() => assertIssuerClaim(iss)).not.toThrow();
+    expect(() => assertIssuerClaim(iss, undefined)).not.toThrow();
+    expect(() => assertIssuerClaim(undefined)).not.toThrow();
+    expect(() => assertIssuerClaim(iss, '')).not.toThrow();
+    expect(() => assertIssuerClaim(iss, [])).not.toThrow();
+  });
+
+  it('does not throw if iss exactly matches the issuer string', () => {
+    expect(() => assertIssuerClaim(iss, iss)).not.toThrow();
+  });
+
+  it('does not throw if iss is included in the issuer list', () => {
+    expect(() => assertIssuerClaim(iss, ['https://clerk.other.com', iss])).not.toThrow();
+  });
+
+  it('throws if iss does not match the issuer string', () => {
+    expect(() => assertIssuerClaim(iss, 'https://clerk.evil.com')).toThrow(
+      `Invalid JWT issuer claim (iss) "https://clerk.example.com".`,
+    );
+  });
+
+  it('throws if iss is not included in the issuer list', () => {
+    expect(() => assertIssuerClaim(iss, ['https://clerk.evil.com', 'https://clerk.other.com'])).toThrow(
+      `Invalid JWT issuer claim (iss) "https://clerk.example.com".`,
+    );
+  });
+
+  it('throws if iss is missing or not a string when an issuer is required', () => {
+    expect(() => assertIssuerClaim(undefined, iss)).toThrow(`Invalid JWT issuer claim (iss) undefined.`);
+    expect(() => assertIssuerClaim(42, iss)).toThrow(`Invalid JWT issuer claim (iss) 42.`);
   });
 });
 
