@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
   id 'com.android.library'
   id 'org.jetbrains.kotlin.android'
@@ -10,6 +12,9 @@ applyKotlinExpoModulesCorePlugin()
 
 group = 'com.clerk.expo'
 version = '1.0.0'
+
+def clerkExpoPackageJson = new JsonSlurper().parse(new File(projectDir, "../package.json"))
+def clerkExpoVersion = clerkExpoPackageJson.version.toString()
 
 // Dependency versions - centralized for easier updates
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
@@ -38,6 +43,7 @@ android {
     targetSdk safeExtGet("targetSdkVersion", 36)
     versionCode 1
     versionName "1.0.0"
+    buildConfigField "String", "CLERK_EXPO_VERSION", "\"${clerkExpoVersion}\""
   }
 
   buildTypes {
@@ -60,6 +66,7 @@ android {
   }
 
   buildFeatures {
+    buildConfig = true
     compose = true
   }
 
