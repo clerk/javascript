@@ -304,6 +304,8 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('does not bounce a JS client listener event while applying a native client change', async () => {
+    mocks.getClientToken.mockResolvedValue(null);
+
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -1042,6 +1044,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('ignores native client events that echo a JS-originated sync', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
+    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
