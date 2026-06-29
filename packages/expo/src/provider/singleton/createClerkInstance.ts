@@ -53,6 +53,7 @@ function hasOwnOption<Key extends keyof BuildClerkOptions>(
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+// Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
 
 /**
