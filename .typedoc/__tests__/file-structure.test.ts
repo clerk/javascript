@@ -64,6 +64,8 @@ describe('Typedoc output', () => {
         "backend/email-address-api/methods",
         "backend/enterprise-connection-api",
         "backend/enterprise-connection-api/methods",
+        "backend/instance-api",
+        "backend/instance-api/methods",
         "backend/invitation-api",
         "backend/invitation-api/methods",
         "backend/m2-m-token-api",

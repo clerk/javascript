@@ -140,6 +140,10 @@ export const BACKEND_API_CONFIG = {
     symbol: 'APIKeysAPI',
     declarationHint: 'api/endpoints/APIKeysApi',
   },
+  'backend/instance-api/instance-api.mdx': {
+    symbol: 'InstanceAPI',
+    declarationHint: 'api/endpoints/InstanceApi',
+  },
 };
 
 /** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
