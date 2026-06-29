@@ -280,4 +280,108 @@ describe('createClerkInstance', () => {
 
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
   });
+
+  test('uses the latest explicit tokenCache for request authorization when the singleton is reused', async () => {
+    const initialTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve(null)),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+    const latestTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve('cached-token')),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: initialTokenCache,
+    }) as unknown as MockClerk;
+
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: latestTokenCache,
+    });
+    getClerkInstance();
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const requestInit = {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+    await beforeRequest(requestInit);
+
+    expect(requestInit.headers.get('authorization')).toBe('cached-token');
+  });
+
+  test('preserves the latest tokenCache when the singleton is reused without one', async () => {
+    const initialTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve(null)),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+    const latestTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve('cached-token')),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: initialTokenCache,
+    }) as unknown as MockClerk;
+
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: latestTokenCache,
+    });
+    getClerkInstance({ publishableKey: 'pk_test_123' });
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const requestInit = {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+    await beforeRequest(requestInit);
+
+    expect(requestInit.headers.get('authorization')).toBe('cached-token');
+  });
+
+  test('uses the latest explicit tokenCache for response authorization when the singleton is reused', async () => {
+    const initialTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve(null)),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+    const latestTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve(null)),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: initialTokenCache,
+    }) as unknown as MockClerk;
+
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: latestTokenCache,
+    });
+
+    const afterResponse = clerk.__internal_onAfterResponse.mock.calls[0][0];
+    await afterResponse(
+      {
+        headers: new Headers(),
+        url: new URL('https://clerk.example.com/v1/client'),
+      },
+      {
+        headers: new Headers({ authorization: 'fresh-token' }),
+        payload: null,
+      },
+    );
+
+    expect(initialTokenCache.saveToken).not.toHaveBeenCalled();
+    expect(latestTokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'fresh-token');
+  });
 });
