@@ -924,10 +924,10 @@ importers:
         specifier: ^7.7.1
         version: 7.7.1
       semver:
-        specifier: ^7.7.4
-        version: 7.8.2
+        specifier: ^7.8.5
+        version: 7.8.5
       yaml:
-        specifier: ^2.8.3
+        specifier: ^2.9.0
         version: 2.9.0
 
   packages/react-router:
@@ -13970,8 +13970,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  semver@7.8.2:
-    resolution: {integrity: sha512-c8jsqUZm3omBOI66G90z1Dyw5z622G8oLG+omfsHBJf3CWQTlOcwOjvOG6wtiNfW6anKm/eA39LMwMtMez2TiQ==}
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -19248,7 +19248,7 @@ snapshots:
       es-toolkit: 1.47.0
       js-yaml: 4.2.0
       obug: 2.1.3
-      semver: 7.8.2
+      semver: 7.8.5
       typanion: 3.14.0
     optionalDependencies:
       '@emnapi/runtime': 1.10.0
@@ -19600,7 +19600,7 @@ snapshots:
       perfect-debounce: 2.1.0
       pkg-types: 2.3.1
       scule: 1.3.0
-      semver: 7.8.2
+      semver: 7.8.5
       srvx: 0.11.16
       std-env: 4.1.0
       tinyclip: 0.1.13
@@ -19634,7 +19634,7 @@ snapshots:
       magicast: 0.5.3
       pathe: 2.0.3
       pkg-types: 2.3.1
-      semver: 7.8.2
+      semver: 7.8.5
 
   '@nuxt/devtools@3.2.4(bufferutil@4.1.0)(utf-8-validate@5.0.10)(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(vue@3.5.35(typescript@6.0.3))':
     dependencies:
@@ -19661,7 +19661,7 @@ snapshots:
       pathe: 2.0.3
       perfect-debounce: 2.1.0
       pkg-types: 2.3.1
-      semver: 7.8.2
+      semver: 7.8.5
       simple-git: 3.36.0
       sirv: 3.0.2
       structured-clone-es: 2.0.0
@@ -19694,7 +19694,7 @@ snapshots:
       pkg-types: 2.3.1
       rc9: 3.0.1
       scule: 1.3.0
-      semver: 7.8.2
+      semver: 7.8.5
       tinyglobby: 0.2.17
       ufo: 1.6.4
       unctx: 2.5.0
@@ -20947,7 +20947,7 @@ snapshots:
       es-toolkit: 1.47.0
       filesize: 10.1.6
       fs-extra: 11.3.2
-      semver: 7.8.2
+      semver: 7.8.5
       source-map: 0.7.6
     transitivePeerDependencies:
       - '@emnapi/core'
@@ -22554,7 +22554,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.58.0
       debug: 4.4.3(supports-color@8.1.1)
       minimatch: 10.2.5
-      semver: 7.8.2
+      semver: 7.8.5
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
@@ -23616,7 +23616,7 @@ snapshots:
       piccolore: 0.1.3
       picomatch: 4.0.4
       rehype: 13.0.2
-      semver: 7.8.2
+      semver: 7.8.5
       shiki: 4.1.0
       smol-toml: 1.6.1
       svgo: 4.0.1
@@ -29638,7 +29638,7 @@ snapshots:
       rollup: 4.61.0
       rollup-plugin-visualizer: 7.0.1(rolldown@1.1.0)(rollup@4.61.0)
       scule: 1.3.0
-      semver: 7.8.2
+      semver: 7.8.5
       serve-placeholder: 2.0.2
       serve-static: 2.2.1
       source-map: 0.7.6
@@ -29869,7 +29869,7 @@ snapshots:
       pkg-types: 2.3.1
       rou3: 0.8.1
       scule: 1.3.0
-      semver: 7.8.2
+      semver: 7.8.5
       std-env: 4.1.0
       tinyglobby: 0.2.17
       ufo: 1.6.4
@@ -31732,7 +31732,7 @@ snapshots:
 
   semver@7.7.4: {}
 
-  semver@7.8.2: {}
+  semver@7.8.5: {}
 
   send@0.19.2:
     dependencies:
@@ -31888,7 +31888,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.0.0
       detect-libc: 2.1.2
-      semver: 7.8.2
+      semver: 7.8.5
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
@@ -32751,7 +32751,7 @@ snapshots:
       picomatch: 4.0.4
       rolldown: 1.1.0
       rolldown-plugin-dts: 0.25.2(rolldown@1.1.0)(typescript@6.0.3)(vue-tsc@3.2.4(typescript@6.0.3))
-      semver: 7.8.2
+      semver: 7.8.5
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tree-kill: 1.2.2
