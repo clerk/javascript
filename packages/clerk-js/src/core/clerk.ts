@@ -1916,7 +1916,7 @@ export class Clerk implements ClerkInterface {
 
       if (customNavigate) {
         debugLogger.info(`Clerk is navigating to: ${to}`);
-        return await customNavigate(to, { windowNavigate });
+        return await customNavigate(to, { windowNavigate: this.__internal_windowNavigate });
       }
 
       // No window.location and no custom router - can't navigate
@@ -1955,13 +1955,13 @@ export class Clerk implements ClerkInterface {
 
     // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
     if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
-      windowNavigate(toURL);
+      this.__internal_windowNavigate(toURL);
       return;
     }
 
     const metadata = {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
-      windowNavigate,
+      windowNavigate: this.__internal_windowNavigate,
     };
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
@@ -3577,6 +3577,21 @@ export class Clerk implements ClerkInterface {
 
     return allowedProtocols;
   }
+
+  /**
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (the static `ALLOWED_PROTOCOLS` ∪ the customer extension),
+   * so internal callers honor customer protocols automatically.
+   *
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension when a call site
+   * must reject any protocol the customer added. There is no current internal consumer of the
+   * opt-out; it exists for future security-critical paths.
+   */
+  public __internal_windowNavigate = (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }): void => {
+    const allowedProtocols = opts?.useStaticAllowlistOnly ? ALLOWED_PROTOCOLS : this.#allowedRedirectProtocols;
+    windowNavigate(to, { allowedProtocols });
+  };
 
   #isLoaded(): this is LoadedClerk {
     return this.client !== undefined;

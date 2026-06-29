@@ -6,7 +6,7 @@ import type {
   SignInResource,
   UnsubscribeCallback,
 } from '@clerk/shared/types';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
@@ -215,7 +215,9 @@ describe('isomorphicClerk', () => {
         load: vi.fn().mockResolvedValue(undefined),
         loaded: false,
       };
-      const mockClerkCtor = vi.fn().mockImplementation(() => mockInstance);
+      const mockClerkCtor = vi.fn().mockImplementation(function () {
+        return mockInstance;
+      });
       mockClerkCtor.prototype = {};
 
       const clerk = new IsomorphicClerk({
@@ -432,6 +434,96 @@ describe('isomorphicClerk', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('__internal_windowNavigate', () => {
+    let originalLocation: Location;
+    let hrefSetter: Mock<(value: unknown) => void>;
+    let warnSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      originalLocation = window.location;
+      hrefSetter = vi.fn<(value: unknown) => void>();
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: new Proxy(
+          { href: 'https://example.com/' },
+          {
+            set: (target, prop, value) => {
+              if (prop === 'href') {
+                hrefSetter(value);
+              }
+              (target as any)[prop] = value;
+              return true;
+            },
+          },
+        ),
+      });
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+      warnSpy.mockRestore();
+    });
+
+    it('delegates to clerk-js when the navigation chokepoint is available', () => {
+      const navigate = vi.fn();
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = { __internal_windowNavigate: navigate };
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in', { useStaticAllowlistOnly: true });
+
+      expect(navigate).toHaveBeenCalledWith('/sign-in', { useStaticAllowlistOnly: true });
+      expect(hrefSetter).not.toHaveBeenCalled();
+    });
+
+    it('falls back to navigation when clerk-js is older and lacks the chokepoint', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      // An older clerk-js that does not expose __internal_windowNavigate.
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in');
+
+      expect(hrefSetter).toHaveBeenCalledWith('https://example.com/sign-in');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback honors the customer-supplied allowedRedirectProtocols option', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123');
+
+      expect(hrefSetter).toHaveBeenCalledWith('slack://channel/123');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback fails closed for disallowed protocols', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('javascript:alert(1)');
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('fallback ignores customer protocols when useStaticAllowlistOnly is set', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123', { useStaticAllowlistOnly: true });
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
