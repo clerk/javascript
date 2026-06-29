@@ -24,7 +24,6 @@ export class BillingCreditLedger extends BaseResource implements BillingCreditLe
     }
 
     this.id = data.id;
-    this.payerId = data.payer_id;
     this.amount = data.amount;
     this.currency = data.currency;
     this.sourceType = data.source_type;

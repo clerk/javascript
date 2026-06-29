@@ -940,11 +940,6 @@ export interface BillingSubscriptionResource extends ClerkResource {
    * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial: boolean;
-
-  /**
-   * The ID of the payer for this subscription.
-   */
-  payerId: string;
 }
 
 /**
@@ -979,7 +974,6 @@ export type GetCreditHistoryParams = {
  */
 export interface BillingCreditLedgerResource {
   id: string;
-  payerId: string;
   amount: number;
   currency: string;
   sourceType: string;

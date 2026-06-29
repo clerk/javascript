@@ -926,7 +926,6 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
   eligible_for_free_trial: boolean;
-  payer_id: string;
 }
 
 /**
@@ -943,7 +942,6 @@ export interface BillingCreditBalanceJSON {
 export interface BillingCreditLedgerJSON {
   object: 'commerce_credit_ledger';
   id: string;
-  payer_id: string;
   amount: number;
   currency: string;
   source_type: string;
