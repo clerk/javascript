@@ -9,57 +9,31 @@ import type {
  */
 export class EnterpriseConnectionSamlConnection {
   constructor(
-    /**
-     * The unique identifier for the SAML connection.
-     */
+    /** The unique identifier for the SAML connection. */
     readonly id: string,
-    /**
-     * The name to use as a label for the connection.
-     */
+    /** The name to use as a label for the connection. */
     readonly name: string,
-    /**
-     * The Entity ID as provided by the Identity Provider (IdP).
-     */
+    /** The Entity ID as provided by the Identity Provider (IdP). */
     readonly idpEntityId: string,
-    /**
-     * The Single-Sign On URL as provided by the Identity Provider (IdP).
-     */
+    /** The Single-Sign On URL as provided by the Identity Provider (IdP). */
     readonly idpSsoUrl: string,
-    /**
-     * The X.509 certificate as provided by the Identity Provider (IdP).
-     */
+    /** The X.509 certificate as provided by the Identity Provider (IdP). */
     readonly idpCertificate: string,
-    /**
-     * The URL which serves the Identity Provider (IdP) metadata.
-     */
+    /** The URL which serves the Identity Provider (IdP) metadata. */
     readonly idpMetadataUrl: string,
-    /**
-     * The XML content of the Identity Provider (IdP) metadata file.
-     */
+    /** The XML content of the Identity Provider (IdP) metadata file. */
     readonly idpMetadata: string,
-    /**
-     * The Assertion Consumer Service (ACS) URL of the connection.
-     */
+    /** The Assertion Consumer Service (ACS) URL of the connection. */
     readonly acsUrl: string,
-    /**
-     * The Entity ID as provided by the Service Provider (Clerk).
-     */
+    /** The Entity ID as provided by the Service Provider (Clerk). */
     readonly spEntityId: string,
-    /**
-     * The metadata URL as provided by the Service Provider (Clerk).
-     */
+    /** The metadata URL as provided by the Service Provider (Clerk). */
     readonly spMetadataUrl: string,
-    /**
-     * Indicates whether the connection syncs user attributes between the IdP and Clerk.
-     */
+    /** Whether the connection syncs user attributes between the IdP and Clerk. */
     readonly syncUserAttributes: boolean,
-    /**
-     * Indicates whether users with an email address subdomain are allowed to use this connection.
-     */
+    /** Whether users with an email address subdomain are allowed to use this connection. */
     readonly allowSubdomains: boolean,
-    /**
-     * Indicates whether Identity Provider (IdP) initiated flows are allowed.
-     */
+    /** Whether IdP-initiated SSO is allowed. */
     readonly allowIdpInitiated: boolean,
   ) {}
 
@@ -152,19 +126,19 @@ export class EnterpriseConnection {
      */
     readonly organizationId: string | null,
     /**
-     * Indicates whether the connection is active or not.
+     * Whether the connection is active or not.
      */
     readonly active: boolean,
     /**
-     * Indicates whether the connection syncs user attributes between the IdP and Clerk or not.
+     * Whether the connection syncs user attributes between the IdP and Clerk or not.
      */
     readonly syncUserAttributes: boolean,
     /**
-     * Indicates whether users with an email address subdomain are allowed to use this connection or not.
+     * Whether users with an email address subdomain are allowed to use this connection or not.
      */
     readonly allowSubdomains: boolean,
     /**
-     * Indicates whether additional identifications are disabled for this connection.
+     * Whether additional identifications are disabled for this connection.
      */
     readonly disableAdditionalIdentifications: boolean,
     /**

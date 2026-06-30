@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.23.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix native OAuth transport handling for combined sign-in-or-up flows so transfer callbacks can continue instead of surfacing a generic OAuth callback failure. ([#9037](https://github.com/clerk/javascript/pull/9037)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Refactor the internal token cache so entry keys are derived through a dedicated `KeyResolver` module. This is an internal change with no effect on caching behavior or the public API. ([#9032](https://github.com/clerk/javascript/pull/9032)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
 ## 6.22.1
 
 ### Patch Changes
