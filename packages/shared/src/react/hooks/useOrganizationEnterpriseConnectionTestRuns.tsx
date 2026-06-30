@@ -89,6 +89,17 @@ export type RevalidateTestRunsOptions = {
    * @default true
    */
   armPolling?: boolean;
+  /**
+   * Invalidate only this query's exact `queryKey` instead of the broad
+   * org+connection `invalidationKey`. The default broad invalidation
+   * prefix-matches every test-runs query for the connection, so a sibling query
+   * (e.g. a success probe sharing the org+connection key with the visible list)
+   * refetches too. Pass `true` to refetch ONLY this query and leave the siblings
+   * — and their loading indicators — untouched.
+   *
+   * @default false
+   */
+  exact?: boolean;
 };
 
 /**
@@ -181,7 +192,17 @@ function useOrganizationEnterpriseConnectionTestRuns(
       // resolve with it, so a caller can gate on the up-to-date result right
       // after `await` — this hook's own `data` state is still the pre-refetch
       // value inside the caller's closure until a re-render lands.
-      await queryClient.invalidateQueries({ queryKey: invalidationKey });
+      //
+      // `exact` scopes the invalidation: the broad `invalidationKey` (org +
+      // connection, no fetch params) prefix-matches every test-runs query for
+      // the connection, so it refetches this query AND its siblings (the success
+      // probe alongside the visible list). `exact: true` invalidates only this
+      // query's own `queryKey`, leaving sibling queries untouched.
+      if (options?.exact) {
+        await queryClient.invalidateQueries({ queryKey, exact: true });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: invalidationKey });
+      }
       const fresh = queryClient.getQueryData<{
         data?: EnterpriseConnectionTestRunResource[];
         total_count?: number;

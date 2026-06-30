@@ -123,8 +123,11 @@ export const useEnterpriseConnectionTestRuns = (
   const revalidateHasSuccessfulTestRun = useCallback(async () => {
     // The probe is the success-filtered query, so a non-empty fresh page is the
     // up-to-date "has a successful run" answer. `armPolling: false`: this is a
-    // one-shot check on Continue, never a polling arm.
-    const { data } = await revalidateProbe({ armPolling: false });
+    // one-shot check on Continue, never a polling arm. `exact: true`: invalidate
+    // only the probe's own query, never the broad org+connection key — so
+    // clicking Continue does not also refetch the visible list (which would spin
+    // the "Refresh logs" button bound to the list's `isFetching`).
+    const { data } = await revalidateProbe({ armPolling: false, exact: true });
     return (data?.length ?? 0) > 0;
   }, [revalidateProbe]);
 
