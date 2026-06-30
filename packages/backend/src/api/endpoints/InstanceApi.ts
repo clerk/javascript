@@ -85,7 +85,7 @@ export class InstanceAPI extends AbstractAPI {
 
   /**
    * Updates the [restriction](https://clerk.com/docs/guides/secure/restricting-access) settings for the current instance.
-   * @returns The updated [`InstanceRestrictions`](https://clerk.com/docs/reference/backend/types/backend-instance-restrictions).
+   * @returns The updated [`InstanceRestrictions`](https://clerk.com/docs/reference/backend/types/backend-instance-restrictions) object.
    */
   public async updateRestrictions(params: UpdateRestrictionsParams) {
     return this.request<InstanceRestrictions>({
@@ -96,7 +96,8 @@ export class InstanceAPI extends AbstractAPI {
   }
 
   /**
-   * Gets the [`OrganizationSettings`](https://clerk.com/docs/reference/backend/types/backend-organization-settings) for the current instance.
+   * Gets the [Organization-related settings](https://clerk.com/docs/guides/organizations/configure) for the current instance.
+   * @returns The [`OrganizationSettings`](https://clerk.com/docs/reference/backend/types/backend-organization-settings) object.
    */
   public async getOrganizationSettings() {
     return this.request<OrganizationSettings>({
@@ -107,7 +108,7 @@ export class InstanceAPI extends AbstractAPI {
 
   /**
    * Updates the [Organization-related settings](https://clerk.com/docs/guides/organizations/configure) for the current instance.
-   * @returns The updated [`OrganizationSettings`](https://clerk.com/docs/reference/backend/types/backend-organization-settings).
+   * @returns The updated [`OrganizationSettings`](https://clerk.com/docs/reference/backend/types/backend-organization-settings) object.
    */
   public async updateOrganizationSettings(params: UpdateOrganizationSettingsParams) {
     return this.request<OrganizationSettings>({

@@ -18,7 +18,7 @@ export class OrganizationSettings {
     readonly adminDeleteEnabled: boolean,
     /** Whether the instance has [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) enabled. */
     readonly domainsEnabled: boolean,
-    /** Whether the instance has [Organization slugs](https://clerk.com/docs/guides/organizations/add-members/verified-domains#organization-slugs) disabled. */
+    /** Whether the instance has [Organization slugs](https://clerk.com/docs/guides/organizations/configure#organization-slugs) disabled. */
     readonly slugDisabled: boolean,
     /**
      * The [enrollment modes](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains) available for Verified Domains.
