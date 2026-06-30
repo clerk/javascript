@@ -49,8 +49,8 @@ import { TokenId } from '@/utils/tokenId';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
-import { isStrictlyStalerJwt, normalizeOrgId, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
 import { SessionTokenCache } from '../tokenCache';
+import { isStrictlyStalerJwt, normalizeOrgId, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
