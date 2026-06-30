@@ -37,6 +37,17 @@ type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
   oauthApplicationId: string;
 };
 
+type RevokeOAuthApplicationTokenParams = {
+  /**
+   * The ID of the OAuth application for which to revoke the token.
+   */
+  oauthApplicationId: string;
+  /**
+   * The opaque OAuth access token or refresh token to revoke.
+   */
+  token: string;
+};
+
 type GetOAuthApplicationListParams = ClerkPaginationRequest<{
   /**
    * Sorts OAuth applications by name or created_at.
@@ -98,6 +109,18 @@ export class OAuthApplicationsApi extends AbstractAPI {
     return this.request<OAuthApplication>({
       method: 'POST',
       path: joinPaths(basePath, oauthApplicationId, 'rotate_secret'),
+    });
+  }
+
+  public async revokeToken(params: RevokeOAuthApplicationTokenParams) {
+    const { oauthApplicationId, ...bodyParams } = params;
+
+    this.requireId(oauthApplicationId);
+
+    return this.request<void>({
+      method: 'POST',
+      path: joinPaths(basePath, oauthApplicationId, 'revoke_token'),
+      bodyParams,
     });
   }
 }
