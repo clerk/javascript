@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider, Global } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import React from 'react';
 
 import type { MosaicAppearance } from './appearance';
@@ -37,9 +37,12 @@ const ensureInsertionPoint = (): HTMLElement | null => {
 // it has 0 specificity: any component class (recipe / sx / appearance) wins regardless of
 // stylesheet insertion order — a plain `[data-cl-slot]` selector (0,1,0) ties with the generated
 // class and would override it on insertion order, undoing component padding/margin.
-const mosaicReset = {
-  ':where([data-cl-slot])': { boxSizing: 'border-box', margin: 0, padding: 0, fontFamily: 'inherit' },
-} as const;
+//
+// Rendered as a plain <style>, not Emotion's <Global>: <Global> emits an inline <style> during SSR
+// but injects via an insertion effect (rendering null) on the client, so the two trees never match
+// and hydration throws. A static <style> is byte-identical on server and client, so it hydrates
+// cleanly. Order doesn't matter thanks to `:where()`, so it needn't live in the Emotion cache.
+const MOSAIC_RESET_CSS = ':where([data-cl-slot]){box-sizing:border-box;margin:0;padding:0;font-family:inherit;}';
 
 const MosaicThemeContext = React.createContext<MosaicTheme | null>(null);
 
@@ -84,7 +87,12 @@ export function MosaicProvider({
       <MosaicAppearanceProvider value={parsedElements}>
         <MosaicIconsProvider value={icons}>
           <CacheProvider value={cache}>
-            <Global styles={mosaicReset} />
+            <style
+              nonce={nonce}
+              dangerouslySetInnerHTML={{
+                __html: cssLayerName ? `@layer ${cssLayerName}{${MOSAIC_RESET_CSS}}` : MOSAIC_RESET_CSS,
+              }}
+            />
             {children}
           </CacheProvider>
         </MosaicIconsProvider>
