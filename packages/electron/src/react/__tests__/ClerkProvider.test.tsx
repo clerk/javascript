@@ -40,6 +40,13 @@ vi.mock('@clerk/shared/loadClerkJsScript', async importOriginal => ({
   loadClerkUIScript,
 }));
 
+function stubWindowProtocol(protocol: string) {
+  vi.stubGlobal('window', {
+    ...window,
+    location: { protocol },
+  });
+}
+
 describe('Electron ClerkProvider', () => {
   const tokenCache = {
     clearToken: vi.fn(),
@@ -93,7 +100,7 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('defaults allowedRedirectProtocols to the renderer custom scheme', () => {
-    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+    stubWindowProtocol('clerk:');
 
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_scheme_default'>App</ClerkProvider>);
 
@@ -101,7 +108,7 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('does not add standard web protocols to allowedRedirectProtocols', () => {
-    (window as unknown as { location: { protocol: string } }).location = { protocol: 'https:' };
+    stubWindowProtocol('https:');
 
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_https_origin'>App</ClerkProvider>);
 
@@ -109,7 +116,7 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('does not add file protocol to allowedRedirectProtocols', () => {
-    (window as unknown as { location: { protocol: string } }).location = { protocol: 'file:' };
+    stubWindowProtocol('file:');
 
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_file_origin'>App</ClerkProvider>);
 
@@ -117,7 +124,7 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('respects an explicit allowedRedirectProtocols value over the scheme default', () => {
-    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+    stubWindowProtocol('clerk:');
 
     renderToStaticMarkup(
       <ClerkProvider
@@ -132,7 +139,7 @@ describe('Electron ClerkProvider', () => {
   });
 
   it('respects an explicit empty allowedRedirectProtocols array', () => {
-    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+    stubWindowProtocol('clerk:');
 
     renderToStaticMarkup(
       <ClerkProvider
