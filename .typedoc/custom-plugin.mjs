@@ -138,18 +138,6 @@ const LINK_REPLACEMENTS = [
   ],
   ['create-organization-domain-params', '#create-organization-domain-params'],
   ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
-  [
-    'prepare-affiliation-verification-params',
-    '/docs/reference/types/organization-domain-resource#prepare-affiliation-verification-params',
-  ],
-  [
-    'attempt-affiliation-verification-params',
-    '/docs/reference/types/organization-domain-resource#attempt-affiliation-verification-params',
-  ],
-  [
-    'organization-domain-ownership-verification',
-    '/docs/reference/types/organization-domain-resource#organization-domain-verification',
-  ],
 ];
 
 /**
