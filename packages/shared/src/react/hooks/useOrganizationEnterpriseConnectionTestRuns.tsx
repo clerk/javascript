@@ -76,7 +76,9 @@ export type UseOrganizationEnterpriseConnectionTestRunsReturn = {
    * `revalidate()` (or `revalidate({ armPolling: true })`) after a run is kicked
    * off.
    */
-  revalidate: (options?: RevalidateTestRunsOptions) => Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult>;
+  revalidate: (
+    options?: RevalidateTestRunsOptions,
+  ) => Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult>;
 };
 
 export type RevalidateTestRunsOptions = {
@@ -161,7 +163,9 @@ function useOrganizationEnterpriseConnectionTestRuns(
   }, [shouldPoll, hasRows]);
 
   const revalidate = useCallback(
-    async (options?: RevalidateTestRunsOptions): Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult> => {
+    async (
+      options?: RevalidateTestRunsOptions,
+    ): Promise<UseOrganizationEnterpriseConnectionTestRunsRevalidateResult> => {
       // Arm polling only when the caller opts in (the default) AND there is
       // nothing in the list yet. An entry/pagination refetch passes
       // `armPolling: false` so an empty list on entry never arms polling on its
