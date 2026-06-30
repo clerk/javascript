@@ -11,6 +11,7 @@ let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let isLoaded: boolean;
+let isSessionLoaded: boolean;
 let organization: { id: string; name: string; destroy: () => Promise<void>; adminDeleteEnabled: boolean } | null;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
@@ -19,7 +20,10 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useOrganization: () => ({ isLoaded, organization, membership: null }),
     useOrganizationList: () => ({ userMemberships: { revalidate } }),
-    useSession: () => ({ session: { id: 'sess_1', checkAuthorization } }),
+    useSession: () => ({
+      isLoaded: isSessionLoaded,
+      session: isSessionLoaded ? { id: 'sess_1', checkAuthorization } : undefined,
+    }),
   };
 });
 
@@ -28,6 +32,7 @@ beforeEach(() => {
   revalidate = vi.fn().mockResolvedValue(undefined);
   checkAuthorization = vi.fn().mockReturnValue(true);
   isLoaded = true;
+  isSessionLoaded = true;
   organization = { id: 'org_1', name: ORG_NAME, destroy, adminDeleteEnabled: true };
 });
 
@@ -64,6 +69,15 @@ describe('useDeleteOrganizationController', () => {
     render(<Harness />);
 
     expect(screen.getByTestId('state')).toHaveTextContent('loading');
+  });
+
+  it('is loading until the session is loaded', () => {
+    isSessionLoaded = false;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('loading');
+    expect(checkAuthorization).not.toHaveBeenCalled();
   });
 
   it('is ready when the user can delete and admin delete is enabled', () => {

@@ -33,11 +33,14 @@ export function useLeaveOrganizationController(): LeaveOrganizationController {
     },
   });
 
-  if (!isLoaded) {
+  // `membership === undefined` means Clerk is still hydrating it (e.g. SSR), so
+  // keep it in 'loading'. Only an explicit `null` means there is no membership
+  // to leave, which is genuinely 'hidden'.
+  if (!isLoaded || membership === undefined) {
     return { status: 'loading' };
   }
 
-  if (!organization || !membership) {
+  if (!organization || membership === null) {
     return { status: 'hidden' };
   }
 

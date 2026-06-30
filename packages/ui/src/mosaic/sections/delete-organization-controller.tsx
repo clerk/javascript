@@ -16,8 +16,8 @@ type DeleteOrganizationController =
     };
 
 export function useDeleteOrganizationController(): DeleteOrganizationController {
-  const { isLoaded, organization } = useOrganization();
-  const { session } = useSession();
+  const { isLoaded: isOrganizationLoaded, organization } = useOrganization();
+  const { isLoaded: isSessionLoaded, session } = useSession();
   const { userMemberships } = useOrganizationList({ userMemberships: true });
 
   const [snapshot, send, actor] = useMachine(deleteOrgMachine, {
@@ -34,7 +34,10 @@ export function useDeleteOrganizationController(): DeleteOrganizationController 
     },
   });
 
-  if (!isLoaded) {
+  // The permission check needs both the organization and the session resolved.
+  // Treat either still loading as 'loading' so a not-yet-known session is never
+  // collapsed into a definitive 'hidden'.
+  if (!isOrganizationLoaded || !isSessionLoaded) {
     return { status: 'loading' };
   }
 

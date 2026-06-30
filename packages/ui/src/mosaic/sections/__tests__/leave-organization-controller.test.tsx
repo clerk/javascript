@@ -11,7 +11,7 @@ let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
 let isLoaded: boolean;
 let organization: { id: string; name: string } | null;
-let membership: { id: string; destroy: () => Promise<void> } | null;
+let membership: { id: string; destroy: () => Promise<void> } | null | undefined;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react')>();
@@ -59,6 +59,14 @@ function openAndConfirm() {
 describe('useLeaveOrganizationController', () => {
   it('is loading until useOrganization is loaded', () => {
     isLoaded = false;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('loading');
+  });
+
+  it('is loading while membership is still resolving', () => {
+    membership = undefined;
 
     render(<Harness />);
 
