@@ -146,6 +146,15 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   }
   const hadInitialConnection = hadInitialConnectionRef.current === true;
 
+  // Has the very first page load — including the gated test-runs probe — settled
+  // at least once? Latches `true` exactly once and never flips back. Render-phase
+  // ref, matching `hadInitialConnectionRef` above: it records a one-time fact
+  // about load, it does not sync state to props. This is what scopes the
+  // test-runs term to the genuine initial load in the `isLoading` derivation
+  // before the return — so a mid-session reconfigure's cold test-runs load stays
+  // table-level and never re-raises the page skeleton.
+  const hasSettledRef = useRef(false);
+
   // The test-runs source is relevant exactly when the connection is configured —
   // the same condition that makes the Test step reachable
   // (`hasMinimumConfiguration || isActive`). Deriving activation straight from
@@ -317,16 +326,36 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     [enterpriseConnection, hasSuccessfulTestRun],
   );
 
+  // Test-runs gate the full skeleton only during the genuine FIRST page load,
+  // and only when a connection was present then (that case fetches them as part
+  // of the initial load). After the first settle the latch below freezes this
+  // contribution off: on the fresh-start path test-runs stay dormant until the
+  // connection is configured, and a later (re)configure's cold test-runs load
+  // surfaces as table-level loading, never the global skeleton.
+  const isInitialLoad = !hasSettledRef.current;
+  const isLoading =
+    isLoadingEnterpriseConnections ||
+    isLoadingOrganizationDomains ||
+    (isInitialLoad && hadInitialConnection && isLoadingTestRuns);
+
+  // Latch settled once that first load — connections, domains, and (when gated)
+  // the test-runs probe — has finished. Evaluated AFTER `isLoading` so this
+  // render still counts as the initial load; from the next render on, test-runs
+  // no longer feed the page-level flag.
+  if (
+    isInitialLoad &&
+    !isLoadingEnterpriseConnections &&
+    !isLoadingOrganizationDomains &&
+    (!hadInitialConnection || !isLoadingTestRuns)
+  ) {
+    hasSettledRef.current = true;
+  }
+
   return {
     user,
     session,
     organization,
-    // Test-runs gate the full skeleton only when a connection was present at
-    // first load — that case fetches them as part of the initial load. On the
-    // fresh-start path they stay dormant until the connection is configured, and
-    // landing on the test step then shows table-level loading, never the global
-    isLoading:
-      isLoadingEnterpriseConnections || isLoadingOrganizationDomains || (hadInitialConnection && isLoadingTestRuns),
+    isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,
