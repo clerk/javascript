@@ -230,8 +230,9 @@ export class Session extends BaseResource implements SessionResource {
     const baseline = held && isSameContext(tokenOrgId(held)) ? held : null;
 
     // With a same-context baseline, drop a wrong-org or strictly-staler incoming token. With no
-    // baseline, adopt it anyway: a bad token is still dropped downstream by the cookie guard,
-    // whereas an empty lastActiveToken reads as a sign-out and clears __session.
+    // baseline, adopt it anyway: an empty lastActiveToken reads as a sign-out and clears __session,
+    // which is worse than briefly carrying a token the next fetch corrects. A wrong-context token
+    // adopted here is not cached under the active-org key.
     if (baseline && (!sameContext || pickFreshestJwt(baseline, incoming) === baseline)) {
       this.lastActiveToken = baseline;
       return;
