@@ -108,6 +108,14 @@ describe('Electron ClerkProvider', () => {
     expect(capturedProviderProps?.allowedRedirectProtocols).toBeUndefined();
   });
 
+  it('does not add file protocol to allowedRedirectProtocols', () => {
+    (window as unknown as { location: { protocol: string } }).location = { protocol: 'file:' };
+
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_file_origin'>App</ClerkProvider>);
+
+    expect(capturedProviderProps?.allowedRedirectProtocols).toBeUndefined();
+  });
+
   it('respects an explicit allowedRedirectProtocols value over the scheme default', () => {
     (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
 
