@@ -942,7 +942,7 @@ export type GetCreditHistoryParams = {
 };
 
 /**
- * The `BillingCreditLedgerResource` type represents a credit ledger entry for a payer.
+ * The `BillingCreditLedgerResource` type represents a credit ledger entry for the current payer or given Organization.
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCreditLedgerResource {
