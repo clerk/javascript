@@ -22,9 +22,11 @@ export * from './JwtTemplatesApi';
 // UserApi's variants remain the canonical public exports through this barrel; OrganizationApi's
 // variants are reachable via direct import from `./OrganizationApi`, and typedoc still resolves
 // them locally on the class methods.
-// Similarly, `CreateParams` is defined on both `InvitationApi` and `OrganizationApi`. InvitationApi's
-// variant remains the canonical public export through this barrel (via `export * from './InvitationApi'`);
-// OrganizationApi's `CreateParams` is reachable via direct import from `./OrganizationApi`.
+// Similarly, `CreateParams` is defined on both `InvitationApi` and `OrganizationApi`, and
+// `UpdateParams` is defined on both `InstanceApi` and `OrganizationApi`. The InvitationApi /
+// InstanceApi variants remain the canonical public exports through this barrel (via their
+// `export * from` lines); OrganizationApi's `CreateParams` and `UpdateParams` are reachable via
+// direct import from `./OrganizationApi`.
 export { OrganizationAPI } from './OrganizationApi';
 export type {
   CreateBulkOrganizationInvitationParams,
@@ -45,7 +47,6 @@ export type {
   UpdateOrganizationDomainParams,
   UpdateOrganizationMembershipMetadataParams,
   UpdateOrganizationMembershipParams,
-  UpdateParams,
 } from './OrganizationApi';
 export * from './OrganizationPermissionApi';
 export * from './OrganizationRoleApi';
