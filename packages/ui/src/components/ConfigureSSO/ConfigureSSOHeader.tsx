@@ -1,4 +1,10 @@
-import { Flex, useLocalizations } from '@/customizables';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
+
+import { descriptors, Flex, Icon, useLocalizations } from '@/customizables';
+import { IconButton } from '@/elements/IconButton';
+import { useUnsafeModalContext } from '@/elements/Modal';
+import { useUnsafeProfileCardCloseButton } from '@/elements/ProfileCard';
+import { Close } from '@/icons';
 import { mqu } from '@/styledSystem';
 
 import { ProfileCardHeader } from './elements/ProfileCard';
@@ -12,6 +18,19 @@ type ConfigureSSOHeaderProps = {
 export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Element => {
   const { activeSteps, currentIndex, goToStep } = useWizard();
   const { t } = useLocalizations();
+  const { toggle } = useUnsafeModalContext();
+  const { setHeaderOwnsCloseButton } = useUnsafeProfileCardCloseButton();
+  const isModal = Boolean(toggle);
+
+  // In modal mode the header renders its own close button, so the card's shared
+  // absolute overlay hides on desktop. Lifecycle registration only.
+  useSafeLayoutEffect(() => {
+    if (!isModal) {
+      return;
+    }
+    setHeaderOwnsCloseButton?.(true);
+    return () => setHeaderOwnsCloseButton?.(false);
+  }, [isModal, setHeaderOwnsCloseButton]);
 
   // Breadcrumb membership = labelled steps. `select-provider` has no label, so
   // it is absent from the visual stepper while remaining a real navigable step.
@@ -45,6 +64,26 @@ export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Elem
           })}
         </Stepper>
       </Flex>
+
+      {isModal && (
+        <IconButton
+          elementDescriptor={descriptors.modalCloseButton}
+          variant='ghost'
+          aria-label='Close modal'
+          onClick={toggle}
+          icon={
+            <Icon
+              icon={Close}
+              size='md'
+            />
+          }
+          sx={t => ({
+            color: t.colors.$colorMutedForeground,
+            // Desktop-only: mobile falls back to the card's absolute close button.
+            [mqu.md]: { display: 'none' },
+          })}
+        />
+      )}
     </ProfileCardHeader>
   );
 };
