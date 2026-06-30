@@ -510,9 +510,7 @@ function collectPropertiesFromType(type, reflectionsByName) {
 }
 
 /**
- * Cheap structural fingerprint for a `Type`. One-level deep — enough to disambiguate
- * inline shapes used in different positions while staying fast on large projects. Two
- * shapes that produce the same fingerprint are treated as structurally identical.
+ * Cheap structural fingerprint for a `Type`. One-level deep — enough to disambiguate inline shapes used in different positions while staying fast on large projects. Two shapes that produce the same fingerprint are treated as structurally identical.
  *
  * @param {import('typedoc').SomeType | undefined} type
  * @returns {string}
@@ -551,18 +549,9 @@ function typeFingerprint(type) {
 }
 
 /**
- * When TypeScript resolves a type through `Omit<...>` / `Pick<...>` (e.g.
- * `ClerkProviderProps = Omit<IsomorphicClerkOptions, …> & { … }`), inline anonymous
- * object literal property types get re-synthesized — and TypeDoc loses the JSDoc on
- * most of their members. Only the first/leading property's comment survives, the
- * rest come through with `comment === undefined`. The same shape elsewhere in the
- * project (e.g. directly under `IsomorphicClerkOptions['telemetry']`) carries all
- * comments correctly.
+ * When TypeScript resolves a type through `Omit<...>` / `Pick<...>` (e.g. `ClerkProviderProps = Omit<IsomorphicClerkOptions, …> & { … }`), inline anonymous object literal property types get re-synthesized — and TypeDoc loses the JSDoc on most of their members. Only the first/leading property's comment survives, the rest come through with `comment === undefined`. The same shape elsewhere in the project (e.g. directly under `IsomorphicClerkOptions['telemetry']`) carries all comments correctly.
  *
- * Match `@kind:typeLiteral` reflections by structural fingerprint (set of
- * `(name, type, optional)` tuples on their property children); within each group,
- * pick the reflection with the most commented children as the source-of-truth and
- * copy missing comments onto its siblings.
+ * Match `@kind:typeLiteral` reflections by structural fingerprint (set of `(name, type, optional)` tuples on their property children); within each group, pick the reflection with the most commented children as the source-of-truth and copy missing comments onto its siblings.
  *
  * @param {import('typedoc').Reflection[]} all
  */
