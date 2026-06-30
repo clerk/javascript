@@ -2,41 +2,25 @@ import type { RoleJSON } from './JSON';
 import { Permission } from './Permission';
 
 /**
- * The Backend `Role` object represents an organization role that can be assigned to organization members.
+ * The Backend `Role` object represents an Organization [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) that can be assigned to Organization members.
  */
 export class Role {
   constructor(
-    /**
-     * The unique identifier for the role.
-     */
+    /** The unique identifier for the Role. */
     readonly id: string,
-    /**
-     * The name of the role.
-     */
+    /** The name of the Role. */
     readonly name: string,
-    /**
-     * The unique key of the role, in the format `org:role`.
-     */
+    /** The unique key of the Role, in the format `org:role`. */
     readonly key: string,
-    /**
-     * A description of the role.
-     */
+    /** A description of the Role. */
     readonly description: string | null,
-    /**
-     * The permissions assigned to the role.
-     */
+    /** The [Permissions](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) assigned to the Role. */
     readonly permissions: Permission[],
-    /**
-     * Whether this role is eligible to be an organization creator role.
-     */
+    /** Whether this Role is eligible to be an Organization creator Role. */
     readonly isCreatorEligible: boolean,
-    /**
-     * The date when the role was first created.
-     */
+    /** The Unix timestamp when the Role was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the role was last updated.
-     */
+    /** The Unix timestamp when the Role was last updated. */
     readonly updatedAt: number,
   ) {}
 

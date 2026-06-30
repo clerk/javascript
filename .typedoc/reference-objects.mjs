@@ -56,13 +56,106 @@ export const REFERENCE_OBJECT_CONFIG = {
   },
 };
 
-/** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG}. */
-export const REFERENCE_OBJECTS_LIST = Object.keys(REFERENCE_OBJECT_CONFIG);
+/**
+ * Backend API endpoint pages: identical extraction machinery as {@link REFERENCE_OBJECT_CONFIG}, but each `methods/<name>.mdx` is written in **page format** — no `### foo()` title at the top, and the `Parameters` section uses an `## H2` heading. The reference-object format uses an H3 title + H4 parameters, which suits pages that aggregate many methods on a single resource. Backend API method files are consumed standalone (one method per docs page), so the heading levels need to shift accordingly.
+ */
+export const BACKEND_API_CONFIG = {
+  'backend/user-api/user-api.mdx': {
+    symbol: 'UserAPI',
+    declarationHint: 'api/endpoints/UserApi',
+  },
+  'backend/organization-api/organization-api.mdx': {
+    symbol: 'OrganizationAPI',
+    declarationHint: 'api/endpoints/OrganizationApi',
+  },
+  'backend/billing-api/billing-api.mdx': {
+    symbol: 'BillingAPI',
+    declarationHint: 'api/endpoints/BillingApi',
+  },
+  'backend/allowlist-identifier-api/allowlist-identifier-api.mdx': {
+    symbol: 'AllowlistIdentifierAPI',
+    declarationHint: 'api/endpoints/AllowlistIdentifierApi',
+  },
+  'backend/domain-api/domain-api.mdx': {
+    symbol: 'DomainAPI',
+    declarationHint: 'api/endpoints/DomainApi',
+  },
+  'backend/session-api/session-api.mdx': {
+    symbol: 'SessionAPI',
+    declarationHint: 'api/endpoints/SessionApi',
+  },
+  'backend/client-api/client-api.mdx': {
+    symbol: 'ClientAPI',
+    declarationHint: 'api/endpoints/ClientApi',
+  },
+  'backend/invitation-api/invitation-api.mdx': {
+    symbol: 'InvitationAPI',
+    declarationHint: 'api/endpoints/InvitationApi',
+  },
+  'backend/redirect-url-api/redirect-url-api.mdx': {
+    symbol: 'RedirectUrlAPI',
+    declarationHint: 'api/endpoints/RedirectUrlApi',
+  },
+  'backend/email-address-api/email-address-api.mdx': {
+    symbol: 'EmailAddressAPI',
+    declarationHint: 'api/endpoints/EmailAddressApi',
+  },
+  'backend/phone-number-api/phone-number-api.mdx': {
+    symbol: 'PhoneNumberAPI',
+    declarationHint: 'api/endpoints/PhoneNumberApi',
+  },
+  'backend/agent-task-api/agent-task-api.mdx': {
+    symbol: 'AgentTaskAPI',
+    declarationHint: 'api/endpoints/AgentTaskApi',
+  },
+  'backend/sign-in-token-api/sign-in-token-api.mdx': {
+    symbol: 'SignInTokenAPI',
+    declarationHint: 'api/endpoints/SignInTokenApi',
+  },
+  'backend/enterprise-connection-api/enterprise-connection-api.mdx': {
+    symbol: 'EnterpriseConnectionAPI',
+    declarationHint: 'api/endpoints/EnterpriseConnectionApi',
+  },
+  'backend/testing-token-api/testing-token-api.mdx': {
+    symbol: 'TestingTokenAPI',
+    declarationHint: 'api/endpoints/TestingTokenApi',
+  },
+  'backend/waitlist-entry-api/waitlist-entry-api.mdx': {
+    symbol: 'WaitlistEntryAPI',
+    declarationHint: 'api/endpoints/WaitlistEntryApi',
+  },
+  'backend/machine-api/machine-api.mdx': {
+    symbol: 'MachineApi',
+    declarationHint: 'api/endpoints/MachineApi',
+  },
+  'backend/m2-m-token-api/m2-m-token-api.mdx': {
+    symbol: 'M2MTokenApi',
+    declarationHint: 'api/endpoints/M2MTokenApi',
+  },
+  'backend/o-auth-applications-api/o-auth-applications-api.mdx': {
+    symbol: 'OAuthApplicationsApi',
+    declarationHint: 'api/endpoints/OAuthApplicationsApi',
+  },
+  'backend/api-keys-api/api-keys-api.mdx': {
+    symbol: 'APIKeysAPI',
+    declarationHint: 'api/endpoints/APIKeysApi',
+  },
+  'backend/instance-api/instance-api.mdx': {
+    symbol: 'InstanceAPI',
+    declarationHint: 'api/endpoints/InstanceApi',
+  },
+};
+
+/** Stable iteration order matches key order in {@link REFERENCE_OBJECT_CONFIG} then {@link BACKEND_API_CONFIG}. */
+export const REFERENCE_OBJECTS_LIST = [...Object.keys(REFERENCE_OBJECT_CONFIG), ...Object.keys(BACKEND_API_CONFIG)];
 
 /**
  * Primary interface/class documented on each reference object page (used to resolve TypeDoc reflections).
- * Derived from {@link REFERENCE_OBJECT_CONFIG}; kept for callers that only need `pageUrl → symbol`.
+ * Includes both {@link REFERENCE_OBJECT_CONFIG} and {@link BACKEND_API_CONFIG} so the router applies the same folder-nesting rule to backend API pages.
  */
 export const REFERENCE_OBJECT_PAGE_SYMBOLS = Object.fromEntries(
-  Object.entries(REFERENCE_OBJECT_CONFIG).map(([url, { symbol }]) => [url, symbol]),
+  [...Object.entries(REFERENCE_OBJECT_CONFIG), ...Object.entries(BACKEND_API_CONFIG)].map(([url, { symbol }]) => [
+    url,
+    symbol,
+  ]),
 );
