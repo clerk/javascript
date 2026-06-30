@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.8.5
+
+### Patch Changes
+
+- Add an optional `externalAccountId` to the backend `ExternalAccount` resource. For Google and Facebook accounts the resource `id` is the `idn_`-prefixed identification id, which `users.deleteUserExternalAccount()` rejects; `externalAccountId` now exposes the `eac_`-prefixed id those calls expect. For all other providers `id` is already the `eac_` id and `externalAccountId` is `undefined`, so use `externalAccountId ?? id` to get an id you can delete with. ([#8995](https://github.com/clerk/javascript/pull/8995)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+
 ## 3.8.4
 
 ### Patch Changes

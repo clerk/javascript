@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.6.3
+
+### Patch Changes
+
+- Send Expo host SDK headers from the Android native bridge. ([#9031](https://github.com/clerk/javascript/pull/9031)) by [@mikepitre](https://github.com/mikepitre)
+
+- Record `useSignInWithGoogle` usage ([#9012](https://github.com/clerk/javascript/pull/9012)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix persisted session restoration when the native Clerk singleton is created before `ClerkProvider` receives the app's token cache. ([#8928](https://github.com/clerk/javascript/pull/8928)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Clarify the native Google Sign-In migration warning to mention the required Expo config plugin. ([#9019](https://github.com/clerk/javascript/pull/9019)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/clerk-js@6.22.1
+  - @clerk/react@6.11.2
+  - @clerk/shared@4.22.1
+
 ## 3.6.2
 
 ### Patch Changes

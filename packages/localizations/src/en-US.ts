@@ -903,6 +903,15 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        title: 'Account credit history',
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -1784,6 +1793,15 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        title: 'Account credit history',
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',

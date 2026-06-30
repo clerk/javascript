@@ -373,10 +373,10 @@ view
 Flow slices should be split by role:
 
 ```text
-delete-organization-machine.ts       // pure state machine
-delete-organization-controller.tsx    // Clerk/mock adapter + actor wiring
-delete-organization-view.tsx          // view-only rendering
-delete-organization.tsx               // thin composition wrapper
+delete-organization.machine.ts        // pure state machine
+delete-organization.controller.tsx     // Clerk/mock adapter + actor wiring
+delete-organization.view.tsx           // view-only rendering
+delete-organization.tsx                // thin composition wrapper
 ```
 
 The exported component composes the controller and view:
@@ -384,7 +384,11 @@ The exported component composes the controller and view:
 ```tsx
 export function DeleteOrganization() {
   const controller = useDeleteOrganizationController();
-  if (controller.status === 'loading') return <SectionSkeleton />;
+  // Render nothing until the controller is ready (mirrors the legacy sections,
+  // which gate their own visibility and show no skeleton).
+  if (controller.status !== 'ready') {
+    return null;
+  }
 
   return (
     <DeleteOrganizationView

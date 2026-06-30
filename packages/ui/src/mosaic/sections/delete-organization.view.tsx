@@ -2,7 +2,7 @@ import { Destructive } from '../block/destructive';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import type { Snapshot } from '../machine/types';
-import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization-machine';
+import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization.machine';
 
 interface DeleteOrganizationViewProps {
   snapshot: Snapshot<DeleteOrgContext>;
