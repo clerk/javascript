@@ -1,7 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationProfileGeneral } from '@clerk/ui/mosaic/panels/organization-profile-general';
+import { OrganizationProfileGeneralView } from '@clerk/ui/mosaic/panels/organization-profile-general-view';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { Default as DeleteOrganizationDemo } from './delete-organization.stories';
+import { Default as LeaveOrganizationDemo } from './leave-organization.stories';
 
 export const meta: StoryMeta = {
   group: 'Panels',
@@ -11,5 +14,10 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <OrganizationProfileGeneral />;
+  return (
+    <OrganizationProfileGeneralView
+      leaveOrganization={<LeaveOrganizationDemo />}
+      deleteOrganization={<DeleteOrganizationDemo />}
+    />
+  );
 }

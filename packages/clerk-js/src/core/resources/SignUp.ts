@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { Poller } from '@clerk/shared/poller';
 import type {
@@ -794,7 +795,7 @@ class SignUpFuture implements SignUpFutureResource {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
       this.#resource.verifications.externalAccount.status === 'transferable' &&
-      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.error?.code === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS
     );
   }
 

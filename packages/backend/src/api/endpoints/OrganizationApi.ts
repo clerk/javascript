@@ -454,6 +454,8 @@ export class OrganizationAPI extends AbstractAPI {
    * @returns The deleted [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization).
    */
   public async deleteOrganization(organizationId: string) {
+    this.requireId(organizationId);
+
     return this.request<Organization>({
       method: 'DELETE',
       path: joinPaths(basePath, organizationId),
