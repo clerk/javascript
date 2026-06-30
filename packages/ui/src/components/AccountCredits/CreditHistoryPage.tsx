@@ -105,15 +105,7 @@ export const CreditHistoryPage = (): JSX.Element => {
                 })}
               >
                 <Td sx={t => ({ padding: t.space.$3 })}>
-                  <Text
-                    variant='subtitle'
-                    sx={{ color: entry.amount.amount >= 0 ? undefined : 'inherit' }}
-                  >
-                    {`${entry.amount.amount >= 0 ? '+' : '-'}${$({
-                      ...entry.amount,
-                      amount: Math.abs(entry.amount.amount),
-                    })}`}
-                  </Text>
+                  <Text variant='subtitle'>{$(entry.amount)}</Text>
                 </Td>
                 <Td sx={t => ({ padding: t.space.$3 })}>
                   <Text variant='body'>{formatCreditDate(entry.createdAt)}</Text>
