@@ -7,6 +7,8 @@ import type { ForceNull, RemoveFunctions, Simplify } from './utils';
 
 /**
  * Intersects `T` with an optional organization scope (`orgId`) for billing and related requests.
+ *
+ * @interface
  */
 export type WithOptionalOrgType<T> = T & {
   /**
@@ -82,6 +84,20 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;
+
+  /**
+   * Gets the credit balance for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditBalance: (params: GetCreditBalanceParams) => Promise<BillingCreditBalanceResource>;
+
+  /**
+   * Gets the credit history for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditHistory: (params: GetCreditHistoryParams) => Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>>;
 }
 
 /**
@@ -315,25 +331,15 @@ export interface BillingPlanUnitPrice {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPlanPrice {
-  /**
-   * The ID of the price
-   */
+  /** The unique identifier of the price */
   id: string;
-  /**
-   * The monthly price or `null` if the price is not monthly.
-   */
+  /** The monthly price or `null` if the price is not monthly. */
   fee: BillingMoneyAmount | null;
-  /**
-   * The effective monthly price when billed annually or `null` if the price is not annual.
-   */
+  /** The effective monthly price when billed annually or `null` if the price is not annual. */
   annualMonthlyFee: BillingMoneyAmount | null;
-  /**
-   * Whether this price is the default price for the plan it's associated with.
-   */
+  /** Whether this price is the default price for the plan it's associated with. */
   isDefault: boolean;
-  /**
-   * The individual unit prices applicable to this price.
-   */
+  /** The individual unit prices applicable to this price. */
   unitPrices?: BillingPlanUnitPrice[];
 }
 
@@ -343,17 +349,11 @@ export interface BillingPlanPrice {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPerUnitTotalTier {
-  /**
-   * The quantity billed within this tier. `null` means unlimited.
-   */
+  /** The quantity billed within this tier. `null` means unlimited. */
   quantity: number | null;
-  /**
-   * The fee charged per block for this tier.
-   */
+  /** The fee charged per block for this tier. */
   feePerBlock: BillingMoneyAmount;
-  /**
-   * The total billed amount for this tier.
-   */
+  /** The total billed amount for this tier. */
   total: BillingMoneyAmount;
 }
 
@@ -363,17 +363,11 @@ export interface BillingPerUnitTotalTier {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPerUnitTotal {
-  /**
-   * The unit name, for example `seats`.
-   */
+  /** The unit name, for example `seats`. */
   name: string;
-  /**
-   * Number of units represented by one billable block.
-   */
+  /** The number of units represented by one billable block. */
   blockSize: number;
-  /**
-   * Detailed tier breakdown for this unit total.
-   */
+  /** The tiers breakdown for this unit total. */
   tiers: BillingPerUnitTotalTier[];
 }
 
@@ -383,25 +377,15 @@ export interface BillingPerUnitTotal {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface FeatureResource extends ClerkResource {
-  /**
-   * The unique identifier for the Feature.
-   */
+  /** The unique identifier for the Feature. */
   id: string;
-  /**
-   * The display name of the Feature.
-   */
+  /** The display name of the Feature. */
   name: string;
-  /**
-   * A short description of what the Feature provides, or `null` if not provided.
-   */
+  /** A short description of what the Feature provides, or `null` if not provided. */
   description: string | null;
-  /**
-   * A unique, URL-friendly identifier for the Feature.
-   */
+  /** A unique, URL-friendly identifier for the Feature. */
   slug: string;
-  /**
-   * The URL of the Feature's avatar image, or `null` if not set.
-   */
+  /** The URL of the Feature's avatar image, or `null` if not set. */
   avatarUrl: string | null;
 }
 
@@ -926,6 +910,44 @@ export interface BillingSubscriptionResource extends ClerkResource {
    * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial: boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceResource {
+  /**
+   * The balance of the credit.
+   */
+  balance: BillingMoneyAmount | null;
+}
+
+export type GetCreditBalanceParams = {
+  /**
+   * The ID of the Organization to get the credit balance for.
+   */
+  orgId?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type GetCreditHistoryParams = {
+  /**
+   * The ID of the Organization to get the credit history for.
+   */
+  orgId?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerResource {
+  id: string;
+  amount: BillingMoneyAmount;
+  sourceType: string;
+  sourceId: string;
+  createdAt: Date;
 }
 
 /**

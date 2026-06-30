@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.9.0
+
+### Minor Changes
+
+- Add `clerkClient.oauthApplications.revokeToken()` for revoking opaque OAuth application access and refresh tokens. ([#9040](https://github.com/clerk/javascript/pull/9040)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- `organizations.deleteOrganization()` now validates that an organization ID was provided. Calling it with an empty ID throws `A valid resource ID is required.` locally instead of issuing a `DELETE` request to the organizations collection endpoint, matching the other ID-based methods on the API. ([#9036](https://github.com/clerk/javascript/pull/9036)) by [@jacekradko](https://github.com/jacekradko)
+
+- M2M JWT verification now validates the token-category (`cat`) header and rejects M2M JWTs tagged as a different token class. M2M JWTs minted by Clerk carry the correct category and are unaffected; M2M JWTs without the header continue to verify. ([#9038](https://github.com/clerk/javascript/pull/9038)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
 ## 3.8.5
 
 ### Patch Changes

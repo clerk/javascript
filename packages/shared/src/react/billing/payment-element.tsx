@@ -303,6 +303,7 @@ export type UsePaymentElementReturn = {
        * An object containing information about the initialized payment provider. It is `undefined` until `isProviderReady` is `true`.
        */
       provider: {
+        /** The name of the payment provider. */
         name: 'stripe';
       };
       /**
