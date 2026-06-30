@@ -8,6 +8,52 @@ export type TokenStorage = {
   removeItem: (key: string) => Awaitable<void>;
 };
 
+export type OAuthRedirectStrategy =
+  | {
+      /**
+       * Receive the OAuth callback on a short-lived `http://127.0.0.1:<port>` loopback server.
+       * Recommended for desktop OAuth (RFC 8252 §7.3): it needs no OS protocol registration and lets
+       * the system browser tab resolve to a real page instead of stalling on a custom-scheme redirect.
+       */
+      type: 'http';
+      /**
+       * Port for the loopback callback server. Add `http://127.0.0.1:<port>/sso-callback` to your
+       * instance's allowed redirect URLs.
+       *
+       * @default 45789
+       */
+      port?: number;
+      /**
+       * Absolute `http(s)` URL to redirect the browser to once the callback is captured (e.g. a
+       * hosted "you're signed in" page). Takes priority over `successHtml`.
+       */
+      successUrl?: string;
+      /**
+       * Custom HTML served on the callback instead of the built-in "you can close this window" page.
+       * Ignored when `successUrl` is set.
+       */
+      successHtml?: string;
+    }
+  | {
+      /**
+       * Receive the OAuth callback through a registered custom URI scheme (`scheme://host/`),
+       * delivered via Electron's `open-url` / `second-instance` deep-link events. Requires
+       * `renderer` and OS-level protocol registration.
+       */
+      type: 'deep-link';
+    };
+
+export type OAuthOptions = {
+  /**
+   * How the native OAuth callback is delivered back to the app. Defaults to the custom-scheme deep
+   * link; opt into the loopback server with `{ type: 'http' }` (or the `httpRedirectStrategy()`
+   * helper) to get a browser-renderable completion page.
+   *
+   * @default { type: 'deep-link' }
+   */
+  redirect?: OAuthRedirectStrategy;
+};
+
 export type CreateClerkBridgeOptions = {
   /**
    * Storage adapter used by the main process to persist Clerk tokens.
@@ -17,6 +63,11 @@ export type CreateClerkBridgeOptions = {
    * Registers the custom scheme used to serve the Electron renderer from a stable origin.
    */
   renderer?: RendererSchemeOptions;
+  /**
+   * Configures how native OAuth callbacks are delivered back to the app. Defaults to a custom-scheme
+   * deep link; opt into an `http` loopback redirect via `oauth: { redirect: httpRedirectStrategy() }`.
+   */
+  oauth?: OAuthOptions;
   /**
    * Registers the IPC handlers for native passkey ceremonies. Native support also requires
    * the optional `@clerk/electron-passkeys` package and `exposeClerkBridge({ passkeys: true })`.
