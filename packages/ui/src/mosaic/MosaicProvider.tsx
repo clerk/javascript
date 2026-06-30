@@ -53,7 +53,16 @@ export interface MosaicProviderProps {
   scope?: string;
 }
 
-export function MosaicProvider({ children, nonce, cssLayerName, appearance, scope }: MosaicProviderProps) {
+// Exported Mosaic components annotate a React return type on purpose. The package sets
+// `jsxImportSource: '@emotion/react'`, so an inferred return leaks Emotion's `JSX.Element` into the
+// published `.d.ts`, which React 19 consumers reject as a JSX element type.
+export function MosaicProvider({
+  children,
+  nonce,
+  cssLayerName,
+  appearance,
+  scope,
+}: MosaicProviderProps): React.ReactElement {
   const theme = React.useMemo(() => resolveVariables(defaultMosaicVariables, appearance?.variables), [appearance]);
   const parsedElements = React.useMemo(() => parseMosaicAppearance(appearance, scope), [appearance, scope]);
   const icons = React.useMemo(() => appearance?.icons ?? {}, [appearance]);

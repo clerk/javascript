@@ -1,10 +1,12 @@
+import type { ReactElement } from 'react';
+
 import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
 import { DeleteOrganization } from '../sections/delete-organization';
 import { LeaveOrganization } from '../sections/leave-organization';
 import { useOrganizationProfileController } from './organization-profile.controller';
 import { OrganizationProfileView } from './organization-profile-view';
 
-export function OrganizationProfile() {
+export function OrganizationProfile(): ReactElement | null {
   const controller = useOrganizationProfileController();
   if (controller.status !== 'ready') {
     return null;
