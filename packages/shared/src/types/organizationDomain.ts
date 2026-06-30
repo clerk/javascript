@@ -173,13 +173,13 @@ export interface OrganizationDomainResource extends ClerkResource {
   totalPendingSuggestions: number;
   /**
    * Begins the verification process of a created Organization domain by sending a verification code to the provided email address.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   prepareAffiliationVerification: (params: PrepareAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
 
   /**
-   * Completes the verification process started by [`prepareAffiliationVerification()`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource#prepare-affiliation-verification), by validating the provided verification code.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * Completes the verification process started by [`prepareAffiliationVerification()`](https://clerk.com/docs/reference/types/organization-domain-resource#prepare-affiliation-verification), by validating the provided verification code.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   /**
@@ -189,7 +189,7 @@ export interface OrganizationDomainResource extends ClerkResource {
   delete: () => Promise<void>;
   /**
    * Updates the enrollment mode of the Verified Domain.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   updateEnrollmentMode: (params: UpdateEnrollmentModeParams) => Promise<OrganizationDomainResource>;
 }
