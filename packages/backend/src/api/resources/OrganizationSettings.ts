@@ -8,9 +8,9 @@ export class OrganizationSettings {
     readonly enabled: boolean,
     /** The maximum number of [memberships allowed](https://clerk.com/docs/guides/organizations/configure#membership-limits) per Organization. */
     readonly maxAllowedMemberships: number,
-    /** The maximum number of [Roles allowed](https://clerk.com/docs/guides/organizations/configure#role-limits) per Organization. */
+    /** The maximum number of Roles allowed per Organization. */
     readonly maxAllowedRoles: number,
-    /** The maximum number of [Permissions allowed](https://clerk.com/docs/guides/organizations/configure#permission-limits) per Organization. */
+    /** The maximum number of Permissions allowed per Organization. */
     readonly maxAllowedPermissions: number,
     /** The default [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) for an Organization creator. */
     readonly creatorRole: string,
