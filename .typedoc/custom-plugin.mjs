@@ -138,6 +138,18 @@ const LINK_REPLACEMENTS = [
   ],
   ['create-organization-domain-params', '#create-organization-domain-params'],
   ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
+  [
+    'prepare-affiliation-verification-params',
+    '/docs/reference/types/organization-domain-resource#prepare-affiliation-verification-params',
+  ],
+  [
+    'attempt-affiliation-verification-params',
+    '/docs/reference/types/organization-domain-resource#attempt-affiliation-verification-params',
+  ],
+  [
+    'organization-domain-ownership-verification',
+    '/docs/reference/types/organization-domain-resource#organization-domain-verification',
+  ],
 ];
 
 /**
@@ -510,6 +522,110 @@ function collectPropertiesFromType(type, reflectionsByName) {
 }
 
 /**
+ * Cheap structural fingerprint for a `Type`. One-level deep — enough to disambiguate
+ * inline shapes used in different positions while staying fast on large projects. Two
+ * shapes that produce the same fingerprint are treated as structurally identical.
+ *
+ * @param {import('typedoc').SomeType | undefined} type
+ * @returns {string}
+ */
+function typeFingerprint(type) {
+  if (!type) return '?';
+  const t =
+    /** @type {{ type?: string; name?: string; value?: unknown; elementType?: import('typedoc').SomeType; types?: import('typedoc').SomeType[]; declaration?: import('typedoc').DeclarationReflection }} */ (
+      /** @type {unknown} */ (type)
+    );
+  switch (t.type) {
+    case 'intrinsic':
+      return `i:${t.name ?? ''}`;
+    case 'literal':
+      return `l:${JSON.stringify(t.value)}`;
+    case 'reference':
+      return `r:${t.name ?? ''}`;
+    case 'array':
+      return `a:${typeFingerprint(t.elementType)}`;
+    case 'optional':
+      return `o:${typeFingerprint(t.elementType)}`;
+    case 'union':
+      return `u:[${(t.types ?? []).map(typeFingerprint).sort().join(',')}]`;
+    case 'intersection':
+      return `n:[${(t.types ?? []).map(typeFingerprint).sort().join(',')}]`;
+    case 'reflection': {
+      const kids = t.declaration?.children?.filter(c => c.kindOf?.(ReflectionKind.Property)) ?? [];
+      return `rf:[${kids
+        .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}`)
+        .sort()
+        .join(',')}]`;
+    }
+    default:
+      return t.type ?? '?';
+  }
+}
+
+/**
+ * When TypeScript resolves a type through `Omit<...>` / `Pick<...>` (e.g.
+ * `ClerkProviderProps = Omit<IsomorphicClerkOptions, …> & { … }`), inline anonymous
+ * object literal property types get re-synthesized — and TypeDoc loses the JSDoc on
+ * most of their members. Only the first/leading property's comment survives, the
+ * rest come through with `comment === undefined`. The same shape elsewhere in the
+ * project (e.g. directly under `IsomorphicClerkOptions['telemetry']`) carries all
+ * comments correctly.
+ *
+ * Match `@kind:typeLiteral` reflections by structural fingerprint (set of
+ * `(name, type, optional)` tuples on their property children); within each group,
+ * pick the reflection with the most commented children as the source-of-truth and
+ * copy missing comments onto its siblings.
+ *
+ * @param {import('typedoc').Reflection[]} all
+ */
+function backfillInlineObjectChildComments(all) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection[]>} */
+  const groups = new Map();
+  for (const r of all) {
+    if (!r.kindOf?.(ReflectionKind.TypeLiteral)) continue;
+    const decl = /** @type {import('typedoc').DeclarationReflection} */ (r);
+    const propChildren = decl.children?.filter(c => c.kindOf?.(ReflectionKind.Property));
+    if (!propChildren?.length) continue;
+    const key = propChildren
+      .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type)}`)
+      .sort()
+      .join('|');
+    if (!groups.has(key)) groups.set(key, []);
+    /** @type {import('typedoc').DeclarationReflection[]} */ (groups.get(key)).push(decl);
+  }
+
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    /** @type {import('typedoc').DeclarationReflection | null} */
+    let best = null;
+    let bestScore = -1;
+    for (const refl of group) {
+      const score =
+        refl.children?.filter(c => c.kindOf?.(ReflectionKind.Property) && c.comment?.summary?.length).length ?? 0;
+      if (score > bestScore) {
+        best = refl;
+        bestScore = score;
+      }
+    }
+    if (!best || bestScore === 0) continue;
+    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+    const bestByName = new Map();
+    for (const c of best.children ?? []) {
+      if (c.kindOf?.(ReflectionKind.Property)) bestByName.set(c.name, c);
+    }
+    for (const refl of group) {
+      if (refl === best) continue;
+      for (const child of refl.children ?? []) {
+        if (!child.kindOf?.(ReflectionKind.Property)) continue;
+        if (child.comment?.summary?.length) continue;
+        const src = bestByName.get(child.name);
+        if (src?.comment) child.comment = src.comment;
+      }
+    }
+  }
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -565,6 +681,8 @@ export function load(app) {
         }
       }
     }
+
+    backfillInlineObjectChildComments(all);
   });
 
   app.renderer.on(MarkdownPageEvent.END, output => {
