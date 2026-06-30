@@ -6,11 +6,13 @@ import { useLeaveOrganizationController } from '../leave-organization.controller
 
 const ORG_NAME = 'Acme Inc';
 
-let destroy: ReturnType<typeof vi.fn>;
+let leaveOrganization: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
+let navigate: ReturnType<typeof vi.fn>;
+let afterLeaveUrl: string;
 let isLoaded: boolean;
 let organization: { id: string; name: string } | null;
-let membership: { id: string; destroy: () => Promise<void> } | null | undefined;
+let membership: { id: string } | null | undefined;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react')>();
@@ -18,15 +20,22 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useOrganization: () => ({ isLoaded, organization, membership }),
     useOrganizationList: () => ({ userMemberships: { revalidate } }),
+    useUser: () => ({ user: { leaveOrganization } }),
+    useClerk: () => ({
+      navigate,
+      __internal_environment: { displayConfig: { afterLeaveOrganizationUrl: afterLeaveUrl } },
+    }),
   };
 });
 
 beforeEach(() => {
-  destroy = vi.fn();
+  leaveOrganization = vi.fn();
   revalidate = vi.fn().mockResolvedValue(undefined);
+  navigate = vi.fn().mockResolvedValue(undefined);
+  afterLeaveUrl = '/after-leave';
   isLoaded = true;
   organization = { id: 'org_1', name: ORG_NAME };
-  membership = { id: 'mem_1', destroy };
+  membership = { id: 'mem_1' };
 });
 
 afterEach(() => {
@@ -90,7 +99,7 @@ describe('useLeaveOrganizationController', () => {
 
   it('drives CONFIRM → leaving → resolve → left', async () => {
     const gate = deferred<void>();
-    destroy.mockReturnValue(gate.promise);
+    leaveOrganization.mockReturnValue(gate.promise);
 
     render(<Harness />);
     expect(screen.getByTestId('state')).toHaveTextContent('idle');
@@ -103,13 +112,27 @@ describe('useLeaveOrganizationController', () => {
     });
 
     expect(screen.getByTestId('state')).toHaveTextContent('left');
-    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(leaveOrganization).toHaveBeenCalledWith('org_1');
     expect(revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  it('navigates to afterLeaveOrganizationUrl after a successful leave', async () => {
+    const gate = deferred<void>();
+    leaveOrganization.mockReturnValue(gate.promise);
+
+    render(<Harness />);
+    openAndConfirm();
+
+    await act(async () => {
+      gate.resolve();
+    });
+
+    expect(navigate).toHaveBeenCalledWith('/after-leave');
   });
 
   it('returns to confirming with an error message when leaving rejects', async () => {
     const gate = deferred<void>();
-    destroy.mockReturnValue(gate.promise);
+    leaveOrganization.mockReturnValue(gate.promise);
 
     render(<Harness />);
     openAndConfirm();
@@ -122,5 +145,6 @@ describe('useLeaveOrganizationController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('confirming');
     expect(screen.getByTestId('error')).toHaveTextContent('nope');
     expect(revalidate).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

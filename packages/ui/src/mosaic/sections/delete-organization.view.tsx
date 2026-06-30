@@ -62,6 +62,7 @@ export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrga
               sx={{
                 flexShrink: 0,
               }}
+              type='button'
             >
               Delete organization
             </Button>

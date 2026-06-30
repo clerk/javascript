@@ -8,6 +8,8 @@ const ORG_NAME = 'Acme Inc';
 
 let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
+let navigate: ReturnType<typeof vi.fn>;
+let afterLeaveUrl: string;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let isLoaded: boolean;
 let isSessionLoaded: boolean;
@@ -23,12 +25,18 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       isLoaded: isSessionLoaded,
       session: isSessionLoaded ? { id: 'sess_1', checkAuthorization } : undefined,
     }),
+    useClerk: () => ({
+      navigate,
+      __internal_environment: { displayConfig: { afterLeaveOrganizationUrl: afterLeaveUrl } },
+    }),
   };
 });
 
 beforeEach(() => {
   destroy = vi.fn();
   revalidate = vi.fn().mockResolvedValue(undefined);
+  navigate = vi.fn().mockResolvedValue(undefined);
+  afterLeaveUrl = '/after-leave';
   checkAuthorization = vi.fn().mockReturnValue(true);
   isLoaded = true;
   isSessionLoaded = true;
@@ -121,6 +129,20 @@ describe('useDeleteOrganizationController', () => {
     expect(revalidate).toHaveBeenCalledTimes(1);
   });
 
+  it('navigates to afterLeaveOrganizationUrl after a successful delete', async () => {
+    const gate = deferred<void>();
+    destroy.mockReturnValue(gate.promise);
+
+    render(<Harness />);
+    openAndConfirm();
+
+    await act(async () => {
+      gate.resolve();
+    });
+
+    expect(navigate).toHaveBeenCalledWith('/after-leave');
+  });
+
   it('returns to confirming with an error message when deleting rejects', async () => {
     const gate = deferred<void>();
     destroy.mockReturnValue(gate.promise);
@@ -136,5 +158,6 @@ describe('useDeleteOrganizationController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('confirming');
     expect(screen.getByTestId('error')).toHaveTextContent('nope');
     expect(revalidate).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

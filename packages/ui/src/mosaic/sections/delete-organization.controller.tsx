@@ -1,5 +1,7 @@
 import { useOrganization, useOrganizationList, useSession } from '@clerk/shared/react';
 
+import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
+import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
 import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization.machine';
@@ -19,6 +21,8 @@ export function useDeleteOrganizationController(): DeleteOrganizationController 
   const { isLoaded: isOrganizationLoaded, organization } = useOrganization();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const { userMemberships } = useOrganizationList({ userMemberships: true });
+  const router = useMosaicRouter();
+  const afterLeaveUrl = useMosaicEnvironment()?.displayConfig.afterLeaveOrganizationUrl;
 
   const [snapshot, send, actor] = useMachine(deleteOrgMachine, {
     context: {
@@ -28,8 +32,11 @@ export function useDeleteOrganizationController(): DeleteOrganizationController 
         // Refresh org lists elsewhere (e.g. the switcher). Not awaited: a stale
         // list must not make a successful delete look like it failed.
         void userMemberships.revalidate?.();
-        // TODO(mosaic): navigate away from the deleted org's profile once the flow
-        // has router context, mirroring legacy navigateAfterLeaveOrganization.
+        // Navigate away from the deleted org's profile, mirroring legacy
+        // navigateAfterLeaveOrganization. Fire-and-forget for the same reason.
+        if (afterLeaveUrl) {
+          void router.navigate(afterLeaveUrl);
+        }
       },
     },
   });

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider } from '@emotion/react';
+import { CacheProvider, Global } from '@emotion/react';
 import React from 'react';
 
 import type { MosaicAppearance } from './appearance';
@@ -9,12 +9,37 @@ import { MosaicAppearanceProvider, MosaicIconsProvider, parseMosaicAppearance } 
 import type { MosaicTheme } from './variables';
 import { defaultMosaicVariables, resolveVariables } from './variables';
 
-const getInsertionPoint = (): HTMLElement | null => {
+const INSERTION_POINT_ID = 'cl-mosaic-style-insertion-point';
+
+// Anchor Emotion's <style> insertion at a known point so Mosaic's styles land in a
+// deterministic spot relative to any host styles. A host may pre-place the node; if
+// it hasn't, create it once so the consumer contract is just "wrap with MosaicProvider".
+// querySelector-first keeps this idempotent across StrictMode double-renders and
+// multiple providers.
+const ensureInsertionPoint = (): HTMLElement | null => {
   if (typeof document === 'undefined') {
     return null;
   }
-  return document.querySelector('style#cl-mosaic-style-insertion-point');
+  const existing = document.querySelector<HTMLElement>(`style#${INSERTION_POINT_ID}`);
+  if (existing) {
+    return existing;
+  }
+  const node = document.createElement('style');
+  node.id = INSERTION_POINT_ID;
+  document.head.appendChild(node);
+  return node;
 };
+
+// A single zero-specificity reset for every Mosaic part. Keyed on `data-cl-slot` — the one
+// attribute that every part emits (via useRecipe / useSlot / slot) — so it covers all authoring
+// tiers with one rule instead of bloating each element's generated css. Scoped to the attribute
+// (never a bare `*`) so it can't stomp host-app or legacy-system styles. Wrapped in `:where()` so
+// it has 0 specificity: any component class (recipe / sx / appearance) wins regardless of
+// stylesheet insertion order — a plain `[data-cl-slot]` selector (0,1,0) ties with the generated
+// class and would override it on insertion order, undoing component padding/margin.
+const mosaicReset = {
+  ':where([data-cl-slot])': { boxSizing: 'border-box', margin: 0, padding: 0, fontFamily: 'inherit' },
+} as const;
 
 const MosaicThemeContext = React.createContext<MosaicTheme | null>(null);
 
@@ -33,7 +58,7 @@ export function MosaicProvider({ children, nonce, cssLayerName, appearance, scop
   const parsedElements = React.useMemo(() => parseMosaicAppearance(appearance, scope), [appearance, scope]);
   const icons = React.useMemo(() => appearance?.icons ?? {}, [appearance]);
   const cache = React.useMemo(() => {
-    const el = getInsertionPoint();
+    const el = ensureInsertionPoint();
     const emotionCache = createCache({
       key: 'cl-mosaic',
       stylisPlugins: [],
@@ -49,7 +74,10 @@ export function MosaicProvider({ children, nonce, cssLayerName, appearance, scop
     <MosaicThemeContext.Provider value={theme}>
       <MosaicAppearanceProvider value={parsedElements}>
         <MosaicIconsProvider value={icons}>
-          <CacheProvider value={cache}>{children}</CacheProvider>
+          <CacheProvider value={cache}>
+            <Global styles={mosaicReset} />
+            {children}
+          </CacheProvider>
         </MosaicIconsProvider>
       </MosaicAppearanceProvider>
     </MosaicThemeContext.Provider>
