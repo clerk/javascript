@@ -16,12 +16,17 @@ function asJwt(input: TokenResource | JWT): JWT | undefined {
  * `oiat` is from a pre-feature codebase and is by definition staler than any
  * token that has one.
  *
- * Used by the cross-tab broadcast handler in tokenCache to drop stale
- * edge-minted tokens that would otherwise clobber a fresher cached entry.
+ * Returns `incoming` when `existing` is null/undefined (no baseline yet), so a
+ * caller with an optional baseline (a cache miss, a not-yet-set token) can pass
+ * it straight through.
  *
  * @internal
  */
-export function pickFreshestJwt<T extends TokenResource | JWT>(existing: T, incoming: T): T {
+export function pickFreshestJwt<T extends TokenResource | JWT>(existing: T | null | undefined, incoming: T): T {
+  if (existing == null) {
+    return incoming;
+  }
+
   const existingOiat = asJwt(existing)?.header?.oiat;
   const incomingOiat = asJwt(incoming)?.header?.oiat;
 
@@ -66,8 +71,4 @@ export function tokenOrgId(input: TokenResource | JWT): string {
 
 export function normalizeOrgId(orgId?: string | null): string {
   return orgId || '';
-}
-
-export function pickFreshestOrIncoming<T extends TokenResource | JWT>(existing: T | null | undefined, incoming: T): T {
-  return existing == null ? incoming : pickFreshestJwt(existing, incoming);
 }

@@ -50,7 +50,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { normalizeOrgId, pickFreshestJwt, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
+import { normalizeOrgId, pickFreshestJwt, tokenOrgId } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -544,7 +544,7 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt && pickFreshestOrIncoming(this.lastActiveToken, token) === token) {
+    if (token.jwt && pickFreshestJwt(this.lastActiveToken, token) === token) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
@@ -561,7 +561,7 @@ export class Session extends BaseResource implements SessionResource {
 
     const fetchPromise = this.#createTokenResolver(template, organizationId, skipCache);
     const tokenResolver = fetchPromise.then(fetched =>
-      pickFreshestOrIncoming(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, fetched),
+      pickFreshestJwt(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, fetched),
     );
 
     SessionTokenCache.set({
@@ -628,7 +628,7 @@ export class Session extends BaseResource implements SessionResource {
           return;
         }
 
-        const winner = pickFreshestOrIncoming(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, token);
+        const winner = pickFreshestJwt(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, token);
 
         // Cache the resolved token for future calls
         // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration

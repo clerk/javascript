@@ -1,14 +1,7 @@
 import type { JWT, TokenResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import {
-  normalizeOrgId,
-  pickFreshestJwt,
-  pickFreshestOrIncoming,
-  tokenOiat,
-  tokenOrgId,
-  tokenSid,
-} from '../tokenFreshness';
+import { normalizeOrgId, pickFreshestJwt, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
 
 interface TokenOpts {
   oiat?: number;
@@ -134,27 +127,27 @@ describe('pickFreshestJwt', () => {
   });
 });
 
-describe('pickFreshestOrIncoming', () => {
+describe('pickFreshestJwt (optional baseline)', () => {
   it('returns incoming when existing is null', () => {
     const incoming = makeToken({ oiat: 100 });
-    expect(pickFreshestOrIncoming(null, incoming)).toBe(incoming);
+    expect(pickFreshestJwt(null, incoming)).toBe(incoming);
   });
 
   it('returns incoming when existing is undefined', () => {
     const incoming = makeToken({ oiat: 100 });
-    expect(pickFreshestOrIncoming(undefined, incoming)).toBe(incoming);
+    expect(pickFreshestJwt(undefined, incoming)).toBe(incoming);
   });
 
   it('returns the newer token when existing is older than incoming', () => {
     const existing = makeToken({ oiat: 90 });
     const incoming = makeToken({ oiat: 100 });
-    expect(pickFreshestOrIncoming(existing, incoming)).toBe(incoming);
+    expect(pickFreshestJwt(existing, incoming)).toBe(incoming);
   });
 
   it('returns the newer token when existing is newer than incoming', () => {
     const existing = makeToken({ oiat: 100 });
     const incoming = makeToken({ oiat: 90 });
-    expect(pickFreshestOrIncoming(existing, incoming)).toBe(existing);
+    expect(pickFreshestJwt(existing, incoming)).toBe(existing);
   });
 });
 

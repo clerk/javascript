@@ -6,7 +6,7 @@ import { TokenId } from '@/utils/tokenId';
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { createKeyResolver, type TokenCacheKeyJSON } from './keyResolver';
 import { Token } from './resources/internal';
-import { pickFreshestJwt, pickFreshestOrIncoming } from './tokenFreshness';
+import { pickFreshestJwt } from './tokenFreshness';
 import { createTokenStore } from './tokenStore';
 
 /**
@@ -318,7 +318,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     clearTimeout(existing?.refreshTimeoutId);
 
     if (existing?.entry.resolvedToken) {
-      entry.resolvedToken = pickFreshestOrIncoming(entry.resolvedToken, existing.entry.resolvedToken);
+      entry.resolvedToken = pickFreshestJwt(entry.resolvedToken, existing.entry.resolvedToken);
     }
 
     const nowSeconds = Math.floor(Date.now() / 1000);
@@ -354,7 +354,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         // Reconcile against the freshest token known for this key, regardless of
         // which resolver owns the live slot. A staler resolve can never publish.
         const prev = live.entry.resolvedToken;
-        live.entry.resolvedToken = pickFreshestOrIncoming(prev, newToken);
+        live.entry.resolvedToken = pickFreshestJwt(prev, newToken);
         const winner = live.entry.resolvedToken;
         // Skip only when the winner did not advance AND this live value already has
         // its timers installed. A fresh set() clears the prior entry's timers and may
