@@ -60,61 +60,32 @@ export const CreditHistoryPage = (): JSX.Element => {
         </Header.BackLink>
       </Header.Root>
 
-      <Box
-        sx={t => ({
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
-          borderRadius: t.radii.$lg,
-          overflow: 'clip',
-        })}
-      >
-        <Table sx={{ width: '100%', borderCollapse: 'collapse' }}>
-          <Thead>
-            <Tr
-              sx={t => ({
-                background: t.colors.$neutralAlpha25,
-                borderBlockEndWidth: t.borderWidths.$normal,
-                borderBlockEndStyle: t.borderStyles.$solid,
-                borderBlockEndColor: t.colors.$borderAlpha100,
-              })}
-            >
-              <Th
-                sx={t => ({ padding: t.space.$3, textAlign: 'left' })}
-                localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__amount`,
-                )}
-              />
-              <Th
-                sx={t => ({ padding: t.space.$3, textAlign: 'left' })}
-                localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__date`,
-                )}
-              />
+      <Table>
+        <Thead>
+          <Tr sx={t => ({ background: t.colors.$neutralAlpha25 })}>
+            <Th
+              localizationKey={localizationKeys(
+                `${localizationRoot}.billingPage.creditHistoryPage.tableHeader__amount`,
+              )}
+            />
+            <Th
+              localizationKey={localizationKeys(`${localizationRoot}.billingPage.creditHistoryPage.tableHeader__date`)}
+            />
+          </Tr>
+        </Thead>
+        <Tbody>
+          {creditHistory?.data?.map(entry => (
+            <Tr key={entry.id}>
+              <Td>
+                <Text variant='subtitle'>{$(entry.amount)}</Text>
+              </Td>
+              <Td>
+                <Text variant='body'>{formatCreditDate(entry.createdAt)}</Text>
+              </Td>
             </Tr>
-          </Thead>
-          <Tbody>
-            {creditHistory?.data?.map(entry => (
-              <Tr
-                key={entry.id}
-                sx={t => ({
-                  borderBlockEndWidth: t.borderWidths.$normal,
-                  borderBlockEndStyle: t.borderStyles.$solid,
-                  borderBlockEndColor: t.colors.$borderAlpha100,
-                  '&:last-child': { borderBlockEnd: 'none' },
-                })}
-              >
-                <Td sx={t => ({ padding: t.space.$3 })}>
-                  <Text variant='subtitle'>{$(entry.amount)}</Text>
-                </Td>
-                <Td sx={t => ({ padding: t.space.$3 })}>
-                  <Text variant='body'>{formatCreditDate(entry.createdAt)}</Text>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+          ))}
+        </Tbody>
+      </Table>
     </ProfileCard.Page>
   );
 };
