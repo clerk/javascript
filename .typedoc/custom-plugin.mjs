@@ -510,15 +510,18 @@ function collectPropertiesFromType(type, reflectionsByName) {
 }
 
 /**
- * Cheap structural fingerprint for a `Type`. One-level deep — enough to disambiguate inline shapes used in different positions while staying fast on large projects. Two shapes that produce the same fingerprint are treated as structurally identical.
+ * Structural fingerprint for a `Type`. Recurses into composite shapes so two types that only differ in their type arguments (`Foo<string>` vs `Foo<number>`) or in their nested property types (`{ x: string }` vs `{ x: number }`) get distinct fingerprints. Two shapes that produce the same fingerprint are treated as structurally identical and so eligible for cross-pollinating JSDoc comments.
+ *
+ * Recursion guard: a single shared `Set` of visited reflection ids threads through every nested call to avoid infinite loops on cyclic types (e.g. a type literal that ultimately references itself).
  *
  * @param {import('typedoc').SomeType | undefined} type
+ * @param {Set<number>} [seen]
  * @returns {string}
  */
-function typeFingerprint(type) {
+function typeFingerprint(type, seen = new Set()) {
   if (!type) return '?';
   const t =
-    /** @type {{ type?: string; name?: string; value?: unknown; elementType?: import('typedoc').SomeType; types?: import('typedoc').SomeType[]; declaration?: import('typedoc').DeclarationReflection }} */ (
+    /** @type {{ type?: string; name?: string; value?: unknown; elementType?: import('typedoc').SomeType; types?: import('typedoc').SomeType[]; typeArguments?: import('typedoc').SomeType[]; declaration?: import('typedoc').DeclarationReflection }} */ (
       /** @type {unknown} */ (type)
     );
   switch (t.type) {
@@ -526,20 +529,33 @@ function typeFingerprint(type) {
       return `i:${t.name ?? ''}`;
     case 'literal':
       return `l:${JSON.stringify(t.value)}`;
-    case 'reference':
-      return `r:${t.name ?? ''}`;
+    case 'reference': {
+      const args = t.typeArguments?.length ? `<${t.typeArguments.map(a => typeFingerprint(a, seen)).join(',')}>` : '';
+      return `r:${t.name ?? ''}${args}`;
+    }
     case 'array':
-      return `a:${typeFingerprint(t.elementType)}`;
+      return `a:${typeFingerprint(t.elementType, seen)}`;
     case 'optional':
-      return `o:${typeFingerprint(t.elementType)}`;
+      return `o:${typeFingerprint(t.elementType, seen)}`;
     case 'union':
-      return `u:[${(t.types ?? []).map(typeFingerprint).sort().join(',')}]`;
+      return `u:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
     case 'intersection':
-      return `n:[${(t.types ?? []).map(typeFingerprint).sort().join(',')}]`;
+      return `n:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
     case 'reflection': {
-      const kids = t.declaration?.children?.filter(c => c.kindOf?.(ReflectionKind.Property)) ?? [];
+      const decl = t.declaration;
+      if (decl?.id != null) {
+        if (seen.has(decl.id)) return `rf:<cycle>`;
+        seen.add(decl.id);
+      }
+      const kids = decl?.children?.filter(c => c.kindOf?.(ReflectionKind.Property)) ?? [];
       return `rf:[${kids
-        .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}`)
+        .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type, seen)}`)
         .sort()
         .join(',')}]`;
     }
