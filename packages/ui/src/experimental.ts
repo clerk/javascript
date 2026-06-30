@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Experimental entrypoint for the Mosaic design system.
  *
