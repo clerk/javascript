@@ -898,20 +898,20 @@ describe('Clerk singleton', () => {
       expect(document.cookie).toContain(second);
     });
 
-    it('drops a token for a different session', async () => {
+    it('writes a token for a different session (cross-context cookies are not compared)', async () => {
       await loadClerkWithSession();
 
-      const wrongSession = createJwtWithOiat(1000, 200, { sid: 'sess_other' });
-      emitToken(wrongSession);
-      expect(document.cookie).not.toContain(wrongSession);
+      const otherSession = createJwtWithOiat(1000, 200, { sid: 'sess_other' });
+      emitToken(otherSession);
+      expect(document.cookie).toContain(otherSession);
     });
 
-    it('drops a token for a different organization', async () => {
+    it('writes a token for a different organization (cross-context cookies are not compared)', async () => {
       await loadClerkWithSession();
 
-      const wrongOrg = createJwtWithOiat(1000, 200, { org: 'org_other' });
-      emitToken(wrongOrg);
-      expect(document.cookie).not.toContain(wrongOrg);
+      const otherOrg = createJwtWithOiat(1000, 200, { org: 'org_other' });
+      emitToken(otherOrg);
+      expect(document.cookie).toContain(otherOrg);
     });
 
     it('applies a personal-workspace token (no org) for the active personal workspace', async () => {

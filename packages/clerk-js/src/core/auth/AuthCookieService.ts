@@ -220,31 +220,28 @@ export class AuthCookieService {
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
 
-  // Returns true only when `raw` is positively wrong-context or strictly staler than the
-  // SAME-context current cookie. Inert (false) for tokens without oiat and on any decode
-  // failure: stranding the user is worse than a transient revert.
+  // Returns true only when `raw` is strictly staler than the SAME session+org current cookie.
+  // Fails open (false) for tokens without oiat, decode failures, and cross-context tokens: the
+  // cookie enforces monotonicity within one session+org only, never across a session/org switch.
   #shouldDropStaleToken(raw: string): boolean {
     const incoming = this.#decodeToken(raw);
     if (!incoming || tokenOiat(incoming) == null) {
       return false;
     }
 
-    const sid = tokenSid(incoming);
-    if (sid && sid !== (this.clerk.session?.id ?? '')) {
-      return true;
-    }
-    if (normalizeOrgId(tokenOrgId(incoming)) !== normalizeOrgId(this.clerk.organization?.id)) {
-      return true;
-    }
-
     const current = this.#decodeToken(this.sessionCookie.get());
     if (!current || tokenOiat(current) == null) {
       return false;
     }
-    // Only a same-context cookie is a valid freshness baseline.
-    if (tokenSid(current) !== sid || normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))) {
+
+    // Only a same session+org cookie is a comparable freshness baseline; write through otherwise.
+    if (
+      tokenSid(current) !== tokenSid(incoming) ||
+      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
+    ) {
       return false;
     }
+
     return pickFreshestJwt(current, incoming) === current;
   }
 
