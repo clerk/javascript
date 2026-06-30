@@ -78,7 +78,34 @@ function createOAuthTransport(): ClerkOAuthTransport | undefined {
   };
 }
 
-export function ClerkProvider({ children, publishableKey, passkeys, ...props }: ClerkProviderProps): JSX.Element {
+/**
+ * Allow the renderer's own custom scheme as a redirect protocol by default.
+ *
+ * The renderer is served from the scheme registered via `createClerkBridge({ renderer: { scheme } })`
+ * (e.g. `clerk://app`), so `window.location.protocol` is that scheme. Clerk's prebuilt UI renders
+ * in-app cross-links (e.g. "Sign up" on the sign-in card) as absolute anchors against the current
+ * origin — `clerk://app/sign-up` — which clerk-js's navigate allowlist would otherwise reject. The
+ * standard web protocols are already allowed by clerk-js, so only a custom scheme needs adding.
+ *
+ * Returns `undefined` for the built-in protocols (and outside a browser) so nothing redundant is set.
+ */
+function defaultAllowedRedirectProtocols(): string[] | undefined {
+  const protocol = typeof window !== 'undefined' ? window.location?.protocol : undefined;
+
+  if (!protocol || protocol === 'http:' || protocol === 'https:') {
+    return undefined;
+  }
+
+  return [protocol];
+}
+
+export function ClerkProvider({
+  children,
+  publishableKey,
+  passkeys,
+  allowedRedirectProtocols,
+  ...props
+}: ClerkProviderProps): JSX.Element {
   const clerk = createClerkInstance(publishableKey, passkeys);
   const oauthTransport = createOAuthTransport();
   const clerkUI = loadClerkUI(publishableKey, props);
@@ -88,6 +115,8 @@ export function ClerkProvider({ children, publishableKey, passkeys, ...props }: 
       {...props}
       Clerk={clerk}
       __internal_oauthTransport={oauthTransport}
+      // Default to the renderer's own scheme; an explicit value (even `[]`) is respected as-is.
+      allowedRedirectProtocols={allowedRedirectProtocols ?? defaultAllowedRedirectProtocols()}
       publishableKey={publishableKey}
       standardBrowser={false}
       ui={{ ClerkUI: clerkUI }}

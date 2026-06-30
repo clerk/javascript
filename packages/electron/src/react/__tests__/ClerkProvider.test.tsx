@@ -92,6 +92,52 @@ describe('Electron ClerkProvider', () => {
     });
   });
 
+  it('defaults allowedRedirectProtocols to the renderer custom scheme', () => {
+    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_scheme_default'>App</ClerkProvider>);
+
+    expect(capturedProviderProps?.allowedRedirectProtocols).toEqual(['clerk:']);
+  });
+
+  it('does not add standard web protocols to allowedRedirectProtocols', () => {
+    (window as unknown as { location: { protocol: string } }).location = { protocol: 'https:' };
+
+    renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_https_origin'>App</ClerkProvider>);
+
+    expect(capturedProviderProps?.allowedRedirectProtocols).toBeUndefined();
+  });
+
+  it('respects an explicit allowedRedirectProtocols value over the scheme default', () => {
+    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+
+    renderToStaticMarkup(
+      <ClerkProvider
+        allowedRedirectProtocols={['myscheme:']}
+        publishableKey='pk_test_explicit_protocols'
+      >
+        App
+      </ClerkProvider>,
+    );
+
+    expect(capturedProviderProps?.allowedRedirectProtocols).toEqual(['myscheme:']);
+  });
+
+  it('respects an explicit empty allowedRedirectProtocols array', () => {
+    (window as unknown as { location: { protocol: string } }).location = { protocol: 'clerk:' };
+
+    renderToStaticMarkup(
+      <ClerkProvider
+        allowedRedirectProtocols={[]}
+        publishableKey='pk_test_empty_protocols'
+      >
+        App
+      </ClerkProvider>,
+    );
+
+    expect(capturedProviderProps?.allowedRedirectProtocols).toEqual([]);
+  });
+
   it('registers an OAuth transport backed by the Electron bridge', async () => {
     oauthTransport.getRedirectUrl.mockResolvedValue('my-app://renderer/');
     oauthTransport.open.mockResolvedValue({ callbackUrl: 'my-app://renderer/?code=123' });
