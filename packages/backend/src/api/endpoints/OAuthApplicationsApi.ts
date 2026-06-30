@@ -31,13 +31,9 @@ export type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
 
 /** @generateWithEmptyComment */
 export type RevokeOAuthApplicationTokenParams = {
-  /**
-   * The ID of the OAuth application for which to revoke the token.
-   */
+  /** The ID of the OAuth application for which to revoke the token. */
   oauthApplicationId: string;
-  /**
-   * The opaque OAuth access token or refresh token to revoke.
-   */
+  /** The opaque OAuth access token or refresh token to revoke. */
   token: string;
 };
 
@@ -135,6 +131,9 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Revokes both the OAuth access token and refresh token for the associated grant for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application). The request may specify either token.
+   */
   public async revokeToken(params: RevokeOAuthApplicationTokenParams) {
     const { oauthApplicationId, ...bodyParams } = params;
 
