@@ -7,10 +7,15 @@
  * release. Render `OrganizationProfile` under a `ClerkProvider` (for data) and a
  * `MosaicProvider` (for styling/appearance).
  *
- * This entry carries a `'use client'` boundary because every Mosaic component is
- * client-only (React context, hooks, emotion). It lives under `experimental/mosaic`
- * rather than the generic `experimental` so that boundary stays scoped to Mosaic and
- * does not force a client directive onto unrelated experimental exports.
+ * This entry carries a `'use client'` boundary because every Mosaic component needs one
+ * (React context, hooks, emotion can't run in a Server Component). The directive marks a
+ * client boundary — it does not opt out of SSR; React still invokes these components during
+ * the server render. In practice they emit no server markup anyway, because their controllers
+ * gate on Clerk being loaded (`!isLoaded` → render `null`) and Clerk only loads client-side,
+ * so the UI appears after hydration. What the directive actually buys is letting the flat
+ * exports below drop straight into a Server Component with no consumer setup. It lives under
+ * `experimental/mosaic` rather than the generic `experimental` so that boundary stays scoped
+ * to Mosaic and does not force a client directive onto unrelated experimental exports.
  *
  * The profile's parts are exposed two ways:
  *
