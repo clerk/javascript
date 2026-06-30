@@ -56,6 +56,9 @@ export const isEnterpriseConnectionConfigured = (
 export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
   !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
 
+export const hasAnyOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
+  !!domains?.length && domains.some(domain => domain.ownershipVerification?.status === 'verified');
+
 const connectionStatus = ({
   hasConnection,
   isActive,
