@@ -330,17 +330,15 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       value.expiresIn = existing.expiresIn;
     }
 
-    const deleteKey = () => {
-      const cachedValue = store.get(key);
-      if (cachedValue === value) {
-        if (cachedValue.timeoutId !== undefined) {
-          clearTimeout(cachedValue.timeoutId);
-        }
-        if (cachedValue.refreshTimeoutId !== undefined) {
-          clearTimeout(cachedValue.refreshTimeoutId);
-        }
-        store.delete(key);
+    // Clears both timers and drops the slot, but only if it still holds `target`
+    // (a newer set() may have replaced it while a promise/timer was pending).
+    const dropIfCurrent = (target: TokenCacheValue) => {
+      if (store.get(key) !== target) {
+        return;
       }
+      clearTimeout(target.timeoutId);
+      clearTimeout(target.refreshTimeoutId);
+      store.delete(key);
     };
 
     store.set(key, value);
@@ -368,11 +366,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
         const claims = winner.jwt?.claims;
         if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
-          if (store.get(key) === live) {
-            clearTimeout(live.timeoutId);
-            clearTimeout(live.refreshTimeoutId);
-            store.delete(key);
-          }
+          dropIfCurrent(live);
           return;
         }
 
@@ -385,15 +379,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         live.createdAt = issuedAt;
         live.expiresIn = expiresIn;
 
-        const liveDeleteKey = () => {
-          if (store.get(key) === live) {
-            clearTimeout(live.timeoutId);
-            clearTimeout(live.refreshTimeoutId);
-            store.delete(key);
-          }
-        };
-
-        const timeoutId = setTimeout(liveDeleteKey, expiresIn * 1000);
+        const timeoutId = setTimeout(() => dropIfCurrent(live), expiresIn * 1000);
         live.timeoutId = timeoutId;
 
         // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
@@ -473,7 +459,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         }
       })
       .catch(() => {
-        deleteKey();
+        dropIfCurrent(value);
       });
   };
 

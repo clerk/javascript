@@ -544,7 +544,7 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt && (!this.lastActiveToken || pickFreshestOrIncoming(this.lastActiveToken, token) === token)) {
+    if (token.jwt && pickFreshestOrIncoming(this.lastActiveToken, token) === token) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
