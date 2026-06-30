@@ -938,6 +938,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -1211,6 +1220,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -1390,7 +1408,11 @@ export type __internal_LocalizationResource = {
       domainCard: {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
+        badge__expired: LocalizationValue;
         verifiedAtLabel: LocalizationValue<'date'>;
+        expiredAtLabel: LocalizationValue<'date'>;
+        expiredLabel: LocalizationValue;
+        verifyAgainButton: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {

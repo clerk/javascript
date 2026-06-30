@@ -717,11 +717,12 @@ export type ElementsConfig = {
   configureSSOVerifyDomainErrorSubtitle: WithOptions;
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
-  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified'>;
+  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
+  configureSSOVerifyDomainCardExpired: WithOptions;
   configureSSOEmailVerificationForm: WithOptions<string>;
   configureSSOEmailVerificationIcon: WithOptions<string>;
   configureSSOEmailVerificationTitle: WithOptions<string>;

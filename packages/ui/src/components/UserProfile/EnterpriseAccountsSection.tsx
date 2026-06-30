@@ -1,6 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
-import { __internal_useUserEnterpriseConnections, useReverification, useUser } from '@clerk/shared/react';
+import { __internal_useUserEnterpriseConnections, useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
@@ -9,6 +8,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/ui/utils/sleep';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
@@ -17,6 +17,7 @@ import { Action } from '../../elements/Action';
 const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionResource }) => {
   const { connection } = props;
   const card = useCardState();
+  const clerk = useClerk();
   const { user } = useUser();
   const { componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
@@ -42,7 +43,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
       .then(res => {
         if (res?.verification?.externalVerificationRedirectURL) {
           void sleep(2000).then(() => card.setIdle(loadingKey));
-          windowNavigate(res.verification.externalVerificationRedirectURL);
+          clerkWindowNavigate(clerk, res.verification.externalVerificationRedirectURL);
         }
       })
       .catch(err => {

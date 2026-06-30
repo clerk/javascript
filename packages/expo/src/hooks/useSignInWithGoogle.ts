@@ -22,7 +22,7 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * For web platforms, use the OAuth-based Google Sign-In flow instead via useSSO.
  *
  * In the next major version, apps using native Google Sign-In will need to install
- * `@clerk/expo-google-signin` alongside `@clerk/expo`.
+ * `@clerk/expo-google-signin` alongside `@clerk/expo` and add its Expo config plugin.
  *
  * @example
  * ```tsx

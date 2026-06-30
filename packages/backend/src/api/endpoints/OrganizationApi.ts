@@ -361,6 +361,8 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async deleteOrganization(organizationId: string) {
+    this.requireId(organizationId);
+
     return this.request<Organization>({
       method: 'DELETE',
       path: joinPaths(basePath, organizationId),

@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
@@ -32,7 +33,7 @@ function warnAboutGoogleSignInPackageMigration() {
 
   hasWarnedAboutGoogleSignInPackage = true;
   console.warn(
-    'Clerk: In the next major version, native Google Sign-In will require installing @clerk/expo-google-signin. The @clerk/expo/google import path will continue to work.',
+    'Clerk: In the next major version, native Google Sign-In will require installing @clerk/expo-google-signin and adding its Expo config plugin. The @clerk/expo/google import path will continue to work.',
   );
 }
 
@@ -75,6 +76,8 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
     warnAboutGoogleSignInPackageMigration();
 
     const clerk = useClerk();
+
+    clerk.telemetry?.record(eventMethodCalled('useSignInWithGoogle'));
 
     async function startGoogleAuthenticationFlow(
       startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,

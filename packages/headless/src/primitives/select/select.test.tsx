@@ -291,6 +291,24 @@ describe('Select', () => {
       expect(activeOption).toBeInTheDocument();
     });
 
+    it.each(['{ArrowDown}', '{ArrowUp}'])(
+      'opens from a focused trigger with %s and focuses the selected option',
+      async key => {
+        const user = userEvent.setup();
+        renderSelect({ defaultValue: 'banana' });
+
+        const trigger = screen.getByRole('combobox');
+        trigger.focus();
+
+        await user.keyboard(key);
+
+        const options = screen.getAllByRole('option');
+        expect(options[1]).toHaveAttribute('data-cl-selected', '');
+        expect(document.activeElement).toBe(options[1]);
+        expect(options[1]).toHaveAttribute('data-cl-active', '');
+      },
+    );
+
     it('scrolls options into view on arrow key navigation', async () => {
       const manyItems = Array.from({ length: 20 }, (_, i) => ({
         label: `Item ${i + 1}`,

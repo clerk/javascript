@@ -82,6 +82,20 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;
+
+  /**
+   * Gets the credit balance for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditBalance: (params: GetCreditBalanceParams) => Promise<BillingCreditBalanceResource>;
+
+  /**
+   * Gets the credit history for the current payer.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  getCreditHistory: (params: GetCreditHistoryParams) => Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>>;
 }
 
 /**
@@ -926,6 +940,44 @@ export interface BillingSubscriptionResource extends ClerkResource {
    * Whether the payer is eligible for a free trial.
    */
   eligibleForFreeTrial: boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceResource {
+  /**
+   * The balance of the credit.
+   */
+  balance: BillingMoneyAmount | null;
+}
+
+export type GetCreditBalanceParams = {
+  /**
+   * The ID of the Organization to get the credit balance for.
+   */
+  orgId?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type GetCreditHistoryParams = {
+  /**
+   * The ID of the Organization to get the credit history for.
+   */
+  orgId?: string;
+};
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerResource {
+  id: string;
+  amount: BillingMoneyAmount;
+  sourceType: string;
+  sourceId: string;
+  createdAt: Date;
 }
 
 /**

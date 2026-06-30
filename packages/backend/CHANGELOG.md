@@ -1,5 +1,36 @@
 # Change Log
 
+## 3.9.0
+
+### Minor Changes
+
+- Add `clerkClient.oauthApplications.revokeToken()` for revoking opaque OAuth application access and refresh tokens. ([#9040](https://github.com/clerk/javascript/pull/9040)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- `organizations.deleteOrganization()` now validates that an organization ID was provided. Calling it with an empty ID throws `A valid resource ID is required.` locally instead of issuing a `DELETE` request to the organizations collection endpoint, matching the other ID-based methods on the API. ([#9036](https://github.com/clerk/javascript/pull/9036)) by [@jacekradko](https://github.com/jacekradko)
+
+- M2M JWT verification now validates the token-category (`cat`) header and rejects M2M JWTs tagged as a different token class. M2M JWTs minted by Clerk carry the correct category and are unaffected; M2M JWTs without the header continue to verify. ([#9038](https://github.com/clerk/javascript/pull/9038)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
+## 3.8.5
+
+### Patch Changes
+
+- Add an optional `externalAccountId` to the backend `ExternalAccount` resource. For Google and Facebook accounts the resource `id` is the `idn_`-prefixed identification id, which `users.deleteUserExternalAccount()` rejects; `externalAccountId` now exposes the `eac_`-prefixed id those calls expect. For all other providers `id` is already the `eac_` id and `externalAccountId` is `undefined`, so use `externalAccountId ?? id` to get an id you can delete with. ([#8995](https://github.com/clerk/javascript/pull/8995)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+
+## 3.8.4
+
+### Patch Changes
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+
 ## 3.8.3
 
 ### Patch Changes

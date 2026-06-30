@@ -18,7 +18,7 @@ export type {
  * - No additional dependencies required
  *
  * In the next major version, apps using native Google Sign-In will need to install
- * `@clerk/expo-google-signin` alongside `@clerk/expo`.
+ * `@clerk/expo-google-signin` alongside `@clerk/expo` and add its Expo config plugin.
  *
  * @example
  * ```tsx

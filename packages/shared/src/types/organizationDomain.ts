@@ -34,30 +34,51 @@ type OrganizationDomainVerificationStrategy = 'email_code';
 /**
  * The current status of an Organization domain verification.
  *
+ * <ul>
+ *  <li>`unverified`: Verification has not been completed yet. An attempt may be pending.</li>
+ *  <li>`verified`: Verification has been completed.</li>
+ *  <li>`failed`: Too many verification attempts were made without success.</li>
+ *  <li>`expired`: The pending verification attempt expired before it could be completed.</li>
+ * </ul>
+ *
  * @inline
  */
-export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
+export type OrganizationDomainVerificationStatus = 'unverified' | 'verified' | 'failed' | 'expired';
+
+/**
+ * The current status of an Organization domain ownership verification.
+ *
+ * <ul>
+ *  <li>`unverified`: Ownership has not been established yet. A TXT challenge is pending.</li>
+ *  <li>`verified`: Ownership has been verified.</li>
+ *  <li>`expired`: The pending ownership verification attempt expired before ownership could be confirmed. A new TXT challenge must be issued (via `prepareOwnershipVerification()`) to retry.</li>
+ * </ul>
+ *
+ * @inline
+ */
+export type OrganizationDomainOwnershipVerificationStatus = 'unverified' | 'verified' | 'expired';
 
 /**
  * The strategy used to verify ownership of an Organization's domain.
  * @inline
  */
-export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override';
+export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override' | 'parent_domain';
 
 /**
  * Holds the ownership verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Ownership proves control of the underlying DNS domain, typically by publishing a TXT record, and is required before the domain can be used for enterprise SSO.
  */
 export interface OrganizationDomainOwnershipVerification {
   /**
-   * The current status of the domain ownership verification.
+   * The current status of the domain ownership verification. A status of `expired` means the pending TXT challenge expired before ownership could be confirmed and a new challenge must be issued.
    */
-  status: OrganizationDomainVerificationStatus;
+  status: OrganizationDomainOwnershipVerificationStatus;
   /**
    * The strategy used to verify ownership of the domain.
    * <ul>
    *  <li>`txt`: Ownership is proven by publishing a DNS TXT record (see `txtRecordName` and `txtRecordValue` on `OrganizationDomainOwnershipVerification`).</li>
    *  <li>`legacy`: Ownership was implicitly granted to domains that predate the TXT verification flow, so no per-attempt proof exists.</li>
    *  <li>`manual_override`: Ownership was granted manually by a Clerk admin via the Backend API or Dashboard, bypassing the DNS challenge.</li>
+   *  <li>`parent_domain`: Ownership was inherited from a parent domain that has already been verified, so no per-attempt proof exists.</li>
    * </ul>
    */
   strategy: OrganizationDomainOwnershipVerificationStrategy;
@@ -66,7 +87,7 @@ export interface OrganizationDomainOwnershipVerification {
    */
   attempts: number | null;
   /**
-   * The date and time when the current ownership verification attempt expires, or `null` when there is no pending attempt.
+   * The date and time when the current ownership verification attempt expires, or `null` when there is no pending attempt. When `status` is `expired`, this is the date and time at which the attempt expired.
    */
   expiresAt: Date | null;
   /**

@@ -69,6 +69,13 @@ export class ExternalAccount {
      * An object holding information on the verification of this external account.
      */
     readonly verification: Verification | null,
+    /**
+     * The `eac_`-prefixed id of the external account resource, which is the id
+     * `users.deleteUserExternalAccount()` expects. Only returned for Google and
+     * Facebook accounts; for other providers it is `undefined` and `id` already
+     * holds the `eac_` value. Use `externalAccountId ?? id` to get a deletable id.
+     */
+    readonly externalAccountId?: string,
   ) {}
 
   static fromJSON(data: ExternalAccountJSON): ExternalAccount {
@@ -88,6 +95,7 @@ export class ExternalAccount {
       data.public_metadata,
       data.label,
       data.verification && Verification.fromJSON(data.verification),
+      data.external_account_id,
     );
   }
 }

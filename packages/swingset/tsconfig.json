@@ -13,6 +13,7 @@
       "@/*": ["./src/*"],
       "@clerk/ui/mosaic": ["../ui/src/mosaic"],
       "@clerk/ui/mosaic/*": ["../ui/src/mosaic/*"],
+      "@clerk/headless/hooks": ["../headless/src/hooks"],
       "@clerk/headless/*": ["../headless/src/primitives/*"]
     },
     "plugins": [
