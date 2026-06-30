@@ -1,7 +1,6 @@
 import { ProfileSection } from '@/ui/elements/Section';
 import { useCreditBalance, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { localizationKeys, Text, useLocalizations } from '../../customizables';
-import { ArrowRight } from '../../icons';
 import { useRouter } from '../../router';
 
 export const AccountCredits = () => {
@@ -33,16 +32,10 @@ export const AccountCredits = () => {
         <ProfileSection.Item id='accountCredits'>
           <Text variant='subtitle'>{$(creditBalance.balance)}</Text>
         </ProfileSection.Item>
-        <ProfileSection.ArrowButton
+        <ProfileSection.Button
           id='accountCredits'
-          textLocalizationKey={localizationKeys(`${localizationRoot}.billingPage.accountCreditsSection.viewHistory`)}
+          localizationKey={localizationKeys(`${localizationRoot}.billingPage.accountCreditsSection.viewHistory`)}
           sx={[t => ({ justifyContent: 'start', height: t.sizes.$8 })]}
-          leftIconSx={() => ({ display: 'none' })}
-          rightIcon={ArrowRight}
-          rightIconSx={t => ({
-            width: t.sizes.$4,
-            height: t.sizes.$4,
-          })}
           onClick={() => void navigate('credit-history')}
         />
       </ProfileSection.ItemList>
