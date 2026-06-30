@@ -594,9 +594,13 @@ function backfillInlineObjectChildComments(all) {
       if (refl === best) continue;
       for (const child of refl.children ?? []) {
         if (!child.kindOf?.(ReflectionKind.Property)) continue;
-        if (child.comment?.summary?.length) continue;
+        // Any `.comment` object means TypeDoc found a JSDoc block at the source — including
+        // intentionally empty comments left over from `@generateWithEmptyComment` after the
+        // modifier tag is stripped in `EVENT_RESOLVE_END`. Only fill in children that have
+        // no comment at all.
+        if (child.comment) continue;
         const src = bestByName.get(child.name);
-        if (src?.comment) child.comment = src.comment;
+        if (src?.comment?.summary?.length) child.comment = src.comment;
       }
     }
   }
