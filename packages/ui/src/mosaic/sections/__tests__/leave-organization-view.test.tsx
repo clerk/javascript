@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import type { Snapshot } from '../../machine/types';
-import type { LeaveOrgContext } from '../leave-organization-machine';
-import { LeaveOrganizationView } from '../leave-organization-view';
+import { MosaicProvider } from '../../MosaicProvider';
+import type { LeaveOrgContext } from '../leave-organization.machine';
+import { LeaveOrganizationView } from '../leave-organization.view';
 
 function renderView(snapshot: Snapshot<LeaveOrgContext>, send = vi.fn(), canSubmit = false) {
   render(

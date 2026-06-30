@@ -2,7 +2,7 @@ import { Destructive } from '../block/destructive';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import type { Snapshot } from '../machine/types';
-import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization-machine';
+import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization.machine';
 
 interface LeaveOrganizationViewProps {
   snapshot: Snapshot<LeaveOrgContext>;

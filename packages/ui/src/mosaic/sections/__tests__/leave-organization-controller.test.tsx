@@ -1,9 +1,8 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useLeaveOrganizationController } from '../leave-organization-controller';
+import { useLeaveOrganizationController } from '../leave-organization.controller';
 
 const ORG_NAME = 'Acme Inc';
 

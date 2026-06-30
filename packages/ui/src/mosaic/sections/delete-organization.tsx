@@ -1,5 +1,5 @@
-import { useDeleteOrganizationController } from './delete-organization-controller';
-import { DeleteOrganizationView } from './delete-organization-view';
+import { useDeleteOrganizationController } from './delete-organization.controller';
+import { DeleteOrganizationView } from './delete-organization.view';
 
 export function DeleteOrganization() {
   const controller = useDeleteOrganizationController();

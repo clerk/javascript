@@ -2,8 +2,8 @@ import { useOrganization, useOrganizationList, useSession } from '@clerk/shared/
 
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
-import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization-machine';
-import { deleteOrgMachine } from './delete-organization-machine';
+import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization.machine';
+import { deleteOrgMachine } from './delete-organization.machine';
 
 type DeleteOrganizationController =
   | { status: 'loading' }

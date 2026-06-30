@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
-import { deleteOrgMachine } from '../delete-organization-machine';
+import { deleteOrgMachine } from '../delete-organization.machine';
 
 const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 

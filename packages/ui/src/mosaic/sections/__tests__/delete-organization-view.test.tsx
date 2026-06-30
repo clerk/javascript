@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import type { Snapshot } from '../../machine/types';
-import type { DeleteOrgContext } from '../delete-organization-machine';
-import { DeleteOrganizationView } from '../delete-organization-view';
+import { MosaicProvider } from '../../MosaicProvider';
+import type { DeleteOrgContext } from '../delete-organization.machine';
+import { DeleteOrganizationView } from '../delete-organization.view';
 
 function renderView(snapshot: Snapshot<DeleteOrgContext>, send = vi.fn(), canSubmit = false) {
   render(

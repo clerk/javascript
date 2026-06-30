@@ -1,5 +1,5 @@
-import { useLeaveOrganizationController } from './leave-organization-controller';
-import { LeaveOrganizationView } from './leave-organization-view';
+import { useLeaveOrganizationController } from './leave-organization.controller';
+import { LeaveOrganizationView } from './leave-organization.view';
 
 export function LeaveOrganization() {
   const controller = useLeaveOrganizationController();

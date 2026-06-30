@@ -2,8 +2,8 @@ import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
-import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization-machine';
-import { leaveOrgMachine } from './leave-organization-machine';
+import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization.machine';
+import { leaveOrgMachine } from './leave-organization.machine';
 
 type LeaveOrganizationController =
   | { status: 'loading' }
