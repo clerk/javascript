@@ -20,9 +20,9 @@ import type {
 import { useCallback, useMemo, useRef } from 'react';
 
 import {
-  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
@@ -280,7 +280,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       createTestRun,
     };
   }, [
-    user,
     organization,
     organizationDomains,
     enterpriseConnection,

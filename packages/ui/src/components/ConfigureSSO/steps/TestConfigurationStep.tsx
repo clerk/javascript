@@ -206,6 +206,7 @@ const ContinueTestSsoStepButton = ({
   const card = useCardState();
   const { goNext } = useWizard();
   const [isValidating, setIsValidating] = useState(false);
+  const isLoading = useSpinDelay(isValidating);
 
   const advance = (): void => {
     card.setError(undefined);
@@ -245,7 +246,7 @@ const ContinueTestSsoStepButton = ({
   return (
     <Step.Footer.Continue
       onClick={handleContinue}
-      isLoading={isValidating}
+      isLoading={isLoading}
     />
   );
 };
