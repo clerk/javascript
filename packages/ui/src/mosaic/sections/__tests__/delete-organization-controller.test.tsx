@@ -9,21 +9,26 @@ const ORG_NAME = 'Acme Inc';
 
 let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
-let organization: { id: string; name: string; destroy: () => Promise<void> } | null;
+let checkAuthorization: ReturnType<typeof vi.fn>;
+let isLoaded: boolean;
+let organization: { id: string; name: string; destroy: () => Promise<void>; adminDeleteEnabled: boolean } | null;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react')>();
   return {
     ...actual,
-    useOrganization: () => ({ isLoaded: true, organization, membership: null }),
+    useOrganization: () => ({ isLoaded, organization, membership: null }),
     useOrganizationList: () => ({ userMemberships: { revalidate } }),
+    useSession: () => ({ session: { id: 'sess_1', checkAuthorization } }),
   };
 });
 
 beforeEach(() => {
   destroy = vi.fn();
   revalidate = vi.fn().mockResolvedValue(undefined);
-  organization = { id: 'org_1', name: ORG_NAME, destroy };
+  checkAuthorization = vi.fn().mockReturnValue(true);
+  isLoaded = true;
+  organization = { id: 'org_1', name: ORG_NAME, destroy, adminDeleteEnabled: true };
 });
 
 afterEach(() => {
@@ -33,7 +38,7 @@ afterEach(() => {
 function Harness() {
   const controller = useDeleteOrganizationController();
   if (controller.status !== 'ready') {
-    return <output data-testid='state'>loading</output>;
+    return <output data-testid='state'>{controller.status}</output>;
   }
   return (
     <div>
@@ -53,6 +58,37 @@ function openAndConfirm() {
 }
 
 describe('useDeleteOrganizationController', () => {
+  it('is loading until useOrganization is loaded', () => {
+    isLoaded = false;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('loading');
+  });
+
+  it('is ready when the user can delete and admin delete is enabled', () => {
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('idle');
+    expect(checkAuthorization).toHaveBeenCalledWith({ permission: 'org:sys_profile:delete' });
+  });
+
+  it('is hidden when the user lacks the delete permission', () => {
+    checkAuthorization.mockReturnValue(false);
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('hidden');
+  });
+
+  it('is hidden when admin delete is disabled', () => {
+    organization = { id: 'org_1', name: ORG_NAME, destroy, adminDeleteEnabled: false };
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('hidden');
+  });
+
   it('drives CONFIRM → deleting → resolve → deleted', async () => {
     const gate = deferred<void>();
     destroy.mockReturnValue(gate.promise);

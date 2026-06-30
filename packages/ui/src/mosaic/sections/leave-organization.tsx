@@ -1,10 +1,11 @@
-import { SectionSkeleton } from '../components/section-skeleton';
 import { useLeaveOrganizationController } from './leave-organization-controller';
 import { LeaveOrganizationView } from './leave-organization-view';
 
 export function LeaveOrganization() {
   const controller = useLeaveOrganizationController();
-  if (controller.status === 'loading') return <SectionSkeleton />;
+  if (controller.status !== 'ready') {
+    return null;
+  }
   return (
     <LeaveOrganizationView
       snapshot={controller.snapshot}

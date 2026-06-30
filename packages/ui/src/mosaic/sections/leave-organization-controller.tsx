@@ -1,9 +1,21 @@
 import { useOrganization, useOrganizationList } from '@clerk/shared/react';
 
+import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
+import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization-machine';
 import { leaveOrgMachine } from './leave-organization-machine';
 
-export function useLeaveOrganizationController() {
+type LeaveOrganizationController =
+  | { status: 'loading' }
+  | { status: 'hidden' }
+  | {
+      status: 'ready';
+      snapshot: Snapshot<LeaveOrgContext>;
+      send: (event: LeaveOrgEvent) => void;
+      canSubmit: boolean;
+    };
+
+export function useLeaveOrganizationController(): LeaveOrganizationController {
   const { isLoaded, organization, membership } = useOrganization();
   const { userMemberships } = useOrganizationList({ userMemberships: true });
 
@@ -21,12 +33,16 @@ export function useLeaveOrganizationController() {
     },
   });
 
-  if (!isLoaded || !organization || !membership) {
-    return { status: 'loading' as const };
+  if (!isLoaded) {
+    return { status: 'loading' };
+  }
+
+  if (!organization || !membership) {
+    return { status: 'hidden' };
   }
 
   return {
-    status: 'ready' as const,
+    status: 'ready',
     snapshot,
     send,
     canSubmit: actor.can({ type: 'CONFIRM' }),
