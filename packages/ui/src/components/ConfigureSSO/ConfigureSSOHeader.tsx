@@ -1,4 +1,5 @@
 import { Flex, useLocalizations } from '@/customizables';
+import { mqu } from '@/styledSystem';
 
 import { ProfileCardHeader } from './elements/ProfileCard';
 import { Stepper } from './elements/Stepper';
@@ -21,7 +22,7 @@ export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Elem
     <ProfileCardHeader>
       {title}
 
-      <Flex sx={title ? { marginInlineStart: 'auto' } : undefined}>
+      <Flex sx={title ? { marginInlineStart: 'auto', [mqu.md]: { marginInlineStart: 0 } } : undefined}>
         <Stepper>
           {visibleSteps.map((step, index) => {
             const isCurrent = index === currentVisibleIndex;

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useControllableState } from '@clerk/headless/hooks';
+import React, { useEffect } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
@@ -17,6 +18,10 @@ interface DestructiveProps {
   resourceName: string;
   onDelete: () => void | Promise<void>;
   isDeleting: boolean;
+  canSubmit: boolean;
+  error?: string | null;
+  confirmationValue?: string;
+  onConfirmationValueChange?: (value: string) => void;
 }
 
 export function Destructive({
@@ -29,17 +34,24 @@ export function Destructive({
   resourceName,
   onDelete,
   isDeleting,
+  canSubmit,
+  error,
+  confirmationValue,
+  onConfirmationValueChange,
 }: DestructiveProps) {
-  const [confirmValue, setConfirmValue] = useState('');
-  const canSubmit = confirmValue === resourceName && !isDeleting;
+  const [confirmValue, setConfirmValue] = useControllableState(confirmationValue, '', onConfirmationValueChange);
 
   useEffect(() => {
-    if (!open) setConfirmValue('');
-  }, [open]);
+    if (!open) {
+      setConfirmValue('');
+    }
+  }, [open, setConfirmValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (canSubmit) onDelete();
+    if (canSubmit) {
+      onDelete();
+    }
   };
 
   return (
@@ -52,6 +64,19 @@ export function Destructive({
         <>
           <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
           <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          {error && (
+            <Box
+              role='alert'
+              render={p => <p {...p} />}
+              sx={t => ({
+                ...t.text('sm'),
+                color: t.color.destructive,
+                marginBlockStart: t.spacing(2),
+              })}
+            >
+              {error}
+            </Box>
+          )}
           <form onSubmit={handleSubmit}>
             <Box
               render={p => <label {...p} />}

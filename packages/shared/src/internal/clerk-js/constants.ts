@@ -33,6 +33,7 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
   EXTERNAL_ACCOUNT_NOT_FOUND: 'external_account_not_found',
+  EXTERNAL_ACCOUNT_EXISTS: 'external_account_exists',
   SESSION_EXISTS: 'session_exists',
   SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
   SIGN_UP_MODE_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',

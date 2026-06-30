@@ -25,13 +25,6 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-export function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
-
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
   const allowBillingRoutes = useProtect(

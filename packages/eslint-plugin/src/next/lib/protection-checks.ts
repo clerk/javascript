@@ -199,6 +199,19 @@ function isRecognizedAuthCheck(test: TSESTree.Expression, bindings: Set<AuthFiel
   return false;
 }
 
+// Recurse the conditions to support e.g. `if (!isAuthenticated || !has(...))`
+// or other joint conditions - safe as long as it's all `||`
+function guardFiresWhenUnauthenticated(test: TSESTree.Expression, bindings: Set<AuthField>): boolean {
+  if (isRecognizedAuthCheck(test, bindings)) {
+    return true;
+  }
+  // Only `||` preserves the guarantee
+  if (test.type === 'LogicalExpression' && test.operator === '||') {
+    return guardFiresWhenUnauthenticated(test.left, bindings) || guardFiresWhenUnauthenticated(test.right, bindings);
+  }
+  return false;
+}
+
 function isExitCall(expr: TSESTree.Expression | null | undefined): boolean {
   if (!expr || expr.type !== 'CallExpression') {
     return false;
@@ -247,7 +260,7 @@ function isAuthGuardWithExit(stmt: TSESTree.Statement, bindings: Set<AuthField>)
   if (stmt.type !== 'IfStatement') {
     return false;
   }
-  if (!isRecognizedAuthCheck(stmt.test, bindings)) {
+  if (!guardFiresWhenUnauthenticated(stmt.test, bindings)) {
     return false;
   }
   return consequentExits(stmt.consequent);

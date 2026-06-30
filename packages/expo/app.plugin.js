@@ -6,8 +6,7 @@
  * 1. iOS is configured with the required deployment target and metadata
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
   withXcodeProject,
@@ -187,8 +186,7 @@ const withClerkGoogleSignIn = config => {
  * 2. Android gets packaging exclusions for dependency conflicts
  * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.
@@ -227,7 +225,8 @@ const withClerkAppleSignIn = config => {
  * Accepts a `theme` prop pointing to a JSON file with optional keys:
  *   - colors: { primary, background, input, danger, success, warning,
  *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
+ *               secondaryButtonForeground }  (hex color strings)
  *   - darkColors: same keys as colors (for dark mode)
  *   - design: { fontFamily: string, borderRadius: number }
  *
@@ -250,6 +249,8 @@ const VALID_COLOR_KEYS = [
   'ring',
   'muted',
   'shadow',
+  'secondaryButtonBackground',
+  'secondaryButtonForeground',
 ];
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;

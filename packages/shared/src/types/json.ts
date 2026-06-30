@@ -20,6 +20,7 @@ import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
 import type {
+  OrganizationDomainOwnershipVerificationStatus,
   OrganizationDomainOwnershipVerificationStrategy,
   OrganizationDomainVerificationStatus,
   OrganizationEnrollmentMode,
@@ -398,6 +399,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
   self_serve_sso_enabled?: boolean;
+  exclusive_membership?: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
@@ -435,7 +437,7 @@ export interface OrganizationDomainVerificationJSON {
 }
 
 export interface OrganizationDomainOwnershipVerificationJSON {
-  status: OrganizationDomainVerificationStatus;
+  status: OrganizationDomainOwnershipVerificationStatus;
   strategy: OrganizationDomainOwnershipVerificationStrategy;
   attempts: number | null;
   expire_at: number | null;

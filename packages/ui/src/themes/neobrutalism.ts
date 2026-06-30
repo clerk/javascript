@@ -3,7 +3,7 @@ import { createTheme } from './createTheme';
 const buttonStyle = {
   boxShadow: '3px 3px 0px #000',
   border: '2px solid #000',
-  '&:focus': {
+  '&:focus-visible': {
     boxShadow: '4px 4px 0px #000',
     border: '2px solid #000',
     transform: 'scale(1.01)',
@@ -49,7 +49,7 @@ export const neobrutalism = createTheme({
       ...buttonStyle,
       ...shadowStyle,
       transition: 'all 0.2s ease-in-out',
-      '&:focus': {
+      '&:focus-visible': {
         boxShadow: '4px 4px 0px #000',
         border: '2px solid #000',
         transform: 'scale(1.01)',
@@ -69,7 +69,7 @@ export const neobrutalism = createTheme({
     formFieldInput: {
       ...shadowStyle,
       transition: 'all 0.2s ease-in-out',
-      '&:focus': {
+      '&:focus-visible': {
         boxShadow: '4px 4px 0px #000',
         border: '2px solid #000',
         transform: 'scale(1.01)',
@@ -102,7 +102,7 @@ export const neobrutalism = createTheme({
     footerActionLink: {
       fontWeight: '700',
       borderBottom: '3px solid',
-      '&:focus': {
+      '&:focus-visible': {
         boxShadow: 'none',
       },
     },

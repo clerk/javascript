@@ -94,34 +94,42 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             boxShadow: hoverBoxShadow,
           },
         };
+  const borderColor = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha150
+      : t.colors.$warningAlpha300
+    : t.colors.$dangerAlpha500;
+
+  const boxShadow = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha100
+      : t.colors.$warningAlpha50
+    : t.colors.$borderAlpha150;
+
+  const defaultBoxShadow = t.shadows.$input.replace('{{color}}', boxShadow);
+
+  const focusStyleValues = {
+    borderColor: hoverBorderColor,
+    WebkitTapHighlightColor: 'transparent',
+    boxShadow: [
+      hoverBoxShadow,
+      t.shadows.$focusRing.replace(
+        '{{color}}',
+        !props?.hasError ? t.colors.$borderAlpha150 : (t.colors.$dangerAlpha200 as string),
+      ),
+    ].toString(),
+  };
   const focusStyles =
     props?.focusRing === false
       ? {}
       : {
-          '&:focus': {
-            borderColor: hoverBorderColor,
-            WebkitTapHighlightColor: 'transparent',
-            boxShadow: [
-              hoverBoxShadow,
-              t.shadows.$focusRing.replace(
-                '{{color}}',
-                !props?.hasError ? t.colors.$borderAlpha150 : (t.colors.$dangerAlpha200 as string),
-              ),
-            ].toString(),
+          '&:focus': focusStyleValues,
+          '&:focus:not(:focus-visible)': {
+            borderColor,
+            boxShadow: defaultBoxShadow,
           },
+          '&:focus-visible': focusStyleValues,
         };
-
-  const borderColor = !props?.hasError
-    ? !props?.hasWarning
-      ? t.colors.$borderAlpha150 // Default border color
-      : t.colors.$warningAlpha300 // Warning border color
-    : t.colors.$dangerAlpha500; // Error border color
-
-  const boxShadow = !props?.hasError
-    ? !props?.hasWarning
-      ? t.colors.$borderAlpha100 // Default box shadow color
-      : t.colors.$warningAlpha50 // Warning box shadow color
-    : t.colors.$borderAlpha150; // Error box shadow color
 
   return {
     normal: {
@@ -129,7 +137,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
       borderWidth: t.borderWidths.$normal,
       borderStyle: t.borderStyles.$solid,
       borderColor,
-      boxShadow: t.shadows.$input.replace('{{color}}', boxShadow),
+      boxShadow: defaultBoxShadow,
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
@@ -159,6 +167,12 @@ const focusRingStyles = (t: InternalTheme) => {
 const focusRing = (t: InternalTheme) => {
   return {
     '&:focus': {
+      ...focusRingStyles(t),
+    },
+    '&:focus:not(:focus-visible)': {
+      boxShadow: 'none',
+    },
+    '&:focus-visible': {
       ...focusRingStyles(t),
     },
   } as const;

@@ -1,0 +1,122 @@
+name: 'Expo native build (@clerk/expo)'
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - '.github/workflows/expo-native-build.yml'
+      - 'integration/templates/expo-native/**'
+      - 'packages/expo/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: expo-native-build-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FIXTURE_DIR: integration/templates/expo-native
+  FIXTURE_PUBLISHABLE_KEY: pk_test_ZHVtbXkuY2xlcmsuYWNjb3VudHMuZGV2JA
+  SDK_PACK_DIR: /tmp/clerk-expo-pack
+
+jobs:
+  native-build:
+    if: ${{ github.head_ref != 'changeset-release/main' }}
+    name: Expo ${{ matrix.expo-sdk }} / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - expo-sdk: 54
+            platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+          - expo-sdk: 54
+            platform: ios
+            runner: blacksmith-6vcpu-macos-26
+          - expo-sdk: 55
+            platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+          - expo-sdk: 55
+            platform: ios
+            runner: blacksmith-6vcpu-macos-26
+          - expo-sdk: 56
+            platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+          - expo-sdk: 56
+            platform: ios
+            runner: blacksmith-6vcpu-macos-26
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Install monorepo dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and pack @clerk/expo
+        run: |
+          pnpm --filter @clerk/expo... build
+          mkdir -p "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
+          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-*.tgz)"
+          if tar -tf "$SDK_TARBALL" | grep -q '^package/e2e/'; then
+            echo "Fixture files must not be packed into @clerk/expo"
+            exit 1
+          fi
+
+      - name: Install fixture dependencies
+        working-directory: ${{ env.FIXTURE_DIR }}
+        env:
+          EXPO_SDK: ${{ matrix.expo-sdk }}
+        run: |
+          cp "package.sdk-$EXPO_SDK.json" package.json
+          pnpm install --no-frozen-lockfile
+          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-*.tgz)"
+          pnpm add "$SDK_TARBALL" -w
+          pnpm expo install expo-auth-session expo-constants expo-crypto expo-dev-client expo-secure-store expo-web-browser
+
+      - name: Write fixture .env
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: |
+          echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=$FIXTURE_PUBLISHABLE_KEY" > .env
+
+      - name: Set up JDK 17
+        if: ${{ matrix.platform == 'android' }}
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prebuild Android fixture
+        if: ${{ matrix.platform == 'android' }}
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm expo prebuild --clean --platform android
+
+      - name: Build Android fixture
+        if: ${{ matrix.platform == 'android' }}
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm build:android
+
+      - name: Prebuild iOS fixture
+        if: ${{ matrix.platform == 'ios' }}
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm expo prebuild --clean --platform ios
+
+      - name: Build iOS fixture
+        if: ${{ matrix.platform == 'ios' }}
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: pnpm build:ios

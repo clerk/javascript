@@ -1,4 +1,5 @@
 import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -1633,7 +1634,7 @@ describe('Clerk singleton', () => {
                 strategy: 'oauth_google',
                 external_verification_redirect_url: null,
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                   long_message: 'This external account already exists.',
                   message: 'already exists',
                 },
@@ -1645,7 +1646,7 @@ describe('Clerk singleton', () => {
               strategy: 'oauth_google',
               external_verification_redirect_url: null,
               error: {
-                code: 'external_account_exists',
+                code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 long_message: 'This external account already exists.',
                 message: 'already exists',
               },
@@ -2231,7 +2232,7 @@ describe('Clerk singleton', () => {
               external_account: {
                 status: 'transferable',
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 },
               },
             },
@@ -3241,7 +3242,9 @@ describe('Clerk singleton', () => {
 
     it('uses ui.ClerkUI when provided', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3254,7 +3257,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3267,7 +3272,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({

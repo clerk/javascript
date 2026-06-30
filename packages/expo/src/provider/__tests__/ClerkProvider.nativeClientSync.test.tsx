@@ -89,7 +89,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
       addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      removeListeners: vi.fn(),
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
   };
@@ -124,7 +123,7 @@ describe('ClerkProvider native client sync', () => {
     vi.clearAllMocks();
     mocks.nativeClientEvent = null;
     mocks.configure.mockResolvedValue(undefined);
-    mocks.getClientToken.mockResolvedValue('native-client-token');
+    mocks.getClientToken.mockResolvedValue(null);
     mocks.syncClientStateFromJs.mockResolvedValue(undefined);
     mocks.tokenCache.getToken.mockResolvedValue('client-token');
     mocks.tokenCache.saveToken.mockResolvedValue(undefined);
@@ -185,7 +184,6 @@ describe('ClerkProvider native client sync', () => {
 
   test('reloads JS resources after native emits a device token change', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -224,6 +222,8 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('reloads JS resources after native clears the device token', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -262,8 +262,6 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('reloads JS resources after a native client-only change without rewriting the token cache', async () => {
-    mocks.getClientToken.mockResolvedValue(null);
-
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -341,7 +339,6 @@ describe('ClerkProvider native client sync', () => {
 
   test('keeps token cache notifications suppressed across overlapping native token writes', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
-    mocks.getClientToken.mockResolvedValue(null);
 
     const firstSave = deferred();
     const secondSave = deferred();
@@ -444,7 +441,6 @@ describe('ClerkProvider native client sync', () => {
       fetch: vi.fn().mockResolvedValue(refreshedClient),
     };
     mocks.clerkInstance.session = activeSession;
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -508,7 +504,6 @@ describe('ClerkProvider native client sync', () => {
       mocks.clerkInstance.session = session;
       return Promise.resolve();
     });
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -568,7 +563,6 @@ describe('ClerkProvider native client sync', () => {
       }),
     };
     mocks.clerkInstance.session = removedSession;
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -642,7 +636,6 @@ describe('ClerkProvider native client sync', () => {
       mocks.clerkInstance.session = session;
       return Promise.resolve();
     });
-    mocks.getClientToken.mockResolvedValue(null);
 
     render(
       <ClerkProvider

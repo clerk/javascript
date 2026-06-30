@@ -358,7 +358,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
-      await userEvent.click(getByRole('menuitem'));
+      await userEvent.click(getByRole('button', { name: /manage/i }));
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalled();
     });
 
@@ -375,7 +375,7 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
@@ -391,7 +391,7 @@ describe('OrganizationSwitcher', () => {
 
       const { getByRole, queryByLabelText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(getByRole('button', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
       expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
@@ -597,6 +597,81 @@ describe('OrganizationSwitcher', () => {
     });
   });
 
+  describe('Accessibility', () => {
+    it('focuses the dialog container on open, not the first interactive item', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveFocus();
+    });
+
+    it('traps focus within the popover when open', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+
+      for (let i = 0; i < 10; i++) {
+        await userEvent.tab();
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+    });
+
+    it('uses dialog semantics for the trigger button', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open organization switcher' });
+
+      expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+      await userEvent.click(trigger);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('menuitem')).toBeNull();
+    });
+
+    it('closes on escape and restores focus to the trigger', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open organization switcher' });
+
+      await userEvent.click(trigger);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await userEvent.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+      expect(trigger).toHaveFocus();
+    });
+  });
+
   describe('OrganizationSwitcher with PortalProvider', () => {
     it('passes getContainer to openOrganizationProfile', async () => {
       const container = document.createElement('div');
@@ -619,7 +694,7 @@ describe('OrganizationSwitcher', () => {
       );
 
       await userEvent.click(getByRole('button'));
-      const manageButton = await waitFor(() => screen.getByRole('menuitem', { name: /manage/i }));
+      const manageButton = await waitFor(() => screen.getByRole('button', { name: /manage/i }));
       await userEvent.click(manageButton);
 
       expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
@@ -649,7 +724,7 @@ describe('OrganizationSwitcher', () => {
       );
 
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      const createButton = await waitFor(() => screen.getByRole('menuitem', { name: 'Create organization' }));
+      const createButton = await waitFor(() => screen.getByRole('button', { name: 'Create organization' }));
       await userEvent.click(createButton);
 
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));

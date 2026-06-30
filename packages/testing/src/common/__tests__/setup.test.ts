@@ -40,6 +40,7 @@ describe('fetchWithRetry (via fetchEnvVars)', () => {
   const mockCreateTestingToken = vi.fn();
 
   beforeEach(() => {
+    mockCreateTestingToken.mockReset();
     vi.useFakeTimers();
     vi.stubEnv('CLERK_PUBLISHABLE_KEY', 'pk_test_abc');
     vi.stubEnv('CLERK_SECRET_KEY', 'sk_test_abc');

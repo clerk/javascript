@@ -674,8 +674,8 @@ export const plPL: LocalizationResource = {
         messageLabel: 'Twój e-mail używa {{domain}}. Czy chcesz go dodać?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Wpisz tutaj swoją domenę i kliknij dodaj, aby rozpocząć',
-      formFieldLabel__domain: 'Domeny',
+      formFieldInputPlaceholder__domain: 'Dodaj domenę',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -1088,18 +1088,13 @@ export const plPL: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
       },
       title: undefined,
@@ -1670,6 +1665,7 @@ export const plPL: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Adres e-mail lub numer telefonu nie jest dozwolony do rejestracji. Może to być spowodowane użyciem '+', '=', '#' lub '.' w adresie e-mail, użyciem domeny skojarzonej z usługą poczty e-mail tymczasowej lub jawnego wykluczenia.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'To jest zablokowana domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_common: 'To jest popularna domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_exists_for_enterprise_connection:
@@ -1746,6 +1742,9 @@ export const plPL: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Wyloguj',
     action__signOutAll: 'Wyloguj ze wszystkich kont',
+    label__userButtonPopover: 'Panel konta',
+    label__accountActions: 'Działania na koncie',
+    label__activeSessions: 'Aktywne sesje',
   },
   userProfile: {
     apiKeysPage: {

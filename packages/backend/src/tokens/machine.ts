@@ -8,6 +8,11 @@ export const M2M_SUBJECT_PREFIX = 'mch_';
 export const OAUTH_TOKEN_PREFIX = 'oat_';
 export const API_KEY_PREFIX = 'ak_';
 
+// Token-category tag in the protected JOSE header of instance-signed M2M JWTs,
+// used to distinguish them from other JWT classes signed by the same instance
+// key. Kept in sync with clerk_go (pkg/jwt) and cloudflare-workers.
+export const JWT_CATEGORY_M2M_TOKEN = 'cl_B7d4PD333AAA';
+
 const MACHINE_TOKEN_PREFIXES = [M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX, API_KEY_PREFIX] as const;
 
 export const JwtFormatRegExp = /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/;

@@ -21,6 +21,7 @@ import { ArrowUpTray, Close } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
+import { ActiveConnectionAlert } from './ActiveConnectionAlert';
 import type { IdpConfigurationMode } from './IdentityProviderConfigurationModes';
 
 type CardState = ReturnType<typeof useCardState>;
@@ -70,7 +71,7 @@ export type IdentityProviderConfigurationFormProps =
   | { mode: 'metadataFile'; form: MetadataFileForm; labels: MetadataFileLabels }
   | { mode: 'manual'; form: ManualConfigurationForm; labels: ManualConfigurationLabels };
 
-export const IdentityProviderConfigurationForm = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
+const ConfigurationPanel = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
   switch (config.mode) {
     case 'metadataUrl':
       return (
@@ -94,6 +95,15 @@ export const IdentityProviderConfigurationForm = (config: IdentityProviderConfig
         />
       );
   }
+};
+
+export const IdentityProviderConfigurationForm = (config: IdentityProviderConfigurationFormProps): JSX.Element => {
+  return (
+    <>
+      <ConfigurationPanel {...config} />
+      <ActiveConnectionAlert />
+    </>
+  );
 };
 
 type MetadataUrlPanelProps = {

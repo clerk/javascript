@@ -673,8 +673,6 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      // TODO: Re-enable once flaky statements endpoint is fixed
-      test.skip(true, 'Skipped due to flaky statements endpoint');
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
