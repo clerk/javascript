@@ -50,7 +50,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { isStrictlyStalerJwt, normalizeOrgId, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
+import { normalizeOrgId, pickFreshestJwt, pickFreshestOrIncoming, tokenOrgId } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -232,7 +232,7 @@ export class Session extends BaseResource implements SessionResource {
     // With a same-context baseline, drop a wrong-org or strictly-staler incoming token. With no
     // baseline, adopt it anyway: a bad token is still dropped downstream by the cookie guard,
     // whereas an empty lastActiveToken reads as a sign-out and clears __session.
-    if (baseline && (!sameContext || isStrictlyStalerJwt(incoming, baseline))) {
+    if (baseline && (!sameContext || pickFreshestJwt(baseline, incoming) === baseline)) {
       this.lastActiveToken = baseline;
       return;
     }
@@ -544,7 +544,7 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt && (!this.lastActiveToken || !isStrictlyStalerJwt(token, this.lastActiveToken))) {
+    if (token.jwt && (!this.lastActiveToken || pickFreshestOrIncoming(this.lastActiveToken, token) === token)) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }

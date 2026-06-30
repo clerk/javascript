@@ -71,22 +71,3 @@ export function normalizeOrgId(orgId?: string | null): string {
 export function pickFreshestOrIncoming<T extends TokenResource | JWT>(existing: T | null | undefined, incoming: T): T {
   return existing == null ? incoming : pickFreshestJwt(existing, incoming);
 }
-
-// The single drop/keep primitive. True ONLY when both carry oiat and `incoming` is
-// strictly older. Missing oiat (either side) or a full oiat+iat tie => false (fail open).
-export function isStrictlyStalerJwt(incoming: TokenResource | JWT, baseline: TokenResource | JWT): boolean {
-  const i = tokenOiat(incoming);
-  const b = tokenOiat(baseline);
-  if (i == null || b == null) {
-    return false;
-  }
-  if (i < b) {
-    return true;
-  }
-  if (i > b) {
-    return false;
-  }
-  const iIat = asJwt(incoming)?.claims?.iat ?? 0;
-  const bIat = asJwt(baseline)?.claims?.iat ?? 0;
-  return iIat < bIat;
-}

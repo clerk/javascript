@@ -20,7 +20,7 @@ import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
 import { Token } from '../resources/Token';
-import { isStrictlyStalerJwt, normalizeOrgId, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
+import { normalizeOrgId, pickFreshestJwt, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -245,7 +245,7 @@ export class AuthCookieService {
     if (tokenSid(current) !== sid || normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))) {
       return false;
     }
-    return isStrictlyStalerJwt(incoming, current);
+    return pickFreshestJwt(current, incoming) === current;
   }
 
   #decodeToken(raw: string | undefined): Token | null {

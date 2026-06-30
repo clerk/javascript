@@ -2,7 +2,6 @@ import type { JWT, TokenResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {
-  isStrictlyStalerJwt,
   normalizeOrgId,
   pickFreshestJwt,
   pickFreshestOrIncoming,
@@ -132,40 +131,6 @@ describe('pickFreshestJwt', () => {
       expect(pickFreshestJwt(a, b)).toBe(b);
       expect(pickFreshestJwt(b, a)).toBe(b);
     });
-  });
-});
-
-describe('isStrictlyStalerJwt', () => {
-  it('returns true when incoming oiat is older than baseline', () => {
-    expect(isStrictlyStalerJwt(makeToken({ oiat: 90 }), makeToken({ oiat: 100 }))).toBe(true);
-  });
-
-  it('returns false when incoming oiat is newer than baseline', () => {
-    expect(isStrictlyStalerJwt(makeToken({ oiat: 100 }), makeToken({ oiat: 90 }))).toBe(false);
-  });
-
-  it('returns true when oiat is equal and incoming iat is older', () => {
-    expect(isStrictlyStalerJwt(makeToken({ oiat: 100, iat: 150 }), makeToken({ oiat: 100, iat: 200 }))).toBe(true);
-  });
-
-  it('returns false when oiat and iat are both equal (full tie, fail open)', () => {
-    expect(isStrictlyStalerJwt(makeToken({ oiat: 100, iat: 150 }), makeToken({ oiat: 100, iat: 150 }))).toBe(false);
-  });
-
-  it('returns false when incoming is missing oiat', () => {
-    expect(isStrictlyStalerJwt(makeToken({ iat: 150 }), makeToken({ oiat: 100 }))).toBe(false);
-  });
-
-  it('returns false when baseline is missing oiat', () => {
-    expect(isStrictlyStalerJwt(makeToken({ oiat: 100 }), makeToken({ iat: 150 }))).toBe(false);
-  });
-
-  it('returns false when both are missing oiat', () => {
-    expect(isStrictlyStalerJwt(makeToken({ iat: 150 }), makeToken({ iat: 200 }))).toBe(false);
-  });
-
-  it('accepts raw decoded JWT inputs', () => {
-    expect(isStrictlyStalerJwt(makeJwt({ oiat: 90 }), makeJwt({ oiat: 100 }))).toBe(true);
   });
 });
 

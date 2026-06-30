@@ -2245,7 +2245,7 @@ describe('Session', () => {
       expect(sessionB.lastActiveToken).toBeNull();
     });
 
-    it('successive tokens without oiat keep writing lastActiveToken (fail open, no false drop)', async () => {
+    it('successive tokens without oiat keep writing lastActiveToken (equal rank, newest wins)', async () => {
       const session = makeSession();
       const first = createJwtWithOiat(NOW, undefined, { sid: 'sess_a' });
       const second = createJwtWithOiat(NOW + 5, undefined, { sid: 'sess_b' });
