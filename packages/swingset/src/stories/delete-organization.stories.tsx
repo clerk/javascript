@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
-import { deleteOrgMachine } from '@clerk/ui/mosaic/sections/delete-organization-machine';
-import { DeleteOrganizationView } from '@clerk/ui/mosaic/sections/delete-organization-view';
+import { deleteOrgMachine } from '@clerk/ui/mosaic/sections/delete-organization.machine';
+import { DeleteOrganizationView } from '@clerk/ui/mosaic/sections/delete-organization.view';
 
 import type { StoryMeta } from '@/lib/types';
 
