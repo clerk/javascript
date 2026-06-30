@@ -87,6 +87,7 @@ export interface BillingNamespace {
 
   /**
    * Gets the credit balance for the current payer.
+   * @returns A [`BillingCreditBalanceResource`](https://clerk.com/docs/reference/types/billing-credit-balance-resource) object.
    *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
@@ -94,6 +95,7 @@ export interface BillingNamespace {
 
   /**
    * Gets the credit history for the current payer.
+   * @returns A [`ClerkPaginatedResponse`](https://clerk.com/docs/reference/types/clerk-paginated-response) of [`BillingCreditLedgerResource`](https://clerk.com/docs/reference/types/billing-credit-ledger-resource) objects.
    *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
@@ -913,19 +915,19 @@ export interface BillingSubscriptionResource extends ClerkResource {
 }
 
 /**
+ * The `BillingCreditBalanceResource` type represents the credit balance for a payer.
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCreditBalanceResource {
-  /**
-   * The balance of the credit.
-   */
+  /** The balance of the credit. */
   balance: BillingMoneyAmount | null;
 }
 
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export type GetCreditBalanceParams = {
-  /**
-   * The ID of the Organization to get the credit balance for.
-   */
+  /** The ID of the Organization to get the credit balance for. */
   orgId?: string;
 };
 
@@ -940,13 +942,19 @@ export type GetCreditHistoryParams = {
 };
 
 /**
+ * The `BillingCreditLedgerResource` type represents a credit ledger entry for a payer.
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingCreditLedgerResource {
+  /** The ID of the credit ledger entry. */
   id: string;
+  /** The amount of the credit ledger entry. */
   amount: BillingMoneyAmount;
+  /** The type of the source of the credit ledger entry. */
   sourceType: string;
+  /** The ID of the source of the credit ledger entry. */
   sourceId: string;
+  /** The date when the credit ledger entry was created. */
   createdAt: Date;
 }
 
