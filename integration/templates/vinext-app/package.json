@@ -1,0 +1,26 @@
+{
+  "name": "vinext-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite dev",
+    "start": "vite preview"
+  },
+  "dependencies": {
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.25.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "react-server-dom-webpack": "^19.2.4",
+    "typescript": "^5",
+    "vinext": "^0.0.15",
+    "vite": "^7.3.1"
+  }
+}

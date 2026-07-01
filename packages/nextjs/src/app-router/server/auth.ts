@@ -12,6 +12,7 @@ import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
 import { middlewareFileReference } from '../../utils/sdk-versions';
+import { assertServerOnly } from './assertServerOnly';
 import {
   buildRequestLike,
   ClerkUseCacheError,
@@ -75,8 +76,7 @@ export type AuthFn = GetAuthFnNoRequest<SessionAuthWithRedirect, true> & {
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/reference/nextjs/clerk-middleware) to be configured.
  */
 export const auth: AuthFn = (async (options?: AuthOptions) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
+  assertServerOnly();
 
   try {
     const request = await buildRequestLike();
@@ -158,8 +158,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
 }) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('server-only');
+  assertServerOnly();
 
   const request = await buildRequestLike();
   const requestedToken = args?.[0]?.token || args?.[1]?.token || TokenType.SessionToken;
