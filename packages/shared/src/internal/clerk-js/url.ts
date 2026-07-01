@@ -424,7 +424,11 @@ export function requiresUserInput(redirectUrl: string): boolean {
 }
 
 export const isAllowedRedirect =
-  (allowedRedirectOrigins: Array<string | RegExp> | undefined, currentOrigin: string) => (_url: URL | string) => {
+  (
+    allowedRedirectOrigins: Array<string | RegExp> | undefined,
+    currentOrigin: string,
+  ): ((_url: URL | string) => boolean) =>
+  (_url: URL | string): boolean => {
     let url = _url;
     if (typeof url === 'string') {
       url = relativeToAbsoluteUrl(url, currentOrigin);
