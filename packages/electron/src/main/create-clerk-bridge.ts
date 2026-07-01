@@ -19,6 +19,18 @@ function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridge
   }
 }
 
+function buildUserAgentFallback(defaultUserAgent: string, productToken: string): string {
+  const platformComment = defaultUserAgent.match(/\([^)]*\)/)?.[0];
+
+  if (!platformComment) {
+    return productToken;
+  }
+
+  // Clerk's session activity parser preserves the platform comment and treats the
+  // token after Gecko as the app/browser name.
+  return `Mozilla/5.0 ${platformComment} Gecko/20100101 ${productToken}`;
+}
+
 /**
  * Creates the Clerk bridge for Electron's main process.
  *
@@ -38,7 +50,7 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
   const passkeys = options.passkeys ? setupPasskeysMain() : null;
 
   if (options.userAgent) {
-    app.userAgentFallback = options.userAgent;
+    app.userAgentFallback = buildUserAgentFallback(app.userAgentFallback, options.userAgent);
   }
 
   if (options.renderer) {

@@ -23,8 +23,10 @@ export type CreateClerkBridgeOptions = {
    */
   passkeys?: boolean;
   /**
-   * Overrides Electron's user-agent fallback. Clerk uses this value for UserProfile session
-   * activity attribution when no webContents or session-level user-agent is set.
+   * Product token to use in Electron's user-agent fallback. Clerk uses the resulting
+   * user-agent for UserProfile session activity attribution when no webContents or
+   * session-level user-agent is set. The Electron platform comment is preserved so
+   * device details such as macOS or Windows can still be detected.
    */
   userAgent?: string;
 };

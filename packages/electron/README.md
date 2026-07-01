@@ -96,13 +96,13 @@ import { passkeys } from '@clerk/electron/passkeys';
 </ClerkProvider>;
 ```
 
-Pass `userAgent` to `createClerkBridge` before creating renderer windows to control what Clerk uses for UserProfile session activity attribution:
+Pass `userAgent` to `createClerkBridge` before creating renderer windows to set an app-specific product token, such as `Acme Co/1.0.0`. Clerk preserves Electron's platform details, such as `Macintosh` or `Windows`, while using the product token for UserProfile session activity attribution:
 
 ```ts
 createClerkBridge({
   storage: storage(),
   renderer: { scheme: 'my-app', host: 'renderer' },
-  userAgent: 'Acme Desktop/1.2.3',
+  userAgent: 'Acme Co/1.0.0',
 });
 ```
 
