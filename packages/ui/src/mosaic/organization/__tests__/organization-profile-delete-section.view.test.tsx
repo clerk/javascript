@@ -3,13 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { Snapshot } from '../../machine/types';
 import { MosaicProvider } from '../../MosaicProvider';
-import type { DeleteOrgContext } from '../delete-organization.machine';
-import { DeleteOrganizationView } from '../delete-organization.view';
+import type { OrganizationProfileDeleteSectionContext } from '../organization-profile-delete-section.machine';
+import { OrganizationProfileDeleteSectionView } from '../organization-profile-delete-section.view';
 
-function renderView(snapshot: Snapshot<DeleteOrgContext>, send = vi.fn(), canSubmit = false) {
+function renderView(snapshot: Snapshot<OrganizationProfileDeleteSectionContext>, send = vi.fn(), canSubmit = false) {
   render(
     <MosaicProvider>
-      <DeleteOrganizationView
+      <OrganizationProfileDeleteSectionView
         snapshot={snapshot}
         send={send}
         canSubmit={canSubmit}
@@ -19,7 +19,9 @@ function renderView(snapshot: Snapshot<DeleteOrgContext>, send = vi.fn(), canSub
   return { send };
 }
 
-function snapshot(overrides: Partial<Snapshot<DeleteOrgContext>> = {}): Snapshot<DeleteOrgContext> {
+function snapshot(
+  overrides: Partial<Snapshot<OrganizationProfileDeleteSectionContext>> = {},
+): Snapshot<OrganizationProfileDeleteSectionContext> {
   return {
     value: 'confirming',
     status: 'active',
@@ -33,7 +35,7 @@ function snapshot(overrides: Partial<Snapshot<DeleteOrgContext>> = {}): Snapshot
   };
 }
 
-describe('DeleteOrganizationView', () => {
+describe('OrganizationProfileDeleteSectionView', () => {
   it('emits a typed confirmation event from the input', () => {
     const { send } = renderView(snapshot());
 

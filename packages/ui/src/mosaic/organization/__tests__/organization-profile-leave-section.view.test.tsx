@@ -3,13 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { Snapshot } from '../../machine/types';
 import { MosaicProvider } from '../../MosaicProvider';
-import type { LeaveOrgContext } from '../leave-organization.machine';
-import { LeaveOrganizationView } from '../leave-organization.view';
+import type { OrganizationProfileLeaveSectionContext } from '../organization-profile-leave-section.machine';
+import { OrganizationProfileLeaveSectionView } from '../organization-profile-leave-section.view';
 
-function renderView(snapshot: Snapshot<LeaveOrgContext>, send = vi.fn(), canSubmit = false) {
+function renderView(snapshot: Snapshot<OrganizationProfileLeaveSectionContext>, send = vi.fn(), canSubmit = false) {
   render(
     <MosaicProvider>
-      <LeaveOrganizationView
+      <OrganizationProfileLeaveSectionView
         snapshot={snapshot}
         send={send}
         canSubmit={canSubmit}
@@ -19,7 +19,9 @@ function renderView(snapshot: Snapshot<LeaveOrgContext>, send = vi.fn(), canSubm
   return { send };
 }
 
-function snapshot(overrides: Partial<Snapshot<LeaveOrgContext>> = {}): Snapshot<LeaveOrgContext> {
+function snapshot(
+  overrides: Partial<Snapshot<OrganizationProfileLeaveSectionContext>> = {},
+): Snapshot<OrganizationProfileLeaveSectionContext> {
   return {
     value: 'confirming',
     status: 'active',
@@ -33,7 +35,7 @@ function snapshot(overrides: Partial<Snapshot<LeaveOrgContext>> = {}): Snapshot<
   };
 }
 
-describe('LeaveOrganizationView', () => {
+describe('OrganizationProfileLeaveSectionView', () => {
   it('emits a typed confirmation event from the input', () => {
     const { send } = renderView(snapshot());
 

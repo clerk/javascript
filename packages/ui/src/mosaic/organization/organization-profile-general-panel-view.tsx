@@ -3,17 +3,17 @@ import type { ReactNode } from 'react';
 import { Box } from '../components/box';
 import { alpha } from '../utils';
 
-interface OrganizationProfileGeneralViewProps {
-  /** The leave-organization section, rendered above the divider. */
+interface OrganizationProfileGeneralPanelViewProps {
+  /** The organization-profile-leave-section section, rendered above the divider. */
   leaveOrganization: ReactNode;
-  /** The delete-organization section, rendered below the divider. */
+  /** The organization-profile-delete-section section, rendered below the divider. */
   deleteOrganization: ReactNode;
 }
 
-export function OrganizationProfileGeneralView({
+export function OrganizationProfileGeneralPanelView({
   leaveOrganization,
   deleteOrganization,
-}: OrganizationProfileGeneralViewProps) {
+}: OrganizationProfileGeneralPanelViewProps) {
   return (
     <Box
       sx={{

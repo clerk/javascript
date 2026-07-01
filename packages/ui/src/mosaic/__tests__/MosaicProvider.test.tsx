@@ -1,6 +1,6 @@
-import { renderHook } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import type { MosaicAppearance } from '../appearance';
 import { parseMosaicAppearance, useMosaicAppearance } from '../appearance';
@@ -12,6 +12,12 @@ const appearance: MosaicAppearance = {
     signIn: { button: { color: 'red' } },
   },
 };
+
+// Every MosaicProvider render now self-creates the Emotion insertion-point node, so
+// clean it up after each test to keep the document fresh across the whole file.
+afterEach(() => {
+  document.querySelectorAll('style#cl-mosaic-style-insertion-point').forEach(node => node.remove());
+});
 
 describe('parseMosaicAppearance', () => {
   it('returns [] with no appearance', () => {
@@ -67,5 +73,45 @@ describe('MosaicProvider theme from appearance.variables', () => {
       wrapper: ({ children }) => React.createElement(MosaicProvider, {}, children),
     });
     expect(result.current.rounded.md).toBe('0.375rem');
+  });
+});
+
+describe('MosaicProvider global reset', () => {
+  const styleText = () =>
+    Array.from(document.querySelectorAll('style'))
+      .map(node => node.textContent ?? '')
+      .join('');
+
+  it('emits a zero-specificity box-sizing/margin/padding reset scoped to [data-cl-slot]', () => {
+    render(React.createElement(MosaicProvider, {}, React.createElement('div')));
+
+    const css = styleText();
+    // `:where()` keeps the reset at 0 specificity so component classes always win on insertion-order ties.
+    expect(css).toContain(':where([data-cl-slot])');
+    expect(css).toContain('box-sizing:border-box');
+    expect(css).toContain('margin:0');
+    expect(css).toContain('padding:0');
+  });
+});
+
+describe('MosaicProvider Emotion insertion point', () => {
+  it('creates the insertion-point node when the host has not supplied one', () => {
+    expect(document.querySelector('style#cl-mosaic-style-insertion-point')).toBeNull();
+
+    render(React.createElement(MosaicProvider, {}, React.createElement('div')));
+
+    expect(document.querySelectorAll('style#cl-mosaic-style-insertion-point')).toHaveLength(1);
+  });
+
+  it('reuses a host-supplied node instead of creating a second one', () => {
+    const existing = document.createElement('style');
+    existing.id = 'cl-mosaic-style-insertion-point';
+    document.head.appendChild(existing);
+
+    render(React.createElement(MosaicProvider, {}, React.createElement('div')));
+
+    const nodes = document.querySelectorAll('style#cl-mosaic-style-insertion-point');
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0]).toBe(existing);
   });
 });

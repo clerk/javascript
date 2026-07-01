@@ -37,6 +37,7 @@ export default defineConfig(({ watch }) => {
       entry: [
         './src/index.ts',
         './src/entry.ts',
+        './src/experimental/mosaic.ts',
         './src/server.ts',
         './src/internal/index.ts',
         './src/themes/index.ts',

@@ -2,31 +2,45 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useLeaveOrganizationController } from '../leave-organization.controller';
+import { useOrganizationProfileDeleteSectionController } from '../organization-profile-delete-section.controller';
 
 const ORG_NAME = 'Acme Inc';
 
 let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
+let navigate: ReturnType<typeof vi.fn>;
+let afterLeaveUrl: string;
+let checkAuthorization: ReturnType<typeof vi.fn>;
 let isLoaded: boolean;
-let organization: { id: string; name: string } | null;
-let membership: { id: string; destroy: () => Promise<void> } | null | undefined;
+let isSessionLoaded: boolean;
+let organization: { id: string; name: string; destroy: () => Promise<void>; adminDeleteEnabled: boolean } | null;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react')>();
   return {
     ...actual,
-    useOrganization: () => ({ isLoaded, organization, membership }),
+    useOrganization: () => ({ isLoaded, organization, membership: null }),
     useOrganizationList: () => ({ userMemberships: { revalidate } }),
+    useSession: () => ({
+      isLoaded: isSessionLoaded,
+      session: isSessionLoaded ? { id: 'sess_1', checkAuthorization } : undefined,
+    }),
+    useClerk: () => ({
+      navigate,
+      __internal_environment: { displayConfig: { afterLeaveOrganizationUrl: afterLeaveUrl } },
+    }),
   };
 });
 
 beforeEach(() => {
   destroy = vi.fn();
   revalidate = vi.fn().mockResolvedValue(undefined);
+  navigate = vi.fn().mockResolvedValue(undefined);
+  afterLeaveUrl = '/after-leave';
+  checkAuthorization = vi.fn().mockReturnValue(true);
   isLoaded = true;
-  organization = { id: 'org_1', name: ORG_NAME };
-  membership = { id: 'mem_1', destroy };
+  isSessionLoaded = true;
+  organization = { id: 'org_1', name: ORG_NAME, destroy, adminDeleteEnabled: true };
 });
 
 afterEach(() => {
@@ -34,7 +48,7 @@ afterEach(() => {
 });
 
 function Harness() {
-  const controller = useLeaveOrganizationController();
+  const controller = useOrganizationProfileDeleteSectionController();
   if (controller.status !== 'ready') {
     return <output data-testid='state'>{controller.status}</output>;
   }
@@ -55,7 +69,7 @@ function openAndConfirm() {
   fireEvent.click(screen.getByText('Confirm'));
 }
 
-describe('useLeaveOrganizationController', () => {
+describe('useOrganizationProfileDeleteSectionController', () => {
   it('is loading until useOrganization is loaded', () => {
     isLoaded = false;
 
@@ -64,31 +78,39 @@ describe('useLeaveOrganizationController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('loading');
   });
 
-  it('is loading while membership is still resolving', () => {
-    membership = undefined;
+  it('is loading until the session is loaded', () => {
+    isSessionLoaded = false;
 
     render(<Harness />);
 
     expect(screen.getByTestId('state')).toHaveTextContent('loading');
+    expect(checkAuthorization).not.toHaveBeenCalled();
   });
 
-  it('is hidden when there is no active organization', () => {
-    organization = null;
+  it('is ready when the user can delete and admin delete is enabled', () => {
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('idle');
+    expect(checkAuthorization).toHaveBeenCalledWith({ permission: 'org:sys_profile:delete' });
+  });
+
+  it('is hidden when the user lacks the delete permission', () => {
+    checkAuthorization.mockReturnValue(false);
 
     render(<Harness />);
 
     expect(screen.getByTestId('state')).toHaveTextContent('hidden');
   });
 
-  it('is hidden when there is no membership', () => {
-    membership = null;
+  it('is hidden when admin delete is disabled', () => {
+    organization = { id: 'org_1', name: ORG_NAME, destroy, adminDeleteEnabled: false };
 
     render(<Harness />);
 
     expect(screen.getByTestId('state')).toHaveTextContent('hidden');
   });
 
-  it('drives CONFIRM → leaving → resolve → left', async () => {
+  it('drives CONFIRM → deleting → resolve → deleted', async () => {
     const gate = deferred<void>();
     destroy.mockReturnValue(gate.promise);
 
@@ -96,24 +118,38 @@ describe('useLeaveOrganizationController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('idle');
 
     openAndConfirm();
-    expect(screen.getByTestId('state')).toHaveTextContent('leaving');
+    expect(screen.getByTestId('state')).toHaveTextContent('deleting');
 
     await act(async () => {
       gate.resolve();
     });
 
-    expect(screen.getByTestId('state')).toHaveTextContent('left');
+    expect(screen.getByTestId('state')).toHaveTextContent('deleted');
     expect(destroy).toHaveBeenCalledTimes(1);
     expect(revalidate).toHaveBeenCalledTimes(1);
   });
 
-  it('returns to confirming with an error message when leaving rejects', async () => {
+  it('navigates to afterLeaveOrganizationUrl after a successful delete', async () => {
     const gate = deferred<void>();
     destroy.mockReturnValue(gate.promise);
 
     render(<Harness />);
     openAndConfirm();
-    expect(screen.getByTestId('state')).toHaveTextContent('leaving');
+
+    await act(async () => {
+      gate.resolve();
+    });
+
+    expect(navigate).toHaveBeenCalledWith('/after-leave');
+  });
+
+  it('returns to confirming with an error message when deleting rejects', async () => {
+    const gate = deferred<void>();
+    destroy.mockReturnValue(gate.promise);
+
+    render(<Harness />);
+    openAndConfirm();
+    expect(screen.getByTestId('state')).toHaveTextContent('deleting');
 
     await act(async () => {
       gate.reject(new Error('nope'));
@@ -122,5 +158,6 @@ describe('useLeaveOrganizationController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('confirming');
     expect(screen.getByTestId('error')).toHaveTextContent('nope');
     expect(revalidate).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });
