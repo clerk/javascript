@@ -4,7 +4,7 @@ import React from 'react';
 import { descriptors, Icon, Spinner } from '../customizables';
 import { TriangleRight } from '../icons';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
-import { common, createCssVariables, createVariants } from '../styledSystem';
+import { common, createCssVariables, createVariants, mqu } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
 import { Flex } from './Flex';
 
@@ -40,7 +40,12 @@ const { applyVariants, filterProps } = createVariants(
             padding: `${theme.space.$1} ${theme.space.$3}`,
           },
           sm: {
-            padding: `${theme.space.$1x5} ${theme.space.$3}`,
+            // Taller controls on mobile (8px) than desktop (7px) for easier tapping.
+            padding: `${theme.space.$1x75} ${theme.space.$3}`,
+            [mqu.sm]: {
+              paddingTop: theme.space.$2,
+              paddingBottom: theme.space.$2,
+            },
           },
           md: {
             padding: `${theme.space.$2x5} ${theme.space.$5}`,

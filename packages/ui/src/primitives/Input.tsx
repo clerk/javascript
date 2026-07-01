@@ -10,13 +10,13 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     boxSizing: 'border-box',
     margin: 0,
-    padding: `${theme.space.$1x5} ${theme.space.$3}`,
+    padding: `${theme.space.$1x75} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInput,
     color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
     outline: 'transparent solid 2px',
     outlineOffset: '2px',
-    maxHeight: theme.sizes.$9,
+    maxHeight: theme.sizes.$10,
     width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
     accentColor: theme.colors.$primary500,
     ...(props.type === 'checkbox'
@@ -35,6 +35,11 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       : {}),
     ...common.textVariants(theme).body,
     ...common.disabled(theme),
+    // Taller inputs on mobile (8px) than desktop (7px) for easier tapping.
+    [mqu.sm]: {
+      paddingTop: theme.space.$2,
+      paddingBottom: theme.space.$2,
+    },
     // This is a workaround to prevent zooming on iOS when focusing an input
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,

@@ -195,6 +195,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                // Icon-only buttons get a 16px glyph on desktop and 20px on mobile to
+                // stay proportional to the taller button; block buttons keep 16px, which
+                // fits their fixed icon slot.
+                size='$4'
+                sx={preferBlockButtons ? undefined : t => ({ [mqu.sm]: { width: t.sizes.$5, height: t.sizes.$5 } })}
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               />
@@ -250,8 +255,10 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       colorScheme='neutral'
       hoverAsFocus
       sx={t => ({
+        // Match the taller block/primary buttons so the icon row lines up.
         minHeight: t.sizes.$8,
         width: '100%',
+        [mqu.sm]: { minHeight: t.sizes.$9 },
       })}
       {...rest}
     >
