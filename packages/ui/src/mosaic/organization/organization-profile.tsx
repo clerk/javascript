@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
 
-import { OrganizationProfileGeneralPanel } from '../panels/organization-profile-general-panel';
-import { OrganizationProfileDeleteSection } from '../sections/organization-profile-delete-section';
-import { OrganizationProfileLeaveSection } from '../sections/organization-profile-leave-section';
 import { useOrganizationProfileController } from './organization-profile.controller';
+import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
+import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
+import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
 import { OrganizationProfileView } from './organization-profile-view';
 
 function OrganizationProfileRoot(): ReactElement | null {

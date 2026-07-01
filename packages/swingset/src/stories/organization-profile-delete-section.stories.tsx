@@ -1,14 +1,14 @@
 /** @jsxImportSource @emotion/react */
 import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
-import { organizationProfileDeleteSectionMachine } from '@clerk/ui/mosaic/sections/organization-profile-delete-section.machine';
-import { OrganizationProfileDeleteSectionView } from '@clerk/ui/mosaic/sections/organization-profile-delete-section.view';
+import { organizationProfileDeleteSectionMachine } from '@clerk/ui/mosaic/organization/organization-profile-delete-section.machine';
+import { OrganizationProfileDeleteSectionView } from '@clerk/ui/mosaic/organization/organization-profile-delete-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Organization',
   title: 'OrganizationProfileDeleteSection',
-  source: 'packages/ui/src/mosaic/sections/organization-profile-delete-section.tsx',
+  source: 'packages/ui/src/mosaic/organization/organization-profile-delete-section.tsx',
 };
 
 export function Default() {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { OrganizationProfileGeneralPanel as GeneralPanelPart } from '../../mosaic/panels/organization-profile-general-panel';
-import { OrganizationProfileDeleteSection as DeleteSectionPart } from '../../mosaic/sections/organization-profile-delete-section';
-import { OrganizationProfileLeaveSection as LeaveSectionPart } from '../../mosaic/sections/organization-profile-leave-section';
+import { OrganizationProfileDeleteSection as DeleteSectionPart } from '../../mosaic/organization/organization-profile-delete-section';
+import { OrganizationProfileGeneralPanel as GeneralPanelPart } from '../../mosaic/organization/organization-profile-general-panel';
+import { OrganizationProfileLeaveSection as LeaveSectionPart } from '../../mosaic/organization/organization-profile-leave-section';
 import {
   OrganizationProfile,
   OrganizationProfileDeleteSection,

@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/panels/organization-profile-general-panel-view';
+import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organization/organization-profile-general-panel-view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -9,7 +9,7 @@ import { Default as OrganizationProfileLeaveSectionDemo } from './organization-p
 export const meta: StoryMeta = {
   group: 'Organization',
   title: 'OrganizationProfileGeneralPanel',
-  source: 'packages/ui/src/mosaic/panels/organization-profile-general-panel.tsx',
+  source: 'packages/ui/src/mosaic/organization/organization-profile-general-panel.tsx',
 };
 
 export function Default() {

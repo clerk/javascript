@@ -1,14 +1,14 @@
 /** @jsxImportSource @emotion/react */
 import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
-import { organizationProfileLeaveSectionMachine } from '@clerk/ui/mosaic/sections/organization-profile-leave-section.machine';
-import { OrganizationProfileLeaveSectionView } from '@clerk/ui/mosaic/sections/organization-profile-leave-section.view';
+import { organizationProfileLeaveSectionMachine } from '@clerk/ui/mosaic/organization/organization-profile-leave-section.machine';
+import { OrganizationProfileLeaveSectionView } from '@clerk/ui/mosaic/organization/organization-profile-leave-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Organization',
   title: 'OrganizationProfileLeaveSection',
-  source: 'packages/ui/src/mosaic/sections/organization-profile-leave-section.tsx',
+  source: 'packages/ui/src/mosaic/organization/organization-profile-leave-section.tsx',
 };
 
 export function Default() {

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { OrganizationProfileGeneralPanel } from '../../panels/organization-profile-general-panel';
-import { OrganizationProfileDeleteSection } from '../../sections/organization-profile-delete-section';
-import { OrganizationProfileLeaveSection } from '../../sections/organization-profile-leave-section';
 import { OrganizationProfile } from '../organization-profile';
+import { OrganizationProfileDeleteSection } from '../organization-profile-delete-section';
+import { OrganizationProfileGeneralPanel } from '../organization-profile-general-panel';
+import { OrganizationProfileLeaveSection } from '../organization-profile-leave-section';
 
 describe('OrganizationProfile compound parts', () => {
   it('exposes the general panel as a standalone part', () => {

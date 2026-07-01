@@ -33,8 +33,8 @@
  */
 export { MosaicProvider } from '../mosaic/MosaicProvider';
 export type { MosaicProviderProps } from '../mosaic/MosaicProvider';
-export { OrganizationProfile } from '../mosaic/aio/organization-profile';
-export { OrganizationProfileGeneralPanel } from '../mosaic/panels/organization-profile-general-panel';
-export { OrganizationProfileDeleteSection } from '../mosaic/sections/organization-profile-delete-section';
-export { OrganizationProfileLeaveSection } from '../mosaic/sections/organization-profile-leave-section';
+export { OrganizationProfile } from '../mosaic/organization/organization-profile';
+export { OrganizationProfileGeneralPanel } from '../mosaic/organization/organization-profile-general-panel';
+export { OrganizationProfileDeleteSection } from '../mosaic/organization/organization-profile-delete-section';
+export { OrganizationProfileLeaveSection } from '../mosaic/organization/organization-profile-leave-section';
 export type { MosaicAppearance } from '../mosaic/appearance';

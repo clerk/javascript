@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 
-import { OrganizationProfileDeleteSection } from '../sections/organization-profile-delete-section';
-import { OrganizationProfileLeaveSection } from '../sections/organization-profile-leave-section';
+import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
 import { OrganizationProfileGeneralPanelView } from './organization-profile-general-panel-view';
+import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
 
 export function OrganizationProfileGeneralPanel(): ReactElement {
   return (
