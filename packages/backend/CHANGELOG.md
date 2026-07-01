@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.10.0
+
+### Minor Changes
+
+- Add an experimental `clerkClient.emails.create()` method for sending transactional emails. It accepts address- or user-based recipients, supports optional `replyTo`, `subject`, and HTML and/or text content, and returns the created `Email` resource. ([#9010](https://github.com/clerk/javascript/pull/9010)) by [@cbnsndwch](https://github.com/cbnsndwch)
+
+  This method is marked `@experimental` and may change in a future release.
+
 ## 3.9.0
 
 ### Minor Changes
