@@ -11,6 +11,7 @@ import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
+import { AccountCredits } from '../AccountCredits';
 
 const tabMap = {
   0: 'subscriptions',
@@ -66,6 +67,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                   )}
                 />
                 <PaymentMethods />
+                <AccountCredits />
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <StatementsList />

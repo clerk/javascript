@@ -1,22 +1,22 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useLeaveOrganizationController } from '../leave-organization-controller';
+import { useLeaveOrganizationController } from '../leave-organization.controller';
 
 const ORG_NAME = 'Acme Inc';
 
 let destroy: ReturnType<typeof vi.fn>;
 let revalidate: ReturnType<typeof vi.fn>;
+let isLoaded: boolean;
 let organization: { id: string; name: string } | null;
-let membership: { id: string; destroy: () => Promise<void> } | null;
+let membership: { id: string; destroy: () => Promise<void> } | null | undefined;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof import('@clerk/shared/react')>();
   return {
     ...actual,
-    useOrganization: () => ({ isLoaded: true, organization, membership }),
+    useOrganization: () => ({ isLoaded, organization, membership }),
     useOrganizationList: () => ({ userMemberships: { revalidate } }),
   };
 });
@@ -24,6 +24,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 beforeEach(() => {
   destroy = vi.fn();
   revalidate = vi.fn().mockResolvedValue(undefined);
+  isLoaded = true;
   organization = { id: 'org_1', name: ORG_NAME };
   membership = { id: 'mem_1', destroy };
 });
@@ -35,7 +36,7 @@ afterEach(() => {
 function Harness() {
   const controller = useLeaveOrganizationController();
   if (controller.status !== 'ready') {
-    return <output data-testid='state'>loading</output>;
+    return <output data-testid='state'>{controller.status}</output>;
   }
   return (
     <div>
@@ -55,6 +56,38 @@ function openAndConfirm() {
 }
 
 describe('useLeaveOrganizationController', () => {
+  it('is loading until useOrganization is loaded', () => {
+    isLoaded = false;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('loading');
+  });
+
+  it('is loading while membership is still resolving', () => {
+    membership = undefined;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('loading');
+  });
+
+  it('is hidden when there is no active organization', () => {
+    organization = null;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('hidden');
+  });
+
+  it('is hidden when there is no membership', () => {
+    membership = null;
+
+    render(<Harness />);
+
+    expect(screen.getByTestId('state')).toHaveTextContent('hidden');
+  });
+
   it('drives CONFIRM → leaving → resolve → left', async () => {
     const gate = deferred<void>();
     destroy.mockReturnValue(gate.promise);

@@ -1,5 +1,9 @@
 import type {
   BillingCheckoutJSON,
+  BillingCreditBalanceJSON,
+  BillingCreditBalanceResource,
+  BillingCreditLedgerJSON,
+  BillingCreditLedgerResource,
   BillingNamespace,
   BillingPaymentJSON,
   BillingPaymentResource,
@@ -11,6 +15,8 @@ import type {
   BillingSubscriptionResource,
   ClerkPaginatedResponse,
   CreateCheckoutParams,
+  GetCreditBalanceParams,
+  GetCreditHistoryParams,
   GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
@@ -21,6 +27,8 @@ import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOff
 import {
   BaseResource,
   BillingCheckout,
+  BillingCreditBalance,
+  BillingCreditLedger,
   BillingPayment,
   BillingPlan,
   BillingStatement,
@@ -139,5 +147,30 @@ export class Billing implements BillingNamespace {
     )?.response as unknown as BillingCheckoutJSON;
 
     return new BillingCheckout(json);
+  };
+
+  getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {
+    return await BaseResource._fetch({
+      path: Billing.path('/credits', { orgId: params.orgId }),
+      method: 'GET',
+    }).then(res => new BillingCreditBalance(res?.response as unknown as BillingCreditBalanceJSON));
+  };
+
+  getCreditHistory = async (
+    params: GetCreditHistoryParams,
+  ): Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>> => {
+    return await BaseResource._fetch({
+      path: Billing.path('/credits/history', { orgId: params.orgId }),
+      method: 'GET',
+    }).then(res => {
+      const { data, total_count } = res?.response as unknown as {
+        data: BillingCreditLedgerJSON[];
+        total_count: number;
+      };
+      return {
+        total_count,
+        data: data.map(item => new BillingCreditLedger(item)),
+      };
+    });
   };
 }

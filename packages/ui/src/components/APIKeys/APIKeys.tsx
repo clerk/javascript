@@ -162,7 +162,9 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         >
           <Box elementDescriptor={descriptors.apiKeysSearchBox}>
             <InputWithIcon
+              name='apiKeysSearch'
               placeholder={t(localizationKeys('apiKeys.action__search'))}
+              aria-label={t(localizationKeys('apiKeys.action__search'))}
               leftIcon={
                 <Icon
                   icon={MagnifyingGlass}
@@ -171,6 +173,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               }
               value={searchValue}
               type='search'
+              autoComplete='off'
               autoCapitalize='none'
               spellCheck={false}
               onChange={e => setSearchValue(e.target.value)}

@@ -1,15 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
 import type { Snapshot } from '../../machine/types';
-import type { LeaveOrgContext } from '../leave-organization-machine';
-import { LeaveOrganizationView } from '../leave-organization-view';
+import { MosaicProvider } from '../../MosaicProvider';
+import type { DeleteOrgContext } from '../delete-organization.machine';
+import { DeleteOrganizationView } from '../delete-organization.view';
 
-function renderView(snapshot: Snapshot<LeaveOrgContext>, send = vi.fn(), canSubmit = false) {
+function renderView(snapshot: Snapshot<DeleteOrgContext>, send = vi.fn(), canSubmit = false) {
   render(
     <MosaicProvider>
-      <LeaveOrganizationView
+      <DeleteOrganizationView
         snapshot={snapshot}
         send={send}
         canSubmit={canSubmit}
@@ -19,21 +19,21 @@ function renderView(snapshot: Snapshot<LeaveOrgContext>, send = vi.fn(), canSubm
   return { send };
 }
 
-function snapshot(overrides: Partial<Snapshot<LeaveOrgContext>> = {}): Snapshot<LeaveOrgContext> {
+function snapshot(overrides: Partial<Snapshot<DeleteOrgContext>> = {}): Snapshot<DeleteOrgContext> {
   return {
     value: 'confirming',
     status: 'active',
     context: {
       organizationName: 'Acme Inc',
       confirmationValue: '',
-      leaveOrganization: async () => {},
+      destroyOrganization: async () => {},
       error: null,
     },
     ...overrides,
   };
 }
 
-describe('LeaveOrganizationView', () => {
+describe('DeleteOrganizationView', () => {
   it('emits a typed confirmation event from the input', () => {
     const { send } = renderView(snapshot());
 
@@ -48,7 +48,7 @@ describe('LeaveOrganizationView', () => {
         context: {
           organizationName: 'Acme Inc',
           confirmationValue: 'Acme Inc',
-          leaveOrganization: async () => {},
+          destroyOrganization: async () => {},
           error: null,
         },
       }),
@@ -69,7 +69,7 @@ describe('LeaveOrganizationView', () => {
         context: {
           organizationName: 'Acme Inc',
           confirmationValue: 'Acme Inc',
-          leaveOrganization: async () => {},
+          destroyOrganization: async () => {},
           error: null,
         },
       }),
@@ -77,7 +77,7 @@ describe('LeaveOrganizationView', () => {
       false,
     );
 
-    expect(screen.getByRole('button', { name: 'Leave organization' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Delete organization' })).toBeDisabled();
   });
 
   it('shows machine errors without Clerk fixtures', () => {
@@ -86,12 +86,12 @@ describe('LeaveOrganizationView', () => {
         context: {
           organizationName: 'Acme Inc',
           confirmationValue: 'Acme Inc',
-          leaveOrganization: async () => {},
-          error: 'Leave failed',
+          destroyOrganization: async () => {},
+          error: 'Delete failed',
         },
       }),
     );
 
-    expect(screen.getByText('Leave failed')).toBeInTheDocument();
+    expect(screen.getByText('Delete failed')).toBeInTheDocument();
   });
 });

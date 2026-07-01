@@ -23,6 +23,7 @@ export { usePaymentMethods as __experimental_usePaymentMethods } from './usePaym
 export { usePlans as __experimental_usePlans } from './usePlans';
 export { useSubscription as __experimental_useSubscription } from './useSubscription';
 export { useCheckout as __experimental_useCheckout } from './useCheckout';
+export { __internal_useCreditBalanceQuery } from './useCreditBalance';
 
 /**
  * Internal hooks to be consumed only by `@clerk/clerk-js`.
@@ -30,6 +31,7 @@ export { useCheckout as __experimental_useCheckout } from './useCheckout';
  *
  * These exist here in order to keep React Query implementations in a centralized place.
  */
+export { __internal_useCreditHistoryQuery } from './useCreditHistory';
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';
 export { __internal_usePaymentAttemptQuery } from './usePaymentAttemptQuery';
