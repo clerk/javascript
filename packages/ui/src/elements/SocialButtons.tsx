@@ -254,15 +254,19 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       variant='outline'
       colorScheme='neutral'
       hoverAsFocus
-      sx={t => ({
-        // Match the taller block/primary buttons so the icon row lines up.
-        minHeight: t.sizes.$8,
-        width: '100%',
-        [mqu.sm]: { minHeight: t.sizes.$9 },
-      })}
+      sx={{ width: '100%' }}
       {...rest}
     >
-      {icon}
+      {/* Reserve one line of button text so the icon button matches the height of the
+          block button (and its siblings) across any theme spacing/font size, instead of
+          pinning to a static minHeight that stops tracking the text-based controls. */}
+      <Flex
+        as='span'
+        center
+        sx={{ minHeight: '1lh' }}
+      >
+        {icon}
+      </Flex>
     </Button>
   );
 });
