@@ -10,6 +10,7 @@ import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Tooltip } from '@/ui/elements/Tooltip';
+import { toNegativeAmount } from '@/ui/utils/billing';
 import {
   getCheckoutSeatUnitTotal,
   getIncludedSeatsUnitTotalTier,
@@ -134,7 +135,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
               <LineItems.Description
-                text={totals.discounts?.proration?.amount ? `- ${$(totals.discounts.proration.amount)}` : ''}
+                text={totals.discounts?.proration?.amount ? $(toNegativeAmount(totals.discounts.proration.amount)) : ''}
               />
             </LineItems.Group>
           )}
@@ -142,7 +143,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
               <LineItems.Description
-                text={totals.credits?.proration?.amount ? `- ${$(totals.credits.proration.amount)}` : ''}
+                text={totals.credits?.proration?.amount ? $(toNegativeAmount(totals.credits.proration.amount)) : ''}
               />
             </LineItems.Group>
           )}
@@ -150,7 +151,9 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
               <LineItems.Description
-                text={totals.credits?.payer?.appliedAmount ? `- ${$(totals.credits.payer.appliedAmount)}` : ''}
+                text={
+                  totals.credits?.payer?.appliedAmount ? $(toNegativeAmount(totals.credits.payer.appliedAmount)) : ''
+                }
               />
             </LineItems.Group>
           )}
