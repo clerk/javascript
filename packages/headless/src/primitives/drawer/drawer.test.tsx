@@ -191,6 +191,14 @@ function stubHeight(el: HTMLElement, height: number) {
   vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ height } as DOMRect);
 }
 
+// A `getBoundingClientRect` that reflects an applied `style.height` cap the way a
+// real browser does, so tests can exercise the read-back-what-you-just-set path.
+function stubMeasuredHeight(el: HTMLElement, naturalHeight: number) {
+  vi.spyOn(el, 'getBoundingClientRect').mockImplementation(
+    () => ({ height: el.style.height ? parseFloat(el.style.height) : naturalHeight }) as DOMRect,
+  );
+}
+
 function makeScrollable(
   el: HTMLElement,
   { scrollHeight, clientHeight, scrollTop }: { scrollHeight: number; clientHeight: number; scrollTop: number },
@@ -592,6 +600,38 @@ describe('Drawer', () => {
       expect(parseFloat(swipeY(popup))).toBeLessThanOrEqual(0);
 
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 97 });
+    });
+
+    it('removes the iOS touchend fallback listener on release (no leak per gesture)', () => {
+      // iOS registers a `touchend` fallback on pointerdown (it may not dispatch
+      // pointerup after a scroll-cancelled gesture). A normal release must remove
+      // it so listeners can't pile up on `window` across gestures.
+      const hadPlatform = Object.getOwnPropertyDescriptor(navigator, 'platform');
+      Object.defineProperty(navigator, 'platform', { value: 'iPhone', configurable: true });
+      const add = vi.spyOn(window, 'addEventListener');
+      const remove = vi.spyOn(window, 'removeEventListener');
+      try {
+        render(<DrawerFixture defaultOpen />);
+        const popup = screen.getByRole('dialog');
+        stubHeight(popup, 400);
+
+        clock.t += OPEN_GRACE_PERIOD + 50;
+        fireEvent.pointerDown(popup, { pointerId: 1, clientY: 0, button: 0, pointerType: 'touch' });
+        fireEvent.pointerUp(popup, { pointerId: 1, clientY: 0 });
+
+        const added = add.mock.calls.filter(c => c[0] === 'touchend').length;
+        const removed = remove.mock.calls.filter(c => c[0] === 'touchend').length;
+        expect(added).toBeGreaterThan(0);
+        expect(removed).toBe(added);
+      } finally {
+        add.mockRestore();
+        remove.mockRestore();
+        if (hadPlatform) {
+          Object.defineProperty(navigator, 'platform', hadPlatform);
+        } else {
+          Reflect.deleteProperty(navigator, 'platform');
+        }
+      }
     });
   });
 
@@ -1192,6 +1232,24 @@ describe('Drawer', () => {
       vv.dispatchEvent(new Event('resize'));
 
       expect(popup.style.bottom).toBe('300px');
+      expect(popup.style.height).toBe('500px');
+    });
+
+    it('keeps the height cap stable across repeated resizes while the keyboard stays open', () => {
+      const vv = new FakeVisualViewport();
+      setVisualViewport(vv);
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubMeasuredHeight(popup, 900); // natural height, taller than the shrunken viewport
+
+      screen.getByTestId('field').focus();
+      vv.height = 500;
+      vv.dispatchEvent(new Event('resize'));
+      expect(popup.style.height).toBe('500px');
+
+      // iOS fires `resize` repeatedly while the keyboard is open. The cap must not
+      // flip off just because the popup now measures at the capped height.
+      vv.dispatchEvent(new Event('resize'));
       expect(popup.style.height).toBe('500px');
     });
 

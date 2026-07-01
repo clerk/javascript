@@ -69,6 +69,9 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   const lastSample = useRef({ y: 0, t: 0 });
   const vel = useRef(0); // px/ms, signed
   const captured = useRef<Element | null>(null);
+  // Removes the current iOS `touchend` fallback listener (see `onPointerDown`),
+  // so it never outlives its gesture or piles up across gestures.
+  const removeTouchEnd = useRef<(() => void) | null>(null);
 
   // Latest options, read at event time so the handlers can stay referentially stable.
   const cfg = useRef(opts);
@@ -81,6 +84,9 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       openTime.current = now();
     }
   }, [open, now]);
+
+  // Drop any pending iOS touchend fallback if the drawer unmounts mid-gesture.
+  useEffect(() => () => removeTouchEnd.current?.(), []);
 
   const shouldDrag = useCallback((target: HTMLElement, down: boolean): boolean => {
     const { now: clock, curSwipe, snap } = cfg.current;
@@ -180,15 +186,18 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     captured.current = target;
     safeCapture(target, e.pointerId, 'setPointerCapture');
 
-    // iOS doesn't dispatch pointerup after a scroll-cancelled gesture.
+    // iOS doesn't dispatch pointerup after a scroll-cancelled gesture, so reset
+    // `allowed` on touchend. Track the listener (and drop any stale one from a
+    // prior gesture that never fired) so it's removed on release/unmount instead
+    // of leaking on `window`.
     if (isIOS()) {
-      window.addEventListener(
-        'touchend',
-        () => {
-          allowed.current = false;
-        },
-        { once: true },
-      );
+      removeTouchEnd.current?.();
+      const onTouchEnd = (): void => {
+        allowed.current = false;
+        removeTouchEnd.current = null;
+      };
+      window.addEventListener('touchend', onTouchEnd, { once: true });
+      removeTouchEnd.current = () => window.removeEventListener('touchend', onTouchEnd);
     }
   }, []);
 
@@ -229,6 +238,9 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     if (!draggingRef.current) {
       return;
     }
+    // Normal release: the iOS touchend fallback is no longer needed.
+    removeTouchEnd.current?.();
+    removeTouchEnd.current = null;
     const {
       snapPoints,
       snap,

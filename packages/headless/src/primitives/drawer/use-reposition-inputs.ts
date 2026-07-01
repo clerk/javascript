@@ -50,6 +50,12 @@ export function useRepositionInputs({ enabled, popupRef }: UseRepositionInputsOp
         return;
       }
       const keyboardHeight = window.innerHeight - viewport.height;
+      // Measure the *natural* height by first clearing any cap we applied on a
+      // prior resize. Reading `getBoundingClientRect` while our own cap is in
+      // place would report the capped height, so the cap would flip off on the
+      // next resize (and back on the one after), thrashing the sheet height while
+      // the keyboard stays open.
+      popup.style.height = '';
       const popupHeight = popup.getBoundingClientRect().height;
       popup.style.height = popupHeight > viewport.height ? `${viewport.height}px` : '';
       popup.style.bottom = `${Math.max(keyboardHeight, 0)}px`;
