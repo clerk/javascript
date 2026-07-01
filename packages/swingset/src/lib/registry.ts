@@ -48,6 +48,10 @@ import {
   Default as OrganizationProfileLeaveSectionDefault,
   meta as organizationProfileLeaveSectionMeta,
 } from '../stories/organization-profile-leave-section.stories';
+import {
+  Default as OrganizationProfileProfileSectionDefault,
+  meta as organizationProfileProfileSectionMeta,
+} from '../stories/organization-profile-profile-section.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -71,6 +75,10 @@ const organizationProfileLeaveSectionModule: StoryModule = {
 const organizationProfileDeleteSectionModule: StoryModule = {
   meta: organizationProfileDeleteSectionMeta,
   Default: OrganizationProfileDeleteSectionDefault,
+};
+const organizationProfileProfileSectionModule: StoryModule = {
+  meta: organizationProfileProfileSectionMeta,
+  Default: OrganizationProfileProfileSectionDefault,
 };
 const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
 const organizationProfileGeneralPanelModule: StoryModule = {
@@ -124,6 +132,7 @@ export const registry: StoryModule[] = [
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
+  organizationProfileProfileSectionModule,
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,
   // Blocks
