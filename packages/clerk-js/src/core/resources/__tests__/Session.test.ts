@@ -8,7 +8,7 @@ import { TokenId } from '@/utils/tokenId';
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
-import { BaseResource, Organization, Session, Token } from '../internal';
+import { BaseResource, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
