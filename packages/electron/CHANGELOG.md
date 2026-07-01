@@ -1,5 +1,14 @@
 # @clerk/electron
 
+## 0.0.9
+
+### Patch Changes
+
+- Add a `userAgent` option to `createClerkBridge()` so Electron apps can customize the app name used for UserProfile session activity attribution while preserving platform details. ([#9066](https://github.com/clerk/javascript/pull/9066)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Updated dependencies []:
+  - @clerk/react@6.11.3
+
 ## 0.0.8
 
 ### Patch Changes
