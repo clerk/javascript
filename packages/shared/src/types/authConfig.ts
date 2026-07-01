@@ -21,6 +21,5 @@ export interface AuthConfigResource extends ClerkResource {
    * Preferred channels for phone code providers.
    */
   preferredChannels: Record<string, PhoneCodeChannel> | null;
-  sessionMinter: boolean;
   __internal_toSnapshot: () => AuthConfigJSONSnapshot;
 }
