@@ -436,12 +436,24 @@ export const isAllowedRedirect =
 
     const isSameOrigin = currentOrigin === url.origin;
 
+    const patterns = allowedRedirectOrigins.map(origin =>
+      typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin,
+    );
+
+    // When the redirect URL includes a non-default port (common in local dev, e.g. :5173),
+    // url.origin includes the port (https://app.example.net:5173) while allowedRedirectOrigins
+    // patterns are typically port-less (https://*.example.net). Test both forms so that satellite
+    // apps running on custom ports are not incorrectly rejected.
+    const portlessOrigin = url.port !== '' ? `${url.protocol}//${url.hostname}` : null;
+
     const isAllowed =
       !isProblematicUrl(url) &&
       (isSameOrigin ||
-        allowedRedirectOrigins
-          .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-          .some(origin => origin.test(trimTrailingSlash(url.origin))));
+        patterns.some(
+          pattern =>
+            pattern.test(trimTrailingSlash(url.origin)) ||
+            (portlessOrigin !== null && pattern.test(portlessOrigin)),
+        ));
 
     if (!isAllowed) {
       logger.warnOnce(

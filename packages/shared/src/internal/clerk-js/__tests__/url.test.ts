@@ -579,6 +579,14 @@ describe('isAllowedRedirect', () => {
     ['https:evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['//evil.com', [/https:\/\/www\.clerk\.com/], false],
     ['..//evil.com', ['https://www.clerk.com'], false],
+    // non-default ports — satellite apps in local dev (e.g. Vite on :5173)
+    ['https://www.clerk.com:3000', ['https://www.clerk.com'], true],
+    ['https://www.clerk.com:3000/path?q=1', ['https://www.clerk.com'], true],
+    ['https://app.example.net:5173', ['https://*.example.net'], true],
+    ['https://app.example.net:5176', ['https://*.example.net'], true],
+    // non-default port must not bypass domain validation
+    ['https://evil.com:5173', ['https://*.clerk.com'], false],
+    ['https://evil.clerk.com.evil.com:5173', ['https://*.clerk.com'], false],
   ];
 
   const warnMock = vi.spyOn(logger, 'warnOnce');
