@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { OAUTH_TRANSPORT_CHANNELS, PASSKEY_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
 import { createClerkBridge } from '../create-clerk-bridge';
+import { httpRedirectStrategy } from '../oauth-redirect';
 
 vi.mock('electron', () => ({
   app: {
@@ -227,6 +228,7 @@ describe('createClerkBridge', () => {
         host: 'renderer',
         scheme: 'my-app',
       },
+      oauth: { redirect: { type: 'deep-link' } },
     });
 
     clerk.cleanup();
@@ -248,10 +250,21 @@ describe('createClerkBridge', () => {
 
     expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, expect.any(Function));
     expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+  });
+
+  it('registers a protocol client by default (deep-link)', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
     expect(app.setAsDefaultProtocolClient).toHaveBeenCalledWith('my-app');
   });
 
-  it('derives the OAuth callback URL from the renderer origin', () => {
+  it('derives the OAuth callback URL from the renderer origin by default', () => {
     createClerkBridge({
       storage,
       renderer: {
@@ -267,7 +280,72 @@ describe('createClerkBridge', () => {
     expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('my-app://renderer/');
   });
 
-  it('opens OAuth URLs externally and resolves with the matching deep-link callback URL', async () => {
+  it('does not register a protocol client when oauth.redirect is http', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      oauth: { redirect: { type: 'http' } },
+    });
+
+    expect(app.setAsDefaultProtocolClient).not.toHaveBeenCalled();
+    expect(app.on).not.toHaveBeenCalledWith('open-url', expect.any(Function));
+  });
+
+  it('uses a loopback redirect URL when oauth.redirect is http', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      oauth: { redirect: { type: 'http' } },
+    });
+
+    const getRedirectUrlHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
+    })?.[1];
+
+    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('http://127.0.0.1:45789/sso-callback');
+  });
+
+  it('accepts a redirect built with httpRedirectStrategy()', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      oauth: { redirect: httpRedirectStrategy({ port: 6001 }) },
+    });
+
+    const getRedirectUrlHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
+    })?.[1];
+
+    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('http://127.0.0.1:6001/sso-callback');
+  });
+
+  it('honors a custom loopback port', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      oauth: { redirect: { type: 'http', port: 51234 } },
+    });
+
+    const getRedirectUrlHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
+    })?.[1];
+
+    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('http://127.0.0.1:51234/sso-callback');
+  });
+
+  it('opens OAuth URLs externally and resolves with the matching deep-link callback URL in protocol mode', async () => {
     vi.mocked(shell.openExternal).mockResolvedValue(undefined);
     createClerkBridge({
       storage,
@@ -275,6 +353,7 @@ describe('createClerkBridge', () => {
         host: 'renderer',
         scheme: 'my-app',
       },
+      oauth: { redirect: { type: 'deep-link' } },
     });
 
     const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
