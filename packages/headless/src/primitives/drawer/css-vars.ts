@@ -19,6 +19,8 @@ export const DrawerCssVars = {
   frontmostHeight: '--cl-drawer-frontmost-height',
   /** count of open nested drawers. */
   nestedCount: '--cl-drawer-nested-drawers',
+  /** 0..1 dismiss progress of the frontmost nested child (drives the parent's live scale-in). */
+  nestedDragProgress: '--cl-drawer-nested-drag-progress',
 } as const;
 
 export const DrawerAttrs = {
@@ -55,6 +57,7 @@ export function registerDrawerCssVars(): void {
     [DrawerCssVars.swipeY, '<length>', '0px'],
     [DrawerCssVars.snapOffset, '<length>', '0px'],
     [DrawerCssVars.swipeProgress, '<number>', '0'],
+    [DrawerCssVars.nestedDragProgress, '<number>', '0'],
   ] as const;
   for (const [name, syntax, initialValue] of defs) {
     try {

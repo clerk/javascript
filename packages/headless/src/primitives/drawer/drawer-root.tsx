@@ -15,7 +15,7 @@ import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useStat
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';
-import { DrawerCssVars, registerDrawerCssVars } from './css-vars';
+import { DrawerAttrs, DrawerCssVars, registerDrawerCssVars } from './css-vars';
 import {
   DrawerContext,
   type DrawerContextValue,
@@ -165,6 +165,8 @@ function DrawerInner(props: DrawerProps) {
     setVar,
     setSwipe,
     curSwipe,
+    onNestedDrag: parent?.onNested.onNestedDrag,
+    onNestedRelease: parent?.onNested.onNestedRelease,
   });
 
   useEffect(() => {
@@ -180,10 +182,18 @@ function DrawerInner(props: DrawerProps) {
     () => ({
       onNestedOpenChange: (childOpen: boolean) =>
         setNestedOpenCount(count => Math.max(0, childOpen ? count + 1 : count - 1)),
-      onNestedDrag: () => {},
-      onNestedRelease: () => {},
+      // High-frequency: write straight to the popup (like the drag engine) instead
+      // of routing through React state, so a nested child's drag stays 60fps.
+      onNestedDrag: (progress: number) => {
+        setVar(DrawerCssVars.nestedDragProgress, String(progress));
+        popupRef.current?.setAttribute(DrawerAttrs.nestedSwiping, '');
+      },
+      onNestedRelease: () => {
+        setVar(DrawerCssVars.nestedDragProgress, '0');
+        popupRef.current?.removeAttribute(DrawerAttrs.nestedSwiping);
+      },
     }),
-    [],
+    [setVar],
   );
 
   useEffect(() => {

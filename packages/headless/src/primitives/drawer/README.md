@@ -155,13 +155,14 @@ properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` i
 
 ### CSS custom properties (on `Drawer.Popup`)
 
-| Variable                        | Written by    | Meaning                                          |
-| ------------------------------- | ------------- | ------------------------------------------------ |
-| `--cl-drawer-swipe-movement-y`  | drag engine   | px live drag delta on the Y axis (0 at rest)     |
-| `--cl-drawer-swipe-progress`    | drag engine   | 0..1 dismiss progress (drives backdrop fade)     |
-| `--cl-drawer-snap-point-offset` | snap layer    | px resting translateY of the active snap point   |
-| `--cl-drawer-swipe-strength`    | drag engine   | 0.1..1 from release velocity (scales exit speed) |
-| `--cl-drawer-nested-drawers`    | nesting layer | count of open nested children                    |
+| Variable                           | Written by    | Meaning                                                                               |
+| ---------------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| `--cl-drawer-swipe-movement-y`     | drag engine   | px live drag delta on the Y axis (0 at rest)                                          |
+| `--cl-drawer-swipe-progress`       | drag engine   | 0..1 dismiss progress (drives backdrop fade)                                          |
+| `--cl-drawer-snap-point-offset`    | snap layer    | px resting translateY of the active snap point                                        |
+| `--cl-drawer-swipe-strength`       | drag engine   | 0.1..1 from release velocity (scales exit speed)                                      |
+| `--cl-drawer-nested-drawers`       | nesting layer | count of open nested children                                                         |
+| `--cl-drawer-nested-drag-progress` | nesting layer | 0..1 dismiss progress of the dragged nested child (drives the parent's live scale-in) |
 
 ### Data attributes
 
@@ -174,6 +175,7 @@ properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` i
 | `data-cl-expanded`                                | Popup                              | Resting at the full-height snap |
 | `data-cl-nested`                                  | Popup                              | This drawer is itself nested    |
 | `data-cl-nested-drawer-open`                      | Popup                              | A nested child is open          |
+| `data-cl-nested-drawer-swiping`                   | Popup                              | A nested child is being dragged |
 | `data-cl-drawer-handle`                           | Handle                             | Grip / `handleOnly` hit-test    |
 | `data-cl-drawer-no-drag`                          | (consumer-set)                     | Opt a subtree out of dragging   |
 
@@ -194,13 +196,17 @@ Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by t
   sheet joins the same `FloatingTree`, so a press in its portal counts as inside.
 - **Nested drawers** stack automatically (shared `FloatingTree`); the parent receives
   `data-cl-nested-drawer-open` and `--cl-drawer-nested-drawers` so the styled layer can scale it back.
+  While a nested child is dragged, the parent also receives `data-cl-nested-drawer-swiping` and a live
+  `--cl-drawer-nested-drag-progress` (0 = child at rest, 1 = child fully dismissed), so the styled layer
+  can interpolate the parent's scale back in as the child is dragged down (vaul-style coupling).
 
 ## Out of scope (follow-ups)
 
 - Directions other than bottom (top / left / right).
 - Full iOS keyboard hardening (the pre-focus `translateY` trick and a `focus` override) plus
   snap-point-aware keyboard offsets and flick-focus suppression.
-- Animated nested scale-back interpolation and `--cl-drawer-frontmost-height` peek math.
+- `--cl-drawer-frontmost-height` peek math (the live scale-back interpolation via
+  `--cl-drawer-nested-drag-progress` is built; frontmost-height-based peek offsets are not).
 - Resize-driven recomputation of snap offsets.
 - Per-trigger payloads on detached handles (`createDrawerHandle<T>()` + a render-prop `Drawer.Root`).
 - `onActiveSnapPointChange` event details (the change `reason`, e.g. close-press vs. drag).

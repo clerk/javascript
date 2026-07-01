@@ -32,6 +32,10 @@ export interface UseDrawerDragOptions {
   setSwipe: (px: number) => void;
   /** Source of truth for the current swipe-y, read by drag decisions. */
   curSwipe: React.MutableRefObject<number>;
+  /** When this drawer is nested, report its live 0..1 dismiss progress so the parent can scale in. */
+  onNestedDrag?: (progress: number) => void;
+  /** When this drawer is nested, signal the parent that the drag gesture ended. */
+  onNestedRelease?: () => void;
 }
 
 export interface UseDrawerDragReturn {
@@ -193,7 +197,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       if (!draggingRef.current || e.pointerId !== pid.current) {
         return;
       }
-      const { snapPoints, snap, setSwipe, setVar, now: clock } = cfg.current;
+      const { snapPoints, snap, setSwipe, setVar, now: clock, onNestedDrag } = cfg.current;
       const dist = e.clientY - startY.current; // positive is downward
       const down = dist > 0;
 
@@ -202,6 +206,9 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       }
       allowed.current = true;
       sample(e.clientY, clock());
+
+      // Nested: hand the parent our normalized downward progress so it can scale in.
+      onNestedDrag?.(clamp(dist / sheetH.current, 0, 1));
 
       if (snapPoints && snap) {
         snap.onDrag(dist);
@@ -222,7 +229,17 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     if (!draggingRef.current) {
       return;
     }
-    const { snapPoints, snap, dismissible, close, setVar, setSwipe, now: clock, curSwipe } = cfg.current;
+    const {
+      snapPoints,
+      snap,
+      dismissible,
+      close,
+      setVar,
+      setSwipe,
+      now: clock,
+      curSwipe,
+      onNestedRelease,
+    } = cfg.current;
 
     if (captured.current && pid.current !== null) {
       safeCapture(captured.current, pid.current, 'releasePointerCapture');
@@ -230,6 +247,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     captured.current = null;
     setIsDragging(false);
     draggingRef.current = false;
+    onNestedRelease?.(); // clear the parent's live coupling so it can settle
     const didDrag = allowed.current;
     allowed.current = false;
     pid.current = null;

@@ -16,8 +16,10 @@ export interface DrawerDrag {
 /** Callbacks a nested `Drawer.Root` invokes on its parent so the parent can scale/dim back. */
 export interface NestedDrawerCallbacks {
   onNestedOpenChange: (open: boolean) => void;
+  /** Live 0..1 dismiss progress of the child, reported each pointermove while it drags. */
   onNestedDrag: (progress: number) => void;
-  onNestedRelease: (open: boolean) => void;
+  /** The child's drag gesture ended; the parent clears its live coupling and settles. */
+  onNestedRelease: () => void;
 }
 
 export interface DrawerContextValue extends DialogContextValue {

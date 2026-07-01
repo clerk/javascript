@@ -1166,6 +1166,58 @@ describe('Drawer', () => {
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
       expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
     });
+
+    function getChildPopup() {
+      const childPopup = screen.getByText('Child drawer').closest('[role="dialog"]');
+      if (!(childPopup instanceof HTMLElement)) {
+        throw new Error('expected the child drawer popup to be an HTMLElement');
+      }
+      return childPopup;
+    }
+
+    it("reports the child's live dismiss progress to the parent while it is dragged", async () => {
+      const user = userEvent.setup();
+      render(<NestedFixture />);
+      const parentPopup = screen.getByRole('dialog'); // only the parent is open initially
+      await user.click(screen.getByRole('button', { name: 'Open child' }));
+      const childPopup = getChildPopup();
+      stubHeight(childPopup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(childPopup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+      clock.t += 50;
+      fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 200 }); // 200 / 400 = 0.5
+
+      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-swiping', '');
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0.5');
+
+      // Release: the parent's live coupling clears so the styled layer can settle.
+      fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 200 });
+      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
+    });
+
+    it('clamps the reported nested progress to the 0..1 range', async () => {
+      const user = userEvent.setup();
+      render(<NestedFixture />);
+      const parentPopup = screen.getByRole('dialog'); // only the parent is open initially
+      await user.click(screen.getByRole('button', { name: 'Open child' }));
+      const childPopup = getChildPopup();
+      stubHeight(childPopup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(childPopup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+
+      clock.t += 20;
+      fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 600 }); // past the sheet height
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('1');
+
+      clock.t += 20;
+      fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: -100 }); // upward: no dismiss progress
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
+
+      fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: -100 });
+    });
   });
 
   describe('nested portals (form controls)', () => {
