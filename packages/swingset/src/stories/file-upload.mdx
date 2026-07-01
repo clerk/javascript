@@ -1,0 +1,159 @@
+import * as FileUploadStories from './file-upload.stories';
+
+# FileUpload
+
+A file picker that accepts input from a trigger button or drag-and-drop, from `@clerk/headless`.
+It is a **headless** primitive: it owns the selected-file state, a hidden `<input type="file">`,
+`accept` filtering (applied to both the picker and dropped files), single/multiple modes, and image
+preview thumbnails, but ships **no styles** — you bring your own CSS by targeting the `data-cl-*`
+attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its behavior.
+Click the trigger to open the native picker, or drag image files onto the area; each selected file
+renders an `<img>` preview with a remove button. Non-image files render no preview.
+
+<Story
+  name='Default'
+  storyModule={FileUploadStories}
+/>
+
+## Usage
+
+```tsx
+import { FileUpload } from '@clerk/headless/file-upload';
+
+<FileUpload.Root
+  accept='image/*'
+  multiple
+>
+  <FileUpload.Dropzone>
+    <FileUpload.Trigger>Choose files</FileUpload.Trigger>
+    <span>or drag files here</span>
+  </FileUpload.Dropzone>
+
+  <FileList />
+</FileUpload.Root>;
+```
+
+The selected files live in `FileUpload.Root`. Read them with the `useFileUpload` hook and render each
+one inside a `FileUpload.Item` — `ItemPreview` renders an `<img>` for images and nothing otherwise,
+so it is safe to include unconditionally:
+
+```tsx
+function FileList() {
+  const { files } = FileUpload.useFileUpload();
+  return (
+    <ul>
+      {files.map(file => (
+        <li key={file.name}>
+          <FileUpload.Item file={file}>
+            <FileUpload.ItemPreview />
+            <span>{file.name}</span>
+            <FileUpload.ItemDelete>Remove</FileUpload.ItemDelete>
+          </FileUpload.Item>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Single file (avatar)
+
+Omit `multiple` and a new selection replaces the previous file instead of appending.
+
+```tsx
+<FileUpload.Root accept='image/*'>
+  <FileUpload.Trigger>Upload avatar</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
+### Controlled
+
+```tsx
+const [files, setFiles] = useState<File[]>([]);
+
+<FileUpload.Root
+  value={files}
+  onValueChange={setFiles}
+>
+  {/* ... */}
+</FileUpload.Root>;
+```
+
+## Parts
+
+| Part                     | Default Element | Description                                                          |
+| ------------------------ | --------------- | -------------------------------------------------------------------- |
+| `FileUpload.Root`        | `<div>`         | Root wrapper; owns file state and renders the hidden `<input>`       |
+| `FileUpload.Trigger`     | `<button>`      | Opens the native file picker                                         |
+| `FileUpload.Dropzone`    | `<div>`         | Drag-and-drop target; filters dropped files by `accept`              |
+| `FileUpload.Item`        | `<div>`         | Wraps one selected file; provides item context (file, remove)        |
+| `FileUpload.ItemPreview` | `<img>`         | Image thumbnail for the item's file (renders nothing for non-images) |
+| `FileUpload.ItemDelete`  | `<button>`      | Removes the item's file                                              |
+
+All parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their
+default element. Compound parts throw if used outside their parent (`FileUpload.*` outside `Root`;
+`Item`-scoped parts outside `Item`).
+
+`FileUpload.useFileUpload()` is a hook (not a component) that returns
+`{ files, addFiles, removeFile, clearFiles, openFilePicker, disabled }` for reading the selection and
+driving custom UI. It must be called inside `FileUpload.Root`.
+
+## Props
+
+### `FileUpload.Root`
+
+| Prop                       | Type                                               | Default            | Description                                                |
+| -------------------------- | -------------------------------------------------- | ------------------ | ---------------------------------------------------------- |
+| <code>value</code>         | <code>File[]</code>                                | —                  | Controlled list of selected files                          |
+| <code>defaultValue</code>  | <code>File[]</code>                                | <code>[]</code>    | Initially selected files (uncontrolled)                    |
+| <code>onValueChange</code> | <code>(files: File[]) => void</code>               | —                  | Called with the full list whenever the selection changes   |
+| <code>multiple</code>      | <code>boolean</code>                               | <code>false</code> | Allow selecting more than one file                         |
+| <code>accept</code>        | <code>string</code>                                | —                  | `accept` filter (e.g. `image/*,.pdf`) for picker and drops |
+| <code>maxSize</code>       | <code>number</code>                                | —                  | Max size in bytes for a single file; larger files rejected |
+| <code>onReject</code>      | <code>(rejections: FileRejection[]) => void</code> | —                  | Called with files rejected by `accept` or `maxSize`        |
+| <code>disabled</code>      | <code>boolean</code>                               | <code>false</code> | Disable the trigger, dropzone, and picker                  |
+
+A `FileRejection` is `{ file: File; reason: 'accept' | 'size' }`. `onReject` fires for both the
+picker and drops, `accept` is checked before `maxSize`, and accepted files in the same batch are
+still added.
+
+### `FileUpload.Item`
+
+| Prop              | Type              | Default      | Description                   |
+| ----------------- | ----------------- | ------------ | ----------------------------- |
+| <code>file</code> | <code>File</code> | — (required) | The file this item represents |
+
+`FileUpload.Trigger`, `FileUpload.Dropzone`, `FileUpload.ItemPreview`, and `FileUpload.ItemDelete`
+take no additional props beyond standard HTML attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute          | Applies To                          | Description                                     |
+| ------------------ | ----------------------------------- | ----------------------------------------------- |
+| `data-cl-slot`     | All parts                           | Part identifier (e.g. `"file-upload-dropzone"`) |
+| `data-cl-empty`    | Root                                | Present when no files are selected              |
+| `data-cl-dragging` | Dropzone                            | Present while a valid drag is over the zone     |
+| `data-cl-image`    | Item                                | Present when the item's file is an image        |
+| `data-cl-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                           |
+
+```css
+[data-cl-slot='file-upload-dropzone'] {
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 24px;
+}
+[data-cl-slot='file-upload-dropzone'][data-cl-dragging] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
+}
+```
+
+The hidden `<input type="file">` is `aria-hidden` and out of the tab order; the `Trigger` button is
+the accessible control and forwards its click to the input. `ItemPreview` uses the file name as its
+`alt` text.

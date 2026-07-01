@@ -39,6 +39,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     autocomplete: dynamic(() => import('../stories/autocomplete.mdx')),
     collapsible: dynamic(() => import('../stories/collapsible.mdx')),
     dialog: dynamic(() => import('../stories/dialog.mdx')),
+    'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
