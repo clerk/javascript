@@ -1367,6 +1367,29 @@ describe('SessionTokenCache', () => {
       expect(newRefresh).toHaveBeenCalledTimes(1);
     });
 
+    it('schedules a cookie-hydrated (past-iat) token from its absolute expiry, not a full TTL out', async () => {
+      // Token minted 30s before this tab loaded: 60s TTL, but exp is only 30s away.
+      // The proactive refresh must fire at exp - now - 17 = 13s (recomputed against the
+      // wall clock), not at the old relative ttl - 17 = 43s, which would land past expiry
+      // and never fire proactively. Drives the claims.exp -> absolute expiresAt wiring.
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds - 30, 60);
+      const token = new Token({ id: 'past-iat-token', jwt, object: 'token' });
+
+      const onRefresh = vi.fn();
+      SessionTokenCache.set({
+        tokenId: 'past-iat-token',
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh,
+      });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(12 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
     it('cancels old expiration timer when set() is called again for the same key', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt1 = createJwtWithTtl(nowSeconds, 30);

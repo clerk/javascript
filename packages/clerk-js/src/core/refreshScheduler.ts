@@ -32,6 +32,9 @@ export interface Clock {
   now(): number;
 }
 
+/** The production wall clock, in seconds since the UNIX epoch. */
+export const systemClock: Clock = { now: () => Date.now() / 1000 };
+
 interface ScheduleParams {
   /** Absolute expiry of the token, in seconds since the UNIX epoch (JWT `exp`). */
   expiresAt: number;
@@ -51,7 +54,7 @@ export interface RefreshScheduler {
   schedule(key: string, params: ScheduleParams): void;
   /** Cancels both timers for a single key. */
   cancel(key: string): void;
-  /** Cancels every key's timers (for cache `clear()` / `close()`). */
+  /** Cancels every key's timers (for cache `clear()`). */
   cancelAll(): void;
 }
 
@@ -82,7 +85,7 @@ const clearHandles = (handles: TimerHandles) => {
 /**
  * Creates a {@link RefreshScheduler} bound to a {@link Clock} (defaults to the wall clock).
  */
-export const createRefreshScheduler = (clock: Clock = { now: () => Date.now() / 1000 }): RefreshScheduler => {
+export const createRefreshScheduler = (clock: Clock = systemClock): RefreshScheduler => {
   const timers = new Map<string, TimerHandles>();
 
   const cancel = (key: string) => {

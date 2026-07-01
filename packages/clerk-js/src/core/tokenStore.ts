@@ -11,10 +11,7 @@ export interface TokenStore<V> {
   set(key: string, value: V): void;
   delete(key: string): void;
   clear(): void;
-  /**
-   * Iterates over every stored entry. Used by the cache to release per-entry
-   * timers before clearing.
-   */
+  /** Iterates over every stored entry. */
   forEach(callback: (value: V, key: string) => void): void;
   size(): number;
 }

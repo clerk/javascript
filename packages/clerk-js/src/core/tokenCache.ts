@@ -5,7 +5,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { createKeyResolver, type TokenCacheKeyJSON } from './keyResolver';
-import { type Clock, createRefreshScheduler } from './refreshScheduler';
+import { type Clock, createRefreshScheduler, systemClock } from './refreshScheduler';
 import { Token } from './resources/internal';
 import { pickFreshestJwt } from './tokenFreshness';
 import { createTokenStore } from './tokenStore';
@@ -120,7 +120,7 @@ const generateTabId = (): string => {
  * Automatically manages token expiration and cleanup via scheduled timeouts.
  * BroadcastChannel support is enabled whenever the environment provides it.
  */
-const MemoryTokenCache = (prefix?: string, clock: Clock = { now: () => Date.now() / 1000 }): TokenCache => {
+const MemoryTokenCache = (prefix?: string, clock: Clock = systemClock): TokenCache => {
   const store = createTokenStore<TokenCacheValue>();
   const keyResolver = createKeyResolver(prefix);
   const scheduler = createRefreshScheduler(clock);
