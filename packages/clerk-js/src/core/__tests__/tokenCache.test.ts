@@ -1329,6 +1329,67 @@ describe('SessionTokenCache', () => {
       expect(backgroundRefresh).toHaveBeenCalledTimes(1);
     });
 
+    it('a stale rejected resolver after overwrite does not cancel the replacement timers', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const newToken = new Token({ id: 'stale-reject', jwt, object: 'token' });
+
+      const key = { tokenId: 'stale-reject' };
+      const staleRefresh = vi.fn();
+      const newRefresh = vi.fn();
+
+      // 1. First set() with a still-pending resolver that will later reject.
+      let rejectStale: (reason?: unknown) => void = () => {};
+      const staleResolver = new Promise<TokenResource>((_resolve, reject) => {
+        rejectStale = reject;
+      });
+      SessionTokenCache.set({ ...key, tokenResolver: staleResolver, onRefresh: staleRefresh });
+
+      // 2. Overwrite with a resolved token; its refresh timer arms at 43s.
+      SessionTokenCache.set({
+        ...key,
+        tokenResolver: Promise.resolve<TokenResource>(newToken),
+        onRefresh: newRefresh,
+      });
+      await Promise.resolve();
+
+      // 3. The stale resolver rejects AFTER the overwrite. Its .catch(deleteKey) must bail on the
+      //    identity guard — it must not cancel the replacement's live timers nor evict its token.
+      rejectStale(new Error('stale token fetch failed'));
+      for (let i = 0; i < 5; i++) {
+        await Promise.resolve();
+      }
+
+      expect(SessionTokenCache.get(key)?.entry.tokenId).toBe('stale-reject');
+
+      vi.advanceTimersByTime(44 * 1000);
+      expect(staleRefresh).not.toHaveBeenCalled();
+      expect(newRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('schedules a cookie-hydrated (past-iat) token from its absolute expiry, not a full TTL out', async () => {
+      // Token minted 30s before this tab loaded: 60s TTL, but exp is only 30s away.
+      // The proactive refresh must fire at exp - now - 17 = 13s (recomputed against the
+      // wall clock), not at the old relative ttl - 17 = 43s, which would land past expiry
+      // and never fire proactively. Drives the claims.exp -> absolute expiresAt wiring.
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds - 30, 60);
+      const token = new Token({ id: 'past-iat-token', jwt, object: 'token' });
+
+      const onRefresh = vi.fn();
+      SessionTokenCache.set({
+        tokenId: 'past-iat-token',
+        tokenResolver: Promise.resolve<TokenResource>(token),
+        onRefresh,
+      });
+      await Promise.resolve();
+
+      vi.advanceTimersByTime(12 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
     it('cancels old expiration timer when set() is called again for the same key', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt1 = createJwtWithTtl(nowSeconds, 30);

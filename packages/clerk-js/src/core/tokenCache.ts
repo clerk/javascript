@@ -5,6 +5,7 @@ import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { createKeyResolver, type TokenCacheKeyJSON } from './keyResolver';
+import { type Clock, createRefreshScheduler, systemClock } from './refreshScheduler';
 import { Token } from './resources/internal';
 import { pickFreshestJwt } from './tokenFreshness';
 import { createTokenStore } from './tokenStore';
@@ -40,16 +41,13 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
 type Seconds = number;
 
 /**
- * Internal cache value containing the entry, expiration metadata, and timers.
+ * Internal cache value containing the entry and expiration metadata. Timers are
+ * owned by the {@link RefreshScheduler}, keyed by the same cache key.
  */
 interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
-  /** Timer for automatic cache cleanup when token expires */
-  timeoutId?: ReturnType<typeof setTimeout>;
-  /** Timer for proactive refresh before token enters leeway period */
-  refreshTimeoutId?: ReturnType<typeof setTimeout>;
 }
 
 /**
@@ -98,17 +96,6 @@ export interface TokenCache {
   size(): number;
 }
 
-/**
- * Default seconds before token expiration to trigger background refresh.
- * This threshold accounts for timer jitter, SafeLock contention (~5s), network latency,
- * and tolerance for missed poller ticks.
- *
- * Users can customize this value:
- * - Lower values (min: 5s) delay background refresh until closer to expiration
- * - Higher values trigger earlier background refresh but may cause more frequent requests
- */
-const BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS = 15;
-
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
 
@@ -133,9 +120,10 @@ const generateTabId = (): string => {
  * Automatically manages token expiration and cleanup via scheduled timeouts.
  * BroadcastChannel support is enabled whenever the environment provides it.
  */
-const MemoryTokenCache = (prefix?: string): TokenCache => {
+const MemoryTokenCache = (prefix?: string, clock: Clock = systemClock): TokenCache => {
   const store = createTokenStore<TokenCacheValue>();
   const keyResolver = createKeyResolver(prefix);
+  const scheduler = createRefreshScheduler(clock);
   const tabId = generateTabId();
 
   let broadcastChannel: BroadcastChannel | null = null;
@@ -160,14 +148,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
   ensureBroadcastChannel();
 
   const clear = () => {
-    store.forEach(value => {
-      if (value.timeoutId !== undefined) {
-        clearTimeout(value.timeoutId);
-      }
-      if (value.refreshTimeoutId !== undefined) {
-        clearTimeout(value.refreshTimeoutId);
-      }
-    });
+    scheduler.cancelAll();
     store.clear();
   };
 
@@ -181,19 +162,14 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       return;
     }
 
-    const nowSeconds = Math.floor(Date.now() / 1000);
+    const nowSeconds = Math.floor(clock.now());
     const elapsed = nowSeconds - value.createdAt;
     const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
     // Token expired or dangerously close to expiration - force synchronous refresh
     // Uses poller interval as threshold since the poller might not get to it in time
     if (remainingTtl <= POLLER_INTERVAL_IN_MS / 1000) {
-      if (value.timeoutId !== undefined) {
-        clearTimeout(value.timeoutId);
-      }
-      if (value.refreshTimeoutId !== undefined) {
-        clearTimeout(value.refreshTimeoutId);
-      }
+      scheduler.cancel(key);
       store.delete(key);
       return;
     }
@@ -310,26 +286,21 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       tokenId: entry.tokenId,
     });
 
-    // Clear timers from any existing entry for this key to prevent orphaned
+    // Cancel timers from any existing entry for this key to prevent orphaned
     // refresh timers from accumulating across set() calls (e.g., from
     // #hydrateCache during _updateClient AND #refreshTokenInBackground).
-    const existing = store.get(key);
-    clearTimeout(existing?.timeoutId);
-    clearTimeout(existing?.refreshTimeoutId);
+    scheduler.cancel(key);
 
-    const nowSeconds = Math.floor(Date.now() / 1000);
+    const nowSeconds = Math.floor(clock.now());
     const createdAt = entry.createdAt ?? nowSeconds;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
+    // Cancel inside the identity guard: deleteKey is also the resolver chain's
+    // .catch handler, so a stale rejected resolver must not cancel a newer
+    // entry's live timers.
     const deleteKey = () => {
-      const cachedValue = store.get(key);
-      if (cachedValue === value) {
-        if (cachedValue.timeoutId !== undefined) {
-          clearTimeout(cachedValue.timeoutId);
-        }
-        if (cachedValue.refreshTimeoutId !== undefined) {
-          clearTimeout(cachedValue.refreshTimeoutId);
-        }
+      if (store.get(key) === value) {
+        scheduler.cancel(key);
         store.delete(key);
       }
     };
@@ -361,35 +332,11 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         value.createdAt = issuedAt;
         value.expiresIn = expiresIn;
 
-        const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
-        value.timeoutId = timeoutId;
-
-        // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
-        // More info at https://nodejs.org/api/timers.html#timeoutunref
-        if (typeof (timeoutId as any).unref === 'function') {
-          (timeoutId as any).unref();
-        }
-
-        // Schedule proactive refresh timer to fire before token enters leeway period
-        // This ensures new tokens are ready before the old one expires
-        // refreshLeadTime: 2s buffer before leeway starts. Token fetches typically complete in ~100ms,
-        // so 2s provides ample margin for the refresh to complete before the token enters the leeway period.
-        const refreshLeadTime = 2;
-        const minLeeway = POLLER_INTERVAL_IN_MS / 1000; // Minimum is poller interval (5s)
-        const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
-        const refreshFireTime = expiresIn - leeway - refreshLeadTime;
-
-        if (refreshFireTime > 0 && entry.onRefresh) {
-          const refreshTimeoutId = setTimeout(() => {
-            entry.onRefresh?.();
-          }, refreshFireTime * 1000);
-
-          value.refreshTimeoutId = refreshTimeoutId;
-
-          if (typeof (refreshTimeoutId as any).unref === 'function') {
-            (refreshTimeoutId as any).unref();
-          }
-        }
+        // Arm the expiration-cleanup and proactive-refresh timers. Fire points are
+        // recomputed against the wall clock from the absolute expiry, so a token
+        // issued before this tab loaded refreshes at its true expiry rather than
+        // a full TTL from now.
+        scheduler.schedule(key, { expiresAt, onExpire: deleteKey, onRefresh: entry.onRefresh });
 
         const channel = broadcastChannel;
         if (channel && options.broadcast) {
