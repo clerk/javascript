@@ -193,6 +193,41 @@ describe('Client Singleton', () => {
     expect(client.signIn.status).toBe('needs_second_factor');
   });
 
+  it('preserves sign in identity when fromJSON receives a new sign_in after reset', () => {
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const session = createSession({ id: 'session_1' }, user);
+    const initialClientJSON: ClientJSON = {
+      object: 'client',
+      id: 'test_id',
+      status: 'active',
+      last_active_session_id: 'test_session_id',
+      sign_in: createSignIn({ id: 'test_sign_in_id', status: 'needs_first_factor' }, user),
+      sign_up: createSignUp({ id: 'test_sign_up_id', status: 'missing_requirements' }),
+      sessions: [session],
+      created_at: Date.now() - 1000,
+      updated_at: Date.now(),
+    } as any;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const client = new Client(initialClientJSON);
+
+    client.resetSignIn();
+    const signInAfterReset = client.signIn;
+    expect(signInAfterReset.id).toBeUndefined();
+
+    client.fromJSON({
+      ...initialClientJSON,
+      sign_in: createSignIn({ id: 'test_sign_in_id_v2', status: 'needs_first_factor', identifier: 'test@example.com' }, user),
+      updated_at: Date.now() + 1000,
+    });
+
+    // The same SignIn instance from after the reset is reused (preserving its SignInFuture
+    // reference so useSignIn() hooks stay valid across the reset → new attempt transition).
+    expect(client.signIn).toBe(signInAfterReset);
+    expect(client.signIn.id).toBe('test_sign_in_id_v2');
+    expect(client.signIn.identifier).toBe('test@example.com');
+  });
+
   it('replaces sign up and sign in identity when fromJSON receives new ids', () => {
     const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
     const session = createSession({ id: 'session_1' }, user);
