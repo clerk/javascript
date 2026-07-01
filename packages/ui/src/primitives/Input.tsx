@@ -10,7 +10,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     boxSizing: 'border-box',
     margin: 0,
-    padding: `${theme.space.$1x5} ${theme.space.$3}`,
+    padding: `${theme.space.$1x75} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInput,
     color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
