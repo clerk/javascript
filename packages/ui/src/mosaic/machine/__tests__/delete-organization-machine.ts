@@ -6,7 +6,7 @@ import type { DoneInvokeEvent, ErrorInvokeEvent, StateMachine } from '../types';
  * Shared fixture: the delete-organization flow expressed as an explicit machine.
  *
  * Today this logic is smeared across four `useState` flags in
- * `sections/delete-organization.tsx` + `block/destructive.tsx`
+ * `sections/organization-profile-delete-section.tsx` + `block/destructive.tsx`
  * (`open`, `isDeleting`, `confirmValue`, and the derived `canSubmit`). Modelling
  * it as a machine — `idle → confirming → deleting → deleted`, guarded on the
  * typed name matching, with an error path back to `confirming` — makes every

@@ -1,21 +1,24 @@
 import { setup } from '../machine/setup';
 
-export interface DeleteOrgContext {
+export interface OrganizationProfileDeleteSectionContext {
   organizationName: string;
   confirmationValue: string;
   destroyOrganization: () => Promise<void>;
   error: string | null;
 }
 
-export type DeleteOrgEvent =
+export type OrganizationProfileDeleteSectionEvent =
   | { type: 'OPEN' }
   | { type: 'TYPE_CONFIRMATION'; value: string }
   | { type: 'CONFIRM' }
   | { type: 'CANCEL' };
 
-const { createMachine, assign, fromPromise } = setup<DeleteOrgContext, DeleteOrgEvent>();
+const { createMachine, assign, fromPromise } = setup<
+  OrganizationProfileDeleteSectionContext,
+  OrganizationProfileDeleteSectionEvent
+>();
 
-export const deleteOrgMachine = createMachine({
+export const organizationProfileDeleteSectionMachine = createMachine({
   id: 'deleteOrg',
   initial: 'idle',
   context: {

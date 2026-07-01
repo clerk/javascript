@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useLeaveOrganizationController } from '../leave-organization.controller';
+import { useOrganizationProfileLeaveSectionController } from '../organization-profile-leave-section.controller';
 
 const ORG_NAME = 'Acme Inc';
 
@@ -43,7 +43,7 @@ afterEach(() => {
 });
 
 function Harness() {
-  const controller = useLeaveOrganizationController();
+  const controller = useOrganizationProfileLeaveSectionController();
   if (controller.status !== 'ready') {
     return <output data-testid='state'>{controller.status}</output>;
   }
@@ -64,7 +64,7 @@ function openAndConfirm() {
   fireEvent.click(screen.getByText('Confirm'));
 }
 
-describe('useLeaveOrganizationController', () => {
+describe('useOrganizationProfileLeaveSectionController', () => {
   it('is loading until useOrganization is loaded', () => {
     isLoaded = false;
 

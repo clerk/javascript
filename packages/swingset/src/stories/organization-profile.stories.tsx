@@ -3,15 +3,14 @@ import { OrganizationProfileView } from '@clerk/ui/mosaic/aio/organization-profi
 
 import type { StoryMeta } from '@/lib/types';
 
-import { Default as OrganizationProfileGeneralDemo } from './organization-profile-general.stories';
+import { Default as OrganizationProfileGeneralPanelDemo } from './organization-profile-general-panel.stories';
 
 export const meta: StoryMeta = {
-  group: 'AIO',
+  group: 'Organization',
   title: 'OrganizationProfile',
-  label: 'Org Profile',
   source: 'packages/ui/src/mosaic/aio/organization-profile.tsx',
 };
 
 export function Default() {
-  return <OrganizationProfileView general={<OrganizationProfileGeneralDemo />} />;
+  return <OrganizationProfileView general={<OrganizationProfileGeneralPanelDemo />} />;
 }

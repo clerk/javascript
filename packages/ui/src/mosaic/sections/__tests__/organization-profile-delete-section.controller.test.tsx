@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useDeleteOrganizationController } from '../delete-organization.controller';
+import { useOrganizationProfileDeleteSectionController } from '../organization-profile-delete-section.controller';
 
 const ORG_NAME = 'Acme Inc';
 
@@ -48,7 +48,7 @@ afterEach(() => {
 });
 
 function Harness() {
-  const controller = useDeleteOrganizationController();
+  const controller = useOrganizationProfileDeleteSectionController();
   if (controller.status !== 'ready') {
     return <output data-testid='state'>{controller.status}</output>;
   }
@@ -69,7 +69,7 @@ function openAndConfirm() {
   fireEvent.click(screen.getByText('Confirm'));
 }
 
-describe('useDeleteOrganizationController', () => {
+describe('useOrganizationProfileDeleteSectionController', () => {
   it('is loading until useOrganization is loaded', () => {
     isLoaded = false;
 

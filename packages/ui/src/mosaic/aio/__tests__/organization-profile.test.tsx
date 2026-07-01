@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { OrganizationProfileGeneral } from '../../panels/organization-profile-general';
-import { DeleteOrganization } from '../../sections/delete-organization';
-import { LeaveOrganization } from '../../sections/leave-organization';
+import { OrganizationProfileGeneralPanel } from '../../panels/organization-profile-general-panel';
+import { OrganizationProfileDeleteSection } from '../../sections/organization-profile-delete-section';
+import { OrganizationProfileLeaveSection } from '../../sections/organization-profile-leave-section';
 import { OrganizationProfile } from '../organization-profile';
 
 describe('OrganizationProfile compound parts', () => {
   it('exposes the general panel as a standalone part', () => {
-    expect(OrganizationProfile.GeneralPanel).toBe(OrganizationProfileGeneral);
+    expect(OrganizationProfile.GeneralPanel).toBe(OrganizationProfileGeneralPanel);
   });
 
   it('exposes the leave section as a standalone part', () => {
-    expect(OrganizationProfile.LeaveSection).toBe(LeaveOrganization);
+    expect(OrganizationProfile.LeaveSection).toBe(OrganizationProfileLeaveSection);
   });
 
   it('exposes the delete section as a standalone part', () => {
-    expect(OrganizationProfile.DeleteSection).toBe(DeleteOrganization);
+    expect(OrganizationProfile.DeleteSection).toBe(OrganizationProfileDeleteSection);
   });
 });

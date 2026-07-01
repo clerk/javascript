@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 
-import { OrganizationProfileGeneral } from '../panels/organization-profile-general';
-import { DeleteOrganization } from '../sections/delete-organization';
-import { LeaveOrganization } from '../sections/leave-organization';
+import { OrganizationProfileGeneralPanel } from '../panels/organization-profile-general-panel';
+import { OrganizationProfileDeleteSection } from '../sections/organization-profile-delete-section';
+import { OrganizationProfileLeaveSection } from '../sections/organization-profile-leave-section';
 import { useOrganizationProfileController } from './organization-profile.controller';
 import { OrganizationProfileView } from './organization-profile-view';
 
@@ -11,7 +11,7 @@ function OrganizationProfileRoot(): ReactElement | null {
   if (controller.status !== 'ready') {
     return null;
   }
-  return <OrganizationProfileView general={<OrganizationProfileGeneral />} />;
+  return <OrganizationProfileView general={<OrganizationProfileGeneralPanel />} />;
 }
 
 // Standalone parts of the profile, exposed via the compound namespace. Each part is
@@ -24,7 +24,7 @@ function OrganizationProfileRoot(): ReactElement | null {
 // `OrganizationProfile.X = ...` statements, leaving the parts `undefined` at runtime. Folding
 // them into the exported binding's initializer keeps them attached across that boundary.
 export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
-  GeneralPanel: OrganizationProfileGeneral,
-  LeaveSection: LeaveOrganization,
-  DeleteSection: DeleteOrganization,
+  GeneralPanel: OrganizationProfileGeneralPanel,
+  LeaveSection: OrganizationProfileLeaveSection,
+  DeleteSection: OrganizationProfileDeleteSection,
 });

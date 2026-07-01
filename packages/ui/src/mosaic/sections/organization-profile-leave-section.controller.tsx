@@ -4,27 +4,30 @@ import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
-import type { LeaveOrgContext, LeaveOrgEvent } from './leave-organization.machine';
-import { leaveOrgMachine } from './leave-organization.machine';
+import type {
+  OrganizationProfileLeaveSectionContext,
+  OrganizationProfileLeaveSectionEvent,
+} from './organization-profile-leave-section.machine';
+import { organizationProfileLeaveSectionMachine } from './organization-profile-leave-section.machine';
 
-type LeaveOrganizationController =
+type OrganizationProfileLeaveSectionController =
   | { status: 'loading' }
   | { status: 'hidden' }
   | {
       status: 'ready';
-      snapshot: Snapshot<LeaveOrgContext>;
-      send: (event: LeaveOrgEvent) => void;
+      snapshot: Snapshot<OrganizationProfileLeaveSectionContext>;
+      send: (event: OrganizationProfileLeaveSectionEvent) => void;
       canSubmit: boolean;
     };
 
-export function useLeaveOrganizationController(): LeaveOrganizationController {
+export function useOrganizationProfileLeaveSectionController(): OrganizationProfileLeaveSectionController {
   const { isLoaded, organization, membership } = useOrganization();
   const { user } = useUser();
   const { userMemberships } = useOrganizationList({ userMemberships: true });
   const router = useMosaicRouter();
   const afterLeaveUrl = useMosaicEnvironment()?.displayConfig.afterLeaveOrganizationUrl;
 
-  const [snapshot, send, actor] = useMachine(leaveOrgMachine, {
+  const [snapshot, send, actor] = useMachine(organizationProfileLeaveSectionMachine, {
     context: {
       organizationName: organization?.name ?? '',
       leaveOrganization: async () => {

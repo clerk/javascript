@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { OrganizationProfileGeneral } from '../../mosaic/panels/organization-profile-general';
-import { DeleteOrganization } from '../../mosaic/sections/delete-organization';
-import { LeaveOrganization } from '../../mosaic/sections/leave-organization';
+import { OrganizationProfileGeneralPanel as GeneralPanelPart } from '../../mosaic/panels/organization-profile-general-panel';
+import { OrganizationProfileDeleteSection as DeleteSectionPart } from '../../mosaic/sections/organization-profile-delete-section';
+import { OrganizationProfileLeaveSection as LeaveSectionPart } from '../../mosaic/sections/organization-profile-leave-section';
 import {
   OrganizationProfile,
   OrganizationProfileDeleteSection,
@@ -18,17 +18,17 @@ import {
 // component object.
 describe('experimental/mosaic flat part exports', () => {
   it('exports the general panel as a top-level export equal to the compound part', () => {
-    expect(OrganizationProfileGeneralPanel).toBe(OrganizationProfileGeneral);
+    expect(OrganizationProfileGeneralPanel).toBe(GeneralPanelPart);
     expect(OrganizationProfileGeneralPanel).toBe(OrganizationProfile.GeneralPanel);
   });
 
   it('exports the leave section as a top-level export equal to the compound part', () => {
-    expect(OrganizationProfileLeaveSection).toBe(LeaveOrganization);
+    expect(OrganizationProfileLeaveSection).toBe(LeaveSectionPart);
     expect(OrganizationProfileLeaveSection).toBe(OrganizationProfile.LeaveSection);
   });
 
   it('exports the delete section as a top-level export equal to the compound part', () => {
-    expect(OrganizationProfileDeleteSection).toBe(DeleteOrganization);
+    expect(OrganizationProfileDeleteSection).toBe(DeleteSectionPart);
     expect(OrganizationProfileDeleteSection).toBe(OrganizationProfile.DeleteSection);
   });
 });
