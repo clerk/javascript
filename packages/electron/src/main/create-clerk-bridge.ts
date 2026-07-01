@@ -20,11 +20,14 @@ function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridge
 }
 
 function buildUserAgentFallback(defaultUserAgent: string, productToken: string): string {
-  const platformComment = defaultUserAgent.match(/\([^)]*\)/)?.[0];
+  const platformCommentStart = defaultUserAgent.indexOf('(');
+  const platformCommentEnd = defaultUserAgent.indexOf(')', platformCommentStart + 1);
 
-  if (!platformComment) {
+  if (platformCommentStart === -1 || platformCommentEnd === -1) {
     return productToken;
   }
+
+  const platformComment = defaultUserAgent.slice(platformCommentStart, platformCommentEnd + 1);
 
   // Clerk's session activity parser preserves the platform comment and treats the
   // token after Gecko as the app/browser name.

@@ -72,6 +72,14 @@ describe('createClerkBridge', () => {
     expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
   });
 
+  it('falls back to the configured user-agent when the app fallback has malformed platform details', () => {
+    app.userAgentFallback = 'Mozilla/5.0 ((((';
+
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
+  });
+
   it('registers the configured renderer scheme as privileged before app ready', () => {
     createClerkBridge({
       storage,
