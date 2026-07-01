@@ -250,7 +250,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     try {
       const result = get({ tokenId: data.tokenId });
       if (result) {
-        const existingToken = await result.entry.tokenResolver;
+        const existingToken = result.entry.resolvedToken ?? (await result.entry.tokenResolver);
         if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
             'Ignoring staler token broadcast',
@@ -317,52 +317,70 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     clearTimeout(existing?.timeoutId);
     clearTimeout(existing?.refreshTimeoutId);
 
+    if (existing?.entry.resolvedToken) {
+      entry.resolvedToken = pickFreshestJwt(entry.resolvedToken, existing.entry.resolvedToken);
+    }
+
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
-    const deleteKey = () => {
-      const cachedValue = store.get(key);
-      if (cachedValue === value) {
-        if (cachedValue.timeoutId !== undefined) {
-          clearTimeout(cachedValue.timeoutId);
-        }
-        if (cachedValue.refreshTimeoutId !== undefined) {
-          clearTimeout(cachedValue.refreshTimeoutId);
-        }
-        store.delete(key);
+    if (existing?.entry.resolvedToken && existing.expiresIn !== undefined) {
+      value.createdAt = existing.createdAt;
+      value.expiresIn = existing.expiresIn;
+    }
+
+    // Clears both timers and drops the slot, but only if it still holds `target`
+    // (a newer set() may have replaced it while a promise/timer was pending).
+    const dropIfCurrent = (target: TokenCacheValue) => {
+      if (store.get(key) !== target) {
+        return;
       }
+      clearTimeout(target.timeoutId);
+      clearTimeout(target.refreshTimeoutId);
+      store.delete(key);
     };
 
     store.set(key, value);
 
     entry.tokenResolver
       .then(newToken => {
-        // If this entry was overwritten by a newer set() call while our promise
-        // was pending, bail out to avoid installing orphaned timers. Monotonic
-        // replacement is enforced at the read sites (cookie + broadcast + Session)
-        // where the user-visible state lives.
-        if (store.get(key) !== value) {
+        const live = store.get(key);
+        if (!live) {
+          // Cleared while pending — do not resurrect.
           return;
         }
 
-        // Store resolved token for synchronous reads
-        entry.resolvedToken = newToken;
-
-        const claims = newToken.jwt?.claims;
-        if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
-          return deleteKey();
+        // Reconcile against the freshest token known for this key, regardless of
+        // which resolver owns the live slot. A staler resolve can never publish.
+        const prev = live.entry.resolvedToken;
+        live.entry.resolvedToken = pickFreshestJwt(prev, newToken);
+        const winner = live.entry.resolvedToken;
+        // Skip only when the winner did not advance AND this live value already has
+        // its timers installed. A fresh set() clears the prior entry's timers and may
+        // carry its resolved token forward (so prev can equal the winner); that value
+        // still needs winner-derived timers, which an unconditional skip would drop.
+        if (winner === prev && live.timeoutId !== undefined) {
+          return;
         }
 
-        const expiresAt = claims.exp;
+        const claims = winner.jwt?.claims;
+        if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
+          dropIfCurrent(live);
+          return;
+        }
+
+        clearTimeout(live.timeoutId);
+        clearTimeout(live.refreshTimeoutId);
+
         const issuedAt = claims.iat;
-        const expiresIn: Seconds = expiresAt - issuedAt;
+        const expiresIn: Seconds = claims.exp - issuedAt;
 
-        value.createdAt = issuedAt;
-        value.expiresIn = expiresIn;
+        live.createdAt = issuedAt;
+        live.expiresIn = expiresIn;
 
-        const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
-        value.timeoutId = timeoutId;
+        const timeoutId = setTimeout(() => dropIfCurrent(live), expiresIn * 1000);
+        live.timeoutId = timeoutId;
 
         // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
         // More info at https://nodejs.org/api/timers.html#timeoutunref
@@ -379,12 +397,12 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
         const refreshFireTime = expiresIn - leeway - refreshLeadTime;
 
-        if (refreshFireTime > 0 && entry.onRefresh) {
+        if (refreshFireTime > 0 && live.entry.onRefresh) {
           const refreshTimeoutId = setTimeout(() => {
-            entry.onRefresh?.();
+            live.entry.onRefresh?.();
           }, refreshFireTime * 1000);
 
-          value.refreshTimeoutId = refreshTimeoutId;
+          live.refreshTimeoutId = refreshTimeoutId;
 
           if (typeof (refreshTimeoutId as any).unref === 'function') {
             (refreshTimeoutId as any).unref();
@@ -396,7 +414,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
           // Best-effort side effect: a broadcast failure (e.g. postMessage racing a
           // channel close) must not reach the outer catch and evict the cached token (SDK-119).
           try {
-            const tokenRaw = newToken.getRawString();
+            const tokenRaw = winner.getRawString();
             if (tokenRaw && claims.sid) {
               const sessionId = claims.sid;
               const organizationId = claims.org_id || (claims.o as any)?.id;
@@ -441,7 +459,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         }
       })
       .catch(() => {
-        deleteKey();
+        dropIfCurrent(value);
       });
   };
 

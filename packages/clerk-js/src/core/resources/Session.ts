@@ -50,6 +50,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
+import { pickFreshestJwt } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -520,7 +521,7 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt) {
+    if (token.jwt && pickFreshestJwt(this.lastActiveToken, token) === token) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
@@ -535,21 +536,25 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<string | null> {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
-    const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
+    const fetchPromise = this.#createTokenResolver(template, organizationId, skipCache);
+    const tokenResolver = fetchPromise.then(fetched =>
+      pickFreshestJwt(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, fetched),
+    );
+
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
       onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
     });
 
-    return tokenResolver.then(token => {
-      const rawString = token.getRawString();
+    return tokenResolver.then(winner => {
+      const rawString = winner.getRawString();
       if (!rawString) {
         // Throw so retry logic in getToken() can handle it,
         // rather than silently returning null (which callers interpret as "signed out").
         throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
       }
-      this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      this.#dispatchTokenEvents(winner, shouldDispatchTokenUpdate);
       return rawString;
     });
   }
@@ -600,14 +605,16 @@ export class Session extends BaseResource implements SessionResource {
           return;
         }
 
+        const winner = pickFreshestJwt(SessionTokenCache.get({ tokenId })?.entry.resolvedToken, token);
+
         // Cache the resolved token for future calls
         // Re-register onRefresh to handle the next refresh cycle when this token approaches expiration
         SessionTokenCache.set({
           tokenId,
-          tokenResolver: Promise.resolve(token),
+          tokenResolver: Promise.resolve(winner),
           onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
         });
-        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+        this.#dispatchTokenEvents(winner, shouldDispatchTokenUpdate);
       })
       .catch(error => {
         // Log but don't propagate - callers already have stale token
