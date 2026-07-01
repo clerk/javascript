@@ -34,8 +34,8 @@ export interface UseDrawerDragOptions {
   curSwipe: React.MutableRefObject<number>;
   /** When this drawer is nested, report its live 0..1 dismiss progress so the parent can scale in. */
   onNestedDrag?: (progress: number) => void;
-  /** When this drawer is nested, signal the parent that the drag gesture ended. */
-  onNestedRelease?: () => void;
+  /** When this drawer is nested, signal the parent that the drag ended (and whether this drawer stays open). */
+  onNestedRelease?: (childOpen: boolean) => void;
 }
 
 export interface UseDrawerDragReturn {
@@ -247,7 +247,6 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     captured.current = null;
     setIsDragging(false);
     draggingRef.current = false;
-    onNestedRelease?.(); // clear the parent's live coupling so it can settle
     const didDrag = allowed.current;
     allowed.current = false;
     pid.current = null;
@@ -269,22 +268,22 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     setVar(DrawerCssVars.swipeStrength, String(clamp(1 - v, 0.1, 1)));
 
     if (snapPoints && snap) {
-      snap.onRelease({ dist: e.clientY - startY.current, v, dismissible, close });
+      const childOpen = snap.onRelease({ dist: e.clientY - startY.current, v, dismissible, close });
+      onNestedRelease?.(childOpen);
       return;
     }
-    if (e.clientY < startY.current) {
-      reset(); // net upward
-      return;
-    }
-    if (v > VELOCITY_THRESHOLD) {
-      close(); // downward flick
-      return;
-    }
-    if (swipe >= sheetH.current * CLOSE_THRESHOLD) {
+
+    // Dismiss only on a net-downward release that is either a flick or past the
+    // distance threshold; otherwise snap back. A nesting parent is told which way
+    // this went so it can settle its scale in one direction (no flicker).
+    const dismiss =
+      e.clientY >= startY.current && (v > VELOCITY_THRESHOLD || swipe >= sheetH.current * CLOSE_THRESHOLD);
+    if (dismiss) {
       close();
-      return;
+    } else {
+      reset();
     }
-    reset();
+    onNestedRelease?.(!dismiss);
   }, []);
 
   return {

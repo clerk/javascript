@@ -180,16 +180,26 @@ function DrawerInner(props: DrawerProps) {
   const [nestedOpenCount, setNestedOpenCount] = useState(0);
   const onNested = useMemo<NestedDrawerCallbacks>(
     () => ({
-      onNestedOpenChange: (childOpen: boolean) =>
-        setNestedOpenCount(count => Math.max(0, childOpen ? count + 1 : count - 1)),
+      onNestedOpenChange: (childOpen: boolean) => {
+        setNestedOpenCount(count => Math.max(0, childOpen ? count + 1 : count - 1));
+        // Start each nesting at the scaled-back rest (progress 0). Without this a
+        // prior dismiss (which parks progress at 1) would leave the next child's
+        // parent un-scaled.
+        if (childOpen) {
+          setVar(DrawerCssVars.nestedDragProgress, '0');
+        }
+      },
       // High-frequency: write straight to the popup (like the drag engine) instead
       // of routing through React state, so a nested child's drag stays 60fps.
       onNestedDrag: (progress: number) => {
         setVar(DrawerCssVars.nestedDragProgress, String(progress));
         popupRef.current?.setAttribute(DrawerAttrs.nestedSwiping, '');
       },
-      onNestedRelease: () => {
-        setVar(DrawerCssVars.nestedDragProgress, '0');
+      // Settle toward the rest the drawer is heading to: scaled-back (0) if the
+      // child stays open, fully restored (1) if it is dismissing. That matches the
+      // open-count dropping, so the styled scale animates one way — no flicker.
+      onNestedRelease: (childOpen: boolean) => {
+        setVar(DrawerCssVars.nestedDragProgress, childOpen ? '0' : '1');
         popupRef.current?.removeAttribute(DrawerAttrs.nestedSwiping);
       },
     }),

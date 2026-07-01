@@ -15,8 +15,6 @@ export const DrawerCssVars = {
   swipeStrength: '--cl-drawer-swipe-strength',
   /** px measured popup height (ResizeObserver). */
   height: '--cl-drawer-height',
-  /** px frontmost open child height (for the parent's nested-stack math). */
-  frontmostHeight: '--cl-drawer-frontmost-height',
   /** count of open nested drawers. */
   nestedCount: '--cl-drawer-nested-drawers',
   /** 0..1 dismiss progress of the frontmost nested child (drives the parent's live scale-in). */

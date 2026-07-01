@@ -1175,7 +1175,7 @@ describe('Drawer', () => {
       return childPopup;
     }
 
-    it("reports the child's live dismiss progress to the parent while it is dragged", async () => {
+    it('reports live progress while dragging and settles the parent to full (1) on a dismiss', async () => {
       const user = userEvent.setup();
       render(<NestedFixture />);
       const parentPopup = screen.getByRole('dialog'); // only the parent is open initially
@@ -1191,10 +1191,59 @@ describe('Drawer', () => {
       expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-swiping', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0.5');
 
-      // Release: the parent's live coupling clears so the styled layer can settle.
+      // Fast, past-threshold release = dismiss. The parent settles toward full (1),
+      // the same direction the open-count drop takes it, so the styled scale never
+      // jumps backward.
       fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 200 });
       expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('1');
+      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open'); // child dismissed
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
+    });
+
+    it('settles the parent back to the scaled rest (0) when the child stays open on release', async () => {
+      const user = userEvent.setup();
+      render(<NestedFixture />);
+      const parentPopup = screen.getByRole('dialog');
+      await user.click(screen.getByRole('button', { name: 'Open child' }));
+      const childPopup = getChildPopup();
+      stubHeight(childPopup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(childPopup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+      clock.t += 400; // slow drag => low release velocity
+      fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 40 }); // 40 < 400 * 0.25 threshold
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0.1');
+
+      // Small, slow release = snap back. The child stays open, so the parent
+      // returns to its scaled-back rest (0) and remains nested-open.
+      fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 40 });
+      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
+      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('1');
+    });
+
+    it('resets the parent progress to 0 when the next child opens after a dismiss', async () => {
+      const user = userEvent.setup();
+      render(<NestedFixture />);
+      const parentPopup = screen.getByRole('dialog');
+      await user.click(screen.getByRole('button', { name: 'Open child' }));
+      const childPopup = getChildPopup();
+      stubHeight(childPopup, 400);
+
+      // Dismiss the first child by dragging it down; progress parks at 1 (full).
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(childPopup, { pointerId: 1, clientY: 0, button: 0, isPrimary: true, pointerType: 'touch' });
+      clock.t += 50;
+      fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 300 });
+      fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 300 });
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('1');
+
+      // Opening the next child must re-scale the parent, not leave it parked at 1.
+      await user.click(screen.getByRole('button', { name: 'Open child' }));
+      expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
+      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
     });
 
     it('clamps the reported nested progress to the 0..1 range', async () => {

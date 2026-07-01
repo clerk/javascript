@@ -18,8 +18,12 @@ export interface NestedDrawerCallbacks {
   onNestedOpenChange: (open: boolean) => void;
   /** Live 0..1 dismiss progress of the child, reported each pointermove while it drags. */
   onNestedDrag: (progress: number) => void;
-  /** The child's drag gesture ended; the parent clears its live coupling and settles. */
-  onNestedRelease: () => void;
+  /**
+   * The child's drag gesture ended. `childOpen` is whether the child stays open, so the parent
+   * settles its scale toward the right rest (scaled-back if open, fully restored if dismissing)
+   * in a single direction — no flicker.
+   */
+  onNestedRelease: (childOpen: boolean) => void;
 }
 
 export interface DrawerContextValue extends DialogContextValue {

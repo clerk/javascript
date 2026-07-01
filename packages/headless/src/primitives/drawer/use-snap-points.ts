@@ -18,7 +18,8 @@ export interface SnapReleaseArgs {
 
 export interface SnapController {
   onDrag: (dist: number) => void;
-  onRelease: (args: SnapReleaseArgs) => void;
+  /** Settles to a snap point (or dismisses). Returns whether the drawer stays open. */
+  onRelease: (args: SnapReleaseArgs) => boolean;
   snapTo: (index: number) => void;
   activeIndex: number;
   setActiveIndex: (index: number) => void;
@@ -109,7 +110,7 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
   );
 
   const onRelease = useCallback(
-    ({ dist, v, dismissible, close }: SnapReleaseArgs): void => {
+    ({ dist, v, dismissible, close }: SnapReleaseArgs): boolean => {
       const pos = offset(activeIndex) + dist;
       const down = dist > 0;
 
@@ -119,16 +120,16 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
           if (activeIndex === 0) {
             if (dismissible) {
               close();
-            } else {
-              snapTo(0);
+              return false;
             }
+            snapTo(0);
           } else {
             snapTo(activeIndex - 1);
           }
         } else {
           snapTo(Math.min(activeIndex + 1, lastIndex));
         }
-        return;
+        return true;
       }
 
       // Otherwise settle to the closest snap point.
@@ -139,6 +140,7 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
         }
       }
       snapTo(closest);
+      return true;
     },
     [offset, activeIndex, lastIndex, snapTo],
   );

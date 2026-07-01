@@ -181,6 +181,43 @@ properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` i
 
 Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by the headless parts.
 
+### Nested drawer animation (styled-layer recipe)
+
+Everything a styled layer needs for vaul-style nested scaling is emitted; it owns only the
+displacement constant. `--cl-drawer-nested-drag-progress` is `0` at the scaled-back rest and `1` at
+full size, so the same var drives both the enter/exit scale-back and the live drag coupling:
+
+```css
+[data-cl-slot='drawer-popup'] {
+  --rest-scale: calc((100vw - 16px) / 100vw); /* vaul's NESTED_DISPLACEMENT = 16px */
+  transform-origin: center top;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* A child is open: scale = lerp(rest-scale, 1, progress); translateY = lerp(-16px, 0, progress). */
+[data-cl-slot='drawer-popup'][data-cl-nested-drawer-open] {
+  --p: var(--cl-drawer-nested-drag-progress);
+  transform: translateY(calc(-16px * (1 - var(--p))))
+    scale(calc(var(--rest-scale) + (1 - var(--rest-scale)) * var(--p)));
+}
+
+/* While the child drags, follow the finger 1:1 (no animation). */
+[data-cl-slot='drawer-popup'][data-cl-nested-drawer-swiping] {
+  transition: none;
+}
+```
+
+Lifecycle of the driving signals (all handled by the headless layer):
+
+- **Child opens** → `data-cl-nested-drawer-open` is set and `--cl-drawer-nested-drag-progress` is
+  reset to `0`, so the parent animates from full to the scaled-back rest.
+- **Child drags** → `data-cl-nested-drawer-swiping` is set and progress tracks the drag `0..1`, so the
+  parent follows the finger back toward full.
+- **Child releases** → swiping clears and progress settles to `0` (child stays open) or `1` (child
+  dismisses). The dismiss target matches the open-count dropping, so the scale animates in one
+  direction with no backward flicker.
+- **Multiple levels** → `--cl-drawer-nested-drawers` carries the open-child count for stacking depth.
+
 ## Important Notes
 
 - **`autoFocus` defaults to `false`** (unlike `Dialog`). Opening on touch should not move focus to an
@@ -194,19 +231,16 @@ Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by t
   away from the top. Use `data-cl-drawer-no-drag` for any other custom draggable.
 - **Nested overlays don't dismiss the drawer.** A `Select` / `Autocomplete` / `Menu` opened inside the
   sheet joins the same `FloatingTree`, so a press in its portal counts as inside.
-- **Nested drawers** stack automatically (shared `FloatingTree`); the parent receives
-  `data-cl-nested-drawer-open` and `--cl-drawer-nested-drawers` so the styled layer can scale it back.
-  While a nested child is dragged, the parent also receives `data-cl-nested-drawer-swiping` and a live
-  `--cl-drawer-nested-drag-progress` (0 = child at rest, 1 = child fully dismissed), so the styled layer
-  can interpolate the parent's scale back in as the child is dragged down (vaul-style coupling).
+- **Nested drawers** stack automatically (shared `FloatingTree`) and drive the parent's scale-back
+  through the signals above. The scale-back uses a fixed displacement (vaul's model), not the child's
+  height. See the styled-layer recipe under **Styling API → Nested drawer animation** for the full
+  contract; the release always settles in one direction so the styled scale never flickers.
 
 ## Out of scope (follow-ups)
 
 - Directions other than bottom (top / left / right).
 - Full iOS keyboard hardening (the pre-focus `translateY` trick and a `focus` override) plus
   snap-point-aware keyboard offsets and flick-focus suppression.
-- `--cl-drawer-frontmost-height` peek math (the live scale-back interpolation via
-  `--cl-drawer-nested-drag-progress` is built; frontmost-height-based peek offsets are not).
 - Resize-driven recomputation of snap offsets.
 - Per-trigger payloads on detached handles (`createDrawerHandle<T>()` + a render-prop `Drawer.Root`).
 - `onActiveSnapPointChange` event details (the change `reason`, e.g. close-press vs. drag).
