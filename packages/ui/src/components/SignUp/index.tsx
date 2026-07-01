@@ -13,6 +13,7 @@ import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStart
 
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
+import { SignUpProtectCheck } from './SignUpProtectCheck';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -35,6 +36,12 @@ function SignUpRoutes(): JSX.Element {
     <Flow.Root flow='signUp'>
       <Switch>
         <Route
+          path='protect-check'
+          canActivate={clerk => !!clerk.client.signUp.protectCheck}
+        >
+          <SignUpProtectCheck />
+        </Route>
+        <Route
           path='verify-email-address'
           canActivate={clerk => !!clerk.client.signUp.emailAddress}
         >
@@ -56,6 +63,7 @@ function SignUpRoutes(): JSX.Element {
             continueSignUpUrl='../continue'
             verifyEmailAddressUrl='../verify-email-address'
             verifyPhoneNumberUrl='../verify-phone-number'
+            signUpProtectCheckUrl='../protect-check'
             unsafeMetadata={signUpContext.unsafeMetadata}
           />
         </Route>
@@ -67,6 +75,13 @@ function SignUpRoutes(): JSX.Element {
           />
         </Route>
         <Route path='continue'>
+          <Route
+            path='protect-check'
+            canActivate={clerk => !!clerk.client.signUp.protectCheck}
+          >
+            {/* Under `continue`, the continue index is `..`, not `../continue`. */}
+            <SignUpProtectCheck continuePath='..' />
+          </Route>
           <Route
             path='verify-email-address'
             canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -138,4 +153,4 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   );
 };
 
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
+export { SignUpContinue, SignUpProtectCheck, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };

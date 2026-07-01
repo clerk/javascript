@@ -23,6 +23,7 @@ import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -35,6 +36,7 @@ import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInProtectCheck } from './SignInProtectCheck';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -53,6 +55,12 @@ function SignInRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signIn'>
       <Switch>
+        <Route
+          path='protect-check'
+          canActivate={clerk => !!clerk.client.signIn.protectCheck}
+        >
+          <SignInProtectCheck />
+        </Route>
         <Route path='factor-one'>
           <SignInFactorOne />
         </Route>
@@ -87,6 +95,12 @@ function SignInRoutes(): JSX.Element {
         {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
+              path='protect-check'
+              canActivate={clerk => !!clerk.client.signUp.protectCheck}
+            >
+              <LazySignUpProtectCheck />
+            </Route>
+            <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}
             >
@@ -110,6 +124,13 @@ function SignInRoutes(): JSX.Element {
               />
             </Route>
             <Route path='continue'>
+              <Route
+                path='protect-check'
+                canActivate={clerk => !!clerk.client.signUp.protectCheck}
+              >
+                {/* Under `create/continue`, the continue index is `..`, not `../continue`. */}
+                <LazySignUpProtectCheck continuePath='..' />
+              </Route>
               <Route
                 path='verify-email-address'
                 canActivate={clerk => !!clerk.client.signUp.emailAddress}
