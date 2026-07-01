@@ -96,6 +96,16 @@ import { passkeys } from '@clerk/electron/passkeys';
 </ClerkProvider>;
 ```
 
+Pass `userAgent` to `createClerkBridge` before creating renderer windows to control what Clerk uses for UserProfile session activity attribution:
+
+```ts
+createClerkBridge({
+  storage: storage(),
+  renderer: { scheme: 'my-app', host: 'renderer' },
+  userAgent: 'Acme Desktop/1.2.3',
+});
+```
+
 ## Content Security Policy
 
 `@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime rather than bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.

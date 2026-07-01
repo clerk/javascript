@@ -10,6 +10,7 @@ vi.mock('electron', () => ({
     on: vi.fn(),
     removeListener: vi.fn(),
     setAsDefaultProtocolClient: vi.fn(),
+    userAgentFallback: 'Electron default',
   },
   ipcMain: {
     handle: vi.fn(),
@@ -42,6 +43,7 @@ describe('createClerkBridge', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    app.userAgentFallback = 'Electron default';
   });
 
   it('requires a storage adapter', () => {
@@ -52,6 +54,12 @@ describe('createClerkBridge', () => {
     createClerkBridge({ storage });
 
     expect(ipcMain.handle).toHaveBeenCalledTimes(3);
+  });
+
+  it('sets the app user-agent fallback when configured', () => {
+    createClerkBridge({ storage, userAgent: 'Acme Desktop/1.2.3' });
+
+    expect(app.userAgentFallback).toBe('Acme Desktop/1.2.3');
   });
 
   it('registers the configured renderer scheme as privileged before app ready', () => {

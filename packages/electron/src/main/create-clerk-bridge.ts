@@ -1,4 +1,4 @@
-import { protocol } from 'electron';
+import { app, protocol } from 'electron';
 
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
@@ -36,6 +36,10 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
   let cleanupOAuthTransport: (() => void) | undefined;
   const passkeys = options.passkeys ? setupPasskeysMain() : null;
+
+  if (options.userAgent) {
+    app.userAgentFallback = options.userAgent;
+  }
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);

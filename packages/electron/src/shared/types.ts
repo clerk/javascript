@@ -22,6 +22,11 @@ export type CreateClerkBridgeOptions = {
    * the optional `@clerk/electron-passkeys` package and `exposeClerkBridge({ passkeys: true })`.
    */
   passkeys?: boolean;
+  /**
+   * Overrides Electron's user-agent fallback. Clerk uses this value for UserProfile session
+   * activity attribution when no webContents or session-level user-agent is set.
+   */
+  userAgent?: string;
 };
 
 export type ExposeClerkBridgeOptions = {
