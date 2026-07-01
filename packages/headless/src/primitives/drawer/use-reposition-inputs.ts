@@ -40,6 +40,13 @@ export function useRepositionInputs({ enabled, popupRef }: UseRepositionInputsOp
       }
       const active = document.activeElement;
       if (!active || !isInput(active)) {
+        // The keyboard has closed (focus usually falls back to `body`); drop the
+        // lift we applied so the sheet doesn't stay raised until unmount.
+        if (touched) {
+          touched.style.height = '';
+          touched.style.bottom = '';
+          touched = null;
+        }
         return;
       }
       const keyboardHeight = window.innerHeight - viewport.height;

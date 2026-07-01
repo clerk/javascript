@@ -78,10 +78,12 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
   const withFloating = mergeProps<'div'>(ownProps, getFloatingProps());
   const defaultProps = mergeProps<'div'>(withFloating, transitionProps);
 
+  // An empty array carries no snap points, so it must not surface snap state.
+  const hasSnapPoints = snapPoints !== undefined && snapPoints.length > 0;
   const state = {
     swiping: drag.isDragging,
-    snap: snapPoints ? activeSnapPointIndex : null,
-    expanded: snapPoints ? activeSnapPointIndex === snapPoints.length - 1 : false,
+    snap: hasSnapPoints ? activeSnapPointIndex : null,
+    expanded: hasSnapPoints ? activeSnapPointIndex === snapPoints.length - 1 : false,
     nested: isNested,
     nestedOpen: nestedOpenCount > 0,
   };

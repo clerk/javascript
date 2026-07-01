@@ -5,12 +5,12 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { SNAP_SKIP_VELOCITY } from './constants';
 import { DrawerCssVars } from './css-vars';
-import { getSnapPointSwipeMovement } from './helpers';
+import { clamp, getSnapPointSwipeMovement } from './helpers';
 
 export interface SnapReleaseArgs {
   /** Net pointer delta on the Y axis over the gesture (`endY - startY`); positive is downward. */
   dist: number;
-  /** Absolute release velocity, px/ms. */
+  /** Signed release velocity, px/ms; positive is downward. */
   v: number;
   dismissible: boolean;
   close: () => void;
@@ -54,12 +54,17 @@ export interface UseSnapPointsOptions {
  */
 export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null {
   const { snapPoints, setVar, setSwipe, onActiveSnapPointChange, open } = opts;
-  const lastIndex = snapPoints ? snapPoints.length - 1 : 0;
+  // An empty array is treated as "no snap points" so `lastIndex` never goes
+  // negative (which would seed the state with -1 and emit `NaNpx` offsets).
+  const hasSnapPoints = !!snapPoints && snapPoints.length > 0;
+  const lastIndex = hasSnapPoints ? snapPoints.length - 1 : 0;
+  // Externally supplied indices are clamped to a valid, integral snap point.
+  const clampIndex = (i: number): number => clamp(Math.round(i), 0, lastIndex);
   const isControlled = opts.activeSnapPoint !== undefined;
-  const defaultIndex = opts.defaultActiveSnapPoint ?? lastIndex;
+  const defaultIndex = clampIndex(opts.defaultActiveSnapPoint ?? lastIndex);
 
   const [activeIndex, setActiveIndex] = useControllableState(
-    opts.activeSnapPoint,
+    opts.activeSnapPoint === undefined ? undefined : clampIndex(opts.activeSnapPoint),
     defaultIndex,
     onActiveSnapPointChange,
   );
@@ -77,7 +82,7 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
       // `offset` is read during render (via `restOffset` below), so it must be
       // SSR-safe: `window` is absent on the server. Return 0 (fully open) until
       // the client can measure; the popup's mount-effect writes the real offset.
-      if (!snapPoints || typeof window === 'undefined') {
+      if (!snapPoints || snapPoints.length === 0 || typeof window === 'undefined') {
         return 0;
       }
       const vh = window.innerHeight;
@@ -112,10 +117,14 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
   const onRelease = useCallback(
     ({ dist, v, dismissible, close }: SnapReleaseArgs): boolean => {
       const pos = offset(activeIndex) + dist;
-      const down = dist > 0;
+      // Direction comes from the release velocity (falling back to net distance
+      // when the gesture ended at rest), so reversing course before lifting —
+      // drag down, then flick up — settles upward rather than dismissing.
+      const speed = Math.abs(v);
+      const down = v === 0 ? dist > 0 : v > 0;
 
       // Fast flick: skip straight to the neighbouring snap point (or dismiss).
-      if (v > SNAP_SKIP_VELOCITY) {
+      if (speed > SNAP_SKIP_VELOCITY) {
         if (down) {
           if (activeIndex === 0) {
             if (dismissible) {
@@ -158,5 +167,5 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
     [onDrag, onRelease, snapTo, activeIndex, setActiveIndex, offset, lastIndex],
   );
 
-  return snapPoints ? controller : null;
+  return hasSnapPoints ? controller : null;
 }

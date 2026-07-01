@@ -7,7 +7,7 @@ import { Dialog } from '../dialog/index';
 import { Select } from '../select/index';
 import { OPEN_GRACE_PERIOD } from './constants';
 import { DrawerCssVars } from './css-vars';
-import { getSnapPointSwipeMovement } from './helpers';
+import { getSnapPointSwipeMovement, safeCapture } from './helpers';
 import { createDrawerHandle, Drawer } from './index';
 
 // happy-dom does not implement pointer capture; the engine's safeCapture already
@@ -474,6 +474,30 @@ describe('Drawer', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
 
+    it('a fast upward flick after dragging down stays open', () => {
+      const onOpenChange = vi.fn();
+      render(
+        <DrawerFixture
+          defaultOpen
+          onOpenChange={onOpenChange}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 400);
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 0, button: 0, pointerType: 'touch' });
+      clock.t += 200;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 80 }); // dragged down, below the 100px threshold
+      clock.t += 10;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 50 }); // fast flick back up (still net-downward)
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 50 });
+
+      // The release velocity is upward, so it must not read as a downward flick-to-dismiss.
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(swipeY(popup)).toBe('0px');
+    });
+
     it('does not drag at all when dismissible is false and no snap points', () => {
       const onOpenChange = vi.fn();
       render(
@@ -922,6 +946,58 @@ describe('Drawer', () => {
       expect(onOpenChange).not.toHaveBeenCalledWith(false);
       expect(swipeY(popup)).toBe('');
     });
+
+    it('a fast upward flick after dragging down expands instead of dismissing', () => {
+      const onOpenChange = vi.fn();
+      const onActiveSnapPointChange = vi.fn();
+      render(
+        <DrawerFixture
+          defaultOpen
+          snapPoints={SNAP_POINTS}
+          defaultActiveSnapPoint={0}
+          onOpenChange={onOpenChange}
+          onActiveSnapPointChange={onActiveSnapPointChange}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+
+      clock.t += OPEN_GRACE_PERIOD + 50;
+      fireEvent.pointerDown(popup, { pointerId: 1, clientY: 0, button: 0, pointerType: 'touch' });
+      clock.t += 200;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 100 }); // dragged down toward dismissal
+      clock.t += 10;
+      fireEvent.pointerMove(popup, { pointerId: 1, clientY: 40 }); // fast flick back up
+      fireEvent.pointerUp(popup, { pointerId: 1, clientY: 40 });
+
+      expect(onOpenChange).not.toHaveBeenCalledWith(false);
+      expect(onActiveSnapPointChange).toHaveBeenCalledWith(1);
+      expect(snapOffset(popup)).toBe('0px');
+    });
+
+    it('treats an empty snapPoints array as no snap points', () => {
+      render(
+        <DrawerFixture
+          defaultOpen
+          snapPoints={[]}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+      expect(popup).not.toHaveAttribute('data-cl-snap');
+      expect(snapOffset(popup)).toBe('');
+    });
+
+    it('clamps an out-of-range controlled activeSnapPoint', () => {
+      render(
+        <DrawerFixture
+          defaultOpen
+          snapPoints={SNAP_POINTS}
+          activeSnapPoint={5}
+        />,
+      );
+      const popup = screen.getByRole('dialog');
+      expect(popup).toHaveAttribute('data-cl-snap', '1'); // clamped to lastIndex, not NaN
+      expect(snapOffset(popup)).toBe('0px');
+    });
   });
 
   describe('snap point lifecycle', () => {
@@ -1015,6 +1091,25 @@ describe('Drawer', () => {
     });
   });
 
+  describe('safeCapture', () => {
+    it('no-ops when the pointer-capture method is unavailable', () => {
+      const el = document.createElement('div');
+      Object.defineProperty(el, 'setPointerCapture', { value: undefined, configurable: true });
+      expect(() => safeCapture(el, 1, 'setPointerCapture')).not.toThrow();
+    });
+
+    it('swallows a NotFoundError from releasing an uncaptured pointer', () => {
+      const el = document.createElement('div');
+      Object.defineProperty(el, 'releasePointerCapture', {
+        value: () => {
+          throw new DOMException('not found', 'NotFoundError');
+        },
+        configurable: true,
+      });
+      expect(() => safeCapture(el, 1, 'releasePointerCapture')).not.toThrow();
+    });
+  });
+
   describe('virtual keyboard (repositionInputs)', () => {
     class FakeVisualViewport extends EventTarget {
       height = 800;
@@ -1054,6 +1149,28 @@ describe('Drawer', () => {
 
       expect(popup.style.bottom).toBe('300px');
       expect(popup.style.height).toBe('500px');
+    });
+
+    it('drops the lift when the keyboard closes', () => {
+      const vv = new FakeVisualViewport();
+      setVisualViewport(vv);
+      render(<DrawerFixture defaultOpen />);
+      const popup = screen.getByRole('dialog');
+      stubHeight(popup, 900);
+
+      const field = screen.getByTestId('field');
+      field.focus();
+      vv.height = 500;
+      vv.dispatchEvent(new Event('resize'));
+      expect(popup.style.bottom).toBe('300px');
+
+      // Keyboard dismissed: focus falls back to `body` and the viewport grows again.
+      field.blur();
+      vv.height = 800;
+      vv.dispatchEvent(new Event('resize'));
+
+      expect(popup.style.bottom).toBe('');
+      expect(popup.style.height).toBe('');
     });
 
     it('does nothing when the focused element is not a text field', () => {

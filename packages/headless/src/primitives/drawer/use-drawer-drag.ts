@@ -263,9 +263,11 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     };
 
     const swipe = curSwipe.current;
-    const v = clock() - lastSample.current.t <= RELEASE_VEL_MAX_AGE_MS ? Math.abs(vel.current) : 0;
+    // Signed (positive is downward). Keeping the sign means a fast *upward* flick
+    // that ends net-downward isn't mistaken for a downward dismiss.
+    const v = clock() - lastSample.current.t <= RELEASE_VEL_MAX_AGE_MS ? vel.current : 0;
     // Faster flick => shorter exit; the styled layer reads this to scale duration.
-    setVar(DrawerCssVars.swipeStrength, String(clamp(1 - v, 0.1, 1)));
+    setVar(DrawerCssVars.swipeStrength, String(clamp(1 - Math.abs(v), 0.1, 1)));
 
     if (snapPoints && snap) {
       const childOpen = snap.onRelease({ dist: e.clientY - startY.current, v, dismissible, close });

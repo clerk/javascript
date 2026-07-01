@@ -70,10 +70,14 @@ export function isIOS(): boolean {
 
 /**
  * Pointer capture that tolerates environments/states where it is unavailable.
- * happy-dom may not implement `set/releasePointerCapture`, and releasing a
- * pointer that was never captured throws `NotFoundError`; both are swallowed.
+ * happy-dom may not implement `set/releasePointerCapture` (calling an absent
+ * method would throw `TypeError`), and releasing a pointer that was never
+ * captured throws `NotFoundError`; both are swallowed.
  */
 export function safeCapture(el: Element, id: number, method: 'setPointerCapture' | 'releasePointerCapture'): void {
+  if (typeof el[method] !== 'function') {
+    return;
+  }
   try {
     el[method](id);
   } catch (e) {
