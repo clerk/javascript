@@ -26,7 +26,7 @@ function SelectedFiles() {
   return (
     <ul>
       {files.map(file => (
-        <li key={file.name}>
+        <li key={`${file.name}-${file.size}-${file.lastModified}`}>
           <FileUpload.Item file={file}>
             <FileUpload.ItemPreview style={{ width: 48, height: 48, objectFit: 'cover' }} />
             <span>{file.name}</span>

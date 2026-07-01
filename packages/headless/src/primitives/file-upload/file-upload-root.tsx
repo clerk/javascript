@@ -8,12 +8,15 @@ import { isFileAccepted } from './accept';
 import { FileUploadContext, type FileUploadContextValue } from './file-upload-context';
 
 /** Why a file was rejected when added. */
-export type FileRejectionReason = 'accept' | 'size';
+export type FileRejectionReason = 'accept' | 'size' | 'overflow';
 
 export interface FileRejection {
   /** The rejected file. */
   file: File;
-  /** `'accept'` for a type/extension mismatch, `'size'` for exceeding `maxSize`. */
+  /**
+   * `'accept'` for a type/extension mismatch, `'size'` for exceeding `maxSize`,
+   * `'overflow'` for extra files supplied beyond the first in single-file mode.
+   */
   reason: FileRejectionReason;
 }
 
@@ -89,14 +92,22 @@ export function FileUploadRoot(props: FileUploadProps) {
         }
       }
 
+      // Single mode keeps only the first accepted file; the rest are reported as
+      // overflow rather than dropped silently.
+      const kept = multiple ? accepted : accepted.slice(0, 1);
+      if (!multiple) {
+        for (const file of accepted.slice(1)) {
+          rejected.push({ file, reason: 'overflow' });
+        }
+      }
+
       if (rejected.length > 0) {
         onReject?.(rejected);
       }
-      if (accepted.length === 0) {
+      if (kept.length === 0) {
         return;
       }
-      // Single mode keeps only the first accepted file; multiple mode appends.
-      setFiles(multiple ? [...files, ...accepted] : [accepted[0]]);
+      setFiles(multiple ? [...files, ...kept] : kept);
     },
     [files, multiple, accept, maxSize, onReject, setFiles],
   );

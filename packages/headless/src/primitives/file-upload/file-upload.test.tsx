@@ -196,6 +196,27 @@ describe('FileUpload', () => {
       expect(onReject).not.toHaveBeenCalled();
     });
 
+    it('reports extra files as "overflow" in single mode and keeps the first', () => {
+      const onReject = vi.fn();
+      const onValueChange = vi.fn();
+      // No `multiple` → single mode.
+      render(
+        <Harness
+          onReject={onReject}
+          onValueChange={onValueChange}
+        />,
+      );
+      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const first = makeFile('first.png', 'image/png');
+      const second = makeFile('second.png', 'image/png');
+
+      fireEvent.drop(dropzone, { dataTransfer: { files: [first, second] } });
+
+      expect(onValueChange.mock.calls[0][0].map((f: File) => f.name)).toEqual(['first.png']);
+      expect(onReject).toHaveBeenCalledTimes(1);
+      expect(onReject.mock.calls[0][0]).toEqual([{ file: second, reason: 'overflow' }]);
+    });
+
     it('checks accept before size (type mismatch wins)', () => {
       const onReject = vi.fn();
       render(

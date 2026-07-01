@@ -117,9 +117,10 @@ driving custom UI. It must be called inside `FileUpload.Root`.
 | <code>onReject</code>      | <code>(rejections: FileRejection[]) => void</code> | —                  | Called with files rejected by `accept` or `maxSize`        |
 | <code>disabled</code>      | <code>boolean</code>                               | <code>false</code> | Disable the trigger, dropzone, and picker                  |
 
-A `FileRejection` is `{ file: File; reason: 'accept' | 'size' }`. `onReject` fires for both the
-picker and drops, `accept` is checked before `maxSize`, and accepted files in the same batch are
-still added.
+A `FileRejection` is `{ file: File; reason: 'accept' | 'size' | 'overflow' }`. `onReject` fires for
+both the picker and drops, `accept` is checked before `maxSize`, and in single-file mode any files
+beyond the first are reported as `'overflow'` rather than dropped silently. Accepted files in the
+same batch are still added.
 
 ### `FileUpload.Item`
 
