@@ -72,3 +72,20 @@ export function tokenOrgId(input: TokenResource | JWT): string {
 export function normalizeOrgId(orgId?: string | null): string {
   return orgId || '';
 }
+
+export function isSameOrgContext(token: TokenResource | JWT, activeOrgId: string | null | undefined): boolean {
+  const org = tokenOrgId(token);
+  return !org || normalizeOrgId(org) === normalizeOrgId(activeOrgId);
+}
+
+export function pickSameContextFreshestJwt<T extends TokenResource | JWT>(
+  baseline: T | null | undefined,
+  incoming: T,
+  activeOrgId: string | null | undefined,
+): T {
+  const trusted = baseline && isSameOrgContext(baseline, activeOrgId) ? baseline : null;
+  if (trusted && !isSameOrgContext(incoming, activeOrgId)) {
+    return trusted;
+  }
+  return pickFreshestJwt(trusted, incoming);
+}
