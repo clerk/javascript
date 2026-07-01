@@ -195,6 +195,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                // Icon-only buttons get a 16px glyph on desktop and 20px on mobile to
+                // stay proportional to the taller button; block buttons keep 16px, which
+                // fits their fixed icon slot.
+                size='$4'
+                sx={preferBlockButtons ? undefined : t => ({ [mqu.sm]: { width: t.sizes.$5, height: t.sizes.$5 } })}
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               />
