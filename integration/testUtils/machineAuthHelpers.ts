@@ -262,6 +262,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     test('should handle multiple token types', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       const url = new URL(adapter.apiKey.path, app.serverUrl).toString();
+      const origin = new URL(app.serverUrl).origin;
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -271,14 +272,16 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
       const getRes = await u.page.request.get(url);
       expect(getRes.status()).toBe(401);
 
-      const postWithSessionRes = await u.page.request.post(url);
+      const postWithSessionRes = await u.page.request.post(url, {
+        headers: { Origin: origin },
+      });
       const sessionData = await postWithSessionRes.json();
       expect(postWithSessionRes.status()).toBe(200);
       expect(sessionData.userId).toBe(fakeBapiUser.id);
       expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
       const postWithApiKeyRes = await u.page.request.post(url, {
-        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}`, Origin: origin },
       });
       const apiKeyData = await postWithApiKeyRes.json();
       expect(postWithApiKeyRes.status()).toBe(200);
