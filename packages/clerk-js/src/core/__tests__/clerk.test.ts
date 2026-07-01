@@ -26,6 +26,9 @@ const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
 vi.mock('../resources/Client');
 vi.mock('../resources/Environment');
 
+const { mockCreateClientFromJwt } = vi.hoisted(() => ({ mockCreateClientFromJwt: vi.fn() }));
+vi.mock('../jwt-client', () => ({ createClientFromJwt: mockCreateClientFromJwt }));
+
 vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: vi.fn(),
@@ -818,6 +821,141 @@ describe('Clerk singleton', () => {
         });
       },
     );
+
+    describe('when the client fetch fails or hangs at load', () => {
+      let startPollSpy: ReturnType<typeof vi.spyOn>;
+      let stopPollSpy: ReturnType<typeof vi.spyOn>;
+      let callLog: string[];
+
+      const sessionClient = (session: any) => ({
+        signedInSessions: [session],
+        lastActiveSessionId: session.id,
+      });
+      const sessionlessClient = () => ({ signedInSessions: [], lastActiveSessionId: null });
+
+      // `load()` awaits native crypto (cookie suffix) before scheduling the timeout, so a single
+      // advance can run before the timer exists; advance the budget repeatedly until load settles.
+      const pumpUntilSettled = async (promise: Promise<unknown>) => {
+        let settled = false;
+        const tracked = promise.then(
+          v => ((settled = true), v),
+          e => ((settled = true), Promise.reject(e)),
+        );
+        for (let i = 0; i < 20 && !settled; i++) {
+          await vi.advanceTimersByTimeAsync(5000);
+        }
+        await tracked;
+      };
+
+      beforeEach(async () => {
+        callLog = [];
+        // Import at runtime (not top-level) so this module does not reorder the
+        // static graph and break the auto-mocked Environment/Client resources.
+        const { AuthCookieService } = await import('../auth/AuthCookieService');
+        startPollSpy = vi
+          .spyOn(AuthCookieService.prototype, 'startPollingForToken')
+          .mockImplementation(() => void callLog.push('startPoll'));
+        stopPollSpy = vi
+          .spyOn(AuthCookieService.prototype, 'stopPollingForToken')
+          .mockImplementation(() => void callLog.push('stopPoll'));
+        mockCreateClientFromJwt.mockReturnValue(sessionlessClient());
+      });
+
+      afterEach(() => {
+        startPollSpy.mockRestore();
+        stopPollSpy.mockRestore();
+        mockCreateClientFromJwt.mockReset();
+        vi.useRealTimers();
+      });
+
+      it('fails fast and marks Clerk degraded when the client fetch hangs', async () => {
+        vi.useFakeTimers();
+        mockClientFetch.mockReturnValue(new Promise(() => {}));
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(sut.status).toBe('degraded');
+        expect(stopPollSpy).toHaveBeenCalled();
+        expect(startPollSpy).toHaveBeenCalled();
+      });
+
+      it('clears the token cache and mints without skipCache when the client fetch fails with a session present', async () => {
+        const getToken = vi.fn(() => {
+          callLog.push('getToken');
+          return Promise.resolve('fresh-token');
+        });
+        const clearCache = vi.fn(() => void callLog.push('clearCache'));
+        const session = {
+          id: 'sess_1',
+          status: 'active',
+          user: {},
+          getToken,
+          clearCache,
+        };
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(clearCache).toHaveBeenCalledTimes(1);
+        expect(getToken).toHaveBeenCalledTimes(1);
+        expect(getToken).toHaveBeenCalledWith();
+        expect(getToken).not.toHaveBeenCalledWith({ skipCache: true });
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'startPoll']);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('re-clears the token cache before restarting the poller when the recovery mint hangs', async () => {
+        vi.useFakeTimers();
+        const getToken = vi.fn(() => {
+          callLog.push('getToken');
+          return new Promise<string>(() => {});
+        });
+        const clearCache = vi.fn(() => void callLog.push('clearCache'));
+        const session = {
+          id: 'sess_1',
+          status: 'active',
+          user: {},
+          getToken,
+          clearCache,
+        };
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(clearCache).toHaveBeenCalledTimes(2);
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'clearCache', 'startPoll']);
+        const secondClearOrder = clearCache.mock.invocationCallOrder[1];
+        const lastStartPollOrder = startPollSpy.mock.invocationCallOrder.at(-1);
+        expect(secondClearOrder).toBeLessThan(lastStartPollOrder!);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('renders the empty client without minting when there is no session cookie', async () => {
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(sut.session).toBeNull();
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'startPoll']);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('rethrows a 4xx client error without entering the mint path', async () => {
+        const err = Object.assign(new Error('bad request'), { status: 400 });
+        mockClientFetch.mockRejectedValue(err);
+
+        const sut = new Clerk(productionPublishableKey);
+        await expect(sut.load()).rejects.toBe(err);
+
+        expect(mockCreateClientFromJwt).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('.signOut()', () => {

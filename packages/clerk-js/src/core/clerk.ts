@@ -140,7 +140,7 @@ import type {
 } from '@clerk/shared/types';
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, handleValueOrFn, noop, timeLimit } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
@@ -215,6 +215,7 @@ const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_o
 const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
 const CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE =
   'cannot_render_configure_sso_email_address_disabled';
+const INITIALIZATION_TIMEOUT_MS = 5_000;
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -3174,8 +3175,7 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
-          return Client.getOrCreateInstance()
-            .fetch()
+          return timeLimit(Client.getOrCreateInstance().fetch(), INITIALIZATION_TIMEOUT_MS)
             .then(res => this.updateClient(res))
             .catch(async e => {
               /**
@@ -3199,16 +3199,23 @@ export class Clerk implements ClerkInterface {
                */
               this.#authService?.stopPollingForToken();
 
-              // Attempt to grab a fresh token
-              await this.session
-                ?.getToken({ skipCache: true })
-                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
-                .catch(() => null)
-                .finally(() => {
-                  this.#authService?.startPollingForToken();
-                });
+              const session = this.session;
+              if (session) {
+                session.clearCache();
+                await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS)
+                  .catch(() => {
+                    // On timeout the recovery getToken is still in flight with a pending resolver in the cache;
+                    // clear it so the poller's next getToken starts fresh instead of awaiting the abandoned one.
+                    session.clearCache();
+                    return null;
+                  })
+                  .finally(() => {
+                    this.#authService?.startPollingForToken();
+                  });
+              } else {
+                this.#authService?.startPollingForToken();
+              }
 
-              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
               return null;
             });
         };
