@@ -41,6 +41,10 @@
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
     },
+    "./drawer": {
+      "import": "./dist/primitives/drawer/index.js",
+      "types": "./dist/primitives/drawer/index.d.ts"
+    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "types": "./dist/hooks/index.d.ts"
