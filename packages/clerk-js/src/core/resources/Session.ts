@@ -50,7 +50,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { normalizeOrgId, pickFreshestJwt, tokenOrgId } from '../tokenFreshness';
+import { pickFreshestJwt } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -87,6 +87,7 @@ export class Session extends BaseResource implements SessionResource {
     super();
 
     this.fromJSON(data);
+    this.#hydrateCache(this.lastActiveToken);
   }
 
   end = (): Promise<SessionResource> => {
@@ -209,44 +210,19 @@ export class Session extends BaseResource implements SessionResource {
     })(params);
   };
 
-  #applyIncomingLastActiveToken(raw: SessionJSON['last_active_token'] | null) {
-    if (!raw) {
-      this.lastActiveToken = null;
-      return;
-    }
-
-    const incoming = new Token(raw);
-    const tokenId = this.#getCacheId();
-    const current = SessionTokenCache.get({ tokenId })?.entry.resolvedToken ?? null;
-
-    // Tokens are kept monotonic against a freshness baseline: the active-org cache slot, or the
-    // token we already hold when that slot is empty (evicted, or an in-flight fetch leaves
-    // resolvedToken null). The baseline must be same-context (its org claim matches the active
-    // org, or it has none) so a leftover previous-org token cannot veto a fresh active-org token.
-    const isSameContext = (orgClaim: string) =>
-      !orgClaim || normalizeOrgId(orgClaim) === normalizeOrgId(this.lastActiveOrganizationId);
-    const sameContext = isSameContext(tokenOrgId(incoming));
-    const held = current ?? this.lastActiveToken;
-    const baseline = held && isSameContext(tokenOrgId(held)) ? held : null;
-
-    // With a same-context baseline, drop a wrong-org or strictly-staler incoming token. With no
-    // baseline, adopt it anyway: an empty lastActiveToken reads as a sign-out and clears __session,
-    // which is worse than briefly carrying a token the next fetch corrects. A wrong-context token
-    // adopted here is not cached under the active-org key.
-    if (baseline && (!sameContext || pickFreshestJwt(baseline, incoming) === baseline)) {
-      this.lastActiveToken = baseline;
-      return;
-    }
-
-    this.lastActiveToken = incoming;
-    if (sameContext && (!current || current.getRawString() !== incoming.getRawString())) {
+  #hydrateCache = (token: TokenResource | null) => {
+    if (token) {
+      const tokenId = this.#getCacheId();
+      // Dispatch tokenUpdate for __session tokens with the session's active organization ID
+      const shouldDispatchTokenUpdate = true;
       SessionTokenCache.set({
         tokenId,
-        tokenResolver: Promise.resolve(incoming),
-        onRefresh: () => this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, true),
+        tokenResolver: Promise.resolve(token),
+        onRefresh: () =>
+          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
       });
     }
-  }
+  };
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
   // and retrieve it using the session id concatenated with the jwt template name.
@@ -430,7 +406,7 @@ export class Session extends BaseResource implements SessionResource {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
 
-    this.#applyIncomingLastActiveToken(data.last_active_token ?? null);
+    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
 
     return this;
   }
