@@ -1,5 +1,25 @@
 # @clerk/ui
 
+## 1.24.1
+
+### Patch Changes
+
+- Add an accessible name to the API Keys search input so screen readers announce it correctly. ([#9055](https://github.com/clerk/javascript/pull/9055)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.24.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix `<UserButton />` session actions alignment. ([#9034](https://github.com/clerk/javascript/pull/9034)) by [@andrewtam](https://github.com/andrewtam)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/localizations@4.12.0
+  - @clerk/shared@4.23.0
+
 ## 1.23.1
 
 ### Patch Changes

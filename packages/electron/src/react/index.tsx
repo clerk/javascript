@@ -1,5 +1,6 @@
 import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react';
 import { InternalClerkProvider as ReactClerkProvider } from '@clerk/react/internal';
+import { ALLOWED_PROTOCOLS } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
 import type { ReactNode } from 'react';
@@ -78,7 +79,27 @@ function createOAuthTransport(): ClerkOAuthTransport | undefined {
   };
 }
 
-export function ClerkProvider({ children, publishableKey, passkeys, ...props }: ClerkProviderProps): JSX.Element {
+/**
+ * Infer the custom renderer scheme registered with `createClerkBridge({ renderer })`.
+ * Built-in Clerk protocols and local file renderers are not inferred.
+ */
+function defaultAllowedRedirectProtocols(): string[] | undefined {
+  const protocol = typeof window !== 'undefined' ? window.location?.protocol : undefined;
+
+  if (!protocol || ALLOWED_PROTOCOLS.includes(protocol) || protocol === 'file:') {
+    return undefined;
+  }
+
+  return [protocol];
+}
+
+export function ClerkProvider({
+  children,
+  publishableKey,
+  passkeys,
+  allowedRedirectProtocols,
+  ...props
+}: ClerkProviderProps): JSX.Element {
   const clerk = createClerkInstance(publishableKey, passkeys);
   const oauthTransport = createOAuthTransport();
   const clerkUI = loadClerkUI(publishableKey, props);
@@ -88,6 +109,7 @@ export function ClerkProvider({ children, publishableKey, passkeys, ...props }: 
       {...props}
       Clerk={clerk}
       __internal_oauthTransport={oauthTransport}
+      allowedRedirectProtocols={allowedRedirectProtocols ?? defaultAllowedRedirectProtocols()}
       publishableKey={publishableKey}
       standardBrowser={false}
       ui={{ ClerkUI: clerkUI }}

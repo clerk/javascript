@@ -1,4 +1,4 @@
-import { protocol } from 'electron';
+import { app, protocol } from 'electron';
 
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
@@ -19,6 +19,21 @@ function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridge
   }
 }
 
+function buildUserAgentFallback(defaultUserAgent: string, productToken: string): string {
+  const platformCommentStart = defaultUserAgent.indexOf('(');
+  const platformCommentEnd = defaultUserAgent.indexOf(')', platformCommentStart + 1);
+
+  if (platformCommentStart === -1 || platformCommentEnd === -1) {
+    return productToken;
+  }
+
+  const platformComment = defaultUserAgent.slice(platformCommentStart, platformCommentEnd + 1);
+
+  // Clerk's session activity parser preserves the platform comment and treats the
+  // token after Gecko as the app/browser name.
+  return `Mozilla/5.0 ${platformComment} Gecko/20100101 ${productToken}`;
+}
+
 /**
  * Creates the Clerk bridge for Electron's main process.
  *
@@ -37,6 +52,10 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
   let cleanupOAuthTransport: (() => void) | undefined;
   const passkeys = options.passkeys ? setupPasskeysMain() : null;
+
+  if (options.userAgent) {
+    app.userAgentFallback = buildUserAgentFallback(app.userAgentFallback, options.userAgent);
+  }
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
