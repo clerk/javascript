@@ -66,6 +66,10 @@ const handle = createDrawerHandle();
 `handle.open()` / `handle.close()` / `handle.toggle()` work imperatively; `handle.isOpen` and
 `handle.subscribe(cb)` make it `useSyncExternalStore`-compatible.
 
+`Drawer.Root` stays the single source of truth, so the handle composes with `open` / `defaultOpen`
+/ `onOpenChange`: `defaultOpen` and a controlled `open` prop still apply, and every handle-driven
+transition fires `onOpenChange` just like a click or dismissal.
+
 ### Snap points
 
 ```tsx

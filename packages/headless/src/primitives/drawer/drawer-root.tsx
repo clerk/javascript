@@ -11,7 +11,7 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';
@@ -59,7 +59,6 @@ export interface DrawerProps {
 }
 
 const defaultNow = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now());
-const noopSubscribe = (): (() => void) => () => {};
 
 function DrawerInner(props: DrawerProps) {
   const {
@@ -83,31 +82,31 @@ function DrawerInner(props: DrawerProps) {
   nowRef.current = props._now ?? defaultNow;
   const now = useCallback(() => nowRef.current(), []);
 
-  // Open state. A `handle` (detached trigger) becomes the shared source of truth.
-  const [internalOpen, setInternalOpen] = useControllableState(
-    props.open,
-    props.defaultOpen ?? false,
-    props.onOpenChange,
-  );
-  const handleOpen = useSyncExternalStore(
-    useCallback((cb: () => void) => handle?.subscribe(cb) ?? noopSubscribe(), [handle]),
-    () => handle?.isOpen ?? false,
-    () => handle?.isOpen ?? false,
-  );
-  const open = handle ? handleOpen : internalOpen;
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (handle) {
-        if (next) {
-          handle.open();
-        } else {
-          handle.close();
-        }
-      }
-      setInternalOpen(next);
-    },
-    [handle, setInternalOpen],
-  );
+  // `Drawer.Root` is the single source of truth for open state (controlled
+  // `open`/`defaultOpen` + `onOpenChange`). A detached `handle` is only a bridge:
+  // its imperative calls route back through `setOpen` (below) so `onOpenChange`
+  // always fires and a controlled `open` prop is respected.
+  const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
+
+  // Read via refs so the handle connection stays stable across renders even when
+  // the consumer passes a fresh `onOpenChange` (which re-creates `setOpen`).
+  const openRef = useRef(open);
+  openRef.current = open;
+  const setOpenRef = useRef(setOpen);
+  setOpenRef.current = setOpen;
+  useEffect(() => {
+    if (!handle) {
+      return;
+    }
+    return handle.connect({
+      setOpen: next => setOpenRef.current(next),
+      getOpen: () => openRef.current,
+    });
+  }, [handle]);
+  // Push our open state to the handle's subscribers (e.g. a detached trigger).
+  useEffect(() => {
+    handle?.emit();
+  }, [handle, open]);
 
   const labelId = useId();
   const descriptionId = useId();

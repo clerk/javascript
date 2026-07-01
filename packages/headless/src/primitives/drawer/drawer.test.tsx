@@ -321,7 +321,10 @@ describe('Drawer', () => {
   });
 
   describe('detached handle', () => {
-    function DetachedFixture(handle: ReturnType<typeof createDrawerHandle>) {
+    function DetachedFixture(
+      handle: ReturnType<typeof createDrawerHandle>,
+      props: Partial<React.ComponentProps<typeof Drawer.Root>> = {},
+    ) {
       return (
         <>
           <Drawer.Trigger
@@ -333,6 +336,7 @@ describe('Drawer', () => {
           <Drawer.Root
             handle={handle}
             _now={() => clock.t}
+            {...props}
           >
             <Drawer.Portal>
               <Drawer.Viewport>
@@ -371,6 +375,46 @@ describe('Drawer', () => {
 
       expect(handle.isOpen).toBe(false);
       expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-cl-closed', '');
+    });
+
+    it('fires onOpenChange for handle-driven transitions', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      const handle = createDrawerHandle();
+      render(DetachedFixture(handle, { onOpenChange }));
+
+      await user.click(screen.getByTestId('ext-trigger'));
+      expect(onOpenChange).toHaveBeenLastCalledWith(true);
+
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    });
+
+    it('honors defaultOpen when a handle is provided', () => {
+      const handle = createDrawerHandle();
+      render(DetachedFixture(handle, { defaultOpen: true }));
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(handle.isOpen).toBe(true);
+    });
+
+    it('honors a controlled open prop when a handle is provided', () => {
+      const handle = createDrawerHandle();
+      const { rerender } = render(DetachedFixture(handle, { open: false }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      rerender(DetachedFixture(handle, { open: true }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(handle.isOpen).toBe(true);
+    });
+
+    it('adopts an imperative open requested before the root mounts', () => {
+      const handle = createDrawerHandle();
+      handle.open(); // called before render/connect
+      render(DetachedFixture(handle));
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(handle.isOpen).toBe(true);
     });
   });
 
