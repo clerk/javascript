@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.24.2
+
+### Patch Changes
+
+- Use locale and currency aware formatting for negative money amounts ([#9064](https://github.com/clerk/javascript/pull/9064)) by [@dstaley](https://github.com/dstaley)
+
+- Fix icon-only social buttons rendering taller than the ones with text. They now size to the same height as the text (block) buttons across all appearance spacing and font-size settings, keeping every social button in a row consistent. ([#9058](https://github.com/clerk/javascript/pull/9058)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Stop `truncateWithEndVisible` from splitting characters outside the BMP (such as CJK Extension B kanji and emoji) into a broken replacement character when truncating to a very small width. The short-width fallback now slices by code point, matching the main truncation path. ([#9047](https://github.com/clerk/javascript/pull/9047)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.24.1
 
 ### Patch Changes
