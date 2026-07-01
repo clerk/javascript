@@ -2,7 +2,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
-import { authFnContext, requestStateContext } from './clerkMiddleware';
+import { authFnContext, requestStateContext, resolveRequestState } from './clerkMiddleware';
 import type {
   AdditionalStateOptions,
   LoaderFunctionArgsWithAuth,
@@ -128,6 +128,8 @@ export const rootAuthLoader: RootAuthLoader = async (
     );
   }
 
-  const { requestState, additionalState } = contextValue;
-  return processRootAuthLoader(args, requestState, additionalState, handler);
+  // Reuse the middleware-resolved state (keyed by Request, so identity can't bleed
+  // across concurrent requests), re-deriving only on a Request-instance miss.
+  const requestState = await resolveRequestState(args);
+  return processRootAuthLoader(args, requestState, contextValue.additionalState, handler);
 };

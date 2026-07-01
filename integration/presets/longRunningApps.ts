@@ -84,6 +84,11 @@ export const createLongRunningApps = () => {
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
+    {
+      id: 'react-router.node-shared-context',
+      config: reactRouter.reactRouterNodeSharedContext,
+      env: envs.withEmailCodes,
+    },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodesProxy', config: express.vite, env: envs.withEmailCodesProxy },
     { id: 'express.vite.withCustomRoles', config: express.vite, env: envs.withCustomRoles },

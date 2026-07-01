@@ -2,13 +2,13 @@ import {
   type AuthenticateRequestOptions,
   type GetAuthFn,
   getAuthObjectForAcceptedToken,
+  signedOutAuthObject,
 } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { LoaderFunctionArgs } from 'react-router';
 
-import { IsOptIntoMiddleware } from '../server/utils';
 import { noLoaderArgsPassedInGetAuth } from '../utils/errors';
-import { authFnContext } from './clerkMiddleware';
+import { resolveRequestState } from './clerkMiddleware';
 
 type GetAuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
@@ -22,15 +22,19 @@ export const getAuth: GetAuthFn<LoaderFunctionArgs, true> = (async (
 
   const { acceptsToken, treatPendingAsSignedOut } = opts || {};
 
-  const authObjectFn = IsOptIntoMiddleware(args.context) && args.context.get(authFnContext);
-  if (!authObjectFn) {
-    throw new Error(
-      'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
-    );
-  }
+  // Resolve auth for this request: reuse what the middleware resolved (keyed by
+  // Request, so a shared context can't return another user), re-deriving only on
+  // a Request-instance miss.
+  const requestState = await resolveRequestState(args);
+
+  // The middleware redirects on a handshake before loaders run, but the Request-miss
+  // re-derive can still land on a handshake state, whose toAuth() returns null. Fall back to
+  // a signed-out object so getAuth never dereferences null here; the next top-level GET
+  // navigation handshakes through the middleware.
+  const authObject = requestState.toAuth({ treatPendingAsSignedOut }) ?? signedOutAuthObject();
 
   return getAuthObjectForAcceptedToken({
-    authObject: authObjectFn({ treatPendingAsSignedOut }),
+    authObject,
     acceptsToken,
   });
 }) as GetAuthFn<LoaderFunctionArgs, true>;
