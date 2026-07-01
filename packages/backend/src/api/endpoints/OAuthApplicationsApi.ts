@@ -132,7 +132,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
   }
 
   /**
-   * Revokes both the OAuth access token and refresh token for the associated grant for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application). The request may specify either token.
+   * Revokes both the [OAuth access token](!oauth-access-token) and refresh token for the associated grant for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application). The request may specify either token.
    */
   public async revokeToken(params: RevokeOAuthApplicationTokenParams) {
     const { oauthApplicationId, ...bodyParams } = params;
