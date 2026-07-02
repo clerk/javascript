@@ -1,0 +1,355 @@
+import { useClerk } from '@clerk/react';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type {
+  BillingPlanResource,
+  BillingStore,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
+import type { Purchase } from 'expo-iap';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
+
+import { IAPBillingError } from './errors';
+import type { ExpoIapModule } from './expoIap';
+import { ensureIapConnection, loadExpoIap } from './expoIap';
+import type { IAPPurchaseResult, IAPRestorePurchasesResult, UseIAPBillingReturn } from './types';
+import {
+  deriveAppleAppAccountToken,
+  deriveGoogleObfuscatedAccountId,
+  extractPurchasePayload,
+  findAlreadySubscribedError,
+  platformToStore,
+  resolveStoreProduct,
+} from './utils';
+
+function purchaseStore(purchase: Purchase, fallback: BillingStore): BillingStore {
+  return purchase.store === 'apple' || purchase.store === 'google' ? purchase.store : fallback;
+}
+
+function isUserCancelledPurchaseError(error: unknown): boolean {
+  return !!error && typeof error === 'object' && (error as { code?: unknown }).code === 'user-cancelled';
+}
+
+/**
+ * Waits for the purchase-updated / purchase-error event for the given product ID. `expo-iap`'s `requestPurchase()`
+ * is event-based: the actual outcome is delivered through `purchaseUpdatedListener` / `purchaseErrorListener`, not
+ * the returned promise. Listeners must be attached before `requestPurchase()` is called.
+ */
+function waitForPurchase(iap: ExpoIapModule, productId: string): { promise: Promise<Purchase>; remove: () => void } {
+  const subscriptions: { remove: () => void }[] = [];
+  const remove = () => subscriptions.forEach(subscription => subscription.remove());
+
+  const promise = new Promise<Purchase>((resolve, reject) => {
+    subscriptions.push(
+      iap.purchaseUpdatedListener(purchase => {
+        if (purchase.productId === productId || purchase.ids?.includes(productId)) {
+          resolve(purchase);
+        }
+      }),
+    );
+    subscriptions.push(
+      iap.purchaseErrorListener(error => {
+        // expo-iap's listener PurchaseError carries a single optional productId; errors without one (for example,
+        // connection failures) are attributed to the in-flight request.
+        if (!error.productId || error.productId === productId) {
+          reject(error);
+        }
+      }),
+    );
+  });
+
+  return { promise, remove };
+}
+
+/**
+ * Resolves the Play Billing offer token required to purchase an Android subscription. Falls back to the first
+ * available offer for the product; the Clerk store product mapping is per `(plan, period, store)` product ID, so any
+ * eligible offer of that product resolves to the same Clerk plan.
+ */
+async function resolveAndroidOfferToken(iap: ExpoIapModule, productId: string): Promise<string | undefined> {
+  const products = await iap.fetchProducts({ skus: [productId], type: 'subs' });
+  const androidProduct = (products ?? []).find(
+    product => product.id === productId && product.platform === 'android',
+  ) as { subscriptionOffers?: { offerTokenAndroid?: string | null }[] | null } | undefined;
+
+  return androidProduct?.subscriptionOffers?.find(offer => !!offer.offerTokenAndroid)?.offerTokenAndroid ?? undefined;
+}
+
+/**
+ * The `useIAPBilling()` hook provides in-app purchase (Apple App Store / Google Play) billing for Expo apps, backed
+ * by Clerk Billing. It requires the optional `expo-iap` module (`npx expo install expo-iap`) and a signed-in user.
+ *
+ * Purchases follow a server-first flow: the store transaction is registered with Clerk before it is finished. On
+ * iOS, the transaction is finished through `expo-iap` after Clerk accepts it. On Android, the transaction is never
+ * finished client-side because the Clerk backend acknowledges Google Play purchases (and `expo-iap`'s
+ * `finishTransaction()` would acknowledge client-side).
+ *
+ * @example
+ * ```tsx
+ * import { useIAPBilling } from '@clerk/expo/experimental';
+ *
+ * function PaywallScreen() {
+ *   const { plans, loading, purchase } = useIAPBilling();
+ *
+ *   const onSubscribe = async (plan) => {
+ *     const result = await purchase(plan, 'month');
+ *     if (result.status === 'already_subscribed') {
+ *       // The user already subscribed via `result.alreadySubscribedVia` (for example, on the web).
+ *     }
+ *   };
+ *   // ...
+ * }
+ * ```
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export function useIAPBilling(): UseIAPBillingReturn {
+  const clerk = useClerk();
+  const [plans, setPlans] = useState<BillingPlanResource[]>([]);
+  const [currentSubscriptionItems, setCurrentSubscriptionItems] = useState<BillingSubscriptionItemResource[]>([]);
+  const [loading, setLoading] = useState(true);
+  /**
+   * Product IDs with an in-flight `purchase()` call. The out-of-band purchase listener skips these; the initiating
+   * `purchase()` call owns their registration.
+   */
+  const pendingProductIdsRef = useRef<Set<string>>(new Set());
+
+  clerk.telemetry?.record(eventMethodCalled('useIAPBilling'));
+
+  const userId = clerk.loaded ? clerk.user?.id : undefined;
+
+  const refetch = useCallback(async (): Promise<void> => {
+    if (!clerk.loaded || !clerk.user) {
+      setPlans([]);
+      setCurrentSubscriptionItems([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const [plansResponse, subscription] = await Promise.all([
+        clerk.billing.getPlans({ for: 'user' }),
+        clerk.billing.getSubscription({}),
+      ]);
+      setPlans(plansResponse.data);
+      setCurrentSubscriptionItems(subscription.subscriptionItems ?? []);
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- userId is intentional: the clerk instance is stable, so refetch must be recreated (re-running the mount effect) when the signed-in user changes.
+  }, [clerk, userId]);
+
+  /**
+   * Registers a store purchase with Clerk, then finishes the transaction where appropriate (server-first ordering):
+   * - iOS: finishing after Clerk accepts the purchase is required so StoreKit stops replaying the transaction.
+   * - Android: `finishTransaction()` is intentionally never called. `expo-iap` acknowledges the purchase on Android
+   *   (`acknowledgePurchaseAndroid`) with no way to suppress it, and acknowledgment is performed by the Clerk
+   *   backend when the purchase is registered.
+   */
+  const registerWithClerk = useCallback(
+    async (iap: ExpoIapModule, purchase: Purchase, store: BillingStore): Promise<BillingSubscriptionItemResource> => {
+      const payload = extractPurchasePayload(purchase);
+      const subscriptionItem = await clerk.billing.registerStorePurchase({ store, payload });
+
+      if (store === 'apple') {
+        await iap.finishTransaction({ purchase, isConsumable: false });
+      }
+
+      return subscriptionItem;
+    },
+    [clerk],
+  );
+
+  /**
+   * Refreshes the session token so newly granted feature (`fea`) claims are live immediately, then re-fetches the
+   * billing state.
+   */
+  const refreshSessionAndState = useCallback(async (): Promise<void> => {
+    await clerk.session?.getToken({ skipCache: true });
+    await refetch();
+  }, [clerk, refetch]);
+
+  useEffect(() => {
+    refetch().catch(() => {
+      // Initial fetch errors leave the hook with empty data; callers can retry through `refetch()`.
+    });
+  }, [refetch]);
+
+  // Out-of-band transactions (renewals completed while backgrounded, ask-to-buy approvals, promo-code redemptions)
+  // are delivered through `expo-iap`'s purchase-updated listener and registered through the same endpoint.
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    let iap: ExpoIapModule;
+    try {
+      iap = loadExpoIap();
+    } catch {
+      // expo-iap is an optional dependency; skip out-of-band transaction handling when it is not installed.
+      return;
+    }
+
+    let disposed = false;
+    let subscription: { remove: () => void } | undefined;
+
+    const handleOutOfBandPurchase = async (purchase: Purchase) => {
+      if (pendingProductIdsRef.current.has(purchase.productId)) {
+        return;
+      }
+      try {
+        const store = purchaseStore(purchase, platformToStore(Platform.OS));
+        await registerWithClerk(iap, purchase, store);
+        await refreshSessionAndState();
+      } catch {
+        // Registration is idempotent and unfinished transactions are replayed by the store, so a failed attempt is
+        // retried on a later event or on restorePurchases().
+      }
+    };
+
+    ensureIapConnection(iap)
+      .then(() => {
+        if (disposed) {
+          return;
+        }
+        subscription = iap.purchaseUpdatedListener(purchase => void handleOutOfBandPurchase(purchase));
+      })
+      .catch(() => {
+        // The store billing connection is unavailable; purchase() will surface the connection error when used.
+      });
+
+    return () => {
+      disposed = true;
+      subscription?.remove();
+    };
+  }, [userId, registerWithClerk, refreshSessionAndState]);
+
+  const purchase = useCallback(
+    async (plan: BillingPlanResource, period: BillingSubscriptionPlanPeriod): Promise<IAPPurchaseResult> => {
+      const store = platformToStore(Platform.OS);
+      const product = resolveStoreProduct(plan, store, period);
+
+      const purchaserId = clerk.user?.id;
+      if (!purchaserId) {
+        throw new IAPBillingError('user_unavailable', 'A signed-in user is required to make an in-app purchase.');
+      }
+
+      const iap = loadExpoIap();
+      await ensureIapConnection(iap);
+
+      pendingProductIdsRef.current.add(product.productId);
+      const waiter = waitForPurchase(iap, product.productId);
+
+      try {
+        let storePurchase: Purchase;
+        try {
+          if (store === 'apple') {
+            await iap.requestPurchase({
+              request: {
+                apple: {
+                  sku: product.productId,
+                  // Binds the store transaction to the Clerk user; the backend cross-checks it on registration.
+                  appAccountToken: await deriveAppleAppAccountToken(purchaserId),
+                },
+              },
+              type: 'subs',
+            });
+          } else {
+            const offerToken = await resolveAndroidOfferToken(iap, product.productId);
+            await iap.requestPurchase({
+              request: {
+                google: {
+                  skus: [product.productId],
+                  // Binds the store transaction to the Clerk user; the backend cross-checks it on registration.
+                  obfuscatedAccountId: await deriveGoogleObfuscatedAccountId(purchaserId),
+                  ...(offerToken ? { subscriptionOffers: [{ sku: product.productId, offerToken }] } : {}),
+                },
+              },
+              type: 'subs',
+            });
+          }
+
+          storePurchase = await waiter.promise;
+        } catch (error) {
+          if (isUserCancelledPurchaseError(error)) {
+            return { status: 'cancelled' };
+          }
+          if (error instanceof IAPBillingError) {
+            throw error;
+          }
+          const message =
+            error instanceof Error
+              ? error.message
+              : ((error as { message?: string } | null)?.message ?? 'Unknown error');
+          throw new IAPBillingError('purchase_failed', `The ${store} store purchase failed: ${message}`, {
+            cause: error,
+          });
+        }
+
+        let subscriptionItem: BillingSubscriptionItemResource;
+        try {
+          // Server-first: the purchase is registered with Clerk before the transaction is finished.
+          subscriptionItem = await registerWithClerk(iap, storePurchase, store);
+        } catch (error) {
+          const alreadySubscribed = findAlreadySubscribedError(error);
+          if (alreadySubscribed) {
+            return { status: 'already_subscribed', alreadySubscribedVia: alreadySubscribed.alreadySubscribedVia };
+          }
+          throw error;
+        }
+
+        await refreshSessionAndState();
+
+        return { status: 'success', subscriptionItem };
+      } finally {
+        waiter.remove();
+        pendingProductIdsRef.current.delete(product.productId);
+      }
+    },
+    [clerk, registerWithClerk, refreshSessionAndState],
+  );
+
+  const restorePurchases = useCallback(async (): Promise<IAPRestorePurchasesResult> => {
+    const fallbackStore = platformToStore(Platform.OS);
+
+    const iap = loadExpoIap();
+    await ensureIapConnection(iap);
+
+    const availablePurchases = await iap.getAvailablePurchases();
+    const registered: BillingSubscriptionItemResource[] = [];
+    const failed: { productId: string; error: unknown }[] = [];
+
+    for (const availablePurchase of availablePurchases) {
+      try {
+        const payload = extractPurchasePayload(availablePurchase);
+        // Registration is idempotent by store transaction lineage: replays resolve with the current item. Restored
+        // purchases are already-completed transactions, so they are intentionally not finished/acknowledged here.
+        registered.push(
+          await clerk.billing.registerStorePurchase({
+            store: purchaseStore(availablePurchase, fallbackStore),
+            payload,
+          }),
+        );
+      } catch (error) {
+        failed.push({ productId: availablePurchase.productId, error });
+      }
+    }
+
+    if (registered.length > 0) {
+      await refreshSessionAndState();
+    }
+
+    return { registered, failed };
+  }, [clerk, refreshSessionAndState]);
+
+  return {
+    plans,
+    loading,
+    currentSubscriptionItems,
+    purchase,
+    restorePurchases,
+    refetch,
+  };
+}

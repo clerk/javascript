@@ -41,6 +41,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       is_plan_upgrade_possible: error?.meta?.isPlanUpgradePossible,
       seats_quantity_to_add: error?.meta?.seatsQuantityToAdd,
       seats_quantity: error?.meta?.seatsQuantity,
+      already_subscribed_via: error?.meta?.alreadySubscribedVia,
     },
   };
 }

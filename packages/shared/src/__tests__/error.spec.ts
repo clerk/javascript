@@ -5,10 +5,12 @@ import {
   buildErrorThrower,
   ClerkOfflineError,
   ClerkRuntimeError,
+  errorToJSON,
   is4xxError,
   is429Error,
   isClerkRuntimeError,
   isUnauthenticatedError,
+  parseError,
 } from '../error';
 
 describe('ErrorThrower', () => {
@@ -168,5 +170,19 @@ describe('ClerkOfflineError', () => {
     it('returns false for non-error objects', () => {
       expect(ClerkOfflineError.is({ message: 'test' })).toBe(false);
     });
+  });
+});
+
+describe('parseError', () => {
+  it('surfaces meta.already_subscribed_via as alreadySubscribedVia and round-trips through errorToJSON', () => {
+    const error = parseError({
+      code: 'already_subscribed',
+      message: 'Already subscribed',
+      meta: { already_subscribed_via: 'stripe' },
+    });
+
+    expect(error.code).toBe('already_subscribed');
+    expect(error.meta?.alreadySubscribedVia).toBe('stripe');
+    expect(errorToJSON(error).meta?.already_subscribed_via).toBe('stripe');
   });
 });

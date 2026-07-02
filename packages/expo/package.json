@@ -135,6 +135,7 @@
     "expo-auth-session": "^7.0.11",
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
+    "expo-iap": "^4.3.5",
     "expo-local-authentication": "^17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-web-browser": "^15.0.11",
@@ -148,6 +149,7 @@
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
     "expo-crypto": ">=12",
+    "expo-iap": ">=4.3.0",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
@@ -172,6 +174,9 @@
       "optional": true
     },
     "expo-crypto": {
+      "optional": true
+    },
+    "expo-iap": {
       "optional": true
     },
     "expo-local-authentication": {

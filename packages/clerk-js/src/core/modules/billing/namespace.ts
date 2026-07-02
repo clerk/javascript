@@ -11,6 +11,8 @@ import type {
   BillingPlanResource,
   BillingStatementJSON,
   BillingStatementResource,
+  BillingSubscriptionItemJSON,
+  BillingSubscriptionItemResource,
   BillingSubscriptionJSON,
   BillingSubscriptionResource,
   ClerkPaginatedResponse,
@@ -21,6 +23,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
+  RegisterStorePurchaseParams,
 } from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
@@ -33,6 +36,7 @@ import {
   BillingPlan,
   BillingStatement,
   BillingSubscription,
+  BillingSubscriptionItem,
 } from '../../resources/internal';
 
 export class Billing implements BillingNamespace {
@@ -147,6 +151,28 @@ export class Billing implements BillingNamespace {
     )?.response as unknown as BillingCheckoutJSON;
 
     return new BillingCheckout(json);
+  };
+
+  /**
+   * Registers an in-app purchase made through an app store (Apple App Store or Google Play) with Clerk.
+   *
+   * Posts the store purchase payload form-encoded (`store`, `payload`) to `/me/billing/store_purchases`. The
+   * endpoint is idempotent by store transaction lineage, so replays (restore purchases, out-of-band transaction
+   * listeners) resolve with the current subscription item. Store purchases are only supported for user payers.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  registerStorePurchase = async (params: RegisterStorePurchaseParams): Promise<BillingSubscriptionItemResource> => {
+    const json = (
+      await BaseResource._fetch<BillingSubscriptionItemJSON>({
+        // Store purchases are only supported for user payers, so the path is never org-scoped.
+        path: Billing.path('/store_purchases'),
+        method: 'POST',
+        body: params as any,
+      })
+    )?.response as unknown as BillingSubscriptionItemJSON;
+
+    return new BillingSubscriptionItem(json);
   };
 
   getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {

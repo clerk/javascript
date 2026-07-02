@@ -100,6 +100,26 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getCreditHistory: (params: GetCreditHistoryParams) => Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>>;
+
+  /**
+   * Registers an in-app purchase made through an app store (Apple App Store or Google Play) with Clerk. The purchase
+   * payload is verified against the store's servers, bound to the current user, and activated as a subscription item.
+   *
+   * The endpoint is idempotent by store transaction lineage: replaying an already-registered purchase (for example,
+   * during a restore-purchases flow or from an out-of-band transaction listener) returns the current subscription item.
+   *
+   * If the user already holds an active subscription through another payment processor, the request fails with a
+   * [`ClerkAPIResponseError`](https://clerk.com/docs/reference/javascript/types/clerk-api-response-error) whose first
+   * error has the code `already_subscribed` and `meta.alreadySubscribedVia` set to the conflicting processor.
+   *
+   * For Google Play purchases, the server acknowledges the purchase — clients must not acknowledge (or finish/consume)
+   * the transaction before this method resolves successfully.
+   *
+   * @returns A [`BillingSubscriptionItemResource`](/docs/reference/types/billing-subscription-item-resource) object.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  registerStorePurchase: (params: RegisterStorePurchaseParams) => Promise<BillingSubscriptionItemResource>;
 }
 
 /**
@@ -1281,6 +1301,23 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
    */
   priceId?: string;
 }>;
+
+/**
+ * The `registerStorePurchase()` method accepts the following parameters.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type RegisterStorePurchaseParams = {
+  /**
+   * The app store the purchase was made through.
+   */
+  store: BillingStore;
+  /**
+   * The store purchase payload. For Apple, the StoreKit 2 signed JWS transaction representation. For Google, the
+   * Play Billing purchase token.
+   */
+  payload: string;
+};
 
 /**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**

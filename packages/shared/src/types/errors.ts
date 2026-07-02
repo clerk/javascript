@@ -23,6 +23,7 @@ export interface ClerkAPIErrorJSON {
     is_plan_upgrade_possible?: boolean;
     seats_quantity_to_add?: number;
     seats_quantity?: number;
+    already_subscribed_via?: string;
   };
 }
 
@@ -67,6 +68,11 @@ export interface ClerkAPIError {
     isPlanUpgradePossible?: boolean;
     seatsQuantityToAdd?: number;
     seatsQuantity?: number;
+    /**
+     * The payment processor that manages the user's existing subscription when an in-app purchase is rejected with
+     * the `already_subscribed` error code.
+     */
+    alreadySubscribedVia?: string;
   };
 }
 
