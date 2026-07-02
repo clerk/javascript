@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Apply session tokens monotonically by origin-issued-at on a single tab, so a stale edge-minted token can no longer overwrite a fresher one in the `__session` cookie, the session's last active token, or the token cache.
+Prevent a staler session token from overwriting a fresher one on the same tab. Freshness is ranked by the JWT `oiat` header, then `iat`; tokens without `oiat` always pass through.

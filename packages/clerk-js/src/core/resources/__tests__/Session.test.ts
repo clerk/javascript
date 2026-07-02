@@ -2115,7 +2115,7 @@ describe('Session', () => {
       SessionTokenCache.clear();
     });
 
-    it('coalesced waiters and lastActiveToken keep the freshest token (resolve high then low)', async () => {
+    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve high then low)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2130,9 +2130,10 @@ describe('Session', () => {
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
 
-      // The low fetch resolves last but the guarded resolver hands back the freshest token.
+      // Each skipCache call returns its own mint (main parity): the low fetch resolves last and
+      // returns low, but it never regresses the cache slot or lastActiveToken.
       dLow.resolve({ object: 'token', jwt: low });
-      await expect(pLow).resolves.toBe(high);
+      await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, null);
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
@@ -2140,7 +2141,7 @@ describe('Session', () => {
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
-    it('coalesced waiters and lastActiveToken keep the freshest token (resolve low then high)', async () => {
+    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve low then high)', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2152,6 +2153,7 @@ describe('Session', () => {
       const pFirst = session.getToken({ skipCache: true });
       const pSecond = session.getToken({ skipCache: true });
 
+      // Each skipCache call returns its own mint (main parity).
       dFirst.resolve({ object: 'token', jwt: low });
       await expect(pFirst).resolves.toBe(low);
 
@@ -2164,7 +2166,7 @@ describe('Session', () => {
       expect(session.lastActiveToken?.getRawString()).toBe(high);
     });
 
-    it('a stale fetch after a fresh one does not regress lastActiveToken or the next /tokens token field', async () => {
+    it('a stale fetch after a fresh one returns its own mint but never regresses lastActiveToken or the next /tokens token field', async () => {
       const session = makeSession();
       const high = createJwtWithOiat(NOW, NOW + 30);
       const low = createJwtWithOiat(NOW, NOW);
@@ -2175,13 +2177,14 @@ describe('Session', () => {
         .mockResolvedValueOnce({ object: 'token', jwt: low });
 
       expect(await session.getToken()).toBe(high);
-      expect(await session.getToken({ skipCache: true })).toBe(high);
-      expect(await session.getToken({ skipCache: true })).toBe(high);
+      // Each skipCache call returns its own mint (main parity), so the staler fetches return low.
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+      expect(await session.getToken({ skipCache: true })).toBe(low);
 
-      // The first stale fetch carried high as the previous token, and the next request still does
-      // — proving lastActiveToken never regressed to the stale token.
-      expect((fetchSpy.mock.calls[1][0] as any).body.token).toBe(high);
-      expect((fetchSpy.mock.calls[2][0] as any).body.token).toBe(high);
+      // The first stale fetch carried high as the previous token, and the next request still does,
+      // proving lastActiveToken never regressed to the stale token.
+      expect(fetchSpy.mock.calls[1][0].body.token).toBe(high);
+      expect(fetchSpy.mock.calls[2][0].body.token).toBe(high);
 
       const tokenId = TokenId.build('session_1', undefined, null);
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
@@ -2200,10 +2203,11 @@ describe('Session', () => {
       const pHigh = session.getToken({ organizationId: 'org_other', skipCache: true });
       const pLow = session.getToken({ organizationId: 'org_other', skipCache: true });
 
+      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
-      await expect(pLow).resolves.toBe(high);
+      await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', undefined, 'org_other');
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
@@ -2222,10 +2226,11 @@ describe('Session', () => {
       const pHigh = session.getToken({ template: 't', skipCache: true });
       const pLow = session.getToken({ template: 't', skipCache: true });
 
+      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
       dHigh.resolve({ object: 'token', jwt: high });
       await expect(pHigh).resolves.toBe(high);
       dLow.resolve({ object: 'token', jwt: low });
-      await expect(pLow).resolves.toBe(high);
+      await expect(pLow).resolves.toBe(low);
 
       const tokenId = TokenId.build('session_1', 't', null);
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);

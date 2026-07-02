@@ -43,6 +43,15 @@ type Seconds = number;
  * Internal cache value containing the entry, expiration metadata, and timers.
  */
 interface TokenCacheValue {
+  /**
+   * Freshest claims-valid token observed for this key, chained across set() calls
+   * and updated by every resolver settle, including resolvers replaced by a newer
+   * set() while still pending. Internal bookkeeping only: readers only ever see
+   * entry.resolvedToken, so a pending entry still reads as pending and callers
+   * await its resolver. Folded into resolvedToken when the live entry resolves,
+   * which is what keeps a staler resolve from overwriting a fresher token.
+   */
+  baseline?: TokenResource;
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
@@ -317,18 +326,14 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     clearTimeout(existing?.timeoutId);
     clearTimeout(existing?.refreshTimeoutId);
 
-    if (existing?.entry.resolvedToken) {
-      entry.resolvedToken = pickFreshestJwt(entry.resolvedToken, existing.entry.resolvedToken);
-    }
-
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
-    if (existing?.entry.resolvedToken && existing.expiresIn !== undefined) {
-      value.createdAt = existing.createdAt;
-      value.expiresIn = existing.expiresIn;
-    }
+    // Chain the freshest known token across replacements. This never touches
+    // entry.resolvedToken: a pending entry reads as pending and callers await.
+    const prior = existing?.entry.resolvedToken;
+    value.baseline = prior ? pickFreshestJwt(existing?.baseline, prior) : existing?.baseline;
 
     // Clears both timers and drops the slot, but only if it still holds `target`
     // (a newer set() may have replaced it while a promise/timer was pending).
@@ -347,25 +352,46 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       .then(newToken => {
         const live = store.get(key);
         if (!live) {
-          // Cleared while pending — do not resurrect.
+          // Cleared while pending; do not resurrect.
           return;
         }
 
-        // Reconcile against the freshest token known for this key, regardless of
-        // which resolver owns the live slot. A staler resolve can never publish.
-        const prev = live.entry.resolvedToken;
-        live.entry.resolvedToken = pickFreshestJwt(prev, newToken);
-        const winner = live.entry.resolvedToken;
-        // Skip only when the winner did not advance AND this live value already has
-        // its timers installed. A fresh set() clears the prior entry's timers and may
-        // carry its resolved token forward (so prev can equal the winner); that value
-        // still needs winner-derived timers, which an unconditional skip would drop.
-        if (winner === prev && live.timeoutId !== undefined) {
+        const claims = newToken.jwt?.claims;
+        const isValid = !!claims && typeof claims.exp === 'number' && typeof claims.iat === 'number';
+        const isOwn = live === value;
+
+        if (isOwn && !isValid) {
+          // The live slot's own fetch resolved unusable: drop the slot so the next
+          // read refetches. Keeping the baseline alive here would hide a broken
+          // token endpoint behind cache hits.
+          dropIfCurrent(live);
+          return;
+        }
+        if (!isValid) {
           return;
         }
 
-        const claims = winner.jwt?.claims;
-        if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
+        // Track the freshest token seen for this key, even when this resolver was
+        // replaced by a newer set() while it was pending.
+        const baseline = pickFreshestJwt(live.baseline, newToken);
+        live.baseline = baseline;
+
+        // resolvedToken is only written once the live slot itself resolves. While
+        // the live slot is pending, readers must keep awaiting its resolver, so a
+        // replaced resolver may only advance the baseline above.
+        if (!isOwn && live.entry.resolvedToken === undefined) {
+          return;
+        }
+
+        const winner = pickFreshestJwt(live.entry.resolvedToken, baseline);
+        if (winner === live.entry.resolvedToken) {
+          // Nothing advanced; the installed timers already match the winner.
+          return;
+        }
+        live.entry.resolvedToken = winner;
+
+        const winnerClaims = winner.jwt?.claims;
+        if (!winnerClaims || typeof winnerClaims.exp !== 'number' || typeof winnerClaims.iat !== 'number') {
           dropIfCurrent(live);
           return;
         }
@@ -373,8 +399,9 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         clearTimeout(live.timeoutId);
         clearTimeout(live.refreshTimeoutId);
 
-        const issuedAt = claims.iat;
-        const expiresIn: Seconds = claims.exp - issuedAt;
+        const expiresAt = winnerClaims.exp;
+        const issuedAt = winnerClaims.iat;
+        const expiresIn: Seconds = expiresAt - issuedAt;
 
         live.createdAt = issuedAt;
         live.expiresIn = expiresIn;
@@ -415,9 +442,9 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
           // channel close) must not reach the outer catch and evict the cached token (SDK-119).
           try {
             const tokenRaw = winner.getRawString();
-            if (tokenRaw && claims.sid) {
-              const sessionId = claims.sid;
-              const organizationId = claims.org_id || (claims.o as any)?.id;
+            if (tokenRaw && winnerClaims.sid) {
+              const sessionId = winnerClaims.sid;
+              const organizationId = winnerClaims.org_id || (winnerClaims.o as any)?.id;
               const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
 
               const expectedTokenId = TokenId.build(sessionId, template, organizationId);
