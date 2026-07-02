@@ -207,6 +207,8 @@ describe('EnterpriseConnectionAPI', () => {
       expect(response.samlConnection).not.toBeNull();
       expect(response.samlConnection?.id).toBe('samlc_1');
       expect(response.samlConnection?.idpEntityId).toBe('https://idp.example.com');
+      expect(response.samlConnection?.idpCertificateIssuedAt).toBe(1672531200000);
+      expect(response.samlConnection?.idpCertificateExpiresAt).toBe(1704067200000);
       expect(response.oauthConfig).not.toBeNull();
       expect(response.oauthConfig?.clientId).toBe('client_abc');
       expect(response.oauthConfig?.discoveryUrl).toBe('https://oauth.example.com/.well-known/openid-configuration');

@@ -47,6 +47,8 @@ export interface EnterpriseSamlConnectionNestedJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -64,6 +66,10 @@ export interface EnterpriseSamlConnectionNestedResource {
   idpEntityId: string;
   idpSsoUrl: string;
   idpCertificate: string;
+  /** Unix timestamp (milliseconds) of the start of the IdP certificate validity window (X.509 NotBefore). */
+  idpCertificateIssuedAt: number;
+  /** Unix timestamp (milliseconds) of the end of the IdP certificate validity window (X.509 NotAfter). */
+  idpCertificateExpiresAt: number;
   idpMetadataUrl: string;
   idpMetadata: string;
   acsUrl: string;
