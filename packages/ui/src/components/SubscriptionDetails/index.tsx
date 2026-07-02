@@ -372,13 +372,16 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isManageable = isManageableSubscriptionItem(subscription);
+  // Subscription items managed by an app store are billed through the store and cannot be managed through Clerk.
+  const isStoreManaged = subscription.managedBy === 'apple' || subscription.managedBy === 'google';
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
     subscription.status !== 'past_due' &&
+    !isStoreManaged &&
     isManageable;
-  const isCancellable = subscription.canceledAt === null && isManageable;
-  const isReSubscribable = subscription.canceledAt !== null && isManageable;
+  const isCancellable = subscription.canceledAt === null && !isStoreManaged && isManageable;
+  const isReSubscribable = subscription.canceledAt !== null && !isStoreManaged && isManageable;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -463,6 +466,32 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
     setConfirmationOpen,
     $,
   ]);
+
+  if (isStoreManaged) {
+    return (
+      <Flex
+        elementDescriptor={descriptors.subscriptionDetailsCardActions}
+        gap={2}
+        sx={t => ({
+          paddingInline: t.space.$3,
+          paddingBlock: t.space.$3,
+          borderBlockStartWidth: t.borderWidths.$normal,
+          borderBlockStartStyle: t.borderStyles.$solid,
+          borderBlockStartColor: t.colors.$borderAlpha100,
+        })}
+      >
+        <Text
+          variant='caption'
+          colorScheme='secondary'
+          localizationKey={
+            subscription.managedBy === 'apple'
+              ? localizationKeys('billing.managedViaAppStore')
+              : localizationKeys('billing.managedViaGooglePlay')
+          }
+        />
+      </Flex>
+    );
+  }
 
   if (actions.length === 0) {
     return null;

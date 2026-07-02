@@ -140,6 +140,8 @@ export const nbNO: LocalizationResource = {
     keepSubscription: 'Behold abonnement',
     manage: 'Administrer',
     manageSubscription: 'Administrer abonnement',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Måned',
     monthAbbreviation: 'mnd',
     monthPerUnit: 'Måned per {{unitName}}',

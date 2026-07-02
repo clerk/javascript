@@ -195,6 +195,8 @@ export type __internal_LocalizationResource = {
     getStarted: LocalizationValue;
     manage: LocalizationValue;
     manageSubscription: LocalizationValue;
+    managedViaAppStore: LocalizationValue;
+    managedViaGooglePlay: LocalizationValue;
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;

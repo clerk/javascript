@@ -139,6 +139,8 @@ export const viVN: LocalizationResource = {
     keepSubscription: 'Giữ đăng ký',
     manage: 'Quản lý',
     manageSubscription: 'Quản lý đăng ký',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Tháng',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

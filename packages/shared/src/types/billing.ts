@@ -131,6 +131,24 @@ export type BillingSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_
 export type BillingSubscriptionPlanPeriod = 'month' | 'annual';
 
 /**
+ * The app store through which a Plan can be purchased as an in-app purchase.
+ *
+ * @inline
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type BillingStore = 'apple' | 'google';
+
+/**
+ * The party that manages the billing lifecycle of a subscription item.
+ *
+ * @inline
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type BillingManagedBy = 'clerk' | 'apple' | 'google';
+
+/**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPayerMethods {
@@ -265,6 +283,10 @@ export interface BillingPlanResource extends ClerkResource {
    * Whether the Plan has a free trial.
    */
   freeTrialEnabled: boolean;
+  /**
+   * The app store products associated with the Plan. Empty when the Plan cannot be purchased as an in-app purchase.
+   */
+  storeProducts: BillingPlanStoreProduct[];
 }
 
 /**
@@ -343,6 +365,20 @@ export interface BillingPlanPrice {
   isDefault: boolean;
   /** The individual unit prices applicable to this price. */
   unitPrices?: BillingPlanUnitPrice[];
+}
+
+/**
+ * The `BillingPlanStoreProduct` type represents an app store product associated with a Clerk Billing Plan.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPlanStoreProduct {
+  /** The app store where the product is available. */
+  store: BillingStore;
+  /** The identifier of the product in the app store. */
+  productId: string;
+  /** The billing period of the store product. */
+  period: BillingSubscriptionPlanPeriod;
 }
 
 /**
@@ -864,6 +900,11 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * Whether the subscription item is for a free trial.
    */
   isFreeTrial: boolean;
+  /**
+   * The party that manages the billing lifecycle of the subscription item. Subscription items managed by `'apple'` or
+   * `'google'` are billed through the respective app store and cannot be canceled through Clerk.
+   */
+  managedBy: BillingManagedBy;
 }
 
 /**

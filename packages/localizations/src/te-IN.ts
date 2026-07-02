@@ -140,6 +140,8 @@ export const teIN: LocalizationResource = {
     keepSubscription: 'సబ్‌స్క్రిప్షన్‌ను ఉంచు',
     manage: 'నిర్వహించు',
     manageSubscription: 'సభ్యత్వాన్ని నిర్వహించండి',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'నెల',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

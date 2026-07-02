@@ -133,6 +133,8 @@ export const esCR: LocalizationResource = {
     keepSubscription: 'Mantener suscripción',
     manage: 'Gestionar',
     manageSubscription: 'Gestionar suscripción',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mes',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

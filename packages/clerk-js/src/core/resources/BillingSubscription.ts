@@ -1,5 +1,6 @@
 import type {
   BillingCredits,
+  BillingManagedBy,
   BillingMoneyAmount,
   BillingSubscriptionItemJSON,
   BillingSubscriptionItemNextPayment,
@@ -87,6 +88,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   credits?: BillingCredits;
   nextPayment?: BillingSubscriptionItemNextPayment | null;
   isFreeTrial!: boolean;
+  managedBy!: BillingManagedBy;
 
   constructor(data: BillingSubscriptionItemJSON) {
     super();
@@ -130,6 +132,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
           : billingSubscriptionItemNextPaymentFromJSON(data.next_payment);
 
     this.isFreeTrial = this.withDefault(data.is_free_trial, false);
+    this.managedBy = this.withDefault(data.managed_by, 'clerk');
     return this;
   }
 

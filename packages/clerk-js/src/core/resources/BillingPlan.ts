@@ -4,6 +4,7 @@ import type {
   BillingPlanJSON,
   BillingPlanPrice,
   BillingPlanResource,
+  BillingPlanStoreProduct,
   BillingPlanUnitPrice,
 } from '@clerk/shared/types';
 
@@ -30,6 +31,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   availablePrices?: BillingPlanPrice[];
   freeTrialDays!: number | null;
   freeTrialEnabled!: boolean;
+  storeProducts!: BillingPlanStoreProduct[];
 
   constructor(data: BillingPlanJSON) {
     super();
@@ -64,6 +66,11 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       annualMonthlyFee: price.annual_monthly_fee ? billingMoneyAmountFromJSON(price.annual_monthly_fee) : null,
       isDefault: price.is_default,
       unitPrices: price.unit_prices?.map(billingUnitPriceFromJSON),
+    }));
+    this.storeProducts = (data.store_products || []).map(product => ({
+      store: product.store,
+      productId: product.product_id,
+      period: product.period,
     }));
 
     return this;

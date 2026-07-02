@@ -141,6 +141,8 @@ export const msMY: LocalizationResource = {
     keepSubscription: 'Kekalkan langganan',
     manage: 'Urus',
     manageSubscription: 'Urus keahlian',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Bulan',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

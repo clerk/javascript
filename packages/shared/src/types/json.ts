@@ -4,11 +4,13 @@
 
 import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
+  BillingManagedBy,
   BillingPayerResourceType,
   BillingPaymentChargeType,
   BillingPaymentMethodStatus,
   BillingPaymentStatus,
   BillingStatementStatus,
+  BillingStore,
   BillingSubscriptionPlanPeriod,
   BillingSubscriptionStatus,
 } from './billing';
@@ -746,6 +748,17 @@ export interface BillingPriceJSON extends ClerkResourceJSON {
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ *
+ * Represents an app store product associated with a plan.
+ */
+export interface BillingPlanStoreProductJSON {
+  store: BillingStore;
+  product_id: string;
+  period: BillingSubscriptionPlanPeriod;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
@@ -770,6 +783,10 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
    */
   unit_prices?: BillingPlanUnitPriceJSON[];
   available_prices?: BillingPriceJSON[];
+  /**
+   * The app store products associated with the plan. Absent when the plan cannot be purchased as an in-app purchase.
+   */
+  store_products?: BillingPlanStoreProductJSON[];
 }
 
 /**
@@ -913,6 +930,11 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   is_free_trial: boolean;
   next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+  /**
+   * The party that manages the billing lifecycle of the subscription item. Absent for subscription items managed by
+   * Clerk.
+   */
+  managed_by?: BillingManagedBy;
 }
 
 export interface BillingSubscriptionNextPaymentJSON {

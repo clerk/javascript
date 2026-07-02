@@ -136,6 +136,8 @@ export const zhTW: LocalizationResource = {
     keepSubscription: '保留訂閱',
     manage: '管理',
     manageSubscription: '管理訂閱',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: '月',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

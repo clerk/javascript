@@ -139,6 +139,8 @@ export const roRO: LocalizationResource = {
     keepSubscription: 'Păstrează abonamentul',
     manage: 'Gestionează',
     manageSubscription: 'Gestionează abonamentul',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Lună',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

@@ -140,6 +140,8 @@ export const jaJP: LocalizationResource = {
     keepSubscription: 'サブスクリプションを継続',
     manage: '管理',
     manageSubscription: 'サブスクリプションを管理',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: '月',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

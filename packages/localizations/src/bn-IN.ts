@@ -139,6 +139,8 @@ export const bnIN: LocalizationResource = {
     keepSubscription: 'সাবস্ক্রিপশন রাখুন',
     manage: 'পরিচালনা করুন',
     manageSubscription: 'সদস্যতা পরিচালনা করুন',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'মাস',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

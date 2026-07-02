@@ -137,6 +137,8 @@ export const thTH: LocalizationResource = {
     keepSubscription: 'ใช้การสมัครสมาชิกต่อ',
     manage: 'จัดการ',
     manageSubscription: 'จัดการการสมัครสมาชิก',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'เดือน',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

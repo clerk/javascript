@@ -133,6 +133,8 @@ export const nlBE: LocalizationResource = {
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: undefined,
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: undefined,
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

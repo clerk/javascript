@@ -139,6 +139,8 @@ export const isIS: LocalizationResource = {
     keepSubscription: 'Halda áskrift',
     manage: 'Stjórna',
     manageSubscription: 'Stjórna áskrift',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mánuður',
     monthAbbreviation: 'mán.',
     monthPerUnit: 'Mánuður á {{unitName}}',

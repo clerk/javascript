@@ -137,6 +137,8 @@ export const koKR: LocalizationResource = {
     keepSubscription: '구독 유지',
     manage: '관리',
     manageSubscription: '구독 관리',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: '월',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

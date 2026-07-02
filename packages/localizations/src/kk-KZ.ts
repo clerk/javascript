@@ -133,6 +133,8 @@ export const kkKZ: LocalizationResource = {
     keepSubscription: 'Жазылымды сақтау',
     manage: 'Басқару',
     manageSubscription: 'Жазылымды басқару',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Ай',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

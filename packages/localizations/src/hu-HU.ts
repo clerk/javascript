@@ -140,6 +140,8 @@ export const huHU: LocalizationResource = {
     keepSubscription: 'Előfizetés megtartása',
     manage: 'Kezelés',
     manageSubscription: 'Előfizetés kezelése',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Hónap',
     monthAbbreviation: 'hó',
     monthPerUnit: 'Hónap / {{unitName}}',

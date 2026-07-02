@@ -139,6 +139,8 @@ export const fiFI: LocalizationResource = {
     keepSubscription: 'Pidä tilaus',
     manage: 'Hallinnoi',
     manageSubscription: 'Hallinnoi tilausta',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Kuukausi',
     monthAbbreviation: 'kk',
     monthPerUnit: 'Kuukausi per {{unitName}}',

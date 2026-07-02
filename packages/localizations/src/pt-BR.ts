@@ -139,6 +139,8 @@ export const ptBR: LocalizationResource = {
     keepSubscription: 'Manter assinatura',
     manage: 'Gerenciar',
     manageSubscription: 'Gerenciar assinatura',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mês',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

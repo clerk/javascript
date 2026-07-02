@@ -133,6 +133,8 @@ export const elGR: LocalizationResource = {
     keepSubscription: 'Διατήρηση συνδρομής',
     manage: 'Διαχείριση',
     manageSubscription: 'Διαχείριση συνδρομής',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'μήνας',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

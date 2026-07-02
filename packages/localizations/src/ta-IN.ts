@@ -141,6 +141,8 @@ export const taIN: LocalizationResource = {
     keepSubscription: 'சந்தாவை வைத்திரு',
     manage: 'நிர்வகி',
     manageSubscription: 'உறுப்பினர் நிர்வாகம்',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'மாதம்',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

@@ -140,6 +140,8 @@ export const caES: LocalizationResource = {
     keepSubscription: 'Mantén la subscripció',
     manage: 'Gestiona',
     manageSubscription: 'Gestiona la subscripció',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mes',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

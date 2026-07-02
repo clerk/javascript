@@ -133,6 +133,8 @@ export const trTR: LocalizationResource = {
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: undefined,
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: undefined,
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

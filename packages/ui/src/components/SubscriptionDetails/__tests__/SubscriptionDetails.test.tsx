@@ -235,6 +235,90 @@ describe('SubscriptionDetails', () => {
     expect(getByText('Cancel subscription')).toBeVisible();
   });
 
+  it('store-managed subscription hides Clerk-side actions and shows store indicator', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      pastDueAt: null,
+      id: 'sub_123',
+      nextPayment: {
+        amount: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        date: new Date('2021-02-01'),
+      },
+      status: 'active',
+      subscriptionItems: [
+        {
+          id: 'sub_123',
+          plan: {
+            id: 'plan_123',
+            name: 'Test Plan',
+            fee: {
+              amount: 1000,
+              amountFormatted: '10.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualFee: {
+              amount: 10000,
+              amountFormatted: '100.00',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            annualMonthlyFee: {
+              amount: 8333,
+              amountFormatted: '83.33',
+              currencySymbol: '$',
+              currency: 'USD',
+            },
+            description: 'Test Plan',
+            hasBaseFee: true,
+            isRecurring: true,
+            isDefault: false,
+          },
+          createdAt: new Date('2021-01-01'),
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-02-01'),
+          canceledAt: null,
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          managedBy: 'apple' as const,
+        },
+      ],
+    });
+
+    const { getByRole, getByText, queryByText } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <SubscriptionDetails />
+      </Drawer.Root>,
+      { wrapper },
+    );
+    await waitFor(() => {
+      expect(getByRole('heading', { name: /Subscription/i })).toBeVisible();
+    });
+
+    expect(getByText('Test Plan')).toBeVisible();
+    expect(getByText('Managed via App Store')).toBeVisible();
+    expect(queryByText('Cancel subscription')).toBeNull();
+    expect(queryByText('Switch to annual $100 / year')).toBeNull();
+  });
+
   it('active free subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });

@@ -139,6 +139,8 @@ export const hiIN: LocalizationResource = {
     keepSubscription: 'सदस्यता रखें',
     manage: 'प्रबंधित करें',
     manageSubscription: 'सदस्यता प्रबंधित करें',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'महीना',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

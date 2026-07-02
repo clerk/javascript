@@ -138,6 +138,8 @@ export const faIR: LocalizationResource = {
     keepSubscription: 'حفظ اشتراک',
     manage: 'مدیریت',
     manageSubscription: 'مدیریت اشتراک',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'ماه',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

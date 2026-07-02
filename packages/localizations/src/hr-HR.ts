@@ -140,6 +140,8 @@ export const hrHR: LocalizationResource = {
     keepSubscription: 'Zadrži pretplatu',
     manage: 'Upravljaj',
     manageSubscription: 'Upravljaj pretplatom',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mjesec',
     monthAbbreviation: 'mj',
     monthPerUnit: 'Mjesec po {{unitName}}',

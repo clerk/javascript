@@ -24,6 +24,7 @@ const basePlan: BillingPlanResource = {
   features: [],
   freeTrialDays: 14,
   freeTrialEnabled: true,
+  storeProducts: [],
   pathRoot: '',
   reload: async () => undefined as any,
 };
@@ -39,6 +40,7 @@ const makeSub = (overrides: Partial<BillingSubscriptionItemResource>): BillingSu
   periodEnd: new Date('2021-01-31'),
   canceledAt: null,
   isFreeTrial: false,
+  managedBy: 'clerk',
   cancel: async () => undefined as any,
   pathRoot: '',
   reload: async () => undefined as any,

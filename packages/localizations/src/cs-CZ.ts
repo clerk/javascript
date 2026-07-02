@@ -137,6 +137,8 @@ export const csCZ: LocalizationResource = {
     keepSubscription: 'Ponechat předplatné',
     manage: 'Spravovat',
     manageSubscription: 'Spravovat předplatné',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Měsíc',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

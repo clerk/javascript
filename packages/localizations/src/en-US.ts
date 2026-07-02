@@ -128,6 +128,8 @@ export const enUS: LocalizationResource = {
     keepSubscription: 'Keep subscription',
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
+    managedViaAppStore: 'Managed via App Store',
+    managedViaGooglePlay: 'Managed via Google Play',
     month: 'Month',
     monthAbbreviation: 'mo',
     monthPerUnit: 'Month per {{unitName}}',

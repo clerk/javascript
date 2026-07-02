@@ -133,6 +133,8 @@ export const skSK: LocalizationResource = {
     keepSubscription: undefined,
     manage: undefined,
     manageSubscription: 'Spravovať členstvo',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mesiac',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

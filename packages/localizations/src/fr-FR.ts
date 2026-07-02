@@ -141,6 +141,8 @@ export const frFR: LocalizationResource = {
     keepSubscription: "Conserver l'abonnement",
     manage: 'Gérer',
     manageSubscription: "Gérer l'abonnement",
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mois',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

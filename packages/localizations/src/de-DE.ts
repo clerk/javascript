@@ -139,6 +139,8 @@ export const deDE: LocalizationResource = {
     keepSubscription: 'Abonnement behalten',
     manage: 'Verwalten',
     manageSubscription: 'Mitgliedschaft verwalten',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Monat',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,

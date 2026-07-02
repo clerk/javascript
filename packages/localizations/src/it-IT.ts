@@ -139,6 +139,8 @@ export const itIT: LocalizationResource = {
     keepSubscription: 'Mantieni abbonamento',
     manage: 'Gestisci',
     manageSubscription: 'Gestisci abbonamento',
+    managedViaAppStore: undefined,
+    managedViaGooglePlay: undefined,
     month: 'Mese',
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
