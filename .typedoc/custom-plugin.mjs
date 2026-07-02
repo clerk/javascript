@@ -435,19 +435,6 @@ function restoreProtectedInlineCodeSpans(text, placeholders) {
 }
 
 /**
- * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`); the table body (no heading) is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
- *
- * @param {string} contents
- */
-export function stripReferenceObjectPropertiesSection(contents) {
-  if (!contents) {
-    return contents;
-  }
-  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
-  return stripped.trimEnd() + '\n';
-}
-
-/**
  * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
  * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
  *
