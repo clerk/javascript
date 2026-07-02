@@ -123,17 +123,25 @@ export function OTPInput(props: OTPInputProps) {
       // Ctrl/Cmd (without Alt) turns navigation and delete into boundary actions.
       const boundaryModifier = (event.ctrlKey || event.metaKey) && !event.altKey;
 
+      // Resolve direction from the nearest ancestor with an explicit `dir` so
+      // arrow keys follow reading order: in RTL, Left moves to the next slot and
+      // Right to the previous one.
+      const isRtl = (event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl';
+      const previousKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+      const nextKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+
+      if (event.key === previousKey) {
+        event.preventDefault();
+        focus(boundaryModifier ? 0 : index - 1);
+        return;
+      }
+      if (event.key === nextKey) {
+        event.preventDefault();
+        focus(boundaryModifier ? endIndex : index + 1);
+        return;
+      }
+
       switch (event.key) {
-        case 'ArrowLeft': {
-          event.preventDefault();
-          focus(boundaryModifier ? 0 : index - 1);
-          return;
-        }
-        case 'ArrowRight': {
-          event.preventDefault();
-          focus(boundaryModifier ? endIndex : index + 1);
-          return;
-        }
         case 'Home':
         case 'ArrowUp': {
           event.preventDefault();

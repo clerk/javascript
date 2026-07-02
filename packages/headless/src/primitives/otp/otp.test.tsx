@@ -236,6 +236,44 @@ describe('OTP', () => {
       expect(inputs().map(i => i.value)).toEqual(['', '', '', '']);
       expect(inputs()[0]).toHaveFocus();
     });
+
+    it('swaps ArrowLeft/ArrowRight under dir="rtl"', async () => {
+      const user = userEvent.setup();
+      render(
+        <div dir='rtl'>
+          <Harness
+            length={4}
+            defaultValue='1234'
+          />
+        </div>,
+      );
+
+      await user.click(inputs()[1]);
+      await user.keyboard('{ArrowLeft}'); // rtl: next slot
+      expect(inputs()[2]).toHaveFocus();
+
+      await user.keyboard('{ArrowRight}'); // rtl: previous slot
+      expect(inputs()[1]).toHaveFocus();
+    });
+
+    it('swaps Ctrl/Cmd + arrows under dir="rtl"', async () => {
+      const user = userEvent.setup();
+      render(
+        <div dir='rtl'>
+          <Harness
+            length={4}
+            defaultValue='123'
+          />
+        </div>,
+      );
+
+      await user.click(inputs()[1]);
+      await user.keyboard('{Control>}{ArrowLeft}{/Control}'); // rtl: last-entered (index 3)
+      expect(inputs()[3]).toHaveFocus();
+
+      await user.keyboard('{Control>}{ArrowRight}{/Control}'); // rtl: first
+      expect(inputs()[0]).toHaveFocus();
+    });
   });
 
   describe('clicking', () => {

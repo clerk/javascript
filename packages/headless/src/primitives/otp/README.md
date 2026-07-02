@@ -142,6 +142,10 @@ default element.
 Focus can't skip past the first empty slot: clicking, arrowing, or tabbing onto an empty slot beyond
 it snaps focus back to the first empty slot (so an empty field always focuses the first slot).
 
+Arrow keys follow reading order. Under `dir="rtl"` (resolved from the nearest ancestor with an
+explicit `dir`), `ArrowLeft` moves to the next slot and `ArrowRight` to the previous one; `Home`/`End`
+and the `Ctrl`/`Cmd` boundary jumps stay logical (first / last-entered).
+
 ## Data Attributes
 
 | Attribute          | Applies To  | Description                                   |

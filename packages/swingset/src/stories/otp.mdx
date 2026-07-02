@@ -162,4 +162,5 @@ Each part emits `data-cl-*` attributes you can target with any CSS solution:
 `OTP.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
 Each `OTP.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
 a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
-hidden form input is `aria-hidden` and out of the tab order.
+hidden form input is `aria-hidden` and out of the tab order. Arrow keys follow reading order — under
+`dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.
