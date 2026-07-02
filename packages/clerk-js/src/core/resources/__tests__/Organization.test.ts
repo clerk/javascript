@@ -88,6 +88,8 @@ describe('Organization', () => {
             idp_entity_id: 'https://idp.acme.com/entity',
             idp_sso_url: 'https://idp.acme.com/sso',
             idp_certificate: 'MIICertificatePlaceholder',
+            idp_certificate_issued_at: 1672531200000,
+            idp_certificate_expires_at: 1704067200000,
             idp_metadata_url: 'https://idp.acme.com/metadata',
             idp_metadata: '',
             acs_url: 'https://clerk.example.com/v1/saml/acs',
