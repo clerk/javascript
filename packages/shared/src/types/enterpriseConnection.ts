@@ -22,20 +22,35 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
 export type EnterpriseConnectionJSONSnapshot = EnterpriseConnectionJSON;
 
 export interface EnterpriseConnectionResource extends ClerkResource {
+  /** The enterprise connection ID. */
   id: string;
+  /** The display name of the connection. */
   name: string;
+  /** Whether the enterprise connection is active. */
   active: boolean;
+  /** The identity provider the connection uses (e.g. `saml_okta`, `oidc_custom`). */
   provider: string;
+  /** The public URL of the identity provider's logo, or `null` when none is set. */
   logoPublicUrl: string | null;
+  /** Domains associated with the enterprise connection. */
   domains: string[];
+  /** Organization ID when the connection is linked to an organization, otherwise `null`. */
   organizationId: string | null;
+  /** Whether user attributes are synced from the identity provider on each sign-in. */
   syncUserAttributes: boolean;
+  /** Whether additional identification methods are disabled for users signing in through this connection. */
   disableAdditionalIdentifications: boolean;
+  /** Whether this connection supports account linking via organization membership. */
   allowOrganizationAccountLinking: boolean;
+  /** Custom attributes configured for the connection. */
   customAttributes: unknown[];
+  /** The OAuth configuration, present when the enterprise connection uses OIDC, otherwise `null`. */
   oauthConfig: EnterpriseOAuthConfigResource | null;
+  /** The SAML configuration, present when the enterprise connection uses SAML, otherwise `null`. */
   samlConnection: EnterpriseSamlConnectionNestedResource | null;
+  /** The date when the connection was created. */
   createdAt: Date | null;
+  /** The date when the connection was last updated. */
   updatedAt: Date | null;
   __internal_toSnapshot: () => EnterpriseConnectionJSONSnapshot;
 }
