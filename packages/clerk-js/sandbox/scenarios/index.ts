@@ -5,3 +5,4 @@ export { OrgProfileSeatLimit } from './org-profile-seat-limit';
 export { PricingTableSBB } from './pricing-table-sbb';
 export { AnnualOnlyPlans } from './annual-only-plans';
 export { XProviderEnabled } from './x-provider-enabled';
+export { ProtectChallenge } from './protect-challenge';
