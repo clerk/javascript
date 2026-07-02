@@ -1,0 +1,182 @@
+'use client';
+
+import { type Ref, useCallback } from 'react';
+
+import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { useOTPContext } from './otp-context';
+import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
+
+export interface OTPInputProps extends ComponentProps<'input'> {
+  /** This slot's position, `0`-based (typically from `useOTP().slots`). */
+  index: number;
+}
+
+export function OTPInput(props: OTPInputProps) {
+  const { render, index, ref: forwardedRef, ...otherProps } = props;
+  const {
+    value,
+    length,
+    disabled,
+    pattern,
+    mask,
+    activeIndex,
+    setValue,
+    queueFocus,
+    focus,
+    registerInput,
+    onSlotFocus,
+    onSlotBlur,
+  } = useOTPContext();
+
+  const char = value[index] ?? '';
+
+  // Compose our slot registration with any ref the consumer forwards.
+  const setRef = useCallback<(element: HTMLInputElement | null) => void>(
+    element => {
+      registerInput(index, element);
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(element);
+      } else if (forwardedRef) {
+        (forwardedRef as { current: HTMLInputElement | null }).current = element;
+      }
+    },
+    [registerInput, index, forwardedRef],
+  );
+
+  // Roving tab order: the focused slot is the tab stop, or the next empty slot
+  // when the field is unfocused, so Tab enters and leaves the group once.
+  const tabStop = activeIndex ?? Math.min(value.length, length - 1);
+
+  const state = { active: activeIndex === index, filled: char !== '', disabled };
+
+  const defaultProps: Record<string, unknown> = {
+    'data-cl-slot': 'otp-input',
+    ref: setRef as Ref<HTMLInputElement>,
+    value: char,
+    type: mask ? 'password' : 'text',
+    inputMode: inputModeForPattern(pattern),
+    // Only the first slot advertises autofill so browsers drop the whole SMS
+    // code into it; its onChange then spills the characters across the slots.
+    autoComplete: index === 0 ? 'one-time-code' : 'off',
+    autoCorrect: 'off',
+    spellCheck: false,
+    // The first slot accepts the full code (autofill/paste); the rest are
+    // single characters handled by onChange/onPaste.
+    maxLength: index === 0 ? length : 1,
+    tabIndex: tabStop === index ? 0 : -1,
+    disabled,
+    'aria-label': `Character ${index + 1} of ${length}`,
+    onMouseDown: (event: React.MouseEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
+      // Take focus ourselves so a click always selects the slot's character
+      // (typing replaces it) instead of dropping a caret mid-value.
+      event.preventDefault();
+      focus(index);
+    },
+    onFocus: (event: React.FocusEvent<HTMLInputElement>) => {
+      onSlotFocus(index);
+      event.currentTarget.select();
+    },
+    onBlur: () => {
+      onSlotBlur();
+    },
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
+      const raw = event.currentTarget.value;
+
+      // Empty means the character was removed (mobile delete, cut, clear).
+      if (raw === '') {
+        setValue(removeAt(value, index));
+        return;
+      }
+
+      const inserted = sanitize(raw, pattern, length);
+      if (inserted === '') {
+        // Only disallowed characters were typed; restore the stored value.
+        event.currentTarget.value = char;
+        return;
+      }
+
+      const next = sanitize(replaceAt(value, index, inserted), pattern, length);
+      setValue(next);
+      queueFocus(Math.min(index + inserted.length, length - 1), next);
+    },
+    onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
+
+      switch (event.key) {
+        case 'Backspace': {
+          event.preventDefault();
+          const targetIndex = Math.max(0, index - 1);
+          // Delete this slot's character if it has one, otherwise the previous
+          // slot's — either way focus lands on the previous slot.
+          const deleteIndex = char === '' ? targetIndex : index;
+          const next = removeAt(value, deleteIndex);
+          setValue(next);
+          queueFocus(targetIndex, next);
+          break;
+        }
+        case 'Delete': {
+          event.preventDefault();
+          const next = removeAt(value, index);
+          setValue(next);
+          queueFocus(index, next);
+          break;
+        }
+        case 'ArrowLeft': {
+          event.preventDefault();
+          focus(index - 1);
+          break;
+        }
+        case 'ArrowRight': {
+          event.preventDefault();
+          focus(index + 1);
+          break;
+        }
+        case 'Home': {
+          event.preventDefault();
+          focus(0);
+          break;
+        }
+        case 'End': {
+          event.preventDefault();
+          focus(Math.min(value.length, length - 1));
+          break;
+        }
+        default:
+          break;
+      }
+    },
+    onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
+      event.preventDefault();
+      const inserted = sanitize(event.clipboardData?.getData('text') ?? '', pattern, length);
+      if (inserted === '') {
+        return;
+      }
+      const next = sanitize(replaceAt(value, index, inserted), pattern, length);
+      setValue(next);
+      queueFocus(Math.min(index + inserted.length, length - 1), next);
+    },
+  };
+
+  return renderElement({
+    defaultTagName: 'input',
+    render,
+    state,
+    stateAttributesMapping: {
+      active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
+      filled: (v: boolean) => (v ? { 'data-cl-filled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+    },
+    props: mergeProps<'input'>(defaultProps, otherProps),
+  });
+}

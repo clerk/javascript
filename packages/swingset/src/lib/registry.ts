@@ -41,6 +41,7 @@ import {
   meta as leaveOrganizationMeta,
 } from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
@@ -109,6 +110,7 @@ const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const menuModule: StoryModule = { meta: menuMeta };
+const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
@@ -142,6 +144,7 @@ export const registry: StoryModule[] = [
   dialogModule,
   fileUploadModule,
   menuModule,
+  otpModule,
   popoverModule,
   selectModule,
   tabsModule,

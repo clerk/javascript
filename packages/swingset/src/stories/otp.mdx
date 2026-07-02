@@ -1,0 +1,164 @@
+import * as OTPStories from './otp.stories';
+
+# OTP
+
+A one-time-password / PIN input from `@clerk/headless`. It is a **headless** primitive: it owns the
+value (a single string), splits it across per-character `Input` slots, and handles focus movement,
+keyboard editing, and paste distribution, but ships **no styles** — you bring your own CSS by
+targeting the `data-cl-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its behavior.
+Type digits and focus advances slot to slot; `Backspace` walks back; arrow keys move between slots;
+and pasting a full code distributes it across the slots.
+
+<Story
+  name='Default'
+  storyModule={OTPStories}
+/>
+
+## Usage
+
+The value lives in `OTP.Root`. Read the slots with the `useOTP` hook and render one `OTP.Input` per
+slot, passing each its `index`:
+
+```tsx
+import { OTP } from '@clerk/headless/otp';
+
+function VerifyCode() {
+  return (
+    <OTP.Root
+      length={6}
+      aria-label='Verification code'
+      onComplete={code => submit(code)}
+    >
+      <Slots />
+    </OTP.Root>
+  );
+}
+
+function Slots() {
+  const { slots } = OTP.useOTP();
+  return slots.map(slot => (
+    <OTP.Input
+      key={slot.index}
+      index={slot.index}
+    />
+  ));
+}
+```
+
+### Controlled
+
+```tsx
+const [code, setCode] = useState('');
+
+<OTP.Root
+  length={6}
+  value={code}
+  onValueChange={setCode}
+>
+  <Slots />
+</OTP.Root>;
+```
+
+### Inside a form
+
+Pass `name` to submit the combined value through a hidden input:
+
+```tsx
+<form action={verify}>
+  <OTP.Root
+    length={6}
+    name='code'
+  >
+    <Slots />
+  </OTP.Root>
+  <button type='submit'>Verify</button>
+</form>
+```
+
+### Masked / alphanumeric
+
+```tsx
+<OTP.Root
+  length={4}
+  mask
+  pattern='alphanumeric'
+>
+  <Slots />
+</OTP.Root>
+```
+
+## Parts
+
+| Part        | Default Element | Description                                                    |
+| ----------- | --------------- | -------------------------------------------------------------- |
+| `OTP.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value    |
+| `OTP.Input` | `<input>`       | A single character slot; render one per `useOTP().slots` entry |
+
+Both parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their
+default element. `OTP.Input` (and the `useOTP` hook) throw if used outside `OTP.Root`.
+
+`OTP.useOTP()` is a hook (not a component) that returns
+`{ value, length, disabled, complete, slots, activeIndex, clear, focus }` for reading the value and
+driving custom UI. Each `slots` entry is `{ index, char, isActive, isFilled }`. It must be called
+inside `OTP.Root`.
+
+## Props
+
+### `OTP.Root`
+
+| Prop            | Type                                     | Default      | Description                                         |
+| --------------- | ---------------------------------------- | ------------ | --------------------------------------------------- |
+| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code            |
+| `value`         | `string`                                 | —            | Controlled value                                    |
+| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                        |
+| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change          |
+| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                    |
+| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped             |
+| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                     |
+| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name |
+| `disabled`      | `boolean`                                | `false`      | Disable every slot                                  |
+
+### `OTP.Input`
+
+| Prop    | Type     | Default      | Description                                           |
+| ------- | -------- | ------------ | ----------------------------------------------------- |
+| `index` | `number` | — (required) | The slot's `0`-based position (from `useOTP().slots`) |
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute          | Applies To  | Description                                   |
+| ------------------ | ----------- | --------------------------------------------- |
+| `data-cl-slot`     | All parts   | Part identifier (`"otp-root"`, `"otp-input"`) |
+| `data-cl-empty`    | Root        | Present when no character has been entered    |
+| `data-cl-complete` | Root        | Present when every slot is filled             |
+| `data-cl-disabled` | Root, Input | Present when disabled                         |
+| `data-cl-active`   | Input       | Present when the slot holds focus             |
+| `data-cl-filled`   | Input       | Present when the slot holds a character       |
+
+```css
+[data-cl-slot='otp-root'] {
+  display: flex;
+  gap: 8px;
+}
+[data-cl-slot='otp-input'] {
+  width: 40px;
+  height: 48px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+[data-cl-slot='otp-input'][data-cl-active] {
+  border-color: var(--color-accent);
+}
+```
+
+`OTP.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
+Each `OTP.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
+a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
+hidden form input is `aria-hidden` and out of the tab order.
