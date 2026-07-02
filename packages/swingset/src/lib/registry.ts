@@ -41,7 +41,6 @@ import {
   meta as leaveOrganizationMeta,
 } from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
-import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
@@ -50,6 +49,7 @@ import {
   Default as OrganizationProfileGeneralDefault,
   meta as organizationProfileGeneralMeta,
 } from '../stories/organization-profile-general.stories';
+import { meta as otpMeta } from '../stories/otp.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
