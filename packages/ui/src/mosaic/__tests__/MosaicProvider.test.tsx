@@ -13,10 +13,13 @@ const appearance: MosaicAppearance = {
   },
 };
 
-// Every MosaicProvider render now self-creates the Emotion insertion-point node, so
-// clean it up after each test to keep the document fresh across the whole file.
+// Every MosaicProvider render now self-creates the Emotion insertion-point node and Emotion
+// appends its own <style data-emotion> tags, so clear both after each test to keep the document
+// fresh across the whole file (Emotion tags would otherwise leak across the layer-wrapping cases).
 afterEach(() => {
-  document.querySelectorAll('style#cl-mosaic-style-insertion-point').forEach(node => node.remove());
+  document
+    .querySelectorAll('style#cl-mosaic-style-insertion-point, style[data-emotion]')
+    .forEach(node => node.remove());
 });
 
 describe('parseMosaicAppearance', () => {
@@ -91,6 +94,41 @@ describe('MosaicProvider global reset', () => {
     expect(css).toContain('box-sizing:border-box');
     expect(css).toContain('margin:0');
     expect(css).toContain('padding:0');
+  });
+});
+
+describe('MosaicProvider cssLayerName', () => {
+  // Emotion's generated component styles carry `data-emotion`; the static reset does not, so this
+  // isolates the styles inserted *through the cache* — the ones the layer wrap has to cover.
+  const emotionCss = () =>
+    Array.from(document.querySelectorAll('style[data-emotion]'))
+      .map(node => node.textContent ?? '')
+      .join('');
+
+  it('wraps cache-generated component styles in the layer when cssLayerName is set', () => {
+    render(
+      <MosaicProvider cssLayerName='cl-test'>
+        <div css={{ color: 'red' }} />
+      </MosaicProvider>,
+    );
+
+    const css = emotionCss();
+    expect(css).toContain('color:red');
+    // Without the insert wrap, the generated rule ships unlayered and outranks a consumer's
+    // @layer-ed app styles. The @layer only appears in Emotion output when the wrap is applied.
+    expect(css).toContain('@layer cl-test');
+  });
+
+  it('leaves cache-generated styles unlayered when no cssLayerName is set', () => {
+    render(
+      <MosaicProvider>
+        <div css={{ color: 'blue' }} />
+      </MosaicProvider>,
+    );
+
+    const css = emotionCss();
+    expect(css).toContain('color:blue');
+    expect(css).not.toContain('@layer');
   });
 });
 

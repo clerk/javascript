@@ -34,26 +34,33 @@ export type IconProps = React.ComponentPropsWithRef<'svg'> & RecipeVariantProps<
 /**
  * Renders a Mosaic icon by name. The glyph can be swapped per-name via `appearance.icons` on
  * `MosaicProvider`. Mosaic's recipe styling (sizing/color) is applied to *both* the built-in glyph and
- * an override so they stay visually consistent — the override receives the resolved `className` plus
- * `data-cl-slot="icon"` and forwarded props.
+ * an override so they stay visually consistent — the override element is cloned with the resolved
+ * `className` (merged with its own), `data-cl-slot="icon"`, and forwarded props.
  */
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIcon({ name, size, sx, ...rest }, ref) {
   const { root } = useRecipe(iconRecipe, { variants: { size }, sx });
   const override = useMosaicIcons()[name];
 
   if (override) {
-    // The override is authored in a consumer file without the Emotion jsx pragma, so the `css` prop
-    // would be ignored there. Serialize Mosaic's styling to a real `className` (via the Mosaic cache)
-    // so it applies to the override exactly as it does to the built-in glyph.
+    // The override is authored in a consumer file without the Emotion jsx pragma, so its own `css`
+    // prop would be ignored. Serialize Mosaic's styling to a real `className` (via the Mosaic cache)
+    // and inject it — plus `data-cl-slot` and the forwarded svg props — into the override element with
+    // cloneElement, so it styles exactly like the built-in glyph. Cloning an element (rather than
+    // calling a render fn) is what lets overrides be plain elements, which unlike functions serialize
+    // across the RSC boundary.
     return (
       <ClassNames>
-        {emotion =>
-          override({
+        {emotion => {
+          // SAFETY: React 18 types `ReactElement.props` as `any`; we only read an optional className
+          // to merge with Mosaic's so a consumer's own class survives. cloneElement re-validates the
+          // merged props against the element's real type at render, surfacing any mismatch there.
+          const overrideClassName = (override.props as { className?: string }).className;
+          return React.cloneElement(override, {
             ...rest,
             'data-cl-slot': root['data-cl-slot'],
-            className: emotion.cx(emotion.css(root.css), root.className),
-          })
-        }
+            className: emotion.cx(emotion.css(root.css), root.className, overrideClassName),
+          });
+        }}
       </ClassNames>
     );
   }

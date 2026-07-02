@@ -79,6 +79,22 @@ export function MosaicProvider({
       nonce,
     });
 
+    // Route every cache insert through `@layer` so generated component styles carry the same layer
+    // as the static reset above. The reset alone is not enough: without wrapping `insert`, Emotion
+    // ships each component rule unlayered, and unlayered styles always outrank a consumer's
+    // `@layer`-ed app styles. Mirrors StyleCacheProvider's wrap — keep the two in sync.
+    if (cssLayerName) {
+      const layer = cssLayerName;
+      const insert = emotionCache.insert.bind(emotionCache);
+      emotionCache.insert = (selector, serialized, sheet, shouldCache) => {
+        if (!serialized.styles.startsWith('@layer')) {
+          const layered = { ...serialized, styles: `@layer ${layer} {${serialized.styles}}` };
+          return insert(selector, layered, sheet, shouldCache);
+        }
+        return insert(selector, serialized, sheet, shouldCache);
+      };
+    }
+
     return emotionCache;
   }, [nonce, cssLayerName]);
 
