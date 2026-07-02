@@ -1,1 +1,1699 @@
 The `Clerk` class serves as the central interface for working with Clerk's authentication and user management functionality in your application. As a top-level class in the Clerk SDK, it provides access to key methods and properties for managing users, sessions, API keys, billing, organizations, and more.
+
+## `addListener()`
+
+Register a listener that triggers a callback whenever a change in the [`Client`](/docs/reference/objects/client), [`Session`](/docs/reference/objects/session), [`User`](/docs/reference/objects/user), or [`Organization`](/docs/reference/objects/organization) resources occurs. This method is primarily used to build frontend SDKs like [`@clerk/react`](https://www.npmjs.com/package/@clerk/react).
+
+Allows hooking up at different steps in the sign up, sign in processes.
+
+Some important checkpoints:
+
+- When there is an active session, `user === session.user`.
+- When there is no active session, user and session will both be `null`.
+- When a session is loading, user and session will be `undefined`.
+
+```typescript
+function addListener(
+  callback: (emission: {
+    client: ClientResource;
+    organization?: null | OrganizationResource;
+    session?: null | SignedInSessionResource;
+    user?: null | UserResource;
+  }) => void,
+  options?: { skipInitialEmit?: boolean },
+): UnsubscribeCallback;
+```
+
+### Parameters
+
+| Parameter                   | Type                                                                                                                                                                                                                                                                                                                             | Description                                                                                  |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `callback`                  | <code>(emission: \{ client: [ClientResource](/docs/reference/objects/client); organization?: null \| [OrganizationResource](/docs/reference/objects/organization); session?: null \| [SignedInSessionResource](/docs/reference/objects/session); user?: null \| [UserResource](/docs/reference/objects/user); \}) => void</code> | The function to call when Clerk resources change.                                            |
+| `options?`                  | <code>\{ skipInitialEmit?: boolean; \}</code>                                                                                                                                                                                                                                                                                    | Optional configuration.                                                                      |
+| `options?.skipInitialEmit?` | `boolean`                                                                                                                                                                                                                                                                                                                        | Whether the callback will not be called immediately after registration. Defaults to `false`. |
+
+### Returns
+
+`UnsubscribeCallback` — - An `UnsubscribeCallback` function that can be used to remove the listener from the `Clerk` object.
+
+## `authenticateWithBase()`
+
+Starts a sign-in flow that uses Base to authenticate the user using their Web3 wallet address.
+
+```typescript
+function authenticateWithBase(
+  params?: AuthenticateWithBaseParams,
+): Promise<unknown>;
+```
+
+### `AuthenticateWithBaseParams`
+
+| Property                                            | Type                                                                           | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                      | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                       | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                       | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata) | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `authenticateWithCoinbaseWallet()`
+
+Starts a sign-in flow that uses Coinbase Smart Wallet to authenticate the user using their Coinbase wallet address.
+
+```typescript
+function authenticateWithCoinbaseWallet(
+  params?: AuthenticateWithCoinbaseWalletParams,
+): Promise<unknown>;
+```
+
+### `AuthenticateWithCoinbaseWalletParams`
+
+| Property                                            | Type                                                                           | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                      | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                       | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                       | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata) | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `authenticateWithGoogleOneTap()`
+
+Authenticates user using a Google token generated from Google identity services.
+
+```typescript
+function authenticateWithGoogleOneTap(
+  params: AuthenticateWithGoogleOneTapParams,
+): Promise<SignInResource | SignUpResource>;
+```
+
+### `AuthenticateWithGoogleOneTapParams`
+
+| Property                                    | Type      | Description                                                                                                                 |
+| ------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| <a id="legalaccepted"></a> `legalAccepted?` | `boolean` | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents. |
+| <a id="token"></a> `token`                  | `string`  | The Google credential token from the Google Identity Services response.                                                     |
+
+### Returns
+
+`Promise`\<<code>[SignInResource](/docs/reference/objects/sign-in) \| [SignUpResource](/docs/reference/objects/sign-up)</code>\>
+
+## `authenticateWithMetamask()`
+
+Starts a sign-in flow that uses MetaMask to authenticate the user using their Metamask wallet address.
+
+```typescript
+function authenticateWithMetamask(
+  params?: AuthenticateWithMetamaskParams,
+): Promise<unknown>;
+```
+
+### `AuthenticateWithMetamaskParams`
+
+| Property                                            | Type                                                                           | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                      | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                       | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                       | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata) | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `authenticateWithOKXWallet()`
+
+Starts a sign-in flow that uses OKX Wallet to authenticate the user using their OKX wallet address.
+
+```typescript
+function authenticateWithOKXWallet(
+  params?: AuthenticateWithOKXWalletParams,
+): Promise<unknown>;
+```
+
+### `AuthenticateWithOKXWalletParams`
+
+| Property                                            | Type                                                                           | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                      | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                       | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                       | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata) | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `authenticateWithSolana()`
+
+Starts a sign-in flow that uses Solana to authenticate the user using their Solana wallet address.
+
+```typescript
+function authenticateWithSolana(
+  params: AuthenticateWithSolanaParams,
+): Promise<unknown>;
+```
+
+### `AuthenticateWithSolanaParams`
+
+| Property                                            | Type                                                                           | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                      | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                       | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                       | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata) | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+| <a id="walletname"></a> `walletName`                | `string`                                                                       | The name of the Solana wallet to use for authentication.                                                                                                                                                                                                                                                                                                                  |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `authenticateWithWeb3()`
+
+Starts a sign-in flow that uses a Web3 Wallet browser extension to authenticate the user using their Ethereum wallet address.
+
+```typescript
+function authenticateWithWeb3(
+  params: ClerkAuthenticateWithWeb3Params,
+): Promise<unknown>;
+```
+
+### `ClerkAuthenticateWithWeb3Params`
+
+| Property                                            | Type                                                                                                                                                          | Description                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="customnavigate"></a> `customNavigate?`       | <code>(to: string) => Promise\<unknown\></code>                                                                                                               | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                                                                                                   |
+| <a id="legalaccepted"></a> `legalAccepted?`         | `boolean`                                                                                                                                                     | A boolean indicating whether the user has agreed to the [legal compliance](/docs/guides/secure/legal-compliance) documents.                                                                                                                                                                                                                                               |
+| <a id="redirecturl"></a> `redirectUrl?`             | `string`                                                                                                                                                      | The full URL or path to navigate to after a successful sign-in or sign-up.                                                                                                                                                                                                                                                                                                |
+| <a id="secondfactorurl"></a> `secondFactorUrl?`     | `string`                                                                                                                                                      | The URL to navigate to if [second factor](/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is required.                                                                                                                                                                                                                        |
+| <a id="signupcontinueurl"></a> `signUpContinueUrl?` | `string`                                                                                                                                                      | The URL to navigate to if the sign-up process is missing user information.                                                                                                                                                                                                                                                                                                |
+| <a id="strategy"></a> `strategy`                    | <code>"web3_metamask_signature" \| "web3_base_signature" \| "web3_coinbase_wallet_signature" \| "web3_okx_wallet_signature" \| "web3_solana_signature"</code> | The strategy to use for the sign-in flow.                                                                                                                                                                                                                                                                                                                                 |
+| <a id="unsafemetadata"></a> `unsafeMetadata?`       | [SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)                                                                                | Metadata that can be read and set from the frontend. Once the sign-up is complete, the value of this field will be automatically copied to the newly created user's unsafe metadata. One common use case for this attribute is to use it to implement custom fields that can be collected during sign-up and will automatically be attached to the created `User` object. |
+| <a id="walletname"></a> `walletName?`               | `string`                                                                                                                                                      | The name of the wallet to use for authentication.                                                                                                                                                                                                                                                                                                                         |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `buildAfterMultiSessionSingleSignOutUrl()`
+
+Returns the configured `afterMultiSessionSingleSignOutUrl` of the instance.
+
+```typescript
+function buildAfterMultiSessionSingleSignOutUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildAfterSignInUrl()`
+
+Returns the configured `afterSignInUrl` of the instance.
+
+```typescript
+function buildAfterSignInUrl(params?: { params?: URLSearchParams }): string;
+```
+
+### Parameters
+
+| Parameter | Type                                         | Description                                     |
+| --------- | -------------------------------------------- | ----------------------------------------------- |
+| `params?` | <code>\{ params?: URLSearchParams; \}</code> | Optional query parameters to append to the URL. |
+
+### Returns
+
+`string`
+
+## `buildAfterSignOutUrl()`
+
+Returns the configured `afterSignOutUrl` of the instance.
+
+```typescript
+function buildAfterSignOutUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildAfterSignUpUrl()`
+
+Returns the configured `afterSignUpUrl` of the instance.
+
+```typescript
+function buildAfterSignUpUrl(params?: { params?: URLSearchParams }): string;
+```
+
+### Parameters
+
+| Parameter | Type                                         | Description                                     |
+| --------- | -------------------------------------------- | ----------------------------------------------- |
+| `params?` | <code>\{ params?: URLSearchParams; \}</code> | Optional query parameters to append to the URL. |
+
+### Returns
+
+`string`
+
+## `buildCreateOrganizationUrl()`
+
+Returns the configured URL where [`<CreateOrganization />`](/docs/reference/components/organization/create-organization) is mounted or a custom create-organization page is rendered.
+
+```typescript
+function buildCreateOrganizationUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildNewSubscriptionRedirectUrl()`
+
+Returns the configured `newSubscriptionRedirectUrl` of the instance.
+
+```typescript
+function buildNewSubscriptionRedirectUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildOrganizationProfileUrl()`
+
+Returns the configured URL where [`<OrganizationProfile />`](/docs/reference/components/organization/organization-profile) is mounted or a custom organization-profile page is rendered.
+
+```typescript
+function buildOrganizationProfileUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildSignInUrl()`
+
+Returns the configured URL where [`<SignIn/>`](/docs/reference/components/authentication/sign-in) is mounted or a custom sign-in page is rendered.
+
+```typescript
+function buildSignInUrl(opts?: RedirectOptions): string;
+```
+
+### `RedirectOptions`
+
+| Property                                                            | Type                        | Description                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="redirecturl"></a> `redirectUrl?`                             | <code>string \| null</code> | Full URL or path to navigate to after a successful action.                                                                                                                                                                                                                    |
+| <a id="signinfallbackredirecturl"></a> `signInFallbackRedirectUrl?` | <code>string \| null</code> | The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead. Defaults to `'/'`. |
+| <a id="signinforceredirecturl"></a> `signInForceRedirectUrl?`       | <code>string \| null</code> | If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.                                                   |
+| <a id="signupfallbackredirecturl"></a> `signUpFallbackRedirectUrl?` | <code>string \| null</code> | The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead. Defaults to `'/'`. |
+| <a id="signupforceredirecturl"></a> `signUpForceRedirectUrl?`       | <code>string \| null</code> | If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.                                                   |
+
+### Returns
+
+`string`
+
+## `buildSignUpUrl()`
+
+Returns the configured URL where [`<SignUp/>`](/docs/reference/components/authentication/sign-up) is mounted or a custom sign-up page is rendered.
+
+```typescript
+function buildSignUpUrl(opts?: RedirectOptions): string;
+```
+
+### `RedirectOptions`
+
+| Property                                                            | Type                        | Description                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <a id="redirecturl"></a> `redirectUrl?`                             | <code>string \| null</code> | Full URL or path to navigate to after a successful action.                                                                                                                                                                                                                    |
+| <a id="signinfallbackredirecturl"></a> `signInFallbackRedirectUrl?` | <code>string \| null</code> | The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead. Defaults to `'/'`. |
+| <a id="signinforceredirecturl"></a> `signInForceRedirectUrl?`       | <code>string \| null</code> | If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.                                                   |
+| <a id="signupfallbackredirecturl"></a> `signUpFallbackRedirectUrl?` | <code>string \| null</code> | The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead. Defaults to `'/'`. |
+| <a id="signupforceredirecturl"></a> `signUpForceRedirectUrl?`       | <code>string \| null</code> | If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.                                                   |
+
+### Returns
+
+`string`
+
+## `buildTasksUrl()`
+
+Returns the configured URL where [session tasks](/docs/guides/configure/session-tasks) are mounted.
+
+```typescript
+function buildTasksUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildUrlWithAuth()`
+
+Decorates the provided URL with the auth token for development instances.
+
+```typescript
+function buildUrlWithAuth(to: string): string;
+```
+
+### Parameters
+
+| Parameter | Type     | Description                        |
+| --------- | -------- | ---------------------------------- |
+| `to`      | `string` | The route to create a URL towards. |
+
+### Returns
+
+`string`
+
+## `buildUserProfileUrl()`
+
+Returns the configured URL where [`<UserProfile />`](/docs/reference/components/user/user-profile) is mounted or a custom user-profile page is rendered.
+
+```typescript
+function buildUserProfileUrl(): string;
+```
+
+### Returns
+
+`string`
+
+## `buildWaitlistUrl()`
+
+Returns the configured URL where [`<Waitlist />`](/docs/reference/components/authentication/waitlist) is mounted or a custom waitlist page is rendered.
+
+```typescript
+function buildWaitlistUrl(opts?: {
+  initialValues?: Record<string, string>;
+}): string;
+```
+
+### Parameters
+
+| Parameter              | Type                                                         | Description                                  |
+| ---------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| `opts?`                | <code>\{ initialValues?: Record\<string, string\>; \}</code> | Options to control the waitlist URL.         |
+| `opts?.initialValues?` | `Record`\<`string`, `string`\>                               | Initial values to prefill the waitlist form. |
+
+### Returns
+
+`string`
+
+## `closeCreateOrganization()`
+
+Closes the Clerk CreateOrganization modal.
+
+```typescript
+function closeCreateOrganization(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeGoogleOneTap()`
+
+Opens the Google One Tap component.
+If the component is not already open, results in a noop.
+
+```typescript
+function closeGoogleOneTap(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeOrganizationProfile()`
+
+Closes the Clerk OrganizationProfile modal.
+
+```typescript
+function closeOrganizationProfile(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeSignIn()`
+
+Closes the Clerk SignIn modal.
+
+```typescript
+function closeSignIn(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeSignUp()`
+
+Closes the Clerk SignUp modal.
+
+```typescript
+function closeSignUp(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeUserProfile()`
+
+Closes the Clerk UserProfile modal.
+
+```typescript
+function closeUserProfile(): void;
+```
+
+### Returns
+
+`void`
+
+## `closeWaitlist()`
+
+Closes the Clerk Waitlist modal.
+
+```typescript
+function closeWaitlist(): void;
+```
+
+### Returns
+
+`void`
+
+## `createOrganization()`
+
+Creates an Organization programmatically, adding the current user as admin. Returns an [`Organization`](/docs/reference/objects/organization) object.
+
+> [!NOTE]
+> For React-based apps, consider using the [`<CreateOrganization />`](/docs/reference/components/organization/create-organization) component.
+
+```typescript
+function createOrganization(
+  params: CreateOrganizationParams,
+): Promise<OrganizationResource>;
+```
+
+### `CreateOrganizationParams`
+
+| Property                  | Type     | Description                   |
+| ------------------------- | -------- | ----------------------------- |
+| <a id="name"></a> `name`  | `string` | The name of the Organization. |
+| <a id="slug"></a> `slug?` | `string` | The slug of the Organization. |
+
+### Returns
+
+`Promise`\<[`OrganizationResource`](/docs/reference/objects/organization)\>
+
+## `getOrganization()`
+
+Gets a single [Organization](/docs/reference/objects/organization) by ID.
+
+```typescript
+function getOrganization(organizationId: string): Promise<OrganizationResource>;
+```
+
+### Parameters
+
+| Parameter        | Type     | Description                        |
+| ---------------- | -------- | ---------------------------------- |
+| `organizationId` | `string` | The ID of the Organization to get. |
+
+### Returns
+
+`Promise`\<[`OrganizationResource`](/docs/reference/objects/organization)\>
+
+## `handleEmailLinkVerification()`
+
+Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+
+```typescript
+function handleEmailLinkVerification(
+  params: {
+    onVerifiedOnOtherDevice?: () => void;
+    redirectUrl?: string;
+    redirectUrlComplete?: string;
+  },
+  customNavigate?: (to: string) => Promise<unknown>,
+): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter                         | Type                                                                                                         | Description                                                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `params`                          | <code>\{ onVerifiedOnOtherDevice?: () => void; redirectUrl?: string; redirectUrlComplete?: string; \}</code> | Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution. |
+| `params.onVerifiedOnOtherDevice?` | <code>() => void</code>                                                                                      | Callback function to be executed after successful email link verification on another device.                                                                                                                                                                                             |
+| `params.redirectUrl?`             | `string`                                                                                                     | The full URL to navigate to after successful email link verification on the same device, but without completing sign-in or sign-up.                                                                                                                                                      |
+| `params.redirectUrlComplete?`     | `string`                                                                                                     | The full URL to navigate to after successful email link verification on completed sign-up or sign-in on the same device.                                                                                                                                                                 |
+| `customNavigate?`                 | <code>(to: string) => Promise\<unknown\></code>                                                              | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.                                                                                                                                                  |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `handleGoogleOneTapCallback()`
+
+Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+
+```typescript
+function handleGoogleOneTapCallback(
+  signInOrUp: SignInResource | SignUpResource,
+  params: HandleOAuthCallbackParams,
+  customNavigate?: (to: string) => Promise<unknown>,
+): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter         | Type                                                                                                                | Description                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `signInOrUp`      | <code>[SignInResource](/docs/reference/objects/sign-in) \| [SignUpResource](/docs/reference/objects/sign-up)</code> | The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).                                         |
+| `params`          | [`HandleOAuthCallbackParams`](/docs/reference/types/handle-o-auth-callback-params)                                  | Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.                       |
+| `customNavigate?` | <code>(to: string) => Promise\<unknown\></code>                                                                     | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `handleRedirectCallback()`
+
+Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](/docs/reference/objects/sign-up).
+
+```typescript
+function handleRedirectCallback(
+  params: HandleOAuthCallbackParams,
+  customNavigate?: (to: string) => Promise<unknown>,
+): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter         | Type                                                                               | Description                                                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `params`          | [`HandleOAuthCallbackParams`](/docs/reference/types/handle-o-auth-callback-params) | Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.                        |
+| `customNavigate?` | <code>(to: string) => Promise\<unknown\></code>                                    | A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `handleUnauthenticated()`
+
+Handles a 401 response from the Frontend API by refreshing the [`Client`](/docs/reference/objects/client) and [`Session`](/docs/reference/objects/session) object accordingly.
+
+```typescript
+function handleUnauthenticated(): Promise<unknown>;
+```
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `joinWaitlist()`
+
+Create a new waitlist entry programmatically. Requires that you set your app's sign-up mode to [**Waitlist**](/docs/guides/secure/restricting-access#waitlist) in the Clerk Dashboard.
+
+```typescript
+function joinWaitlist(params: JoinWaitlistParams): Promise<WaitlistResource>;
+```
+
+### `JoinWaitlistParams`
+
+| Property                                 | Type     | Description                                           |
+| ---------------------------------------- | -------- | ----------------------------------------------------- |
+| <a id="emailaddress"></a> `emailAddress` | `string` | The email address of the user to add to the waitlist. |
+
+### Returns
+
+`Promise`\<`WaitlistResource`\>
+
+## `mountAPIKeys()`
+
+Mount an API keys component at the target element.
+
+```typescript
+function mountAPIKeys(targetNode: HTMLDivElement, props?: APIKeysProps): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                    | Description                            |
+| ------------ | --------------------------------------- | -------------------------------------- |
+| `targetNode` | `HTMLDivElement`                        | Target to mount the APIKeys component. |
+| `props?`     | [`APIKeysProps`](../api-keys-props.mdx) | Configuration parameters.              |
+
+### Returns
+
+`void`
+
+## `mountCreateOrganization()`
+
+Mount a CreateOrganization component at the target element.
+
+```typescript
+function mountCreateOrganization(
+  targetNode: HTMLDivElement,
+  props?: CreateOrganizationProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                          | Description                                       |
+| ------------ | ------------------------------------------------------------- | ------------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                              | Target to mount the CreateOrganization component. |
+| `props?`     | [`CreateOrganizationProps`](../create-organization-props.mdx) | Configuration parameters.                         |
+
+### Returns
+
+`void`
+
+## `mountOAuthConsent()`
+
+Mounts a OAuth consent component at the target element.
+
+```typescript
+function mountOAuthConsent(
+  targetNode: HTMLDivElement,
+  oauthConsentProps?: OAuthConsentProps,
+): void;
+```
+
+### Parameters
+
+| Parameter            | Type                | Description                                       |
+| -------------------- | ------------------- | ------------------------------------------------- |
+| `targetNode`         | `HTMLDivElement`    | Target node to mount the OAuth consent component. |
+| `oauthConsentProps?` | `OAuthConsentProps` | OAuth consent configuration parameters.           |
+
+### Returns
+
+`void`
+
+## `mountOrganizationList()`
+
+Mount an Organization list component at the target element.
+
+```typescript
+function mountOrganizationList(
+  targetNode: HTMLDivElement,
+  props?: OrganizationListProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                      | Description                                     |
+| ------------ | --------------------------------------------------------- | ----------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                          | Target to mount the OrganizationList component. |
+| `props?`     | [`OrganizationListProps`](../organization-list-props.mdx) | Configuration parameters.                       |
+
+### Returns
+
+`void`
+
+## `mountOrganizationProfile()`
+
+Mount an Organization profile component at the target element.
+
+```typescript
+function mountOrganizationProfile(
+  targetNode: HTMLDivElement,
+  props?: OrganizationProfileProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                            | Description                                        |
+| ------------ | --------------------------------------------------------------- | -------------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                                | Target to mount the OrganizationProfile component. |
+| `props?`     | [`OrganizationProfileProps`](../organization-profile-props.mdx) | Configuration parameters.                          |
+
+### Returns
+
+`void`
+
+## `mountOrganizationSwitcher()`
+
+Mount an Organization switcher component at the target element.
+
+```typescript
+function mountOrganizationSwitcher(
+  targetNode: HTMLDivElement,
+  props?: OrganizationSwitcherProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                              | Description                                         |
+| ------------ | ----------------------------------------------------------------- | --------------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                                  | Target to mount the OrganizationSwitcher component. |
+| `props?`     | [`OrganizationSwitcherProps`](../organization-switcher-props.mdx) | Configuration parameters.                           |
+
+### Returns
+
+`void`
+
+## `mountPricingTable()`
+
+Mounts a pricing table component at the target element.
+
+```typescript
+function mountPricingTable(
+  targetNode: HTMLDivElement,
+  props?: PricingTableProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                              | Description                                      |
+| ------------ | ------------------------------------------------- | ------------------------------------------------ |
+| `targetNode` | `HTMLDivElement`                                  | Target node to mount the PricingTable component. |
+| `props?`     | [`PricingTableProps`](../pricing-table-props.mdx) | configuration parameters.                        |
+
+### Returns
+
+`void`
+
+## `mountSignIn()`
+
+Mounts a sign in flow component at the target element.
+
+```typescript
+function mountSignIn(
+  targetNode: HTMLDivElement,
+  signInProps?: SignInProps,
+): void;
+```
+
+### Parameters
+
+| Parameter      | Type                                  | Description                                |
+| -------------- | ------------------------------------- | ------------------------------------------ |
+| `targetNode`   | `HTMLDivElement`                      | Target node to mount the SignIn component. |
+| `signInProps?` | [`SignInProps`](../sign-in-props.mdx) | sign in configuration parameters.          |
+
+### Returns
+
+`void`
+
+## `mountSignUp()`
+
+Mounts a sign up flow component at the target element.
+
+```typescript
+function mountSignUp(
+  targetNode: HTMLDivElement,
+  signUpProps?: SignUpProps,
+): void;
+```
+
+### Parameters
+
+| Parameter      | Type                                  | Description                                |
+| -------------- | ------------------------------------- | ------------------------------------------ |
+| `targetNode`   | `HTMLDivElement`                      | Target node to mount the SignUp component. |
+| `signUpProps?` | [`SignUpProps`](../sign-up-props.mdx) | sign up configuration parameters.          |
+
+### Returns
+
+`void`
+
+## `mountTaskChooseOrganization()`
+
+Mounts a TaskChooseOrganization component at the target element.
+
+```typescript
+function mountTaskChooseOrganization(
+  targetNode: HTMLDivElement,
+  props?: TaskChooseOrganizationProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                                   | Description                                                |
+| ------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                                       | Target node to mount the TaskChooseOrganization component. |
+| `props?`     | [`TaskChooseOrganizationProps`](../task-choose-organization-props.mdx) | configuration parameters.                                  |
+
+### Returns
+
+`void`
+
+## `mountTaskResetPassword()`
+
+Mounts a TaskResetPassword component at the target element.
+
+```typescript
+function mountTaskResetPassword(
+  targetNode: HTMLDivElement,
+  props?: TaskResetPasswordProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                                         | Description                                           |
+| ------------ | ------------------------------------------------------------ | ----------------------------------------------------- |
+| `targetNode` | `HTMLDivElement`                                             | Target node to mount the TaskResetPassword component. |
+| `props?`     | [`TaskResetPasswordProps`](../task-reset-password-props.mdx) | configuration parameters.                             |
+
+### Returns
+
+`void`
+
+## `mountTaskSetupMFA()`
+
+Mounts a TaskSetupMFA component at the target element.
+This component allows users to set up multi-factor authentication.
+
+```typescript
+function mountTaskSetupMFA(
+  targetNode: HTMLDivElement,
+  props?: TaskSetupMFAProps,
+): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                               | Description                                      |
+| ------------ | -------------------------------------------------- | ------------------------------------------------ |
+| `targetNode` | `HTMLDivElement`                                   | Target node to mount the TaskSetupMFA component. |
+| `props?`     | [`TaskSetupMFAProps`](../task-setup-mfa-props.mdx) | configuration parameters.                        |
+
+### Returns
+
+`void`
+
+## `mountUserAvatar()`
+
+Mount a user avatar component at the target element.
+
+```typescript
+function mountUserAvatar(
+  targetNode: HTMLDivElement,
+  userAvatarProps?: UserAvatarProps,
+): void;
+```
+
+### Parameters
+
+| Parameter          | Type              | Description                                    |
+| ------------------ | ----------------- | ---------------------------------------------- |
+| `targetNode`       | `HTMLDivElement`  | Target node to mount the UserAvatar component. |
+| `userAvatarProps?` | `UserAvatarProps` | -                                              |
+
+### Returns
+
+`void`
+
+## `mountUserButton()`
+
+Mount a user button component at the target element.
+
+```typescript
+function mountUserButton(
+  targetNode: HTMLDivElement,
+  userButtonProps?: UserButtonProps,
+): void;
+```
+
+### Parameters
+
+| Parameter          | Type              | Description                                    |
+| ------------------ | ----------------- | ---------------------------------------------- |
+| `targetNode`       | `HTMLDivElement`  | Target node to mount the UserButton component. |
+| `userButtonProps?` | `UserButtonProps` | User button configuration parameters.          |
+
+### Returns
+
+`void`
+
+## `mountUserProfile()`
+
+Mount a user profile component at the target element.
+
+```typescript
+function mountUserProfile(
+  targetNode: HTMLDivElement,
+  userProfileProps?: UserProfileProps,
+): void;
+```
+
+### Parameters
+
+| Parameter           | Type                                            | Description                                |
+| ------------------- | ----------------------------------------------- | ------------------------------------------ |
+| `targetNode`        | `HTMLDivElement`                                | Target to mount the UserProfile component. |
+| `userProfileProps?` | [`UserProfileProps`](../user-profile-props.mdx) | User profile configuration parameters.     |
+
+### Returns
+
+`void`
+
+## `mountWaitlist()`
+
+Mount a waitlist at the target element.
+
+```typescript
+function mountWaitlist(targetNode: HTMLDivElement, props?: WaitlistProps): void;
+```
+
+### Parameters
+
+| Parameter    | Type                                     | Description                             |
+| ------------ | ---------------------------------------- | --------------------------------------- |
+| `targetNode` | `HTMLDivElement`                         | Target to mount the Waitlist component. |
+| `props?`     | [`WaitlistProps`](../waitlist-props.mdx) | Configuration parameters.               |
+
+### Returns
+
+`void`
+
+## `navigate()`
+
+Helper method which will use the custom push navigation function of your application to navigate to the provided URL or relative path.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function navigate(
+  to: string,
+  options?: { metadata?: RouterMetadata; replace?: boolean },
+): Promise<unknown> | void;
+```
+
+### Parameters
+
+| Parameter            | Type                                                             | Description                                                                |
+| -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `to`                 | `string`                                                         | The URL or relative path to navigate to.                                   |
+| `options?`           | <code>\{ metadata?: RouterMetadata; replace?: boolean; \}</code> | Optional configuration.                                                    |
+| `options?.metadata?` | `RouterMetadata`                                                 | Router metadata.                                                           |
+| `options?.replace?`  | `boolean`                                                        | Whether to replace the current history entry instead of pushing a new one. |
+
+### Returns
+
+<code>Promise\<unknown\> \| void</code>
+
+## `off()`
+
+Removes an event handler for a specific Clerk event.
+
+```typescript
+function off<E>(event: E, handler: EventHandler<E>): void;
+```
+
+### Parameters
+
+| Parameter | Type                  | Description                         |
+| --------- | --------------------- | ----------------------------------- |
+| `event`   | `E`                   | The event name to unsubscribe from. |
+| `handler` | `EventHandler`\<`E`\> | The callback function to remove.    |
+
+### Returns
+
+`void`
+
+## `on()`
+
+Registers an event handler for a specific Clerk event.
+
+```typescript
+function on<E>(
+  event: E,
+  handler: EventHandler<E>,
+  opt?: { notify: boolean },
+): void;
+```
+
+### Parameters
+
+| Parameter      | Type                                | Description                                                                                                  |
+| -------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `event`        | `E`                                 | The event name to subscribe to.                                                                              |
+| `handler`      | `EventHandler`\<`E`\>               | The callback function to execute when the event is dispatched.                                               |
+| `opt?`         | <code>\{ notify: boolean; \}</code> | Optional configuration.                                                                                      |
+| `opt?.notify?` | `boolean`                           | If true and the event was previously dispatched, handler will be called immediately with the latest payload. |
+
+### Returns
+
+`void`
+
+## `openCreateOrganization()`
+
+Opens the Clerk CreateOrganization modal.
+
+```typescript
+function openCreateOrganization(props?: CreateOrganizationModalProps): void;
+```
+
+### `CreateOrganizationModalProps`
+
+| Property        | Type                                   | Description                                                                                                                                                                                                                 |
+| --------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getContainer?` | <code>() => HTMLElement \| null</code> | Function that returns the container element where portals should be rendered. This allows Clerk components to render inside external dialogs/popovers (e.g., Radix Dialog, React Aria Components) instead of document.body. |
+
+### Returns
+
+`void`
+
+## `openGoogleOneTap()`
+
+Opens the Google One Tap component.
+
+```typescript
+function openGoogleOneTap(props?: GoogleOneTapProps): void;
+```
+
+### `GoogleOneTapProps`
+
+| Property              | Type                                                    | Description                                                                                                                                                                                                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `appearance?`         | [`ClerkAppearanceTheme`](../clerk-appearance-theme.mdx) | Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.                                     |
+| `cancelOnTapOutside?` | `boolean`                                               | Whether to cancel the Google One Tap request if a user clicks outside the prompt. Defaults to `true`.                                                                                                                                                                                                                                            |
+| `fedCmSupport?`       | `boolean`                                               | FedCM enables more private sign-in flows without requiring the use of third-party cookies. The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given. Backwards compatible with browsers that still support third-party cookies. Defaults to `true`. |
+| `itpSupport?`         | `boolean`                                               | Enables upgraded One Tap UX on ITP browsers. Turning this options off, would hide any One Tap UI in such browsers. Defaults to `true`.                                                                                                                                                                                                           |
+
+### Returns
+
+`void`
+
+## `openOrganizationProfile()`
+
+Opens the Clerk OrganizationProfile modal.
+
+```typescript
+function openOrganizationProfile(props?: OrganizationProfileModalProps): void;
+```
+
+### Parameters
+
+| Parameter | Type                            | Description                                                              |
+| --------- | ------------------------------- | ------------------------------------------------------------------------ |
+| `props?`  | `OrganizationProfileModalProps` | Optional props that will be passed to the OrganizationProfile component. |
+
+### Returns
+
+`void`
+
+## `openSignIn()`
+
+Opens the Clerk SignIn component in a modal.
+
+```typescript
+function openSignIn(props?: SignInModalProps): void;
+```
+
+### Parameters
+
+| Parameter | Type               | Description                                |
+| --------- | ------------------ | ------------------------------------------ |
+| `props?`  | `SignInModalProps` | Optional sign in configuration parameters. |
+
+### Returns
+
+`void`
+
+## `openSignUp()`
+
+Opens the Clerk SignUp component in a modal.
+
+```typescript
+function openSignUp(props?: SignUpModalProps): void;
+```
+
+### Parameters
+
+| Parameter | Type               | Description                                                 |
+| --------- | ------------------ | ----------------------------------------------------------- |
+| `props?`  | `SignUpModalProps` | Optional props that will be passed to the SignUp component. |
+
+### Returns
+
+`void`
+
+## `openUserProfile()`
+
+Opens the Clerk UserProfile modal.
+
+```typescript
+function openUserProfile(props?: UserProfileModalProps): void;
+```
+
+### Parameters
+
+| Parameter | Type                    | Description                                                      |
+| --------- | ----------------------- | ---------------------------------------------------------------- |
+| `props?`  | `UserProfileModalProps` | Optional props that will be passed to the UserProfile component. |
+
+### Returns
+
+`void`
+
+## `openWaitlist()`
+
+Opens the Clerk Waitlist modal.
+
+```typescript
+function openWaitlist(props?: WaitlistModalProps): void;
+```
+
+### `WaitlistModalProps`
+
+| Property                                                  | Type                                                    | Description                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| <a id="afterjoinwaitlisturl"></a> `afterJoinWaitlistUrl?` | `string`                                                | Full URL or path to navigate to after join waitlist.                                                                                                                                                                                                                                                         |
+| <a id="appearance"></a> `appearance?`                     | [`ClerkAppearanceTheme`](../clerk-appearance-theme.mdx) | Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information. |
+| `getContainer?`                                           | <code>() => HTMLElement \| null</code>                  | Function that returns the container element where portals should be rendered. This allows Clerk components to render inside external dialogs/popovers (e.g., Radix Dialog, React Aria Components) instead of document.body.                                                                                  |
+| <a id="signinurl"></a> `signInUrl?`                       | `string`                                                | Full URL or path where the SignIn component is mounted.                                                                                                                                                                                                                                                      |
+
+### Returns
+
+`void`
+
+## `redirectToAfterSignIn()`
+
+Redirects to the configured `afterSignIn` URL.
+
+```typescript
+function redirectToAfterSignIn(): void;
+```
+
+### Returns
+
+`void`
+
+## `redirectToAfterSignOut()`
+
+Redirects to the configured `afterSignOut` URL.
+
+```typescript
+function redirectToAfterSignOut(): void;
+```
+
+### Returns
+
+`void`
+
+## `redirectToAfterSignUp()`
+
+Redirects to the configured `afterSignUp` URL.
+
+```typescript
+function redirectToAfterSignUp(): void;
+```
+
+### Returns
+
+`void`
+
+## `redirectToCreateOrganization()`
+
+Redirects to the configured URL where [`<CreateOrganization />`](/docs/reference/components/organization/create-organization) is mounted. This method uses the [`navigate()`](/docs/reference/objects/clerk#navigate) method under the hood.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectToCreateOrganization(): Promise<unknown>;
+```
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToOrganizationProfile()`
+
+Redirects to the configured URL where [`<OrganizationProfile />`](/docs/reference/components/organization/organization-profile) is mounted. This method uses the [`navigate()`](/docs/reference/objects/clerk#navigate) method under the hood.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectToOrganizationProfile(): Promise<unknown>;
+```
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToSignIn()`
+
+Redirects to the sign-in URL, as configured in your application's instance settings. This method uses the [`navigate()`](/docs/reference/objects/clerk#navigate) method under the hood.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter | Type                                                                    | Description                      |
+| --------- | ----------------------------------------------------------------------- | -------------------------------- |
+| `opts?`   | [SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options) | Options to control the redirect. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToSignUp()`
+
+Redirects to the sign-up URL, as configured in your application's instance settings. This method uses the [`navigate()`](/docs/reference/objects/clerk#navigate) method under the hood.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter | Type                                                                    | Description                      |
+| --------- | ----------------------------------------------------------------------- | -------------------------------- |
+| `opts?`   | [SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options) | Options to control the redirect. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToTasks()`
+
+Redirects to the configured URL where [session tasks](/docs/reference/objects/session) are mounted.
+
+```typescript
+function redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter | Type                                                           | Description                                                                   |
+| --------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `opts?`   | [TasksRedirectOptions](/docs/reference/types/redirect-options) | Options to control the redirect (e.g. redirect URL after tasks are complete). |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToUserProfile()`
+
+Redirects to the configured URL where [`<UserProfile />`](/docs/reference/components/user/user-profile) is mounted.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectToUserProfile(): Promise<unknown>;
+```
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `redirectToWaitlist()`
+
+Redirects to the configured URL where [`<Waitlist />`](/docs/reference/components/authentication/waitlist) is mounted.
+
+```typescript
+function redirectToWaitlist(): void;
+```
+
+### Returns
+
+`void`
+
+## `redirectWithAuth()`
+
+Redirects to the provided URL after appending authentication credentials. For development instances, this method decorates the URL with an auth token to maintain authentication state. For production instances, the standard session cookie is used.
+
+Returns a promise that can be `await`ed in order to listen for the navigation to finish. The inner value should not be relied on, as it can change based on the framework it's used within.
+
+```typescript
+function redirectWithAuth(to: string): Promise<unknown>;
+```
+
+### Parameters
+
+| Parameter | Type     | Description             |
+| --------- | -------- | ----------------------- |
+| `to`      | `string` | The URL to redirect to. |
+
+### Returns
+
+`Promise`\<`unknown`\>
+
+## `setActive()`
+
+A method used to set the current session and/or Organization for the client. Accepts a [`SetActiveParams`](/docs/reference/types/set-active-params) object.
+
+If the session param is `null`, the active session is deleted.
+In a similar fashion, if the organization param is `null`, the current organization is removed as active.
+
+```typescript
+function setActive(setActiveParams: SetActiveParams): Promise<void>;
+```
+
+### `SetActiveParams`
+
+| Property                                  | Type                                                                                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| <a id="navigate"></a> `navigate?`         | `SetActiveNavigate`                                                                         | A custom navigation function to be called just before the session and/or Organization is set. When provided, it takes precedence over the `redirectUrl` parameter for navigation. The callback receives a `decorateUrl` function that should be used to wrap destination URLs. This enables Safari ITP cookie refresh when needed. The decorated URL may be an external URL (starting with `https://`) that requires `window.location.href` instead of client-side navigation. See the [section on using the `navigate()` parameter](/docs/reference/objects/clerk#using-the-navigate-parameter) for more details. |
+| <a id="organization"></a> `organization?` | <code>null \| string \| [OrganizationResource](/docs/reference/objects/organization)</code> | The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| <a id="redirecturl"></a> `redirectUrl?`   | `string`                                                                                    | The full URL or path to redirect to just before the session and/or organization is set.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| <a id="session"></a> `session?`           | <code>null \| string \| [SignedInSessionResource](/docs/reference/objects/session)</code>   | The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+### Returns
+
+`Promise`\<`void`\>
+
+## `signOut()`
+
+Signs out the current user on single-session instances, or all users on multi-session instances.
+
+```typescript
+function signOut(options?: SignOutOptions): Promise<void>;
+```
+
+### `SignOutOptions`
+
+| Property                                | Type     | Description                                                                    |
+| --------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| <a id="redirecturl"></a> `redirectUrl?` | `string` | Specify a redirect URL to navigate to after sign-out is complete.              |
+| <a id="sessionid"></a> `sessionId?`     | `string` | Specify a specific session to sign out. Useful for multi-session applications. |
+
+### Returns
+
+`Promise`\<`void`\>
+
+## `unmountAPIKeys()`
+
+Unmount an API keys component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountAPIKeys(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                        |
+| ------------ | ---------------- | -------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the APIKeys component from. |
+
+### Returns
+
+`void`
+
+## `unmountCreateOrganization()`
+
+Unmount the CreateOrganization component from the target node.
+
+```typescript
+function unmountCreateOrganization(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                   |
+| ------------ | ---------------- | ------------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the CreateOrganization component from. |
+
+### Returns
+
+`void`
+
+## `unmountOAuthConsent()`
+
+Unmounts a OAuth consent component from the target element.
+
+```typescript
+function unmountOAuthConsent(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                              |
+| ------------ | ---------------- | -------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the OAuth consent component from. |
+
+### Returns
+
+`void`
+
+## `unmountOrganizationList()`
+
+Unmount the Organization list component from the target node.\*
+
+```typescript
+function unmountOrganizationList(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                 |
+| ------------ | ---------------- | ----------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the OrganizationList component from. |
+
+### Returns
+
+`void`
+
+## `unmountOrganizationProfile()`
+
+Unmount the Organization profile component from the target node.
+
+```typescript
+function unmountOrganizationProfile(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                    |
+| ------------ | ---------------- | -------------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the OrganizationProfile component from. |
+
+### Returns
+
+`void`
+
+## `unmountOrganizationSwitcher()`
+
+Unmount the Organization switcher component from the target node.\*
+
+```typescript
+function unmountOrganizationSwitcher(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                     |
+| ------------ | ---------------- | --------------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the OrganizationSwitcher component from. |
+
+### Returns
+
+`void`
+
+## `unmountPricingTable()`
+
+Unmount a pricing table component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountPricingTable(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                             |
+| ------------ | ---------------- | ------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the PricingTable component from. |
+
+### Returns
+
+`void`
+
+## `unmountSignIn()`
+
+Unmount a sign in flow component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountSignIn(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                       |
+| ------------ | ---------------- | ------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the SignIn component from. |
+
+### Returns
+
+`void`
+
+## `unmountSignUp()`
+
+Unmount a sign up flow component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountSignUp(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                       |
+| ------------ | ---------------- | ------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the SignUp component from. |
+
+### Returns
+
+`void`
+
+## `unmountTaskChooseOrganization()`
+
+Unmount a TaskChooseOrganization component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountTaskChooseOrganization(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                       |
+| ------------ | ---------------- | ----------------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the TaskChooseOrganization component from. |
+
+### Returns
+
+`void`
+
+## `unmountTaskResetPassword()`
+
+Unmount a TaskResetPassword component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountTaskResetPassword(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                                  |
+| ------------ | ---------------- | ------------------------------------------------------------ |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the TaskResetPassword component from. |
+
+### Returns
+
+`void`
+
+## `unmountTaskSetupMFA()`
+
+Unmount a TaskSetupMFA component from the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountTaskSetupMFA(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                             |
+| ------------ | ---------------- | ------------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the TaskSetupMFA component from. |
+
+### Returns
+
+`void`
+
+## `unmountUserAvatar()`
+
+Unmount a user avatar component at the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountUserAvatar(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                           |
+| ------------ | ---------------- | ----------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the UserAvatar component from. |
+
+### Returns
+
+`void`
+
+## `unmountUserButton()`
+
+Unmount a user button component at the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountUserButton(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                           |
+| ------------ | ---------------- | ----------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the UserButton component from. |
+
+### Returns
+
+`void`
+
+## `unmountUserProfile()`
+
+Unmount a user profile component at the target element.
+If there is no component mounted at the target node, results in a noop.
+
+```typescript
+function unmountUserProfile(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                            |
+| ------------ | ---------------- | ------------------------------------------------------ |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the UserProfile component from. |
+
+### Returns
+
+`void`
+
+## `unmountWaitlist()`
+
+Unmount the Waitlist component from the target node.
+
+```typescript
+function unmountWaitlist(targetNode: HTMLDivElement): void;
+```
+
+### Parameters
+
+| Parameter    | Type             | Description                                         |
+| ------------ | ---------------- | --------------------------------------------------- |
+| `targetNode` | `HTMLDivElement` | Target node to unmount the Waitlist component from. |
+
+### Returns
+
+`void`

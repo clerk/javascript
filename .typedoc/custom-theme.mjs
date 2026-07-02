@@ -1148,104 +1148,6 @@ function hasExtractMethodsModifier(decl) {
 }
 
 /**
- * @typedef {{ filePath: string, content: string }} ExtractedFile
- */
-
-/**
- * Collect `methods/<parent>-<child>.mdx` content for each direct member of an `@extractMethods` object-like type: callables via {@link buildMethodMdx}, non-callables with a resolvable object shape via {@link buildPropertyTableDocMdx}. Plus a `<parent>.mdx` index for non-callable members.
- *
- * Supports inline object literals and named references (`interface` / object-like `type` aliases) via {@link resolveDeclarationWithObjectMembers}.
- *
- * @param {import('typedoc').DeclarationReflection} parentDecl
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @param {string} outDir
- * @returns {ExtractedFile[]}
- */
-function processExtractMethodsNamespace(parentDecl, ctx, outDir) {
-  const project = ctx.page?.project;
-  const members = resolveDeclarationWithObjectMembers(parentDecl.type, project) ?? [];
-  if (members.length === 0) {
-    console.warn(
-      `[custom-theme] @extractMethods on "${parentDecl.name}" requires an object-like type with members; skipping nested extraction`,
-    );
-    return [];
-  }
-  const parentName = parentDecl.name;
-  /** @type {ExtractedFile[]} */
-  const collected = [];
-  /** @type {import('typedoc').DeclarationReflection[]} */
-  const nonCallableMembers = [];
-  for (const nested of members) {
-    if (nested.name.startsWith('__')) {
-      continue;
-    }
-    const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
-    const fileSlug = `${toFileSlug(parentName)}-${toFileSlug(nd.name)}`;
-    const filePath = `${outDir ? `${outDir}/` : ''}${fileSlug}.mdx`;
-    if (shouldExtractCallableMember(nd, ctx)) {
-      const mdx = buildMethodMdx(nd, ctx, { qualifiedName: `${parentName}.${nd.name}` });
-      if (!mdx) {
-        continue;
-      }
-      collected.push({ filePath, content: mdx });
-      continue;
-    }
-    nonCallableMembers.push(nd);
-    const propTableMdx = buildPropertyTableDocMdx(parentName, nd, ctx);
-    if (!propTableMdx) {
-      continue;
-    }
-    collected.push({ filePath, content: propTableMdx });
-  }
-  if (nonCallableMembers.length) {
-    const namespaceMdx = buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx);
-    if (namespaceMdx) {
-      const namespacePath = `${outDir ? `${outDir}/` : ''}${toFileSlug(parentName)}.mdx`;
-      collected.push({ filePath: namespacePath, content: namespaceMdx });
-    }
-  }
-  return collected;
-}
-
-/**
- * Collect (path, content) pairs for each callable/`@extractMethods` child on `decl`.
- *
- * @param {import('typedoc').DeclarationReflection} decl
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @param {string} outDir
- * @param {MethodFormat} [methodFormat]
- * @returns {ExtractedFile[]}
- */
-function extractCallableMembersFromDeclaration(decl, ctx, outDir, methodFormat = 'reference') {
-  if (!decl.children) {
-    return [];
-  }
-  /** @type {ExtractedFile[]} */
-  const collected = [];
-  for (const child of decl.children) {
-    if (child.name.startsWith('__')) {
-      continue;
-    }
-    const childDecl = /** @type {import('typedoc').DeclarationReflection} */ (child);
-
-    if (hasExtractMethodsModifier(childDecl)) {
-      collected.push(...processExtractMethodsNamespace(childDecl, ctx, outDir));
-      continue;
-    }
-
-    if (shouldExtractCallableMember(childDecl, ctx)) {
-      const mdx = buildMethodMdx(childDecl, ctx, { methodFormat });
-      if (mdx) {
-        const fileName = `${toFileSlug(child.name)}.mdx`;
-        const filePath = `${outDir ? `${outDir}/` : ''}${fileName}`;
-        collected.push({ filePath, content: mdx });
-      }
-    }
-  }
-  return collected;
-}
-
-/**
  * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} output
  * @returns {string | undefined}
  */
@@ -1268,39 +1170,409 @@ function configEntryForPageUrl(pageUrl) {
 }
 
 /**
- * Build the marker-wrapped inline block appended to reference-object / backend-api parent pages during {@link MarkdownPageEvent.END}.
- * The block is stripped by `extract-methods.mjs`'s slicer after being read; it does not appear in the final parent page.
+ * Wrap the name portion of bare method headings on a parent page in backticks:
+ * `^## methodName()` → `` ^## `methodName()` ``. Applies to H2–H4 headings whose full text is
+ * an identifier followed by `()` with no other content — matches typedoc's natural rendering of
+ * callable signature titles on aggregator pages (e.g. `agent-task-api.mdx`). Idempotent: headings
+ * that already contain a backtick are left alone.
  *
- * `extractCallableMembersFromDeclaration` returns entries with a full `filePath`; here we pass `''` as `outDir` so the field is just the basename we later use as the marker `filename=` attribute.
- *
- * @param {import('typedoc').DeclarationReflection} decl
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @param {import('typedoc').ProjectReflection} project
- * @param {MethodFormat} methodFormat
- * @param {ReturnType<typeof configEntryForPageUrl>} entry
+ * @param {string} contents
  * @returns {string}
  */
-function renderInlineMethodsBlock(decl, ctx, project, methodFormat, entry) {
-  const collected = extractCallableMembersFromDeclaration(decl, ctx, '', methodFormat);
+function addBackticksToBareMethodHeadings(contents) {
+  if (!contents) return contents;
+  return contents.replace(/^(#{2,4}) ([A-Za-z_$][A-Za-z0-9_$]*)\(\)\s*$/gm, '$1 `$2()`');
+}
+
+/**
+ * Replace each method's natural `### Parameters` (or `## Parameters` on single-callable pages)
+ * section with the canonical `parametersMarkdownTable` output for the same signature at the same
+ * heading level. Routes every parameters table through the same code path:
+ *
+ * - single nominal param (e.g. `create(params: CreateAgentTaskParams)`): section becomes
+ *   `` `TypeName` `` (backticked) + the propertiesTable-based expanded rows.
+ * - multi-arg or non-nominal (e.g. `revoke(agentTaskId: string)`): section stays `Parameters`
+ *   + parametersTable output.
+ *
+ * Handles two page shapes:
+ * 1. **Aggregator pages** (backend API parents, namespaces like `api-keys-namespace.mdx`): each
+ *    method is a `## `methodName()` ` section with `### Parameters` inside. Iterates `decl.children`.
+ * 2. **Single-callable pages** (`server-get-token.mdx`, React hooks): no method heading, `## Parameters`
+ *    at top-level. Uses `decl`'s own signature.
+ *
+ * Runs uniformly across all pages. `extract-returns-and-params.mjs` is responsible for renaming
+ * `` ## `TypeName` `` back to `## Parameters` on the react-package pages it post-processes (so the
+ * sibling `-params.mdx` extraction still finds the section) — this keeps theme output uniform and
+ * pushes downstream-consumer knowledge into the downstream tool.
+ *
+ * Applies link replacements manually because this listener runs after `custom-plugin.mjs`'s pass.
+ *
+ * @param {string} contents
+ * @param {import('typedoc').DeclarationReflection | import('typedoc').Reflection} decl
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {string}
+ */
+function swapParentPageParametersSections(contents, decl, ctx) {
+  if (!contents) return contents;
+  let result = contents;
+
+  /** @param {import('typedoc').SignatureReflection} sig @param {number} level */
+  const renderParams = (sig, level) => {
+    const skip =
+      Boolean(/** @type {any} */ (sig).comment?.hasModifier?.('@skipParametersSection')) ||
+      Boolean(/** @type {any} */ (sig).parent?.comment?.hasModifier?.('@skipParametersSection'));
+    if (skip) return undefined;
+    overlayParamCommentsFromSignatureBlockTags(sig);
+    const parent = /** @type {import('typedoc').DeclarationReflection} */ (sig.parent);
+    const instantiationMap = parent ? getGenericInstantiationMapFromCallableProperty(parent) : undefined;
+    const md = parametersMarkdownTable(sig, ctx, instantiationMap, level);
+    if (!md) return undefined;
+    return applyCatchAllMdReplacements(applyRelativeLinkReplacements(md));
+  };
+
+  const declWithChildren = /** @type {import('typedoc').DeclarationReflection} */ (decl);
+  const callableChildren = (declWithChildren.children ?? []).filter(
+    /** @param {import('typedoc').DeclarationReflection} c */ c => {
+      if (c.name.startsWith('__')) return false;
+      return shouldExtractCallableMember(c, ctx);
+    },
+  );
+
+  if (callableChildren.length > 0) {
+    // Aggregator page: iterate `## `methodName()` ` blocks, swap the nested params section.
+    for (const child of callableChildren) {
+      const sig = getPrimaryCallSignature(/** @type {import('typedoc').DeclarationReflection} */ (child));
+      if (!sig) continue;
+      const heading = `## \`${child.name}()\``;
+      const startIdx = result.indexOf(heading);
+      if (startIdx === -1) continue;
+      const rest = result.slice(startIdx);
+      const paramsMatch = rest.match(/\n(##+) Parameters\n[\s\S]*?(?=\n(?:##+ |---)|$)/);
+      if (!paramsMatch || paramsMatch.index === undefined) continue;
+      const level = paramsMatch[1].length;
+      const newParamsMd = renderParams(sig, level);
+      if (!newParamsMd) continue;
+      const absStart = startIdx + paramsMatch.index;
+      const absEnd = absStart + paramsMatch[0].length;
+      result = `${result.slice(0, absStart)}\n${newParamsMd.trimEnd()}\n${result.slice(absEnd)}`;
+    }
+    return result;
+  }
+
+  // Single-callable page: `decl` is (or wraps) the signature. Find the top-level Parameters section.
+  /** @type {import('typedoc').SignatureReflection | undefined} */
+  const sig =
+    /** @type {any} */ (decl).signatures?.[0] ??
+    /** @type {any} */ ((decl).kind && getPrimaryCallSignature(declWithChildren)) ??
+    undefined;
+  if (!sig) return result;
+  const paramsMatch = result.match(/(^|\n)(##+) Parameters\n[\s\S]*?(?=\n(?:##+ |---)|$)/);
+  if (!paramsMatch || paramsMatch.index === undefined) return result;
+  const level = paramsMatch[2].length;
+  const newParamsMd = renderParams(sig, level);
+  if (!newParamsMd) return result;
+  const leadingNl = paramsMatch[1];
+  const absStart = paramsMatch.index + leadingNl.length;
+  const absEnd = paramsMatch.index + paramsMatch[0].length;
+  result = `${result.slice(0, absStart)}${newParamsMd.trimEnd()}\n${result.slice(absEnd)}`;
+  return result;
+}
+
+/**
+ * Check whether the page contents already include a `## methodName()` H2 heading (either bare or
+ * backticked) for the given method name. Used to avoid duplicating a synthesized aggregator section
+ * on pages where typedoc-plugin-markdown already emits per-method headings naturally (backend
+ * class-based API pages).
+ *
+ * @param {string} contents
+ * @param {string} name
+ * @returns {boolean}
+ */
+function contentsHaveMethodHeading(contents, name) {
+  if (!contents) return false;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|\\n)## \`?${escaped}\`?\\(\\)\`?[ \\t]*(\\n|$)`);
+  return re.test(contents);
+}
+
+/**
+ * Render the canonical H2 property-table section for a parent page. Shape:
+ *
+ *     ## `name`
+ *     <description>
+ *     <property table>
+ *
+ * `namespacePropertyTable` entries list the non-callable members of an `@extractMethods` namespace
+ * (e.g. `## `verifications`` lists `emailAddress`, `phoneNumber`, ...). `memberPropertyTable`
+ * entries expand one non-callable member's object shape (e.g. `## `emailLink.verification``).
+ *
+ * Sub-doc equivalents produced by the marker-block path use H3 (`### `name``); text-slice demotes
+ * the H2 back to H3 on reshape, so the sub-doc is byte-identical to the marker-block output.
+ *
+ * @param {Extract<AggregatorMethodEntry, { kind: 'namespacePropertyTable' | 'memberPropertyTable' }>} entry
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {string}
+ */
+function renderAggregatorPropertyTableSection(entry, ctx) {
+  const displayName = entry.kind === 'namespacePropertyTable' ? entry.decl.name : entry.qualifiedName;
+  const description = commentSummaryAndBody(entry.decl.comment);
+  /** @type {import('typedoc').DeclarationReflection[]} */
+  let propsUnsorted;
+  if (entry.kind === 'namespacePropertyTable') {
+    propsUnsorted = entry.nonCallableMembers;
+  } else {
+    propsUnsorted = resolveObjectShapeMembersForPropertyTable(entry.decl.type) ?? [];
+  }
+  if (!propsUnsorted.length) return '';
+  const props = [...propsUnsorted].sort((a, b) => a.name.localeCompare(b.name));
+  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
+    ctx.partials.propertiesTable(
+      props,
+      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
+      ({
+        kind: ReflectionKind.Interface,
+        isEventProps: false,
+        applyAllowlistedPropertyTableRowFilters: false,
+      }),
+    ),
+  );
+  if (!tableMd?.trim()) return '';
+  const title = `## \`${displayName}\``;
+  const raw = [title, '', description, '', tableMd].filter(Boolean).join('\n\n');
+  return `${applyCatchAllMdReplacements(applyRelativeLinkReplacements(raw)).trim()}\n`;
+}
+
+/**
+ * Render one method's canonical "aggregator" H2 section for a parent page — the shape every parent
+ * page uses so `extract-methods.mjs` can slice it and reshape into the per-method extracted file
+ * with pure text ops (no reflection access needed downstream):
+ *
+ *     ## `name()`
+ *     <description>          (summary + non-@returns block tags)
+ *     ```typescript
+ *     function name(...): ReturnType
+ *     ```
+ *     ### `TypeName`         (nominal single-arg) OR ### Parameters
+ *     <canonical parametersMarkdownTable output>
+ *     ### Returns
+ *     `Type` — <returns text> (from ctx.partials.signatureReturns)
+ *
+ * Used to synthesize sections for callable members typedoc doesn't render as separate H2s —
+ * function-typed properties on interfaces (`end: () => Promise<X>`) and members declared on
+ * `extraMethodInterfaces`. Sections synthesized here are indistinguishable from natural sections
+ * on the same page after all reshapers have run.
+ *
+ * Applies link replacements manually because this listener runs after `custom-plugin.mjs`'s pass.
+ * For property-table entries, delegates to {@link renderAggregatorPropertyTableSection}.
+ *
+ * @param {AggregatorMethodEntry} entry
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {string}
+ */
+function renderAggregatorMethodSection(entry, ctx) {
+  if (entry.kind === 'namespacePropertyTable' || entry.kind === 'memberPropertyTable') {
+    return renderAggregatorPropertyTableSection(entry, ctx);
+  }
+  const { decl, qualifiedName } = entry;
+  const sig = getPrimaryCallSignature(decl);
+  if (!sig) return '';
+  const displayName = qualifiedName ?? decl.name;
+  const title = `## \`${displayName}()\``;
+  const comment = decl.comment ?? sig.comment;
+  const c = comment ? (applyTodoStrippingToComment(comment) ?? comment) : undefined;
+  const summary = c ? displayPartsToString(c.summary).trim() : '';
+  const block =
+    c?.blockTags
+      ?.filter(t => !BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE.has(t.tag))
+      .map(t => displayPartsToString(t.content).trim())
+      .filter(Boolean)
+      .join('\n\n') ?? '';
+  const description = [summary, block].filter(Boolean).join('\n\n');
+  const instantiationMap = getGenericInstantiationMapFromCallableProperty(decl);
+  const signatureBlock = ['```typescript', formatTypeScriptSignature(sig, displayName, instantiationMap), '```'].join(
+    '\n',
+  );
+  const skipParametersSection =
+    Boolean(decl.comment?.hasModifier('@skipParametersSection')) ||
+    Boolean(sig.comment?.hasModifier('@skipParametersSection'));
+  let paramsMd = '';
+  if (!skipParametersSection) {
+    overlayParamCommentsFromSignatureBlockTags(sig);
+    paramsMd = parametersMarkdownTable(sig, ctx, instantiationMap, 3);
+  }
+  // Function-typed properties (`create: (params) => Promise<X>`) carry `@returns` on the property
+  // comment, not on the signature comment. `signatureReturns` reads sig.comment.@returns; overlay
+  // the decl comment's @returns onto sig so the rendered `### Returns` section carries the
+  // description text.
+  const declReturnsTag = decl.comment?.getTag('@returns');
+  const sigReturnsTag = sig.comment?.getTag('@returns');
+  if (declReturnsTag?.content?.length && !sigReturnsTag?.content?.length) {
+    if (!sig.comment) sig.comment = new Comment();
+    sig.comment.blockTags = [...(sig.comment.blockTags ?? []), declReturnsTag];
+  }
+  const returnsMd = ctx.partials.signatureReturns(sig, { headingLevel: 3 });
+  // Apply link replacements to the prose chunks only. The typescript signature block must stay
+  // raw — `applyRelativeLinkReplacements` is line-based and would rewrite bare type identifiers
+  // inside the fenced code block into `[Type](...)` markdown link syntax, breaking downstream
+  // slicing.
+  const proseChunks = [title, description, paramsMd.trimEnd(), returnsMd]
+    .filter(s => s && s.length > 0)
+    .map(s => applyCatchAllMdReplacements(applyRelativeLinkReplacements(s)));
+  const chunks = [proseChunks[0], proseChunks[1], signatureBlock, ...proseChunks.slice(2)].filter(
+    s => s && s.length > 0,
+  );
+  return chunks.join('\n\n');
+}
+
+/**
+ * Delete a `## methodName()` H2 section (heading through the next `## ` or end-of-file) from the
+ * page contents. Used when a natural typedoc-emitted section needs to be replaced by a synthesized
+ * one — e.g. overloaded backend-class methods where typedoc emits `### Call Signature` sub-headings
+ * per overload, but the aggregator synthesizes a single section for the primary signature only
+ * (via `getPrimaryCallSignature`).
+ *
+ * @param {string} contents
+ * @param {string} name
+ * @returns {string}
+ */
+function removeMethodH2Section(contents, name) {
+  if (!contents) return contents;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const headingRe = new RegExp(`(^|\\n)## \`?${escaped}\`?\\(\\)\`?[ \\t]*\\n`, '');
+  const m = contents.match(headingRe);
+  if (!m || m.index === undefined) return contents;
+  const startIdx = m.index + (m[1] === '\n' ? 1 : 0);
+  const afterHeading = m.index + m[0].length;
+  const rest = contents.slice(afterHeading);
+  const nextH2 = rest.search(/\n## /);
+  const endIdx = nextH2 === -1 ? contents.length : afterHeading + nextH2 + 1;
+  // Also trim the trailing `***` typedoc separator that natural sections use between overloads.
+  let sliceEnd = endIdx;
+  const trailingSep = contents.slice(sliceEnd).match(/^\*+\s*\n+/);
+  if (trailingSep) sliceEnd += trailingSep[0].length;
+  return contents.slice(0, startIdx) + contents.slice(sliceEnd);
+}
+
+/**
+ * Insert a `` ```typescript ... ``` `` signature code block into each natural (typedoc-emitted)
+ * `## methodName()` H2 section on the parent page. Positioned after the section's description
+ * prose and before the first `### ` subheading — matching the position `renderAggregatorMethodSection`
+ * uses for synthesized sections. This is what makes the parent's H2 sections a self-contained
+ * source for `extract-methods.mjs`: the extracted file's signature can be sliced out of the parent
+ * verbatim rather than regenerated downstream.
+ *
+ * Idempotent-ish: relies on `contentsHaveMethodHeading` matching the (possibly-backticked) title,
+ * and looks for the absence of a fenced ```typescript block already inside the section.
+ *
+ * @param {string} contents
+ * @param {import('typedoc').DeclarationReflection[]} callableDecls - direct callable members that
+ *   may have natural sections. Callers pass the same list they enumerate for synthesis-vs-natural
+ *   decisions.
+ * @returns {string}
+ */
+function insertSignatureBlocksIntoNaturalMethodSections(contents, callableDecls) {
+  if (!contents) return contents;
+  let result = contents;
+  for (const decl of callableDecls) {
+    const sig = getPrimaryCallSignature(decl);
+    if (!sig) continue;
+    const escaped = decl.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const headingRe = new RegExp(`(^|\\n)## \`?${escaped}\`?\\(\\)\`?[ \\t]*\\n`);
+    const headingMatch = result.match(headingRe);
+    if (!headingMatch || headingMatch.index === undefined) continue;
+    const sectionStart = headingMatch.index + headingMatch[0].length;
+    const rest = result.slice(sectionStart);
+    const nextH2 = rest.search(/\n## /);
+    const sectionEnd = nextH2 === -1 ? result.length : sectionStart + nextH2;
+    const section = result.slice(sectionStart, sectionEnd);
+    if (/```typescript\n/.test(section)) continue;
+    const firstSubheading = section.search(/\n### /);
+    const descriptionEnd = firstSubheading === -1 ? section.length : firstSubheading;
+    const description = section.slice(0, descriptionEnd);
+    const remainder = section.slice(descriptionEnd);
+    const instantiationMap = getGenericInstantiationMapFromCallableProperty(decl);
+    const signatureBlock = ['```typescript', formatTypeScriptSignature(sig, decl.name, instantiationMap), '```'].join(
+      '\n',
+    );
+    const before = result.slice(0, sectionStart);
+    const rebuilt = `${description.trimEnd()}\n\n${signatureBlock}\n${remainder.startsWith('\n') ? remainder : `\n${remainder}`}`;
+    result = `${before}${rebuilt}${result.slice(sectionEnd)}`;
+  }
+  return result;
+}
+
+/**
+ * @typedef {(
+ *   | { kind?: 'method', decl: import('typedoc').DeclarationReflection, qualifiedName?: string }
+ *   | { kind: 'namespacePropertyTable', decl: import('typedoc').DeclarationReflection, nonCallableMembers: import('typedoc').DeclarationReflection[] }
+ *   | { kind: 'memberPropertyTable', decl: import('typedoc').DeclarationReflection, qualifiedName: string }
+ * )} AggregatorMethodEntry
+ */
+
+/**
+ * Enumerate per-H2-section entries for the given parent page. Three shapes:
+ *   - `method`: direct callable children, callables from `extraMethodInterfaces`, and callables
+ *     inside `@extractMethods` namespaces (qualified names like `emailCode.sendCode`).
+ *   - `namespacePropertyTable`: an `@extractMethods` namespace with at least one non-callable
+ *     object-like member. Rendered as a `## `namespace`` H2 listing those non-callable members.
+ *   - `memberPropertyTable`: a non-callable, object-like member inside an `@extractMethods`
+ *     namespace. Rendered as a `## `namespace.member`` H2 expanding that member's object shape.
+ *
+ * @param {import('typedoc').DeclarationReflection} decl
+ * @param {import('typedoc').ProjectReflection | undefined} project
+ * @param {ReturnType<typeof configEntryForPageUrl>} entry
+ * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @returns {AggregatorMethodEntry[]}
+ */
+function enumerateAggregatorMethodDecls(decl, project, entry, ctx) {
+  /** @type {AggregatorMethodEntry[]} */
+  const out = [];
+  /** @param {import('typedoc').DeclarationReflection} d */
+  const pushCallables = d => {
+    for (const child of d.children ?? []) {
+      if (child.name.startsWith('__')) continue;
+      const cd = /** @type {import('typedoc').DeclarationReflection} */ (child);
+      if (hasExtractMethodsModifier(cd)) {
+        // `@extractMethods` namespace: enumerate its object-like members. Callables produce
+        // qualified-name method entries (`emailCode.sendCode`). Non-callable members with a
+        // resolvable object shape produce `memberPropertyTable` entries; if any such members
+        // exist, a `namespacePropertyTable` entry is also emitted for the namespace itself.
+        const members = resolveDeclarationWithObjectMembers(cd.type, project) ?? [];
+        /** @type {import('typedoc').DeclarationReflection[]} */
+        const nonCallableMembers = [];
+        for (const nested of members) {
+          if (nested.name.startsWith('__')) continue;
+          const nd = /** @type {import('typedoc').DeclarationReflection} */ (nested);
+          if (shouldExtractCallableMember(nd, ctx)) {
+            out.push({ kind: 'method', decl: nd, qualifiedName: `${cd.name}.${nd.name}` });
+            continue;
+          }
+          nonCallableMembers.push(nd);
+          if (resolveObjectShapeMembersForPropertyTable(nd.type)?.length) {
+            out.push({ kind: 'memberPropertyTable', decl: nd, qualifiedName: `${cd.name}.${nd.name}` });
+          }
+        }
+        if (nonCallableMembers.length) {
+          out.push({ kind: 'namespacePropertyTable', decl: cd, nonCallableMembers });
+        }
+        continue;
+      }
+      if (shouldExtractCallableMember(cd, ctx)) out.push({ kind: 'method', decl: cd });
+    }
+  };
+  pushCallables(decl);
   const extraMethodInterfaces = entry && 'extraMethodInterfaces' in entry ? entry.extraMethodInterfaces : undefined;
-  if (Array.isArray(extraMethodInterfaces)) {
+  if (Array.isArray(extraMethodInterfaces) && project) {
     for (const extra of extraMethodInterfaces) {
       const extraDecl = findInterfaceOrClass(project, extra.symbol, extra.declarationHint);
-      if (!extraDecl?.children) {
+      if (!extraDecl) {
         console.warn(`[custom-theme] extraMethodInterfaces: could not find "${extra.symbol}"`);
         continue;
       }
-      collected.push(...extractCallableMembersFromDeclaration(extraDecl, ctx, '', methodFormat));
+      pushCallables(extraDecl);
     }
   }
-  if (collected.length === 0) {
-    return '';
-  }
-  const parts = collected.map(({ filePath, content }) => {
-    const filename = filePath.replace(/^.*[\\/]/, '');
-    return `<!-- clerk:method-start filename=${JSON.stringify(filename)} -->\n${content.trimEnd()}\n<!-- clerk:method-end -->`;
-  });
-  return parts.join('\n\n');
+  return out;
 }
 
 /**
@@ -1341,42 +1613,95 @@ export function load(app) {
   // Negative priority ensures this fires AFTER `custom-plugin.mjs`'s `MarkdownPageEvent.END`
   // listener (which applies `applyRelativeLinkReplacements` + `applyCatchAllMdReplacements` at the
   // default priority of 0). If we emitted first, custom-plugin's second pass would re-apply link
-  // replacements to method content that `buildMethodMdx` already replaced — mangling the
+  // replacements to synthesized aggregator sections we already processed — mangling the
   // ```typescript``` signature fences (custom-plugin's replacements are line-based and do not
-  // skip fenced code blocks). By emitting after custom-plugin, method markers pass through
-  // untouched. `extract-methods.mjs`'s slicer registers at an even lower priority so it fires
-  // after this emit.
+  // skip fenced code blocks). `extract-methods.mjs`'s slicer registers at an even lower priority
+  // so it fires after this emit.
   app.renderer.on(
     MarkdownPageEvent.END,
     output => {
-      const pageUrl = matchReferenceObjectPageUrl(output);
-      if (!pageUrl) return;
-      const entry = configEntryForPageUrl(pageUrl);
-      const methodFormat = methodFormatForPageUrl(pageUrl);
       const decl = /** @type {import('typedoc').DeclarationReflection | undefined} */ (output.model);
-      if (!decl?.children) {
-        console.warn(`[custom-theme] No children on reflection for ${pageUrl}, skipping inline emit`);
-        return;
-      }
-      const project = output.project;
-      if (!project) {
-        console.warn(`[custom-theme] No project on page event for ${pageUrl}, skipping inline emit`);
-        return;
-      }
+      if (!decl) return;
       const theme = /** @type {InstanceType<typeof MarkdownTheme> | undefined} */ (app.renderer.theme);
-      if (!theme || typeof theme.getRenderContext !== 'function') {
-        console.warn(`[custom-theme] Renderer theme not ready for ${pageUrl}, skipping inline emit`);
-        return;
-      }
+      if (!theme || typeof theme.getRenderContext !== 'function') return;
       const ctx = /** @type {import('typedoc-plugin-markdown').MarkdownThemeContext} */ (
         theme.getRenderContext(output)
       );
 
-      const inline = renderInlineMethodsBlock(decl, ctx, project, methodFormat, entry);
-      if (inline) {
-        output.contents = `${output.contents ?? ''}\n\n<!-- clerk:methods-block-start -->\n${inline}\n<!-- clerk:methods-block-end -->\n`;
+      output.contents = addBackticksToBareMethodHeadings(output.contents ?? '');
+      output.contents = swapParentPageParametersSections(output.contents ?? '', decl, ctx);
+
+      const pageUrl = matchReferenceObjectPageUrl(output);
+      // Reference-object / backend-api specific work:
+      // 1. Synthesize per-H2 aggregator sections for callable and property-table members that
+      //    typedoc-plugin-markdown doesn't render on its own (function-typed interface properties,
+      //    `extraMethodInterfaces`, `@extractMethods` namespace members).
+      // 2. Wrap the `## Properties` section for post-prettier extraction into `properties.mdx`.
+      //    `extract-methods.mjs` slices the resulting parent page into `methods/*.mdx` sub-docs.
+      if (pageUrl) {
+        const entry = configEntryForPageUrl(pageUrl);
+        const methodFormat = methodFormatForPageUrl(pageUrl);
+        const project = output.project;
+        if (decl.children && project) {
+          const allEntries = enumerateAggregatorMethodDecls(decl, project, entry, ctx);
+          // Property-table entries are always synthesized (typedoc emits nothing for them);
+          // handle them alongside `missing` methods below. Only the method entries participate
+          // in the natural-heading dance.
+          const methodEntries = allEntries.filter(e => !e.kind || e.kind === 'method');
+          const propertyTableEntries = allEntries.filter(
+            e => e.kind === 'namespacePropertyTable' || e.kind === 'memberPropertyTable',
+          );
+          // Overloaded methods on backend classes render natively as `### Call Signature`
+          // sub-sections per overload. To keep the parent-page shape uniform across single and
+          // multi-overload methods (so `extract-methods.mjs` can slice with one code path), remove
+          // the overloaded natural section and treat the method as missing — it'll be re-synthesized
+          // below using `getPrimaryCallSignature`.
+          for (const e of methodEntries) {
+            const nm = e.qualifiedName ?? e.decl.name;
+            if ((e.decl.signatures?.length ?? 0) > 1 && contentsHaveMethodHeading(output.contents ?? '', nm)) {
+              output.contents = removeMethodH2Section(output.contents ?? '', nm);
+            }
+          }
+          const naturalCallables = methodEntries.filter(e =>
+            contentsHaveMethodHeading(output.contents ?? '', e.qualifiedName ?? e.decl.name),
+          );
+          const missing = [
+            ...methodEntries.filter(
+              e => !contentsHaveMethodHeading(output.contents ?? '', e.qualifiedName ?? e.decl.name),
+            ),
+            ...propertyTableEntries,
+          ];
+          // Backend class pages: typedoc-plugin-markdown already emits `## methodName()` H2s.
+          // Inject a `` ```typescript ``` `` signature block after each natural section's
+          // description so the parent's section is self-contained (matches shape of synthesized
+          // sections below). Only applies to unqualified members — qualified-name entries from
+          // `@extractMethods` namespaces are never natural on the parent page.
+          const naturalUnqualified = naturalCallables.filter(e => !e.qualifiedName).map(e => e.decl);
+          if (naturalUnqualified.length) {
+            output.contents = insertSignatureBlocksIntoNaturalMethodSections(output.contents ?? '', naturalUnqualified);
+          }
+          if (missing.length) {
+            const sections = missing.map(e => renderAggregatorMethodSection(e, ctx)).filter(Boolean);
+            if (sections.length) {
+              // Insert synthesized sections BEFORE `## Properties` so extract-methods' strip
+              // (which drops `## Properties` and everything after during the transitional refactor)
+              // preserves them. Falls back to appending at end when the page has no properties
+              // section (backend class pages have methods only).
+              const block = sections.join('\n\n');
+              const currentContents = output.contents ?? '';
+              const propsIdx = currentContents.search(/(^|\n)## Properties\n/);
+              if (propsIdx === -1) {
+                output.contents = `${currentContents.trimEnd()}\n\n${block}\n`;
+              } else {
+                const before = currentContents.slice(0, propsIdx);
+                const after = currentContents.slice(propsIdx);
+                output.contents = `${before.trimEnd()}\n\n${block}\n\n${after.replace(/^\n+/, '')}`;
+              }
+            }
+          }
+        }
+        output.contents = wrapPropertiesSectionWithMarkers(output.contents ?? '');
       }
-      output.contents = wrapPropertiesSectionWithMarkers(output.contents ?? '');
     },
     -100,
   );
@@ -2665,22 +2990,6 @@ function commentSummaryAndBody(comment) {
 }
 
 /**
- * When `@returns` exists only on the call signature (not on the declaration), append it to the prose.
- * @param {import('typedoc').Comment | undefined} declComment
- * @param {import('typedoc').Comment | undefined} sigComment
- */
-function appendSignatureOnlyReturns(declComment, sigComment) {
-  if (declComment?.getTag('@returns')?.content?.length) {
-    return '';
-  }
-  const tag = sigComment?.getTag('@returns');
-  if (!tag?.content?.length) {
-    return '';
-  }
-  return formatReturnsLineFromTag(tag);
-}
-
-/**
  * @param {import('typedoc').DeclarationReflection} prop
  */
 function propertyReflectionTypeIsNever(prop) {
@@ -3165,6 +3474,12 @@ function parametersMarkdownTable(sig, ctx, instantiationMap, headingLevel = 4) {
     nested.push(...nestedParameterRowsFromDocumentedProperties(p, ctx));
   }
   if (nested.length) {
+    // Nested rows are always 3-column (`| name | type | description |`). If the base table came
+    // back 2-column (no direct param has a comment, so `clerkParametersTable` omits the Description
+    // column), pad the base to 3 columns so the appended rows don't malform the table.
+    if (!parameterTableHasDescriptionColumn(tableMd)) {
+      tableMd = padParameterTableWithEmptyDescriptionColumn(tableMd);
+    }
     tableMd = `${tableMd.trimEnd()}\n${nested.join('\n')}\n`;
   }
 
@@ -3174,111 +3489,42 @@ function parametersMarkdownTable(sig, ctx, instantiationMap, headingLevel = 4) {
 }
 
 /**
- * @param {import('typedoc').DeclarationReflection} decl
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- * @param {{ qualifiedName?: string, methodFormat?: MethodFormat }} [options] Nested namespace methods use `parent.child` for headings / signatures.
- */
-function buildMethodMdx(decl, ctx, options = {}) {
-  const name = options.qualifiedName ?? decl.name;
-  const methodFormat = options.methodFormat ?? 'reference';
-  const sig = getPrimaryCallSignature(decl);
-  if (!sig) {
-    return '';
-  }
-  // `'page'` format renders one method per docs page, so the page is anchored by a containing file/heading upstream — no in-page `### foo()` title needed. `'reference'` format aggregates many methods on one page and uses `### foo()` to disambiguate them.
-  const title = methodFormat === 'page' ? '' : `### \`${name}()\``;
-  const paramsHeadingLevel = methodFormat === 'page' ? 2 : 4;
-  /** Prefer the declaration comment (property-style methods document `addListener` on the property, not the signature). */
-  const comment = decl.comment ?? sig.comment;
-  let description = commentSummaryAndBody(comment);
-  const sigReturns = comment === sig.comment ? '' : appendSignatureOnlyReturns(decl.comment, sig.comment);
-  if (sigReturns) {
-    description = [description, sigReturns].filter(Boolean).join('\n\n');
-  }
-  const instantiationMap = getGenericInstantiationMapFromCallableProperty(decl);
-  const ts = ['```typescript', formatTypeScriptSignature(sig, name, instantiationMap), '```'].join('\n');
-  const skipParametersSection =
-    Boolean(decl.comment?.hasModifier('@skipParametersSection')) ||
-    Boolean(sig.comment?.hasModifier('@skipParametersSection'));
-  if (!skipParametersSection) {
-    overlayParamCommentsFromSignatureBlockTags(sig);
-  }
-  const paramsMd = skipParametersSection ? '' : parametersMarkdownTable(sig, ctx, instantiationMap, paramsHeadingLevel);
-
-  // Same post-process as `custom-plugin.mjs` `MarkdownPageEvent.END`: relative `.mdx` links, then catch-alls.
-  // Skip the ```typescript``` fence so signatures stay plain code.
-  const headSource = title ? [title, '', description].join('\n') : description;
-  const head = applyCatchAllMdReplacements(applyRelativeLinkReplacements(headSource));
-  const paramsProcessed = paramsMd ? applyCatchAllMdReplacements(applyRelativeLinkReplacements(paramsMd)) : '';
-  const chunks = head ? [head, ts] : [ts];
-  if (paramsProcessed) {
-    chunks.push(paramsProcessed);
-  }
-  return chunks.join('\n\n').trim() + '\n';
-}
-
-/**
- * @param {string} parentName
- * @param {import('typedoc').DeclarationReflection} nestedDecl
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
- */
-function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
-  const qualifiedName = `${parentName}.${nestedDecl.name}`;
-  const title = `### \`${qualifiedName}\``;
-  const description = commentSummaryAndBody(nestedDecl.comment);
-  const propsUnsorted = resolveObjectShapeMembersForPropertyTable(nestedDecl.type);
-  if (!propsUnsorted?.length) {
-    return '';
-  }
-  /** Match nominal param tables and merged intersection holders: stable A–Z by property name (TypeDoc inline literal `children` order is declaration order). */
-  const props = [...propsUnsorted].sort((a, b) => a.name.localeCompare(b.name));
-  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
-    ctx.partials.propertiesTable(
-      props,
-      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
-      ({
-        kind: ReflectionKind.Interface,
-        isEventProps: false,
-        applyAllowlistedPropertyTableRowFilters: false,
-      }),
-    ),
-  );
-  const chunks = [title, '', description, '', tableMd].filter(Boolean);
-  const raw = chunks.join('\n\n');
-  return `${applyCatchAllMdReplacements(applyRelativeLinkReplacements(raw)).trim()}\n`;
-}
-
-/**
- * Parent-level property table for an `@extractMethods` namespace.
- * Lists non-callable direct members on the namespace (e.g. `verifications.emailAddress`, `verifications.phoneNumber`).
+ * Detects whether a markdown parameter table (pipe-format) already has a `Description` column.
+ * HTML tables render on a single line — treat those as "already correct" (they carry their own
+ * column structure via `<th>` cells and aren't concatenated with pipe-row nested output).
  *
- * @param {import('typedoc').DeclarationReflection} parentDecl
- * @param {import('typedoc').DeclarationReflection[]} nonCallableMembers
- * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
+ * @param {string} tableMd
  */
-function buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMembers, ctx) {
-  if (!nonCallableMembers.length) {
-    return '';
+function parameterTableHasDescriptionColumn(tableMd) {
+  if (!tableMd) return true;
+  const firstLine = tableMd.split('\n', 1)[0].trim();
+  if (!firstLine.startsWith('|')) return true;
+  return /\|\s*Description\s*\|/.test(firstLine);
+}
+
+/**
+ * Append an empty Description column to a 2-column pipe-format parameter table so that appending
+ * 3-column nested-row output doesn't malform it. Header gets ` Description |`, divider gets
+ * ` ------ |`, data rows get ` - |`.
+ *
+ * @param {string} tableMd
+ */
+function padParameterTableWithEmptyDescriptionColumn(tableMd) {
+  const lines = tableMd.split('\n');
+  let sawDivider = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.startsWith('|') || !line.endsWith('|')) continue;
+    if (i === 0) {
+      lines[i] = line.replace(/\|\s*$/, ' Description |');
+    } else if (!sawDivider && /^\|[\s\-|:]+\|$/.test(line)) {
+      lines[i] = line.replace(/\|\s*$/, ' ------ |');
+      sawDivider = true;
+    } else {
+      lines[i] = line.replace(/\|\s*$/, ' - |');
+    }
   }
-  const title = `### \`${parentDecl.name}\``;
-  const description = commentSummaryAndBody(parentDecl.comment);
-  const props = [...nonCallableMembers].sort((a, b) => a.name.localeCompare(b.name));
-  const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
-    ctx.partials.propertiesTable(
-      props,
-      /** @type {Parameters<import('typedoc-plugin-markdown').MarkdownThemeContext['partials']['propertiesTable']>[1]} */
-      ({
-        kind: ReflectionKind.Interface,
-        isEventProps: false,
-        applyAllowlistedPropertyTableRowFilters: false,
-      }),
-    ),
-  );
-  if (!tableMd?.trim()) {
-    return '';
-  }
-  const raw = [title, '', description, '', tableMd].filter(Boolean).join('\n\n');
-  return `${applyCatchAllMdReplacements(applyRelativeLinkReplacements(raw)).trim()}\n`;
+  return lines.join('\n');
 }
 
 /**
