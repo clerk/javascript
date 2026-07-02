@@ -11,6 +11,7 @@ This package is **internal** (`private: true`) and consumed by `@clerk/ui`. It e
 | Accordion    | `@clerk/headless/accordion`    | Expandable content sections with single/multiple mode         |
 | Autocomplete | `@clerk/headless/autocomplete` | Combobox input with filterable option list                    |
 | Dialog       | `@clerk/headless/dialog`       | Modal dialog with focus trapping and scroll lock              |
+| FileUpload   | `@clerk/headless/file-upload`  | File picker + drag-and-drop upload with image previews        |
 | Menu         | `@clerk/headless/menu`         | Dropdown and nested context menus with safe hover zones       |
 | Popover      | `@clerk/headless/popover`      | Non-modal floating content triggered by click                 |
 | Select       | `@clerk/headless/select`       | Dropdown select with typeahead and keyboard navigation        |
