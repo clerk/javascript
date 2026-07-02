@@ -41,6 +41,10 @@
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
     },
+    "./file-upload": {
+      "import": "./dist/primitives/file-upload/index.js",
+      "types": "./dist/primitives/file-upload/index.d.ts"
+    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "types": "./dist/hooks/index.d.ts"

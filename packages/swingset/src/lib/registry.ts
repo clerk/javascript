@@ -15,6 +15,7 @@ import {
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Default as HeadingDefault,
   Intents as HeadingIntents,
@@ -106,6 +107,7 @@ const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
+const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
@@ -138,6 +140,7 @@ export const registry: StoryModule[] = [
   autocompleteModule,
   collapsibleModule,
   dialogModule,
+  fileUploadModule,
   menuModule,
   popoverModule,
   selectModule,
