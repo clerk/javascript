@@ -758,6 +758,8 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -801,6 +803,8 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;

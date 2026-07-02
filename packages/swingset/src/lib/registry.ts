@@ -49,6 +49,7 @@ import {
   Default as OrganizationProfileGeneralDefault,
   meta as organizationProfileGeneralMeta,
 } from '../stories/organization-profile-general.stories';
+import { meta as otpMeta } from '../stories/otp.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -109,6 +110,7 @@ const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const menuModule: StoryModule = { meta: menuMeta };
+const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
@@ -142,6 +144,7 @@ export const registry: StoryModule[] = [
   dialogModule,
   fileUploadModule,
   menuModule,
+  otpModule,
   popoverModule,
   selectModule,
   tabsModule,

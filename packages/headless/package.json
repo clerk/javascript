@@ -45,6 +45,10 @@
       "import": "./dist/primitives/file-upload/index.js",
       "types": "./dist/primitives/file-upload/index.d.ts"
     },
+    "./otp": {
+      "import": "./dist/primitives/otp/index.js",
+      "types": "./dist/primitives/otp/index.d.ts"
+    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "types": "./dist/hooks/index.d.ts"
