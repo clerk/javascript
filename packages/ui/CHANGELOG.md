@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.24.1
+
+### Patch Changes
+
+- Add an accessible name to the API Keys search input so screen readers announce it correctly. ([#9055](https://github.com/clerk/javascript/pull/9055)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.24.0
 
 ### Minor Changes

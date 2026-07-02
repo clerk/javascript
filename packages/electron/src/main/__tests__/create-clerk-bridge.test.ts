@@ -10,6 +10,8 @@ vi.mock('electron', () => ({
     on: vi.fn(),
     removeListener: vi.fn(),
     setAsDefaultProtocolClient: vi.fn(),
+    userAgentFallback:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   },
   ipcMain: {
     handle: vi.fn(),
@@ -42,6 +44,8 @@ describe('createClerkBridge', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    app.userAgentFallback =
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
   });
 
   it('requires a storage adapter', () => {
@@ -52,6 +56,28 @@ describe('createClerkBridge', () => {
     createClerkBridge({ storage });
 
     expect(ipcMain.handle).toHaveBeenCalledTimes(3);
+  });
+
+  it('keeps the platform details when setting the app user-agent fallback', () => {
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Gecko/20100101 Acme Co/1.0.0');
+  });
+
+  it('falls back to the configured user-agent when the app fallback has no platform details', () => {
+    app.userAgentFallback = 'Electron default';
+
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
+  });
+
+  it('falls back to the configured user-agent when the app fallback has malformed platform details', () => {
+    app.userAgentFallback = 'Mozilla/5.0 ((((';
+
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
   });
 
   it('registers the configured renderer scheme as privileged before app ready', () => {

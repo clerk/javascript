@@ -37,20 +37,31 @@ function extractCustomClaims(payload: M2MJwtPayload): Record<string, any> | null
 }
 
 /**
- * The Backend `M2MToken` object holds information about a machine-to-machine token.
+ * The Backend `M2MToken` object holds information about a [machine-to-machine token](https://clerk.com/docs/guides/development/machine-auth/m2m-tokens).
  */
 export class M2MToken {
   constructor(
+    /** The ID of the M2M token. */
     readonly id: string,
+    /** The subject of the M2M token. */
     readonly subject: string,
+    /** The scopes of the M2M token. */
     readonly scopes: string[],
+    /** The claims of the M2M token. */
     readonly claims: Record<string, any> | null,
+    /** Whether the M2M token has been revoked. */
     readonly revoked: boolean,
+    /** The reason for revoking the M2M token. */
     readonly revocationReason: string | null,
+    /** Whether the M2M token has expired. */
     readonly expired: boolean,
+    /** The Unix timestamp when the M2M token expires. */
     readonly expiration: number | null,
+    /** The Unix timestamp when the M2M token was created. */
     readonly createdAt: number,
+    /** The Unix timestamp when the M2M token was last updated. */
     readonly updatedAt: number,
+    /** The token string. */
     readonly token?: string,
   ) {}
 
