@@ -44,6 +44,7 @@
     "./drawer": {
       "import": "./dist/primitives/drawer/index.js",
       "types": "./dist/primitives/drawer/index.d.ts"
+    },
     "./file-upload": {
       "import": "./dist/primitives/file-upload/index.js",
       "types": "./dist/primitives/file-upload/index.d.ts"
