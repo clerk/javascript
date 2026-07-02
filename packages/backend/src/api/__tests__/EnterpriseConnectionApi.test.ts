@@ -28,6 +28,8 @@ describe('EnterpriseConnectionAPI', () => {
       idp_entity_id: 'https://idp.example.com',
       idp_sso_url: 'https://idp.example.com/sso',
       idp_certificate: '-----BEGIN CERTIFICATE-----',
+      idp_certificate_issued_at: 1672531200000,
+      idp_certificate_expires_at: 1704067200000,
       idp_metadata_url: 'https://idp.example.com/metadata',
       idp_metadata: '<xml/>',
       acs_url: 'https://clerk.example.com/v1/saml/acs',
