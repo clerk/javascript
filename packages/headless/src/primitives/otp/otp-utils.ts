@@ -1,15 +1,15 @@
-/** The character set an OTP value is allowed to contain. */
-export type OTPPattern = 'numeric' | 'alpha' | 'alphanumeric';
+/** The character set an Otp value is allowed to contain. */
+export type OtpPattern = 'numeric' | 'alpha' | 'alphanumeric';
 
 // Each pattern maps to a regex that matches the characters to *strip*.
-const DISALLOWED: Record<OTPPattern, RegExp> = {
+const DISALLOWED: Record<OtpPattern, RegExp> = {
   numeric: /[^0-9]/g,
   alpha: /[^a-zA-Z]/g,
   alphanumeric: /[^a-zA-Z0-9]/g,
 };
 
 /** The `inputMode` best suited to a pattern's on-screen keyboard. */
-export function inputModeForPattern(pattern: OTPPattern): 'numeric' | 'text' {
+export function inputModeForPattern(pattern: OtpPattern): 'numeric' | 'text' {
   return pattern === 'numeric' ? 'numeric' : 'text';
 }
 
@@ -19,7 +19,7 @@ export function inputModeForPattern(pattern: OTPPattern): 'numeric' | 'text' {
  * typing, pasting, and controlled/default values — so state can never hold an
  * out-of-range or overflowing string.
  */
-export function sanitize(value: string, pattern: OTPPattern, length: number): string {
+export function sanitize(value: string, pattern: OtpPattern, length: number): string {
   return value.replace(/\s/g, '').replace(DISALLOWED[pattern], '').slice(0, length);
 }
 

@@ -4,10 +4,10 @@ import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, us
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
-import { OTPContext, type OTPContextValue, type OTPSlot } from './otp-context';
-import { inputModeForPattern, type OTPPattern, sanitize } from './otp-utils';
+import { OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
+import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
-export interface OTPProps extends Omit<ComponentProps<'div'>, 'value' | 'defaultValue' | 'onChange'> {
+export interface OtpProps extends Omit<ComponentProps<'div'>, 'value' | 'defaultValue' | 'onChange'> {
   /** The number of slots (characters) in the code. */
   length: number;
   /** Controlled value. */
@@ -19,7 +19,7 @@ export interface OTPProps extends Omit<ComponentProps<'div'>, 'value' | 'default
   /** Called with the value once every slot is filled. */
   onComplete?: (value: string) => void;
   /** Allowed character set; other characters are stripped. @default 'numeric' */
-  pattern?: OTPPattern;
+  pattern?: OtpPattern;
   /** Render slots as masked (password) inputs. @default false */
   mask?: boolean;
   /**
@@ -46,7 +46,7 @@ const visuallyHiddenInputStyle: CSSProperties = {
   border: 0,
 };
 
-export function OTPRoot(props: OTPProps) {
+export function OtpRoot(props: OtpProps) {
   const {
     render,
     length,
@@ -126,7 +126,7 @@ export function OTPRoot(props: OTPProps) {
 
   const complete = value.length === length;
 
-  const slots = useMemo<OTPSlot[]>(
+  const slots = useMemo<OtpSlot[]>(
     () =>
       Array.from({ length }, (_, index) => {
         const char = value[index] ?? '';
@@ -135,7 +135,7 @@ export function OTPRoot(props: OTPProps) {
     [length, value, activeIndex],
   );
 
-  const contextValue = useMemo<OTPContextValue>(
+  const contextValue = useMemo<OtpContextValue>(
     () => ({
       value,
       length,
@@ -199,7 +199,7 @@ export function OTPRoot(props: OTPProps) {
   };
 
   return (
-    <OTPContext.Provider value={contextValue}>
+    <OtpContext.Provider value={contextValue}>
       {renderElement({
         defaultTagName: 'div',
         render,
@@ -211,6 +211,6 @@ export function OTPRoot(props: OTPProps) {
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}
-    </OTPContext.Provider>
+    </OtpContext.Provider>
   );
 }

@@ -1,4 +1,4 @@
-import { OTP } from '@clerk/headless/otp';
+import { Otp } from '@clerk/headless/otp';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -17,9 +17,9 @@ export const meta: StoryMeta = {
 };
 
 function Slots() {
-  const { slots } = OTP.useOTP();
+  const { slots } = Otp.useOtp();
   return slots.map(slot => (
-    <OTP.Input
+    <Otp.Input
       key={slot.index}
       index={slot.index}
     />
@@ -28,11 +28,11 @@ function Slots() {
 
 export function Default() {
   return (
-    <OTP.Root
+    <Otp.Root
       length={6}
       aria-label='Verification code'
     >
       <Slots />
-    </OTP.Root>
+    </Otp.Root>
   );
 }

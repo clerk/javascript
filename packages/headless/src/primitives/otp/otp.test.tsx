@@ -4,29 +4,29 @@ import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
-import { OTP } from './index';
+import { Otp } from './index';
 
 afterEach(() => cleanup());
 
 /** A default composition driving the slots off the live slot list. */
-function Harness(props: Partial<React.ComponentProps<typeof OTP.Root>> & { length?: number } = {}) {
+function Harness(props: Partial<React.ComponentProps<typeof Otp.Root>> & { length?: number } = {}) {
   const { length = 4, children, ...rootProps } = props;
   return (
-    <OTP.Root
+    <Otp.Root
       length={length}
       {...rootProps}
     >
       <Slots />
-    </OTP.Root>
+    </Otp.Root>
   );
 }
 
 function Slots() {
-  const { slots } = OTP.useOTP();
+  const { slots } = Otp.useOtp();
   return (
     <>
       {slots.map(slot => (
-        <OTP.Input
+        <Otp.Input
           key={slot.index}
           index={slot.index}
         />
@@ -39,7 +39,7 @@ function inputs() {
   return Array.from(document.querySelectorAll<HTMLInputElement>('[data-cl-slot="otp-input"]'));
 }
 
-describe('OTP', () => {
+describe('Otp', () => {
   describe('slot attributes', () => {
     it('renders the root and one input per slot', () => {
       render(<Harness length={4} />);
@@ -375,13 +375,13 @@ describe('OTP', () => {
       function Controlled() {
         const [value, setValue] = useState('');
         return (
-          <OTP.Root
+          <Otp.Root
             length={4}
             value={value}
             onValueChange={setValue}
           >
             <Slots />
-          </OTP.Root>
+          </Otp.Root>
         );
       }
       render(<Controlled />);
@@ -435,11 +435,11 @@ describe('OTP', () => {
     });
   });
 
-  describe('useOTP', () => {
+  describe('useOtp', () => {
     it('exposes slots and a clear action', async () => {
       const user = userEvent.setup();
       function WithClear() {
-        const { clear, complete } = OTP.useOTP();
+        const { clear, complete } = Otp.useOtp();
         return (
           <>
             <Slots />
@@ -454,12 +454,12 @@ describe('OTP', () => {
         );
       }
       render(
-        <OTP.Root
+        <Otp.Root
           length={2}
           defaultValue='12'
         >
           <WithClear />
-        </OTP.Root>,
+        </Otp.Root>,
       );
       expect(screen.getByText('done')).toBeInTheDocument();
 
@@ -468,13 +468,13 @@ describe('OTP', () => {
       expect(screen.queryByText('done')).not.toBeInTheDocument();
     });
 
-    it('throws when used outside <OTP.Root>', () => {
+    it('throws when used outside <Otp.Root>', () => {
       function Orphan() {
-        OTP.useOTP();
+        Otp.useOtp();
         return null;
       }
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      expect(() => render(<Orphan />)).toThrow(/within <OTP.Root>/);
+      expect(() => render(<Orphan />)).toThrow(/within <Otp.Root>/);
       spy.mockRestore();
     });
   });
@@ -482,8 +482,8 @@ describe('OTP', () => {
   describe('render prop', () => {
     it('lets a slot render a custom element', () => {
       render(
-        <OTP.Root length={1}>
-          <OTP.Input
+        <Otp.Root length={1}>
+          <Otp.Input
             index={0}
             render={props => (
               <input
@@ -492,7 +492,7 @@ describe('OTP', () => {
               />
             )}
           />
-        </OTP.Root>,
+        </Otp.Root>,
       );
       const custom = screen.getByTestId('custom');
       expect(custom).toHaveAttribute('data-cl-slot', 'otp-input');
@@ -502,12 +502,12 @@ describe('OTP', () => {
   describe('accessibility', () => {
     it('has no axe violations', async () => {
       const { container } = render(
-        <OTP.Root
+        <Otp.Root
           length={4}
           aria-label='One-time code'
         >
           <Slots />
-        </OTP.Root>,
+        </Otp.Root>,
       );
       expect(await axe(container)).toHaveNoViolations();
     });

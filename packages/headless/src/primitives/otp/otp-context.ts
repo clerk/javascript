@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
 
-import type { OTPPattern } from './otp-utils';
+import type { OtpPattern } from './otp-utils';
 
-/** A single OTP slot, as read through {@link useOTP}. */
-export interface OTPSlot {
+/** A single Otp slot, as read through {@link useOtp}. */
+export interface OtpSlot {
   /** The slot's position, `0`-based. */
   index: number;
   /** The character in this slot, or `''` when empty. */
@@ -14,8 +14,8 @@ export interface OTPSlot {
   isFilled: boolean;
 }
 
-export interface OTPContextValue {
-  /** The current OTP value. */
+export interface OtpContextValue {
+  /** The current Otp value. */
   value: string;
   /** The number of slots. */
   length: number;
@@ -24,18 +24,18 @@ export interface OTPContextValue {
   /** Whether every slot is filled. */
   complete: boolean;
   /** The allowed character set. */
-  pattern: OTPPattern;
+  pattern: OtpPattern;
   /** Render each slot as a masked (password) input. */
   mask: boolean;
   /** One descriptor per slot, in order. */
-  slots: OTPSlot[];
+  slots: OtpSlot[];
   /** The index of the currently focused slot, or `null` when unfocused. */
   activeIndex: number | null;
   /** Clear the value and focus the first slot. */
   clear: () => void;
   /** Focus the slot at `index` (clamped to range). */
   focus: (index: number) => void;
-  // --- internal wiring used by <OTP.Input> ---
+  // --- internal wiring used by <Otp.Input> ---
   /** Register/unregister a slot input's element by index. */
   registerInput: (index: number, element: HTMLInputElement | null) => void;
   /** Propose a new full value; it is sanitized and clamped before commit. */
@@ -48,25 +48,25 @@ export interface OTPContextValue {
   onSlotBlur: () => void;
 }
 
-export const OTPContext = createContext<OTPContextValue | null>(null);
+export const OtpContext = createContext<OtpContextValue | null>(null);
 
-export function useOTPContext(): OTPContextValue {
-  const ctx = useContext(OTPContext);
+export function useOtpContext(): OtpContextValue {
+  const ctx = useContext(OtpContext);
   if (!ctx) {
-    throw new Error('OTP compound components must be used within <OTP.Root>');
+    throw new Error('Otp compound components must be used within <Otp.Root>');
   }
   return ctx;
 }
 
 /**
- * Reads the current OTP state and actions. Use it to render one
- * `<OTP.Input>` per slot, show a completion state, or drive a custom clear
- * button. Must be called inside `<OTP.Root>`.
+ * Reads the current Otp state and actions. Use it to render one
+ * `<Otp.Input>` per slot, show a completion state, or drive a custom clear
+ * button. Must be called inside `<Otp.Root>`.
  */
-export function useOTP(): Pick<
-  OTPContextValue,
+export function useOtp(): Pick<
+  OtpContextValue,
   'value' | 'length' | 'disabled' | 'complete' | 'slots' | 'activeIndex' | 'clear' | 'focus'
 > {
-  const { value, length, disabled, complete, slots, activeIndex, clear, focus } = useOTPContext();
+  const { value, length, disabled, complete, slots, activeIndex, clear, focus } = useOtpContext();
   return { value, length, disabled, complete, slots, activeIndex, clear, focus };
 }

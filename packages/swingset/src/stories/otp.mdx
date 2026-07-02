@@ -1,4 +1,4 @@
-import * as OTPStories from './otp.stories';
+import * as OtpStories from './otp.stories';
 
 # OTP
 
@@ -16,33 +16,33 @@ slots. Focus can't skip past the first empty slot, so an empty field always focu
 
 <Story
   name='Default'
-  storyModule={OTPStories}
+  storyModule={OtpStories}
 />
 
 ## Usage
 
-The value lives in `OTP.Root`. Read the slots with the `useOTP` hook and render one `OTP.Input` per
+The value lives in `Otp.Root`. Read the slots with the `useOtp` hook and render one `Otp.Input` per
 slot, passing each its `index`:
 
 ```tsx
-import { OTP } from '@clerk/headless/otp';
+import { Otp } from '@clerk/headless/otp';
 
 function VerifyCode() {
   return (
-    <OTP.Root
+    <Otp.Root
       length={6}
       aria-label='Verification code'
       onComplete={code => submit(code)}
     >
       <Slots />
-    </OTP.Root>
+    </Otp.Root>
   );
 }
 
 function Slots() {
-  const { slots } = OTP.useOTP();
+  const { slots } = Otp.useOtp();
   return slots.map(slot => (
-    <OTP.Input
+    <Otp.Input
       key={slot.index}
       index={slot.index}
     />
@@ -55,13 +55,13 @@ function Slots() {
 ```tsx
 const [code, setCode] = useState('');
 
-<OTP.Root
+<Otp.Root
   length={6}
   value={code}
   onValueChange={setCode}
 >
   <Slots />
-</OTP.Root>;
+</Otp.Root>;
 ```
 
 ### Inside a form
@@ -70,12 +70,12 @@ Pass `name` to submit the combined value through a hidden input:
 
 ```tsx
 <form action={verify}>
-  <OTP.Root
+  <Otp.Root
     length={6}
     name='code'
   >
     <Slots />
-  </OTP.Root>
+  </Otp.Root>
   <button type='submit'>Verify</button>
 </form>
 ```
@@ -83,33 +83,33 @@ Pass `name` to submit the combined value through a hidden input:
 ### Masked / alphanumeric
 
 ```tsx
-<OTP.Root
+<Otp.Root
   length={4}
   mask
   pattern='alphanumeric'
 >
   <Slots />
-</OTP.Root>
+</Otp.Root>
 ```
 
 ## Parts
 
 | Part        | Default Element | Description                                                    |
 | ----------- | --------------- | -------------------------------------------------------------- |
-| `OTP.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value    |
-| `OTP.Input` | `<input>`       | A single character slot; render one per `useOTP().slots` entry |
+| `Otp.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value    |
+| `Otp.Input` | `<input>`       | A single character slot; render one per `useOtp().slots` entry |
 
 Both parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their
-default element. `OTP.Input` (and the `useOTP` hook) throw if used outside `OTP.Root`.
+default element. `Otp.Input` (and the `useOtp` hook) throw if used outside `Otp.Root`.
 
-`OTP.useOTP()` is a hook (not a component) that returns
+`Otp.useOtp()` is a hook (not a component) that returns
 `{ value, length, disabled, complete, slots, activeIndex, clear, focus }` for reading the value and
 driving custom UI. Each `slots` entry is `{ index, char, isActive, isFilled }`. It must be called
-inside `OTP.Root`.
+inside `Otp.Root`.
 
 ## Props
 
-### `OTP.Root`
+### `Otp.Root`
 
 | Prop            | Type                                     | Default      | Description                                         |
 | --------------- | ---------------------------------------- | ------------ | --------------------------------------------------- |
@@ -123,11 +123,11 @@ inside `OTP.Root`.
 | `name`          | `string`                                 | —            | Submit the value via a hidden input under this name |
 | `disabled`      | `boolean`                                | `false`      | Disable every slot                                  |
 
-### `OTP.Input`
+### `Otp.Input`
 
 | Prop    | Type     | Default      | Description                                           |
 | ------- | -------- | ------------ | ----------------------------------------------------- |
-| `index` | `number` | — (required) | The slot's `0`-based position (from `useOTP().slots`) |
+| `index` | `number` | — (required) | The slot's `0`-based position (from `useOtp().slots`) |
 
 ## Styling
 
@@ -159,8 +159,8 @@ Each part emits `data-cl-*` attributes you can target with any CSS solution:
 }
 ```
 
-`OTP.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
-Each `OTP.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
+`Otp.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
+Each `Otp.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
 a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
 hidden form input is `aria-hidden` and out of the tab order. Arrow keys follow reading order — under
 `dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.

@@ -1,3 +1,3 @@
-export * as OTP from './parts';
+export * as Otp from './parts';
 
-export type { OTPInputProps, OTPPattern, OTPProps, OTPSlot } from './parts';
+export type { OtpInputProps, OtpPattern, OtpProps, OtpSlot } from './parts';

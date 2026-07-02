@@ -1,7 +1,7 @@
 # OTP
 
 A headless one-time-password (OTP / PIN) input. The value is a single string; each character is
-rendered by its own `<OTP.Input>` slot, so you style each box yourself. Typing advances focus,
+rendered by its own `<Otp.Input>` slot, so you style each box yourself. Typing advances focus,
 `Backspace` walks back, arrows/Home/End move between slots, and pasting a full code distributes it
 across the slots. Supports controlled/uncontrolled value, a character `pattern`, masking, a
 `disabled` state, and optional `<form>` submission via `name`.
@@ -18,25 +18,25 @@ no global CSS. Everything is driven by `data-cl-*` attributes.
 ## Usage
 
 ```tsx
-import { OTP } from '@clerk/headless/otp';
+import { Otp } from '@clerk/headless/otp';
 
 function VerifyCode() {
   return (
-    <OTP.Root
+    <Otp.Root
       length={6}
       aria-label='Verification code'
       onComplete={code => submit(code)}
     >
       <Slots />
-    </OTP.Root>
+    </Otp.Root>
   );
 }
 
 // Render one Input per slot from the live slot list.
 function Slots() {
-  const { slots } = OTP.useOTP();
+  const { slots } = Otp.useOtp();
   return slots.map(slot => (
-    <OTP.Input
+    <Otp.Input
       key={slot.index}
       index={slot.index}
     />
@@ -44,22 +44,22 @@ function Slots() {
 }
 ```
 
-`useOTP()` returns `{ value, length, disabled, complete, slots, activeIndex, clear, focus }`. Each
+`useOtp()` returns `{ value, length, disabled, complete, slots, activeIndex, clear, focus }`. Each
 entry in `slots` is `{ index, char, isActive, isFilled }`, so you can render decorations (a caret, a
-separator) around the boxes. It must be called inside `<OTP.Root>`.
+separator) around the boxes. It must be called inside `<Otp.Root>`.
 
 ### Controlled
 
 ```tsx
 const [code, setCode] = useState('');
 
-<OTP.Root
+<Otp.Root
   length={6}
   value={code}
   onValueChange={setCode}
 >
   <Slots />
-</OTP.Root>;
+</Otp.Root>;
 ```
 
 ### Inside a form
@@ -68,12 +68,12 @@ Pass `name` to submit the combined value through a hidden input:
 
 ```tsx
 <form action={verify}>
-  <OTP.Root
+  <Otp.Root
     length={6}
     name='code'
   >
     <Slots />
-  </OTP.Root>
+  </Otp.Root>
   <button type='submit'>Verify</button>
 </form>
 ```
@@ -81,28 +81,28 @@ Pass `name` to submit the combined value through a hidden input:
 ### Masked / alphanumeric
 
 ```tsx
-<OTP.Root
+<Otp.Root
   length={4}
   mask
   pattern='alphanumeric'
 >
   <Slots />
-</OTP.Root>
+</Otp.Root>
 ```
 
 ## Parts
 
 | Part        | Default Element | Description                                                 |
 | ----------- | --------------- | ----------------------------------------------------------- |
-| `OTP.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value |
-| `OTP.Input` | `<input>`       | A single character slot (render one per `slots` entry)      |
+| `Otp.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value |
+| `Otp.Input` | `<input>`       | A single character slot (render one per `slots` entry)      |
 
-`OTP.useOTP()` is a hook (not a component) for reading the value and driving custom UI. It must be
-called inside `OTP.Root`.
+`Otp.useOtp()` is a hook (not a component) for reading the value and driving custom UI. It must be
+called inside `Otp.Root`.
 
 ## Props
 
-### `OTP.Root`
+### `Otp.Root`
 
 | Prop            | Type                                     | Default     | Description                                         |
 | --------------- | ---------------------------------------- | ----------- | --------------------------------------------------- |
@@ -116,11 +116,11 @@ called inside `OTP.Root`.
 | `name`          | `string`                                 | —           | Submit the value via a hidden input under this name |
 | `disabled`      | `boolean`                                | `false`     | Disable every slot                                  |
 
-### `OTP.Input`
+### `Otp.Input`
 
 | Prop    | Type     | Default | Description                                           |
 | ------- | -------- | ------- | ----------------------------------------------------- |
-| `index` | `number` | —       | The slot's `0`-based position (from `useOTP().slots`) |
+| `index` | `number` | —       | The slot's `0`-based position (from `useOtp().slots`) |
 
 Both parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their
 default element.

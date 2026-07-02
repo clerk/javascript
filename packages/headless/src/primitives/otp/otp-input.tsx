@@ -3,15 +3,15 @@
 import { type Ref, useCallback } from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
-import { useOTPContext } from './otp-context';
+import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
 
-export interface OTPInputProps extends ComponentProps<'input'> {
-  /** This slot's position, `0`-based (typically from `useOTP().slots`). */
+export interface OtpInputProps extends ComponentProps<'input'> {
+  /** This slot's position, `0`-based (typically from `useOtp().slots`). */
   index: number;
 }
 
-export function OTPInput(props: OTPInputProps) {
+export function OtpInput(props: OtpInputProps) {
   const { render, index, ref: forwardedRef, ...otherProps } = props;
   const {
     value,
@@ -26,7 +26,7 @@ export function OTPInput(props: OTPInputProps) {
     registerInput,
     onSlotFocus,
     onSlotBlur,
-  } = useOTPContext();
+  } = useOtpContext();
 
   const char = value[index] ?? '';
 
