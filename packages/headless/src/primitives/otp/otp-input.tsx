@@ -1,6 +1,7 @@
 'use client';
 
-import { type Ref, useCallback } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import React, { useCallback } from 'react';
 
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useOtpContext } from './otp-context';
@@ -11,8 +12,8 @@ export interface OtpInputProps extends ComponentProps<'input'> {
   index: number;
 }
 
-export function OtpInput(props: OtpInputProps) {
-  const { render, index, ref: forwardedRef, ...otherProps } = props;
+export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(function OtpInput(props, forwardedRef) {
+  const { render, index, ...otherProps } = props;
   const {
     value,
     length,
@@ -30,18 +31,13 @@ export function OtpInput(props: OtpInputProps) {
 
   const char = value[index] ?? '';
 
-  // Compose our slot registration with any ref the consumer forwards.
-  const setRef = useCallback<(element: HTMLInputElement | null) => void>(
-    element => {
-      registerInput(index, element);
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(element);
-      } else if (forwardedRef) {
-        (forwardedRef as { current: HTMLInputElement | null }).current = element;
-      }
-    },
-    [registerInput, index, forwardedRef],
+  // Register this slot for programmatic focus, keyed by index.
+  const registerRef = useCallback<(element: HTMLInputElement | null) => void>(
+    element => registerInput(index, element),
+    [registerInput, index],
   );
+  // Compose our slot registration with any ref the consumer forwards.
+  const setRef = useMergeRefs([registerRef, forwardedRef]);
 
   // Roving tab order: the focused slot is the tab stop, or the next empty slot
   // when the field is unfocused, so Tab enters and leaves the group once.
@@ -51,7 +47,7 @@ export function OtpInput(props: OtpInputProps) {
 
   const defaultProps: Record<string, unknown> = {
     'data-cl-slot': 'otp-input',
-    ref: setRef as Ref<HTMLInputElement>,
+    ref: setRef,
     value: char,
     type: mask ? 'password' : 'text',
     inputMode: inputModeForPattern(pattern),
@@ -217,4 +213,4 @@ export function OtpInput(props: OtpInputProps) {
     },
     props: mergeProps<'input'>(defaultProps, otherProps),
   });
-}
+});

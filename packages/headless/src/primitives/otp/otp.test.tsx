@@ -499,6 +499,21 @@ describe('Otp', () => {
     });
   });
 
+  describe('ref forwarding', () => {
+    it('populates a consumer ref with the underlying input element', () => {
+      const ref = { current: null as HTMLInputElement | null };
+      render(
+        <Otp.Root length={1}>
+          <Otp.Input
+            index={0}
+            ref={ref}
+          />
+        </Otp.Root>,
+      );
+      expect(ref.current).toBe(inputs()[0]);
+    });
+  });
+
   describe('accessibility', () => {
     it('has no axe violations', async () => {
       const { container } = render(
