@@ -6,9 +6,20 @@ import type { Autocomplete } from './types';
  * (e.g. `/dashboard(.*)` matches `/dashboardxyz`).
  */
 export type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
-// Suggests the `:path*` subtree form (e.g. `/dashboard/:path*`), which matches on
-// path-segment boundaries. `/` is special-cased to `/:path*` to avoid a malformed `//:path*`.
-export type WithPathSegmentWildcard<T = string> = T extends '/' ? '/:path*' : `${T & string}/:path*`;
+
+type StripTrailingSlash<T extends string> = T extends '/'
+  ? T
+  : T extends `${infer Prefix}/`
+    ? StripTrailingSlash<Prefix>
+    : T;
+
+/**
+ * Suggests the `:path*` subtree form (e.g. `/dashboard/:path*`), which matches on
+ * path-segment boundaries. `/` is special-cased to `/:path*` to avoid a malformed `//:path*`.
+ */
+export type WithPathSegmentWildcard<T = string> = T extends '/'
+  ? '/:path*'
+  : `${StripTrailingSlash<T & string>}/:path*`;
 export type PathPattern = Autocomplete<WithPathSegmentWildcard>;
 export type PathMatcherParam = Array<RegExp | PathPattern> | RegExp | PathPattern;
 
