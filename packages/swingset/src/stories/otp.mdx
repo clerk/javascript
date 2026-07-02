@@ -10,8 +10,9 @@ targeting the `data-cl-*` attributes each part emits.
 ## Example
 
 The demo below is intentionally unstyled — it renders the raw primitive so you can see its behavior.
-Type digits and focus advances slot to slot; `Backspace` walks back; arrow keys move between slots;
-and pasting a full code distributes it across the slots.
+Type digits and focus advances slot to slot; `Backspace` walks back; arrow keys (plus `Home`/`End`
+and `Ctrl`/`Cmd` variants) move between slots; and pasting a full code distributes it across the
+slots. Focus can't skip past the first empty slot, so an empty field always focuses the first slot.
 
 <Story
   name='Default'

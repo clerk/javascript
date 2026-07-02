@@ -127,14 +127,20 @@ default element.
 
 ## Keyboard
 
-| Key                      | Behavior                                                          |
-| ------------------------ | ----------------------------------------------------------------- |
-| character                | Fills the slot and moves focus to the next slot                   |
-| `Backspace`              | Clears the slot, or the previous slot when already empty          |
-| `Delete`                 | Clears the current slot                                           |
-| `ArrowLeft`/`ArrowRight` | Moves focus to the previous / next slot                           |
-| `Home`/`End`             | Moves focus to the first / last-entered slot                      |
-| paste                    | Distributes the pasted code across the slots from the focus point |
+| Key                        | Behavior                                                          |
+| -------------------------- | ----------------------------------------------------------------- |
+| character                  | Fills the slot and moves focus to the next slot                   |
+| `Backspace`                | Clears the slot, or the previous slot when already empty          |
+| `Ctrl`/`Cmd` + `Backspace` | Clears the whole value and focuses the first slot                 |
+| `Delete`                   | Clears the current slot                                           |
+| `ArrowLeft`/`ArrowRight`   | Moves focus to the previous / next slot                           |
+| `Ctrl`/`Cmd` + arrow       | Jumps focus to the first / last-entered slot                      |
+| `Home`/`ArrowUp`           | Moves focus to the first slot                                     |
+| `End`/`ArrowDown`          | Moves focus to the last-entered slot                              |
+| paste                      | Distributes the pasted code across the slots from the focus point |
+
+Focus can't skip past the first empty slot: clicking, arrowing, or tabbing onto an empty slot beyond
+it snaps focus back to the first empty slot (so an empty field always focuses the first slot).
 
 ## Data Attributes
 

@@ -168,6 +168,113 @@ describe('OTP', () => {
       await user.keyboard('{Home}');
       expect(inputs()[0]).toHaveFocus();
     });
+
+    it('does not let focus skip past the first empty slot', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='12'
+        />,
+      );
+
+      // Clicking an empty slot beyond the first empty one snaps to slot 2.
+      await user.click(inputs()[3]);
+      expect(inputs()[2]).toHaveFocus();
+
+      // Arrowing right from the first empty slot stays put.
+      await user.keyboard('{ArrowRight}');
+      expect(inputs()[2]).toHaveFocus();
+    });
+
+    it('treats ArrowUp/ArrowDown as first / last-entered slot', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='12'
+        />,
+      );
+
+      await user.click(inputs()[0]);
+      await user.keyboard('{ArrowDown}'); // last-entered = first empty slot (index 2)
+      expect(inputs()[2]).toHaveFocus();
+
+      await user.keyboard('{ArrowUp}'); // first slot
+      expect(inputs()[0]).toHaveFocus();
+    });
+
+    it('jumps to the boundaries with Ctrl/Cmd + arrow keys', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='123'
+        />,
+      );
+
+      await user.click(inputs()[0]);
+      await user.keyboard('{Control>}{ArrowRight}{/Control}'); // last-entered (index 3)
+      expect(inputs()[3]).toHaveFocus();
+
+      await user.keyboard('{Control>}{ArrowLeft}{/Control}'); // first
+      expect(inputs()[0]).toHaveFocus();
+    });
+
+    it('clears the whole value with Ctrl/Cmd + Backspace', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='1234'
+        />,
+      );
+
+      await user.click(inputs()[2]);
+      await user.keyboard('{Control>}{Backspace}{/Control}');
+
+      expect(inputs().map(i => i.value)).toEqual(['', '', '', '']);
+      expect(inputs()[0]).toHaveFocus();
+    });
+  });
+
+  describe('clicking', () => {
+    it('focuses the first input when the field is empty', async () => {
+      const user = userEvent.setup();
+      render(<Harness length={4} />);
+
+      await user.click(inputs()[2]);
+      expect(inputs()[0]).toHaveFocus();
+    });
+
+    it('focuses the clicked slot when the field is filled', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='1234'
+        />,
+      );
+
+      await user.click(inputs()[2]);
+      expect(inputs()[2]).toHaveFocus();
+    });
+  });
+
+  describe('re-typing the same character', () => {
+    it('advances focus even though the value is unchanged', async () => {
+      const user = userEvent.setup();
+      render(
+        <Harness
+          length={4}
+          defaultValue='12'
+        />,
+      );
+
+      await user.click(inputs()[0]); // selects the "1"
+      await user.keyboard('1'); // same character
+      expect(inputs()[1]).toHaveFocus();
+    });
   });
 
   describe('paste', () => {

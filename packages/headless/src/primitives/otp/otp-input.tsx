@@ -76,6 +76,12 @@ export function OTPInput(props: OTPInputProps) {
       focus(index);
     },
     onFocus: (event: React.FocusEvent<HTMLInputElement>) => {
+      // Focus can't skip past the first empty slot: any attempt to land on an
+      // empty slot beyond it (via click, arrow key, or Tab) snaps to that slot.
+      if (index > value.length) {
+        focus(Math.min(value.length, length - 1));
+        return;
+      }
       onSlotFocus(index);
       event.currentTarget.select();
     },
@@ -110,9 +116,50 @@ export function OTPInput(props: OTPInputProps) {
         return;
       }
 
+      const lastIndex = Math.max(length - 1, 0);
+      // The last slot that can hold focus: the last-entered slot, or the first
+      // empty one when the value isn't full.
+      const endIndex = Math.min(value.length, lastIndex);
+      // Ctrl/Cmd (without Alt) turns navigation and delete into boundary actions.
+      const boundaryModifier = (event.ctrlKey || event.metaKey) && !event.altKey;
+
       switch (event.key) {
+        case 'ArrowLeft': {
+          event.preventDefault();
+          focus(boundaryModifier ? 0 : index - 1);
+          return;
+        }
+        case 'ArrowRight': {
+          event.preventDefault();
+          focus(boundaryModifier ? endIndex : index + 1);
+          return;
+        }
+        case 'Home':
+        case 'ArrowUp': {
+          event.preventDefault();
+          focus(0);
+          return;
+        }
+        case 'End':
+        case 'ArrowDown': {
+          event.preventDefault();
+          focus(endIndex);
+          return;
+        }
+        case 'Delete': {
+          event.preventDefault();
+          const next = removeAt(value, index);
+          setValue(next);
+          queueFocus(index, next);
+          return;
+        }
         case 'Backspace': {
           event.preventDefault();
+          if (boundaryModifier) {
+            setValue('');
+            queueFocus(0, '');
+            return;
+          }
           const targetIndex = Math.max(0, index - 1);
           // Delete this slot's character if it has one, otherwise the previous
           // slot's — either way focus lands on the previous slot.
@@ -120,37 +167,20 @@ export function OTPInput(props: OTPInputProps) {
           const next = removeAt(value, deleteIndex);
           setValue(next);
           queueFocus(targetIndex, next);
-          break;
-        }
-        case 'Delete': {
-          event.preventDefault();
-          const next = removeAt(value, index);
-          setValue(next);
-          queueFocus(index, next);
-          break;
-        }
-        case 'ArrowLeft': {
-          event.preventDefault();
-          focus(index - 1);
-          break;
-        }
-        case 'ArrowRight': {
-          event.preventDefault();
-          focus(index + 1);
-          break;
-        }
-        case 'Home': {
-          event.preventDefault();
-          focus(0);
-          break;
-        }
-        case 'End': {
-          event.preventDefault();
-          focus(Math.min(value.length, length - 1));
-          break;
+          return;
         }
         default:
           break;
+      }
+
+      // Re-typing the character already in the (fully selected) slot leaves the
+      // value unchanged, so onChange won't advance focus — do it here instead.
+      const fullSelection =
+        event.currentTarget.selectionStart === 0 &&
+        event.currentTarget.selectionEnd === event.currentTarget.value.length;
+      if (event.key.length === 1 && !boundaryModifier && fullSelection && char === event.key) {
+        event.preventDefault();
+        focus(index + 1);
       }
     },
     onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
