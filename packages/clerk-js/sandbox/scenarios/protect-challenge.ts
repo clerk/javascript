@@ -62,6 +62,41 @@ function getChallengeMode(): ChallengeMode {
   }
 }
 
+/**
+ * The msw session template ships with `user: null`, so a session piggybacked
+ * on a resolver response hydrates an empty `Clerk.user` after `setActive`.
+ * Graft a minimal UserJSON onto it so the signed-in state carries the real
+ * user the integration spec asserts on.
+ */
+function attachSessionUser(session: unknown, userId: string, identifier: string) {
+  (session as { user: unknown }).user = {
+    object: 'user',
+    id: userId,
+    primary_email_address_id: 'email_signed_in_user',
+    email_addresses: [
+      {
+        object: 'email_address',
+        id: 'email_signed_in_user',
+        email_address: identifier,
+        verification: {
+          object: 'verification',
+          status: 'verified',
+          strategy: 'ticket',
+          attempts: null,
+          expire_at: null,
+        },
+        linked_to: [],
+      },
+    ],
+    phone_numbers: [],
+    web3_wallets: [],
+    external_accounts: [],
+    enterprise_accounts: [],
+    passkeys: [],
+    organization_memberships: [],
+  };
+}
+
 function createNoStoreResponse(data: unknown, options?: { status?: number }) {
   return HttpResponse.json(data, {
     status: options?.status,
@@ -143,6 +178,7 @@ async function resolveSignInProtectCheck(request: Request, environment: typeof E
   }
 
   const { clientState, newSession, newUser, signInResponse } = SignInService.createUser(null);
+  attachSessionUser(newSession, newUser.id, SignInService.getIdentifier());
   setClerkState({ environment, session: newSession as any, user: newUser });
   storeSignedInIdentifier(SignInService.getIdentifier());
   clientState.response.sign_in = signInResponse as any;
@@ -162,6 +198,7 @@ export function ProtectChallenge(): MockScenario {
   if (signedInIdentifier) {
     SignInService.setIdentifier(signedInIdentifier);
     const { newSession, newUser } = SignInService.createUser(null);
+    attachSessionUser(newSession, newUser.id, signedInIdentifier);
     setClerkState({ environment, session: newSession as any, user: newUser });
   } else {
     setClerkState({ environment, session: null });
