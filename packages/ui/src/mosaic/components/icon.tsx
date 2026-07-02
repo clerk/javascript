@@ -44,10 +44,15 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   if (override) {
     // The override is authored in a consumer file without the Emotion jsx pragma, so its own `css`
     // prop would be ignored. Serialize Mosaic's styling to a real `className` (via the Mosaic cache)
-    // and inject it — plus `data-cl-slot` and the forwarded svg props — into the override element with
+    // and inject it, plus `data-cl-slot` and the forwarded svg props, into the override element with
     // cloneElement, so it styles exactly like the built-in glyph. Cloning an element (rather than
     // calling a render fn) is what lets overrides be plain elements, which unlike functions serialize
     // across the RSC boundary.
+    //
+    // Icon's `ref` is intentionally not forwarded to the override. It is typed for the built-in
+    // `SVGSVGElement`, but an override can be any element, so forwarding would mistype it (or drop it
+    // for a non-forwardRef component). A consumer that needs a ref puts one on the element they author
+    // (`icons: { name: <svg ref={r} /> }`); cloneElement preserves it, since we do not set `ref` here.
     return (
       <ClassNames>
         {emotion => {
