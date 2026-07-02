@@ -228,43 +228,54 @@ export function ProtectChallenge(): MockScenario {
 
                 await new Promise((resolve, reject) => {
                   let widgetId;
-                  const abort = () => {
+                  let settled = false;
+                  // Settle exactly once: whichever of abort / script-error /
+                  // widget callback fires first wins, and later events no-op.
+                  const settle = fn => value => {
+                    if (settled) return;
+                    settled = true;
+                    signal?.removeEventListener('abort', onAbort);
+                    fn(value);
+                  };
+                  const succeed = settle(resolve);
+                  const fail = settle(reject);
+                  const onAbort = () => {
                     try { window.turnstile?.remove(widgetId); } catch {}
                     const error = new Error('Protect challenge aborted');
                     error.name = 'AbortError';
-                    reject(error);
+                    fail(error);
                   };
-                  if (signal?.aborted) { abort(); return; }
-                  signal?.addEventListener('abort', abort, { once: true });
+                  if (signal?.aborted) { onAbort(); return; }
+                  signal?.addEventListener('abort', onAbort, { once: true });
 
                   const render = () => {
+                    // The script may finish loading after an abort settled the
+                    // run — don't render into an abandoned slot.
+                    if (settled || signal?.aborted) return;
                     widgetId = window.turnstile.render(slot, {
                       sitekey,
                       callback: () => {
-                        signal?.removeEventListener('abort', abort);
                         description.textContent = 'Turnstile challenge completed.';
-                        resolve();
+                        succeed();
                       },
-                      'error-callback': () => {
-                        signal?.removeEventListener('abort', abort);
-                        reject(new Error('Turnstile widget errored'));
-                      },
+                      'error-callback': () => fail(new Error('Turnstile widget errored')),
                     });
                   };
 
                   if (window.turnstile) { render(); return; }
-                  const existing = document.querySelector('script[data-sandbox-turnstile]');
-                  if (existing) { existing.addEventListener('load', render, { once: true }); return; }
-                  const script = document.createElement('script');
-                  script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-                  script.async = true;
-                  script.dataset.sandboxTurnstile = 'true';
+                  // Reuse an in-flight script tag from a previous run, but
+                  // always attach BOTH load and error handlers (they no-op
+                  // once settled).
+                  let script = document.querySelector('script[data-sandbox-turnstile]');
+                  if (!script) {
+                    script = document.createElement('script');
+                    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                    script.async = true;
+                    script.dataset.sandboxTurnstile = 'true';
+                    document.head.appendChild(script);
+                  }
                   script.addEventListener('load', render, { once: true });
-                  script.addEventListener('error', () => {
-                    signal?.removeEventListener('abort', abort);
-                    reject(new Error('Failed to load the Turnstile script'));
-                  }, { once: true });
-                  document.head.appendChild(script);
+                  script.addEventListener('error', () => fail(new Error('Failed to load the Turnstile script')), { once: true });
                 });
 
                 return 'sandbox-proof-token:' + token;
