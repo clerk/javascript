@@ -630,6 +630,25 @@ describe('SessionTokenCache', () => {
       await tick();
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
     });
+
+    it('schedules timers from the winner remaining ttl, not a full lifetime from now', async () => {
+      // Aged winner: minted 30s before the mocked now with a 120s lifetime, so 90s
+      // actually remain. Refresh must fire at remaining - leeway - lead time
+      // (90 - 15 - 2 = 73s) and the slot must be evicted by its real expiry, not a
+      // full 120s from now.
+      const agedRaw = createJwtWithOiat(1666648230, 1666648230, 120);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(agedRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(74 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+
+      // Past the real 90s expiry: the deletion timer has already dropped the slot.
+      vi.advanceTimersByTime(17 * 1000);
+      expect(SessionTokenCache.size()).toBe(0);
+    });
   });
 
   describe('token expiration with absolute time', () => {

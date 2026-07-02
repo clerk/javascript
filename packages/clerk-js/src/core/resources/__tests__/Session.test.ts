@@ -2252,8 +2252,8 @@ describe('Session', () => {
 
     it('successive tokens without oiat keep writing lastActiveToken (equal rank, newest wins)', async () => {
       const session = makeSession();
-      const first = createJwtWithOiat(NOW, undefined, { sid: 'sess_a' });
-      const second = createJwtWithOiat(NOW + 5, undefined, { sid: 'sess_b' });
+      const first = createJwtWithOiat(NOW, undefined);
+      const second = createJwtWithOiat(NOW + 5, undefined);
 
       fetchSpy
         .mockResolvedValueOnce({ object: 'token', jwt: first })
@@ -2264,6 +2264,27 @@ describe('Session', () => {
 
       expect(await session.getToken({ skipCache: true })).toBe(second);
       expect(session.lastActiveToken?.getRawString()).toBe(second);
+    });
+
+    it('an org-switch token minted with a lower oiat still replaces the previous org lastActiveToken', async () => {
+      const session = makeSession();
+      const personalHigh = createJwtWithOiat(NOW, NOW + 30);
+      const orgLow = createJwtWithOiat(NOW + 5, NOW, { org: 'org_next' });
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: personalHigh })
+        .mockResolvedValueOnce({ object: 'token', jwt: orgLow });
+
+      expect(await session.getToken()).toBe(personalHigh);
+      expect(session.lastActiveToken?.getRawString()).toBe(personalHigh);
+
+      // setActive commits the new organization before its first token fetch.
+      session.lastActiveOrganizationId = 'org_next';
+
+      expect(await session.getToken()).toBe(orgLow);
+      // A cross-org lastActiveToken is not a freshness baseline: the new org's token
+      // wins even though a stale edge minted it with a lower oiat.
+      expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
     });
   });
 });

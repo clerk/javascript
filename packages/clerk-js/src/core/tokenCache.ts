@@ -402,11 +402,21 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         const expiresAt = winnerClaims.exp;
         const issuedAt = winnerClaims.iat;
         const expiresIn: Seconds = expiresAt - issuedAt;
+        // Timers run relative to now, while createdAt/expiresIn describe the token's
+        // real validity window for get(). An aged winner (alive for part of its
+        // lifetime already) must be evicted and refreshed by its real expiry, not a
+        // full lifetime from now.
+        const remainingTtl: Seconds = expiresAt - Math.floor(Date.now() / 1000);
 
         live.createdAt = issuedAt;
         live.expiresIn = expiresIn;
 
-        const timeoutId = setTimeout(() => dropIfCurrent(live), expiresIn * 1000);
+        if (remainingTtl <= 0) {
+          dropIfCurrent(live);
+          return;
+        }
+
+        const timeoutId = setTimeout(() => dropIfCurrent(live), remainingTtl * 1000);
         live.timeoutId = timeoutId;
 
         // Teach ClerkJS not to block the exit of the event loop when used in Node environments.
@@ -422,7 +432,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         const refreshLeadTime = 2;
         const minLeeway = POLLER_INTERVAL_IN_MS / 1000; // Minimum is poller interval (5s)
         const leeway = Math.max(BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS, minLeeway);
-        const refreshFireTime = expiresIn - leeway - refreshLeadTime;
+        const refreshFireTime = remainingTtl - leeway - refreshLeadTime;
 
         if (refreshFireTime > 0 && live.entry.onRefresh) {
           const refreshTimeoutId = setTimeout(() => {

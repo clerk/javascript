@@ -221,8 +221,9 @@ export class AuthCookieService {
   }
 
   // Returns true only when `raw` is strictly staler than the SAME session+org current cookie.
-  // Fails open (false) for tokens without oiat, decode failures, and cross-context tokens: the
-  // cookie enforces monotonicity within one session+org only, never across a session/org switch.
+  // Fails open (false) for tokens without oiat, decode failures, cross-context tokens, and an
+  // already-expired current cookie: the cookie enforces monotonicity within one session+org
+  // only, never across a session/org switch.
   #shouldDropStaleToken(raw: string): boolean {
     const incoming = this.#decodeToken(raw);
     if (!incoming || tokenOiat(incoming) == null) {
@@ -231,6 +232,13 @@ export class AuthCookieService {
 
     const current = this.#decodeToken(this.sessionCookie.get());
     if (!current || tokenOiat(current) == null) {
+      return false;
+    }
+
+    // An expired cookie is not a freshness baseline: a valid fresh mint must always be
+    // able to replace it, even when a stale edge read gives it a lower oiat.
+    const currentExp = current.jwt?.claims?.exp;
+    if (typeof currentExp !== 'number' || currentExp <= Math.floor(Date.now() / 1000)) {
       return false;
     }
 
