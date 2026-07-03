@@ -1,4 +1,5 @@
 import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
@@ -831,7 +832,14 @@ describe('Clerk singleton', () => {
         signedInSessions: [session],
         lastActiveSessionId: session.id,
       });
-      const sessionlessClient = () => ({ signedInSessions: [], lastActiveSessionId: null });
+      const makeSession = (overrides: Record<string, unknown> = {}) => ({
+        id: 'sess_1',
+        status: 'active',
+        user: {},
+        getToken: vi.fn(() => Promise.resolve('fresh-token')),
+        clearCache: vi.fn(),
+        ...overrides,
+      });
 
       // `load()` awaits native crypto (cookie suffix) before scheduling the timeout, so a single
       // advance can run before the timer exists; advance the budget repeatedly until load settles.
@@ -858,7 +866,8 @@ describe('Clerk singleton', () => {
         stopPollSpy = vi
           .spyOn(AuthCookieService.prototype, 'stopPollingForToken')
           .mockImplementation(() => void callLog.push('stopPoll'));
-        mockCreateClientFromJwt.mockReturnValue(sessionlessClient());
+        mockClientFetch.mockClear();
+        mockCreateClientFromJwt.mockReturnValue({ signedInSessions: [], lastActiveSessionId: null });
       });
 
       afterEach(() => {
@@ -878,6 +887,25 @@ describe('Clerk singleton', () => {
         expect(sut.status).toBe('degraded');
         expect(stopPollSpy).toHaveBeenCalled();
         expect(startPollSpy).toHaveBeenCalled();
+        // The timed-out /client request gets aborted instead of being left in flight.
+        expect(mockClientFetch.mock.calls[0]?.[0]?.signal?.aborted).toBe(true);
+      });
+
+      it('builds the degraded identity from the minted token and falls back to the cookie only if the mint fails', async () => {
+        const stubSession = makeSession();
+        const freshSession = { id: 'sess_1', status: 'active', user: { id: 'user_fresh' } };
+        const freshClient = { signedInSessions: [freshSession], lastActiveSessionId: 'sess_1' };
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValueOnce(sessionClient(stubSession)).mockReturnValueOnce(freshClient);
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(mockCreateClientFromJwt).toHaveBeenCalledTimes(2);
+        expect(mockCreateClientFromJwt).toHaveBeenNthCalledWith(2, 'fresh-token');
+        expect(sut.client).toBe(freshClient);
+        expect(sut.session).toBe(freshSession);
+        expect(sut.status).toBe('degraded');
       });
 
       it('clears the token cache and mints without skipCache when the client fetch fails with a session present', async () => {
@@ -886,21 +914,13 @@ describe('Clerk singleton', () => {
           return Promise.resolve('fresh-token');
         });
         const clearCache = vi.fn(() => void callLog.push('clearCache'));
-        const session = {
-          id: 'sess_1',
-          status: 'active',
-          user: {},
-          getToken,
-          clearCache,
-        };
+        const session = makeSession({ getToken, clearCache });
         mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
         mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
 
-        expect(clearCache).toHaveBeenCalledTimes(1);
-        expect(getToken).toHaveBeenCalledTimes(1);
         expect(getToken).toHaveBeenCalledWith();
         expect(getToken).not.toHaveBeenCalledWith({ skipCache: true });
         expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'startPoll']);
@@ -914,24 +934,14 @@ describe('Clerk singleton', () => {
           return new Promise<string>(() => {});
         });
         const clearCache = vi.fn(() => void callLog.push('clearCache'));
-        const session = {
-          id: 'sess_1',
-          status: 'active',
-          user: {},
-          getToken,
-          clearCache,
-        };
+        const session = makeSession({ getToken, clearCache });
         mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
         mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
 
         const sut = new Clerk(productionPublishableKey);
         await pumpUntilSettled(sut.load());
 
-        expect(clearCache).toHaveBeenCalledTimes(2);
         expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'clearCache', 'startPoll']);
-        const secondClearOrder = clearCache.mock.invocationCallOrder[1];
-        const lastStartPollOrder = startPollSpy.mock.invocationCallOrder.at(-1);
-        expect(secondClearOrder).toBeLessThan(lastStartPollOrder!);
         expect(sut.status).toBe('degraded');
       });
 
@@ -954,6 +964,51 @@ describe('Clerk singleton', () => {
         await expect(sut.load()).rejects.toBe(err);
 
         expect(mockCreateClientFromJwt).not.toHaveBeenCalled();
+      });
+
+      it('re-fetches /client in the background after a degraded load and applies the late response', async () => {
+        vi.useFakeTimers();
+        const stubSession = makeSession();
+        const realSession = { id: 'sess_1', status: 'active', user: { id: 'user_real' } };
+        const realClient = { id: 'client_real', signedInSessions: [realSession], lastActiveSessionId: 'sess_1' };
+        const refetch = createDeferredPromise();
+        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed')).mockReturnValueOnce(refetch.promise);
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(stubSession));
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(sut.status).toBe('degraded');
+        expect(mockClientFetch).toHaveBeenCalledTimes(2);
+
+        // The background retry is not bounded by INITIALIZATION_TIMEOUT_MS.
+        await vi.advanceTimersByTimeAsync(60_000);
+        refetch.resolve(realClient);
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(sut.client).toBe(realClient);
+        expect(sut.session).toBe(realSession);
+      });
+
+      it('discards the background /client response when something else updated the client while it was in flight', async () => {
+        const stubSession = makeSession();
+        const refetch = createDeferredPromise();
+        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed')).mockReturnValueOnce(refetch.promise);
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(stubSession));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        // Something newer lands while the background retry is still in flight, e.g. a sign-out
+        // or a mutation's piggybacked client.
+        const interimClient = { id: 'client_interim', signedInSessions: [], lastActiveSessionId: null };
+        sut.updateClient(interimClient as any);
+
+        const staleClient = { id: 'client_stale', signedInSessions: [stubSession], lastActiveSessionId: 'sess_1' };
+        refetch.resolve(staleClient);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(sut.client).toBe(interimClient);
       });
     });
   });
