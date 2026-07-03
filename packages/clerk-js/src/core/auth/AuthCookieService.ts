@@ -19,6 +19,8 @@ import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
+import { Token } from '../resources/Token';
+import { normalizeOrgId, pickFreshestJwt, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -205,6 +207,10 @@ export class AuthCookieService {
       return;
     }
 
+    if (token && this.#shouldDropStaleToken(token)) {
+      return;
+    }
+
     if (!token && !isValidBrowserOnline()) {
       debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
@@ -212,6 +218,51 @@ export class AuthCookieService {
     this.setActiveContextInStorage();
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
+  }
+
+  // Returns true only when `raw` is strictly staler than the SAME session+org current cookie.
+  // Fails open (false) for tokens without oiat, decode failures, cross-context tokens, and an
+  // already-expired current cookie: the cookie enforces monotonicity within one session+org
+  // only, never across a session/org switch.
+  #shouldDropStaleToken(raw: string): boolean {
+    const incoming = this.#decodeToken(raw);
+    if (!incoming || tokenOiat(incoming) == null) {
+      return false;
+    }
+
+    const current = this.#decodeToken(this.sessionCookie.get());
+    if (!current || tokenOiat(current) == null) {
+      return false;
+    }
+
+    // An expired cookie is not a freshness baseline: a valid fresh mint must always be
+    // able to replace it, even when a stale edge read gives it a lower oiat.
+    const currentExp = current.jwt?.claims?.exp;
+    if (typeof currentExp !== 'number' || currentExp <= Math.floor(Date.now() / 1000)) {
+      return false;
+    }
+
+    // Only a same session+org cookie is a comparable freshness baseline; write through otherwise.
+    if (
+      tokenSid(current) !== tokenSid(incoming) ||
+      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
+    ) {
+      return false;
+    }
+
+    return pickFreshestJwt(current, incoming) === current;
+  }
+
+  #decodeToken(raw: string | undefined): Token | null {
+    if (!raw) {
+      return null;
+    }
+    try {
+      const token = new Token({ id: '__session', jwt: raw, object: 'token' });
+      return token.jwt ? token : null;
+    } catch {
+      return null;
+    }
   }
 
   public setClientUatCookieForDevelopmentInstances() {

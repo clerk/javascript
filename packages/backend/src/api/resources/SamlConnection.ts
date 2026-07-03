@@ -20,6 +20,10 @@ export class SamlConnection {
     readonly idpSsoUrl: string | null,
     /** The X.509 certificate as provided by the Identity Provider (IdP). */
     readonly idpCertificate: string | null,
+    /** The Unix timestamp when the Identity Provider (IdP) certificate was issued. */
+    readonly idpCertificateIssuedAt: number,
+    /** The Unix timestamp when the Identity Provider (IdP) certificate expires. */
+    readonly idpCertificateExpiresAt: number,
     /** The URL which serves the Identity Provider (IdP) metadata. If present, it takes priority over the corresponding individual properties. */
     readonly idpMetadataUrl: string | null,
     /** The XML content of the Identity Provider (IdP) metadata file. If present, it takes priority over the corresponding individual properties. */
@@ -58,6 +62,8 @@ export class SamlConnection {
       data.idp_entity_id,
       data.idp_sso_url,
       data.idp_certificate,
+      data.idp_certificate_issued_at,
+      data.idp_certificate_expires_at,
       data.idp_metadata_url,
       data.idp_metadata,
       data.acs_url,
