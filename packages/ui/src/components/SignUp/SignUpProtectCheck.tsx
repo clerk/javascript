@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
-import type { ComponentType } from 'react';
+import { type ComponentType, useEffect, useRef } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -19,6 +19,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
+import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
@@ -47,8 +48,22 @@ function SignUpProtectCheckInternal({
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
   const { navigate } = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
   const { setActive } = useClerk();
   const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  const hasSeenProtectCheckRef = useRef(!!signUp.protectCheck);
+  const didStartNoCheckFallbackRef = useRef(false);
+
+  if (signUp.protectCheck) {
+    hasSeenProtectCheckRef.current = true;
+  }
+
+  useEffect(() => {
+    if (!signUp.protectCheck && !hasSeenProtectCheckRef.current && !didStartNoCheckFallbackRef.current) {
+      didStartNoCheckFallbackRef.current = true;
+      void navigateToFlowStart();
+    }
+  }, [navigateToFlowStart, signUp.protectCheck]);
 
   const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
