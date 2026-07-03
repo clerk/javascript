@@ -87,7 +87,10 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
   return clerkAny as DeepVitestMocked<LoadedClerk>;
 };
 
-export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepVitestMocked<RouteContextValue>>) => {
+export const mockRouteContextValue = ({
+  queryString = '',
+  queryParams,
+}: Partial<DeepVitestMocked<RouteContextValue>>) => {
   return {
     basePath: '',
     startPath: '',
@@ -96,7 +99,7 @@ export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepVitestMo
     indexPath: '',
     currentPath: '',
     queryString,
-    queryParams: {},
+    queryParams: queryParams ?? {},
     getMatchData: vi.fn(),
     matches: vi.fn(),
     baseNavigate: vi.fn(),

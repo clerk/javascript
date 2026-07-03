@@ -35,6 +35,7 @@ export type * from './localization';
 export type * from './multiDomain';
 export type * from './oauth';
 export type * from './oauthApplication';
+export type * from './oauthTransport';
 export type * from './organization';
 export type * from './organizationCreationDefaults';
 export type * from './organizationDomain';

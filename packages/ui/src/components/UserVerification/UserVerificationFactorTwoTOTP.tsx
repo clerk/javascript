@@ -14,6 +14,7 @@ export function UserVerificationFactorTwoTOTP(props: UVFactorTwoTOTPCardProps): 
         cardTitle={localizationKeys('reverification.totpMfa.title')}
         cardSubtitle={localizationKeys('reverification.totpMfa.subtitle')}
         inputLabel={localizationKeys('reverification.totpMfa.formTitle')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
         showAlternativeMethods={props.showAlternativeMethods}
       />
     </Flow.Part>

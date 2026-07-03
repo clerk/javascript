@@ -18,6 +18,7 @@ export const SignInFactorOneForgotPasswordCard = (props: SignInForgotPasswordCar
         cardTitle={localizationKeys('signIn.forgotPassword.title')}
         inputLabel={localizationKeys('signIn.forgotPassword.formTitle')}
         resendButton={localizationKeys('signIn.forgotPassword.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
       />
     </Flow.Part>
   );

@@ -9,6 +9,7 @@ import {
   isNetworkError,
   isUnauthenticatedError,
 } from '@clerk/shared/error';
+import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
@@ -37,7 +38,7 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  * and auth from the Clerk instance.
  * This service is responsible to:
  *   - refresh the session cookie using a poller
- *   - refresh the session cookie on tab visibility change
+ *   - refresh the session cookie on tab focus and visibility change
  *   - update the related cookies listening to the `token:update` event
  *   - initialize auth related cookies for development instances (eg __client_uat, __clerk_db_jwt)
  *   - cookie setup for production / development instances
@@ -156,7 +157,7 @@ export class AuthCookieService {
   }
 
   private refreshTokenOnFocus() {
-    window.addEventListener('focus', () => {
+    const refreshIfVisible = () => {
       if (document.visibilityState === 'visible') {
         // Certain data-fetching libraries that refetch on focus use setTimeout(cb, 0) to schedule a task on the event loop.
         // This gives us an opportunity to ensure the session cookie is updated with a fresh token before the fetch occurs, but it needs to
@@ -166,7 +167,15 @@ export class AuthCookieService {
         // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
         void this.refreshSessionToken({ updateCookieImmediately: true });
       }
-    });
+    };
+
+    // `focus` covers top-level tabs (and the multi-tab active-organization handoff added in #3786), but it never fires
+    // inside a cross-origin iframe on tab re-activation unless the frame itself is clicked. `visibilitychange` does
+    // propagate into the iframe, so embedded apps (e.g. a preview pane) still get a fresh cookie before they refetch.
+    window.addEventListener('focus', refreshIfVisible);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', refreshIfVisible);
+    }
   }
 
   private async refreshSessionToken({
@@ -189,8 +198,10 @@ export class AuthCookieService {
   }
 
   private updateSessionCookie(token: string | null) {
-    // Only allow background tabs to update if both session and organization match
-    if (!document.hasFocus() && !this.isCurrentContextActive()) {
+    // Only allow background tabs to update if both session and organization match.
+    // A cross-origin iframe never reports focus even while visible, so treat a visible embedded
+    // frame as eligible to write; top-level multi-tab ownership still keys on `document.hasFocus()`.
+    if (!document.hasFocus() && !this.inVisibleCrossOriginIframe() && !this.isCurrentContextActive()) {
       return;
     }
 
@@ -256,6 +267,10 @@ export class AuthCookieService {
     } else {
       this.activeCookie.remove();
     }
+  }
+
+  private inVisibleCrossOriginIframe() {
+    return inCrossOriginIframe() && document.visibilityState === 'visible';
   }
 
   private isCurrentContextActive() {

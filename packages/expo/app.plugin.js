@@ -3,11 +3,10 @@
  * Automatically configures iOS and Android to work with Clerk native components
  *
  * When this plugin is used:
- * 1. iOS is configured with Swift Package Manager dependency for clerk-ios
+ * 1. iOS is configured with the required deployment target and metadata
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
   withXcodeProject,
@@ -18,9 +17,7 @@ const {
 } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
-
-const CLERK_IOS_REPO = 'https://github.com/clerk/clerk-ios.git';
-const CLERK_IOS_VERSION = '1.0.0';
+const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
@@ -82,372 +79,10 @@ const withClerkIOS = config => {
     return config;
   });
 
-  // Then add the Swift Package dependency
-  config = withXcodeProject(config, config => {
-    const xcodeProject = config.modResults;
-
-    try {
-      // Get the main app target
-      const targets = xcodeProject.getFirstTarget();
-      if (!targets) {
-        console.warn('⚠️  Could not find main target in Xcode project');
-        return config;
-      }
-
-      const targetUuid = targets.uuid;
-      const targetName = targets.name;
-
-      // Add Swift Package reference to the project
-      const packageUuid = xcodeProject.generateUuid();
-      const packageName = 'clerk-ios';
-
-      // Add package reference to XCRemoteSwiftPackageReference section
-      if (!xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference) {
-        xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference = {};
-      }
-
-      xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[packageUuid] = {
-        isa: 'XCRemoteSwiftPackageReference',
-        repositoryURL: CLERK_IOS_REPO,
-        requirement: {
-          kind: 'exactVersion',
-          version: CLERK_IOS_VERSION,
-        },
-      };
-
-      // Add package product dependencies (ClerkKit + ClerkKitUI)
-      const productUuidKit = xcodeProject.generateUuid();
-      const productUuidKitUI = xcodeProject.generateUuid();
-      if (!xcodeProject.hash.project.objects.XCSwiftPackageProductDependency) {
-        xcodeProject.hash.project.objects.XCSwiftPackageProductDependency = {};
-      }
-
-      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKit] = {
-        isa: 'XCSwiftPackageProductDependency',
-        package: packageUuid,
-        productName: 'ClerkKit',
-      };
-
-      xcodeProject.hash.project.objects.XCSwiftPackageProductDependency[productUuidKitUI] = {
-        isa: 'XCSwiftPackageProductDependency',
-        package: packageUuid,
-        productName: 'ClerkKitUI',
-      };
-
-      // Add package to project's package references
-      const projectSection = xcodeProject.hash.project.objects.PBXProject;
-      const projectUuid = Object.keys(projectSection)[0];
-      const project = projectSection[projectUuid];
-
-      if (!project.packageReferences) {
-        project.packageReferences = [];
-      }
-
-      // Check if package is already added
-      const alreadyAdded = project.packageReferences.some(ref => {
-        const refObj = xcodeProject.hash.project.objects.XCRemoteSwiftPackageReference[ref.value];
-        return refObj && refObj.repositoryURL === CLERK_IOS_REPO;
-      });
-
-      if (!alreadyAdded) {
-        project.packageReferences.push({
-          value: packageUuid,
-          comment: packageName,
-        });
-      }
-
-      // Add package products to main app target
-      const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[targetUuid];
-      if (!nativeTarget.packageProductDependencies) {
-        nativeTarget.packageProductDependencies = [];
-      }
-
-      const kitAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKit);
-      if (!kitAlreadyAdded) {
-        nativeTarget.packageProductDependencies.push({
-          value: productUuidKit,
-          comment: 'ClerkKit',
-        });
-      }
-
-      const kitUIAlreadyAdded = nativeTarget.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
-      if (!kitUIAlreadyAdded) {
-        nativeTarget.packageProductDependencies.push({
-          value: productUuidKitUI,
-          comment: 'ClerkKitUI',
-        });
-      }
-
-      // Also add packages to ClerkExpo pod target if it exists
-      const allTargets = xcodeProject.hash.project.objects.PBXNativeTarget;
-      for (const [uuid, target] of Object.entries(allTargets)) {
-        if (target && target.name === 'ClerkExpo') {
-          if (!target.packageProductDependencies) {
-            target.packageProductDependencies = [];
-          }
-
-          const podKitAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKit);
-          if (!podKitAdded) {
-            target.packageProductDependencies.push({
-              value: productUuidKit,
-              comment: 'ClerkKit',
-            });
-          }
-
-          const podKitUIAdded = target.packageProductDependencies.some(dep => dep.value === productUuidKitUI);
-          if (!podKitUIAdded) {
-            target.packageProductDependencies.push({
-              value: productUuidKitUI,
-              comment: 'ClerkKitUI',
-            });
-          }
-
-          console.log(`✅ Added ClerkKit and ClerkKitUI packages to ClerkExpo pod target`);
-        }
-      }
-
-      console.log(`✅ Added clerk-ios Swift package dependency (${CLERK_IOS_VERSION})`);
-    } catch (error) {
-      console.error('❌ Error adding clerk-ios package:', error.message);
-    }
-
-    return config;
+  config = withInfoPlist(config, modConfig => {
+    modConfig.modResults.ClerkExpoVersion = packageJson.version;
+    return modConfig;
   });
-
-  // Inject ClerkViewFactory.register() call into AppDelegate.swift
-  config = withDangerousMod(config, [
-    'ios',
-    async config => {
-      const platformProjectRoot = config.modRequest.platformProjectRoot;
-      const projectName = config.modRequest.projectName;
-      const appDelegatePath = path.join(platformProjectRoot, projectName, 'AppDelegate.swift');
-
-      if (fs.existsSync(appDelegatePath)) {
-        let contents = fs.readFileSync(appDelegatePath, 'utf8');
-
-        // Check if already added
-        if (!contents.includes('ClerkViewFactory.register()')) {
-          // Find the didFinishLaunchingWithOptions method and add the registration call
-          // Look for the return statement in didFinishLaunching
-          const pattern = /(func application\s*\([^)]*didFinishLaunchingWithOptions[^)]*\)[^{]*\{)/;
-          const match = contents.match(pattern);
-
-          if (match) {
-            // Insert after the opening brace of didFinishLaunching
-            const insertPoint = match.index + match[0].length;
-            const registrationCode = '\n    // Register Clerk native views\n    ClerkViewFactory.register()\n';
-            contents = contents.slice(0, insertPoint) + registrationCode + contents.slice(insertPoint);
-            fs.writeFileSync(appDelegatePath, contents);
-            console.log('✅ Added ClerkViewFactory.register() to AppDelegate.swift');
-          } else {
-            console.warn('⚠️  Could not find didFinishLaunchingWithOptions in AppDelegate.swift');
-          }
-        }
-      }
-
-      return config;
-    },
-  ]);
-
-  // Then inject ClerkViewFactory.swift into the app target
-  // This is required because the file uses `import ClerkKit` which is only available
-  // via SPM in the app target (CocoaPods targets can't see SPM packages)
-  config = withXcodeProject(config, config => {
-    try {
-      const platformProjectRoot = config.modRequest.platformProjectRoot;
-      const projectName = config.modRequest.projectName;
-      const iosProjectPath = path.join(platformProjectRoot, projectName);
-
-      // Find the ClerkViewFactory.swift source file using Node's module resolution,
-      // which handles arbitrary nesting depths in pnpm/yarn/npm workspaces.
-      let sourceFile;
-      try {
-        const packageRoot = path.dirname(require.resolve('@clerk/expo/package.json'));
-        sourceFile = path.join(packageRoot, 'ios', 'ClerkViewFactory.swift');
-      } catch {
-        sourceFile = null;
-      }
-
-      if (sourceFile && fs.existsSync(sourceFile)) {
-        // ALWAYS copy the file to ensure we have the latest version
-        const targetFile = path.join(iosProjectPath, 'ClerkViewFactory.swift');
-        fs.copyFileSync(sourceFile, targetFile);
-        console.log('✅ Copied ClerkViewFactory.swift to app target');
-
-        // Add the file to the Xcode project manually
-        const xcodeProject = config.modResults;
-        const relativePath = `${projectName}/ClerkViewFactory.swift`;
-        const fileName = 'ClerkViewFactory.swift';
-
-        try {
-          // Get the main target
-          const target = xcodeProject.getFirstTarget();
-          if (!target || !target.uuid) {
-            console.warn('⚠️  Could not find target UUID, file copied but not added to project');
-            return config;
-          }
-
-          const targetUuid = target.uuid;
-
-          // Check if file is already in the Xcode project references
-          const fileReferences = xcodeProject.hash.project.objects.PBXFileReference || {};
-          const alreadyExists = Object.values(fileReferences).some(ref => ref && ref.path === fileName);
-
-          if (alreadyExists) {
-            // File is already in project, but we still copied the latest version
-            console.log('✅ ClerkViewFactory.swift updated in app target');
-            return config;
-          }
-
-          // 1. Create PBXFileReference
-          const fileRefUuid = xcodeProject.generateUuid();
-          if (!xcodeProject.hash.project.objects.PBXFileReference) {
-            xcodeProject.hash.project.objects.PBXFileReference = {};
-          }
-
-          xcodeProject.hash.project.objects.PBXFileReference[fileRefUuid] = {
-            isa: 'PBXFileReference',
-            lastKnownFileType: 'sourcecode.swift',
-            name: fileName,
-            path: relativePath, // Use full relative path (projectName/ClerkViewFactory.swift)
-            sourceTree: '"<group>"',
-          };
-
-          // 2. Create PBXBuildFile
-          const buildFileUuid = xcodeProject.generateUuid();
-          if (!xcodeProject.hash.project.objects.PBXBuildFile) {
-            xcodeProject.hash.project.objects.PBXBuildFile = {};
-          }
-
-          xcodeProject.hash.project.objects.PBXBuildFile[buildFileUuid] = {
-            isa: 'PBXBuildFile',
-            fileRef: fileRefUuid,
-            fileRef_comment: fileName,
-          };
-
-          // 3. Add to PBXSourcesBuildPhase
-          const buildPhases = xcodeProject.hash.project.objects.PBXSourcesBuildPhase || {};
-          let sourcesPhaseUuid = null;
-
-          // Find the sources build phase for the main target
-          const nativeTarget = xcodeProject.hash.project.objects.PBXNativeTarget[targetUuid];
-          if (nativeTarget && nativeTarget.buildPhases) {
-            for (const phase of nativeTarget.buildPhases) {
-              if (buildPhases[phase.value] && buildPhases[phase.value].isa === 'PBXSourcesBuildPhase') {
-                sourcesPhaseUuid = phase.value;
-                break;
-              }
-            }
-          }
-
-          if (sourcesPhaseUuid && buildPhases[sourcesPhaseUuid]) {
-            if (!buildPhases[sourcesPhaseUuid].files) {
-              buildPhases[sourcesPhaseUuid].files = [];
-            }
-
-            buildPhases[sourcesPhaseUuid].files.push({
-              value: buildFileUuid,
-              comment: fileName,
-            });
-          } else {
-            console.warn('⚠️  Could not find PBXSourcesBuildPhase for target');
-          }
-
-          // 4. Add to PBXGroup (main group for the project)
-          const groups = xcodeProject.hash.project.objects.PBXGroup || {};
-          let mainGroupUuid = null;
-
-          // Find the group with the same name as the project
-          for (const [uuid, group] of Object.entries(groups)) {
-            if (group && group.name === projectName) {
-              mainGroupUuid = uuid;
-              break;
-            }
-          }
-
-          if (mainGroupUuid && groups[mainGroupUuid]) {
-            if (!groups[mainGroupUuid].children) {
-              groups[mainGroupUuid].children = [];
-            }
-
-            // Add file reference to the group
-            groups[mainGroupUuid].children.push({
-              value: fileRefUuid,
-              comment: fileName,
-            });
-          } else {
-            console.warn('⚠️  Could not find main PBXGroup for project');
-          }
-
-          console.log('✅ Added ClerkViewFactory.swift to Xcode project');
-        } catch (addError) {
-          console.error('❌ Error adding file to Xcode project:', addError.message);
-          console.error(addError.stack);
-        }
-      } else {
-        console.warn('⚠️  ClerkViewFactory.swift not found, skipping injection');
-      }
-    } catch (error) {
-      console.error('❌ Error injecting ClerkViewFactory.swift:', error.message);
-    }
-
-    return config;
-  });
-
-  // Inject SPM package resolution into Podfile post_install hook
-  // This runs synchronously during pod install, ensuring packages are resolved before prebuild completes
-  config = withDangerousMod(config, [
-    'ios',
-    async config => {
-      const platformProjectRoot = config.modRequest.platformProjectRoot;
-      const projectName = config.modRequest.projectName;
-      const podfilePath = path.join(platformProjectRoot, 'Podfile');
-
-      if (fs.existsSync(podfilePath)) {
-        let podfileContents = fs.readFileSync(podfilePath, 'utf8');
-
-        // Check if we've already added our resolution code
-        if (!podfileContents.includes('# Clerk: Resolve SPM packages')) {
-          // Code to inject into existing post_install block
-          // Note: We run this AFTER react_native_post_install to ensure the workspace is fully written
-          const spmResolutionCode = `
-    # Clerk: Resolve SPM packages synchronously during pod install
-    # This ensures packages are downloaded before the user opens Xcode
-    # We wait until the end of post_install to ensure workspace is fully written
-    at_exit do
-      workspace_path = File.join(__dir__, '${projectName}.xcworkspace')
-      if File.exist?(workspace_path)
-        puts ""
-        puts "📦 [Clerk] Resolving Swift Package dependencies..."
-        puts "   This may take a minute on first run..."
-        # Use backticks to capture output and check exit status
-        output = \`xcodebuild -resolvePackageDependencies -workspace "#{workspace_path}" -scheme "${projectName}" 2>&1\`
-        if $?.success?
-          puts "✅ [Clerk] Swift Package dependencies resolved successfully"
-        else
-          puts "⚠️  [Clerk] SPM resolution output:"
-          puts output.lines.last(10).join
-        end
-        puts ""
-      end
-    end
-`;
-
-          // Insert our code at the beginning of the existing post_install block
-          if (podfileContents.includes('post_install do |installer|')) {
-            podfileContents = podfileContents.replace(
-              /post_install do \|installer\|/,
-              `post_install do |installer|${spmResolutionCode}`,
-            );
-            fs.writeFileSync(podfilePath, podfileContents);
-            console.log('✅ Added SPM resolution to Podfile post_install hook');
-          }
-        }
-      }
-
-      return config;
-    },
-  ]);
 
   return config;
 };
@@ -547,12 +182,11 @@ const withClerkGoogleSignIn = config => {
  * Combined Clerk Expo plugin
  *
  * When this plugin is configured in app.json/app.config.js:
- * 1. iOS gets Swift Package Manager dependency for clerk-ios SDK
+ * 1. iOS gets the deployment target and metadata required by Clerk native views
  * 2. Android gets packaging exclusions for dependency conflicts
  * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.
@@ -591,7 +225,8 @@ const withClerkAppleSignIn = config => {
  * Accepts a `theme` prop pointing to a JSON file with optional keys:
  *   - colors: { primary, background, input, danger, success, warning,
  *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
+ *               secondaryButtonForeground }  (hex color strings)
  *   - darkColors: same keys as colors (for dark mode)
  *   - design: { fontFamily: string, borderRadius: number }
  *
@@ -614,6 +249,8 @@ const VALID_COLOR_KEYS = [
   'ring',
   'muted',
   'shadow',
+  'secondaryButtonBackground',
+  'secondaryButtonForeground',
 ];
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
@@ -716,4 +353,9 @@ const withClerkExpo = (config, props = {}) => {
 };
 
 module.exports = withClerkExpo;
-module.exports._testing = { validateThemeJson, isPlainObject, VALID_COLOR_KEYS, HEX_COLOR_REGEX };
+module.exports._testing = {
+  validateThemeJson,
+  isPlainObject,
+  VALID_COLOR_KEYS,
+  HEX_COLOR_REGEX,
+};

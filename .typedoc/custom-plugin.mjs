@@ -1,4 +1,5 @@
 // @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
+import { Converter, DeclarationReflection, ReflectionKind, ReflectionType, RendererEvent } from 'typedoc';
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -38,6 +39,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-creation-defaults-params.mdx',
   'use-o-auth-consent-params.mdx',
   'use-o-auth-consent-return.mdx',
+  'create-organization-domain-params.mdx',
 ];
 
 /**
@@ -62,14 +64,18 @@ const LINK_REPLACEMENTS = [
   ['user-resource', '/docs/reference/objects/user'],
   ['session-status-claim', '/docs/reference/types/session-status'],
   ['user-organization-invitation-resource', '/docs/reference/types/user-organization-invitation'],
+  ['organization-custom-role-key', '/docs/reference/types/organization-custom-role-key'],
   ['organization-membership-resource', '/docs/reference/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/objects/organization'],
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
+  ['o-auth-application-namespace', '/docs/reference/types/oauth-application'],
   ['o-auth-consent-info', '/docs/reference/types/oauth-consent-info'],
   ['o-auth-consent-scope', '/docs/reference/types/oauth-consent-scope'],
+  ['o-auth-strategy', '/docs/reference/types/sso#o-auth-strategy'],
+  ['o-auth-provider', '/docs/reference/types/sso#o-auth-provider'],
   ['session', '/docs/reference/backend/types/backend-session'],
   ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
   ['organization', '/docs/reference/backend/types/backend-organization'],
@@ -82,7 +88,10 @@ const LINK_REPLACEMENTS = [
   ['enterprise-account-connection', '/docs/reference/backend/types/backend-enterprise-account-connection'],
   ['enterprise-connection', '/docs/reference/backend/types/backend-enterprise-connection'],
   ['enterprise-connection-oauth-config', '/docs/reference/backend/types/backend-enterprise-connection-oauth-config'],
-  ['enterprise-connection-saml-connection', '/docs/reference/backend/types/backend-enterprise-connection-saml-connection'],
+  [
+    'enterprise-connection-saml-connection',
+    '/docs/reference/backend/types/backend-enterprise-connection-saml-connection',
+  ],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
@@ -93,6 +102,7 @@ const LINK_REPLACEMENTS = [
   ['confirm-checkout-params', '/docs/reference/types/billing-checkout-resource#parameters'],
   ['billing-payment-method-resource', '/docs/reference/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/types/billing-payer-resource'],
+  ['billing-plan-price', '/docs/reference/types/billing-plan-price'],
   ['billing-plan-resource', '/docs/reference/types/billing-plan-resource'],
   ['billing-plan-unit-price', '/docs/reference/types/billing-plan-unit-price'],
   ['billing-plan-unit-price-tier', '/docs/reference/types/billing-plan-unit-price-tier'],
@@ -114,6 +124,20 @@ const LINK_REPLACEMENTS = [
   ['deleted-object-resource', '/docs/reference/types/deleted-object-resource'],
   ['checkout-flow-resource', '/docs/reference/hooks/use-checkout#checkout-flow-resource'],
   ['organization-creation-defaults-resource', '#organization-creation-defaults-resource'],
+  ['billing-namespace', '/docs/reference/objects/billing'],
+  ['api-keys-namespace', '/docs/reference/objects/api-keys'],
+  ['client-resource', '/docs/reference/objects/client'],
+  ['redirect-options', '/docs/reference/types/redirect-options'],
+  ['handle-o-auth-callback-params', '/docs/reference/types/handle-o-auth-callback-params'],
+  ['session-task', '/docs/reference/types/session-task'],
+  ['public-user-data', '/docs/reference/types/public-user-data'],
+  ['session-status', '/docs/reference/types/session-status'],
+  [
+    'create-organization-invitation-params',
+    '/docs/reference/backend/organization/create-organization-invitation#create-organization-invitation-params',
+  ],
+  ['create-organization-domain-params', '#create-organization-domain-params'],
+  ['organization-domain-verification', '/docs/reference/types/organization-domain-resource'],
 ];
 
 /**
@@ -132,110 +156,216 @@ const LINK_REPLACEMENTS = [
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      // Match both path and optional anchor
-      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Match both flat links and nested object-doc links
+      // Also matches optional anchors (#)
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)(?:${fileName}\\/)?${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
       // Preserve the anchor in replacement if it exists
       replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
 }
 
+/**
+ * First pass of `MarkdownPageEvent.END`: rewrite `(foo.mdx)` / relative paths to `/docs/...` (see {@link LINK_REPLACEMENTS}).
+ * Used by `extract-methods.mjs`, which does not go through the renderer hook.
+ *
+ * @param {string} contents
+ */
+export function applyRelativeLinkReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  let out = contents;
+  for (const { pattern, replace } of getRelativeLinkReplacements()) {
+    // @ts-ignore — string | function
+    out = out.replace(pattern, replace);
+  }
+  return out;
+}
+
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /(?<![`[\]])\bClerkAPIResponseError\b(?![\]\(])/g,
+      pattern: /(?<![\[\w`#])`?ClerkAPIResponseError`?(?![\]\w`])/g,
       replace: '[ClerkAPIResponseError](/docs/reference/types/clerk-api-response-error)',
     },
     {
-      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
-      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
+      pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
+      replace: '[APIKeys](/docs/reference/objects/api-keys)',
     },
     {
-      pattern: /\(CreateOrganizationParams\)/g,
+      pattern: /(?<![\[\w`#])`Appearance`\\<`Theme`\\>/g,
+      replace: '[Appearance<Theme>](/docs/guides/customizing-clerk/appearance-prop/overview)',
+    },
+    {
+      pattern: /(?<![#])\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /`LoadedClerk`/g,
+      pattern: /(?<![\[\w`#])`?EmailAddressResource`?(?![\]\w`])/g,
+      replace: '[EmailAddressResource](/docs/reference/types/email-address)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?EnterpriseAccountResource`?(?![\]\w`])/g,
+      replace: '[EnterpriseAccountResource](/docs/reference/types/enterprise-account)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?ExternalAccountResource`?(?![\]\w`])/g,
+      replace: '[ExternalAccountResource](/docs/reference/types/external-account)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LoadedClerk`?(?![\]\w`])/g,
       replace: '[Clerk](/docs/reference/objects/clerk)',
     },
     {
-      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
-      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+      pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
+      replace: '[LocalizationResource](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?Machine`?(?![\]\w`])/g,
+      replace: '[Machine](/docs/reference/backend/types/backend-machine)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PasskeyResource`?(?![\]\w`])/g,
+      replace: '[PasskeyResource](/docs/reference/types/passkey-resource)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?PhoneNumberResource`?(?![\]\w`])/g,
+      replace: '[PhoneNumberResource](/docs/reference/types/phone-number)',
     },
     {
       // SessionResource appears in plain text, with an array next to it, with backticks, etc.
       // e.g. `SessionResource[]`
-      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
-      replace: '[`SessionResource`](/docs/reference/objects/session)$1',
+      pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[SessionResource](/docs/reference/objects/session)$1',
     },
     {
-      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
-      replace: '[`SessionStatusClaim`](/docs/reference/types/session-status)',
+      pattern: /(?<![\[\w`#])`?SessionStatusClaim`?(?![\]\w`])/g,
+      replace: '[SessionStatusClaim](/docs/reference/types/session-status)',
     },
     {
-      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      pattern: /(?<![\[\w`#])`?SetActiveParams`?(?![\]\w`])/g,
       replace: '[SetActiveParams](/docs/reference/types/set-active-params)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
-      replace: '[`SignInResource`](/docs/reference/objects/sign-in)',
+      pattern: /(?<![\[\w`#])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[SignInResource](/docs/reference/objects/sign-in)',
     },
     {
-      pattern: /(?<![\[\w`])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
-      replace: (/** @type {string} */ _match, /** @type {string} */ type) =>
-        `[\`${type}\`](/docs/reference/types/errors)`,
+      pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
+      replace: (/** @type {string} */ _match, /** @type {string} */ type) => `[${type}](/docs/reference/types/errors)`,
     },
     {
-      pattern: /(?<![\[\w`])`?SignInFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignInFutureResource`](/docs/reference/objects/sign-in-future)',
+      pattern: /(?<![\[\w`#])`?SignInFirstFactor`?(?![\]\w`])/g,
+      replace: '[SignInFirstFactor](/docs/reference/types/sign-in-first-factor)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
-      replace: '[`SignedInSessionResource`](/docs/reference/objects/session)',
+      pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
+      replace: '[SignInFutureResource](/docs/reference/objects/sign-in-future)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
-      replace: '[`SignUpResource`](/docs/reference/objects/sign-up)',
+      pattern: /(?<![\[\w`#])`?SignInSecondFactor`?(?![\]\w`])/g,
+      replace: '[SignInSecondFactor](/docs/reference/types/sign-in-second-factor)',
     },
     {
-      pattern: /(?<![\[\w`])`?SignUpFutureResource`?(?![\]\w`])/g,
-      replace: '[`SignUpFutureResource`](/docs/reference/objects/sign-up-future)',
+      pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
+      replace: '[SignedInSessionResource](/docs/reference/objects/session)',
     },
     {
-      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
-      replace: '[`OrganizationResource`](/docs/reference/objects/organization)',
+      pattern: /(?<![\[\w`#])`?SignInRedirectOptions`?(?![\]\w`])/g,
+      replace: '[SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options)',
     },
     {
-      pattern: /`OrganizationPrivateMetadata`/g,
-      replace: '[`OrganizationPrivateMetadata`](/docs/reference/types/metadata#organization-private-metadata)',
+      pattern: /(?<![\[\w`#])`?SignUpRedirectOptions`?(?![\]\w`])/g,
+      replace: '[SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options)',
     },
     {
-      pattern: /OrganizationPublicMetadata/g,
+      pattern: /(?<![\[\w`#])`?SignUpResource`?(?![\]\w`])/g,
+      replace: '[SignUpResource](/docs/reference/objects/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpVerificationResource`?(?![\]\w`])/g,
+      replace: '[SignUpVerificationResource](/docs/reference/types/sign-up-verification-resource)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpUnsafeMetadata`?(?![\]\w`])/g,
+      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
+      replace: '[SignUpFutureResource](/docs/reference/objects/sign-up-future)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?TasksRedirectOptions`?(?![\]\w`])/g,
+      replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
+      replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OAuthProvider`?(?![\]\w`])/g,
+      replace: '[OAuthProvider](/docs/reference/types/sso#o-auth-provider)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
+      replace: '[OrganizationResource](/docs/reference/objects/organization)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationPrivateMetadata`?(?![\]\w`])/g,
+      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?OrganizationPublicMetadata`?(?![\]\w`])/g,
       replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationInvitationPrivateMetadata`](/docs/reference/types/metadata#organization-invitation-private-metadata)',
+        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
     },
     {
-      pattern: /`OrganizationInvitationPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationInvitationPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationInvitationPublicMetadata`](/docs/reference/types/metadata#organization-invitation-public-metadata)',
+        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPrivateMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPrivateMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationMembershipPrivateMetadata`](/docs/reference/types/metadata#organization-membership-private-metadata)',
+        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
     },
     {
-      pattern: /`OrganizationMembershipPublicMetadata`/g,
+      pattern: /(?<![\[\w`#])`?OrganizationMembershipPublicMetadata`?(?![\]\w`])/g,
       replace:
-        '[`OrganizationMembershipPublicMetadata`](/docs/reference/types/metadata#organization-membership-public-metadata)',
+        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
     },
     {
-      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
-      replace: '[`UserResource`](/docs/reference/objects/user)',
+      pattern: /(?<![\[\w`#])`?UserPrivateMetadata`?(?![\]\w`])/g,
+      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#user-private-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserPublicMetadata`?(?![\]\w`])/g,
+      replace: '[UserPublicMetadata](/docs/reference/types/metadata#user-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserUnsafeMetadata`?(?![\]\w`])/g,
+      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#user-unsafe-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
+      replace: '[UserResource](/docs/reference/objects/user)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
+      replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?Web3WalletResource`?(?![\]\w`])/g,
+      replace: '[Web3WalletResource](/docs/reference/types/web3-wallet)',
+    },
+    {
+      pattern: /(?<![\[\w`#])`?VerificationResource`?(?![\]\w`])/g,
+      replace: '[VerificationResource](/docs/reference/types/verification-resource)',
     },
     {
       /**
@@ -270,27 +400,297 @@ function getCatchAllReplacements() {
   ];
 }
 
+/** CommonMark ATX heading: optional indent, 1–6 `#`, then space or end — entire line is left unchanged. */
+const ATX_HEADING_LINE = /^\s{0,3}#{1,6}(?:\s|$)/;
+
+/** Private-use placeholders — must not appear in real MDX and must not match catch-all patterns. */
+const PIPE_CODE_PH = /\uE000(\d+)\uE001/g;
+
+/**
+ * Inline code that contains a pipe (e.g. `` `a \\| b` `` or `` `a | b` ``) cannot receive link replacements without breaking MDX. Replace those whole spans with placeholders, run catch-alls, then restore.
+ *
+ * @param {string} line
+ * @returns {{ text: string, placeholders: string[] }}
+ */
+function protectPipeDelimitedInlineCodeSpans(line) {
+  /** @type {string[]} */
+  const placeholders = [];
+  const text = line.replace(/`([^`\n]*)`/g, (full, inner) => {
+    if (!inner.includes('|')) {
+      return full;
+    }
+    const id = placeholders.length;
+    placeholders.push(full);
+    return `\uE000${id}\uE001`;
+  });
+  return { text, placeholders };
+}
+
+/**
+ * @param {string} text
+ * @param {string[]} placeholders
+ */
+function restoreProtectedInlineCodeSpans(text, placeholders) {
+  return text.replace(PIPE_CODE_PH, (_, /** @type {string} */ i) => placeholders[Number(i)] ?? '');
+}
+
+/**
+ * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`); the table body (no heading) is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
+ *
+ * @param {string} contents
+ */
+export function stripReferenceObjectPropertiesSection(contents) {
+  if (!contents) {
+    return contents;
+  }
+  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
+  return stripped.trimEnd() + '\n';
+}
+
+/**
+ * Second pass of `MarkdownPageEvent.END` (after {@link applyRelativeLinkReplacements}).
+ * Used by `extract-methods.mjs`, which writes MDX outside TypeDoc and never hits that hook.
+ *
+ * Skips ATX heading lines (`#` … `######`) so titles like `#### SetActiveParams` are never linkified.
+ * (A lone `(?<!#)` in regex is not enough: heading text is separated from `###` by spaces.)
+ *
+ * Skips inline code spans that contain `|` (union / enum style like `` `v1 \\| v2` ``) so link rules do
+ * not run inside them — otherwise MDX breaks.
+ *
+ * @param {string} contents
+ */
+export function applyCatchAllMdReplacements(contents) {
+  if (!contents) {
+    return contents;
+  }
+  return contents
+    .split('\n')
+    .map(
+      /** @param {string} line */ line => {
+        if (ATX_HEADING_LINE.test(line.replace(/\r$/, ''))) {
+          return line;
+        }
+        const { text: withPh, placeholders } = protectPipeDelimitedInlineCodeSpans(line);
+        let out = withPh;
+        for (const { pattern, replace } of getCatchAllReplacements()) {
+          // @ts-ignore — string | function
+          out = out.replace(pattern, replace);
+        }
+        return restoreProtectedInlineCodeSpans(out, placeholders);
+      },
+    )
+    .join('\n');
+}
+
+/**
+ * Walk a typedoc Type and return a flat list of property declarations to render as a merged table. Used by the `@expandProperties` flattener below to handle three shapes:
+ *   - intersection types: walk each constituent
+ *   - inline object literals (ReflectionType): take its declaration.children
+ *   - named references (ReferenceType): take the target's children plus any properties contributed via type arguments, which captures the `Foo<{ ... }>` instantiation pattern where typedoc otherwise loses the generic parameter at the alias boundary.
+ *
+ * @param {import('typedoc').SomeType | undefined} type
+ * @param {Map<string, import('typedoc').Reflection>} reflectionsByName lookup for cross-package refs whose `.reflection` is not linked
+ * @returns {import('typedoc').DeclarationReflection[]}
+ */
+function collectPropertiesFromType(type, reflectionsByName) {
+  if (!type) return [];
+  if (type.type === 'reflection') {
+    return type.declaration?.children ?? [];
+  }
+  if (type.type === 'intersection') {
+    return type.types.flatMap(t => collectPropertiesFromType(t, reflectionsByName));
+  }
+  if (type.type === 'reference') {
+    const target = type.reflection ?? reflectionsByName.get(type.name);
+    const targetChildren = target?.children ?? [];
+    const argChildren = (type.typeArguments ?? []).flatMap(t => collectPropertiesFromType(t, reflectionsByName));
+    return [...targetChildren, ...argChildren];
+  }
+  return [];
+}
+
+/**
+ * Structural fingerprint for a `Type`. Recurses into composite shapes so two types that only differ in their type arguments (`Foo<string>` vs `Foo<number>`) or in their nested property types (`{ x: string }` vs `{ x: number }`) get distinct fingerprints. Two shapes that produce the same fingerprint are treated as structurally identical and so eligible for cross-pollinating JSDoc comments.
+ *
+ * Recursion guard: a single shared `Set` of visited reflection ids threads through every nested call to avoid infinite loops on cyclic types (e.g. a type literal that ultimately references itself).
+ *
+ * @param {import('typedoc').SomeType | undefined} type
+ * @param {Set<number>} [seen]
+ * @returns {string}
+ */
+function typeFingerprint(type, seen = new Set()) {
+  if (!type) return '?';
+  const t =
+    /** @type {{ type?: string; name?: string; value?: unknown; elementType?: import('typedoc').SomeType; types?: import('typedoc').SomeType[]; typeArguments?: import('typedoc').SomeType[]; declaration?: import('typedoc').DeclarationReflection }} */ (
+      /** @type {unknown} */ (type)
+    );
+  switch (t.type) {
+    case 'intrinsic':
+      return `i:${t.name ?? ''}`;
+    case 'literal':
+      return `l:${JSON.stringify(t.value)}`;
+    case 'reference': {
+      const args = t.typeArguments?.length ? `<${t.typeArguments.map(a => typeFingerprint(a, seen)).join(',')}>` : '';
+      return `r:${t.name ?? ''}${args}`;
+    }
+    case 'array':
+      return `a:${typeFingerprint(t.elementType, seen)}`;
+    case 'optional':
+      return `o:${typeFingerprint(t.elementType, seen)}`;
+    case 'union':
+      return `u:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
+    case 'intersection':
+      return `n:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
+    case 'reflection': {
+      const decl = t.declaration;
+      if (decl?.id != null) {
+        if (seen.has(decl.id)) return `rf:<cycle>`;
+        seen.add(decl.id);
+      }
+      const kids = decl?.children?.filter(c => c.kindOf?.(ReflectionKind.Property)) ?? [];
+      return `rf:[${kids
+        .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type, seen)}`)
+        .sort()
+        .join(',')}]`;
+    }
+    default:
+      return t.type ?? '?';
+  }
+}
+
+/**
+ * When TypeScript resolves a type through `Omit<...>` / `Pick<...>` (e.g. `ClerkProviderProps = Omit<IsomorphicClerkOptions, …> & { … }`), inline anonymous object literal property types get re-synthesized — and TypeDoc loses the JSDoc on most of their members. Only the first/leading property's comment survives, the rest come through with `comment === undefined`. The same shape elsewhere in the project (e.g. directly under `IsomorphicClerkOptions['telemetry']`) carries all comments correctly.
+ *
+ * Match `@kind:typeLiteral` reflections by structural fingerprint (set of `(name, type, optional)` tuples on their property children); within each group, pick the reflection with the most commented children as the source-of-truth and copy missing comments onto its siblings.
+ *
+ * @param {import('typedoc').Reflection[]} all
+ */
+function backfillInlineObjectChildComments(all) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection[]>} */
+  const groups = new Map();
+  for (const r of all) {
+    if (!r.kindOf?.(ReflectionKind.TypeLiteral)) continue;
+    const decl = /** @type {import('typedoc').DeclarationReflection} */ (r);
+    const propChildren = decl.children?.filter(c => c.kindOf?.(ReflectionKind.Property));
+    if (!propChildren?.length) continue;
+    const key = propChildren
+      .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type)}`)
+      .sort()
+      .join('|');
+    if (!groups.has(key)) groups.set(key, []);
+    /** @type {import('typedoc').DeclarationReflection[]} */ (groups.get(key)).push(decl);
+  }
+
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    /** @type {import('typedoc').DeclarationReflection | null} */
+    let best = null;
+    let bestScore = -1;
+    for (const refl of group) {
+      const score =
+        refl.children?.filter(c => c.kindOf?.(ReflectionKind.Property) && c.comment?.summary?.length).length ?? 0;
+      if (score > bestScore) {
+        best = refl;
+        bestScore = score;
+      }
+    }
+    if (!best || bestScore === 0) continue;
+    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+    const bestByName = new Map();
+    for (const c of best.children ?? []) {
+      if (c.kindOf?.(ReflectionKind.Property)) bestByName.set(c.name, c);
+    }
+    for (const refl of group) {
+      if (refl === best) continue;
+      for (const child of refl.children ?? []) {
+        if (!child.kindOf?.(ReflectionKind.Property)) continue;
+        // Any `.comment` object means TypeDoc found a JSDoc block at the source — including
+        // intentionally empty comments left over from `@generateWithEmptyComment` after the
+        // modifier tag is stripped in `EVENT_RESOLVE_END`. Only fill in children that have
+        // no comment at all.
+        if (child.comment) continue;
+        const src = bestByName.get(child.name);
+        if (src?.comment?.summary?.length) child.comment = src.comment;
+      }
+    }
+  }
+}
+
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
-  app.renderer.on(MarkdownPageEvent.END, output => {
-    const fileName = output.url.split('/').pop();
-    const linkReplacements = getRelativeLinkReplacements();
+  /**
+   * `@generateWithEmptyComment` exists only to make "intentionally undocumented" explicit at the source.
+   * Strip it from the model post-resolve so the markdown plugin sees a comment indistinguishable from `/** *​/` —
+   * otherwise the table renderer treats the modifier as content and drops the `-` placeholder in the description column.
+   */
+  app.converter.on(Converter.EVENT_RESOLVE_END, context => {
+    for (const reflection of Object.values(context.project.reflections)) {
+      reflection.comment?.modifierTags?.delete('@generateWithEmptyComment');
+    }
+  });
 
-    for (const { pattern, replace } of linkReplacements) {
-      if (output.contents) {
-        output.contents = output.contents.replace(pattern, replace);
+  /**
+   * Flatten the `Foo<{...}>` generic-instantiation pattern into a single merged properties table when `Foo` opts in via `@expandProperties`. typedoc-plugin-markdown would otherwise render an empty page for these aliases because the resolved type is a `ReferenceType` with no inline declaration — see `member.declaration.js` in the plugin, which only walks `IntersectionType` sub-types and has no branch for top-level `ReferenceType`.
+   *
+   * Runs at `RendererEvent.BEGIN` rather than `EVENT_RESOLVE_END` because the resolve hook fires per package, and cross-package references (e.g. `@clerk/backend` types referencing `ClerkPaginationRequest` from `@clerk/shared`) only link up after typedoc merges packages.
+   *
+   * The opt-in tag lives on the wrapper type so we never accidentally flatten unrelated generic aliases (e.g. `SignInErrors = Errors<SignInFields>`).
+   */
+  app.renderer.on(RendererEvent.BEGIN, event => {
+    const all = Object.values(event.project.reflections);
+    const reflectionsByName = new Map();
+    for (const r of all) {
+      if (r.name && !reflectionsByName.has(r.name)) reflectionsByName.set(r.name, r);
+    }
+    const expandable = new Set();
+    for (const r of all) {
+      if (r.comment?.modifierTags?.has('@expandProperties')) {
+        expandable.add(r);
+        r.comment.modifierTags.delete('@expandProperties');
+      }
+    }
+    for (const reflection of all) {
+      if (
+        reflection.kindOf?.(ReflectionKind.TypeAlias) &&
+        reflection.type?.type === 'reference' &&
+        Array.isArray(reflection.type.typeArguments) &&
+        reflection.type.typeArguments.length > 0
+      ) {
+        const target = reflection.type.reflection ?? reflectionsByName.get(reflection.type.name);
+        if (!target || !expandable.has(target)) continue;
+        const merged = collectPropertiesFromType(reflection.type, reflectionsByName);
+        if (merged.length > 0) {
+          // typedoc's package-level `sort: 'alphabetical'` is applied during conversion, before
+          // our synthetic merge runs. Sort here to match the alphabetical ordering used by
+          // every other table in the docs.
+          merged.sort((a, b) => a.name.localeCompare(b.name));
+          const decl = new DeclarationReflection('__type', ReflectionKind.TypeLiteral, reflection);
+          decl.children = merged;
+          reflection.type = new ReflectionType(decl);
+        }
       }
     }
 
-    const catchAllReplacements = getCatchAllReplacements();
+    backfillInlineObjectChildComments(all);
+  });
 
-    for (const { pattern, replace } of catchAllReplacements) {
-      if (output.contents) {
-        // @ts-ignore - Mixture of string and function replacements
-        output.contents = output.contents.replace(pattern, replace);
-      }
+  app.renderer.on(MarkdownPageEvent.END, output => {
+    const fileName = output.url.split('/').pop();
+
+    if (output.contents) {
+      output.contents = applyRelativeLinkReplacements(output.contents);
+    }
+
+    if (output.contents) {
+      output.contents = applyCatchAllMdReplacements(output.contents);
     }
 
     if (fileName) {

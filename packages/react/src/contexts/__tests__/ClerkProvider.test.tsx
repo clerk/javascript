@@ -18,9 +18,16 @@ import {
 import { dark } from '@clerk/ui/themes';
 import { describe, expectTypeOf, it } from 'vitest';
 
+import type { ClerkProviderProps as GenericClerkProviderProps, Ui } from '../../types';
 import type { ClerkProvider } from '../ClerkProvider';
 
 type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
+type CustomAppearance = {
+  options?: {
+    customFlag?: boolean;
+  };
+};
+const customUi = {} as Ui<CustomAppearance>;
 
 describe('ClerkProvider', () => {
   describe('Type tests', () => {
@@ -84,6 +91,19 @@ describe('ClerkProvider', () => {
       //   ...defaultProps,
       //   appearance: { elements: { nonExistentKey: '' } },
       // }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('is driven by the passed ui object type', () => {
+      expectTypeOf({
+        ...defaultProps,
+        ui: customUi,
+        appearance: { options: { customFlag: true } },
+      }).toMatchTypeOf<GenericClerkProviderProps<typeof customUi>>();
+
+      expectTypeOf({
+        ...defaultProps,
+        appearance: { options: { customFlag: true } },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
     });
   });
 

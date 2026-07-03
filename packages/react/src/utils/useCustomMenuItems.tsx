@@ -43,7 +43,7 @@ type UseCustomMenuItemsParams = {
   allowForAnyChildren?: boolean;
 };
 
-type CustomMenuItemType = UserButtonActionProps | UserButtonLinkProps;
+type CustomMenuItemType = (UserButtonActionProps | UserButtonLinkProps) & { portalId?: string };
 
 const useCustomMenuItems = ({
   children,
@@ -57,7 +57,8 @@ const useCustomMenuItems = ({
 }: UseCustomMenuItemsParams) => {
   const validChildren: CustomMenuItemType[] = [];
   const customMenuItems: CustomMenuItem[] = [];
-  const customMenuItemsPortals: React.ComponentType[] = [];
+  const customMenuItemsPortals: Array<{ key: string; portal: React.ComponentType }> = [];
+  const portalIdCounts = new Map<string, number>();
 
   React.Children.forEach(children, child => {
     if (
@@ -89,6 +90,7 @@ const useCustomMenuItems = ({
       }
 
       const { props } = child as ReactElement;
+      const childKey = (child as ReactElement).key;
 
       const { label, labelIcon, href, onClick, open } = props;
 
@@ -106,11 +108,13 @@ const useCustomMenuItems = ({
             validChildren.push({
               ...baseItem,
               onClick,
+              portalId: getCustomMenuItemPortalId('action', props, childKey, portalIdCounts),
             });
           } else if (open !== undefined) {
             validChildren.push({
               ...baseItem,
               open: open.startsWith('/') ? open : `/${open}`,
+              portalId: getCustomMenuItemPortalId('action', props, childKey, portalIdCounts),
             });
           } else {
             // Handle the case where neither onClick nor open is defined
@@ -125,7 +129,12 @@ const useCustomMenuItems = ({
 
       if (isThatComponent(child, MenuLinkComponent)) {
         if (isExternalLink(props)) {
-          validChildren.push({ label, labelIcon, href });
+          validChildren.push({
+            label,
+            labelIcon,
+            href,
+            portalId: getCustomMenuItemPortalId('link', props, childKey, portalIdCounts),
+          });
         } else {
           logErrorInDevMode(userButtonMenuItemLinkWrongProps);
           return;
@@ -138,10 +147,10 @@ const useCustomMenuItems = ({
   const customLinkLabelIcons: UseCustomElementPortalParams[] = [];
   validChildren.forEach((mi, index) => {
     if (isCustomMenuItem(mi)) {
-      customMenuItemLabelIcons.push({ component: mi.labelIcon, id: index });
+      customMenuItemLabelIcons.push({ component: mi.labelIcon, id: mi.portalId || index });
     }
     if (isExternalLink(mi)) {
-      customLinkLabelIcons.push({ component: mi.labelIcon, id: index });
+      customLinkLabelIcons.push({ component: mi.labelIcon, id: mi.portalId || index });
     }
   });
 
@@ -159,7 +168,7 @@ const useCustomMenuItems = ({
         portal: iconPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customMenuItemLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customMenuItemLabelIconsPortals.find(p => p.id === (mi.portalId || index)) as UseCustomElementPortalReturn;
       const menuItem: CustomMenuItem = {
         label: mi.label,
         mountIcon,
@@ -172,25 +181,42 @@ const useCustomMenuItems = ({
         menuItem.open = mi.open;
       }
       customMenuItems.push(menuItem);
-      customMenuItemsPortals.push(iconPortal);
+      customMenuItemsPortals.push({ key: `icon:${mi.portalId || index}`, portal: iconPortal });
     }
     if (isExternalLink(mi)) {
       const {
         portal: iconPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customLinkLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customLinkLabelIconsPortals.find(p => p.id === (mi.portalId || index)) as UseCustomElementPortalReturn;
       customMenuItems.push({
         label: mi.label,
         href: mi.href,
         mountIcon,
         unmountIcon,
       });
-      customMenuItemsPortals.push(iconPortal);
+      customMenuItemsPortals.push({ key: `icon:${mi.portalId || index}`, portal: iconPortal });
     }
   });
 
   return { customMenuItems, customMenuItemsPortals };
+};
+
+const getCustomMenuItemPortalId = (
+  type: 'action' | 'link',
+  props: Pick<CustomMenuItemType, 'label'> & { href?: string; open?: string },
+  key: React.Key | null,
+  portalIdCounts: Map<string, number>,
+) => {
+  if (key != null) {
+    return `${type}:key:${key}`;
+  }
+
+  const target = props.href || props.open || '';
+  const baseId = `${type}:${props.label}:${target}`;
+  const occurrence = portalIdCounts.get(baseId) ?? 0;
+  portalIdCounts.set(baseId, occurrence + 1);
+  return `${baseId}:${occurrence}`;
 };
 
 const isReorderItem = (childProps: any, validItems: string[]): boolean => {

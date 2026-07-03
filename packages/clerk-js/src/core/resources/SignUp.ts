@@ -1,7 +1,7 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -54,6 +54,7 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
@@ -449,7 +450,19 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata?: SignUpUnsafeMetadata;
     },
   ): Promise<void> => {
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    const transport = SignUp.clerk.__internal_oauthTransport;
+    if (transport) {
+      return _authenticateWithTransport({
+        clerk: SignUp.clerk,
+        transport,
+        resource: this,
+        authenticateMethod: this.authenticateWithRedirectOrPopup,
+        params,
+        callbackParams: params.__internal_callbackParams ?? {},
+      });
+    }
+
+    return this.authenticateWithRedirectOrPopup(params, SignUp.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (
@@ -782,7 +795,7 @@ class SignUpFuture implements SignUpFutureResource {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
       this.#resource.verifications.externalAccount.status === 'transferable' &&
-      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.error?.code === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS
     );
   }
 
@@ -886,7 +899,7 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
+      await this.#resource.__internal_basePatch({ body });
     });
   }
 
@@ -906,6 +919,9 @@ class SignUpFuture implements SignUpFutureResource {
       if (this.#resource.id) {
         await this.#resource.__internal_basePatch({ body });
       } else {
+        // Inject browser locale only when creating the sign-up, so an existing
+        // sign-up's locale is not overwritten on update.
+        body.locale = params.locale ?? getBrowserLocale();
         await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       }
     });
@@ -1001,6 +1017,7 @@ class SignUpFuture implements SignUpFutureResource {
       enterpriseConnectionId,
       emailAddress,
       popup,
+      locale,
     } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken({ strategy });
@@ -1037,10 +1054,14 @@ class SignUpFuture implements SignUpFutureResource {
           captchaToken,
           captchaWidgetType,
           captchaError,
+          locale,
         };
         if (this.#resource.id) {
-          return this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
+          return this.#resource.__internal_basePatch({ body });
         }
+        // Inject browser locale only when creating the sign-up, so an existing
+        // sign-up's locale is not overwritten on update.
+        body.locale = locale ?? getBrowserLocale();
         return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       };
 
@@ -1061,14 +1082,14 @@ class SignUpFuture implements SignUpFutureResource {
           // Pick up the modified SignUp resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });
   }
 
   async web3(params: SignUpFutureWeb3Params): Promise<{ error: ClerkError | null }> {
-    const { strategy, unsafeMetadata, legalAccepted } = params;
+    const { strategy, unsafeMetadata, legalAccepted, firstName, lastName, locale } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     return runAsyncResourceTask(this.#resource, async () => {
@@ -1097,7 +1118,7 @@ class SignUpFuture implements SignUpFutureResource {
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const web3Wallet = identifier || this.#resource.web3wallet!;
-      await this._create({ web3Wallet, unsafeMetadata, legalAccepted });
+      await this._create({ web3Wallet, unsafeMetadata, legalAccepted, firstName, lastName, locale });
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
@@ -1135,7 +1156,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ...params, ticket: ticket ?? undefined });
+    return this.create({ ...params, strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {

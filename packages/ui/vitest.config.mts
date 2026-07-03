@@ -36,6 +36,7 @@ export default defineConfig({
     __PKG_VERSION__: JSON.stringify('0.0.0-test'),
   },
   test: {
+    watch: false,
     environment: 'jsdom',
     environmentOptions: {
       jsdom: {

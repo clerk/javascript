@@ -4,6 +4,7 @@ import { APIKeysContext, useUserProfileContext } from '@/ui/contexts';
 import { Col, descriptors, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { APIKeysPage as APIKeysPageInternal } from '../APIKeys/APIKeys';
 
@@ -18,22 +19,24 @@ export const APIKeysPage = () => {
   }
 
   return (
-    <Col
-      gap={4}
-      elementDescriptor={descriptors.page}
-    >
-      <Header.Root>
-        <Header.Title
-          localizationKey={localizationKeys('userProfile.apiKeysPage.title')}
-          textVariant='h2'
-        />
-      </Header.Root>
-      <APIKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
-        <APIKeysPageInternal
-          subject={user.id}
-          revokeModalRoot={contentRef}
-        />
-      </APIKeysContext.Provider>
-    </Col>
+    <ProfileCard.Page>
+      <Col
+        gap={4}
+        elementDescriptor={descriptors.page}
+      >
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('userProfile.apiKeysPage.title')}
+            textVariant='h2'
+          />
+        </Header.Root>
+        <APIKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
+          <APIKeysPageInternal
+            subject={user.id}
+            revokeModalRoot={contentRef}
+          />
+        </APIKeysContext.Provider>
+      </Col>
+    </ProfileCard.Page>
   );
 };

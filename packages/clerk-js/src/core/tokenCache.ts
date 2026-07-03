@@ -4,15 +4,10 @@ import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
 import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
+import { createKeyResolver, type TokenCacheKeyJSON } from './keyResolver';
 import { Token } from './resources/internal';
-
-/**
- * Identifies a cached token entry by tokenId and optional audience.
- */
-interface TokenCacheKeyJSON {
-  audience?: string;
-  tokenId: string;
-}
+import { pickFreshestJwt } from './tokenFreshness';
+import { createTokenStore } from './tokenStore';
 
 /**
  * Cache entry containing token metadata and resolver.
@@ -103,9 +98,6 @@ export interface TokenCache {
   size(): number;
 }
 
-const KEY_PREFIX = 'clerk';
-const DELIMITER = '::';
-
 /**
  * Default seconds before token expiration to trigger background refresh.
  * This threshold accounts for timer jitter, SafeLock contention (~5s), network latency,
@@ -119,36 +111,6 @@ const BACKGROUND_REFRESH_THRESHOLD_IN_SECONDS = 15;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
-
-/**
- * Converts between cache key objects and string representations.
- * Format: `prefix::tokenId::audience`
- */
-export class TokenCacheKey {
-  /**
-   * Parses a cache key string into a TokenCacheKey instance.
-   */
-  static fromKey(key: string): TokenCacheKey {
-    const [prefix, tokenId, audience = ''] = key.split(DELIMITER);
-    return new TokenCacheKey(prefix, { audience, tokenId });
-  }
-
-  constructor(
-    public prefix: string,
-    public data: TokenCacheKeyJSON,
-  ) {
-    this.prefix = prefix;
-    this.data = data;
-  }
-
-  /**
-   * Converts the key to its string representation for Map storage.
-   */
-  toKey(): string {
-    const { tokenId, audience } = this.data;
-    return [this.prefix, tokenId, audience || ''].join(DELIMITER);
-  }
-}
 
 /**
  * Message format for BroadcastChannel token synchronization between tabs.
@@ -171,8 +133,9 @@ const generateTabId = (): string => {
  * Automatically manages token expiration and cleanup via scheduled timeouts.
  * BroadcastChannel support is enabled whenever the environment provides it.
  */
-const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
-  const cache = new Map<string, TokenCacheValue>();
+const MemoryTokenCache = (prefix?: string): TokenCache => {
+  const store = createTokenStore<TokenCacheValue>();
+  const keyResolver = createKeyResolver(prefix);
   const tabId = generateTabId();
 
   let broadcastChannel: BroadcastChannel | null = null;
@@ -197,7 +160,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   ensureBroadcastChannel();
 
   const clear = () => {
-    cache.forEach(value => {
+    store.forEach(value => {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
@@ -205,14 +168,14 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         clearTimeout(value.refreshTimeoutId);
       }
     });
-    cache.clear();
+    store.clear();
   };
 
   const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
-    const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
-    const value = cache.get(cacheKey.toKey());
+    const key = keyResolver.toKey(cacheKeyJSON);
+    const value = store.get(key);
 
     if (!value) {
       return;
@@ -231,7 +194,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       if (value.refreshTimeoutId !== undefined) {
         clearTimeout(value.refreshTimeoutId);
       }
-      cache.delete(cacheKey.toKey());
+      store.delete(key);
       return;
     }
 
@@ -288,11 +251,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       const result = get({ tokenId: data.tokenId });
       if (result) {
         const existingToken = await result.entry.tokenResolver;
-        const existingIat = existingToken.jwt?.claims?.iat;
-        if (existingIat && existingIat >= iat) {
+        if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
-            'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
+            'Ignoring staler token broadcast',
+            { tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
@@ -343,17 +305,15 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
    * @param options - Configuration for cache behavior; broadcast controls whether to notify other tabs
    */
   const setInternal = (entry: TokenCacheEntry, options: { broadcast: boolean } = BROADCAST) => {
-    const cacheKey = new TokenCacheKey(prefix, {
+    const key = keyResolver.toKey({
       audience: entry.audience,
       tokenId: entry.tokenId,
     });
 
-    const key = cacheKey.toKey();
-
     // Clear timers from any existing entry for this key to prevent orphaned
     // refresh timers from accumulating across set() calls (e.g., from
     // #hydrateCache during _updateClient AND #refreshTokenInBackground).
-    const existing = cache.get(key);
+    const existing = store.get(key);
     clearTimeout(existing?.timeoutId);
     clearTimeout(existing?.refreshTimeoutId);
 
@@ -362,7 +322,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
     const deleteKey = () => {
-      const cachedValue = cache.get(key);
+      const cachedValue = store.get(key);
       if (cachedValue === value) {
         if (cachedValue.timeoutId !== undefined) {
           clearTimeout(cachedValue.timeoutId);
@@ -370,17 +330,19 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         if (cachedValue.refreshTimeoutId !== undefined) {
           clearTimeout(cachedValue.refreshTimeoutId);
         }
-        cache.delete(key);
+        store.delete(key);
       }
     };
 
-    cache.set(key, value);
+    store.set(key, value);
 
     entry.tokenResolver
       .then(newToken => {
         // If this entry was overwritten by a newer set() call while our promise
-        // was pending, bail out to avoid installing orphaned timers.
-        if (cache.get(key) !== value) {
+        // was pending, bail out to avoid installing orphaned timers. Monotonic
+        // replacement is enforced at the read sites (cookie + broadcast + Session)
+        // where the user-visible state lives.
+        if (store.get(key) !== value) {
           return;
         }
 
@@ -431,40 +393,50 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
         const channel = broadcastChannel;
         if (channel && options.broadcast) {
-          const tokenRaw = newToken.getRawString();
-          if (tokenRaw && claims.sid) {
-            const sessionId = claims.sid;
-            const organizationId = claims.org_id || (claims.o as any)?.id;
-            const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
+          // Best-effort side effect: a broadcast failure (e.g. postMessage racing a
+          // channel close) must not reach the outer catch and evict the cached token (SDK-119).
+          try {
+            const tokenRaw = newToken.getRawString();
+            if (tokenRaw && claims.sid) {
+              const sessionId = claims.sid;
+              const organizationId = claims.org_id || (claims.o as any)?.id;
+              const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
 
-            const expectedTokenId = TokenId.build(sessionId, template, organizationId);
-            if (entry.tokenId === expectedTokenId) {
-              const traceId = `bc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+              const expectedTokenId = TokenId.build(sessionId, template, organizationId);
+              if (entry.tokenId === expectedTokenId) {
+                const traceId = `bc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-              debugLogger.info(
-                'Broadcasting token update to other tabs',
-                {
+                debugLogger.info(
+                  'Broadcasting token update to other tabs',
+                  {
+                    organizationId,
+                    sessionId,
+                    tabId,
+                    template,
+                    tokenId: entry.tokenId,
+                    traceId,
+                  },
+                  'tokenCache',
+                );
+
+                const message: SessionTokenEvent = {
                   organizationId,
                   sessionId,
-                  tabId,
                   template,
                   tokenId: entry.tokenId,
+                  tokenRaw,
                   traceId,
-                },
-                'tokenCache',
-              );
+                };
 
-              const message: SessionTokenEvent = {
-                organizationId,
-                sessionId,
-                template,
-                tokenId: entry.tokenId,
-                tokenRaw,
-                traceId,
-              };
-
-              channel.postMessage(message);
+                channel.postMessage(message);
+              }
             }
+          } catch (error) {
+            debugLogger.warn(
+              'Failed to broadcast token update to other tabs',
+              { error, tabId, tokenId: entry.tokenId },
+              'tokenCache',
+            );
           }
         }
       })
@@ -481,7 +453,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   };
 
   const size = () => {
-    return cache.size;
+    return store.size();
   };
 
   return { clear, close, get, set, size };

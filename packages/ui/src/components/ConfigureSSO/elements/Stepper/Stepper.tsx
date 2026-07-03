@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Box, descriptors, Flex, Icon, SimpleButton, Text } from '@/customizables';
-import { CaretRight, Check } from '@/icons';
+import { Box, descriptors, Flex, Icon, SimpleButton, Span, Text } from '@/customizables';
+import { Checkmark, ChevronRight } from '@/icons';
+import { mqu } from '@/styledSystem';
 
 import type { StepperItemProps, StepperProps } from './types';
 
@@ -15,21 +16,30 @@ const Root = ({ children }: StepperProps): JSX.Element => {
       sx={theme => ({
         gap: theme.space.$2,
         flexWrap: 'wrap',
+        [mqu.md]: { gap: theme.space.$3 },
       })}
     >
       {items.map((child, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <React.Fragment key={index}>
+        <Span
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          sx={theme => ({
+            display: 'flex',
+            alignItems: 'center',
+            gap: theme.space.$2,
+          })}
+        >
           {child}
           {index < items.length - 1 && (
             <Icon
               elementDescriptor={descriptors.configureSSOStepperSeparator}
-              icon={CaretRight}
+              icon={ChevronRight}
               size='md'
               colorScheme='neutral'
+              sx={{ [mqu.md]: { display: 'none' } }}
             />
           )}
-        </React.Fragment>
+        </Span>
       ))}
     </Flex>
   );
@@ -68,17 +78,18 @@ const Item = ({
           width: theme.sizes.$4,
           height: theme.sizes.$4,
           borderRadius: theme.radii.$circle,
-          backgroundColor: isCurrent
-            ? theme.colors.$colorForeground
-            : isCompleted
-              ? theme.colors.$success500
+          backgroundColor: isCompleted
+            ? theme.colors.$success500
+            : isCurrent
+              ? theme.colors.$colorForeground
               : theme.colors.$colorMutedForeground,
         })}
       >
-        {isCompleted && !isCurrent ? (
+        {isCompleted ? (
           <Icon
-            icon={Check}
-            sx={theme => ({ width: theme.sizes.$2, height: theme.sizes.$2, color: theme.colors.$white })}
+            icon={Checkmark}
+            size='sm'
+            sx={theme => ({ color: theme.colors.$white })}
           />
         ) : (
           <Text
@@ -87,6 +98,7 @@ const Item = ({
               fontSize: theme.fontSizes.$xs,
               fontWeight: theme.fontWeights.$medium,
               color: theme.colors.$colorBackground,
+              lineHeight: '1rem',
             })}
           >
             {bullet}
@@ -118,6 +130,7 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
     sx={theme => ({
       gap: theme.space.$2,
       flexWrap: 'wrap',
+      [mqu.md]: { gap: theme.space.$3 },
     })}
   >
     {Array.from({ length: totalSteps }).map((_, index) => (
@@ -127,10 +140,10 @@ const Skeleton = ({ totalSteps = 4 }: SkeletonProps): JSX.Element => (
         {index < totalSteps - 1 && (
           <Icon
             elementDescriptor={descriptors.configureSSOStepperSeparator}
-            icon={CaretRight}
+            icon={ChevronRight}
             size='md'
             colorScheme='neutral'
-            sx={{ opacity: 0.16 }}
+            sx={{ opacity: 0.16, [mqu.md]: { display: 'none' } }}
           />
         )}
       </React.Fragment>

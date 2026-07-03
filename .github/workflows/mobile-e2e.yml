@@ -41,17 +41,20 @@ jobs:
         working-directory: .
     steps:
       - name: Checkout @clerk/javascript
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Checkout clerk-expo-quickstart
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           repository: clerk/clerk-expo-quickstart
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
 
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20
           cache: pnpm
@@ -95,7 +98,7 @@ jobs:
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
         with:
           distribution: temurin
           java-version: 17
@@ -106,7 +109,7 @@ jobs:
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
       - name: Run Android e2e
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
@@ -126,7 +129,7 @@ jobs:
 
       - name: Upload Maestro artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-android
           path: ~/.maestro/tests
@@ -146,17 +149,20 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout @clerk/javascript
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Checkout clerk-expo-quickstart
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          persist-credentials: false
           repository: clerk/clerk-expo-quickstart
           ref: ${{ inputs.quickstart_ref }}
           path: clerk-expo-quickstart
 
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20
           cache: pnpm
@@ -200,7 +206,7 @@ jobs:
           echo "user_id=$user_id" >> "$GITHUB_OUTPUT"
 
       - name: Cache SPM
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
           key: spm-${{ hashFiles('packages/expo/package.json') }}
@@ -226,7 +232,7 @@ jobs:
 
       - name: Upload Maestro artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-ios
           path: ~/.maestro/tests

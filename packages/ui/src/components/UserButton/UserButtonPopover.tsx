@@ -7,7 +7,7 @@ import { RootBox } from '@/ui/elements/RootBox';
 import { UserPreview } from '@/ui/elements/UserPreview';
 
 import { useEnvironment, useUserButtonContext } from '../../contexts';
-import { descriptors } from '../../customizables';
+import { descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MultiSessionActions, SignOutAllActions, SingleSessionActions } from './SessionActions';
 import { useMultisessionActions } from './useMultisessionActions';
@@ -22,6 +22,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const { __experimental_asStandalone } = userButtonContext;
   const { authConfig } = useEnvironment();
   const { user } = useUser();
+  const { t } = useLocalizations();
   const {
     handleAddAccountClicked,
     handleManageAccountClicked,
@@ -38,7 +39,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         elementDescriptor={descriptors.userButtonPopoverCard}
         ref={ref}
         role='dialog'
-        aria-label='User button popover'
+        aria-label={t(localizationKeys('userButton.label__userButtonPopover'))}
         shouldEntryAnimate={!__experimental_asStandalone}
         {...rest}
       >

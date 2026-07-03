@@ -1,0 +1,46 @@
+import * as HeadingStories from './heading.stories';
+
+# Heading
+
+Heading titles a section or page in Mosaic. It renders as an `<h2>` by default, forwards a ref to the underlying element, and themes its font-size and color through the `size` and `intent` variants. Reach for the `render` prop when you need a different heading level for the document outline.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={HeadingStories}
+/>
+
+## Props
+
+<PropTable
+  meta={HeadingStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Heading'
+  module='@clerk/ui/mosaic/components/heading'
+>
+  Page Title
+</Usage>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={HeadingStories}
+/>
+
+### Intents
+
+<Story
+  name='Intents'
+  storyModule={HeadingStories}
+/>

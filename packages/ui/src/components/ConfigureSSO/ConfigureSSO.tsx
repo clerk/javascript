@@ -1,23 +1,21 @@
-import { __internal_useUserEnterpriseConnections, useSession } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import { useSession } from '@clerk/shared/react';
+import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useProtect } from '@/common';
 import { withCoreUserGuard } from '@/contexts';
-import { Col, descriptors, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
+import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { ConfigureSSOWizard } from './ConfigureSSOWizard';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
-import { Wizard } from './elements/Wizard';
-import { ConfigureStep, ConfirmationStep, SelectProviderStep, TestConfigurationStep, VerifyDomainStep } from './steps';
+import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -39,86 +37,60 @@ const AuthenticatedContent = withCoreUserGuard(() => {
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
       <ConfigureSSONavbar contentRef={contentRef}>
-        <Col
-          ref={contentRef}
-          elementDescriptor={descriptors.scrollBox}
-          sx={t => ({
-            backgroundColor: t.colors.$colorBackground,
-            position: 'relative',
-            borderRadius: t.radii.$lg,
-            width: '100%',
-            overflow: 'hidden',
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$borderAlpha150,
-            flex: 1,
-          })}
-        >
-          <ConfigureSSOCardProtect>
-            <ConfigureSSOCardContent />
-          </ConfigureSSOCardProtect>
-        </Col>
+        <ConfigureSSOContent contentRef={contentRef} />
       </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOCardContent = () => {
-  const { data: enterpriseConnections, isLoading } = __internal_useUserEnterpriseConnections({ enabled: true });
+const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const {
+    isLoading,
+    enterpriseConnection,
+    organizationEnterpriseConnection,
+    testRuns,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
+  } = useOrganizationEnterpriseConnection();
 
-  // Currently FAPI only supports one enterprise connection per user
-  const enterpriseConnection = enterpriseConnections?.[0];
-
-  if (isLoading && !enterpriseConnection) {
+  if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 
   return (
-    <ConfigureSSOFlowProvider enterpriseConnection={enterpriseConnection}>
-      <Wizard>
-        <ConfigureSSOHeader />
-
-        <Wizard.Step id='select-provider'>
-          <SelectProviderStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='verify-domain'
-          label='Verify domain'
-        >
-          <VerifyDomainStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='configure'
-          label='Configure'
-        >
-          <ConfigureStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='test'
-          label='Test'
-        >
-          <TestConfigurationStep />
-        </Wizard.Step>
-
-        <Wizard.Step
-          id='confirmation'
-          label='Confirmation'
-        >
-          <ConfirmationStep />
-        </Wizard.Step>
-      </Wizard>
-    </ConfigureSSOFlowProvider>
+    <ConfigureSSOProtect>
+      <ConfigureSSOWizard
+        organizationEnterpriseConnection={organizationEnterpriseConnection}
+        testRuns={testRuns}
+        enterpriseConnection={enterpriseConnection}
+        contentRef={contentRef}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
+      />
+    </ConfigureSSOProtect>
   );
+};
+
+/** Permission gate shared by the wizard's hosts — personal workspaces pass, since there is no membership to check. */
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
 };
 
 const MissingManageEnterpriseConnectionsPermission = () => (
   <>
-    <Flex sx={t => ({ minHeight: t.sizes.$13, minWidth: '100%' })}>
-      <ProfileCardHeader />
-    </Flex>
+    <ProfileCardHeader />
 
     <Step.Body>
       <Step.Section
@@ -155,23 +127,9 @@ const MissingManageEnterpriseConnectionsPermission = () => (
         </Flex>
       </Step.Section>
     </Step.Body>
+
     <ProfileCardFooter />
   </>
 );
 
-const ConfigureSSOCardProtect = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useSession();
-  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
-  const canManageEnterpriseConnections = useProtect(
-    has => isPersonalWorkspace || has({ permission: 'org:sys_enterprise_connections:manage' }),
-  );
-
-  if (!canManageEnterpriseConnections) {
-    return <MissingManageEnterpriseConnectionsPermission />;
-  }
-
-  return children;
-};
-
-export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
-  withCardStateProvider(ConfigureSSOInternal);
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

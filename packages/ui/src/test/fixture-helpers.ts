@@ -538,9 +538,9 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withEnterpriseSso = (opts?: { selfServeSso?: boolean }) => {
+  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean }) => {
     us.saml = { enabled: true };
-    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSso ?? false };
+    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSSO ?? false };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {

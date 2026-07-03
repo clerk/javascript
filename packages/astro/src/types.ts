@@ -72,7 +72,7 @@ export type InternalRuntimeOptions = {
 
 // Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
-  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  load: (opts?: ClerkOptions) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
@@ -119,5 +119,4 @@ export type InternalUIComponentId =
   | 'google-one-tap'
   | 'waitlist'
   | 'pricing-table'
-  | 'api-keys'
-  | 'configure-sso';
+  | 'api-keys';

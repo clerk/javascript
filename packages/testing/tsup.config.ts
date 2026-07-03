@@ -9,7 +9,7 @@ export default defineConfig(overrideOptions => {
 
   return {
     entry: ['src/playwright/index.ts', 'src/playwright/unstable/index.ts', 'src/cypress/index.ts', 'src/index.ts'],
-    onSuccess: shouldPublish ? 'tsc && pkglab pub --ping' : 'tsc',
+    onSuccess: shouldPublish ? 'pnpm build:declarations && pkglab pub --ping' : 'pnpm build:declarations',
     minify: isProd,
     clean: true,
     sourcemap: true,

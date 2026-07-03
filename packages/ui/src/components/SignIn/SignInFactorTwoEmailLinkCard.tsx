@@ -97,6 +97,7 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
         }
         formSubtitle={localizationKeys('signIn.emailLinkMfa.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLinkMfa.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.imageUrl}

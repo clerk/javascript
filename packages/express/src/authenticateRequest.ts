@@ -3,6 +3,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
@@ -10,8 +11,15 @@ import { Readable } from 'stream';
 
 import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
-import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
-import { incomingMessageToRequest, loadApiEnv, loadClientEnv, requestToProxyRequest } from './utils';
+import type { AuthenticateRequestParams, ClerkMiddlewareOptions } from './types';
+import {
+  brandRequestAuth,
+  incomingMessageToRequest,
+  loadApiEnv,
+  loadClientEnv,
+  requestHasAuthObject,
+  requestToProxyRequest,
+} from './utils';
 
 /**
  * @internal
@@ -140,8 +148,19 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
-    if ((request as ExpressRequestWithAuth).auth) {
+    // Skip authentication only when a Clerk middleware has already processed
+    // this request. The brand check matters: a truthy `req.auth` is not proof
+    // of that, since express-jwt, passport and other libraries set the same
+    // property, and treating their value as ours would silently disable Clerk
+    // authentication.
+    if (requestHasAuthObject(request)) {
       return next();
+    }
+
+    if ('auth' in request) {
+      logger.warnOnce(
+        'Clerk: another middleware has already set `req.auth` on this request. Clerk authentication will run anyway and overwrite it. To use another auth library alongside Clerk, configure it to store its state on a different request property.',
+      );
     }
 
     const env = { ...loadApiEnv(), ...loadClientEnv() };
@@ -226,7 +245,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         return;
       }
 
-      const auth = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
+      const auth = brandRequestAuth((opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts));
 
       Object.assign(request, { auth });
 

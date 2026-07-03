@@ -7,7 +7,6 @@ import {
 } from '@clerk/shared/internal/clerk-js/passkeys';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -83,6 +82,7 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
@@ -379,7 +379,19 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    const transport = SignIn.clerk.__internal_oauthTransport;
+    if (transport) {
+      return _authenticateWithTransport({
+        clerk: SignIn.clerk,
+        transport,
+        resource: this,
+        authenticateMethod: this.authenticateWithRedirectOrPopup,
+        params,
+        callbackParams: params.__internal_callbackParams ?? {},
+      });
+    }
+
+    return this.authenticateWithRedirectOrPopup(params, SignIn.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
@@ -1145,7 +1157,20 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      if (!this.#resource.id) {
+      // Reuse the existing sign-in by default so any state already attached to it carries
+      // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
+      // or a discovered identifier). OAuth is the exception: its redirect URL only comes
+      // back from `_create` and cannot be refreshed in place, so any redirect already
+      // lingering on the resource is stale. Reusing it would replay a previous attempt's
+      // redirect, including a retry of the same provider after an abandoned redirect
+      // (SDK-75), so whenever an OAuth call finds a pending redirect we start fresh.
+      // `enterprise_sso` is always safe to reuse because the `prepare_first_factor` call
+      // below refreshes its redirect against the existing sign-in.
+      const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
+      const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
+      const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
+
+      if (shouldCreateSignIn) {
         await this._create({
           strategy,
           ...routes,
@@ -1173,7 +1198,7 @@ class SignInFuture implements SignInFutureResource {
           // Pick up the modified SignIn resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignIn.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });
@@ -1414,7 +1439,7 @@ class SignInFuture implements SignInFutureResource {
 
   async ticket(params?: SignInFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ticket: ticket ?? undefined });
+    return this.create({ strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {

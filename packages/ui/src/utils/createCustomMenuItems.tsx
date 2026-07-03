@@ -2,7 +2,7 @@ import type { CustomMenuItem, LoadedClerk } from '@clerk/shared/types';
 
 import { USER_BUTTON_ITEM_ID } from '../constants';
 import type { LocalizationKey } from '../customizables';
-import { CogFilled, SignOut } from '../icons';
+import { Cog, SignOut } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -165,7 +165,7 @@ const getUserButtonDefaultMenuItems = () => {
     {
       name: localizationKeys('userButton.action__manageAccount'),
       id: USER_BUTTON_ITEM_ID.MANAGE_ACCOUNT as 'manageAccount',
-      icon: CogFilled as React.ComponentType,
+      icon: Cog as React.ComponentType,
     },
     {
       name: localizationKeys('userButton.action__signOut'),

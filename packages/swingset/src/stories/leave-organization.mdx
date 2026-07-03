@@ -1,0 +1,16 @@
+import * as LeaveOrganizationStories from './leave-organization.stories';
+
+# Leave Organization
+
+A section that owns the open/deleting state and wires the `Destructive` block to the leave-organization flow.
+
+<Story
+  name='Default'
+  storyModule={LeaveOrganizationStories}
+  composition={[
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  ]}
+/>

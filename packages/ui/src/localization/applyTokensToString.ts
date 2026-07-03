@@ -53,7 +53,7 @@ const parseTokensFromLocalizedString = (
   const matches = (s.match(/{{.+?}}/g) || []).map(m => m.replace(/[{}]/g, ''));
   const parsedMatches = matches.map(m => m.split('|').map(m => m.trim()));
   const expressions = parsedMatches
-    .filter(match => match[0] in tokens)
+    .filter(match => Object.prototype.hasOwnProperty.call(tokens, match[0]))
     .map(([token, ...modifiers]) => ({
       token,
       modifiers: modifiers.map(m => getModifierWithParams(m)).filter(m => assertKnownModifier(m.modifierName)),

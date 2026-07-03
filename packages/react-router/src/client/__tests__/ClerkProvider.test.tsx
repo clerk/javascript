@@ -16,20 +16,24 @@ vi.mock('react-router', () => ({
   UNSAFE_DataRouterContext: React.createContext(null),
 }));
 
+const isSpaModeMock = vi.fn(() => false as boolean);
+
 vi.mock('../../utils/assert', () => ({
   assertPublishableKeyInSpaMode: vi.fn(),
   assertValidClerkState: vi.fn(),
-  isSpaMode: () => false,
+  isSpaMode: () => isSpaModeMock(),
   warnForSsr: vi.fn(),
 }));
 
 describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    isSpaModeMock.mockReturnValue(false);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllEnvs();
   });
 
   it('passes __internal_clerkUIUrl from clerkState to the underlying ClerkProvider', async () => {
@@ -69,6 +73,24 @@ describe('ClerkProvider __internal_clerkUIUrl via clerkState', () => {
     expect(mockClerkProvider).toHaveBeenCalledWith(
       expect.objectContaining({
         __internal_clerkUIUrl: undefined,
+      }),
+    );
+  });
+
+  it('reads VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING in SPA mode where clerkState is absent', async () => {
+    isSpaModeMock.mockReturnValue(true);
+    vi.stubEnv('VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING', 'true');
+    const { ClerkProvider } = await import('../ReactRouterClerkProvider');
+
+    render(
+      <ClerkProvider publishableKey='pk_test_xxx'>
+        <div>Test</div>
+      </ClerkProvider>,
+    );
+
+    expect(mockClerkProvider).toHaveBeenCalledWith(
+      expect.objectContaining({
+        unsafe_disableDevelopmentModeConsoleWarning: true,
       }),
     );
   });

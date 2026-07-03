@@ -1,0 +1,54 @@
+import * as IconStories from './icon.stories';
+
+# Icon
+
+Icon renders a named glyph from Mosaic's icon set. It sizes through the `size` variant and inherits color from `currentColor`. Any glyph can be swapped per name through `appearance.icons` on `MosaicProvider`. Mosaic's styling applies to an override just like the built-in glyph — so swapped icons stay visually consistent — and the override also receives `data-cl-slot="icon"` for targeting.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={IconStories}
+/>
+
+## Props
+
+<PropTable
+  meta={IconStories.meta}
+  extra={[{ name: 'name', type: 'IconName' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Icon'
+  module='@clerk/ui/mosaic/components/icon'
+  props={{ name: 'chevron-right' }}
+/>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={IconStories}
+/>
+
+### Names
+
+<Story
+  name='Names'
+  storyModule={IconStories}
+/>
+
+### Overriding a glyph
+
+Pass `appearance.icons` to `MosaicProvider` to replace a glyph by name. The override is a function receiving the resolved props — Mosaic's sizing/color `className` and `data-cl-slot` — which you spread onto your own element. Because Mosaic's styling applies to the override too, the replacement only supplies its `viewBox` and paths.
+
+<Story
+  name='Override'
+  storyModule={IconStories}
+/>

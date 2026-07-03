@@ -1,6 +1,5 @@
 package expo.modules.clerk.googlesignin
 
-import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -9,64 +8,75 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactMethod
-import expo.modules.clerk.NativeClerkGoogleSignInSpec
-import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableNativeMap
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import expo.modules.kotlin.Promise
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
-    NativeClerkGoogleSignInSpec(reactContext) {
-
+class ClerkGoogleSignInModule : Module() {
   private var webClientId: String? = null
   private var hostedDomain: String? = null
   private var autoSelectEnabled: Boolean = false
   private val mainScope = CoroutineScope(Dispatchers.Main)
 
   private val credentialManager: CredentialManager
-    get() = CredentialManager.create(reactApplicationContext)
+    get() = CredentialManager.create(requireNotNull(appContext.reactContext))
 
-  override fun getName(): String = "ClerkGoogleSignIn"
+  override fun definition() = ModuleDefinition {
+    Name("ClerkGoogleSignIn")
+
+    Function("configure") { params: Map<String, Any?> ->
+      configure(params)
+    }
+
+    AsyncFunction("signIn") { params: Map<String, Any?>?, promise: Promise ->
+      signIn(params, promise)
+    }
+
+    AsyncFunction("createAccount") { params: Map<String, Any?>?, promise: Promise ->
+      createAccount(params, promise)
+    }
+
+    AsyncFunction("presentExplicitSignIn") { params: Map<String, Any?>?, promise: Promise ->
+      presentExplicitSignIn(params, promise)
+    }
+
+    AsyncFunction("signOut") { promise: Promise ->
+      signOut(promise)
+    }
+  }
 
   // MARK: - configure
 
-  @ReactMethod
-  override fun configure(params: ReadableMap) {
-    webClientId = if (params.hasKey("webClientId")) params.getString("webClientId") else null
-    hostedDomain = if (params.hasKey("hostedDomain")) params.getString("hostedDomain") else null
-    autoSelectEnabled = if (params.hasKey("autoSelectEnabled")) params.getBoolean("autoSelectEnabled") else false
+  private fun configure(params: Map<String, Any?>) {
+    webClientId = params["webClientId"] as? String
+    hostedDomain = params["hostedDomain"] as? String
+    autoSelectEnabled = params["autoSelectEnabled"] as? Boolean ?: false
   }
 
   // MARK: - signIn
 
-  @ReactMethod
-  override fun signIn(params: ReadableMap?, promise: Promise) {
+  private fun signIn(params: Map<String, Any?>?, promise: Promise) {
     val clientId = webClientId ?: run {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", null)
       return
     }
 
-    val activity = getCurrentActivity() ?: run {
-      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available")
+    val activity = appContext.currentActivity ?: run {
+      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available", null)
       return
     }
 
     mainScope.launch {
       try {
-        val filterByAuthorized = params?.let {
-          if (it.hasKey("filterByAuthorizedAccounts")) it.getBoolean("filterByAuthorizedAccounts") else true
-        } ?: true
-        val nonce = params?.let {
-          if (it.hasKey("nonce")) it.getString("nonce") else null
-        }
+        val filterByAuthorized = params?.get("filterByAuthorizedAccounts") as? Boolean ?: true
+        val nonce = params?.get("nonce") as? String
 
         val googleIdOption = GetGoogleIdOption.Builder()
           .setFilterByAuthorizedAccounts(filterByAuthorized)
@@ -101,23 +111,20 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
 
   // MARK: - createAccount
 
-  @ReactMethod
-  override fun createAccount(params: ReadableMap?, promise: Promise) {
+  private fun createAccount(params: Map<String, Any?>?, promise: Promise) {
     val clientId = webClientId ?: run {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", null)
       return
     }
 
-    val activity = getCurrentActivity() ?: run {
-      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available")
+    val activity = appContext.currentActivity ?: run {
+      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available", null)
       return
     }
 
     mainScope.launch {
       try {
-        val nonce = params?.let {
-          if (it.hasKey("nonce")) it.getString("nonce") else null
-        }
+        val nonce = params?.get("nonce") as? String
 
         val googleIdOption = GetGoogleIdOption.Builder()
           .setFilterByAuthorizedAccounts(false) // Show all accounts for creation
@@ -151,23 +158,20 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
 
   // MARK: - presentExplicitSignIn
 
-  @ReactMethod
-  override fun presentExplicitSignIn(params: ReadableMap?, promise: Promise) {
+  private fun presentExplicitSignIn(params: Map<String, Any?>?, promise: Promise) {
     val clientId = webClientId ?: run {
-      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.")
+      promise.reject("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", null)
       return
     }
 
-    val activity = getCurrentActivity() ?: run {
-      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available")
+    val activity = appContext.currentActivity ?: run {
+      promise.reject("E_ACTIVITY_UNAVAILABLE", "Activity is not available", null)
       return
     }
 
     mainScope.launch {
       try {
-        val nonce = params?.let {
-          if (it.hasKey("nonce")) it.getString("nonce") else null
-        }
+        val nonce = params?.get("nonce") as? String
 
         val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(clientId)
           .apply {
@@ -198,8 +202,7 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
 
   // MARK: - signOut
 
-  @ReactMethod
-  override fun signOut(promise: Promise) {
+  private fun signOut(promise: Promise) {
     mainScope.launch {
       try {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
@@ -219,35 +222,35 @@ class ClerkGoogleSignInModule(reactContext: ReactApplicationContext) :
           try {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
 
-            val userMap = WritableNativeMap().apply {
-              putString("id", googleIdTokenCredential.id)
-              putString("email", googleIdTokenCredential.id)
-              putString("name", googleIdTokenCredential.displayName)
-              putString("givenName", googleIdTokenCredential.givenName)
-              putString("familyName", googleIdTokenCredential.familyName)
-              putString("photo", googleIdTokenCredential.profilePictureUri?.toString())
-            }
+            val user = mapOf(
+              "id" to googleIdTokenCredential.id,
+              "email" to googleIdTokenCredential.id,
+              "name" to googleIdTokenCredential.displayName,
+              "givenName" to googleIdTokenCredential.givenName,
+              "familyName" to googleIdTokenCredential.familyName,
+              "photo" to googleIdTokenCredential.profilePictureUri?.toString()
+            )
 
-            val dataMap = WritableNativeMap().apply {
-              putString("idToken", googleIdTokenCredential.idToken)
-              putMap("user", userMap)
-            }
+            val data = mapOf(
+              "idToken" to googleIdTokenCredential.idToken,
+              "user" to user
+            )
 
-            val responseMap = WritableNativeMap().apply {
-              putString("type", "success")
-              putMap("data", dataMap)
-            }
-
-            promise.resolve(responseMap)
+            promise.resolve(
+              mapOf(
+                "type" to "success",
+                "data" to data
+              )
+            )
           } catch (e: GoogleIdTokenParsingException) {
             promise.reject("GOOGLE_SIGN_IN_ERROR", "Failed to parse Google ID token: ${e.message}", e)
           }
         } else {
-          promise.reject("GOOGLE_SIGN_IN_ERROR", "Unexpected credential type: ${credential.type}")
+          promise.reject("GOOGLE_SIGN_IN_ERROR", "Unexpected credential type: ${credential.type}", null)
         }
       }
       else -> {
-        promise.reject("GOOGLE_SIGN_IN_ERROR", "Unexpected credential type")
+        promise.reject("GOOGLE_SIGN_IN_ERROR", "Unexpected credential type", null)
       }
     }
   }

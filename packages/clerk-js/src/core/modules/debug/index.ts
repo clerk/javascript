@@ -22,11 +22,11 @@ function validateLoggerOptions<T extends { logLevel?: unknown }>(options: T): vo
  * Options for configuring the debug logger.
  */
 export interface LoggerOptions {
-  /** Optional URL to which telemetry logs will be sent. */
+  /** The URL to which telemetry logs will be sent. */
   endpoint?: string;
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
-  /** Optional collector instance for custom telemetry handling. */
+  /** A collector instance for custom telemetry handling. */
   telemetryCollector?: TelemetryCollector;
 }
 
@@ -42,11 +42,11 @@ export interface ConsoleLoggerOptions {
  * Configuration options for a telemetry-based debug logger.
  */
 export interface TelemetryLoggerOptions {
-  /** Optional URL to which telemetry logs will be sent. */
+  /** The URL to which telemetry logs will be sent. */
   endpoint?: string;
   /** Minimum log level to capture. */
   logLevel?: DebugLogLevel;
-  /** Optional collector instance for custom telemetry handling. */
+  /** A collector instance for custom telemetry handling. */
   telemetryCollector?: TelemetryCollector;
 }
 

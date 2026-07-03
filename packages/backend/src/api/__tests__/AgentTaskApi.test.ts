@@ -13,7 +13,8 @@ describe('AgentTaskAPI', () => {
   const mockAgentTaskResponse = {
     object: 'agent_task',
     agent_id: 'agent_123',
-    task_id: 'task_456',
+    task_id: 'agent_task_456',
+    agent_task_id: 'agent_task_456',
     url: 'https://example.com/agent-task',
   };
 
@@ -51,9 +52,9 @@ describe('AgentTaskAPI', () => {
         redirectUrl: 'https://example.com/callback',
         sessionMaxDurationInSeconds: 1800,
       });
-
       expect(response.agentId).toBe('agent_123');
-      expect(response.taskId).toBe('task_456');
+      expect(response.taskId).toBe('agent_task_456');
+      expect(response.agentTaskId).toBe('agent_task_456');
       expect(response.url).toBe('https://example.com/agent-task');
     });
 
@@ -90,7 +91,8 @@ describe('AgentTaskAPI', () => {
       });
 
       expect(response.agentId).toBe('agent_123');
-      expect(response.taskId).toBe('task_456');
+      expect(response.taskId).toBe('agent_task_456');
+      expect(response.agentTaskId).toBe('agent_task_456');
     });
   });
 });

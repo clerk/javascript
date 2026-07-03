@@ -47,7 +47,7 @@ type EventBus<Events extends Record<string, unknown>> = {
    * Unsubscribe from an event
    *
    * @param event - The event name to unsubscribe from
-   * @param handler - Optional specific handler to remove. If omitted, all handlers for the event are removed
+   * @param handler - A specific handler to remove. If omitted, all handlers for the event are removed
    * @returns void
    */
   off: <Event extends keyof Events>(event: Event, handler?: EventHandler<Events, Event>) => void;
@@ -56,7 +56,7 @@ type EventBus<Events extends Record<string, unknown>> = {
    * Unsubscribe from a pre-dispatch event
    *
    * @param event - The event name to unsubscribe from
-   * @param handler - Optional specific handler to remove. If omitted, all pre-dispatch handlers for the event are removed
+   * @param handler - A specific handler to remove. If omitted, all pre-dispatch handlers for the event are removed
    * @returns void
    */
   prioritizedOff: <Event extends keyof Events>(event: Event, handler?: EventHandler<Events, Event>) => void;

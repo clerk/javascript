@@ -9,6 +9,7 @@ import {
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
+  EmailApi,
   EnterpriseConnectionAPI,
   IdPOAuthAccessTokenApi,
   InstanceAPI,
@@ -19,9 +20,12 @@ import {
   MachineApi,
   OAuthApplicationsApi,
   OrganizationAPI,
+  OrganizationPermissionAPI,
+  OrganizationRoleAPI,
   PhoneNumberAPI,
   ProxyCheckAPI,
   RedirectUrlAPI,
+  RoleSetAPI,
   SamlConnectionAPI,
   SessionAPI,
   SignInTokenAPI,
@@ -68,6 +72,12 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
+    /**
+     * @experimental This calls an internal, not-yet-public endpoint for sending
+     * transactional emails and is subject to change. It is advised to
+     * [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
+     */
+    emails: new EmailApi(request),
     enterpriseConnections: new EnterpriseConnectionAPI(request),
     idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
       buildRequest({
@@ -95,9 +105,12 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     oauthApplications: new OAuthApplicationsApi(request),
     organizations: new OrganizationAPI(request),
+    organizationPermissions: new OrganizationPermissionAPI(request),
+    organizationRoles: new OrganizationRoleAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
+    roleSets: new RoleSetAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
     signUps: new SignUpAPI(request),

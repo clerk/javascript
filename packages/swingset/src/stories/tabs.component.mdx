@@ -1,0 +1,58 @@
+import * as TabsStories from './tabs.component.stories';
+
+# Tabs
+
+The styled Mosaic `Tabs` — the headless `@clerk/headless` tabs primitives composed with Mosaic
+slot recipes. It inherits selection state, roving-tabindex keyboard navigation, and ARIA wiring
+(`role="tablist"` / `tab` / `tabpanel`) from the primitive, and adds Mosaic's themed styling for
+each part. Slot identity (`data-cl-slot`) is applied by this styled layer, not by the headless
+parts.
+
+## Example
+
+Click a tab or focus the list and use the arrow keys. The active tab is tracked by a sliding
+`Indicator`; the third tab is `disabled`.
+
+<Story
+  name='Default'
+  storyModule={TabsStories}
+/>
+
+## Usage
+
+```tsx
+import { Tabs } from '@clerk/ui/mosaic/components/tabs';
+
+<Tabs.Root defaultValue='account'>
+  <Tabs.List>
+    <Tabs.Tab value='account'>Account</Tabs.Tab>
+    <Tabs.Tab value='password'>Password</Tabs.Tab>
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Panel value='account'>Manage your account settings here.</Tabs.Panel>
+  <Tabs.Panel value='password'>Change your password here.</Tabs.Panel>
+</Tabs.Root>;
+```
+
+`Tab` participates in roving-tabindex keyboard navigation (arrow keys move focus). `Trigger` is a
+click-only alternative for cases that don't want keyboard roving. Any part accepts a `render` prop
+for polymorphic rendering — pass a function that receives the part's computed props and spreads
+them onto your element.
+
+## Parts
+
+| Part             | Slot             | Description                                                  |
+| ---------------- | ---------------- | ------------------------------------------------------------ |
+| `Tabs.Root`      | none (context)   | Owns the selected value, orientation, and activation mode    |
+| `Tabs.List`      | `tabs-list`      | `role="tablist"` container; anchors the indicator            |
+| `Tabs.Tab`       | `tabs-tab`       | Selectable tab with roving-tabindex keyboard navigation      |
+| `Tabs.Trigger`   | `tabs-trigger`   | Click-only tab (no keyboard roving)                          |
+| `Tabs.Panel`     | `tabs-panel`     | `role="tabpanel"`; hidden via `data-cl-hidden` when inactive |
+| `Tabs.Indicator` | `tabs-indicator` | Sliding underline tracking the active tab (positions inline) |
+
+## Styling
+
+Each styled part is themed by the Mosaic tabs recipe and stays targetable through its
+`data-cl-slot` plus the state attributes the primitive emits (`data-cl-selected`,
+`data-cl-disabled` on tabs; `data-cl-hidden` on panels). Override per slot through
+`appearance.elements` — e.g. `{ 'tabs-tab': { fontWeight: 600 } }`.

@@ -2,10 +2,7 @@ import { readdir } from 'fs/promises';
 import { join, relative } from 'path';
 import { describe, expect, it } from 'vitest';
 
-// Same function as in custom-router.mjs
-function toKebabCase(str: string) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
-}
+import { toUrlSlug } from '../slug.mjs';
 
 const OUTPUT_LOCATION = `${process.cwd()}/docs`;
 
@@ -47,11 +44,71 @@ describe('Typedoc output', () => {
 
   it('should only have these nested folders', async () => {
     const folders = await scanDirectory('directory');
-    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder));
+    const nestedFolders = folders.filter(folder => !isTopLevelPath(folder)).sort((a, b) => a.localeCompare(b));
 
     expect(nestedFolders).toMatchInlineSnapshot(`
       [
+        "backend/agent-task-api",
+        "backend/agent-task-api/methods",
+        "backend/allowlist-identifier-api",
+        "backend/allowlist-identifier-api/methods",
+        "backend/api-keys-api",
+        "backend/api-keys-api/methods",
+        "backend/billing-api",
+        "backend/billing-api/methods",
+        "backend/client-api",
+        "backend/client-api/methods",
+        "backend/domain-api",
+        "backend/domain-api/methods",
+        "backend/email-address-api",
+        "backend/email-address-api/methods",
+        "backend/enterprise-connection-api",
+        "backend/enterprise-connection-api/methods",
+        "backend/instance-api",
+        "backend/instance-api/methods",
+        "backend/invitation-api",
+        "backend/invitation-api/methods",
+        "backend/m2-m-token-api",
+        "backend/m2-m-token-api/methods",
+        "backend/machine-api",
+        "backend/machine-api/methods",
+        "backend/o-auth-applications-api",
+        "backend/o-auth-applications-api/methods",
+        "backend/organization-api",
+        "backend/organization-api/methods",
+        "backend/phone-number-api",
+        "backend/phone-number-api/methods",
+        "backend/redirect-url-api",
+        "backend/redirect-url-api/methods",
+        "backend/session-api",
+        "backend/session-api/methods",
+        "backend/sign-in-token-api",
+        "backend/sign-in-token-api/methods",
+        "backend/testing-token-api",
+        "backend/testing-token-api/methods",
+        "backend/user-api",
+        "backend/user-api/methods",
+        "backend/waitlist-entry-api",
+        "backend/waitlist-entry-api/methods",
         "react/legacy",
+        "shared/api-key-resource",
+        "shared/api-key-resource/methods",
+        "shared/billing-namespace",
+        "shared/billing-namespace/methods",
+        "shared/clerk",
+        "shared/clerk/methods",
+        "shared/client-resource",
+        "shared/client-resource/methods",
+        "shared/organization-resource",
+        "shared/organization-resource/methods",
+        "shared/session-resource",
+        "shared/session-resource/methods",
+        "shared/sign-in-future-resource",
+        "shared/sign-in-future-resource/methods",
+        "shared/sign-up-future-resource",
+        "shared/sign-up-future-resource/methods",
+        "shared/user-resource",
+        "shared/user-resource/methods",
       ]
     `);
   });
@@ -64,7 +121,7 @@ describe('Typedoc output', () => {
   });
   it('should only contain kebab-cased files', async () => {
     const files = await scanDirectory('file');
-    const incorrectFiles = files.filter(file => file !== toKebabCase(file));
+    const incorrectFiles = files.filter(file => file !== toUrlSlug(file));
 
     expect(incorrectFiles).toHaveLength(0);
   });

@@ -60,12 +60,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           variant='ghost'
           aria-label='Close modal'
           onClick={toggle}
-          icon={
-            <Icon
-              icon={Close}
-              size='xs'
-            />
-          }
+          icon={<Icon icon={Close} />}
           sx={t => ({
             color: t.colors.$colorMutedForeground,
             zIndex: t.zIndices.$modal,

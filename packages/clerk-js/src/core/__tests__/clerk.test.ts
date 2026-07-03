@@ -1,4 +1,5 @@
 import { ClerkOfflineError, ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -335,6 +336,41 @@ describe('Clerk singleton', () => {
       // Should only fetch once since cache is used as fallback (no retry needed)
       expect(mockEnvironmentFetch).toHaveBeenCalledTimes(1);
       expect(mockClientFetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('__internal_oauthTransport', () => {
+    it('defaults to null with no getter access errors', () => {
+      const sut = new Clerk(productionPublishableKey);
+
+      expect(sut.__internal_hasOAuthTransport).toBe(false);
+      expect(sut.__internal_oauthTransport).toBeNull();
+    });
+
+    it('exposes the transport registered via options after load', async () => {
+      const transport = {
+        getRedirectUrl: () => 'myapp://sso-callback',
+        open: async (_url: URL) => ({ callbackUrl: 'myapp://sso-callback' }),
+      };
+      const sut = new Clerk(productionPublishableKey);
+
+      await sut.load({ __internal_oauthTransport: transport });
+
+      expect(sut.__internal_hasOAuthTransport).toBe(true);
+      expect(sut.__internal_oauthTransport).toBe(transport);
+    });
+  });
+
+  describe('__internal_handleResourceCallback', () => {
+    it('handleGoogleOneTapCallback delegates to __internal_handleResourceCallback', async () => {
+      const clerk = new Clerk(productionPublishableKey);
+      await clerk.load();
+      const spy = vi.spyOn(clerk, '__internal_handleResourceCallback').mockResolvedValue(undefined);
+      const signInLike = { identifier: 'x' } as any;
+
+      await clerk.handleGoogleOneTapCallback(signInLike, { signInUrl: '/sign-in' });
+
+      expect(spy).toHaveBeenCalledWith(signInLike, { signInUrl: '/sign-in' }, undefined);
     });
   });
 
@@ -1385,6 +1421,104 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('uses __internal_navigateOnSetActive for completed sign in callbacks', async () => {
+      const sessionId = 'sess_123';
+      const mockSession = { id: sessionId, currentTask: null };
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'complete',
+            created_session_id: sessionId,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+        expect(session).toBe(mockSession);
+        expect(redirectUrl).toBe('http://test.host/after-sign-in');
+        expect(decorateUrl('/decorated')).toBe('/decorated');
+      });
+      const mockSetActive = vi.fn(async ({ navigate }) => navigate({ session: mockSession }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive as any;
+
+      await sut.handleRedirectCallback({
+        signInForceRedirectUrl: '/after-sign-in',
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
+      });
+
+      expect(mockSetActive).toHaveBeenCalledWith({
+        session: sessionId,
+        navigate: expect.any(Function),
+      });
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('uses __internal_navigateOnSetActive for completed sign up callbacks', async () => {
+      const sessionId = 'sess_123';
+      const mockSession = { id: sessionId, currentTask: null };
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'complete',
+            created_session_id: sessionId,
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+        expect(session).toBe(mockSession);
+        expect(redirectUrl).toBe('http://test.host/after-sign-up');
+        expect(decorateUrl('/decorated')).toBe('/decorated');
+      });
+      const mockSetActive = vi.fn(async ({ navigate }) => navigate({ session: mockSession }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive as any;
+
+      await sut.handleRedirectCallback({
+        signUpForceRedirectUrl: '/after-sign-up',
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
+      });
+
+      expect(mockSetActive).toHaveBeenCalledWith({
+        session: sessionId,
+        navigate: expect.any(Function),
+      });
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -1534,7 +1668,7 @@ describe('Clerk singleton', () => {
                 strategy: 'oauth_google',
                 external_verification_redirect_url: null,
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                   long_message: 'This external account already exists.',
                   message: 'already exists',
                 },
@@ -1546,7 +1680,7 @@ describe('Clerk singleton', () => {
               strategy: 'oauth_google',
               external_verification_redirect_url: null,
               error: {
-                code: 'external_account_exists',
+                code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 long_message: 'This external account already exists.',
                 message: 'already exists',
               },
@@ -2132,7 +2266,7 @@ describe('Clerk singleton', () => {
               external_account: {
                 status: 'transferable',
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 },
               },
             },
@@ -3142,7 +3276,9 @@ describe('Clerk singleton', () => {
 
     it('uses ui.ClerkUI when provided', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3155,7 +3291,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -3168,7 +3306,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({

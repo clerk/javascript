@@ -1,0 +1,113 @@
+import * as TooltipStories from './tooltip.stories';
+
+# Tooltip
+
+A small floating label shown on hover or focus, from `@clerk/headless`. It is a **headless**
+primitive: it supplies open state, hover/focus delays, portalling, floating-ui positioning,
+optional shared delay groups, and ARIA wiring, but ships **no styles** — you bring your own
+CSS by targeting the `data-cl-*` attributes each part emits. A tooltip never receives or
+traps focus.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Hover or focus the trigger; the tooltip appears after a short
+delay and dismisses on blur or Escape.
+
+<Story
+  name='Default'
+  storyModule={TooltipStories}
+/>
+
+## Usage
+
+```tsx
+import { Tooltip } from '@clerk/headless/tooltip';
+
+<Tooltip.Root>
+  <Tooltip.Trigger>Hover me</Tooltip.Trigger>
+  <Tooltip.Portal>
+    <Tooltip.Positioner>
+      <Tooltip.Popup>
+        Helpful description
+        <Tooltip.Arrow />
+      </Tooltip.Popup>
+    </Tooltip.Positioner>
+  </Tooltip.Portal>
+</Tooltip.Root>;
+```
+
+### Shared delay group
+
+Wrap related tooltips in `Tooltip.Group` so that, once one is open, moving to a sibling
+trigger shows its tooltip instantly (skipping the open delay):
+
+```tsx
+<Tooltip.Group>
+  <Tooltip.Root>{/* … */}</Tooltip.Root>
+  <Tooltip.Root>{/* … */}</Tooltip.Root>
+</Tooltip.Group>;
+```
+
+## Parts
+
+| Part                 | Default Element | Description                                                 |
+| -------------------- | --------------- | ----------------------------------------------------------- |
+| `Tooltip.Root`       | none (context)  | Owns open state, delays, and positioning                    |
+| `Tooltip.Group`      | none (context)  | Shares open/close delay across grouped tooltips             |
+| `Tooltip.Trigger`    | `<button>`      | The reference element that opens the tooltip on hover/focus |
+| `Tooltip.Portal`     | none (portal)   | Portals its children; renders nothing until mounted         |
+| `Tooltip.Positioner` | `<div>`         | Floating-positioned container                               |
+| `Tooltip.Popup`      | `<div>`         | The visible tooltip surface (`role="tooltip"`)              |
+| `Tooltip.Arrow`      | `<svg>`         | Optional arrow pointing at the trigger                      |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Tooltip.Arrow` accepts floating-ui `FloatingArrow`
+props. `Tooltip.Portal` is optional.
+
+## Props
+
+### `Tooltip.Root`
+
+| Prop                      | Type                                 | Default            | Description                                   |
+| ------------------------- | ------------------------------------ | ------------------ | --------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                 | —                  | Controlled open state                         |
+| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code> | Initial open state (uncontrolled)             |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                  | Called when the open state changes            |
+| <code>placement</code>    | <code>Placement</code>               | <code>'top'</code> | Placement relative to the trigger             |
+| <code>sideOffset</code>   | <code>number</code>                  | <code>4</code>     | Gap in px between the trigger and the tooltip |
+| <code>delay</code>        | <code>number</code>                  | <code>200</code>   | Delay in ms before opening on hover           |
+| <code>closeDelay</code>   | <code>number</code>                  | <code>0</code>     | Delay in ms before closing on hover out       |
+
+### `Tooltip.Group`
+
+| Prop                   | Type                                                               | Default                                          | Description                                     |
+| ---------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | ----------------------------------------------- |
+| <code>delay</code>     | <code>number \| &#123; open?: number; close?: number &#125;</code> | <code>&#123; open: 200, close: 100 &#125;</code> | Shared delay config for grouped tooltips        |
+| <code>timeoutMs</code> | <code>number</code>                                                | <code>300</code>                                 | Time in ms before the group leaves instant mode |
+
+`Tooltip.Trigger`, `Tooltip.Positioner`, and `Tooltip.Popup` take no additional props
+beyond standard HTML attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To        | Description                                        |
+| ------------------------ | ----------------- | -------------------------------------------------- |
+| `data-cl-slot`           | All parts         | Part identifier                                    |
+| `data-cl-open`           | Trigger, Popup    | Present when the tooltip is open                   |
+| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
+| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+
+The positioner exposes anchor/viewport geometry as CSS variables:
+
+| Variable                | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `--cl-anchor-width`     | Trigger width                                         |
+| `--cl-anchor-height`    | Trigger height                                        |
+| `--cl-available-width`  | Available width between the anchor and viewport edge  |
+| `--cl-available-height` | Available height between the anchor and viewport edge |
+| `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |

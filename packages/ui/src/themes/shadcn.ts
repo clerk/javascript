@@ -25,7 +25,7 @@ export const shadcn = createTheme({
   },
   elements: {
     input: 'bg-transparent dark:bg-input/30',
-    cardBox: 'shadow-sm border',
+    cardBox: 'shadow-sm border data-[elevation=flush]:shadow-none data-[elevation=flush]:border-0',
     popoverBox: 'shadow-sm border',
     button: {
       '&[data-variant="solid"]::after': {

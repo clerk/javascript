@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import type { JwtPayload } from '@clerk/shared/types';
 
 import { constants } from '../constants';
@@ -635,7 +636,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
 
       if (!data.azp) {
-        console.warn(
+        // Warn once per process rather than per request: a single azp-less cookie
+        // token is reused across every authenticated request until it refreshes,
+        // so an unguarded console.warn floods production logs (see issue #8231).
+        logger.warnOnce(
           'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
         );
       }

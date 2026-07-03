@@ -82,8 +82,7 @@ const withClerkGoogleSignIn: ConfigPlugin = config => {
  * 1. Configures iOS URL scheme for Google Sign-In (if env var is set)
  * 2. Adds Android packaging exclusions to resolve dependency conflicts
  *
- * Native modules are registered via react-native.config.js and standard
- * React Native autolinking (RCTViewManager / ReactPackage).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 const withClerkExpo: ConfigPlugin = config => {
   config = withClerkGoogleSignIn(config);

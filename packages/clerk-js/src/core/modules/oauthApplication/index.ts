@@ -10,12 +10,16 @@ import { BaseResource } from '../../resources/internal';
 
 export class OAuthApplication implements OAuthApplicationNamespace {
   async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
-    const { oauthClientId, scope } = params;
+    const { oauthClientId, scope, redirectUri } = params;
+    const search = {
+      ...(scope !== undefined && { scope }),
+      ...(redirectUri !== undefined && { redirect_uri: redirectUri }),
+    };
     const json = await BaseResource._fetch<OAuthConsentInfoJSON>(
       {
         method: 'GET',
         path: `/me/oauth/consent/${encodeURIComponent(oauthClientId)}`,
-        search: scope !== undefined ? { scope } : undefined,
+        search: Object.keys(search).length > 0 ? search : undefined,
       },
       { skipUpdateClient: true },
     );
@@ -31,6 +35,7 @@ export class OAuthApplication implements OAuthApplicationNamespace {
       oauthApplicationUrl: data.oauth_application_url,
       clientId: data.client_id,
       state: data.state,
+      redirectDomain: data.redirect_domain,
       scopes:
         data.scopes?.map(s => ({
           scope: s.scope,

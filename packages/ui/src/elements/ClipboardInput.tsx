@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 
 import { Button, descriptors, Flex, Icon, Input } from '../customizables';
 import { useClipboard } from '../hooks';
-import { Clipboard, TickShield } from '../icons';
+import { Clipboard, ShieldCheck } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
 
 type ClipboardInputProps = PropsOfComponent<typeof Input> & {
@@ -11,7 +11,7 @@ type ClipboardInputProps = PropsOfComponent<typeof Input> & {
 };
 
 export const ClipboardInput = (props: ClipboardInputProps) => {
-  const { id, value, copyIcon = Clipboard, copiedIcon = TickShield, sx, ...rest } = props;
+  const { id, value, copyIcon = Clipboard, copiedIcon = ShieldCheck, sx, ...rest } = props;
   const { onCopy, hasCopied } = useClipboard(value as string);
 
   return (
@@ -23,23 +23,28 @@ export const ClipboardInput = (props: ClipboardInputProps) => {
       <Input
         {...rest}
         value={value}
-        isDisabled
-        sx={theme => ({ paddingInlineEnd: theme.space.$8 })}
+        readOnly
+        sx={theme => ({ paddingInlineEnd: theme.space.$7x5, textOverflow: 'ellipsis' })}
       />
 
       <Button
         elementDescriptor={descriptors.formFieldInputCopyToClipboardButton}
         variant='ghost'
-        onClick={onCopy}
-        sx={{
-          position: 'absolute',
-          insetInlineEnd: 0,
+        onClick={() => onCopy()}
+        sx={t => {
+          return {
+            position: 'absolute',
+            insetInlineEnd: t.space.$1,
+            padding: 0,
+            height: t.sizes.$6,
+            aspectRatio: 1,
+            borderRadius: `calc(${t.radii.$md} - ${t.space.$1})`,
+          };
         }}
       >
         <Icon
           elementDescriptor={descriptors.formFieldInputCopyToClipboardIcon}
           icon={hasCopied ? copiedIcon : copyIcon}
-          size='sm'
         />
       </Button>
     </Flex>

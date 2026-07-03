@@ -47,6 +47,36 @@ describe('signedInAuthObject', () => {
     expect(token).toBe('token');
   });
 
+  it('redacts raw session and machine tokens from debug output', () => {
+    const rawSessionToken = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.this-segment-must-never-be-logged';
+    const mockAuthenticateContext = {
+      tokenInHeader: 'eyJhbGciOiJSUzI1NiJ9.header-bearer.this-segment-must-never-be-logged',
+      sessionTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.cookie-bearer.this-segment-must-never-be-logged',
+      refreshTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.refresh-bearer.this-segment-must-never-be-logged',
+      devBrowserToken: 'eyJhbGciOiJSUzI1NiJ9.devbrowser-bearer.this-segment-must-never-be-logged',
+      handshakeToken: 'eyJhbGciOiJSUzI1NiJ9.handshake-bearer.this-segment-must-never-be-logged',
+    } as unknown as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, rawSessionToken, {
+      sub: 'userId',
+    } as unknown as JwtPayload);
+
+    const debug = authObject.debug() as Record<string, string>;
+
+    // Only a short, non-reconstructable prefix of each bearer credential is exposed.
+    expect(debug.sessionToken).toBe('eyJhbGc');
+    expect(debug.tokenInHeader).toBe('eyJhbGc');
+    expect(debug.sessionTokenInCookie).toBe('eyJhbGc');
+    expect(debug.refreshTokenInCookie).toBe('eyJhbGc');
+    expect(debug.devBrowserToken).toBe('eyJhbGc');
+    expect(debug.handshakeToken).toBe('eyJhbGc');
+
+    // The full tokens must not be recoverable from the serialized debug payload.
+    const serialized = JSON.stringify(debug);
+    expect(serialized).not.toContain('this-segment-must-never-be-logged');
+    expect(serialized).not.toContain(rawSessionToken);
+  });
+
   describe('JWT v1', () => {
     it('has() for user scope', () => {
       const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;

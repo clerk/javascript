@@ -50,7 +50,7 @@ describe('SubscriptionDetails', () => {
       id: 'sub_123',
       nextPayment: {
         amount: {
-          amount: 1000,
+          amount: 1500,
           amountFormatted: '15.00',
           currency: 'USD',
           currencySymbol: '$',
@@ -151,7 +151,7 @@ describe('SubscriptionDetails', () => {
       id: 'sub_123',
       nextPayment: {
         amount: {
-          amount: 10000,
+          amount: 10100,
           amountFormatted: '101.00',
           currency: 'USD',
           currencySymbol: '$',
@@ -360,7 +360,7 @@ describe('SubscriptionDetails', () => {
       id: 'plan_monthly',
       name: 'Monthly Plan',
       fee: {
-        amount: 1000,
+        amount: 1500,
         amountFormatted: '15.00',
         currencySymbol: '$',
         currency: 'USD',
@@ -1039,7 +1039,7 @@ describe('SubscriptionDetails', () => {
       id: 'sub_123',
       nextPayment: {
         amount: {
-          amount: 1000,
+          amount: 1500,
           amountFormatted: '15.00',
           currency: 'USD',
           currencySymbol: '$',

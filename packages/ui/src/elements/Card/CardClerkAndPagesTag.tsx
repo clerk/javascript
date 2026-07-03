@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Box, Col, Flex, Icon, Link, Text } from '../../customizables';
+import { Box, Col, descriptors, Flex, Icon, Link, Text } from '../../customizables';
 import { useDevMode } from '../../hooks/useDevMode';
 import { LogoMark } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
@@ -28,24 +28,23 @@ export const CardClerkAndPagesTag = React.memo(
 
     return (
       <Box
+        elementDescriptor={descriptors.footerItem}
         sx={[
           {
             width: '100%',
             position: 'relative',
-            isolation: 'isolate',
           },
           outerSx,
         ]}
       >
-        {withDevOverlay && <DevModeOverlay gradient={0} />}
+        {withDevOverlay && <DevModeOverlay />}
         <Col
           sx={t => ({
-            gap: displayConfig.branded || withFooterPages ? t.space.$2 : 0,
+            gap: displayConfig.branded || withFooterPages ? t.space.$4 : 0,
             marginInline: 'auto',
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
-            zIndex: 1,
             position: 'relative',
           })}
         >

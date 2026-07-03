@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "esModuleInterop": true,
     "importHelpers": true,
     "isolatedModules": true,
     "jsx": "react",
-    "lib": ["es6", "dom"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "moduleResolution": "Bundler",
     "module": "preserve",
     "noImplicitReturns": true,
@@ -16,7 +15,9 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "types": ["node"],
+    "rootDir": "./src"
   },
   "include": ["src"]
 }

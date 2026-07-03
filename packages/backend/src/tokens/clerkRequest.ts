@@ -26,18 +26,22 @@ class ClerkRequest extends Request {
     // https://github.com/nodejs/undici/issues/2155
     // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
     const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
-    // When cloning a Request by passing it as init, hide its `signal`. Undici's
-    // Request constructor in Node 24 performs a strict instanceof check on the
-    // signal and rejects ones from a different realm (e.g. NextRequest). Using a
-    // Proxy keeps property access lazy so environments that don't implement
-    // optional getters (e.g. Cloudflare Workers' Request lacks `cache`) still work.
+    // When cloning a Request by passing it as init, hide its `signal` and `body`.
+    // Undici's Request constructor in Node 24 performs a strict instanceof check on
+    // the signal and rejects ones from a different realm (e.g. NextRequest). The
+    // `body` is hidden because forwarding it makes the clone share the original's
+    // single-use ReadableStream; once either side is read the other throws
+    // "Body is unusable" downstream (issue #8305). Auth only reads the method,
+    // headers, cookies, and URL, so the clone never needs a body. Using a Proxy
+    // keeps property access lazy so environments that don't implement optional
+    // getters (e.g. Cloudflare Workers' Request lacks `cache`) still work.
     let cloneInit: RequestInit | undefined;
     if (init) {
       cloneInit = init;
     } else if (typeof input !== 'string') {
       cloneInit = new Proxy(input as Request, {
         get(target, prop) {
-          if (prop === 'signal') {
+          if (prop === 'signal' || prop === 'body') {
             return undefined;
           }
           return Reflect.get(target, prop, target);

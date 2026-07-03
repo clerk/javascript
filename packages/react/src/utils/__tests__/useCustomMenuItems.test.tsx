@@ -135,4 +135,67 @@ describe('useUserButtonCustomMenuItems', () => {
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     }
   });
+
+  it('uses separate portals for duplicate non-keyed menu items', () => {
+    const children = (
+      <MenuItems>
+        <MenuAction
+          label='Duplicate'
+          labelIcon={<div>First icon</div>}
+          open='/duplicate'
+        />
+        <MenuAction
+          label='Duplicate'
+          labelIcon={<div>Second icon</div>}
+          open='/duplicate'
+        />
+      </MenuItems>
+    );
+
+    const { result } = renderHook(() => useUserButtonCustomMenuItems(children));
+
+    expect(result.current.customMenuItems).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals[0].portal).not.toBe(result.current.customMenuItemsPortals[1].portal);
+    expect(result.current.customMenuItemsPortals[0].key).not.toBe(result.current.customMenuItemsPortals[1].key);
+  });
+
+  it('keeps portal identity with the logical menu item when inserting before it', () => {
+    const firstItem = (
+      <MenuAction
+        key='first'
+        label='First action'
+        labelIcon={<div>First icon</div>}
+        onClick={() => {}}
+      />
+    );
+    const secondItem = (
+      <MenuAction
+        key='second'
+        label='Second action'
+        labelIcon={<div>Second icon</div>}
+        onClick={() => {}}
+      />
+    );
+    const makeChildren = (includeFirstItem: boolean) => (
+      <MenuItems>{includeFirstItem ? [firstItem, secondItem] : [secondItem]}</MenuItems>
+    );
+
+    const { result, rerender } = renderHook(
+      ({ includeFirstItem }) => useUserButtonCustomMenuItems(makeChildren(includeFirstItem)),
+      {
+        initialProps: { includeFirstItem: false },
+      },
+    );
+
+    const secondItemIconPortal = result.current.customMenuItemsPortals[0].portal;
+    const secondItemIconKey = result.current.customMenuItemsPortals[0].key;
+
+    rerender({ includeFirstItem: true });
+
+    expect(result.current.customMenuItems).toHaveLength(2);
+    expect(result.current.customMenuItemsPortals[0].portal).not.toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[1].portal).toBe(secondItemIconPortal);
+    expect(result.current.customMenuItemsPortals[1].key).toBe(secondItemIconKey);
+  });
 });

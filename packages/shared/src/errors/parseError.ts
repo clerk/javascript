@@ -39,6 +39,8 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       zxcvbn: error?.meta?.zxcvbn,
       plan: error?.meta?.plan,
       is_plan_upgrade_possible: error?.meta?.isPlanUpgradePossible,
+      seats_quantity_to_add: error?.meta?.seatsQuantityToAdd,
+      seats_quantity: error?.meta?.seatsQuantity,
     },
   };
 }

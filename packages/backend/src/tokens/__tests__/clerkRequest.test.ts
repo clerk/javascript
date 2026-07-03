@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import { createClerkRequest } from '../clerkRequest';
 
+// Some test runtimes (e.g. Cloudflare/miniflare) gate `new ReadableStream()`
+// behind a feature flag and throw when it is constructed directly.
+const supportsStreamConstruction = (() => {
+  try {
+    new ReadableStream({
+      start(controller) {
+        controller.close();
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 describe('createClerkRequest', () => {
   describe('instantiating a request', () => {
     it('retains the headers', () => {
@@ -17,11 +32,34 @@ describe('createClerkRequest', () => {
       expect(req.method).toBe(oldReq.method);
     });
 
-    it('retains the body', async () => {
-      const data = { a: '1' };
-      const oldReq = new Request('http://localhost:3000', { method: 'POST', body: JSON.stringify(data) });
+    // The hazard only exists on undici-style runtimes (Node, edge) where the
+    // request body is a single-use stream. Cloudflare/miniflare buffers bodies
+    // (so the body survives anyway) and cannot construct a streaming body, so
+    // this regression is skipped there.
+    it.skipIf(!supportsStreamConstruction)('does not consume the original request body (issue #8305)', async () => {
+      // Clerk only needs the method, headers, cookies, and URL. Forwarding the
+      // body made the clone share the original's single-use stream, so reading
+      // either side left the other "unusable" for downstream handlers (e.g. a
+      // Hono POST route calling `c.req.json()`).
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode(JSON.stringify({ a: '1' })));
+          controller.close();
+        },
+      });
+      const oldReq = new Request('http://localhost:3000', {
+        method: 'POST',
+        body: stream,
+        // `duplex` is required when streaming a body; not yet in all lib typings.
+        duplex: 'half',
+      } as RequestInit);
+
       const req = createClerkRequest(oldReq);
-      expect((await req.json())['a']).toBe(data.a);
+
+      // The clone carries no body, so it can never lock the original's stream...
+      expect(req.body).toBeNull();
+      // ...and the original stream stays readable for downstream consumers.
+      expect(((await oldReq.json()) as { a: string }).a).toBe('1');
     });
 
     it('retains the url', () => {

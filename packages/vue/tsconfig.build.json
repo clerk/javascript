@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "./dist"
+    "declarationDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.vue"],
   "exclude": ["src/**/*.test.ts"]

@@ -231,6 +231,10 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ExternalAccount;
+  /**
+   * The `eac_`-prefixed external account id. Only present for Google and Facebook accounts.
+   */
+  external_account_id?: string;
   provider: string;
   identification_id: string;
   provider_user_id: string;
@@ -470,25 +474,15 @@ export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitati
   user_id: string;
 }
 
-/**
- * @interface
- */
+/** @inline */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
-  /**
-   * The name of the Organization.
-   */
+  /** The name of the Organization. */
   name: string;
-  /**
-   * The slug of the Organization.
-   */
+  /** The slug of the Organization. */
   slug: string;
-  /**
-   * Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
-   */
+  /** Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization). */
   image_url?: string;
-  /**
-   * Whether the Organization has a profile image.
-   */
+  /** Whether the Organization has a profile image. */
   has_image: boolean;
 }
 
@@ -599,6 +593,10 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
   agent_id: string;
+  agent_task_id: string;
+  /**
+   * @deprecated Use `agent_task_id` instead.
+   */
   task_id: string;
   url: string;
 }
@@ -760,6 +758,8 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -803,6 +803,8 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -836,7 +838,7 @@ export interface RoleJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Role;
   key: string;
   name: string;
-  description: string;
+  description: string | null;
   permissions: PermissionJSON[];
   is_creator_eligible: boolean;
   created_at: number;

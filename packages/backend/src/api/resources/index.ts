@@ -19,6 +19,7 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
+  WaitlistEntryStatus,
 } from './Enums';
 
 export type { SignUpStatus } from '@clerk/shared/types';
@@ -49,9 +50,12 @@ export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './OrganizationSettings';
+export * from './Permission';
 export * from './PhoneNumber';
 export * from './ProxyCheck';
 export * from './RedirectUrl';
+export * from './Role';
+export * from './RoleSet';
 export * from './SamlConnection';
 export * from './Session';
 export * from './SignInTokens';

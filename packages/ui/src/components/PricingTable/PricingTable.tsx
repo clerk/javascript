@@ -11,7 +11,7 @@ import { PricingTableMatrix } from './PricingTableMatrix';
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const getContainer = usePortalRoot();
-  const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
+  const { mode = 'mounted', signInMode = 'redirect', highlightedPlan } = usePricingTableContext();
   const isCompact = mode === 'modal';
   const { data: subscription, subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
@@ -86,11 +86,12 @@ const PricingTableRoot = (props: PricingTableProps) => {
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
-          highlightedPlan={(props as any).highlightPlan}
+          highlightedPlan={highlightedPlan}
         />
       ) : (
         <PricingTableDefault
           plans={plansToRender}
+          highlightedPlan={highlightedPlan}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

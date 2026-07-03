@@ -28,7 +28,12 @@ export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Pro
   try {
     const cryptoKey = await importKey(key, algorithm, 'verify');
 
-    const verified = await runtime.crypto.subtle.verify(algorithm.name, cryptoKey, signature, data);
+    const verified = await runtime.crypto.subtle.verify(
+      algorithm.name,
+      cryptoKey,
+      signature as Uint8Array<ArrayBuffer>,
+      data,
+    );
     return { data: verified };
   } catch (error) {
     return {
@@ -181,7 +186,7 @@ export async function verifyJwt(
     const { azp, sub, aud, iat, exp, nbf } = payload;
 
     assertSubClaim(sub);
-    assertAudienceClaim([aud], [audience]);
+    assertAudienceClaim(aud, audience);
     assertAuthorizedPartiesClaim(azp, authorizedParties);
     assertExpirationClaim(exp, clockSkew);
     assertActivationClaim(nbf, clockSkew);

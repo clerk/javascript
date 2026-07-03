@@ -1,11 +1,6 @@
 import { useCallback } from 'react';
 
-import type { DeletedObjectResource } from '../../types/deletedObject';
-import type {
-  CreateMeEnterpriseConnectionParams,
-  EnterpriseConnectionResource,
-  UpdateMeEnterpriseConnectionParams,
-} from '../../types/enterpriseConnection';
+import type { EnterpriseConnectionResource } from '../../types/enterpriseConnection';
 import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
@@ -25,14 +20,6 @@ export type UseUserEnterpriseConnectionsReturn = {
   error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
-  createEnterpriseConnection: (
-    params: CreateMeEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource | undefined>;
-  updateEnterpriseConnection: (
-    enterpriseConnectionId: string,
-    params: UpdateMeEnterpriseConnectionParams,
-  ) => Promise<EnterpriseConnectionResource | undefined>;
-  deleteEnterpriseConnection: (enterpriseConnectionId: string) => Promise<DeletedObjectResource | undefined>;
   revalidate: () => Promise<void>;
 };
 
@@ -74,41 +61,11 @@ function useUserEnterpriseConnections(
     [queryClient, stableKey],
   );
 
-  const createEnterpriseConnection = useCallback(
-    async (createParams: CreateMeEnterpriseConnectionParams) => {
-      const created = await user?.createEnterpriseConnection(createParams);
-      await revalidate();
-      return created;
-    },
-    [user, revalidate],
-  );
-
-  const updateEnterpriseConnection = useCallback(
-    async (enterpriseConnectionId: string, updateParams: UpdateMeEnterpriseConnectionParams) => {
-      const updated = await user?.updateEnterpriseConnection(enterpriseConnectionId, updateParams);
-      await revalidate();
-      return updated;
-    },
-    [user, revalidate],
-  );
-
-  const deleteEnterpriseConnection = useCallback(
-    async (enterpriseConnectionId: string) => {
-      const deleted = await user?.deleteEnterpriseConnection(enterpriseConnectionId);
-      await revalidate();
-      return deleted;
-    },
-    [user, revalidate],
-  );
-
   return {
     data: query.data,
     error: query.error ?? null,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
-    createEnterpriseConnection,
-    updateEnterpriseConnection,
-    deleteEnterpriseConnection,
     revalidate,
   };
 }

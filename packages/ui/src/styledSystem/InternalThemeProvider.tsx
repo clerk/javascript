@@ -2,7 +2,7 @@
 import { ThemeProvider } from '@emotion/react';
 import React from 'react';
 
-import { useAppearance } from '../customizables';
+import { useAppearance } from '../customizables/AppearanceContext';
 import type { InternalTheme } from './types';
 
 type InternalThemeProviderProps = React.PropsWithChildren<{

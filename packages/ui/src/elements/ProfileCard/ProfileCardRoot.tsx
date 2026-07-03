@@ -15,6 +15,8 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
   return (
     <Card.Root
       ref={ref}
+      // Profile cards always render as raised — flush is scoped to simple card components
+      elevation='raised'
       sx={[
         t => ({
           width: t.sizes.$220,
@@ -55,7 +57,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
             icon={
               <Icon
                 icon={Close}
-                size='sm'
+                size='md'
               />
             }
             sx={t => ({
