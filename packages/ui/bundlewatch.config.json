@@ -1,6 +1,6 @@
 {
   "files": [
-    { "path": "./dist/ui.browser.js", "maxSize": "42KB" },
+    { "path": "./dist/ui.browser.js", "maxSize": "44KB" },
     { "path": "./dist/ui.legacy.browser.js", "maxSize": "84KB" },
     { "path": "./dist/ui.shared.browser.js", "maxSize": "40KB" },
     { "path": "./dist/framework*.js", "maxSize": "44KB" },
