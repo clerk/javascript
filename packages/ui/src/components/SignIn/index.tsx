@@ -55,10 +55,12 @@ function SignInRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signIn'>
       <Switch>
-        <Route
-          path='protect-check'
-          canActivate={clerk => !!clerk.client.signIn.protectCheck}
-        >
+        {/* No canActivate guard here. `!!signIn.protectCheck` flips to false the
+            instant the check resolves (submitProtectCheck clears protectCheck),
+            which would unmount this card mid-navigation and blank the route
+            (RouteGuard renders null + navigateToFlowStart). The card owns its
+            own routing — it navigates to the next step on resolution. */}
+        <Route path='protect-check'>
           <SignInProtectCheck />
         </Route>
         <Route path='factor-one'>
@@ -94,10 +96,9 @@ function SignInRoutes(): JSX.Element {
 
         {signInContext.isCombinedFlow && (
           <Route path='create'>
-            <Route
-              path='protect-check'
-              canActivate={clerk => !!clerk.client.signUp.protectCheck}
-            >
+            {/* No canActivate guard — same resolution race as the sign-in
+                protect-check route above; the card owns its own routing. */}
+            <Route path='protect-check'>
               <LazySignUpProtectCheck />
             </Route>
             <Route
@@ -124,10 +125,9 @@ function SignInRoutes(): JSX.Element {
               />
             </Route>
             <Route path='continue'>
-              <Route
-                path='protect-check'
-                canActivate={clerk => !!clerk.client.signUp.protectCheck}
-              >
+              {/* No canActivate guard — same resolution race as the sign-in
+                  protect-check route; the card owns its own routing. */}
+              <Route path='protect-check'>
                 {/* Under `create/continue`, the continue index is `..`, not `../continue`. */}
                 <LazySignUpProtectCheck continuePath='..' />
               </Route>

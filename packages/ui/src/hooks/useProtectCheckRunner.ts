@@ -94,7 +94,12 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     const abortController = new AbortController();
     let cancelled = false;
-    const isCancelled = () => cancelled;
+    // Routing after the gate clears must survive the effect re-run that
+    // clearing `protectCheck` triggers — that re-run is our cue to route, not a
+    // reason to bail. So the onResolved paths below key on REAL unmount, not the
+    // effect's per-run `cancelled` flag (which the re-run's cleanup sets). Same
+    // rationale the expired-reload path already relies on above.
+    const isUnmounted = () => !mountedRef.current;
 
     const cleanup = () => {
       cancelled = true;
@@ -219,18 +224,18 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           // the refreshed live resource.
           if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
             await reload();
-            if (cancelled) {
+            if (isUnmounted()) {
               return;
             }
-            await onResolved(getResource(), isCancelled);
+            await onResolved(getResource(), isUnmounted);
             return;
           }
           throw err;
         }
-        if (cancelled) {
+        if (isUnmounted()) {
           return;
         }
-        await onResolved(updatedResource, isCancelled);
+        await onResolved(updatedResource, isUnmounted);
       } catch (err: any) {
         if (cancelled) {
           return;
