@@ -19,6 +19,10 @@ export class EnterpriseConnectionSamlConnection {
     readonly idpSsoUrl: string,
     /** The X.509 certificate as provided by the Identity Provider (IdP). */
     readonly idpCertificate: string,
+    /** The Unix timestamp when the Identity Provider (IdP) certificate was issued. */
+    readonly idpCertificateIssuedAt: number,
+    /** The Unix timestamp when the Identity Provider (IdP) certificate expires. */
+    readonly idpCertificateExpiresAt: number,
     /** The URL which serves the Identity Provider (IdP) metadata. */
     readonly idpMetadataUrl: string,
     /** The XML content of the Identity Provider (IdP) metadata file. */
@@ -44,6 +48,8 @@ export class EnterpriseConnectionSamlConnection {
       data.idp_entity_id,
       data.idp_sso_url,
       data.idp_certificate,
+      data.idp_certificate_issued_at,
+      data.idp_certificate_expires_at,
       data.idp_metadata_url,
       data.idp_metadata,
       data.acs_url,

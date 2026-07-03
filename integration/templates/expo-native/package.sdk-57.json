@@ -10,9 +10,9 @@
     "prebuild:ios": "expo prebuild --clean --platform ios"
   },
   "dependencies": {
-    "expo": "~56.0.12",
-    "react": "19.2.3",
-    "react-native": "0.85.3"
+    "expo": "~57.0.1",
+    "react": "19.2.7",
+    "react-native": "0.86.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
