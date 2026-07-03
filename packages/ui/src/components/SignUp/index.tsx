@@ -35,10 +35,11 @@ function SignUpRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signUp'>
       <Switch>
-        <Route
-          path='protect-check'
-          canActivate={clerk => !!clerk.client.signUp.protectCheck}
-        >
+        {/* No canActivate guard here. `!!signUp.protectCheck` flips to false
+            when submitProtectCheck resolves and clears protectCheck, which
+            unmounts this card mid-navigation and blanks the route. The card
+            owns its own post-resolution routing. */}
+        <Route path='protect-check'>
           <SignUpProtectCheck />
         </Route>
         <Route
@@ -75,10 +76,9 @@ function SignUpRoutes(): JSX.Element {
           />
         </Route>
         <Route path='continue'>
-          <Route
-            path='protect-check'
-            canActivate={clerk => !!clerk.client.signUp.protectCheck}
-          >
+          {/* No canActivate guard: same resolution race as the top-level
+              protect-check route; the card owns its own routing. */}
+          <Route path='protect-check'>
             {/* Under `continue`, the continue index is `..`, not `../continue`. */}
             <SignUpProtectCheck continuePath='..' />
           </Route>

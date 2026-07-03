@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, render } from '@/test/utils';
 
+import { SignUp } from '../index';
 import { SignUpProtectCheck } from '../SignUpProtectCheck';
 
 vi.mock('@clerk/shared/internal/clerk-js/protectCheck', () => ({
@@ -32,6 +33,27 @@ describe('SignUpProtectCheck', () => {
     const { findByText } = render(<SignUpProtectCheck />, { wrapper });
 
     expect(await findByText(/verifying your request/i)).toBeInTheDocument();
+  });
+
+  it('keeps the standalone protect-check route mounted after protectCheck clears', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignUpWithProtectCheck();
+    });
+    fixtures.router.currentPath = '/sign-up/protect-check';
+    fixtures.router.fullPath = '/sign-up';
+    fixtures.router.indexPath = '/sign-up';
+    fixtures.router.matches.mockImplementation((path?: string) => path === 'protect-check');
+    mockExecute.mockReturnValue(new Promise(() => {}));
+
+    const { findByText, queryByText, rerender } = render(<SignUp />, { wrapper });
+
+    expect(await findByText(/verifying your request/i)).toBeInTheDocument();
+
+    (fixtures.signUp as any).protectCheck = null;
+    (fixtures.signUp as any).missingFields = [];
+    rerender(<SignUp />);
+
+    expect(queryByText(/verifying your request/i)).toBeInTheDocument();
   });
 
   it('runs the SDK challenge with the URL and resource and submits the proof token', async () => {
