@@ -9,6 +9,7 @@ on:
       - '.github/workflows/expo-native-build.yml'
       - 'integration/templates/expo-native/**'
       - 'packages/expo/**'
+      - 'packages/expo-google-signin/**'
   workflow_dispatch:
 
 permissions:
