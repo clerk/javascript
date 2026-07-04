@@ -52,7 +52,7 @@
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
     "react": "catalog:react",
-    "react-native": "^0.85.2",
+    "react-native": "^0.86.0",
     "tsup": "catalog:repo"
   },
   "peerDependencies": {
