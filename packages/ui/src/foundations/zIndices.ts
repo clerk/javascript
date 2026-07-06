@@ -4,4 +4,5 @@ export const zIndices = Object.freeze({
   fab: '9000',
   modal: '10000',
   dropdown: '11000',
+  tooltip: '12000',
 } as const);
