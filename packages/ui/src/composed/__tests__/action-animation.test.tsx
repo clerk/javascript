@@ -7,16 +7,18 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
 import { clearFetchCache } from '../../hooks';
-import { Account } from '../UserProfile/Account';
-import { AccountEmails } from '../UserProfile/AccountEmails';
-import { AccountProfile } from '../UserProfile/AccountProfile';
+import { UserProfileAccountPanel } from '../UserProfile/Account';
+import { UserProfileEmailSection } from '../UserProfile/AccountEmails';
+import { UserProfileProfileSection } from '../UserProfile/AccountProfile';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
 function findAddAnimationCall(calls: any[]) {
   return calls.find(call => {
     const keyframes = call[0];
-    if (!Array.isArray(keyframes)) return false;
+    if (!Array.isArray(keyframes)) {
+      return false;
+    }
     return keyframes.some(
       (kf: any) => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'),
     );
@@ -40,7 +42,7 @@ describe('Action open animation', () => {
       });
     });
 
-    const { userEvent } = render(<Account />, { wrapper });
+    const { userEvent } = render(<UserProfileAccountPanel />, { wrapper });
     vi.mocked(Element.prototype.animate).mockClear();
 
     await userEvent.click(screen.getByRole('button', { name: /update profile/i }));
@@ -59,7 +61,7 @@ describe('Action open animation', () => {
       });
     });
 
-    const { userEvent } = render(<Account />, { wrapper });
+    const { userEvent } = render(<UserProfileAccountPanel />, { wrapper });
     vi.mocked(Element.prototype.animate).mockClear();
 
     await userEvent.click(screen.getByRole('button', { name: /add email address/i }));
@@ -78,7 +80,7 @@ describe('Action open animation', () => {
       });
     });
 
-    const { userEvent } = render(<Account />, { wrapper });
+    const { userEvent } = render(<UserProfileAccountPanel />, { wrapper });
 
     // Open three-dots menu on the secondary (non-primary) email
     const menuButtons = screen.getAllByRole('button', { name: /open menu/i });
@@ -106,10 +108,10 @@ describe('Action open animation', () => {
     });
 
     const { userEvent } = render(
-      <Account>
-        <AccountProfile />
-        <AccountEmails />
-      </Account>,
+      <UserProfileAccountPanel>
+        <UserProfileProfileSection />
+        <UserProfileEmailSection />
+      </UserProfileAccountPanel>,
       { wrapper },
     );
 
@@ -131,10 +133,10 @@ describe('Action open animation', () => {
     });
 
     const { userEvent } = render(
-      <Account>
-        <AccountProfile />
-        <AccountEmails />
-      </Account>,
+      <UserProfileAccountPanel>
+        <UserProfileProfileSection />
+        <UserProfileEmailSection />
+      </UserProfileAccountPanel>,
       { wrapper },
     );
 

@@ -1,17 +1,17 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 
-import type { Elements } from '../../internal/appearance';
 import { ConfigureSSOContent } from '../../components/ConfigureSSO/ConfigureSSO';
 import { AppearanceOverrides } from '../../elements/AppearanceOverrides';
 import { CardStateProvider } from '../../elements/contexts';
+import type { Elements } from '../../internal/appearance';
 
 const embeddedOverrides: Elements = {
   configureSSOFooter: { background: 'transparent' },
 };
 
-export const ConfigureSSO = (): ReactNode => {
+export const OrganizationProfileConfigureSSOPanel = (): ReactNode => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (

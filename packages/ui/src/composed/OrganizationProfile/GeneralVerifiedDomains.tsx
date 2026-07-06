@@ -6,8 +6,10 @@ import { Protect } from '../../common';
 import { OrganizationDomainsSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 import { useRequirePage } from '../useRequirePage';
 
-export function GeneralVerifiedDomains(): ReactNode {
-  if (!useRequirePage('GeneralVerifiedDomains')) return null;
+export function OrganizationProfileDomainsSection(): ReactNode {
+  if (!useRequirePage('OrganizationProfileDomainsSection')) {
+    return null;
+  }
   return (
     <Protect permission='org:sys_domains:read'>
       <OrganizationDomainsSection />

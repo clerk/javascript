@@ -10,4 +10,4 @@ const APIKeysPage = lazy(() =>
   })),
 );
 
-export const APIKeys = (): ReactNode => <APIKeysSection page={APIKeysPage} />;
+export const UserProfileAPIKeysPanel = (): ReactNode => <APIKeysSection page={APIKeysPage} />;

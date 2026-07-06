@@ -3,4 +3,4 @@
 import { AccountWeb3 as Section } from '../../components/UserProfile/AccountSections';
 import { createSection } from '../createSection';
 
-export const AccountWeb3 = createSection('AccountWeb3', Section);
+export const UserProfileWeb3Section = createSection('UserProfileWeb3Section', Section);

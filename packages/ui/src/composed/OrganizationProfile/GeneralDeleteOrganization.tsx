@@ -3,4 +3,7 @@
 import { OrganizationDeleteSection } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 import { createSection } from '../createSection';
 
-export const GeneralDeleteOrganization = createSection('GeneralDeleteOrganization', OrganizationDeleteSection);
+export const OrganizationProfileDeleteSection = createSection(
+  'OrganizationProfileDeleteSection',
+  OrganizationDeleteSection,
+);

@@ -7,7 +7,7 @@ export function useRequirePage(componentName: string): boolean {
   if (!page) {
     if (typeof __DEV__ === 'undefined' || __DEV__) {
       throw new Error(
-        `<${componentName}> must be rendered inside a page component (e.g. <Account>, <Security>, <General>).`,
+        `<${componentName}> must be rendered inside a page component (e.g. <UserProfileAccountPanel>, <UserProfileSecurityPanel>, <OrganizationProfileGeneralPanel>).`,
       );
     }
     return false;

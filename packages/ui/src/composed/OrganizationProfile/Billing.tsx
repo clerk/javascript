@@ -28,7 +28,7 @@ const OrganizationPaymentAttemptPage = lazy(() =>
   })),
 );
 
-export const Billing = (): ReactNode => (
+export const OrganizationProfileBillingPanel = (): ReactNode => (
   <BillingSection
     billing={OrganizationBillingPage}
     plans={OrganizationPlansPage}

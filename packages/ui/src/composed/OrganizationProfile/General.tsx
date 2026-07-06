@@ -4,11 +4,11 @@ import type { PropsWithChildren, ReactNode } from 'react';
 
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { localizationKeys } from '../../customizables';
 import { OrganizationGeneralPage } from '../../components/OrganizationProfile/OrganizationGeneralPage';
+import { localizationKeys } from '../../customizables';
 import { PageContext } from '../PageContext';
 
-export function General({ children }: PropsWithChildren): ReactNode {
+export function OrganizationProfileGeneralPanel({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <OrganizationGeneralPage />;
   }

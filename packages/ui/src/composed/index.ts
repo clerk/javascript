@@ -1,2 +1,2 @@
-export { UserProfile } from './UserProfile';
-export { OrganizationProfile } from './OrganizationProfile';
+export * from './UserProfile';
+export * from './OrganizationProfile';

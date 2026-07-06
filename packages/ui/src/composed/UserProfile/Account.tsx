@@ -5,8 +5,8 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { localizationKeys } from '../../customizables';
 import { AccountPage } from '../../components/UserProfile/AccountPage';
+import { localizationKeys } from '../../customizables';
 import { PageContext } from '../PageContext';
 
 function AccountComposed({ children }: PropsWithChildren): ReactNode {
@@ -25,7 +25,7 @@ function AccountComposed({ children }: PropsWithChildren): ReactNode {
   );
 }
 
-export function Account({ children }: PropsWithChildren): ReactNode {
+export function UserProfileAccountPanel({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <AccountPage />;
   }

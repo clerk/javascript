@@ -3,4 +3,4 @@
 import { SecurityDelete as Section } from '../../components/UserProfile/SecuritySections';
 import { createSection } from '../createSection';
 
-export const SecurityDelete = createSection('SecurityDelete', Section);
+export const UserProfileDeleteSection = createSection('UserProfileDeleteSection', Section);

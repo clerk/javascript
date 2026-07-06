@@ -4,11 +4,11 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
 import { clearFetchCache } from '../../hooks';
-import { General } from '../OrganizationProfile/General';
-import { GeneralDeleteOrganization } from '../OrganizationProfile/GeneralDeleteOrganization';
-import { GeneralLeaveOrganization } from '../OrganizationProfile/GeneralLeaveOrganization';
-import { GeneralOrganizationProfile } from '../OrganizationProfile/GeneralOrganizationProfile';
-import { GeneralVerifiedDomains } from '../OrganizationProfile/GeneralVerifiedDomains';
+import { OrganizationProfileGeneralPanel } from '../OrganizationProfile/General';
+import { OrganizationProfileDeleteSection } from '../OrganizationProfile/GeneralDeleteOrganization';
+import { OrganizationProfileLeaveSection } from '../OrganizationProfile/GeneralLeaveOrganization';
+import { OrganizationProfileProfileSection } from '../OrganizationProfile/GeneralOrganizationProfile';
+import { OrganizationProfileDomainsSection } from '../OrganizationProfile/GeneralVerifiedDomains';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -26,7 +26,7 @@ describe('OrganizationProfile composed sections', () => {
 
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
-      render(<General />, { wrapper });
+      render(<OrganizationProfileGeneralPanel />, { wrapper });
       screen.getByText('TestOrg');
     });
 
@@ -39,7 +39,7 @@ describe('OrganizationProfile composed sections', () => {
 
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
-      render(<General />, { wrapper });
+      render(<OrganizationProfileGeneralPanel />, { wrapper });
       await waitFor(() => screen.getByText(/verified domains/i));
     });
 
@@ -51,7 +51,7 @@ describe('OrganizationProfile composed sections', () => {
 
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
-      const { queryByText } = render(<General />, { wrapper });
+      const { queryByText } = render(<OrganizationProfileGeneralPanel />, { wrapper });
       expect(queryByText(/verified domains/i)).not.toBeInTheDocument();
     });
   });
@@ -67,9 +67,9 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       const { queryByText } = render(
-        <General>
-          <GeneralOrganizationProfile />
-        </General>,
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileProfileSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
@@ -86,16 +86,16 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       render(
-        <General>
-          <GeneralOrganizationProfile />
-        </General>,
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileProfileSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
       screen.getByText('General');
     });
 
-    it('GeneralVerifiedDomains renders when domains enabled and user has permission', async () => {
+    it('OrganizationProfileDomainsSection renders when domains enabled and user has permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withOrganizationDomains();
@@ -105,16 +105,16 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       render(
-        <General>
-          <GeneralVerifiedDomains />
-        </General>,
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileDomainsSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
       await waitFor(() => screen.getByText(/verified domains/i));
     });
 
-    it('GeneralDeleteOrganization renders null when adminDeleteEnabled is false', async () => {
+    it('OrganizationProfileDeleteSection renders null when adminDeleteEnabled is false', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
@@ -123,10 +123,10 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       const { queryByText } = render(
-        <General>
-          <GeneralOrganizationProfile />
-          <GeneralDeleteOrganization />
-        </General>,
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileProfileSection />
+          <OrganizationProfileDeleteSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
@@ -134,7 +134,7 @@ describe('OrganizationProfile composed sections', () => {
       expect(queryByText(/delete organization/i)).not.toBeInTheDocument();
     });
 
-    it('GeneralLeaveOrganization renders leave button', async () => {
+    it('OrganizationProfileLeaveSection renders leave button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
@@ -143,9 +143,9 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       render(
-        <General>
-          <GeneralLeaveOrganization />
-        </General>,
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileLeaveSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
@@ -161,11 +161,11 @@ describe('OrganizationProfile composed sections', () => {
       fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
       render(
-        <General>
-          <GeneralOrganizationProfile />
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileProfileSection />
           <div data-testid='custom-banner'>Custom org content</div>
-          <GeneralLeaveOrganization />
-        </General>,
+          <OrganizationProfileLeaveSection />
+        </OrganizationProfileGeneralPanel>,
         { wrapper },
       );
 
@@ -181,8 +181,8 @@ describe('OrganizationProfile composed sections', () => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      expect(() => render(<GeneralOrganizationProfile />, { wrapper })).toThrow(
-        '<GeneralOrganizationProfile> must be rendered inside a page component',
+      expect(() => render(<OrganizationProfileProfileSection />, { wrapper })).toThrow(
+        '<OrganizationProfileProfileSection> must be rendered inside a page component',
       );
     });
   });

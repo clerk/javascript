@@ -5,8 +5,8 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { localizationKeys } from '../../customizables';
 import { SecurityPage } from '../../components/UserProfile/SecurityPage';
+import { localizationKeys } from '../../customizables';
 import { PageContext } from '../PageContext';
 
 function SecurityComposed({ children }: PropsWithChildren): ReactNode {
@@ -24,7 +24,7 @@ function SecurityComposed({ children }: PropsWithChildren): ReactNode {
   );
 }
 
-export function Security({ children }: PropsWithChildren): ReactNode {
+export function UserProfileSecurityPanel({ children }: PropsWithChildren): ReactNode {
   if (!children) {
     return <SecurityPage />;
   }
