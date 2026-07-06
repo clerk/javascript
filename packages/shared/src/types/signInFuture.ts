@@ -2,6 +2,7 @@ import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
+import type { ProtectCheckResource } from './signUpCommon';
 import type { OAuthStrategy, PasskeyStrategy, TicketStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 import type { Web3Provider } from './web3';
@@ -338,6 +339,7 @@ export interface SignInFutureResource {
    * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>
    * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
+   * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>
    * </ul>
    */
   readonly status: SignInStatus;
@@ -387,6 +389,12 @@ export interface SignInFutureResource {
    * </ul>
    */
   readonly userData: UserData;
+
+  /**
+   * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
+   * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   */
+  readonly protectCheck: ProtectCheckResource | null;
 
   /**
    * Indicates that the sign-in can be discarded (has been finalized or explicitly reset).
@@ -559,6 +567,12 @@ export interface SignInFutureResource {
    * Initiates a passkey-based authentication flow, enabling users to authenticate using a previously registered passkey. When called without parameters, this method requires a prior call to `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in scenarios where the authentication strategy needs to be determined dynamically at runtime.
    */
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain
+   * another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   */
+  submitProtectCheck: (params: { proofToken: string }) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Converts a sign-in with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.
