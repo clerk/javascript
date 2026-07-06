@@ -65,10 +65,14 @@ describe('SignUpProtectCheck', () => {
     fixtures.router.fullPath = '/sign-up';
     fixtures.router.indexPath = '/sign-up';
 
-    render(<SignUpProtectCheck />, { wrapper });
+    const { queryByText } = render(<SignUpProtectCheck />, { wrapper });
+
+    // The card shell must not flash while the redirect below kicks in.
+    expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
 
     await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-up'));
     expect(mockExecute).not.toHaveBeenCalled();
+    expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
   });
 
   it('runs the SDK challenge with the URL and resource and submits the proof token', async () => {
