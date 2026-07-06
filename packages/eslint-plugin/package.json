@@ -1,6 +1,6 @@
 {
   "name": "@clerk/eslint-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ESLint plugin for enforcing Clerk patterns across JavaScript frameworks.",
   "keywords": [
     "auth",

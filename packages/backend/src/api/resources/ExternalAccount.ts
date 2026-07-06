@@ -8,67 +8,43 @@ import { Verification } from './Verification';
  */
 export class ExternalAccount {
   constructor(
-    /**
-     * The unique identifier for this external account.
-     */
+    /** The unique identifier for this external account. */
     readonly id: string,
-    /**
-     * The provider name (e.g., `google`).
-     */
+    /** The provider name (e.g., `google`). */
     readonly provider: string,
-    /**
-     * The unique ID of the user in the provider.
-     */
+    /** The unique ID of the user in the provider. */
     readonly providerUserId: string,
-    /**
-     * The identification with which this external account is associated.
-     */
+    /** The identification with which this external account is associated. */
     readonly identificationId: string,
-    /**
-     * The unique ID of the user in the provider.
-     * @deprecated Use providerUserId instead
-     */
+    /** @deprecated Use `identificationId` instead. */
     readonly externalId: string,
-    /**
-     * The scopes that the user has granted access to.
-     */
+    /** The scopes that the user has granted access to. */
     readonly approvedScopes: string,
-    /**
-     * The user's email address.
-     */
+    /** The user's email address. */
     readonly emailAddress: string,
-    /**
-     * The user's first name.
-     */
+    /** The user's first name. */
     readonly firstName: string,
-    /**
-     * The user's last name.
-     */
+    /** The user's last name. */
     readonly lastName: string,
-    /**
-     * The user's image URL.
-     */
+    /** The user's image URL. */
     readonly imageUrl: string,
-    /**
-     * The user's username.
-     */
+    /** The user's username. */
     readonly username: string | null,
-    /**
-     * The phone number related to this specific external account.
-     */
+    /** The phone number related to this specific external account. */
     readonly phoneNumber: string | null,
-    /**
-     * Metadata that can be read from the Frontend API and Backend API and can be set only from the Backend API.
-     */
+    /** Metadata that can be read from the Frontend API and Backend API and can be set only from the [Backend API](https://clerk.com/docs/reference/backend-api). */
     readonly publicMetadata: Record<string, unknown> | null = {},
-    /**
-     * A descriptive label to differentiate multiple external accounts of the same user for the same provider.
-     */
+    /** A descriptive label to differentiate multiple external accounts of the same user for the same provider. */
     readonly label: string | null,
-    /**
-     * An object holding information on the verification of this external account.
-     */
+    /** An object holding information on the verification of this external account. */
     readonly verification: Verification | null,
+    /**
+     * The `eac_`-prefixed id of the external account resource, which is the id
+     * `users.deleteUserExternalAccount()` expects. Only returned for Google and
+     * Facebook accounts; for other providers it is `undefined` and `id` already
+     * holds the `eac_` value. Use `externalAccountId ?? id` to get a deletable id.
+     */
+    readonly externalAccountId?: string,
   ) {}
 
   static fromJSON(data: ExternalAccountJSON): ExternalAccount {
@@ -88,6 +64,7 @@ export class ExternalAccount {
       data.public_metadata,
       data.label,
       data.verification && Verification.fromJSON(data.verification),
+      data.external_account_id,
     );
   }
 }

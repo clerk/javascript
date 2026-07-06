@@ -1,41 +1,25 @@
 import type { RoleSetItemJSON, RoleSetJSON, RoleSetMigrationJSON } from './JSON';
 
 /**
- * The Backend `RoleSetItem` object represents a role that belongs to a {@link RoleSet}.
+ * The Backend `RoleSetItem` object represents a [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) that belongs to a {@link RoleSet}.
  */
 export class RoleSetItem {
   constructor(
-    /**
-     * The unique identifier for the role.
-     */
+    /** The unique identifier for the Role. */
     readonly id: string,
-    /**
-     * The name of the role.
-     */
+    /** The name of the Role. */
     readonly name: string,
-    /**
-     * The unique key of the role.
-     */
+    /** The unique key of the Role. */
     readonly key: string,
-    /**
-     * A description of the role.
-     */
+    /** A description of the Role. */
     readonly description: string | null,
-    /**
-     * The date when the role was first created.
-     */
+    /** The Unix timestamp when the Role was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the role was last updated.
-     */
+    /** The Unix timestamp when the Role was last updated. */
     readonly updatedAt: number,
-    /**
-     * The number of organization members that have this role.
-     */
+    /** The number of Organization members that have this Role. */
     readonly membersCount?: number | null,
-    /**
-     * Whether any organization members have this role.
-     */
+    /** Whether any Organization members have this Role. */
     readonly hasMembers?: boolean | null,
   ) {}
 

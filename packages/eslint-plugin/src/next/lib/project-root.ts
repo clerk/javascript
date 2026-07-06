@@ -42,7 +42,10 @@ export function findEslintProjectRoot(filePath: string): string | null {
 }
 
 export interface ResolveProjectRootOptions {
-  /** Explicit override (e.g. `import.meta.dirname` from `eslint.config.mjs`). */
+  /**
+   * Explicit override (e.g. `import.meta.dirname` from `eslint.config.mjs`).
+   * Relative paths are resolved against `cwd`.
+   */
   rootDir?: string;
   /** ESLint `context.cwd` fallback when config discovery finds nothing. */
   cwd?: string;
@@ -58,7 +61,7 @@ export function resolveProjectRoot(
   { rootDir, cwd }: ResolveProjectRootOptions = {},
 ): string | undefined {
   if (rootDir) {
-    return normalizeDir(rootDir);
+    return normalizeDir(path.isAbsolute(rootDir) ? rootDir : path.resolve(cwd ?? process.cwd(), rootDir));
   }
   if (filename) {
     const fromConfig = findEslintProjectRoot(filename);

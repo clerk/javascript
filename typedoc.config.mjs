@@ -122,6 +122,11 @@ const config = {
       '@standalonePage',
       /** Self-documenting placeholder for declarations intentionally left without a description. */
       '@generateWithEmptyComment',
+      /**
+       * On a generic wrapper type (e.g. `ClerkPaginationRequest<T>`), opts every alias of the form `Foo<{...}>` into a single merged properties table that includes the wrapper's own properties. Without this, typedoc-plugin-markdown renders such aliases as empty pages because the resolved type is a ReferenceType with no inline declaration.
+       * Handled by `.typedoc/custom-plugin.mjs`.
+       */
+      '@expandProperties',
     ],
     /**
      * Keep `@inline` / `@inlineType` / `@standalonePage` in the model so the custom router and theme can read them.

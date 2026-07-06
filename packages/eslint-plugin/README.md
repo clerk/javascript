@@ -55,7 +55,7 @@ Requires ESLint `>=9` (flat config), and also works with Oxlint when configured 
 
 ## Usage
 
-Register the plugin and declare your protected/public folder globs in `eslint.config.mjs`:
+Register the plugin and declare your protected/public folder globs in `eslint.config.mjs`, for example:
 
 ```js
 import clerkNext from '@clerk/eslint-plugin/next';
@@ -67,14 +67,16 @@ export default [
       '@clerk/next/require-auth-protection': [
         'error',
         {
-          protected: ['app/**'],
-          public: ['app/sign-in/**', 'app/sign-up/**'],
+          protected: ['**'],
+          public: ['src/app/sign-in/**', 'src/app/sign-up/**'],
         },
       ],
     },
   },
 ];
 ```
+
+You need to adapt the exact paths to your application structure.
 
 This rule also works with Oxlint, you can configure the `rules` just like above after adding the plugin as a `jsPlugin` in `.oxlintrc.json`:
 
@@ -91,21 +93,68 @@ Note that the bulk auto-fixer described further down does require `eslint` to be
 
 ## Options
 
-| Option              | Type                  | Default  | Description                                                                                                                                                                                              |
-| ------------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `protected`         | `string[]` (required) | —        | Folder globs whose resources must be guarded.                                                                                                                                                            |
-| `public`            | `string[]`            | `[]`     | Folder globs that are exempt.                                                                                                                                                                            |
-| `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                                    |
-| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.                          |
-| `rootDir`           | `string`              | _(auto)_ | Directory folder globs are resolved against. Defaults to the nearest ancestor `eslint.config.*`, then ESLint `cwd`. Set to `import.meta.dirname` in your config file when auto-discovery is unavailable. |
+| Option              | Type                  | Default  | Description                                                                                                                                                                          |
+| ------------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `protected`         | `string[]` (required) | —        | Folder globs relative to the project root whose resources must be guarded.                                                                                                           |
+| `public`            | `string[]`            | `[]`     | Folder globs relative to the project root that are exempt.                                                                                                                           |
+| `resources`         | `object`              | all true | Resource groups to check. Supports `routeHandlers`, `serverFunctions`, and `serverComponentEntrypoints`, each as an optional boolean.                                                |
+| `mixedScopeLayouts` | `'auto' \| string[]`  | `'auto'` | Layouts/templates that intentionally wrap both protected and public descendants. `'auto'` allows them silently; a list requires each such folder to be acknowledged explicitly.      |
+| `rootDir`           | `string`              | _(auto)_ | Project root used to resolve project-relative folder globs. Defaults to the nearest ancestor `eslint.config.*`, then ESLint/Oxlint `cwd`. Relative paths are resolved against `cwd`. |
 
 Globs use a minimal dialect — only `*` (single segment) and `**` (any depth). When a folder matches both `protected` and `public`, the most specific pattern wins, and `protected` wins ties.
+
+### Path matching
+
+`protected` and `public` are project-relative folder globs. Use `app/**` for a root `app` directory, `src/app/**` for a `src/app` directory, and `src/**`, `shared/**`, etc. for other project folders.
+
+The project root is normally determined by the nearest `eslint.config.*` ancestor of the file being checked, and falls back to `cwd`. You can configure it manually using `rootDir`; relative `rootDir` values are resolved against ESLint/Oxlint `cwd`.
+
+We recommend starting with `protected: ['**']`. This protects the following resources by default:
+
+- Server Functions are checked wherever they live in the project when their folder is protected
+- Regardless of configuration, App Router entrypoints like `page.jsx` or `route.js` are only checked if they live under `app/` or `src/app/` relative to the project root
+
+Use `public` for explicit exemptions:
+
+```js
+{
+  protected: ['**'],
+  public: [
+    'src/app/sign-in/**',
+    'src/app/sign-up/**',
+    'src/actions/public/**',
+  ],
+}
+```
+
+### Public by default
+
+While we recommend protecting all resources by default and opting out for public ones, it is also possible to make the default public and opting in to what should be protected.
+
+If you do, we recommend `public: ['src/app/**']` over `public: ['**']`, so that Server Functions outside the `app/` folder are still considered protected by default:
+
+```js
+{
+  // Routes are considered public by default
+  public: ['src/app/**'],
+  protected: [
+    // Protect everything outside of src/app/
+    '**',
+    // Opt into protection for parts of src/app/
+    'src/app/(dashboard)/**'
+  ],
+}
+```
+
+With `public: ['**']` it's easy to accidentally add a Server Function to a shared folder and forget adding protection since you'll get no lint error.
+
+### Opting out certain resources
 
 Use `resources` to disable whole resource groups when a project only wants this rule to enforce protection for some App Router resources:
 
 ```js
 {
-  protected: ['app/**'],
+  protected: ['**'],
   resources: {
     routeHandlers: true,
     serverFunctions: true,
@@ -115,6 +164,28 @@ Use `resources` to disable whole resource groups when a project only wants this 
 ```
 
 We recommend leaving all as true, but switching some off can be useful during incremental migrations. This configuration also scopes suggestions and bulk-fix tooling: disabled resource groups are not reported by the rule, so they will not receive editor quick-fixes or bulk-applied fixes.
+
+## Monorepo setups
+
+If you keep a separate `eslint.config.*` in each application, this rule will work with your monorepo setup out of the box.
+
+If you have a single top level `eslint.config.*`, you need to define the rule once for each application, and you need to configure `rootDir` to point to each application root (for example `apps/web`). This makes sense when you consider that each `protected` and `public` pattern is application specific. For example:
+
+```ts
+{
+  files: ['apps/web/src/**/*.{ts,tsx}'],
+  rules: {
+    '@clerk/next/require-auth-protection': [
+      'error',
+      {
+        rootDir: 'apps/web',
+        protected: ['**'],
+        public: ['src/app/sign-in/**'],
+      }
+    ]
+  }
+}
+```
 
 ## What counts as protected
 
@@ -167,7 +238,7 @@ npx clerk-next-fix-auth-protection --dry-run
 # Scope fixes to a specific pattern, this will still
 # use protected/public from your ESLint config, but
 # can be useful to only fix a subset of your application
-npx clerk-next-fix-auth-protection "app/**"
+npx clerk-next-fix-auth-protection "src/**"
 ```
 
 Resources the rule can't safely fix on its own (imported/wrapped exports, unacknowledged mixed-scope layouts) are listed as needing manual attention, and the command exits non-zero when any remain (or when `--dry-run` would make changes).
@@ -178,7 +249,7 @@ The same logic is available programmatically:
 import { fixAuthProtection } from '@clerk/eslint-plugin/next/fix-auth-protection';
 
 const { fixed, unresolved } = await fixAuthProtection({
-  patterns: ['app/**'],
+  patterns: ['src/**'],
   dryRun: false,
 });
 ```
@@ -204,7 +275,7 @@ Notably, it does not:
 
 At the top of the relevant async function, after any directives or TypeScript-only declarations, to count as protected the rule accepts these patterns:
 
-```tsx
+```jsx
 // -- Using the default .protect() behavior --
 await auth.protect()
 await (await auth()).protect()

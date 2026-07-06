@@ -1,7 +1,7 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -480,7 +480,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       });
     }
 
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    return this.authenticateWithRedirectOrPopup(params, SignUp.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (
@@ -835,7 +835,7 @@ class SignUpFuture implements SignUpFutureResource {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
       this.#resource.verifications.externalAccount.status === 'transferable' &&
-      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.error?.code === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS
     );
   }
 
@@ -1122,7 +1122,7 @@ class SignUpFuture implements SignUpFutureResource {
           // Pick up the modified SignUp resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });

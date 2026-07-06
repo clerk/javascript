@@ -288,6 +288,16 @@ export interface Clerk {
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
+  /**
+   * @internal
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (static defaults ∪ the customer extension).
+   * Disallowed protocols and scheme-relative inputs (`//host`) are rejected with a console warning.
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
+   */
+  __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1434,19 +1444,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
     telemetry?:
       | false
       | {
-          /**
-           * If `true`, telemetry will not be collected.
-           */
+          /** Whether telemetry will be collected. */
           disabled?: boolean;
-          /**
-           * If `true`, telemetry events are only logged to the console and not sent to Clerk
-           */
+          /** Whether telemetry events are only logged to the console and not sent to Clerk. */
           debug?: boolean;
-          /**
-           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
-           *
-           * @default true
-           */
+          /** Whether the sampling rates provided per telemetry event will be ignored and all events will be sent. Defaults to `true`. */
           perEventSampling?: boolean;
         };
 

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/electron-passkeys-darwin-x64",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Native passkey support for Clerk's Electron SDK (macOS x64)",
   "repository": {
     "type": "git",

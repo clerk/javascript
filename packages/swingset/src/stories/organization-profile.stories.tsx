@@ -1,7 +1,9 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationProfile } from '@clerk/ui/mosaic/aio/organization-profile';
+import { OrganizationProfileView } from '@clerk/ui/mosaic/aio/organization-profile-view';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { Default as OrganizationProfileGeneralDemo } from './organization-profile-general.stories';
 
 export const meta: StoryMeta = {
   group: 'AIO',
@@ -11,5 +13,5 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <OrganizationProfile />;
+  return <OrganizationProfileView general={<OrganizationProfileGeneralDemo />} />;
 }

@@ -7,7 +7,6 @@ import {
 } from '@clerk/shared/internal/clerk-js/passkeys';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -418,7 +417,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    return this.authenticateWithRedirectOrPopup(params, SignIn.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
@@ -1263,7 +1262,7 @@ class SignInFuture implements SignInFutureResource {
           // Pick up the modified SignIn resource
           await this.#resource.reload();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignIn.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });

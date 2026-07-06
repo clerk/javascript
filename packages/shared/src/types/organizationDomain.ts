@@ -1,9 +1,7 @@
 import type { ClerkResource } from './resource';
 
 /**
- * The `OrganizationDomainVerification` object holds the affiliation verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Affiliation proves that the current user controls an email address that belongs to the domain.
- *
- * This is the object referenced by both `affiliationVerification` and the deprecated `verification` property of the `OrganizationDomainResource` object.
+ * The `OrganizationDomainVerification` object holds the affiliation verification details of an Organization's [Verified Domain](/docs/guides/organizations/add-members/verified-domains). Affiliation proves that the current user controls an email address that belongs to the domain.
  */
 export interface OrganizationDomainVerification {
   /**
@@ -34,30 +32,51 @@ type OrganizationDomainVerificationStrategy = 'email_code';
 /**
  * The current status of an Organization domain verification.
  *
+ * <ul>
+ *  <li>`unverified`: Verification has not been completed yet. An attempt may be pending.</li>
+ *  <li>`verified`: Verification has been completed.</li>
+ *  <li>`failed`: Too many verification attempts were made without success.</li>
+ *  <li>`expired`: The pending verification attempt expired before it could be completed.</li>
+ * </ul>
+ *
  * @inline
  */
-export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
+export type OrganizationDomainVerificationStatus = 'unverified' | 'verified' | 'failed' | 'expired';
+
+/**
+ * The current status of an Organization domain ownership verification.
+ *
+ * <ul>
+ *  <li>`unverified`: Ownership has not been established yet. A TXT challenge is pending.</li>
+ *  <li>`verified`: Ownership has been verified.</li>
+ *  <li>`expired`: The pending ownership verification attempt expired before ownership could be confirmed. A new TXT challenge must be issued (via `prepareOwnershipVerification()`) to retry.</li>
+ * </ul>
+ *
+ * @inline
+ */
+export type OrganizationDomainOwnershipVerificationStatus = 'unverified' | 'verified' | 'expired';
 
 /**
  * The strategy used to verify ownership of an Organization's domain.
  * @inline
  */
-export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override';
+export type OrganizationDomainOwnershipVerificationStrategy = 'txt' | 'legacy' | 'manual_override' | 'parent_domain';
 
 /**
  * Holds the ownership verification details of an Organization's [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains). Ownership proves control of the underlying DNS domain, typically by publishing a TXT record, and is required before the domain can be used for enterprise SSO.
  */
 export interface OrganizationDomainOwnershipVerification {
   /**
-   * The current status of the domain ownership verification.
+   * The current status of the domain ownership verification. A status of `expired` means the pending TXT challenge expired before ownership could be confirmed and a new challenge must be issued.
    */
-  status: OrganizationDomainVerificationStatus;
+  status: OrganizationDomainOwnershipVerificationStatus;
   /**
    * The strategy used to verify ownership of the domain.
    * <ul>
    *  <li>`txt`: Ownership is proven by publishing a DNS TXT record (see `txtRecordName` and `txtRecordValue` on `OrganizationDomainOwnershipVerification`).</li>
    *  <li>`legacy`: Ownership was implicitly granted to domains that predate the TXT verification flow, so no per-attempt proof exists.</li>
    *  <li>`manual_override`: Ownership was granted manually by a Clerk admin via the Backend API or Dashboard, bypassing the DNS challenge.</li>
+   *  <li>`parent_domain`: Ownership was inherited from a parent domain that has already been verified, so no per-attempt proof exists.</li>
    * </ul>
    */
   strategy: OrganizationDomainOwnershipVerificationStrategy;
@@ -66,7 +85,7 @@ export interface OrganizationDomainOwnershipVerification {
    */
   attempts: number | null;
   /**
-   * The date and time when the current ownership verification attempt expires, or `null` when there is no pending attempt.
+   * The date and time when the current ownership verification attempt expires, or `null` when there is no pending attempt. When `status` is `expired`, this is the date and time at which the attempt expired.
    */
   expiresAt: Date | null;
   /**
@@ -154,13 +173,13 @@ export interface OrganizationDomainResource extends ClerkResource {
   totalPendingSuggestions: number;
   /**
    * Begins the verification process of a created Organization domain by sending a verification code to the provided email address.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   prepareAffiliationVerification: (params: PrepareAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
 
   /**
-   * Completes the verification process started by [`prepareAffiliationVerification()`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource#prepare-affiliation-verification), by validating the provided verification code.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * Completes the verification process started by [`prepareAffiliationVerification()`](https://clerk.com/docs/reference/types/organization-domain-resource#prepare-affiliation-verification), by validating the provided verification code.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   attemptAffiliationVerification: (params: AttemptAffiliationVerificationParams) => Promise<OrganizationDomainResource>;
   /**
@@ -170,7 +189,7 @@ export interface OrganizationDomainResource extends ClerkResource {
   delete: () => Promise<void>;
   /**
    * Updates the enrollment mode of the Verified Domain.
-   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/nextjs/reference/types/organization-domain-resource) object.
+   * @returns The updated [`OrganizationDomainResource`](https://clerk.com/docs/reference/types/organization-domain-resource) object.
    */
   updateEnrollmentMode: (params: UpdateEnrollmentModeParams) => Promise<OrganizationDomainResource>;
 }
@@ -207,9 +226,7 @@ export type CreateOrganizationDomainParams = {
   enrollmentMode?: OrganizationEnrollmentMode;
 };
 
-/**
- * The `OrganizationDomainBulkOwnershipVerificationError` object is a single [Verified Domain](https://clerk.com/docs/guides/organizations/add-members/verified-domains) that could not be processed during a bulk ownership verification flow. A failed domain is reported here instead of causing the entire batch to fail.
- */
+/** @inline */
 export interface OrganizationDomainBulkOwnershipVerificationError {
   /**
    * The unique identifier of the domain that could not be processed.
@@ -222,11 +239,11 @@ export interface OrganizationDomainBulkOwnershipVerificationError {
 }
 
 /**
- * The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#prepare-ownership-verification) or [`attemptOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
+ * The `OrganizationDomainsBulkOwnershipVerificationResource` object is the result of a bulk ownership verification flow, such as [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification) or [`attemptOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#attempt-ownership-verification), where ownership is verified for several of an Organization's [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once. Because the operation can partially succeed, each requested domain is reported in either `data` or `errors`.
  */
 export interface OrganizationDomainsBulkOwnershipVerificationResource {
   /**
-   * The domains that were processed successfully. After [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/types/organization-resource#prepare-ownership-verification), each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` that must be published to a DNS TXT record.
+   * The domains that were processed successfully. After [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification), each domain's `ownershipVerification` carries the `txtRecordName` and `txtRecordValue` that must be published to a DNS TXT record.
    */
   data: OrganizationDomainResource[];
   /**

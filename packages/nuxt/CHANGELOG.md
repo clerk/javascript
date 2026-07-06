@@ -1,5 +1,49 @@
 # @clerk/nuxt
 
+## 2.6.12
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/backend@3.11.0
+  - @clerk/shared@4.24.0
+  - @clerk/vue@2.4.11
+
+## 2.6.11
+
+### Patch Changes
+
+- Updated dependencies [[`f42aad9`](https://github.com/clerk/javascript/commit/f42aad99389fa219588a3f450cdaa8fb6b55acda)]:
+  - @clerk/backend@3.10.0
+  - @clerk/vue@2.4.10
+
+## 2.6.10
+
+### Patch Changes
+
+- Updated dependencies [[`2914c2c`](https://github.com/clerk/javascript/commit/2914c2c5dd8e2ce46be37a6645642f4cb32e7909), [`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`07e1b06`](https://github.com/clerk/javascript/commit/07e1b067dc0c6b52ccc23d0a5f0988c4b731959a), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915), [`6a9bb60`](https://github.com/clerk/javascript/commit/6a9bb609050ed498c66db9087ed96350f91ed5df)]:
+  - @clerk/backend@3.9.0
+  - @clerk/shared@4.23.0
+  - @clerk/vue@2.4.10
+
+## 2.6.9
+
+### Patch Changes
+
+- Updated dependencies [[`a8c727c`](https://github.com/clerk/javascript/commit/a8c727c6ad44121204c1fcc95ee356199643a8a9), [`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/backend@3.8.5
+  - @clerk/shared@4.22.1
+  - @clerk/vue@2.4.9
+
+## 2.6.8
+
+### Patch Changes
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+  - @clerk/vue@2.4.8
+  - @clerk/backend@3.8.4
+
 ## 2.6.7
 
 ### Patch Changes

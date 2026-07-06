@@ -1,4 +1,5 @@
 import type { ClerkRuntimeError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { describe, expect, it, vi } from 'vitest';
 
 import { _authenticateWithTransport } from '../authenticateWithTransport';
@@ -63,6 +64,38 @@ describe('_authenticateWithTransport', () => {
     expect(resource.reload).toHaveBeenCalledWith();
     expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, {});
   });
+
+  it.each([ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND, ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS])(
+    'continues to callback handling for native OAuth transfer signal %s',
+    async errorCode => {
+      const clerk = makeClerk();
+      const transport = {
+        getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+        open: vi.fn().mockResolvedValue({
+          callbackUrl: `myapp://sso-callback?__clerk_status=failed&__clerk_error_code=${errorCode}`,
+        }),
+      };
+      const resource = {
+        reload: vi.fn().mockResolvedValue(undefined),
+        create: vi.fn().mockResolvedValue(undefined),
+      } as any;
+      const authenticateMethod = vi.fn(async (_params, navigate) => navigate('https://provider.example/auth'));
+      const callbackParams = { signInUrl: '/sign-in' };
+
+      await _authenticateWithTransport({
+        clerk: clerk as any,
+        transport,
+        resource,
+        authenticateMethod,
+        params: {} as any,
+        callbackParams,
+      });
+
+      expect(resource.reload).toHaveBeenCalledWith();
+      expect(resource.create).not.toHaveBeenCalled();
+      expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, callbackParams);
+    },
+  );
 
   it('rejects with a localizable error without reloading when the native callback reports OAuth failure', async () => {
     const clerk = makeClerk();

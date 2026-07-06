@@ -1,5 +1,41 @@
 # Change Log
 
+## 4.24.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- On the Test step of the self-serve SSO configuration flow, clicking Continue now re-checks for a successful test run before blocking, so a successful run completed in a separate browser tab is recognized without first clicking Refresh logs. ([#9046](https://github.com/clerk/javascript/pull/9046)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- `createPathMatcher()` and `createRouteMatcher()` route suggestions now use the `:path*` subtree form (e.g. `/dashboard/:path*`) instead of `(.*)`. Unlike `/dashboard(.*)`, which also matches sibling routes such as `/dashboardxyz`, `/dashboard/:path*` matches only `/dashboard` and its path-segment subtree. The new suggestion type is exported as `WithPathSegmentWildcard`; the existing `WithPathPatternWildcard` type is unchanged (now deprecated), and `(.*)` patterns keep working. This only changes the type-level autocomplete suggestion. ([#9057](https://github.com/clerk/javascript/pull/9057)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.23.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix native OAuth transport handling for combined sign-in-or-up flows so transfer callbacks can continue instead of surfacing a generic OAuth callback failure. ([#9037](https://github.com/clerk/javascript/pull/9037)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.22.1
+
+### Patch Changes
+
+- Fix missing redirect URL protocol validation for Clerk UI browser navigations, including the multi-session add-account flow. ([#8961](https://github.com/clerk/javascript/pull/8961)) by [@jacekradko](https://github.com/jacekradko)
+
+  Internal browser navigations now consistently honor configured redirect protocols and fail closed across mixed ClerkJS/UI bundle versions.
+
+## 4.22.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.21.0
 
 ### Minor Changes
