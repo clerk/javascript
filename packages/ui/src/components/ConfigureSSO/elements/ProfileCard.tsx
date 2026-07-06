@@ -9,7 +9,7 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
     elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
-      gap: theme.space.$2,
+      gap: theme.space.$3,
       width: '100%',
       minHeight: theme.sizes.$13,
       padding: theme.space.$5,

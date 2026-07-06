@@ -79,10 +79,8 @@ export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Elem
           }
           sx={t => ({
             color: t.colors.$colorMutedForeground,
-            // Ghost Button's default block padding (size='sm') makes this taller than
-            // the back button/stepper, growing the header past its minHeight — zero it
-            // so the button's box matches the icon and stays centered in the row.
-            paddingBlock: t.space.$none,
+            // 4px symmetric padding → 24px box that matches the stepper bullets and gives the ghost hover a clean square (not a squished pill).
+            padding: t.space.$1,
             // Desktop-only: mobile falls back to the card's absolute close button.
             [mqu.md]: { display: 'none' },
           })}
