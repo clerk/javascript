@@ -7,18 +7,19 @@
 // intentionally omitted — the consumer's `<ClerkProvider>` supplies `clerk` via
 // `useClerk()`. The emotion cache is keyed per clerk instance in
 // `styleCacheStore` so sibling composed roots don't duplicate style insertions.
-// eslint-disable-next-line no-restricted-imports
-import createCache from '@emotion/cache';
-// eslint-disable-next-line no-restricted-imports
-import { CacheProvider, type SerializedStyles } from '@emotion/react';
+
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
+import createCache from '@emotion/cache'; // eslint-disable-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports
+import { CacheProvider, type SerializedStyles } from '@emotion/react';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
-import type { Appearance } from '@/ui/internal/appearance';
+import type { Appearance, Elements } from '@/ui/internal/appearance';
 import { getStyleCache, setStyleCache } from '@/ui/internal/styleCacheStore';
 import { RouteContext } from '@/ui/router/RouteContext';
 import { InternalThemeProvider } from '@/ui/styledSystem';
@@ -28,11 +29,23 @@ import { EnvironmentProvider } from '../contexts/EnvironmentContext';
 import { ModuleManagerProvider } from '../contexts/ModuleManagerContext';
 import { OptionsProvider } from '../contexts/OptionsContext';
 import { AppearanceOverrides } from '../elements/AppearanceOverrides';
-import type { Elements } from '../internal/appearance';
 import { createComposedRouter } from './stubRouter';
 
+// Used when `getModuleManager(clerk)` finds no ModuleManager registered for this clerk instance in
+// the `@clerk/shared/moduleManager` registry. In a correctly wired app clerk-js registers itself
+// there during construction (clerk.ts), so reaching this means either the loaded clerk-js is too
+// old to register, or a duplicate `@clerk/shared` copy split the registry so the write and read hit
+// different WeakMaps. Fail loudly on the first dynamic import (Web3, billing, password strength)
+// instead of silently resolving `undefined` and surfacing later as an opaque access on the missing
+// module.
 export const fallbackModuleManager: ModuleManager = {
-  import: () => Promise.resolve(undefined) as any,
+  import: () =>
+    Promise.reject(
+      new ClerkRuntimeError(
+        'Composed profile components could not resolve a Clerk module manager: none is registered for this Clerk instance. This usually means the loaded @clerk/clerk-js is too old to support composed profiles, or a duplicate @clerk/shared copy has split the module-manager registry.',
+        { code: 'composed_module_manager_unavailable' },
+      ),
+    ),
 };
 
 const composedOverrides: Elements = {

@@ -6,11 +6,11 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { clearFetchCache } from '../../../hooks';
 import {
-  AccountUsername,
-  AccountEmails,
-  AccountPhone,
   AccountConnectedAccounts,
+  AccountEmails,
   AccountEnterpriseAccounts,
+  AccountPhone,
+  AccountUsername,
   AccountWeb3,
 } from '../AccountSections';
 
@@ -120,6 +120,62 @@ describe('AccountSections — self-gating visibility', () => {
   });
 
   describe('AccountEnterpriseAccounts', () => {
+    it('renders when enterprise SSO is enabled and the user has an active enterprise account', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          enterprise_accounts: [
+            {
+              object: 'enterprise_account',
+              active: true,
+              first_name: 'Laura',
+              last_name: 'Serafim',
+              protocol: 'saml',
+              provider_user_id: null,
+              public_metadata: {},
+              email_address: 'test@clerk.com',
+              provider: 'saml_okta',
+              enterprise_connection: {
+                object: 'enterprise_connection',
+                provider: 'saml_okta',
+                name: 'Okta Workforce',
+                id: 'ent_123',
+                active: true,
+                allow_idp_initiated: false,
+                allow_subdomains: false,
+                disable_additional_identifications: false,
+                sync_user_attributes: false,
+                domain: 'foocorp.com',
+                created_at: 123,
+                updated_at: 123,
+                logo_public_url: null,
+                protocol: 'saml',
+              },
+              verification: {
+                status: 'verified',
+                strategy: 'enterprise_sso',
+                verified_at_client: 'foo',
+                attempts: 0,
+                error: {
+                  code: 'identifier_already_signed_in',
+                  long_message: "You're already signed in",
+                  message: "You're already signed in",
+                },
+                expire_at: 123,
+                id: 'ver_123',
+                object: 'verification',
+              },
+              id: 'eac_123',
+            },
+          ],
+        });
+      });
+
+      render(<AccountEnterpriseAccounts />, { wrapper });
+      screen.getByText(/enterprise accounts/i);
+    });
+
     it('returns null when enterprise SSO is disabled', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });

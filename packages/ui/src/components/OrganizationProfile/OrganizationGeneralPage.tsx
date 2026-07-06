@@ -72,7 +72,13 @@ export const OrganizationGeneralPage = () => {
   );
 };
 
-export const OrganizationProfileSection = () => {
+/**
+ * Renders the organization profile section (name, logo) with inline edit when the user has
+ * `org:sys_profile:manage`.
+ *
+ * @returns The profile section, or `null` when no organization is active.
+ */
+export const OrganizationProfileSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -121,7 +127,13 @@ export const OrganizationProfileSection = () => {
   );
 };
 
-export const OrganizationDomainsSection = () => {
+/**
+ * Renders the verified-domains section.
+ *
+ * @returns The domains section, or `null` when domains are disabled, no organization is active, or
+ * there are no domains and the user cannot add any.
+ */
+export const OrganizationDomainsSection = (): JSX.Element | null => {
   const { organizationSettings } = useEnvironment();
   const { organization, domains } = useOrganization({ domains: { infinite: true } });
   const canManageDomains = useProtect({ permission: 'org:sys_domains:manage' });
@@ -177,7 +189,12 @@ export const OrganizationDomainsSection = () => {
   );
 };
 
-export const OrganizationLeaveSection = () => {
+/**
+ * Renders the "leave organization" action in the danger section.
+ *
+ * @returns The leave-organization section, or `null` when no organization is active.
+ */
+export const OrganizationLeaveSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -223,7 +240,13 @@ export const OrganizationLeaveSection = () => {
   );
 };
 
-export const OrganizationDeleteSection = () => {
+/**
+ * Renders the "delete organization" action in the danger section.
+ *
+ * @returns The delete-organization section, or `null` when no organization is active, the user
+ * lacks `org:sys_profile:delete`, or admin delete is disabled.
+ */
+export const OrganizationDeleteSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
   const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
