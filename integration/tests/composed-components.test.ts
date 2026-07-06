@@ -290,6 +290,45 @@ export default function Page() {
   );
 }`;
 
+// The composed `OrganizationProfileSecurityPanel` renders the whole standard security page
+// (`OrganizationSecurityPage`) — the SSO overview plus its configuration wizard. Unlike the general
+// tab it has no composable sub-sections, so the panel takes no children. It is the composed
+// counterpart to the security route the standard `<OrganizationProfile />` renders.
+const composedOrganizationSecurityPage = () => `'use client';
+import { useEffect } from 'react';
+import { useClerk, useOrganization, useOrganizationList } from '@clerk/nextjs';
+import {
+  OrganizationProfileProvider,
+  OrganizationProfileSecurityPanel,
+} from '@clerk/ui/experimental';
+
+function EnsureActiveOrganization() {
+  const { setActive } = useClerk();
+  const { organization } = useOrganization();
+  const { isLoaded, userMemberships } = useOrganizationList({ userMemberships: true });
+
+  useEffect(() => {
+    if (!isLoaded || organization) return;
+    const first = userMemberships?.data?.[0]?.organization;
+    if (first && setActive) {
+      void setActive({ organization: first.id });
+    }
+  }, [isLoaded, organization, userMemberships, setActive]);
+
+  return null;
+}
+
+export default function Page() {
+  return (
+    <>
+      <EnsureActiveOrganization />
+      <OrganizationProfileProvider>
+        <OrganizationProfileSecurityPanel />
+      </OrganizationProfileProvider>
+    </>
+  );
+}`;
+
 test.describe('composed OrganizationProfile exports @generic', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
@@ -303,6 +342,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
       .addFile('src/app/provider.tsx', provider)
       .addFile('src/app/layout.tsx', layout)
       .addFile('src/app/composed/organization/page.tsx', composedOrganizationProfilePage)
+      .addFile('src/app/composed/organization-security/page.tsx', composedOrganizationSecurityPage)
       .commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
@@ -396,5 +436,21 @@ test.describe('composed OrganizationProfile exports @generic', () => {
     } finally {
       await delFakeUser.deleteIfExists();
     }
+  });
+
+  test('renders the composed organization security page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+    await u.page.goToRelative('/composed/organization-security');
+
+    // The composed security panel renders the same OrganizationSecurityPage the standard component
+    // shows on its security route: the "Security" page header plus the SSO overview section. This is
+    // the composed counterpart to the security tab (there are no composable sub-sections here).
+    await expect(u.page.getByRole('heading', { name: /^security$/i })).toBeVisible();
+    await expect(u.page.getByText(/^SSO$/)).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /start configuration/i })).toBeVisible();
   });
 });

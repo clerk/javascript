@@ -39,7 +39,7 @@ const EXPECTED_EXPORTS = [
   'OrganizationProfileMembersPanel',
   'OrganizationProfileBillingPanel',
   'OrganizationProfileAPIKeysPanel',
-  'OrganizationProfileConfigureSSOPanel',
+  'OrganizationProfileSecurityPanel',
   // OrganizationProfile general sections
   'OrganizationProfileProfileSection',
   'OrganizationProfileDomainsSection',

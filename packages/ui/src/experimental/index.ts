@@ -29,7 +29,7 @@ export {
   OrganizationProfileMembersPanel,
   OrganizationProfileBillingPanel,
   OrganizationProfileAPIKeysPanel,
-  OrganizationProfileConfigureSSOPanel,
+  OrganizationProfileSecurityPanel,
   OrganizationProfileProfileSection,
   OrganizationProfileDomainsSection,
   OrganizationProfileLeaveSection,
