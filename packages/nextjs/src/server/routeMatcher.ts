@@ -1,11 +1,11 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import { createPathMatcher, type WithPathPatternWildcard } from '@clerk/shared/pathMatcher';
+import { createPathMatcher, type WithPathSegmentWildcard } from '@clerk/shared/pathMatcher';
 import type { Autocomplete } from '@clerk/shared/types';
 import type Link from 'next/link';
 import type { NextRequest } from 'next/server';
 
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
-type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathPatternWildcard<NextTypedRoute> | NextTypedRoute>;
+type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathSegmentWildcard<NextTypedRoute> | NextTypedRoute>;
 
 export type RouteMatcherParam =
   | Array<RegExp | RouteMatcherWithNextTypedRoutes>

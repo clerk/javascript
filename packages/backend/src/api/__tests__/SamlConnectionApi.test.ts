@@ -26,6 +26,8 @@ describe('SamlConnectionAPI', () => {
     idp_entity_id: 'entity_123',
     idp_sso_url: 'https://idp.example.com/sso',
     idp_certificate: 'cert_data',
+    idp_certificate_issued_at: 1672531200000,
+    idp_certificate_expires_at: 1704067200000,
     idp_metadata_url: null,
     idp_metadata: null,
     attribute_mapping: {
@@ -70,6 +72,8 @@ describe('SamlConnectionAPI', () => {
       expect(response.data[0].id).toBe('samlc_123');
       expect(response.data[0].name).toBe('Test Connection');
       expect(response.data[0].organizationId).toBe('org_123');
+      expect(response.data[0].idpCertificateIssuedAt).toBe(1672531200000);
+      expect(response.data[0].idpCertificateExpiresAt).toBe(1704067200000);
       expect(response.totalCount).toBe(1);
     });
   });
@@ -114,6 +118,8 @@ describe('SamlConnectionAPI', () => {
       expect(response.id).toBe('samlc_123');
       expect(response.name).toBe('Test Connection');
       expect(response.organizationId).toBe('org_123');
+      expect(response.idpCertificateIssuedAt).toBe(1672531200000);
+      expect(response.idpCertificateExpiresAt).toBe(1704067200000);
     });
   });
 

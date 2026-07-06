@@ -50,6 +50,7 @@ export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from 
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,
+  UseOrganizationEnterpriseConnectionTestRunsRevalidateResult,
   UseOrganizationEnterpriseConnectionTestRunsReturn,
 } from './useOrganizationEnterpriseConnectionTestRuns';
 
