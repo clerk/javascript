@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.24.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- On the Test step of the self-serve SSO configuration flow, clicking Continue now re-checks for a successful test run before blocking, so a successful run completed in a separate browser tab is recognized without first clicking Refresh logs. ([#9046](https://github.com/clerk/javascript/pull/9046)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- `createPathMatcher()` and `createRouteMatcher()` route suggestions now use the `:path*` subtree form (e.g. `/dashboard/:path*`) instead of `(.*)`. Unlike `/dashboard(.*)`, which also matches sibling routes such as `/dashboardxyz`, `/dashboard/:path*` matches only `/dashboard` and its path-segment subtree. The new suggestion type is exported as `WithPathSegmentWildcard`; the existing `WithPathPatternWildcard` type is unchanged (now deprecated), and `(.*)` patterns keep working. This only changes the type-level autocomplete suggestion. ([#9057](https://github.com/clerk/javascript/pull/9057)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 4.23.0
 
 ### Minor Changes

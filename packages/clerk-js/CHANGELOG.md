@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.24.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Prevent a staler session token from overwriting a fresher one on the same tab. Freshness is ranked by the JWT `oiat` header, then `iat`; tokens without `oiat` always pass through. ([#9030](https://github.com/clerk/javascript/pull/9030)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+
 ## 6.23.0
 
 ### Minor Changes
