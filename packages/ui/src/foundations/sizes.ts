@@ -16,6 +16,7 @@ const baseSpaceUnits = Object.freeze({
 const spacingScale = Object.freeze({
   '0x25': { rem: '0.0625rem', multiplier: 0.25 },
   '0x5': { rem: '0.125rem', multiplier: 0.5 },
+  '0x75': { rem: '0.1875rem', multiplier: 0.75 },
   '1': { rem: '0.25rem', multiplier: 1 },
   '1x5': { rem: '0.375rem', multiplier: 1.5 },
   '2': { rem: '0.5rem', multiplier: 2 },
@@ -197,4 +198,4 @@ const radii = Object.freeze({
  */
 const spaceScaleKeys = Object.keys(spacingScale) as SpacingScaleKey[];
 
-export { sizes, space, radii, spaceScaleKeys };
+export { radii, sizes, space, spaceScaleKeys };
