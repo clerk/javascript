@@ -40,6 +40,7 @@ import { TokenId } from '@/utils/tokenId';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
+import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -437,7 +438,7 @@ export class Session extends BaseResource implements SessionResource {
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token });
 
-        if (token.jwt) {
+        if (token.jwt && !this.#shouldKeepExistingLastActiveToken(token)) {
           this.lastActiveToken = token;
           // Emits the updated session with the new token to the state listeners
           eventBus.emit(events.SessionTokenResolved, null);
@@ -447,6 +448,24 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
     });
+  }
+
+  // Mirrors the cookie guard: only a same session+org lastActiveToken is a comparable
+  // freshness baseline, so a session or org switch always adopts the incoming token.
+  // Without this, an org-switch token minted by a stale edge (lower oiat) would lose
+  // to the previous org's token and pin lastActiveToken to the old org's claims.
+  #shouldKeepExistingLastActiveToken(incoming: TokenResource): boolean {
+    const current = this.lastActiveToken;
+    if (!current?.jwt) {
+      return false;
+    }
+    if (
+      tokenSid(current) !== tokenSid(incoming) ||
+      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
+    ) {
+      return false;
+    }
+    return pickFreshestJwt(current, incoming) !== incoming;
   }
 
   get currentTask() {
