@@ -1,5 +1,28 @@
 # @clerk/electron
 
+## 0.0.9
+
+### Patch Changes
+
+- Add a `userAgent` option to `createClerkBridge()` so Electron apps can customize the app name used for UserProfile session activity attribution while preserving platform details. ([#9066](https://github.com/clerk/javascript/pull/9066)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`73d73ec`](https://github.com/clerk/javascript/commit/73d73ecd425c3c0c02070b84b5c669ed8d74249e), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/clerk-js@6.24.0
+  - @clerk/shared@4.24.0
+  - @clerk/react@6.11.4
+
+## 0.0.8
+
+### Patch Changes
+
+- `<ClerkProvider>` from `@clerk/electron/react` now allows the renderer's own custom scheme as a redirect protocol by default, so apps no longer need to set `allowedRedirectProtocols={['<scheme>:']}` manually. ([#9043](https://github.com/clerk/javascript/pull/9043)) by [@nicolas-angelo](https://github.com/nicolas-angelo)
+
+  This applies when the renderer is served from the custom scheme registered with `createClerkBridge({ renderer })`. Local `file:` renderers are not allowlisted automatically, and explicit `allowedRedirectProtocols` values are still respected.
+
+- Updated dependencies []:
+  - @clerk/react@6.11.3
+  - @clerk/clerk-js@6.23.0
+
 ## 0.0.7
 
 ### Patch Changes

@@ -510,6 +510,119 @@ function collectPropertiesFromType(type, reflectionsByName) {
 }
 
 /**
+ * Structural fingerprint for a `Type`. Recurses into composite shapes so two types that only differ in their type arguments (`Foo<string>` vs `Foo<number>`) or in their nested property types (`{ x: string }` vs `{ x: number }`) get distinct fingerprints. Two shapes that produce the same fingerprint are treated as structurally identical and so eligible for cross-pollinating JSDoc comments.
+ *
+ * Recursion guard: a single shared `Set` of visited reflection ids threads through every nested call to avoid infinite loops on cyclic types (e.g. a type literal that ultimately references itself).
+ *
+ * @param {import('typedoc').SomeType | undefined} type
+ * @param {Set<number>} [seen]
+ * @returns {string}
+ */
+function typeFingerprint(type, seen = new Set()) {
+  if (!type) return '?';
+  const t =
+    /** @type {{ type?: string; name?: string; value?: unknown; elementType?: import('typedoc').SomeType; types?: import('typedoc').SomeType[]; typeArguments?: import('typedoc').SomeType[]; declaration?: import('typedoc').DeclarationReflection }} */ (
+      /** @type {unknown} */ (type)
+    );
+  switch (t.type) {
+    case 'intrinsic':
+      return `i:${t.name ?? ''}`;
+    case 'literal':
+      return `l:${JSON.stringify(t.value)}`;
+    case 'reference': {
+      const args = t.typeArguments?.length ? `<${t.typeArguments.map(a => typeFingerprint(a, seen)).join(',')}>` : '';
+      return `r:${t.name ?? ''}${args}`;
+    }
+    case 'array':
+      return `a:${typeFingerprint(t.elementType, seen)}`;
+    case 'optional':
+      return `o:${typeFingerprint(t.elementType, seen)}`;
+    case 'union':
+      return `u:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
+    case 'intersection':
+      return `n:[${(t.types ?? [])
+        .map(a => typeFingerprint(a, seen))
+        .sort()
+        .join(',')}]`;
+    case 'reflection': {
+      const decl = t.declaration;
+      if (decl?.id != null) {
+        if (seen.has(decl.id)) return `rf:<cycle>`;
+        seen.add(decl.id);
+      }
+      const kids = decl?.children?.filter(c => c.kindOf?.(ReflectionKind.Property)) ?? [];
+      return `rf:[${kids
+        .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type, seen)}`)
+        .sort()
+        .join(',')}]`;
+    }
+    default:
+      return t.type ?? '?';
+  }
+}
+
+/**
+ * When TypeScript resolves a type through `Omit<...>` / `Pick<...>` (e.g. `ClerkProviderProps = Omit<IsomorphicClerkOptions, …> & { … }`), inline anonymous object literal property types get re-synthesized — and TypeDoc loses the JSDoc on most of their members. Only the first/leading property's comment survives, the rest come through with `comment === undefined`. The same shape elsewhere in the project (e.g. directly under `IsomorphicClerkOptions['telemetry']`) carries all comments correctly.
+ *
+ * Match `@kind:typeLiteral` reflections by structural fingerprint (set of `(name, type, optional)` tuples on their property children); within each group, pick the reflection with the most commented children as the source-of-truth and copy missing comments onto its siblings.
+ *
+ * @param {import('typedoc').Reflection[]} all
+ */
+function backfillInlineObjectChildComments(all) {
+  /** @type {Map<string, import('typedoc').DeclarationReflection[]>} */
+  const groups = new Map();
+  for (const r of all) {
+    if (!r.kindOf?.(ReflectionKind.TypeLiteral)) continue;
+    const decl = /** @type {import('typedoc').DeclarationReflection} */ (r);
+    const propChildren = decl.children?.filter(c => c.kindOf?.(ReflectionKind.Property));
+    if (!propChildren?.length) continue;
+    const key = propChildren
+      .map(c => `${c.name}${c.flags?.isOptional ? '?' : ''}:${typeFingerprint(c.type)}`)
+      .sort()
+      .join('|');
+    if (!groups.has(key)) groups.set(key, []);
+    /** @type {import('typedoc').DeclarationReflection[]} */ (groups.get(key)).push(decl);
+  }
+
+  for (const group of groups.values()) {
+    if (group.length < 2) continue;
+    /** @type {import('typedoc').DeclarationReflection | null} */
+    let best = null;
+    let bestScore = -1;
+    for (const refl of group) {
+      const score =
+        refl.children?.filter(c => c.kindOf?.(ReflectionKind.Property) && c.comment?.summary?.length).length ?? 0;
+      if (score > bestScore) {
+        best = refl;
+        bestScore = score;
+      }
+    }
+    if (!best || bestScore === 0) continue;
+    /** @type {Map<string, import('typedoc').DeclarationReflection>} */
+    const bestByName = new Map();
+    for (const c of best.children ?? []) {
+      if (c.kindOf?.(ReflectionKind.Property)) bestByName.set(c.name, c);
+    }
+    for (const refl of group) {
+      if (refl === best) continue;
+      for (const child of refl.children ?? []) {
+        if (!child.kindOf?.(ReflectionKind.Property)) continue;
+        // Any `.comment` object means TypeDoc found a JSDoc block at the source — including
+        // intentionally empty comments left over from `@generateWithEmptyComment` after the
+        // modifier tag is stripped in `EVENT_RESOLVE_END`. Only fill in children that have
+        // no comment at all.
+        if (child.comment) continue;
+        const src = bestByName.get(child.name);
+        if (src?.comment?.summary?.length) child.comment = src.comment;
+      }
+    }
+  }
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -565,6 +678,8 @@ export function load(app) {
         }
       }
     }
+
+    backfillInlineObjectChildComments(all);
   });
 
   app.renderer.on(MarkdownPageEvent.END, output => {

@@ -11,6 +11,7 @@ import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Default as HeadingDefault,
   Intents as HeadingIntents,
@@ -48,6 +49,10 @@ import {
   Default as OrganizationProfileLeaveSectionDefault,
   meta as organizationProfileLeaveSectionMeta,
 } from '../stories/organization-profile-leave-section.stories';
+  Default as OrganizationProfileGeneralDefault,
+  meta as organizationProfileGeneralMeta,
+} from '../stories/organization-profile-general.stories';
+import { meta as otpMeta } from '../stories/otp.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -112,7 +117,9 @@ const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
+const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const menuModule: StoryModule = { meta: menuMeta };
+const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
@@ -142,7 +149,9 @@ export const registry: StoryModule[] = [
   autocompleteModule,
   collapsibleModule,
   dialogModule,
+  fileUploadModule,
   menuModule,
+  otpModule,
   popoverModule,
   selectModule,
   tabsModule,
