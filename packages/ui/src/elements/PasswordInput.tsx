@@ -115,6 +115,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         sx={theme => ({
           position: 'absolute',
           insetInlineEnd: theme.space.$0x75,
+          insetBlock: theme.space.$0x75,
           borderRadius: theme.radii.$sm,
           color: theme.colors.$neutralAlpha400,
           paddingInline: theme.space.$2,
