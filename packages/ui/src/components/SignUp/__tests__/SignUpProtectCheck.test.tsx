@@ -75,6 +75,21 @@ describe('SignUpProtectCheck', () => {
     expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
   });
 
+  it('routes stale standalone protect-check visits through SignUp routes back to the flow start', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignUpWithEmailAddress();
+    });
+    fixtures.router.currentPath = '/sign-up/protect-check';
+    fixtures.router.fullPath = '/sign-up';
+    fixtures.router.indexPath = '/sign-up';
+    fixtures.router.matches.mockImplementation((path?: string) => path === 'protect-check');
+
+    render(<SignUp />, { wrapper });
+
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-up'));
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
+
   it('runs the SDK challenge with the URL and resource and submits the proof token', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignUpWithProtectCheck({ sdkUrl: 'https://protect.example.com/v1.js' });
