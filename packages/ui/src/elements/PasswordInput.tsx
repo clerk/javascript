@@ -114,12 +114,10 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',
-          insetInlineEnd: 0,
-          marginInlineEnd: theme.space.$0x75,
-          paddingInline: theme.space.$2,
-          height: `calc(100% - (${theme.space.$0x75} * 2))`,
-          color: theme.colors.$neutralAlpha400,
+          insetInlineEnd: theme.space.$0x75,
           borderRadius: theme.radii.$sm,
+          color: theme.colors.$neutralAlpha400,
+          paddingInline: theme.space.$2,
           '&::before': {
             content: '""',
             position: 'absolute',
