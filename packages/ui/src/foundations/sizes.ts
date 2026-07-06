@@ -95,6 +95,7 @@ type ExtractRemValues<T> = {
 const spaceUnits = Object.freeze({
   '0x25': spacingScale['0x25'].rem,
   '0x5': spacingScale['0x5'].rem,
+  '0x75': spacingScale['0x75'].rem,
   '1': spacingScale['1'].rem,
   '1x5': spacingScale['1x5'].rem,
   '2': spacingScale['2'].rem,
