@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
-import type { ComponentType } from 'react';
+import { type ComponentType, useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -19,6 +19,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
+import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
@@ -42,13 +43,31 @@ function SignUpProtectCheckInternal({
   verifyPhonePath = '../verify-phone-number',
   continuePath = '../continue',
   protectCheckPath = '.',
-}: SignUpProtectCheckProps = {}): JSX.Element {
+}: SignUpProtectCheckProps = {}): JSX.Element | null {
   const card = useCardState();
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
   const { navigate } = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
   const { setActive } = useClerk();
   const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  // Latches that a protect check existed at some point, so the resolution race
+  // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for
+  // a stale visit. State adjusted during render (guarded) rather than a ref
+  // write, which React disallows in the render body.
+  const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signUp.protectCheck);
+  const didStartNoCheckFallbackRef = useRef(false);
+
+  if (signUp.protectCheck && !everSawProtectCheck) {
+    setEverSawProtectCheck(true);
+  }
+
+  useEffect(() => {
+    if (!signUp.protectCheck && !everSawProtectCheck && !didStartNoCheckFallbackRef.current) {
+      didStartNoCheckFallbackRef.current = true;
+      void navigateToFlowStart();
+    }
+  }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
 
   const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
@@ -80,6 +99,13 @@ function SignUpProtectCheckInternal({
       });
     },
   });
+
+  // Stale/direct visit that never had a check: render nothing while the
+  // flow-start redirect scheduled above kicks in, instead of flashing the card
+  // shell for one paint. Must stay below every hook call.
+  if (!signUp.protectCheck && !everSawProtectCheck) {
+    return null;
+  }
 
   return (
     <Flow.Part part='protectCheck'>
