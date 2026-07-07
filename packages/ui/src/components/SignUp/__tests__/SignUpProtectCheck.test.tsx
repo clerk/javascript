@@ -320,6 +320,40 @@ describe('SignUpProtectCheck', () => {
       setRenderedHeight(container, 65);
       expect(container.style.position).toBe('static');
     });
+
+    it('starts observing widget visibility when the container appears after an initially empty render', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithEmailAddress();
+      });
+      fixtures.router.currentPath = '/sign-up/protect-check';
+      fixtures.router.fullPath = '/sign-up';
+      fixtures.router.indexPath = '/sign-up';
+      let container: HTMLDivElement | undefined;
+      mockExecute.mockImplementation((_protectCheck, el) => {
+        container = el as HTMLDivElement;
+        return new Promise(() => {}); // never resolves; the check stays running
+      });
+
+      const { rerender, queryByText, findByText } = render(<SignUpProtectCheck />, { wrapper });
+
+      // Direct visit with no challenge: the card renders nothing (the flow-start redirect is scheduled).
+      expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
+
+      // A challenge arrives while the route is still mounted — the container mounts only now,
+      // after the hook's first render, and visibility tracking must still attach to it.
+      (fixtures.signUp as any).protectCheck = {
+        status: 'pending',
+        token: 'challenge-token-late',
+        sdkUrl: 'https://protect.example.com/sdk.js',
+      };
+      rerender(<SignUpProtectCheck />);
+
+      await waitFor(() => expect(mockExecute).toHaveBeenCalled());
+      expect(await findByText(/loading/i)).toBeInTheDocument();
+
+      setRenderedHeight(container!, 65);
+      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+    });
   });
 
   it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {

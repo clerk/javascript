@@ -331,6 +331,59 @@ describe('SignInProtectCheck', () => {
       setRenderedHeight(container, 65);
       expect(container.style.position).toBe('static');
     });
+
+    it('falls back to MutationObserver when ResizeObserver is unavailable', async () => {
+      // Legacy-bundle browsers (e.g. Safari < 13.1) have no ResizeObserver; jsdom's native
+      // MutationObserver stands in for theirs here.
+      (window as any).ResizeObserver = undefined;
+      const { container, queryByText, findByText } = await renderWithPendingChallenge();
+
+      expect(await findByText(/loading/i)).toBeInTheDocument();
+
+      Object.defineProperty(container, 'offsetHeight', { value: 65, configurable: true });
+      container.appendChild(document.createElement('div'));
+
+      await waitFor(() => expect(queryByText(/loading/i)).not.toBeInTheDocument());
+    });
+
+    it('clears leftovers from a failed run so the retry starts with the spinner', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      let container: HTMLDivElement | undefined;
+      let rejectRun: ((err: Error) => void) | undefined;
+      mockExecute
+        .mockImplementationOnce((_protectCheck, el) => {
+          container = el as HTMLDivElement;
+          return new Promise((_, reject) => {
+            rejectRun = reject;
+          });
+        })
+        .mockImplementation((_protectCheck, el) => {
+          container = el as HTMLDivElement;
+          return new Promise(() => {}); // retry run stays pending
+        });
+
+      const { findByRole, findByText, queryByText } = render(<SignInProtectCheck />, { wrapper });
+      await waitFor(() => expect(mockExecute).toHaveBeenCalled());
+
+      // A widget renders, then the run fails (e.g. turnstile error-callback).
+      container!.appendChild(document.createElement('div'));
+      setRenderedHeight(container!, 65);
+      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+      rejectRun!(
+        new ClerkRuntimeError('Protect check script execution failed', { code: 'protect_check_execution_failed' }),
+      );
+
+      const retryButton = await findByRole('button', { name: /try again/i });
+      fireEvent.click(retryButton);
+
+      // The new run owns the container: stale widget removed, spinner back while it loads.
+      await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
+      expect(container!.childNodes.length).toBe(0);
+      setRenderedHeight(container!, 0);
+      expect(await findByText(/loading/i)).toBeInTheDocument();
+    });
   });
 
   it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {

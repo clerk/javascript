@@ -42,7 +42,13 @@ export interface ProtectCheckRunnerParams<TResource> {
 }
 
 export interface ProtectCheckRunner {
-  containerRef: React.MutableRefObject<HTMLDivElement | null>;
+  /**
+   * Ref callback for the SDK container element. A callback (not a ref object) because the
+   * container can mount long after the hook does — e.g. `<SignUpProtectCheck />` renders `null`
+   * until a challenge exists — and widget-visibility tracking must attach whenever the node
+   * actually appears.
+   */
+  containerRef: React.RefCallback<HTMLDivElement>;
   isRunning: boolean;
   /**
    * Whether the challenge SDK has rendered visible content (e.g. a Turnstile widget) into the
@@ -67,7 +73,8 @@ export interface ProtectCheckRunner {
 export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
   const card = useCardState();
 
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const containerNodeRef = React.useRef<HTMLDivElement | null>(null);
+  const visibilityObserverRef = React.useRef<ResizeObserver | MutationObserver | null>(null);
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
   const [isRunning, setIsRunning] = React.useState(false);
@@ -80,16 +87,28 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   // means we're in an invisible phase (loading the SDK, a collapsed widget, or submitting the
   // proof) and the caller's spinner should show. Height also stays correct under a future
   // interaction-only SDK that keeps its widget collapsed until user input is required.
-  React.useEffect(() => {
-    const el = containerRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') {
+  const containerRef = React.useCallback((node: HTMLDivElement | null) => {
+    visibilityObserverRef.current?.disconnect();
+    visibilityObserverRef.current = null;
+    containerNodeRef.current = node;
+    if (!node) {
+      setIsWidgetVisible(false);
       return;
     }
-    const update = () => setIsWidgetVisible(el.offsetHeight > 0);
+    const update = () => setIsWidgetVisible(node.offsetHeight > 0);
     update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(update);
+      observer.observe(node);
+      visibilityObserverRef.current = observer;
+    } else {
+      // Legacy-bundle browsers (e.g. Safari < 13.1) lack ResizeObserver. The SDK can only become
+      // visible by mutating nodes or styles inside the container, so MutationObserver (universal)
+      // is an adequate stand-in; reading offsetHeight in the callback forces a fresh layout.
+      const observer = new MutationObserver(update);
+      observer.observe(node, { attributes: true, childList: true, subtree: true });
+      visibilityObserverRef.current = observer;
+    }
   }, []);
 
   // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
@@ -199,9 +218,16 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       return cleanup;
     }
 
-    const container = containerRef.current;
+    const container = containerNodeRef.current;
     if (!container) {
       return;
+    }
+
+    // This run owns the container outright: drop anything a previous run left behind (a solved or
+    // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
+    // second widget under a stale one.
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
 
     isRunningRef.current = true;
