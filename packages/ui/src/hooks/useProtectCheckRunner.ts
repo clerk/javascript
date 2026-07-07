@@ -2,6 +2,7 @@ import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error'
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { ProtectCheckResource } from '@clerk/shared/types';
 import React from 'react';
+import { flushSync } from 'react-dom';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
@@ -44,6 +45,12 @@ export interface ProtectCheckRunnerParams<TResource> {
 export interface ProtectCheckRunner {
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
   isRunning: boolean;
+  /**
+   * Whether the challenge script has signalled (via the `setWidgetVisible` init callback) that
+   * it is showing a widget in the container. While true, the widget owns the progress UI —
+   * callers should hide their own spinner and give the container layout space.
+   */
+  isWidgetVisible: boolean;
   /** Whether the card is currently showing a (recoverable) error. */
   hasError: boolean;
   /** Clears the error and re-runs the challenge from scratch. */
@@ -65,6 +72,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
   const [isRunning, setIsRunning] = React.useState(false);
+  const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
 
   // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
@@ -113,6 +121,22 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       isRunningRef.current = false;
       setIsRunning(false);
       handleError(new ClerkRuntimeError(message, { code }), [], card.setError);
+    };
+
+    // The script owns the widget-visibility decision: it receives this callback in its init
+    // payload (as `setWidgetVisible`) and calls it right before revealing UI in the container,
+    // and again with `false` once its widget is done. flushSync so the returned promise only
+    // resolves after the change is committed to the DOM — the caller's spinner is genuinely
+    // gone when the script reveals its widget, with no frame of overlap (same guarantee
+    // BaseRouter relies on flushSync for). Scoped to THIS run: the abort contract is
+    // best-effort, so a zombie script from a timed-out, retried, or superseded run can still
+    // call it late — those signals must not flip visibility under the active run.
+    const setWidgetVisible = (visible: boolean): Promise<void> => {
+      if (cancelled || abortController.signal.aborted || !mountedRef.current) {
+        return Promise.resolve();
+      }
+      flushSync(() => setIsWidgetVisibleState(visible));
+      return Promise.resolve();
     };
 
     // Fail closed in no-RHC builds (chrome extension / clerk.no-rhc.js): the gate requires a
@@ -179,6 +203,16 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       return;
     }
 
+    // This run owns the container outright: drop anything a previous run left behind (a solved or
+    // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
+    // second widget under a stale one. Reset visibility in the same breath — the container is
+    // empty by construction here, and waiting on the observer callback would leave the state
+    // stale for a scheduling-dependent window (especially on the MutationObserver fallback).
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+    setIsWidgetVisibleState(false);
+
     isRunningRef.current = true;
     setIsRunning(true);
 
@@ -195,7 +229,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         }
         const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
         const proofToken = await Promise.race([
-          executeProtectCheck(protectCheck, container, { signal: abortController.signal }),
+          executeProtectCheck(protectCheck, container, { signal: abortController.signal, setWidgetVisible }),
           new Promise<never>((_, reject) => {
             timeoutId = setTimeout(() => {
               // Stop the (possibly hung) SDK and surface a retryable timeout error.
@@ -268,5 +302,5 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { containerRef, isRunning, hasError: !!card.error, retry };
+  return { containerRef, isRunning, isWidgetVisible, hasError: !!card.error, retry };
 }
