@@ -31,7 +31,7 @@ export type ProtectCheckField = 'protect_check';
 export type SignUpField = SignUpAttributeField | SignUpIdentificationField | ProtectCheckField;
 
 /**
- * A pending Clerk Protect mid-flow challenge. Only surfaced when Protect mid-flow challenges are
+ * An interface that represents a pending Clerk Protect mid-flow challenge. Only surfaced when Protect mid-flow challenges are
  * explicitly enabled for the instance; upgrading the SDK alone does not enable it.
  */
 export interface ProtectCheckResource {
