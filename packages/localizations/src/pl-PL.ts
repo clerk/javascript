@@ -1220,6 +1220,9 @@ export const plPL: LocalizationResource = {
       title: 'Wymagana weryfikacja',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Dodaj konto',

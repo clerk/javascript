@@ -1219,6 +1219,9 @@ export const enGB: LocalizationResource = {
       title: 'Verification required',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',

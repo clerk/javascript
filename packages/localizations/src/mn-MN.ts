@@ -1221,6 +1221,9 @@ export const mnMN: LocalizationResource = {
       title: undefined,
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Бүртгэл нэмэх',

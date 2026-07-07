@@ -1220,6 +1220,9 @@ export const svSE: LocalizationResource = {
       title: 'Tvåstegsverifiering',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Lägg till konto',

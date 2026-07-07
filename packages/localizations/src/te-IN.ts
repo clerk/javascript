@@ -1231,6 +1231,9 @@ export const teIN: LocalizationResource = {
       title: 'ధృవీకరణ అవసరం',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'ఖాతాను జోడించండి',

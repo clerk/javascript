@@ -1232,6 +1232,9 @@ export const msMY: LocalizationResource = {
       title: 'Pengesahan diperlukan',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Tambah akaun',

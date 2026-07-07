@@ -1218,6 +1218,9 @@ export const ukUA: LocalizationResource = {
       title: undefined,
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',

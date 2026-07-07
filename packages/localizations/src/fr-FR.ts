@@ -1236,6 +1236,9 @@ export const frFR: LocalizationResource = {
       title: 'Vérification par application d’authentification',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Ajouter un compte',

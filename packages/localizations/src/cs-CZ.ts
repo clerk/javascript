@@ -1226,6 +1226,9 @@ export const csCZ: LocalizationResource = {
       title: 'Vyžadováno ověření',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Přidat účet',

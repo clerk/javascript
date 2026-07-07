@@ -1228,6 +1228,9 @@ export const viVN: LocalizationResource = {
       title: 'Xác minh yêu cầu',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Thêm tài khoản',

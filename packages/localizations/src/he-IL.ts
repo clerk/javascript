@@ -1213,6 +1213,9 @@ export const heIL: LocalizationResource = {
       title: 'אימות דו-שלבי',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'הוסף חשבון',

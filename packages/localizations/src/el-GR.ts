@@ -1226,6 +1226,9 @@ export const elGR: LocalizationResource = {
       title: 'Επαλήθευση δύο παραγόντων',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Προσθήκη λογαριασμού',

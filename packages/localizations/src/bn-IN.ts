@@ -1228,6 +1228,9 @@ export const bnIN: LocalizationResource = {
       title: 'যাচাইকরণ প্রয়োজন',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'অ্যাকাউন্ট যোগ করুন',

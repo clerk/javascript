@@ -1231,6 +1231,9 @@ export const ptPT: LocalizationResource = {
       title: 'Verificação necessária',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Adicionar conta',

@@ -1229,6 +1229,9 @@ export const jaJP: LocalizationResource = {
       title: '確認が必要です',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'アカウントを追加',

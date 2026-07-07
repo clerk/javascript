@@ -1222,6 +1222,9 @@ export const idID: LocalizationResource = {
       title: 'Verifikasi diperlukan',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Tambah akun',

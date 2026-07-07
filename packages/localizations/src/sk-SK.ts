@@ -1221,6 +1221,9 @@ export const skSK: LocalizationResource = {
       title: 'Vyžaduje sa overenie',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Pridať účet',

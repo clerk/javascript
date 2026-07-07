@@ -1230,6 +1230,9 @@ export const ptBR: LocalizationResource = {
       title: 'Autenticação TOTP',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Adicionar conta',
