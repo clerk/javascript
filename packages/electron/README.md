@@ -96,6 +96,16 @@ import { passkeys } from '@clerk/electron/passkeys';
 </ClerkProvider>;
 ```
 
+Pass `userAgent` to `createClerkBridge` before creating renderer windows to set an app-specific product token, such as `Acme Co/1.0.0`. Clerk preserves Electron's platform details, such as `Macintosh` or `Windows`, while using the product token for UserProfile session activity attribution:
+
+```ts
+createClerkBridge({
+  storage: storage(),
+  renderer: { scheme: 'my-app', host: 'renderer' },
+  userAgent: 'Acme Co/1.0.0',
+});
+```
+
 ## Content Security Policy
 
 `@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime rather than bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.

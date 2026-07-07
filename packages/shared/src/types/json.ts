@@ -148,6 +148,21 @@ export interface SignUpJSON extends ClerkResourceJSON {
   legal_accepted_at: number | null;
   locale: string | null;
   verifications: SignUpVerificationsJSON | null;
+  protect_check?: ProtectCheckJSON | null;
+}
+
+export interface ProtectCheckJSON {
+  /**
+   * Always `'pending'` when surfaced to clients. Completed checks are never emitted on the wire.
+   */
+  status: 'pending';
+  token: string;
+  sdk_url: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
+  expires_at?: number;
+  ui_hints?: Record<string, string>;
 }
 
 /**
@@ -926,6 +941,26 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
   eligible_for_free_trial: boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceJSON {
+  object: 'commerce_credit_balance';
+  balance: BillingMoneyAmountJSON | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerJSON {
+  object: 'commerce_credit_ledger';
+  id: string;
+  amount: BillingMoneyAmountJSON;
+  source_type: string;
+  source_id: string;
+  created_at: number;
 }
 
 /**

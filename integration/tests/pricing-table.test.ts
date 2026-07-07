@@ -595,7 +595,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       await u.po.checkout.clickPayOrSubscribe();
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
-      await expect(u.po.page.getByText('- $9.99')).toBeVisible();
+      await expect(u.po.page.getByText('-$9.99')).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });

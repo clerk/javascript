@@ -45,6 +45,15 @@ type Seconds = number;
  * owned by the {@link RefreshScheduler}, keyed by the same cache key.
  */
 interface TokenCacheValue {
+  /**
+   * Freshest claims-valid token observed for this key, chained across set() calls
+   * and updated by every resolver settle, including resolvers replaced by a newer
+   * set() while still pending. Internal bookkeeping only: readers only ever see
+   * entry.resolvedToken, so a pending entry still reads as pending and callers
+   * await its resolver. Folded into resolvedToken when the live entry resolves,
+   * which is what keeps a staler resolve from overwriting a fresher token.
+   */
+  baseline?: TokenResource;
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
@@ -226,7 +235,7 @@ const MemoryTokenCache = (prefix?: string, clock: Clock = systemClock): TokenCac
     try {
       const result = get({ tokenId: data.tokenId });
       if (result) {
-        const existingToken = await result.entry.tokenResolver;
+        const existingToken = result.entry.resolvedToken ?? (await result.entry.tokenResolver);
         if (pickFreshestJwt(existingToken, token) === existingToken) {
           debugLogger.debug(
             'Ignoring staler token broadcast',
@@ -289,64 +298,107 @@ const MemoryTokenCache = (prefix?: string, clock: Clock = systemClock): TokenCac
     // Cancel timers from any existing entry for this key to prevent orphaned
     // refresh timers from accumulating across set() calls (e.g., from
     // #hydrateCache during _updateClient AND #refreshTokenInBackground).
+    const existing = store.get(key);
     scheduler.cancel(key);
 
     const nowSeconds = Math.floor(clock.now());
     const createdAt = entry.createdAt ?? nowSeconds;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
-    // Cancel inside the identity guard: deleteKey is also the resolver chain's
-    // .catch handler, so a stale rejected resolver must not cancel a newer
-    // entry's live timers.
-    const deleteKey = () => {
-      if (store.get(key) === value) {
-        scheduler.cancel(key);
-        store.delete(key);
+    // Chain the freshest known token across replacements. This never touches
+    // entry.resolvedToken: a pending entry reads as pending and callers await.
+    const prior = existing?.entry.resolvedToken;
+    value.baseline = prior ? pickFreshestJwt(existing?.baseline, prior) : existing?.baseline;
+
+    // Drops the slot, but only if it still holds `target` (a newer set() may have
+    // replaced it while a promise was pending). Also the resolver chain's .catch
+    // handler, so a stale rejected resolver must not evict a newer entry. Timers
+    // are keyed by the cache key, so cancelling the scheduler releases them.
+    const dropIfCurrent = (target: TokenCacheValue) => {
+      if (store.get(key) !== target) {
+        return;
       }
+      scheduler.cancel(key);
+      store.delete(key);
     };
 
     store.set(key, value);
 
     entry.tokenResolver
       .then(newToken => {
-        // If this entry was overwritten by a newer set() call while our promise
-        // was pending, bail out to avoid installing orphaned timers. Monotonic
-        // replacement is enforced at the read sites (cookie + broadcast + Session)
-        // where the user-visible state lives.
-        if (store.get(key) !== value) {
+        const live = store.get(key);
+        if (!live) {
+          // Cleared while pending; do not resurrect.
           return;
         }
 
-        // Store resolved token for synchronous reads
-        entry.resolvedToken = newToken;
-
         const claims = newToken.jwt?.claims;
-        if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
-          return deleteKey();
+        const isValid = !!claims && typeof claims.exp === 'number' && typeof claims.iat === 'number';
+        const isOwn = live === value;
+
+        if (isOwn && !isValid) {
+          // The live slot's own fetch resolved unusable: drop the slot so the next
+          // read refetches. Keeping the baseline alive here would hide a broken
+          // token endpoint behind cache hits.
+          dropIfCurrent(live);
+          return;
+        }
+        if (!isValid) {
+          return;
         }
 
-        const expiresAt = claims.exp;
-        const issuedAt = claims.iat;
-        const expiresIn: Seconds = expiresAt - issuedAt;
+        // Track the freshest token seen for this key, even when this resolver was
+        // replaced by a newer set() while it was pending.
+        const baseline = pickFreshestJwt(live.baseline, newToken);
+        live.baseline = baseline;
 
-        value.createdAt = issuedAt;
-        value.expiresIn = expiresIn;
+        // resolvedToken is only written once the live slot itself resolves. While
+        // the live slot is pending, readers must keep awaiting its resolver, so a
+        // replaced resolver may only advance the baseline above.
+        if (!isOwn && live.entry.resolvedToken === undefined) {
+          return;
+        }
 
-        // Arm the expiration-cleanup and proactive-refresh timers. Fire points are
-        // recomputed against the wall clock from the absolute expiry, so a token
-        // issued before this tab loaded refreshes at its true expiry rather than
-        // a full TTL from now.
-        scheduler.schedule(key, { expiresAt, onExpire: deleteKey, onRefresh: entry.onRefresh });
+        const winner = pickFreshestJwt(live.entry.resolvedToken, baseline);
+        if (winner === live.entry.resolvedToken) {
+          // Nothing advanced; the installed timers already match the winner.
+          return;
+        }
+        live.entry.resolvedToken = winner;
+
+        const winnerClaims = winner.jwt?.claims;
+        if (!winnerClaims || typeof winnerClaims.exp !== 'number' || typeof winnerClaims.iat !== 'number') {
+          dropIfCurrent(live);
+          return;
+        }
+
+        const expiresAt = winnerClaims.exp;
+        const issuedAt = winnerClaims.iat;
+        live.createdAt = issuedAt;
+        live.expiresIn = expiresAt - issuedAt;
+
+        // An already-expired winner is dropped rather than cached: skip arming
+        // timers and broadcasting a dead token.
+        if (expiresAt <= Math.floor(clock.now())) {
+          dropIfCurrent(live);
+          return;
+        }
+
+        // Arm the expiration-cleanup and proactive-refresh timers. The scheduler
+        // recomputes fire points against the wall clock from the absolute expiry,
+        // so an aged winner (issued before this tab loaded) refreshes at its true
+        // expiry rather than a full TTL from now.
+        scheduler.schedule(key, { expiresAt, onExpire: () => dropIfCurrent(live), onRefresh: live.entry.onRefresh });
 
         const channel = broadcastChannel;
         if (channel && options.broadcast) {
           // Best-effort side effect: a broadcast failure (e.g. postMessage racing a
           // channel close) must not reach the outer catch and evict the cached token (SDK-119).
           try {
-            const tokenRaw = newToken.getRawString();
-            if (tokenRaw && claims.sid) {
-              const sessionId = claims.sid;
-              const organizationId = claims.org_id || (claims.o as any)?.id;
+            const tokenRaw = winner.getRawString();
+            if (tokenRaw && winnerClaims.sid) {
+              const sessionId = winnerClaims.sid;
+              const organizationId = winnerClaims.org_id || (winnerClaims.o as any)?.id;
               const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
 
               const expectedTokenId = TokenId.build(sessionId, template, organizationId);
@@ -388,7 +440,7 @@ const MemoryTokenCache = (prefix?: string, clock: Clock = systemClock): TokenCac
         }
       })
       .catch(() => {
-        deleteKey();
+        dropIfCurrent(value);
       });
   };
 
