@@ -259,6 +259,13 @@ describe('SignUpProtectCheck', () => {
       return { ...utils, container: container!, setWidgetVisible: setWidgetVisible! };
     };
 
+    it('waits a beat before showing the spinner so near-instant checks never flash it', async () => {
+      const { queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
+
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+    });
+
     it('hides the spinner while the script signals a visible widget and restores it on the counter-signal', async () => {
       const { setWidgetVisible, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 

@@ -270,6 +270,60 @@ describe('SignInProtectCheck', () => {
       return { ...utils, container: container!, setWidgetVisible: setWidgetVisible! };
     };
 
+    it('waits a beat before showing the spinner so near-instant checks never flash it', async () => {
+      const { queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
+
+      // Inside the spin-delay window nothing shows yet (the card header is already
+      // adequate feedback); the spinner only joins once the wait is genuinely long.
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+    });
+
+    it('never shows the spinner for a check that completes before the delay', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-fast');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_first_factor',
+        protectCheck: null,
+        createdSessionId: null,
+      } as unknown as SignInResource);
+
+      const { queryByLabelText } = render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one'));
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+      // The delayed timer must not fire the spinner after the run has already ended.
+      await new Promise(resolve => setTimeout(resolve, 400));
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+    });
+
+    it('drops the spinner immediately on failure, minDuration notwithstanding', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      let rejectRun: ((err: Error) => void) | undefined;
+      mockExecute.mockImplementation(
+        () =>
+          new Promise((_, reject) => {
+            rejectRun = reject;
+          }),
+      );
+
+      const { findByRole, findByLabelText, queryByLabelText } = render(<SignInProtectCheck />, { wrapper });
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+
+      rejectRun!(
+        new ClerkRuntimeError('Protect check script execution failed', { code: 'protect_check_execution_failed' }),
+      );
+
+      // The retry control and the spinner must not coexist — the error gate outranks
+      // the spin-delay's minimum-visible duration.
+      await findByRole('button', { name: /try again/i });
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+    });
+
     it('hides the spinner while the script signals a visible widget and restores it on the counter-signal', async () => {
       const { setWidgetVisible, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 
