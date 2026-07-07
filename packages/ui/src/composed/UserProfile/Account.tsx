@@ -13,14 +13,14 @@ function AccountComposed({ children }: PropsWithChildren): ReactNode {
   const card = useCardState();
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='account'
         titleKey={localizationKeys('userProfile.start.headerTitle__account')}
         alertContent={card.error}
         outerSx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground, isolation: 'isolate' })}
       >
         {children}
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 }

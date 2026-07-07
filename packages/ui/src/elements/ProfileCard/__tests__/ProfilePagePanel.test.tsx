@@ -8,7 +8,7 @@ import { ProfileCard } from '../index';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-describe('ProfilePageSection', () => {
+describe('ProfilePagePanel', () => {
   beforeEach(() => {
     clearFetchCache();
   });
@@ -19,12 +19,12 @@ describe('ProfilePageSection', () => {
     });
 
     render(
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='account'
         titleKey='userProfile.start.headerTitle__account'
       >
         <div>section content</div>
-      </ProfileCard.PageSection>,
+      </ProfileCard.PagePanel>,
       { wrapper },
     );
 
@@ -38,13 +38,13 @@ describe('ProfilePageSection', () => {
     });
 
     render(
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='account'
         titleKey='userProfile.start.headerTitle__account'
         alertContent='Something went wrong'
       >
         <div>content</div>
-      </ProfileCard.PageSection>,
+      </ProfileCard.PagePanel>,
       { wrapper },
     );
 
@@ -57,12 +57,12 @@ describe('ProfilePageSection', () => {
     });
 
     const { container } = render(
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='security'
         titleKey='userProfile.start.headerTitle__security'
       >
         <div>content</div>
-      </ProfileCard.PageSection>,
+      </ProfileCard.PagePanel>,
       { wrapper },
     );
 
@@ -76,13 +76,13 @@ describe('ProfilePageSection', () => {
     });
 
     render(
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='account'
         titleKey='userProfile.start.headerTitle__account'
       >
         <div data-testid='child-1'>First</div>
         <div data-testid='child-2'>Second</div>
-      </ProfileCard.PageSection>,
+      </ProfileCard.PagePanel>,
       { wrapper },
     );
 

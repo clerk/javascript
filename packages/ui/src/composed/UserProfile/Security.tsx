@@ -13,13 +13,13 @@ function SecurityComposed({ children }: PropsWithChildren): ReactNode {
   const card = useCardState();
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='security'
         titleKey={localizationKeys('userProfile.start.headerTitle__security')}
         alertContent={card.error}
       >
         {children}
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 }

@@ -27,7 +27,7 @@ export function createEmotionCache({ nonce, cssLayerName }: CreateEmotionCacheOp
 
   if (cssLayerName) {
     const prevInsert = cache.insert.bind(cache);
-    // oxlint-disable-next-line no-explicit-any -- SAFETY: emotion types `sheet` as its internal StyleSheet class, which is not exported; we forward it untouched to prevInsert.
+
     cache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
       if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
         const wrapped = { ...serialized, styles: `@layer ${cssLayerName} {${serialized.styles}}` };

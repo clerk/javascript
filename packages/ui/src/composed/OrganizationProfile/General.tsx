@@ -13,13 +13,13 @@ function GeneralComposed({ children }: PropsWithChildren): ReactNode {
   const card = useCardState();
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='organizationGeneral'
         titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
         alertContent={card.error}
       >
         {children}
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 }

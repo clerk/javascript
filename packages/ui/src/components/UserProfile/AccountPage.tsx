@@ -17,7 +17,7 @@ export const AccountPage = withCardStateProvider(() => {
 
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='account'
         titleKey={localizationKeys('userProfile.start.headerTitle__account')}
         alertContent={card.error}
@@ -30,7 +30,7 @@ export const AccountPage = withCardStateProvider(() => {
         <AccountConnectedAccounts />
         <AccountEnterpriseAccounts />
         <AccountWeb3 />
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 });

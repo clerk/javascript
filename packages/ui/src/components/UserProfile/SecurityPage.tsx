@@ -10,7 +10,7 @@ export const SecurityPage = withCardStateProvider(() => {
 
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='security'
         titleKey={localizationKeys('userProfile.start.headerTitle__security')}
         alertContent={card.error}
@@ -20,7 +20,7 @@ export const SecurityPage = withCardStateProvider(() => {
         <SecurityMfa />
         <ActiveDevicesSection />
         <SecurityDelete />
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 });

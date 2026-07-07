@@ -1,22 +1,21 @@
+import type { ProfilePageId } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { Header } from '@/ui/elements/Header';
 
-import type { ProfilePageId } from '@clerk/shared/types';
-
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors } from '../../customizables';
 import type { ThemableCssProp } from '../../styledSystem';
 
-type ProfilePageSectionProps = PropsWithChildren<{
+type ProfilePagePanelProps = PropsWithChildren<{
   pageId: ProfilePageId;
   titleKey: LocalizationKey;
   alertContent?: ReactNode;
   outerSx?: ThemableCssProp;
 }>;
 
-export const ProfilePageSection = ({ children, pageId, titleKey, alertContent, outerSx }: ProfilePageSectionProps) => {
+export const ProfilePagePanel = ({ children, pageId, titleKey, alertContent, outerSx }: ProfilePagePanelProps) => {
   return (
     <Col
       elementDescriptor={descriptors.page}

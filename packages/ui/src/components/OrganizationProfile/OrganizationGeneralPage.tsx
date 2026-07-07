@@ -57,7 +57,7 @@ const DeleteOrganizationScreen = () => {
 export const OrganizationGeneralPage = () => {
   return (
     <ProfileCard.Page>
-      <ProfileCard.PageSection
+      <ProfileCard.PagePanel
         pageId='organizationGeneral'
         titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
       >
@@ -67,7 +67,7 @@ export const OrganizationGeneralPage = () => {
         </Protect>
         <OrganizationLeaveSection />
         <OrganizationDeleteSection />
-      </ProfileCard.PageSection>
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 };
