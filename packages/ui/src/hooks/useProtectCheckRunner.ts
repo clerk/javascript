@@ -2,6 +2,7 @@ import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error'
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { ProtectCheckResource } from '@clerk/shared/types';
 import React from 'react';
+import { flushSync } from 'react-dom';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
@@ -42,18 +43,12 @@ export interface ProtectCheckRunnerParams<TResource> {
 }
 
 export interface ProtectCheckRunner {
-  /**
-   * Ref callback for the SDK container element. A callback (not a ref object) because the
-   * container can mount long after the hook does — e.g. `<SignUpProtectCheck />` renders `null`
-   * until a challenge exists — and widget-visibility tracking must attach whenever the node
-   * actually appears.
-   */
-  containerRef: React.RefCallback<HTMLDivElement>;
+  containerRef: React.MutableRefObject<HTMLDivElement | null>;
   isRunning: boolean;
   /**
-   * Whether the challenge SDK has rendered visible content (e.g. a Turnstile widget) into the
-   * container. While true, the widget owns the progress UI — callers should hide their own
-   * spinner and give the container layout space.
+   * Whether the challenge script has signalled (via the `setWidgetVisible` init callback) that
+   * it is showing a widget in the container. While true, the widget owns the progress UI —
+   * callers should hide their own spinner and give the container layout space.
    */
   isWidgetVisible: boolean;
   /** Whether the card is currently showing a (recoverable) error. */
@@ -73,42 +68,22 @@ export interface ProtectCheckRunner {
 export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
   const card = useCardState();
 
-  const containerNodeRef = React.useRef<HTMLDivElement | null>(null);
-  const visibilityObserverRef = React.useRef<ResizeObserver | MutationObserver | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
   const [isRunning, setIsRunning] = React.useState(false);
-  const [isWidgetVisible, setIsWidgetVisible] = React.useState(false);
+  const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
 
-  // The challenge SDK is a black box: it renders into the container and only resolves its promise
-  // once the whole check completes, with no signal when a widget becomes visible in between. Track
-  // rendered height instead — visible content means the widget owns the progress UI, zero height
-  // means we're in an invisible phase (loading the SDK, a collapsed widget, or submitting the
-  // proof) and the caller's spinner should show. Height also stays correct under a future
-  // interaction-only SDK that keeps its widget collapsed until user input is required.
-  const containerRef = React.useCallback((node: HTMLDivElement | null) => {
-    visibilityObserverRef.current?.disconnect();
-    visibilityObserverRef.current = null;
-    containerNodeRef.current = node;
-    if (!node) {
-      setIsWidgetVisible(false);
-      return;
-    }
-    const update = () => setIsWidgetVisible(node.offsetHeight > 0);
-    update();
-    if (typeof ResizeObserver !== 'undefined') {
-      const observer = new ResizeObserver(update);
-      observer.observe(node);
-      visibilityObserverRef.current = observer;
-    } else {
-      // Legacy-bundle browsers (e.g. Safari < 13.1) lack ResizeObserver. The SDK can only become
-      // visible by mutating nodes or styles inside the container, so MutationObserver (universal)
-      // is an adequate stand-in; reading offsetHeight in the callback forces a fresh layout.
-      const observer = new MutationObserver(update);
-      observer.observe(node, { attributes: true, childList: true, subtree: true });
-      visibilityObserverRef.current = observer;
-    }
+  // The script owns the widget-visibility decision: it receives this callback in its init
+  // payload (as `setWidgetVisible`) and calls it right before revealing UI in the container,
+  // and again with `false` once its widget is done. flushSync so the returned promise only
+  // resolves after the change is committed to the DOM — the caller's spinner is genuinely gone
+  // when the script reveals its widget, with no frame of overlap (same guarantee BaseRouter
+  // relies on flushSync for).
+  const setWidgetVisible = React.useCallback((visible: boolean): Promise<void> => {
+    flushSync(() => setIsWidgetVisibleState(visible));
+    return Promise.resolve();
   }, []);
 
   // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
@@ -218,7 +193,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       return cleanup;
     }
 
-    const container = containerNodeRef.current;
+    const container = containerRef.current;
     if (!container) {
       return;
     }
@@ -231,7 +206,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
-    setIsWidgetVisible(false);
+    setIsWidgetVisibleState(false);
 
     isRunningRef.current = true;
     setIsRunning(true);
@@ -249,7 +224,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         }
         const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
         const proofToken = await Promise.race([
-          executeProtectCheck(protectCheck, container, { signal: abortController.signal }),
+          executeProtectCheck(protectCheck, container, { signal: abortController.signal, setWidgetVisible }),
           new Promise<never>((_, reject) => {
             timeoutId = setTimeout(() => {
               // Stop the (possibly hung) SDK and surface a retryable timeout error.

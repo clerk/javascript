@@ -3,6 +3,16 @@ import type { ProtectCheckResource } from '../../types';
 
 export interface ExecuteProtectCheckOptions {
   /**
+   * Host-provided visibility handshake, forwarded to the script verbatim as
+   * `setWidgetVisible` in the init payload. The script calls it right before revealing UI in
+   * the container (and with `false` once its widget is done); the returned promise resolves
+   * only after the host has applied the change to the DOM (e.g. removed its own loading
+   * spinner), so the script can sequence its reveal without a frame of overlap. A script that
+   * knows its widget is imminent may call it immediately to avoid a spinner flash. Scripts
+   * must treat the field as optional — older hosts don't provide it.
+   */
+  setWidgetVisible?: (visible: boolean) => Promise<void>;
+  /**
    * Signals that the caller no longer needs the proof token (component unmounted, user
    * navigated away, etc.). When the signal aborts:
    *   - If the script has not yet been imported, `executeProtectCheck` rejects with
@@ -22,6 +32,7 @@ interface ScriptInitOptions {
   token: string;
   uiHints?: Record<string, string>;
   signal?: AbortSignal;
+  setWidgetVisible?: (visible: boolean) => Promise<void>;
 }
 
 type ScriptDefault = (container: HTMLDivElement, init: ScriptInitOptions) => Promise<string>;
@@ -88,7 +99,7 @@ export async function executeProtectCheck(
   container: HTMLDivElement,
   options: ExecuteProtectCheckOptions = {},
 ): Promise<string> {
-  const { signal } = options;
+  const { signal, setWidgetVisible } = options;
   const { sdkUrl, token, uiHints } = protectCheck;
 
   const validated = assertValidSdkUrl(sdkUrl);
@@ -123,7 +134,7 @@ export async function executeProtectCheck(
 
   let proofToken: string;
   try {
-    proofToken = await (mod.default as ScriptDefault)(container, { token, uiHints, signal });
+    proofToken = await (mod.default as ScriptDefault)(container, { token, uiHints, signal, setWidgetVisible });
   } catch (err) {
     // Distinguish abort-induced rejections from genuine script errors: only relabel as
     // `protect_check_aborted` when the error looks like an abort (`AbortError`), otherwise

@@ -1,7 +1,7 @@
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, render } from '@/test/utils';
@@ -251,61 +251,27 @@ describe('SignInProtectCheck', () => {
   });
 
   describe('challenge widget visibility', () => {
-    // The remote SDK never tells the host when it paints a widget — visibility is inferred from
-    // the container's rendered height, reported through a ResizeObserver. This controllable mock
-    // replaces the no-op stub from vitest.setup so tests can fire the size-change callbacks.
-    class MockResizeObserver {
-      static instances: MockResizeObserver[] = [];
-      observed: Element[] = [];
-      constructor(private readonly callback: ResizeObserverCallback) {
-        MockResizeObserver.instances.push(this);
-      }
-      observe(el: Element) {
-        this.observed.push(el);
-      }
-      unobserve() {}
-      disconnect() {}
-      static triggerFor(el: Element) {
-        for (const instance of MockResizeObserver.instances) {
-          if (instance.observed.includes(el)) {
-            instance.callback([], instance as unknown as ResizeObserver);
-          }
-        }
-      }
-    }
-
-    const originalResizeObserver = window.ResizeObserver;
-
-    beforeEach(() => {
-      MockResizeObserver.instances = [];
-      window.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
-    });
-
-    afterEach(() => {
-      window.ResizeObserver = originalResizeObserver;
-    });
-
+    // Visibility is driven by the script, not observed from the DOM: executeProtectCheck hands
+    // the script a `setWidgetVisible` callback in its init payload, and the script calls it
+    // right before revealing UI in the container (and with `false` once the widget is done).
     const renderWithPendingChallenge = async () => {
       const { wrapper } = await createFixtures(f => {
         f.startSignInWithProtectCheck();
       });
       let container: HTMLDivElement | undefined;
-      mockExecute.mockImplementation((_protectCheck, el) => {
+      let setWidgetVisible: ((visible: boolean) => Promise<void>) | undefined;
+      mockExecute.mockImplementation((_protectCheck, el, opts) => {
         container = el as HTMLDivElement;
+        setWidgetVisible = opts?.setWidgetVisible;
         return new Promise(() => {}); // never resolves; the check stays running
       });
       const utils = render(<SignInProtectCheck />, { wrapper });
       await waitFor(() => expect(mockExecute).toHaveBeenCalled());
-      return { ...utils, container: container! };
+      return { ...utils, container: container!, setWidgetVisible: setWidgetVisible! };
     };
 
-    const setRenderedHeight = (el: HTMLElement, height: number) => {
-      Object.defineProperty(el, 'offsetHeight', { value: height, configurable: true });
-      act(() => MockResizeObserver.triggerFor(el));
-    };
-
-    it('hides the spinner while the challenge widget is visible and restores it when the widget collapses', async () => {
-      const { container, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
+    it('hides the spinner while the script signals a visible widget and restores it on the counter-signal', async () => {
+      const { setWidgetVisible, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 
       // Invisible phase (SDK loading / executing): the spinner is the progress indicator.
       expect(await findByLabelText(/loading/i)).toBeInTheDocument();
@@ -313,40 +279,34 @@ describe('SignInProtectCheck', () => {
       // consistency; see the dogfooding thread).
       expect(queryByText(/loading/i)).not.toBeInTheDocument();
 
-      // The SDK paints a visible widget (e.g. Turnstile) into the container — the widget owns
-      // the UI now, so the spinner must not keep spinning below it.
-      setRenderedHeight(container, 65);
-      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+      // The script announces its widget. By the time the promise resolves, the spinner must
+      // ALREADY be out of the DOM — that's the contract that lets the script reveal its UI
+      // without a frame of overlap.
+      let spinnerGoneAtResolve = false;
+      await act(async () => {
+        await setWidgetVisible(true);
+        spinnerGoneAtResolve = queryByLabelText(/loading/i) === null;
+      });
+      expect(spinnerGoneAtResolve).toBe(true);
 
-      // The widget collapses again while the check is still running (e.g. solved, proof
-      // verification in flight) — the spinner takes back over.
-      setRenderedHeight(container, 0);
+      // Widget done (e.g. solved, proof verification in flight): spinner takes back over.
+      await act(async () => {
+        await setWidgetVisible(false);
+      });
       expect(await findByLabelText(/loading/i)).toBeInTheDocument();
     });
 
-    it('keeps the empty challenge container out of the layout until the widget renders', async () => {
-      const { container } = await renderWithPendingChallenge();
+    it('keeps the empty challenge container out of the layout until the script signals visibility', async () => {
+      const { container, setWidgetVisible } = await renderWithPendingChallenge();
 
       // No reserved height and no flex-gap slot while there is nothing to show.
       expect(container.style.minHeight).toBe('');
       expect(container.style.position).toBe('absolute');
 
-      setRenderedHeight(container, 65);
+      await act(async () => {
+        await setWidgetVisible(true);
+      });
       expect(container.style.position).toBe('static');
-    });
-
-    it('falls back to MutationObserver when ResizeObserver is unavailable', async () => {
-      // Legacy-bundle browsers (e.g. Safari < 13.1) have no ResizeObserver; jsdom's native
-      // MutationObserver stands in for theirs here.
-      (window as any).ResizeObserver = undefined;
-      const { container, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
-
-      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
-
-      Object.defineProperty(container, 'offsetHeight', { value: 65, configurable: true });
-      container.appendChild(document.createElement('div'));
-
-      await waitFor(() => expect(queryByLabelText(/loading/i)).not.toBeInTheDocument());
     });
 
     it('clears leftovers from a failed run so the retry starts with the spinner', async () => {
@@ -354,10 +314,12 @@ describe('SignInProtectCheck', () => {
         f.startSignInWithProtectCheck();
       });
       let container: HTMLDivElement | undefined;
+      let setWidgetVisible: ((visible: boolean) => Promise<void>) | undefined;
       let rejectRun: ((err: Error) => void) | undefined;
       mockExecute
-        .mockImplementationOnce((_protectCheck, el) => {
+        .mockImplementationOnce((_protectCheck, el, opts) => {
           container = el as HTMLDivElement;
+          setWidgetVisible = opts?.setWidgetVisible;
           return new Promise((_, reject) => {
             rejectRun = reject;
           });
@@ -370,9 +332,11 @@ describe('SignInProtectCheck', () => {
       const { findByRole, findByLabelText, queryByLabelText } = render(<SignInProtectCheck />, { wrapper });
       await waitFor(() => expect(mockExecute).toHaveBeenCalled());
 
-      // A widget renders, then the run fails (e.g. turnstile error-callback).
+      // A widget shows, then the run fails (e.g. turnstile error-callback).
       container!.appendChild(document.createElement('div'));
-      setRenderedHeight(container!, 65);
+      await act(async () => {
+        await setWidgetVisible!(true);
+      });
       expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
       rejectRun!(
         new ClerkRuntimeError('Protect check script execution failed', { code: 'protect_check_execution_failed' }),
@@ -381,8 +345,8 @@ describe('SignInProtectCheck', () => {
       const retryButton = await findByRole('button', { name: /try again/i });
       fireEvent.click(retryButton);
 
-      // The new run owns the container: stale widget removed, spinner back while it loads — with
-      // no help from the observer, so the reset can't depend on observer scheduling.
+      // The new run owns the container: stale widget removed, spinner back — with no
+      // counter-signal from the dead script.
       await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
       expect(container!.childNodes.length).toBe(0);
       expect(await findByLabelText(/loading/i)).toBeInTheDocument();
