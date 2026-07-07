@@ -1,51 +1,25 @@
 import type { BillingSubscriptionResource, ForPayerType } from '../../types';
 
-/**
- * @interface
- */
+/** @interface */
 export type UseSubscriptionParams = {
-  /**
-   * Specifies whether to fetch the Subscription for an Organization or a user.
-   *
-   * @default 'user'
-   */
+  /** Specifies whether to fetch the Subscription for an Organization or a user. Defaults to `'user'`. */
   for?: ForPayerType;
-  /**
-   * If true, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default false
-   */
+  /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `false`. */
   keepPreviousData?: boolean;
-  /**
-   * If `true`, a request will be triggered when the hook is mounted.
-   *
-   * @default true
-   */
+  /** Whether a request will be triggered when the hook is mounted. Defaults to `true`. */
   enabled?: boolean;
 };
 
-/**
- * @interface
- */
+/** @interface */
 export type SubscriptionResult = {
-  /**
-   * The subscription object, `undefined` before the first fetch, or `null` if no subscription exists.
-   */
+  /** The subscription object, `undefined` before the first fetch, or `null` if no subscription exists. */
   data: BillingSubscriptionResource | undefined | null;
-  /**
-   * Any error that occurred during the data fetch, or `undefined` if no error occurred.
-   */
+  /** Any error that occurred during the data fetch, or `undefined` if no error occurred. */
   error: Error | undefined;
-  /**
-   * Indicates whether the initial data is still being fetched.
-   */
+  /** Whether the initial data is still being fetched. */
   isLoading: boolean;
-  /**
-   * Indicates whether any request is still in flight, including background updates.
-   */
+  /** Whether any request is still in flight, including background updates. */
   isFetching: boolean;
-  /**
-   * Function to manually revalidate or refresh the subscription data.
-   */
+  /** Function to manually revalidate or refresh the subscription data. */
   revalidate: () => Promise<void> | void;
 };

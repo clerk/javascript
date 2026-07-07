@@ -26,11 +26,11 @@ type CheckAuthorizationSignedOut = CheckAuthorizationWithoutOrgOrUser;
 export type UseAuthReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
-       * Indicates whether a user is currently signed in.
+       * Whether a user is currently signed in.
        */
       isSignedIn: undefined;
       /**
@@ -123,7 +123,7 @@ export type UseAuthReturn =
 export type UseSignInReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
@@ -147,7 +147,7 @@ export type UseSignInReturn =
 export type UseSignUpReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
@@ -171,11 +171,11 @@ export type UseSignUpReturn =
 export type UseSessionReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
-       * Indicates whether a user is currently signed in.
+       * Whether a user is currently signed in.
        */
       isSignedIn: undefined;
       /**
@@ -200,7 +200,7 @@ export type UseSessionReturn =
 export type UseSessionListReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
@@ -224,11 +224,11 @@ export type UseSessionListReturn =
 export type UseUserReturn =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
        */
       isLoaded: false;
       /**
-       * Indicates whether the user is signed in.
+       * Whether the user is signed in.
        */
       isSignedIn: undefined;
       /**

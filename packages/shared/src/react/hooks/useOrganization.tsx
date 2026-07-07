@@ -20,9 +20,7 @@ import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-/**
- * @interface
- */
+/** @interface */
 export type UseOrganizationParams = {
   /**
    * If set to `true`, all default properties will be used.<br />
@@ -63,38 +61,22 @@ export type UseOrganizationParams = {
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
 
-/**
- * @interface
- */
+/** @interface */
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
-      /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
-       */
+      /** Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)). */
       isLoaded: false;
-      /**
-       * The currently Active Organization.
-       */
+      /** The currently Active Organization. */
       organization: undefined;
-      /**
-       * The current Organization membership.
-       */
+      /** The current Organization membership. */
       membership: undefined;
-      /**
-       * Includes a paginated list of the Organization's domains.
-       */
+      /** Includes a paginated list of the Organization's domains. */
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
-      /**
-       * Includes a paginated list of the Organization's membership requests.
-       */
+      /** Includes a paginated list of the Organization's membership requests. */
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
-      /**
-       * Includes a paginated list of the Organization's memberships.
-       */
+      /** Includes a paginated list of the Organization's memberships. */
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
-      /**
-       * Includes a paginated list of the Organization's invitations.
-       */
+      /** Includes a paginated list of the Organization's invitations. */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
   | {

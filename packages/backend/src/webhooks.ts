@@ -4,13 +4,9 @@ import { Webhook } from 'standardwebhooks';
 import type { WebhookEvent } from './api/resources/Webhooks';
 import { errorThrower } from './util/shared';
 
-/**
- * @inline
- */
+/** @inline */
 export type VerifyWebhookOptions = {
-  /**
-   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#webhooks) instead.
-   */
+  /** The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#webhooks) instead. */
   signingSecret?: string;
 };
 

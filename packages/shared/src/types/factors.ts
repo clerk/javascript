@@ -30,7 +30,7 @@ export type EmailCodeFactor = {
    */
   safeIdentifier: string;
   /**
-   * Indicates whether the email address is set as the primary email address, as multiple can be added to a user's profile.
+   * Whether the email address is set as the primary email address, as multiple can be added to a user's profile.
    */
   primary?: boolean;
 };
@@ -50,7 +50,7 @@ export type EmailLinkFactor = {
    */
   safeIdentifier: string;
   /**
-   * Indicates whether the email address is set as the primary email address, as multiple can be added to a user's profile.
+   * Whether the email address is set as the primary email address, as multiple can be added to a user's profile.
    */
   primary?: boolean;
 };
@@ -70,11 +70,11 @@ export type PhoneCodeFactor = {
    */
   safeIdentifier: string;
   /**
-   * Indicates whether the phone number is set as the primary phone number, as multiple can be added to a user's profile.
+   * Whether the phone number is set as the primary phone number, as multiple can be added to a user's profile.
    */
   primary?: boolean;
   /**
-   * Indicates whether the phone number is set as the default identifier.
+   * Whether the phone number is set as the default identifier.
    */
   default?: boolean;
   /**
@@ -94,7 +94,7 @@ export type Web3SignatureFactor = {
    */
   web3WalletId: string;
   /**
-   * Indicates whether the Web3 Wallet is set as the primary Web3 Wallet, as multiple can be added to a user's profile.
+   * Whether the Web3 Wallet is set as the primary Web3 Wallet, as multiple can be added to a user's profile.
    */
   primary?: boolean;
   /**
@@ -161,7 +161,7 @@ export type ResetPasswordPhoneCodeFactor = {
    */
   safeIdentifier: string;
   /**
-   * Indicates whether the phone number is set as the primary phone number, as multiple can be added to a user's profile.
+   * Whether the phone number is set as the primary phone number, as multiple can be added to a user's profile.
    */
   primary?: boolean;
 };
@@ -181,7 +181,7 @@ export type ResetPasswordEmailCodeFactor = {
    */
   safeIdentifier: string;
   /**
-   * Indicates whether the email address is set as the primary email address, as multiple can be added to a user's profile.
+   * Whether the email address is set as the primary email address, as multiple can be added to a user's profile.
    */
   primary?: boolean;
 };

@@ -30,15 +30,9 @@ import type { TokenResource } from './token';
 import type { UserResource } from './user';
 import type { Autocomplete } from './utils';
 
-/**
- * @inline
- */
+/** @inline */
 export type PendingSessionOptions = {
-  /**
-   * Indicates whether pending sessions are considered as signed out or not.
-   *
-   * @default true
-   */
+  /** Whether pending sessions are considered as signed out or not. Defaults to `true`. */
   treatPendingAsSignedOut?: boolean;
 };
 
@@ -462,7 +456,7 @@ export interface PublicUserData {
    */
   imageUrl: string;
   /**
-   * Indicates whether the user has a profile picture.
+   * Whether the user has a profile picture.
    */
   hasImage: boolean;
   /**
@@ -478,7 +472,7 @@ export interface PublicUserData {
    */
   username?: string;
   /**
-   * Indicates whether the user is banned.
+   * Whether the user is banned.
    */
   banned?: boolean;
 }

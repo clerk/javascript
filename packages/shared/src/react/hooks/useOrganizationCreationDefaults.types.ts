@@ -1,42 +1,22 @@
 import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { OrganizationCreationDefaultsResource } from '../../types';
 
-/**
- * @interface
- */
+/** @interface */
 export type UseOrganizationCreationDefaultsParams = {
-  /**
-   * If true, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default true
-   */
+  /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `true`. */
   keepPreviousData?: boolean;
-  /**
-   * If `true`, a request will be triggered when the hook is mounted.
-   *
-   * @default true
-   */
+  /** Whether a request will be triggered when the hook is mounted. Defaults to `true`. */
   enabled?: boolean;
 };
 
-/**
- * @interface
- */
+/** @interface */
 export type UseOrganizationCreationDefaultsReturn = {
-  /**
-   * The organization creation defaults resource, `undefined` before the first fetch, or `null` if not available.
-   */
+  /** The organization creation defaults resource, `undefined` before the first fetch, or `null` if not available. */
   data: OrganizationCreationDefaultsResource | undefined | null;
-  /**
-   * Any error that occurred during the data fetch, or `null` if no error occurred.
-   */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
-  /**
-   * Indicates whether the initial data is still being fetched.
-   */
+  /** Whether the initial data is still being fetched. */
   isLoading: boolean;
-  /**
-   * Indicates whether any request is still in flight, including background updates.
-   */
+  /** Whether any request is still in flight, including background updates. */
   isFetching: boolean;
 };

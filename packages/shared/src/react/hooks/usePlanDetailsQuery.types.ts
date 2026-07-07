@@ -1,50 +1,26 @@
 import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { BillingPlanResource } from '../../types';
 
-/**
- * @internal
- */
+/** @internal */
 export type UsePlanDetailsQueryParams = {
-  /**
-   * The plan ID to fetch.
-   */
+  /** The plan ID to fetch. */
   planId?: string | null;
-  /**
-   * Initial plan data to use before fetching.
-   */
+  /** Initial plan data to use before fetching. */
   initialPlan?: BillingPlanResource | null;
-  /**
-   * If true, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default true
-   */
+  /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `true`. */
   keepPreviousData?: boolean;
-  /**
-   * If `true`, a request will be triggered when the hook is mounted.
-   *
-   * @default true
-   */
+  /** Whether a request will be triggered when the hook is mounted. Defaults to `true`. */
   enabled?: boolean;
 };
 
-/**
- * @internal
- */
+/** @internal */
 export type PlanDetailsQueryResult = {
-  /**
-   * The plan object, `undefined` before the first fetch, or `null` if no plan exists.
-   */
+  /** The plan object, `undefined` before the first fetch, or `null` if no plan exists. */
   data: BillingPlanResource | undefined | null;
-  /**
-   * Any error that occurred during the data fetch, or `undefined` if no error occurred.
-   */
+  /** Any error that occurred during the data fetch, or `undefined` if no error occurred. */
   error: ClerkAPIResponseError | null;
-  /**
-   * Indicates whether the initial data is still being fetched.
-   */
+  /** Whether the initial data is still being fetched. */
   isLoading: boolean;
-  /**
-   * Indicates whether any request is still in flight, including background updates.
-   */
+  /** Whether any request is still in flight, including background updates. */
   isFetching: boolean;
 };

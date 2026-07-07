@@ -71,34 +71,20 @@ const undefinedPaginatedResource = {
   setData: undefined,
 } as const;
 
-/**
- * @interface
- */
+/** @interface */
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
-      /**
-       * Indicates whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
-       */
+      /** Whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)). */
       isLoaded: false;
-      /**
-       * A function that returns a `Promise` which resolves to the newly created `Organization`.
-       */
+      /** A function that returns a `Promise` which resolves to the newly created `Organization`. */
       createOrganization: undefined;
-      /**
-       * A function that sets the active session and/or Organization.
-       */
+      /** A function that sets the active session and/or Organization. */
       setActive: undefined;
-      /**
-       * Returns `PaginatedResources` which includes a list of the user's Organization memberships.
-       */
+      /** Returns `PaginatedResources` which includes a list of the user's Organization memberships. */
       userMemberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
-      /**
-       * Returns `PaginatedResources` which includes a list of the user's Organization invitations.
-       */
+      /** Returns `PaginatedResources` which includes a list of the user's Organization invitations. */
       userInvitations: PaginatedResourcesWithDefault<UserOrganizationInvitationResource>;
-      /**
-       * Returns `PaginatedResources` which includes a list of suggestions for Organizations that the user can join.
-       */
+      /** Returns `PaginatedResources` which includes a list of suggestions for Organizations that the user can join. */
       userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
   | {

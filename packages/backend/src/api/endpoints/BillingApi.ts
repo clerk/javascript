@@ -13,25 +13,19 @@ const userBasePath = '/users';
 
 /** @generateWithEmptyComment */
 export type GetPlanListParams = ClerkPaginationRequest<{
-  /**
-   * Filters plans by the type of payer.
-   */
+  /** Filters plans by the type of payer. */
   payerType: 'org' | 'user';
 }>;
 
 /** @inline */
 export type CancelSubscriptionItemParams = {
-  /**
-   * Whether the Subscription Item should be canceled immediately. If `false`, the Subscription Item will be canceled at the end of the current billing period.
-   */
+  /** Whether the Subscription Item should be canceled immediately. If `false`, the Subscription Item will be canceled at the end of the current billing period. */
   endNow?: boolean;
 };
 
 /** @inline */
 export type ExtendSubscriptionItemFreeTrialParams = {
-  /**
-   * The date to extend the free trial to. Must be in the future and not more than 365 days from the current trial end date.
-   */
+  /** The date to extend the free trial to. Must be in the future and not more than 365 days from the current trial end date. */
   extendTo: Date;
 };
 

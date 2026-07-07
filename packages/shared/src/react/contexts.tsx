@@ -55,31 +55,17 @@ export function useInitialStateContext(): InitialState | undefined {
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
-/**
- * @interface
- */
+/** @interface */
 export type UseCheckoutOptions = {
-  /**
-   * Specifies if the checkout is for an Organization.
-   *
-   * @default 'user'
-   */
+  /** Specifies if the checkout is for an Organization. Defaults to `'user'`. */
   for?: ForPayerType;
-  /**
-   * The billing period for the Plan.
-   */
+  /** The billing period for the Plan. */
   planPeriod: BillingSubscriptionPlanPeriod;
-  /**
-   * The ID of the Subscription Plan to check out (e.g. `cplan_xxx`).
-   */
+  /** The ID of the Subscription Plan to check out (e.g. `cplan_xxx`). */
   planId: string;
-  /**
-   * The number of total seats to check out for
-   */
+  /** The number of total seats to check out for */
   seatsQuantity?: number;
-  /**
-   * The specific price ID to check out for, used when the desired price ID is not the current default price
-   */
+  /** The specific price ID to check out for, used when the desired price ID is not the current default price */
   priceId?: string;
 };
 
@@ -89,9 +75,7 @@ const __experimental_CheckoutProvider = ({ children, ...rest }: PropsWithChildre
   return <CheckoutContext.Provider value={{ value: rest }}>{children}</CheckoutContext.Provider>;
 };
 
-/**
- * @internal
- */
+/** @internal */
 function useOptionsContext(): ClerkOptions {
   const context = React.useContext(OptionsContext);
   if (context === undefined) {
@@ -100,9 +84,7 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-/**
- * @internal
- */
+/** @internal */
 function useAssertWrappedByClerkProvider(displayNameOrFn: string | (() => void)): void {
   const ctx = React.useContext(ClerkInstanceContext);
 

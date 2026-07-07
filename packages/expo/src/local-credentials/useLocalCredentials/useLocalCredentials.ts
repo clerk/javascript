@@ -190,13 +190,9 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
      * @return A promise that will reject if value cannot be stored on the device.
      */
     setCredentials,
-    /**
-     * Indicates whether there are any credentials stored on the device.
-     */
+    /** Whether there are any credentials stored on the device. */
     hasCredentials: hasLocalAuthCredentials,
-    /**
-     * Indicates whether the stored credentials belong to the signed in user. When there is no signed-in user the value will always be `false`.
-     */
+    /** Whether the stored credentials belong to the signed in user. When there is no signed-in user the value will always be `false`. */
     userOwnsCredentials,
     /**
      * Removes the stored credentials from the device.
