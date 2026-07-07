@@ -1,12 +1,6 @@
 import { OptionDefaults } from 'typedoc';
 
-const CUSTOM_BLOCK_TAGS = [
-  '@unionReturnHeadings',
-  '@displayFunctionSignature',
-  '@paramExtension',
-  '@experimental',
-  '@hideReturns',
-];
+const CUSTOM_BLOCK_TAGS = ['@unionReturnHeadings', '@displayFunctionSignature', '@experimental', '@hideReturns'];
 
 /** @type {import("typedoc-plugin-markdown").PluginOptions} */
 const typedocPluginMarkdownOptions = {

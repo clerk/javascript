@@ -1825,7 +1825,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        */
       signature: (model, options) => {
         const displayFunctionSignatureTag = model.comment?.getTag('@displayFunctionSignature');
-        const paramExtensionTag = model.comment?.getTag('@paramExtension');
         const delimiter = '\n\n';
 
         const customizedOptions = {
@@ -1836,43 +1835,13 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        let output = superPartials.signature(customizedModel, customizedOptions);
+        const output = superPartials.signature(customizedModel, customizedOptions);
 
-        // If there are extra tags, split the output by the delimiter and do the work
-        if (displayFunctionSignatureTag || paramExtensionTag) {
-          let splitOutput = output.split(delimiter);
-
-          if (displayFunctionSignatureTag) {
-            // Swap indexes 0 and 2 so the function signature renders below the description.
-            [splitOutput[0], splitOutput[2]] = [splitOutput[2], splitOutput[0]];
-          }
-
-          if (paramExtensionTag) {
-            const stuff = this.helpers.getCommentParts(paramExtensionTag.content);
-
-            // Find the index of the item that contains '## Parameters'
-            const parametersIndex = splitOutput.findIndex(item => item.includes('## Parameters'));
-
-            if (parametersIndex !== -1) {
-              // Find the immediate next heading after '## Parameters'
-              const nextHeadingIndex = splitOutput.findIndex((item, index) => {
-                // Skip the items before the parameters
-                if (index <= parametersIndex) {
-                  return false;
-                }
-                // Find the next heading
-                return item.startsWith('##') || item.startsWith('\n##');
-              });
-
-              // Insert the stuff before the next heading
-              // (or at the end of the entire page if no heading found)
-              const insertIndex = nextHeadingIndex !== -1 ? nextHeadingIndex : splitOutput.length;
-              splitOutput.splice(insertIndex, 0, stuff);
-            }
-          }
-
-          // Join the output again
-          output = splitOutput.join(delimiter);
+        if (displayFunctionSignatureTag) {
+          // Swap indexes 0 and 2 so the function signature renders below the description.
+          const parts = output.split(delimiter);
+          [parts[0], parts[2]] = [parts[2], parts[0]];
+          return parts.join(delimiter);
         }
 
         return output;
