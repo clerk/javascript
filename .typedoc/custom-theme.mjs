@@ -1843,9 +1843,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           let splitOutput = output.split(delimiter);
 
           if (displayFunctionSignatureTag) {
-            // Change position of the 0 index and 2 index of the output
-            // This way the function signature is below the description
-            splitOutput = swap(splitOutput, 0, 2);
+            // Swap indexes 0 and 2 so the function signature renders below the description.
+            [splitOutput[0], splitOutput[2]] = [splitOutput[2], splitOutput[0]];
           }
 
           if (paramExtensionTag) {
@@ -2329,20 +2328,6 @@ function escapeChars(str) {
     .replace(/\[/g, '\\[')
     .replace(/\]/g, '\\]')
     .replace(/\*/g, '\\*');
-}
-
-/**
- *
- * @param {string[]} arr
- * @param {number} i
- * @param {number} j
- * @returns
- */
-function swap(arr, i, j) {
-  let t = arr[i];
-  arr[i] = arr[j];
-  arr[j] = t;
-  return arr;
 }
 
 // ---------------------------------------------------------------------------
