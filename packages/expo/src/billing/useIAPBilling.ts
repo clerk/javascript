@@ -8,7 +8,7 @@ import type {
 } from '@clerk/shared/types';
 import type { Purchase } from 'expo-iap';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking, Platform } from 'react-native';
+import { AppState, Linking, Platform } from 'react-native';
 
 import { IAPBillingError } from './errors';
 import type { ExpoIapModule } from './expoIap';
@@ -22,6 +22,12 @@ import {
   platformToStore,
   resolveStoreProduct,
 } from './utils';
+
+/**
+ * Minimum interval between foreground-triggered refetches. The app coming to the foreground refreshes billing state
+ * (mirroring the store SDKs), but rapid app-switching should not stampede the API.
+ */
+const FOREGROUND_REFETCH_MIN_INTERVAL_MS = 15_000;
 
 /**
  * Web fallbacks for the stores' subscription management surfaces, used when the corresponding expo-iap API is
@@ -126,6 +132,10 @@ export function useIAPBilling(): UseIAPBillingReturn {
    * `purchase()` call owns their registration.
    */
   const pendingProductIdsRef = useRef<Set<string>>(new Set());
+  /** Timestamp of the last refetch, for throttling foreground-triggered refreshes. */
+  const lastRefetchAtRef = useRef(0);
+  /** Whether an initial load has completed — subsequent refetches revalidate silently instead of flipping `loading`. */
+  const hasLoadedOnceRef = useRef(false);
 
   clerk.telemetry?.record(eventMethodCalled('useIAPBilling'));
 
@@ -135,11 +145,18 @@ export function useIAPBilling(): UseIAPBillingReturn {
     if (!clerk.loaded || !clerk.user) {
       setPlans([]);
       setCurrentSubscriptionItems([]);
+      hasLoadedOnceRef.current = false;
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    lastRefetchAtRef.current = Date.now();
+    // Stale-while-revalidate: `loading` means "nothing to show yet", never "a refresh is in flight". Background
+    // refreshes (foreground return, token-claim changes) update the data silently in place — flipping `loading` on
+    // every fetch would blank and re-mount consumer UI on each automatic refresh.
+    if (!hasLoadedOnceRef.current) {
+      setLoading(true);
+    }
     try {
       const [plansResponse, subscription] = await Promise.all([
         clerk.billing.getPlans({ for: 'user' }),
@@ -147,6 +164,7 @@ export function useIAPBilling(): UseIAPBillingReturn {
       ]);
       setPlans(plansResponse.data);
       setCurrentSubscriptionItems(subscription.subscriptionItems ?? []);
+      hasLoadedOnceRef.current = true;
     } finally {
       setLoading(false);
     }
@@ -209,6 +227,45 @@ export function useIAPBilling(): UseIAPBillingReturn {
     refetch().catch(() => {
       // Initial fetch errors leave the hook with empty data; callers can retry through `refetch()`.
     });
+  }, [refetch]);
+
+  // The session token refresh cycle (~1/min) is already a server signal: when the token's entitlement claims
+  // change, billing state changed server-side (purchase, expiry, transfer, a cancellation made in the store's own
+  // settings). Use that as a refetch trigger so the subscription display reconciles within one token cycle of any
+  // server-side change — no additional polling, and the display can never disagree with `has()` for long.
+  const tokenClaims = clerk.session?.lastActiveToken?.jwt?.claims as { fea?: string; pla?: string } | undefined;
+  const entitlementFingerprint = `${tokenClaims?.fea ?? ''}|${tokenClaims?.pla ?? ''}`;
+  const lastEntitlementFingerprintRef = useRef(entitlementFingerprint);
+  useEffect(() => {
+    if (lastEntitlementFingerprintRef.current === entitlementFingerprint) {
+      return;
+    }
+    // Deliberately NOT deduped against the foreground-refresh channel: coordinating the two safely costs more
+    // correctness risk than the occasional duplicate (idempotent) fetch when both fire within seconds. Each channel
+    // stays independently, trivially correct.
+    lastEntitlementFingerprintRef.current = entitlementFingerprint;
+    refetch().catch(() => {
+      // Best-effort; the next explicit refetch surfaces errors.
+    });
+  }, [entitlementFingerprint, refetch]);
+
+  // Refresh billing state when the app returns to the foreground (mirroring the store SDKs): the server may have
+  // moved while backgrounded — renewals, expirations, or a cancellation made in the store's own settings — and the
+  // subscription display should reconcile without requiring an explicit user refresh. Throttled so rapid
+  // app-switching does not stampede the API.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', state => {
+      if (state !== 'active') {
+        return;
+      }
+      if (Date.now() - lastRefetchAtRef.current < FOREGROUND_REFETCH_MIN_INTERVAL_MS) {
+        return;
+      }
+      refetch().catch(() => {
+        // Foreground refreshes are best-effort; the next explicit refetch surfaces errors.
+      });
+    });
+    return () => subscription.remove();
   }, [refetch]);
 
   // Out-of-band transactions (renewals completed while backgrounded, ask-to-buy approvals, promo-code redemptions)
@@ -383,9 +440,10 @@ export function useIAPBilling(): UseIAPBillingReturn {
       }
     }
 
-    if (registered.length > 0) {
-      await refreshSessionAndState();
-    }
+    // Refresh even when nothing was registered: tapping "restore" expresses "sync my subscription state" — the
+    // server may have moved (renewal, expiry, transfer-away) since the last fetch, and this is the user's explicit
+    // ask to reconcile the display with reality.
+    await refreshSessionAndState();
 
     return { registered, failed };
   }, [clerk, refreshSessionAndState]);

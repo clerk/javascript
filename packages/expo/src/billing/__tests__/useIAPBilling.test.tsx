@@ -44,20 +44,28 @@ const mocks = vi.hoisted(() => {
     deepLinkToSubscriptions: vi.fn(async () => undefined),
   };
 
+  const appStateListeners: AnyListener[] = [];
+
   return {
     Platform: { OS: 'ios' },
     Linking: { openURL: vi.fn(async () => true) },
+    AppState: {
+      currentState: 'active',
+      addEventListener: vi.fn((_type: string, listener: AnyListener) => subscribe(appStateListeners, listener)),
+    },
     iap,
     callLog,
     purchaseListeners,
     errorListeners,
+    appStateListeners,
     emitPurchase: (purchase: any) => [...purchaseListeners].forEach(listener => listener(purchase)),
     emitPurchaseError: (error: any) => [...errorListeners].forEach(listener => listener(error)),
+    emitAppStateChange: (state: string) => [...appStateListeners].forEach(listener => listener(state)),
     useClerk: vi.fn(),
   };
 });
 
-vi.mock('react-native', () => ({ Platform: mocks.Platform, Linking: mocks.Linking }));
+vi.mock('react-native', () => ({ Platform: mocks.Platform, Linking: mocks.Linking, AppState: mocks.AppState }));
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 
@@ -143,6 +151,7 @@ describe('useIAPBilling', () => {
     mocks.Platform.OS = 'ios';
     mocks.callLog.length = 0;
     mocks.purchaseListeners.length = 0;
+    mocks.appStateListeners.length = 0;
     mocks.errorListeners.length = 0;
 
     registerStorePurchase = vi.fn(async () => {
@@ -456,15 +465,104 @@ describe('useIAPBilling', () => {
       expect(getToken).toHaveBeenCalledWith({ skipCache: true });
     });
 
-    it('does not refresh the session when nothing was registered', async () => {
+    it('refreshes state even when nothing was registered — restore is an explicit "sync me" ask', async () => {
       mocks.iap.getAvailablePurchases.mockResolvedValue([]);
       const { result } = await renderIAPBilling();
+      clerk.billing.getSubscription.mockClear();
 
       await act(async () => {
         await result.current.restorePurchases();
       });
 
-      expect(getToken).not.toHaveBeenCalled();
+      expect(getToken).toHaveBeenCalledWith({ skipCache: true });
+      expect(clerk.billing.getSubscription).toHaveBeenCalled();
+    });
+  });
+
+  describe('entitlement-claim refetch trigger', () => {
+    // Claims are mutated IN PLACE (same clerk identity) so `refetch` keeps its identity and the mount effect does
+    // not refire — these tests exercise the fingerprint path specifically.
+    it('refetches when the session token refresh delivers different entitlement claims', async () => {
+      clerk.session.lastActiveToken = { jwt: { claims: { fea: 'u:pro_content' } } };
+      const rendered = renderHook(() => useIAPBilling());
+      await act(async () => {});
+      clerk.billing.getSubscription.mockClear();
+
+      // Same claims → no refetch on unrelated re-renders.
+      rendered.rerender();
+      await act(async () => {});
+      expect(clerk.billing.getSubscription).not.toHaveBeenCalled();
+
+      // Token refresh drops the feature (expiry/cancel landed server-side) → fires.
+      clerk.session.lastActiveToken = { jwt: { claims: { fea: '' } } };
+      rendered.rerender();
+      await act(async () => {});
+
+      expect(clerk.billing.getSubscription).toHaveBeenCalled();
+    });
+  });
+
+  describe('foreground refresh', () => {
+    it('refetches billing state when the app returns to the foreground after the throttle window', async () => {
+      const { result } = await renderIAPBilling();
+      clerk.billing.getSubscription.mockClear();
+
+      // Move past the throttle window relative to the mount fetch.
+      const realNow = Date.now;
+      vi.spyOn(Date, 'now').mockImplementation(() => realNow() + 60_000);
+      await act(async () => {
+        mocks.emitAppStateChange('active');
+      });
+      vi.mocked(Date.now).mockRestore();
+
+      expect(clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(result.current.loading).toBe(false);
+    });
+
+    it('revalidates silently — background refreshes never flip `loading` after the initial load', async () => {
+      const { result } = await renderIAPBilling();
+      expect(result.current.loading).toBe(false);
+
+      // Make the next getSubscription hang so we can observe mid-flight state.
+      let release: (value: any) => void = () => {};
+      clerk.billing.getSubscription.mockImplementation(
+        () =>
+          new Promise(resolve => {
+            release = resolve;
+          }),
+      );
+
+      const realNow = Date.now;
+      vi.spyOn(Date, 'now').mockImplementation(() => realNow() + 60_000);
+      await act(async () => {
+        mocks.emitAppStateChange('active');
+      });
+      vi.mocked(Date.now).mockRestore();
+
+      // Refresh is in flight; the UI keeps showing current data.
+      expect(result.current.loading).toBe(false);
+      expect(result.current.plans).toEqual([plan]);
+
+      await act(async () => {
+        release({ subscriptionItems: [subscriptionItem] });
+      });
+      expect(result.current.loading).toBe(false);
+    });
+
+    it('throttles foreground refetches and ignores non-active transitions', async () => {
+      await renderIAPBilling();
+      clerk.billing.getSubscription.mockClear();
+
+      // Immediately after mount: inside the throttle window — no refetch.
+      await act(async () => {
+        mocks.emitAppStateChange('active');
+      });
+      // Background transitions never trigger.
+      await act(async () => {
+        mocks.emitAppStateChange('background');
+      });
+
+      expect(clerk.billing.getSubscription).not.toHaveBeenCalled();
     });
   });
 
