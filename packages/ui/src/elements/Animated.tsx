@@ -1,5 +1,5 @@
 import autoAnimate from '@formkit/auto-animate';
-import { cloneElement, type PropsWithChildren, useCallback, useEffect, useRef } from 'react';
+import { cloneElement, type PropsWithChildren, useCallback, useRef } from 'react';
 
 import { useAppearance } from '@/customizables';
 
@@ -23,13 +23,6 @@ function useSafeAutoAnimate(): [(node: HTMLElement | null) => void] {
     if (node instanceof HTMLElement && typeof node.animate === 'function') {
       controllerRef.current = autoAnimate(node);
     }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      controllerRef.current?.destroy?.();
-      controllerRef.current = null;
-    };
   }, []);
 
   return [ref];

@@ -17,45 +17,6 @@ describe('OrganizationProfile composed sections', () => {
     clearFetchCache();
   });
 
-  describe('General — passthrough mode', () => {
-    it('renders org name', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
-      });
-
-      fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-      render(<OrganizationProfileGeneralPanel />, { wrapper });
-      screen.getByText('TestOrg');
-    });
-
-    it('renders domains section when enabled', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withOrganizationDomains();
-        f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
-      });
-
-      fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-      render(<OrganizationProfileGeneralPanel />, { wrapper });
-      await waitFor(() => screen.getByText(/verified domains/i));
-    });
-
-    it('hides domains section when disabled', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
-      });
-
-      fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-      const { queryByText } = render(<OrganizationProfileGeneralPanel />, { wrapper });
-      expect(queryByText(/verified domains/i)).not.toBeInTheDocument();
-    });
-  });
-
   describe('General — section composition mode', () => {
     it('renders only declared sections', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {

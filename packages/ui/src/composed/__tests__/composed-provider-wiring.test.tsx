@@ -180,47 +180,6 @@ describe('UserProfileProvider wiring', () => {
     });
   });
 
-  // Dedup-independence: the provider must resolve the manager through the
-  // live `clerk.__internal_moduleManager` getter, which crosses bundle
-  // boundaries regardless of how many @clerk/shared copies are installed.
-  // A registry keyed by module-scoped state would silently return the wrong
-  // manager (or undefined) when the read-side @clerk/shared is a different
-  // physical copy than the write-side one. Here the getter exposes a distinct
-  // manager than anything the real Clerk instance registered, so surfacing it
-  // proves the read channel is the getter, not a shared registry.
-  it('resolves the moduleManager from clerk.__internal_moduleManager (getter), not a shared registry', async () => {
-    const getterImport = vi.fn(() => Promise.resolve(undefined));
-    const getterModuleManager = { import: getterImport };
-
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'] });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
-      value: getterModuleManager,
-      configurable: true,
-    });
-
-    function ModuleManagerIdentityProbe() {
-      const mm = useModuleManager();
-      return (
-        <div
-          data-testid='mm-getter-probe'
-          data-from-getter={String(mm?.import === getterImport)}
-        />
-      );
-    }
-
-    render(
-      <UserProfileProvider>
-        <ModuleManagerIdentityProbe />
-      </UserProfileProvider>,
-      { wrapper },
-    );
-
-    expect(screen.getByTestId('mm-getter-probe').dataset.fromGetter).toBe('true');
-  });
-
   // The end-to-end proof that resolution actually feeds a dynamic import: render
   // the real composed password section, enable zxcvbn strength, type a password,
   // and assert the resolved manager's `import` fires for the zxcvbn module. This
@@ -426,48 +385,6 @@ describe('OrganizationProfileProvider wiring', () => {
     expect(probe.dataset.hasMm).toBe('true');
   });
 
-  // Mirror of the UserProfileProvider getter test: OrganizationProfileProvider
-  // was changed identically, so pin the same dedup-independent read channel.
-  it('resolves the moduleManager from clerk.__internal_moduleManager (getter), not a shared registry', async () => {
-    const getterImport = vi.fn(() => Promise.resolve(undefined));
-    const getterModuleManager = { import: getterImport };
-
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        first_name: 'Test',
-        last_name: 'User',
-        organization_memberships: [{ name: 'TestOrg' }],
-      });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
-      value: getterModuleManager,
-      configurable: true,
-    });
-
-    function ModuleManagerIdentityProbe() {
-      const mm = useModuleManager();
-      return (
-        <div
-          data-testid='org-mm-getter-probe'
-          data-from-getter={String(mm?.import === getterImport)}
-        />
-      );
-    }
-
-    render(
-      <OrganizationProfileProvider>
-        <ModuleManagerIdentityProbe />
-      </OrganizationProfileProvider>,
-      { wrapper },
-    );
-
-    expect(screen.getByTestId('org-mm-getter-probe').dataset.fromGetter).toBe('true');
-  });
-
   it('falls back to fallbackModuleManager when the clerk instance exposes no moduleManager', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -572,4 +489,81 @@ describe('fallbackModuleManager', () => {
       code: 'composed_module_manager_unavailable',
     });
   });
+});
+
+// Both providers were changed identically to resolve the manager through the
+// live `clerk.__internal_moduleManager` getter, which crosses bundle boundaries
+// regardless of how many @clerk/shared copies are installed. A registry keyed by
+// module-scoped state would silently return the wrong manager (or undefined) when
+// the read-side @clerk/shared is a different physical copy than the write-side
+// one. Exposing a getter-only manager (distinct from anything the real Clerk
+// instance registered) and surfacing it proves the read channel is the getter,
+// not a shared registry — pinned here for both providers.
+describe('moduleManager getter resolution', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
+  const cases = [
+    {
+      name: 'UserProfileProvider',
+      component: 'UserProfile' as const,
+      Provider: UserProfileProvider,
+      testId: 'mm-getter-probe',
+      setup: (f: any) => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      },
+    },
+    {
+      name: 'OrganizationProfileProvider',
+      component: 'OrganizationProfile' as const,
+      Provider: OrganizationProfileProvider,
+      testId: 'org-mm-getter-probe',
+      setup: (f: any) => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          first_name: 'Test',
+          last_name: 'User',
+          organization_memberships: [{ name: 'TestOrg' }],
+        });
+      },
+    },
+  ];
+
+  it.each(cases)(
+    '$name resolves the moduleManager from clerk.__internal_moduleManager (getter), not a shared registry',
+    async ({ component, Provider, testId, setup }) => {
+      const { createFixtures } = bindCreateFixtures(component);
+      const getterImport = vi.fn(() => Promise.resolve(undefined));
+      const getterModuleManager = { import: getterImport };
+
+      const { wrapper, fixtures } = await createFixtures(setup);
+      patchEnvironment(fixtures.clerk, fixtures.environment);
+      fixtures.clerk.organization?.getDomains?.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
+      Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+        value: getterModuleManager,
+        configurable: true,
+      });
+
+      function ModuleManagerIdentityProbe() {
+        const mm = useModuleManager();
+        return (
+          <div
+            data-testid={testId}
+            data-from-getter={String(mm?.import === getterImport)}
+          />
+        );
+      }
+
+      render(
+        <Provider>
+          <ModuleManagerIdentityProbe />
+        </Provider>,
+        { wrapper },
+      );
+
+      expect(screen.getByTestId(testId).dataset.fromGetter).toBe('true');
+    },
+  );
 });

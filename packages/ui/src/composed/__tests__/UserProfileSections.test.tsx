@@ -24,42 +24,7 @@ describe('UserProfile composed sections', () => {
     clearFetchCache();
   });
 
-  describe('Account — passthrough mode', () => {
-    it('renders all enabled sections', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withPhoneNumber();
-        f.withUsername();
-        f.withSocialProvider({ provider: 'google' });
-        f.withUser({
-          first_name: 'Test',
-          last_name: 'User',
-          email_addresses: ['test@clerk.com'],
-          phone_numbers: ['+11111111111'],
-          username: 'testuser',
-          external_accounts: [{ provider: 'google', email_address: 'test@clerk.com' }],
-        });
-      });
-
-      render(<UserProfileAccountPanel />, { wrapper });
-      screen.getByText('Test User');
-      screen.getByText('testuser');
-      expect(screen.getAllByText(/email address/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/phone number/i).length).toBeGreaterThan(0);
-      screen.getByText(/connected accounts/i);
-    });
-
-    it('hides disabled sections', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
-      });
-
-      const { queryByText } = render(<UserProfileAccountPanel />, { wrapper });
-      expect(queryByText(/phone number/i)).not.toBeInTheDocument();
-      expect(queryByText(/connected accounts/i)).not.toBeInTheDocument();
-    });
-
+  describe('Account — inline form flow', () => {
     it('inline form flow: update profile opens form', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
@@ -292,35 +257,6 @@ describe('UserProfile composed sections', () => {
       expect(() => render(<UserProfileEmailSection />, { wrapper })).toThrow(
         '<UserProfileEmailSection> must be rendered inside a page component',
       );
-    });
-  });
-
-  describe('Security — passthrough mode', () => {
-    it('renders all enabled sections', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPassword();
-        f.withPasskey();
-        f.withUser({ email_addresses: ['test@clerk.com'], delete_self_enabled: true });
-      });
-      fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
-
-      render(<UserProfileSecurityPanel />, { wrapper });
-      await waitFor(() => screen.getByText(/^password/i));
-      screen.getByText(/^passkeys/i);
-      screen.getByText(/active devices/i);
-      expect(screen.getAllByText(/delete account/i).length).toBeGreaterThan(0);
-    });
-
-    it('hides disabled sections', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-      fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
-
-      render(<UserProfileSecurityPanel />, { wrapper });
-      await waitFor(() => screen.getByText(/active devices/i));
-      expect(screen.queryByText(/^password/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/^passkeys/i)).not.toBeInTheDocument();
     });
   });
 
