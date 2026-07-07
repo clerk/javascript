@@ -513,6 +513,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysHeader',
   'apiKeysSearchBox',
   'apiKeysSearchInput',
+  'apiKeysSearchClearButton',
   'apiKeysAddButton',
   'apiKeysTable',
   'apiKeysCopyButton',

@@ -4,6 +4,7 @@ export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKeys: {
     action__add: 'Add new key',
+    action__clearSearch: 'Clear search',
     action__search: 'Search keys',
     copySecret: {
       formButtonPrimary__copyAndClose: 'Copy & Close',

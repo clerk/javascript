@@ -1880,6 +1880,7 @@ export type __internal_LocalizationResource = {
     formButtonPrimary__add: LocalizationValue;
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
+    action__clearSearch: LocalizationValue;
     action__add: LocalizationValue;
     tableHeader__name: LocalizationValue;
     tableHeader__lastUsed: LocalizationValue;

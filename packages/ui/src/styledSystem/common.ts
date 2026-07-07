@@ -188,6 +188,26 @@ const disabled = (t: InternalTheme) => {
   } as const;
 };
 
+// Shared chrome for a button anchored to the trailing edge of an input (e.g. password reveal,
+// search clear). The clerk theme tightens the geometry in `baseTheme.ts`; the simple theme uses
+// these values as-is. Callers layer on their own icon/visibility styles.
+const inputTrailingButton = (t: InternalTheme) =>
+  ({
+    position: 'absolute',
+    insetInlineEnd: t.space.$1,
+    insetBlock: t.space.$1,
+    borderRadius: `calc(${t.radii.$md} - ${t.space.$1})`,
+    color: t.colors.$neutralAlpha400,
+    paddingInline: t.space.$2,
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: `calc(${t.space.$1} * -1)`,
+      display: 'block',
+      borderRadius: t.radii.$md,
+    },
+  }) as const;
+
 const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   display: display,
   justifyContent: 'center',
@@ -264,6 +284,7 @@ export const common = {
   focusRing,
   disabled,
   borderColor,
+  inputTrailingButton,
   centeredFlex,
   maxHeightScroller,
   mutedBackground,
