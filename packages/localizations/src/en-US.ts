@@ -229,9 +229,9 @@ export const enUS: LocalizationResource = {
     },
     configureStep: {
       activeConnectionWarning: {
+        dismiss: 'Dismiss',
         title:
           'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
-        dismiss: 'Dismiss',
       },
       attributeMappingTable: {
         badges: {
@@ -908,9 +908,9 @@ export const enUS: LocalizationResource = {
         viewHistory: 'View credit history',
       },
       creditHistoryPage: {
-        title: 'Account credit history',
         tableHeader__amount: 'Amount',
         tableHeader__date: 'Date',
+        title: 'Account credit history',
       },
       paymentHistorySection: {
         empty: 'No payment history',
@@ -1117,8 +1117,8 @@ export const enUS: LocalizationResource = {
         title: 'SSO',
         tooltip:
           'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
-        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
         tooltipLabel: 'More information',
+        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
       },
       title: 'Security',
     },
@@ -1391,6 +1391,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'To continue, please enter the verification code sent to your phone',
       title: 'Check your phone',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
       requiredMessage: 'For security reasons, it is required to reset your password.',
@@ -1429,12 +1435,6 @@ export const enUS: LocalizationResource = {
     web3Solana: {
       subtitle: 'Select a wallet below to sign in',
       title: 'Sign in with Solana',
-    },
-    protectCheck: {
-      loading: 'Loading…',
-      retryButton: 'Try again',
-      subtitle: 'Please wait while we verify your request.',
-      title: 'Verifying your request',
     },
   },
   signInEnterPasswordTitle: 'Enter your password',
@@ -1503,6 +1503,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
     restrictedAccess: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -1531,12 +1537,6 @@ export const enUS: LocalizationResource = {
     web3Solana: {
       subtitle: 'Select a wallet below to sign up',
       title: 'Sign up with Solana',
-    },
-    protectCheck: {
-      loading: 'Loading…',
-      retryButton: 'Try again',
-      subtitle: 'Please wait while we verify your request.',
-      title: 'Verifying your request',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -1654,11 +1654,11 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     api_key_name_already_exists: 'API Key name already exists.',
     api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
     avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
-    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
@@ -1791,9 +1791,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
-    label__userButtonPopover: 'Account panel',
     label__accountActions: 'Account actions',
     label__activeSessions: 'Active sessions',
+    label__userButtonPopover: 'Account panel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1821,9 +1821,9 @@ export const enUS: LocalizationResource = {
         viewHistory: 'View credit history',
       },
       creditHistoryPage: {
-        title: 'Account credit history',
         tableHeader__amount: 'Amount',
         tableHeader__date: 'Date',
+        title: 'Account credit history',
       },
       paymentHistorySection: {
         empty: 'No payment history',

@@ -219,7 +219,26 @@ export const zhTW: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -230,26 +249,25 @@ export const zhTW: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -259,7 +277,6 @@ export const zhTW: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -300,7 +317,6 @@ export const zhTW: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -348,7 +364,6 @@ export const zhTW: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -385,7 +400,6 @@ export const zhTW: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -415,6 +429,8 @@ export const zhTW: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -434,21 +450,17 @@ export const zhTW: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -496,7 +508,6 @@ export const zhTW: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -528,7 +539,6 @@ export const zhTW: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -569,7 +579,6 @@ export const zhTW: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -616,38 +625,9 @@ export const zhTW: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -659,8 +639,11 @@ export const zhTW: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: '未驗證',
         badge__verified: '已驗證',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -670,6 +653,7 @@ export const zhTW: LocalizationResource = {
           valueLabel: '值',
         },
         verifiedAtLabel: "驗證於 {{ date | shortDate('zh-TW') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '新增 {{domain}}',
@@ -897,6 +881,15 @@ export const zhTW: LocalizationResource = {
     badge__manualInvitation: '未啟用自動註冊',
     badge__unverified: '未驗證',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '沒有付款歷史',
         notFound: '找不到這筆付款紀錄',
@@ -1092,6 +1085,9 @@ export const zhTW: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1357,6 +1353,12 @@ export const zhTW: LocalizationResource = {
       subtitle: '請輸入已寄至您手機的驗證碼以繼續',
       title: '檢查手機簡訊',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: '重設密碼',
       requiredMessage: '基於安全考量，您必須重設密碼。',
@@ -1461,6 +1463,12 @@ export const zhTW: LocalizationResource = {
       resendButton: '重新傳送驗證碼',
       subtitle: '以繼續前往 {{applicationName}}',
       title: '驗證您的電話號碼',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: '登入',
@@ -1600,6 +1608,7 @@ export const zhTW: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} 已經是組織的成員。',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1667,6 +1676,14 @@ export const zhTW: LocalizationResource = {
       sentencePrefix: '您的密碼必須包含：',
     },
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: '您已經登錄。',
     web3_missing_identifier: '找不到 Web3 錢包擴充功能。請安裝以繼續。',
     web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
@@ -1718,9 +1735,9 @@ export const zhTW: LocalizationResource = {
     action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
-    label__userButtonPopover: '帳戶面板',
     label__accountActions: '帳戶操作',
     label__activeSessions: '活躍工作階段',
+    label__userButtonPopover: '帳戶面板',
   },
   userProfile: {
     apiKeysPage: {
@@ -1740,6 +1757,15 @@ export const zhTW: LocalizationResource = {
       title__codelist: '備用碼',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '沒有付款紀錄',
         notFound: '找不到付款紀錄',

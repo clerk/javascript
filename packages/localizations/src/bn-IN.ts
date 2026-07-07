@@ -222,7 +222,26 @@ export const bnIN: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -233,26 +252,25 @@ export const bnIN: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -262,7 +280,6 @@ export const bnIN: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -303,7 +320,6 @@ export const bnIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -351,7 +367,6 @@ export const bnIN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -388,7 +403,6 @@ export const bnIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -418,6 +432,8 @@ export const bnIN: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -437,21 +453,17 @@ export const bnIN: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -499,7 +511,6 @@ export const bnIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -531,7 +542,6 @@ export const bnIN: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -572,7 +582,6 @@ export const bnIN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -619,38 +628,9 @@ export const bnIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -662,8 +642,11 @@ export const bnIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'যাচাই করা হয়নি',
         badge__verified: 'যাচাই করা হয়েছে',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -674,6 +657,7 @@ export const bnIN: LocalizationResource = {
           valueLabel: 'মান',
         },
         verifiedAtLabel: "{{ date | shortDate('bn-IN') }} তারিখে যাচাই করা হয়েছে",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} যোগ করুন',
@@ -903,6 +887,15 @@ export const bnIN: LocalizationResource = {
     badge__manualInvitation: 'কোনো স্বয়ংক্রিয় তালিকাভুক্তি নেই',
     badge__unverified: 'অযাচাই',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'কোনো পেমেন্ট ইতিহাস নেই',
         notFound: 'পেমেন্ট প্রচেষ্টা পাওয়া যায়নি',
@@ -1104,6 +1097,9 @@ export const bnIN: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1376,6 +1372,12 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যেতে, আপনার ফোনে পাঠানো যাচাইকরণ কোড লিখুন',
       title: 'আপনার ফোন চেক করুন',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'পাসওয়ার্ড রিসেট করুন',
       requiredMessage: 'নিরাপত্তা কারণে, আপনার পাসওয়ার্ড রিসেট করা প্রয়োজন।',
@@ -1481,6 +1483,12 @@ export const bnIN: LocalizationResource = {
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'আপনার ফোনে পাঠানো যাচাইকরণ কোড লিখুন',
       title: 'আপনার ফোন যাচাই করুন',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'সাইন ইন করুন',
@@ -1628,6 +1636,7 @@ export const bnIN: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1706,6 +1715,14 @@ export const bnIN: LocalizationResource = {
       sentencePrefix: 'আপনার পাসওয়ার্ডে অবশ্যই থাকতে হবে',
     },
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
     web3_signature_request_rejected:
@@ -1759,9 +1776,9 @@ export const bnIN: LocalizationResource = {
     action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
-    label__userButtonPopover: 'অ্যাকাউন্ট প্যানেল',
     label__accountActions: 'অ্যাকাউন্ট অ্যাকশন',
     label__activeSessions: 'সক্রিয় সেশন',
+    label__userButtonPopover: 'অ্যাকাউন্ট প্যানেল',
   },
   userProfile: {
     apiKeysPage: {
@@ -1784,6 +1801,15 @@ export const bnIN: LocalizationResource = {
       title__codelist: 'ব্যাকআপ কোড',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'কোনো পেমেন্ট ইতিহাস নেই',
         notFound: 'পেমেন্ট প্রচেষ্টা পাওয়া যায়নি',
