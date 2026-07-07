@@ -39,12 +39,21 @@ export interface ProtectCheckResource {
    * Always `'pending'` when surfaced to clients.
    */
   status: 'pending';
+  /**
+   * Opaque challenge token to pass to the Clerk Protect challenge SDK.
+   */
   token: string;
+  /**
+   * URL of the Clerk Protect challenge SDK to load for this challenge.
+   */
   sdkUrl: string;
   /**
    * Unix epoch timestamp in **milliseconds** at which the challenge expires.
    */
   expiresAt?: number;
+  /**
+   * Optional UI hints for rendering the challenge.
+   */
   uiHints?: Record<string, string>;
 }
 
