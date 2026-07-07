@@ -179,12 +179,23 @@ export function useIAPBilling(): UseIAPBillingReturn {
   );
 
   /**
-   * Refreshes the session token so newly granted feature (`fea`) claims are live immediately, then re-fetches the
-   * billing state.
+   * Applies a freshly registered subscription item to local state immediately, so the UI reflects the purchase the
+   * moment Clerk confirms it — without waiting for the token refresh + refetch round-trips that follow.
+   */
+  const applySubscriptionItem = useCallback((item: BillingSubscriptionItemResource): void => {
+    setCurrentSubscriptionItems(previous => {
+      const others = previous.filter(existing => existing.id !== item.id);
+      return [...others, item];
+    });
+  }, []);
+
+  /**
+   * Refreshes the session token so newly granted feature (`fea`) claims are live immediately, and re-fetches the
+   * billing state. The two are independent, so they run concurrently: the token refresh flips `has()` entitlements
+   * while the refetch reconciles the full subscription list in the background.
    */
   const refreshSessionAndState = useCallback(async (): Promise<void> => {
-    await clerk.session?.getToken({ skipCache: true });
-    await refetch();
+    await Promise.all([clerk.session?.getToken({ skipCache: true }), refetch()]);
   }, [clerk, refetch]);
 
   useEffect(() => {
@@ -322,6 +333,9 @@ export function useIAPBilling(): UseIAPBillingReturn {
           throw error;
         }
 
+        // The registration response IS the new subscription item — reflect it immediately rather than making the
+        // UI wait for the token refresh + refetch round-trips below.
+        applySubscriptionItem(subscriptionItem);
         await refreshSessionAndState();
 
         return { status: 'success', subscriptionItem };
@@ -330,7 +344,7 @@ export function useIAPBilling(): UseIAPBillingReturn {
         pendingProductIdsRef.current.delete(product.productId);
       }
     },
-    [clerk, registerWithClerk, refreshSessionAndState],
+    [clerk, registerWithClerk, applySubscriptionItem, refreshSessionAndState],
   );
 
   const restorePurchases = useCallback(async (): Promise<IAPRestorePurchasesResult> => {
