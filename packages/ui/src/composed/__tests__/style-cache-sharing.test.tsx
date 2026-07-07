@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getStyleCache } from '@/ui/internal/styleCacheStore';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
+import { getStyleCache } from '@/ui/internal/styleCacheStore';
 
 import { clearFetchCache } from '../../hooks';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
@@ -10,6 +10,20 @@ import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
 function patchEnvironment(clerk: any, env: any) {
   Object.defineProperty(clerk, '__internal_environment', { value: env, configurable: true });
+}
+
+// Drive an emotion cache's insert path with a fake serialized style and return
+// every raw rule string it hands to the underlying sheet. Used to assert whether
+// the composed shell's insert wrapper injected an `@layer`.
+function captureInsertedRules(cache: any, styles: string): string[] {
+  const captured: string[] = [];
+  const origSheetInsert = cache.sheet.insert.bind(cache.sheet);
+  cache.sheet.insert = (rule: string) => {
+    captured.push(rule);
+    return origSheetInsert(rule);
+  };
+  cache.insert('.cl-test', { name: 'test', styles, next: undefined } as any, cache.sheet, false);
+  return captured;
 }
 
 describe('composed style cache sharing', () => {
@@ -96,7 +110,9 @@ describe('composed style cache sharing', () => {
     const expectedNonce = 'test-nonce-abc123';
     const originalGetOption = fixtures.clerk.__internal_getOption.bind(fixtures.clerk);
     fixtures.clerk.__internal_getOption = (key: string) => {
-      if (key === 'nonce') return expectedNonce;
+      if (key === 'nonce') {
+        return expectedNonce;
+      }
       return originalGetOption(key);
     };
 
@@ -118,7 +134,9 @@ describe('composed style cache sharing', () => {
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
     fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
-      if (key === 'appearance') return { theme: { cssLayerName: 'app-clerk' } };
+      if (key === 'appearance') {
+        return { theme: { cssLayerName: 'app-clerk' } };
+      }
       return undefined;
     });
 
@@ -133,16 +151,89 @@ describe('composed style cache sharing', () => {
     expect(cache).toBeDefined();
 
     // The insert function is wrapped to inject @layer when cssLayerName was extracted.
-    // Drive it with a fake serialized style and capture the rules handed to the sheet.
-    const captured: string[] = [];
-    const origSheetInsert = cache!.sheet.insert.bind(cache!.sheet);
-    cache!.sheet.insert = (rule: string) => {
-      captured.push(rule);
-      return origSheetInsert(rule);
-    };
-
-    cache!.insert('.cl-test', { name: 'test', styles: 'color: red;', next: undefined } as any, cache!.sheet, false);
-
+    const captured = captureInsertedRules(cache, 'color: red;');
     expect(captured.join('\n')).toContain('@layer app-clerk');
+  });
+
+  it('wraps inserts in @layer when cssLayerName is set at the top level of appearance', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    // Top-level cssLayerName, not nested under theme. This is the direct usage
+    // path; extractCssLayerNameFromAppearance passes it straight through.
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
+      if (key === 'appearance') {
+        return { cssLayerName: 'app-clerk' };
+      }
+      return undefined;
+    });
+
+    render(
+      <UserProfileProvider>
+        <div data-testid='child' />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const cache = getStyleCache(fixtures.clerk);
+    expect(cache).toBeDefined();
+
+    const captured = captureInsertedRules(cache, 'color: red;');
+    expect(captured.join('\n')).toContain('@layer app-clerk');
+  });
+
+  it('does not wrap inserts in @layer when no cssLayerName is configured', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    render(
+      <UserProfileProvider>
+        <div data-testid='child' />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const cache = getStyleCache(fixtures.clerk);
+    expect(cache).toBeDefined();
+
+    // Without a cssLayerName the insert function is left untouched, so styles must
+    // reach the sheet verbatim rather than every rule getting wrapped in @layer.
+    const captured = captureInsertedRules(cache, 'color: red;').join('\n');
+    expect(captured).toContain('color:red'); // the style did reach the sheet (not a vacuous pass)
+    expect(captured).not.toContain('@layer');
+  });
+
+  it('does not double-wrap styles that are already an @layer rule', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
+      if (key === 'appearance') {
+        return { cssLayerName: 'app-clerk' };
+      }
+      return undefined;
+    });
+
+    render(
+      <UserProfileProvider>
+        <div data-testid='child' />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    const cache = getStyleCache(fixtures.clerk);
+    expect(cache).toBeDefined();
+
+    // A serialized style that is already an @layer rule must pass through as-is,
+    // never getting nested inside a second @layer wrapper.
+    const captured = captureInsertedRules(cache, '@layer some-other {.x{color:red;}}').join('\n');
+    expect(captured).toContain('@layer some-other');
+    expect(captured).not.toContain('@layer app-clerk');
   });
 });
