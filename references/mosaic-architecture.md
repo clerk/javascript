@@ -530,8 +530,9 @@ To migrate a component from the old system to Mosaic:
 The steps above cover the **styling** migration (recipes + tokens). For **flow**
 components — where the legacy component also fuses data-fetching and flow logic —
 splitting that logic into the machine/controller/view layers and verifying no
-implicit behavior is dropped is its own end-to-end workflow. See the
-`mosaic-migration` Claude Code skill (`.claude/skills/mosaic-migration/`).
+implicit behavior is dropped is its own end-to-end workflow. See the `mosaic`
+Claude Code skill (`.claude/skills/mosaic/`), in particular its
+`references/migration.md`.
 
 ## Files
 

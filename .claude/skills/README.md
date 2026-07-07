@@ -41,8 +41,7 @@ Skills are Claude Code specific. Cursor does not read this directory; it uses `.
 
 ## Skills in this repo
 
-| Skill              | Use it for                                                                                                                   |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `clerk-monorepo`   | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks. |
-| `mosaic-machine`   | Authoring a Mosaic state machine: `setup`, states/guards/`invoke`, and wiring it to React with `useMachine`/`useActor`.      |
-| `mosaic-migration` | Migrating a legacy component into Mosaic end to end: machine/controller/view split plus behavioral-parity verification.      |
+| Skill            | Use it for                                                                                                                              |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `clerk-monorepo` | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
+| `mosaic`         | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |

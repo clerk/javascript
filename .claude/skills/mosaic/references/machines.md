@@ -1,12 +1,3 @@
----
-name: mosaic-machine
-description: >
-  Author and use Mosaic state machines. Use when the user is writing a state machine
-  with createMachine, modelling a multi-step flow, wiring a machine to React with
-  useMachine/useActor/useSelector, debugging a machine transition, or migrating from
-  useState booleans to a machine.
----
-
 # Mosaic Machine
 
 > **XState-first rule:** Before designing any library feature or changing any API, look up how XState v5 handles the same pattern and align to it. Never invent new API shapes.
@@ -25,7 +16,7 @@ import { assign } from './assign';
 
 `setup<TContext, TEvent>()` returns `{ createMachine, assign, fromPromise }`. Use `fromPromise` for promise-based `invoke` configurations — it carries the resolved type to `e.output` in `onDone.actions`.
 
-> **See also:** migrating a legacy component _into_ this pattern (splitting a component into machine/controller/view and verifying no behavior is dropped) is the `mosaic-migration` skill. This skill covers authoring the machine itself.
+The machine is the pure flow layer. To wire it to Clerk data see `controllers.md`; to render its snapshot see `views.md`; to migrate a legacy component into this pattern see `migration.md`.
 
 ---
 

@@ -1,22 +1,10 @@
----
-name: mosaic-migration
-description: >-
-  Migrate a legacy / pre-Mosaic UI component into Mosaic. Use when moving a component
-  from the old styled system into the machine / controller / view split, splitting a
-  logic-heavy component into those three layers, or verifying migration parity so no
-  behavior that lived implicitly in the legacy component is silently dropped. This is
-  the end-to-end workflow; `mosaic-machine` covers authoring the machine and
-  `references/mosaic-architecture.md` covers the layer contract.
----
-
 # Migrating a component into Mosaic
 
-Mosaic flow UI follows a **machine → controller → view** split (see
-`references/mosaic-architecture.md` → "Flow and data architecture"). Migrating a
-legacy component means taking logic that was fused into one file and pulling it
-apart into those three layers.
+Migrating a legacy component means taking logic that was fused into one file and
+pulling it apart into the machine / controller / view layers (see the skill
+overview and `references/mosaic-architecture.md` → "Flow and data architecture").
 
-**The core risk this skill exists to manage:** a legacy component fuses
+**The core risk this workflow exists to manage:** a legacy component fuses
 rendering, data-fetching, and flow logic into one blob. Splitting it three ways
 silently drops behavior that was only ever _implicit_ — a per-field error map, a
 step-up reverification, an empty-state gate, a derived callout. None of it
@@ -27,9 +15,6 @@ as the spec, and prove the new layers cover every line of it.**
 Do not write the machine first and then ask "did I get everything?" — that means
 proving a negative. Invert it: enumerate the legacy behavior first, then make
 each layer account for a specific row.
-
-For authoring the machine itself (setup, states, guards, `invoke`, React
-wiring), use the `mosaic-machine` skill. This skill is the surrounding workflow.
 
 ---
 
@@ -64,43 +49,31 @@ label. This list is finite and is the contract the migration must satisfy.
 Assign each inventory row to exactly one layer. A row with no home is a behavior
 you are about to drop.
 
-- **machine** (`*.machine.ts`): pure flow rules — states, events, guards, async
-  `invoke`, error transitions. No React hooks, no Clerk hooks, no Clerk resource
-  objects. Author it with the `mosaic-machine` skill.
-- **controller** (`*.controller.tsx`): the only layer that may touch Clerk.
-  Reads Clerk hooks/resources, injects async effects into machine context,
-  gates permissions, owns `revalidate` timing and first-page-load empty-state,
-  derives view props.
-- **view** (`*.view.tsx`): rendering only — receives a snapshot plus explicit
-  props, renders UI, sends events. Derived booleans (`actor.can(...)`) come from
-  the controller so the view never re-implements a guard.
+- Flow rules (states, events, guards, async `invoke`, error transitions) →
+  **machine** (`machines.md`).
+- Clerk reads, mutations, permission gating, revalidate timing, first-page-load
+  empty-state → **controller** (`controllers.md`).
+- Rendering, labels, derived booleans → **view** (`views.md`).
 
 ## Phase 3 — Implement and test per layer
 
 File shape: `<feature>.machine.ts` · `<feature>.controller.tsx` ·
 `<feature>.view.tsx` · `<feature>.tsx` (thin composition wrapper).
 
-Each layer is testable in isolation — that isolation is what makes the
-migration verifiable:
-
-- **machine**: drive `createActor → start → send` in plain JS; reach transient
-  states with `mockActor`. No React, no Clerk fixtures.
-- **view**: render directly with a fake snapshot and a fake `send`. No Clerk
-  providers.
-- **controller**: test against a mocked Clerk for the gating / `hidden` /
-  empty-state logic. This is the **highest-risk, least-covered layer** — it
-  holds the Clerk resource semantics that can't be proven by the pure machine
-  tests. Concentrate scrutiny here.
+Each layer is testable in isolation — that isolation is what makes the migration
+verifiable. Follow the testing recipe in each layer's reference: machine via
+`createActor`/`mockActor` (no React, no Clerk), view via a fake snapshot + fake
+`send`, controller against a mocked Clerk. The controller is the highest-risk,
+least-covered layer — concentrate scrutiny there.
 
 ## Phase 4 — Verify parity (the confidence step)
 
 Machine and view tests only cover branches you remembered to write. To catch the
 ones you didn't, run an automated diff of legacy against new.
 
-Launch an **Explore subagent** with the prompt in
-`references/parity-audit.md`. Give it the legacy file paths and the new
-machine/controller/view paths. It returns a table classifying every legacy
-behavior as:
+Launch an **Explore subagent** with the prompt in `parity-audit.md`. Give it the
+legacy file paths and the new machine/controller/view paths. It returns a table
+classifying every legacy behavior as:
 
 - **Migrated** — points at a specific state / transition / context field.
 - **Deliberately changed** — names the new behavior and why (e.g. infinite
