@@ -2,7 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
-import { getModuleManager, type ModuleManager, setModuleManager } from '@clerk/shared/moduleManager';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -288,13 +288,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   /**
    * Proxies to the inner Clerk instance's ModuleManager. Returns `undefined`
-   * before clerk-js has loaded; composed UI components read this through the
-   * shared WeakMap channel populated in `replayInterceptedInvocations`.
+   * before clerk-js has loaded; composed UI components read this getter
+   * (via `useClerk()`) to resolve dynamic-imported modules and fall back to a
+   * rejecting manager while it is `undefined`.
    *
    * @internal
    */
-  public get __internal_moduleManager() {
-    return this.clerkjs?.__internal_moduleManager as ModuleManager;
+  public get __internal_moduleManager(): ModuleManager | undefined {
+    return this.clerkjs?.__internal_moduleManager;
   }
 
   constructor(options: IsomorphicClerkOptions) {
@@ -678,19 +679,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
-
-    // Forward clerk-js's ModuleManager onto this wrapper so composed/
-    // subcomponent UserProfile (which reads `getModuleManager(useClerk())`)
-    // can resolve it. Prefer the `__internal_moduleManager` getter — clerk-js
-    // ships standalone with its own inlined @clerk/shared, so its own WeakMap
-    // is invisible to the node_modules @clerk/shared this code uses. The
-    // getter is the public cross-bundle channel; the WeakMap fallback covers
-    // any code path that happens to share a @clerk/shared instance with the
-    // running clerk-js (rare).
-    const mm = clerkjs.__internal_moduleManager ?? getModuleManager(clerkjs);
-    if (mm) {
-      setModuleManager(this, mm);
-    }
 
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerExtras, listener) => {

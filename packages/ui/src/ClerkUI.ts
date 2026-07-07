@@ -9,7 +9,6 @@ import { isVersionAtLeast, parseVersion } from '@clerk/shared/versionCheck';
 
 import { type MountComponentRenderer, mountComponentRenderer } from './Components';
 import { MIN_CLERK_JS_VERSION } from './constants';
-import { setModuleManager } from './internal/moduleManagerStore';
 
 /**
  * Core rendering engine for Clerk's prebuilt UI components.
@@ -79,7 +78,6 @@ export class ClerkUI implements ClerkUIInstance {
       }
     }
 
-    setModuleManager(clerk, moduleManager);
     this.#componentRenderer = mountComponentRenderer(getClerk, getEnvironment, options, moduleManager);
   }
 

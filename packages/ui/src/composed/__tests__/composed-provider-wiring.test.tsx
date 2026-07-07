@@ -1,4 +1,3 @@
-import { setModuleManager as setModuleManagerShared } from '@clerk/shared/moduleManager';
 import { act } from '@testing-library/react';
 import { useContext } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,13 +6,13 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 import { useModuleManager, useOptions } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
-import { setModuleManager } from '@/ui/internal/moduleManagerStore';
 import { useRouter } from '@/ui/router';
 
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
 import { UserProfileContext } from '../../contexts/components/UserProfile';
 import { clearFetchCache } from '../../hooks';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
+import { fallbackModuleManager } from '../ProfileProviderShell';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
 function patchEnvironment(clerk: any, env: any) {
@@ -48,14 +47,11 @@ describe('UserProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  it('provides the moduleManager from the store to children', async () => {
-    const mockImport = vi.fn(() => Promise.resolve(undefined));
-
+  it("provides the clerk instance's moduleManager to children", async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
-    setModuleManager(fixtures.clerk, { import: mockImport });
 
     render(
       <UserProfileProvider>
@@ -68,21 +64,35 @@ describe('UserProfileProvider wiring', () => {
     expect(probe.dataset.hasMm).toBe('true');
   });
 
-  it('falls back to fallback moduleManager when store has no entry for clerk', async () => {
+  it('falls back to fallbackModuleManager when the clerk instance exposes no moduleManager', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
+    // Simulate a clerk-js too old to expose the getter (returns undefined).
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      value: undefined,
+      configurable: true,
+    });
+
+    function FallbackProbe() {
+      const mm = useModuleManager();
+      return (
+        <div
+          data-testid='mm-fallback-probe'
+          data-is-fallback={String(mm === fallbackModuleManager)}
+        />
+      );
+    }
 
     render(
       <UserProfileProvider>
-        <ModuleManagerProbe />
+        <FallbackProbe />
       </UserProfileProvider>,
       { wrapper },
     );
 
-    const probe = screen.getByTestId('mm-probe');
-    expect(probe.dataset.hasMm).toBe('true');
+    expect(screen.getByTestId('mm-fallback-probe').dataset.isFallback).toBe('true');
   });
 
   it('provides a router that delegates to clerk.navigate', async () => {
@@ -168,33 +178,33 @@ describe('UserProfileProvider wiring', () => {
     });
   });
 
-  // Validates the read channel only: UserProfileProvider resolves
-  // moduleManager via @clerk/shared/moduleManager keyed by `useClerk()`.
-  //
-  // Caveat: in this test `fixtures.clerk` is both the WeakMap key (we
-  // register against it directly) and the value `useClerk()` returns
-  // through the wrapper, so identity matches trivially. In production
-  // those identities differ — clerk-js's constructor registers against
-  // the inner clerk-js Clerk, while `useClerk()` returns the
-  // IsomorphicClerk wrapper. That cross-identity propagation is covered
-  // by packages/react/src/__tests__/isomorphicClerk.test.ts —
-  // "propagates moduleManager from loaded clerkjs to the isomorphic
-  // wrapper". Don't read this test as end-to-end coverage of the
-  // composed UserProfile wiring in a real Clerk SDK app.
-  it('resolves a moduleManager registered through @clerk/shared, not just via ClerkUI', async () => {
-    const mockImport = vi.fn(() => Promise.resolve(undefined));
+  // Dedup-independence: the provider must resolve the manager through the
+  // live `clerk.__internal_moduleManager` getter, which crosses bundle
+  // boundaries regardless of how many @clerk/shared copies are installed.
+  // A registry keyed by module-scoped state would silently return the wrong
+  // manager (or undefined) when the read-side @clerk/shared is a different
+  // physical copy than the write-side one. Here the getter exposes a distinct
+  // manager than anything the real Clerk instance registered, so surfacing it
+  // proves the read channel is the getter, not a shared registry.
+  it('resolves the moduleManager from clerk.__internal_moduleManager (getter), not a shared registry', async () => {
+    const getterImport = vi.fn(() => Promise.resolve(undefined));
+    const getterModuleManager = { import: getterImport };
+
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
-    setModuleManagerShared(fixtures.clerk, { import: mockImport } as any);
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      value: getterModuleManager,
+      configurable: true,
+    });
 
     function ModuleManagerIdentityProbe() {
       const mm = useModuleManager();
       return (
         <div
-          data-testid='mm-identity-probe'
-          data-is-mock={String(mm?.import === mockImport)}
+          data-testid='mm-getter-probe'
+          data-from-getter={String(mm?.import === getterImport)}
         />
       );
     }
@@ -206,7 +216,7 @@ describe('UserProfileProvider wiring', () => {
       { wrapper },
     );
 
-    expect(screen.getByTestId('mm-identity-probe').dataset.isMock).toBe('true');
+    expect(screen.getByTestId('mm-getter-probe').dataset.fromGetter).toBe('true');
   });
 
   it('returns null when user is not loaded', async () => {
@@ -350,9 +360,7 @@ describe('OrganizationProfileProvider wiring', () => {
     clearFetchCache();
   });
 
-  it('provides the moduleManager from the store to children', async () => {
-    const mockImport = vi.fn(() => Promise.resolve(undefined));
-
+  it("provides the clerk instance's moduleManager to children", async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
@@ -363,7 +371,6 @@ describe('OrganizationProfileProvider wiring', () => {
       });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
-    setModuleManager(fixtures.clerk, { import: mockImport });
     fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
 
     render(

@@ -1,5 +1,4 @@
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
-import { getModuleManager, setModuleManager } from '@clerk/shared/moduleManager';
 import type {
   BrowserClerk,
   HandleOAuthCallbackParams,
@@ -50,46 +49,28 @@ describe('isomorphicClerk', () => {
   });
 
   // Regression: composed/subcomponent UserProfile reads moduleManager via
-  // `getModuleManager(useClerk())`. `useClerk()` returns the IsomorphicClerk
-  // wrapper, so the manager must be reachable from the wrapper's identity.
+  // `useClerk().__internal_moduleManager`. `useClerk()` returns the
+  // IsomorphicClerk wrapper, so its getter must chain through to the loaded
+  // clerk-js's own `__internal_moduleManager`. This plain property access is
+  // the cross-bundle channel: clerk-js ships standalone from the CDN with its
+  // own inlined @clerk/shared, so module-scoped state cannot bridge the two.
   //
-  // Two channels need to work — the cross-bundle case is the one that
-  // actually matters in production:
-  //
-  //   1. Cross-bundle: clerk-js ships standalone from the CDN with its own
-  //      inlined @clerk/shared, so its module-scoped WeakMap is invisible
-  //      to the node_modules @clerk/shared the SDKs use. The handoff goes
-  //      through the `__internal_moduleManager` getter on Clerk.
-  //   2. Same-bundle: when clerk-js and the SDK happen to share a
-  //      @clerk/shared instance, the WeakMap registration is visible too.
-  //      Rare but worth keeping as a fallback.
-  //
-  // Without propagation, every dynamic-imported feature (Coinbase Wallet,
-  // Base, Stripe, zxcvbn) falls back to a no-op manager.
-  it('propagates moduleManager via __internal_moduleManager getter (cross-bundle channel)', () => {
+  // Without this chain, every dynamic-imported feature (Coinbase Wallet, Base,
+  // Stripe, zxcvbn) falls back to a rejecting manager.
+  it('exposes the inner clerk-js moduleManager through the __internal_moduleManager getter', () => {
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
+
+    // Before clerk-js loads, the getter is undefined so readers fall back.
+    expect(isomorphicClerk.__internal_moduleManager).toBeUndefined();
+
     const innerClerk: any = {
       addListener: vi.fn(),
       __internal_moduleManager: mm,
     };
-
     (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
 
-    expect(getModuleManager(isomorphicClerk)).toBe(mm);
-  });
-
-  it('propagates moduleManager via @clerk/shared WeakMap (same-bundle fallback)', () => {
-    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
-    const innerClerk: any = {
-      addListener: vi.fn(),
-    };
-    const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
-    setModuleManager(innerClerk, mm);
-
-    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
-
-    expect(getModuleManager(isomorphicClerk)).toBe(mm);
+    expect(isomorphicClerk.__internal_moduleManager).toBe(mm);
   });
 
   it('updates props asynchronously after clerkjs has loaded', async () => {

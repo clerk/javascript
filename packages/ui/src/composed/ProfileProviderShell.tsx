@@ -11,9 +11,8 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
-import createCache from '@emotion/cache'; // eslint-disable-line no-restricted-imports
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider, type SerializedStyles } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { useMemo } from 'react';
 
@@ -23,6 +22,7 @@ import type { Appearance, Elements } from '@/ui/internal/appearance';
 import { getStyleCache, setStyleCache } from '@/ui/internal/styleCacheStore';
 import { RouteContext } from '@/ui/router/RouteContext';
 import { InternalThemeProvider } from '@/ui/styledSystem';
+import { createEmotionCache } from '@/ui/styledSystem/createEmotionCache';
 import { extractCssLayerNameFromAppearance } from '@/ui/utils/extractCssLayerNameFromAppearance';
 
 import { EnvironmentProvider } from '../contexts/EnvironmentContext';
@@ -31,18 +31,16 @@ import { OptionsProvider } from '../contexts/OptionsContext';
 import { AppearanceOverrides } from '../elements/AppearanceOverrides';
 import { createComposedRouter } from './stubRouter';
 
-// Used when `getModuleManager(clerk)` finds no ModuleManager registered for this clerk instance in
-// the `@clerk/shared/moduleManager` registry. In a correctly wired app clerk-js registers itself
-// there during construction (clerk.ts), so reaching this means either the loaded clerk-js is too
-// old to register, or a duplicate `@clerk/shared` copy split the registry so the write and read hit
-// different WeakMaps. Fail loudly on the first dynamic import (Web3, billing, password strength)
-// instead of silently resolving `undefined` and surfacing later as an opaque access on the missing
-// module.
+// Used when `clerk.__internal_moduleManager` is `undefined`. In a correctly wired app clerk-js
+// exposes its ModuleManager through that getter, so reaching this means the loaded clerk-js is too
+// old to expose it (an older clerk-js also predates composed profiles entirely). Fail loudly on the
+// first dynamic import (Web3, billing, password strength) instead of silently resolving `undefined`
+// and surfacing later as an opaque access on the missing module.
 export const fallbackModuleManager: ModuleManager = {
   import: () =>
     Promise.reject(
       new ClerkRuntimeError(
-        'Composed profile components could not resolve a Clerk module manager: none is registered for this Clerk instance. This usually means the loaded @clerk/clerk-js is too old to support composed profiles, or a duplicate @clerk/shared copy has split the module-manager registry.',
+        'Composed profile components could not resolve a Clerk module manager: this Clerk instance does not expose one. This usually means the loaded @clerk/clerk-js is too old to support composed profiles.',
         { code: 'composed_module_manager_unavailable' },
       ),
     ),
@@ -75,23 +73,7 @@ function SharedStyleCacheProvider({ clerk, nonce, cssLayerName, children }: Shar
     if (existing) {
       return existing;
     }
-    const el = typeof document !== 'undefined' ? document.querySelector('style#cl-style-insertion-point') : null;
-    const next = createCache({
-      key: 'cl-internal',
-      prepend: cssLayerName ? false : !el,
-      insertionPoint: el ? (el as HTMLElement) : undefined,
-      nonce,
-    });
-    if (cssLayerName) {
-      const prevInsert = next.insert.bind(next);
-      next.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
-        if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
-          const wrapped = { ...serialized, styles: `@layer ${cssLayerName} {${serialized.styles}}` };
-          return prevInsert(selector, wrapped, sheet, shouldCache);
-        }
-        return prevInsert(selector, serialized, sheet, shouldCache);
-      };
-    }
+    const next = createEmotionCache({ nonce, cssLayerName });
     setStyleCache(clerk, next);
     return next;
   }, [clerk, nonce, cssLayerName]);

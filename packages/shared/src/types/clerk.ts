@@ -307,13 +307,15 @@ export interface Clerk {
    * Internal handle to the bundled ModuleManager. Exposed so framework SDK
    * wrappers (e.g. IsomorphicClerk) can forward it to composed UI components
    * that need dynamic-imported modules (Coinbase Wallet, Base, Stripe, zxcvbn).
-   * Crosses bundle boundaries that the @clerk/shared module-scoped WeakMap
-   * cannot — clerk-js inlines its own @clerk/shared, so its WeakMap is
-   * invisible to consumers loading @clerk/shared from node_modules.
+   * Plain property access crosses the bundle boundary that other channels
+   * cannot — clerk-js inlines its own @clerk/shared, so module-scoped state is
+   * invisible to consumers loading @clerk/shared from node_modules. It is
+   * `undefined` on a wrapper whose inner clerk-js has not loaded yet, so
+   * readers must handle the absent case.
    *
    * @internal
    */
-  __internal_moduleManager: ModuleManager;
+  __internal_moduleManager: ModuleManager | undefined;
 
   frontendApi: string;
 

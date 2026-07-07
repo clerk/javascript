@@ -39,7 +39,6 @@ import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
-import { setModuleManager } from '@clerk/shared/moduleManager';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import {
   AUTO_PROXY_PATH,
@@ -279,11 +278,10 @@ export class Clerk implements ClerkInterface {
 
   /**
    * Cross-bundle handle to the ModuleManager. clerk-js is loaded standalone
-   * from the CDN with its own inlined @clerk/shared, so the module-scoped
-   * WeakMap in @clerk/shared/moduleManager cannot be observed by consumers
-   * that import @clerk/shared from node_modules (e.g. @clerk/react,
-   * @clerk/ui). This getter is how IsomorphicClerk forwards the manager
-   * across that boundary.
+   * from the CDN with its own inlined @clerk/shared, so plain property access
+   * is the only channel that reliably crosses that boundary. This getter is
+   * how IsomorphicClerk forwards the manager to consumers that import
+   * @clerk/shared from node_modules (e.g. @clerk/react, @clerk/ui).
    *
    * @internal
    */
@@ -504,14 +502,6 @@ export class Clerk implements ClerkInterface {
     this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
     this.#publishableKey = key;
-
-    // Register the ModuleManager in the @clerk/shared WeakMap as well, so any
-    // code path that already has the same @clerk/shared module instance as
-    // clerk-js (rare in practice — clerk-js bundles its own) can resolve it
-    // without going through the getter. The getter (`__internal_moduleManager`
-    // below) is the cross-bundle channel that actually matters: IsomorphicClerk
-    // and other framework-SDK wrappers reach into clerk-js through it.
-    setModuleManager(this, this.#moduleManager);
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
