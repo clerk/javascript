@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
 import { useModuleManager, useOptions } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
 import { useRouter } from '@/ui/router';
@@ -13,6 +13,8 @@ import { UserProfileContext } from '../../contexts/components/UserProfile';
 import { clearFetchCache } from '../../hooks';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
 import { fallbackModuleManager } from '../ProfileProviderShell';
+import { UserProfileSecurityPanel } from '../UserProfile/Security';
+import { UserProfilePasswordSection } from '../UserProfile/SecurityPassword';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
 
 function patchEnvironment(clerk: any, env: any) {
@@ -217,6 +219,46 @@ describe('UserProfileProvider wiring', () => {
     );
 
     expect(screen.getByTestId('mm-getter-probe').dataset.fromGetter).toBe('true');
+  });
+
+  // The end-to-end proof that resolution actually feeds a dynamic import: render
+  // the real composed password section, enable zxcvbn strength, type a password,
+  // and assert the resolved manager's `import` fires for the zxcvbn module. This
+  // exercises the whole chain UserProfileProvider -> ProfileProviderShell ->
+  // ModuleManagerProvider -> useModuleManager -> usePassword -> loadZxcvbn.
+  // (This is the deterministic in-process analog of a Playwright flow, which
+  // cannot run this path without a backend instance that has `show_zxcvbn` on.)
+  it('feeds the resolved moduleManager into the composed password strength import', async () => {
+    // Never settles, so the un-caught `.then` in createValidatePassword does not
+    // surface as an unhandled rejection; we only care that `import` was invoked.
+    const importSpy = vi.fn(() => new Promise<undefined>(() => {}));
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withPassword();
+      f.withPasswordComplexity({ show_zxcvbn: true });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      value: { import: importSpy },
+      configurable: true,
+    });
+
+    const { userEvent, getByRole, getByLabelText } = render(
+      <UserProfileProvider>
+        <UserProfileSecurityPanel>
+          <UserProfilePasswordSection />
+        </UserProfileSecurityPanel>
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    await userEvent.click(getByRole('button', { name: /set password/i }));
+    await userEvent.type(getByLabelText(/new password/i), 'weak');
+
+    await waitFor(() => {
+      expect(importSpy).toHaveBeenCalledWith('@zxcvbn-ts/core');
+    });
   });
 
   it('returns null when user is not loaded', async () => {
