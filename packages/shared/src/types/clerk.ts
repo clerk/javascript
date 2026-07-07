@@ -1401,7 +1401,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/{session_id}/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
