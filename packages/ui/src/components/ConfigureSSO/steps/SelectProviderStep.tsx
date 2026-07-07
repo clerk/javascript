@@ -27,7 +27,7 @@ import type { ProviderType } from '../types';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 const PROVIDER_GROUPS: ReadonlyArray<{
-  id: 'saml';
+  id: 'saml' | 'oidc';
   label: LocalizationKey;
   options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
 }> = [
@@ -53,6 +53,17 @@ const PROVIDER_GROUPS: ReadonlyArray<{
       },
     ],
   },
+  {
+    id: 'oidc',
+    label: localizationKeys('configureSSO.selectProviderStep.oidc.groupLabel'),
+    options: [
+      {
+        id: 'oidc_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.oidc.oidcProvider'),
+        iconId: 'oidc',
+      },
+    ],
+  },
 ];
 
 const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
@@ -63,9 +74,16 @@ export const SelectProviderStep = (): JSX.Element => {
     organizationEnterpriseConnection: c,
     enterpriseConnectionMutations: { createConnection, changeProvider },
     contentRef,
+    isOIDCFlowEnabled,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { t } = useLocalizations();
+
+  // OIDC is gated behind the experimental self-serve flag; SAML always shows.
+  const providerGroups = React.useMemo(
+    () => PROVIDER_GROUPS.filter(group => group.id !== 'oidc' || isOIDCFlowEnabled),
+    [isOIDCFlowEnabled],
+  );
 
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
@@ -143,7 +161,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            {PROVIDER_GROUPS.map(group => (
+            {providerGroups.map(group => (
               <Col
                 key={group.id}
                 elementDescriptor={descriptors.configureSSOProviderGroup}

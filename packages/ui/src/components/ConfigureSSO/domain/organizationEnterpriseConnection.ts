@@ -48,10 +48,18 @@ export interface OrganizationEnterpriseConnection {
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
-// TODO - Update to support OpenID Connect
 export const isEnterpriseConnectionConfigured = (
   connection: EnterpriseConnectionResource | null | undefined,
-): boolean => Boolean(connection?.samlConnection?.idpSsoUrl && connection?.samlConnection?.idpEntityId);
+): boolean => {
+  if (!connection) {
+    return false;
+  }
+  // OIDC exposes only the client ID on the resource; the secret and manual endpoints are write-only.
+  if (connection.provider.startsWith('oidc')) {
+    return Boolean(connection.oauthConfig?.clientId);
+  }
+  return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
+};
 
 export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
   !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');

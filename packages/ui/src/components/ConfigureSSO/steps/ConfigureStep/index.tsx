@@ -8,6 +8,7 @@ import { Step } from '../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../elements/Wizard';
 import type { ProviderType } from '../../types';
 import { SelectProviderStep } from '../SelectProviderStep';
+import { OidcCustomConfigureSteps } from './oidc';
 import {
   SamlCustomConfigureSteps,
   SamlGoogleConfigureSteps,
@@ -20,6 +21,7 @@ const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
   saml_okta: SamlOktaConfigureSteps,
   saml_google: SamlGoogleConfigureSteps,
   saml_microsoft: SamlMicrosoftConfigureSteps,
+  oidc_custom: OidcCustomConfigureSteps,
 };
 
 export const ConfigureStep = (): JSX.Element => {

@@ -239,6 +239,21 @@ export const enUS: LocalizationResource = {
           required: 'Required',
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: 'Set the claims your identity provider includes in the ID token',
+        },
+        credentialsStep: {
+          headerSubtitle: 'Add your application credentials',
+        },
+        endpointsStep: {
+          headerSubtitle: 'Add your identity provider’s endpoints',
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+        redirectUriStep: {
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: 'Assign users or groups to your SAML application',
@@ -694,6 +709,10 @@ export const enUS: LocalizationResource = {
       title: 'Reset connection',
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: 'OpenID Connect (OIDC)',
+        oidcProvider: 'OIDC Provider',
+      },
       saml: {
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
