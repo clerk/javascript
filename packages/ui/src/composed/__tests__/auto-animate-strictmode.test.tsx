@@ -5,7 +5,7 @@ vi.unmock('@formkit/auto-animate');
 
 import autoAnimate from '@formkit/auto-animate';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import React, { StrictMode, useCallback, useEffect, useRef, useState } from 'react';
+import React, { StrictMode } from 'react';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
@@ -42,15 +42,21 @@ describe('auto-animate: destroy/recreate cycle (StrictMode simulation)', () => {
     const remains: any[] = [];
     for (const call of calls) {
       const keyframes = call[0];
-      if (!Array.isArray(keyframes)) continue;
+      if (!Array.isArray(keyframes)) {
+        continue;
+      }
       const isAdd = keyframes.some(
         (kf: any) => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'),
       );
       const isRemain = keyframes.some(
         (kf: any) => typeof kf.transform === 'string' && kf.transform.includes('translate'),
       );
-      if (isAdd) adds.push(call);
-      if (isRemain) remains.push(call);
+      if (isAdd) {
+        adds.push(call);
+      }
+      if (isRemain) {
+        remains.push(call);
+      }
     }
     return { adds, remains };
   }
@@ -316,15 +322,21 @@ describe('auto-animate: useAutoAnimate hook in StrictMode', () => {
     const remains: any[] = [];
     for (const call of calls) {
       const keyframes = call[0];
-      if (!Array.isArray(keyframes)) continue;
+      if (!Array.isArray(keyframes)) {
+        continue;
+      }
       const isAdd = keyframes.some(
         (kf: any) => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'),
       );
       const isRemain = keyframes.some(
         (kf: any) => typeof kf.transform === 'string' && kf.transform.includes('translate'),
       );
-      if (isAdd) adds.push(call);
-      if (isRemain) remains.push(call);
+      if (isAdd) {
+        adds.push(call);
+      }
+      if (isRemain) {
+        remains.push(call);
+      }
     }
     return { adds, remains };
   }
@@ -354,7 +366,7 @@ describe('auto-animate: useAutoAnimate hook in StrictMode', () => {
 
     rerender(
       <StrictMode>
-        <TestComponent showChild={true} />
+        <TestComponent showChild />
       </StrictMode>,
     );
 
@@ -389,14 +401,6 @@ describe('auto-animate: useAutoAnimate hook in StrictMode', () => {
     const countPerElement = new Map<Element, number>();
     for (const el of observeCalls) {
       countPerElement.set(el, (countPerElement.get(el) || 0) + 1);
-    }
-
-    // Log what happened — this is diagnostic
-    for (const [el, count] of countPerElement) {
-      const tag = (el as HTMLElement).dataset?.testid || el.tagName;
-      if (count > 1) {
-        console.log(`[STRICTMODE BUG] ${tag} has ${count} MutationObservers (expected 1)`);
-      }
     }
 
     // Check: the animated-parent div should have exactly 1 MO
