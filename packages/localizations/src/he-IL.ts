@@ -216,7 +216,26 @@ export const heIL: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const heIL: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const heIL: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const heIL: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const heIL: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const heIL: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const heIL: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const heIL: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const heIL: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const heIL: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const heIL: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const heIL: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const heIL: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'לא מאומת',
         badge__verified: 'מאומת',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -667,6 +650,7 @@ export const heIL: LocalizationResource = {
           valueLabel: 'ערך',
         },
         verifiedAtLabel: "אומת בתאריך {{ date | shortDate('he-IL') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'הוסף {{domain}}',
@@ -895,6 +879,15 @@ export const heIL: LocalizationResource = {
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
     badge__unverified: 'לא מאומת',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1091,6 +1084,9 @@ export const heIL: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1358,6 +1354,12 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: 'בדוק את הטלפון שלך',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'אפס סיסמה',
       requiredMessage: 'מטעמי אבטחה, יש לאפס את הסיסמה שלך.',
@@ -1461,6 +1463,12 @@ export const heIL: LocalizationResource = {
       resendButton: 'שלח קוד שוב',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'אמת את מספר הטלפון שלך',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: undefined,
@@ -1600,6 +1608,7 @@ export const heIL: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1669,6 +1678,14 @@ export const heIL: LocalizationResource = {
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',
@@ -1720,9 +1737,9 @@ export const heIL: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
-    label__userButtonPopover: 'לוח החשבון',
     label__accountActions: 'פעולות חשבון',
     label__activeSessions: 'סשנים פעילים',
+    label__userButtonPopover: 'לוח החשבון',
   },
   userProfile: {
     apiKeysPage: {
@@ -1743,6 +1760,15 @@ export const heIL: LocalizationResource = {
       title__codelist: 'קודי גיבוי',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

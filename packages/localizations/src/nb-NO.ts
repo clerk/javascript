@@ -223,7 +223,26 @@ export const nbNO: LocalizationResource = {
     yearPerUnit: 'År per {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -234,26 +253,25 @@ export const nbNO: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -263,7 +281,6 @@ export const nbNO: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -304,7 +321,6 @@ export const nbNO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -352,7 +368,6 @@ export const nbNO: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -389,7 +404,6 @@ export const nbNO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -419,6 +433,8 @@ export const nbNO: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -438,21 +454,17 @@ export const nbNO: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -500,7 +512,6 @@ export const nbNO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -532,7 +543,6 @@ export const nbNO: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -573,7 +583,6 @@ export const nbNO: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -620,38 +629,9 @@ export const nbNO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -663,8 +643,11 @@ export const nbNO: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Ikke verifisert',
         badge__verified: 'Verifisert',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -675,6 +658,7 @@ export const nbNO: LocalizationResource = {
           valueLabel: 'Verdi',
         },
         verifiedAtLabel: "Verifisert den {{ date | shortDate('nb-NO') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Legg til {{domain}}',
@@ -905,6 +889,15 @@ export const nbNO: LocalizationResource = {
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Uverifisert',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Ingen betalingshistorikk',
         notFound: 'Betalingsforsøk ikke funnet',
@@ -1106,6 +1099,9 @@ export const nbNO: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1379,6 +1375,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'For å fortsette, skriv inn verifiseringskoden sendt til telefonen din',
       title: 'Sjekk telefonen din',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Tilbakestill passordet',
       requiredMessage:
@@ -1484,6 +1486,12 @@ export const nbNO: LocalizationResource = {
       resendButton: 'Send kode på nytt',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Verifiser telefonen din',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Logg inn',
@@ -1632,6 +1640,7 @@ export const nbNO: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} er allerede medlem av organisasjonen.',
     api_key_name_already_exists: 'API-nøkkelnavnet finnes allerede.',
     api_key_usage_exceeded: 'Du har nådd bruksgrensen din. Du kan fjerne grensen ved å oppgradere til en betalt plan.',
@@ -1709,6 +1718,14 @@ export const nbNO: LocalizationResource = {
       sentencePrefix: 'Passordet ditt må inneholde',
     },
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Du er allerede logget inn.',
     web3_missing_identifier: 'En Web3-lommebokutvidelse ble ikke funnet. Installer en for å fortsette.',
     web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',
@@ -1761,9 +1778,9 @@ export const nbNO: LocalizationResource = {
     action__openUserMenu: 'Åpne brukermeny',
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
-    label__userButtonPopover: 'Kontopanel',
     label__accountActions: 'Kontohandlinger',
     label__activeSessions: 'Aktive økter',
+    label__userButtonPopover: 'Kontopanel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1786,6 +1803,15 @@ export const nbNO: LocalizationResource = {
       title__codelist: 'Sikkerhetskoder',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Ingen betalingshistorikk',
         notFound: 'Betalingsforsøk ikke funnet',

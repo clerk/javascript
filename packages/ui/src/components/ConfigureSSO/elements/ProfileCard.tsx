@@ -9,7 +9,8 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
     elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
-      gap: theme.space.$2,
+      // Min gap between the back button and the stepper (the auto-margin collapses when the stepper wraps at tight widths).
+      gap: theme.space.$4,
       width: '100%',
       minHeight: theme.sizes.$13,
       padding: theme.space.$5,
