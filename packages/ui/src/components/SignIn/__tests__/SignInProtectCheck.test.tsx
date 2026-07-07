@@ -378,10 +378,10 @@ describe('SignInProtectCheck', () => {
       const retryButton = await findByRole('button', { name: /try again/i });
       fireEvent.click(retryButton);
 
-      // The new run owns the container: stale widget removed, spinner back while it loads.
+      // The new run owns the container: stale widget removed, spinner back while it loads — with
+      // no help from the observer, so the reset can't depend on observer scheduling.
       await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
       expect(container!.childNodes.length).toBe(0);
-      setRenderedHeight(container!, 0);
       expect(await findByText(/loading/i)).toBeInTheDocument();
     });
   });

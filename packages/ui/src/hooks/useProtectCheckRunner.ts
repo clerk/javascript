@@ -225,10 +225,13 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     // This run owns the container outright: drop anything a previous run left behind (a solved or
     // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
-    // second widget under a stale one.
+    // second widget under a stale one. Reset visibility in the same breath — the container is
+    // empty by construction here, and waiting on the observer callback would leave the state
+    // stale for a scheduling-dependent window (especially on the MutationObserver fallback).
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
+    setIsWidgetVisible(false);
 
     isRunningRef.current = true;
     setIsRunning(true);
