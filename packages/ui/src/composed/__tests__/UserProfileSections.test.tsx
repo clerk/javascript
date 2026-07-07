@@ -281,32 +281,6 @@ describe('UserProfile composed sections', () => {
 
       screen.getByText(/web3 wallets/i);
     });
-
-    it.skip('UserProfileWeb3Section connect wallet calls createWeb3Wallet with a valid identifier — requires real moduleManager for @metamask imports', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withWeb3Wallet();
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-
-      const { userEvent } = render(
-        <UserProfileAccountPanel>
-          <UserProfileWeb3Section />
-        </UserProfileAccountPanel>,
-        { wrapper },
-      );
-
-      const connectButton = screen.getByRole('button', { name: /connect wallet/i });
-      await userEvent.click(connectButton);
-
-      const metamaskItem = await screen.findByRole('menuitem', { name: /metamask/i });
-      await userEvent.click(metamaskItem);
-
-      await waitFor(() => {
-        expect(fixtures.clerk.user?.createWeb3Wallet).toHaveBeenCalled();
-      });
-      const callArgs = (fixtures.clerk.user?.createWeb3Wallet as any).mock.calls[0];
-      expect(callArgs[0].web3Wallet).not.toBe('');
-    });
   });
 
   describe('Account — section outside page', () => {
