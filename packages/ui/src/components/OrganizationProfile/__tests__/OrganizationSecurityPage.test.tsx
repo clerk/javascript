@@ -1,7 +1,6 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { ModalContext } from '@/elements/Modal';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
@@ -48,19 +47,6 @@ const configuredConnection = (overrides: Record<string, unknown> = {}) =>
 
 const renderPage = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
   render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper });
-
-// Renders the page inside a modal context (a `toggle` is provided), mirroring how
-// the modal-mode OrganizationProfile owns the close button.
-const renderPageInModal = (wrapper: React.ComponentType<{ children?: React.ReactNode }>, toggle: () => void) => {
-  const FixtureWrapper = wrapper;
-  const modalValue = { value: { toggle } };
-  const ModalWrapper = ({ children }: { children?: React.ReactNode }) => (
-    <FixtureWrapper>
-      <ModalContext.Provider value={modalValue}>{children}</ModalContext.Provider>
-    </FixtureWrapper>
-  );
-  return render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper: ModalWrapper });
-};
 
 describe('OrganizationSecurityPage', () => {
   describe('overview states', () => {
@@ -306,52 +292,6 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
-    });
-  });
-
-  describe('wizard modal close button', () => {
-    it('renders a header close button wired to the modal toggle when the wizard is open in a modal', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
-
-      const toggle = vi.fn();
-      const { userEvent } = renderPageInModal(wrapper, toggle);
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
-      expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
-
-      // jsdom can't evaluate the desktop/mobile media split, so assert behavior:
-      // the header exposes a close button that drives the modal's toggle.
-      const closeButton = screen.getByRole('button', { name: 'Close modal' });
-      await userEvent.click(closeButton);
-      expect(toggle).toHaveBeenCalled();
-    });
-
-    it('does not render the wizard close button when the wizard is open outside a modal', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
-
-      const { userEvent } = renderPage(wrapper);
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
-      expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
-    });
-
-    it('keeps the overview free of the wizard close button inside a modal', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
-
-      const toggle = vi.fn();
-      renderPageInModal(wrapper, toggle);
-
-      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
     });
   });
 

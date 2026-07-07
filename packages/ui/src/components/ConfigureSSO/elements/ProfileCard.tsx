@@ -9,12 +9,10 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
     elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
-      gap: theme.space.$3,
+      gap: theme.space.$2,
       width: '100%',
       minHeight: theme.sizes.$13,
       padding: theme.space.$5,
-      // Vertically center the back button, stepper, and (modal) close button.
-      alignItems: 'center',
       borderBottomWidth: theme.borderWidths.$normal,
       borderBottomStyle: theme.borderStyles.$solid,
       borderBottomColor: theme.colors.$borderAlpha100,

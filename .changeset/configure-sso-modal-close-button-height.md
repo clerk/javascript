@@ -2,4 +2,4 @@
 '@clerk/ui': patch
 ---
 
-Fix the close button in the organization profile's SSO configuration wizard growing the modal header taller than its other content.
+Fix the organization profile modal close button overlapping the SSO configuration wizard's step header.
