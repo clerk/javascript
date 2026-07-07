@@ -3,11 +3,11 @@ name: mosaic
 description: >-
   Work on Mosaic flow UI: authoring a state machine (`setup`, states/guards/`invoke`,
   wiring to React with `useMachine`/`useActor`/`useSelector`), writing the controller
-  (Clerk adapter) or view (rendering) layer, or migrating a legacy / pre-Mosaic
-  component into the machine / controller / view split and verifying no behavior is
-  silently dropped. Use when building or debugging any Mosaic flow, or migrating a
-  component into Mosaic. `references/mosaic-architecture.md` (repo root) holds the
-  design-system contract; this skill is the how-to layer.
+  (Clerk adapter) or view (rendering) layer, testing any of those layers, or migrating
+  a legacy / pre-Mosaic component into the machine / controller / view split and
+  verifying no behavior is silently dropped. Use when building, debugging, or testing
+  any Mosaic flow, or migrating a component into Mosaic. `references/mosaic-architecture.md`
+  (repo root) holds the design-system contract; this skill is the how-to layer.
 ---
 
 # Mosaic flow UI
@@ -36,13 +36,14 @@ _how-to_.
 
 ## Which reference to read
 
-| You are…                                                           | Read                         |
-| ------------------------------------------------------------------ | ---------------------------- |
-| Authoring or debugging a state machine, or wiring one to React     | `references/machines.md`     |
-| Writing the controller (Clerk adapter, permissions, revalidate)    | `references/controllers.md`  |
-| Writing the view (rendering a snapshot, sending events)            | `references/views.md`        |
-| Migrating a legacy component into Mosaic (the end-to-end workflow) | `references/migration.md`    |
-| Running the parity audit that guards a migration                   | `references/parity-audit.md` |
+| You are…                                                           | Read                                                   |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| Authoring or debugging a state machine, or wiring one to React     | `references/machines.md` → in-tree `machine/README.md` |
+| Writing the controller (Clerk adapter, permissions, revalidate)    | `references/controllers.md`                            |
+| Writing the view (rendering a snapshot, sending events)            | `references/views.md`                                  |
+| Testing a machine, controller, or view                             | `references/testing.md`                                |
+| Migrating a legacy component into Mosaic (the end-to-end workflow) | `references/migration.md`                              |
+| Running the parity audit that guards a migration                   | `references/parity-audit.md`                           |
 
 The migration workflow (`migration.md`) ties the others together: it treats the
 legacy component as the spec and drives you through the machine, controller, and
