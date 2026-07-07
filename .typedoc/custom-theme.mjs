@@ -2266,17 +2266,6 @@ ${tabs}
        * Hide "Extends" and "Extended by" sections
        */
       hierarchy: () => '',
-      /**
-       * @param {import('typedoc').DeclarationReflection} model
-       */
-      accessor: model => {
-        // Fallback single-row rendering if used directly elsewhere
-        const name = model.name;
-        const typeStr = model.getSignature?.type ? this.partials.someType(model.getSignature.type) : '';
-        const summary = model.getSignature?.comment?.summary ?? model.comment?.summary;
-        const description = Array.isArray(summary) ? summary.reduce((acc, curr) => acc + (curr.text || ''), '') : '';
-        return '| ' + '`' + escapeChars(name) + '`' + ' | ' + typeStr + ' | ' + description + ' |';
-      },
     };
   }
 }
