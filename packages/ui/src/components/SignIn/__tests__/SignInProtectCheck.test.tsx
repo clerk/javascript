@@ -305,20 +305,23 @@ describe('SignInProtectCheck', () => {
     };
 
     it('hides the spinner while the challenge widget is visible and restores it when the widget collapses', async () => {
-      const { container, queryByText, findByText } = await renderWithPendingChallenge();
+      const { container, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 
       // Invisible phase (SDK loading / executing): the spinner is the progress indicator.
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+      // The label lives on the spinner itself — no visible "Loading" text (design-system
+      // consistency; see the dogfooding thread).
+      expect(queryByText(/loading/i)).not.toBeInTheDocument();
 
       // The SDK paints a visible widget (e.g. Turnstile) into the container — the widget owns
       // the UI now, so the spinner must not keep spinning below it.
       setRenderedHeight(container, 65);
-      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
 
       // The widget collapses again while the check is still running (e.g. solved, proof
       // verification in flight) — the spinner takes back over.
       setRenderedHeight(container, 0);
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
     });
 
     it('keeps the empty challenge container out of the layout until the widget renders', async () => {
@@ -336,14 +339,14 @@ describe('SignInProtectCheck', () => {
       // Legacy-bundle browsers (e.g. Safari < 13.1) have no ResizeObserver; jsdom's native
       // MutationObserver stands in for theirs here.
       (window as any).ResizeObserver = undefined;
-      const { container, queryByText, findByText } = await renderWithPendingChallenge();
+      const { container, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
 
       Object.defineProperty(container, 'offsetHeight', { value: 65, configurable: true });
       container.appendChild(document.createElement('div'));
 
-      await waitFor(() => expect(queryByText(/loading/i)).not.toBeInTheDocument());
+      await waitFor(() => expect(queryByLabelText(/loading/i)).not.toBeInTheDocument());
     });
 
     it('clears leftovers from a failed run so the retry starts with the spinner', async () => {
@@ -364,13 +367,13 @@ describe('SignInProtectCheck', () => {
           return new Promise(() => {}); // retry run stays pending
         });
 
-      const { findByRole, findByText, queryByText } = render(<SignInProtectCheck />, { wrapper });
+      const { findByRole, findByLabelText, queryByLabelText } = render(<SignInProtectCheck />, { wrapper });
       await waitFor(() => expect(mockExecute).toHaveBeenCalled());
 
       // A widget renders, then the run fails (e.g. turnstile error-callback).
       container!.appendChild(document.createElement('div'));
       setRenderedHeight(container!, 65);
-      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
       rejectRun!(
         new ClerkRuntimeError('Protect check script execution failed', { code: 'protect_check_execution_failed' }),
       );
@@ -382,7 +385,7 @@ describe('SignInProtectCheck', () => {
       // no help from the observer, so the reset can't depend on observer scheduling.
       await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
       expect(container!.childNodes.length).toBe(0);
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
     });
   });
 

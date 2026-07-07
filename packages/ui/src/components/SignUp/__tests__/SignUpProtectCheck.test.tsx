@@ -294,20 +294,23 @@ describe('SignUpProtectCheck', () => {
     };
 
     it('hides the spinner while the challenge widget is visible and restores it when the widget collapses', async () => {
-      const { container, queryByText, findByText } = await renderWithPendingChallenge();
+      const { container, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
 
       // Invisible phase (SDK loading / executing): the spinner is the progress indicator.
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+      // The label lives on the spinner itself — no visible "Loading" text (design-system
+      // consistency; see the dogfooding thread).
+      expect(queryByText(/loading/i)).not.toBeInTheDocument();
 
       // The SDK paints a visible widget (e.g. Turnstile) into the container — the widget owns
       // the UI now, so the spinner must not keep spinning below it.
       setRenderedHeight(container, 65);
-      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
 
       // The widget collapses again while the check is still running (e.g. solved, proof
       // verification in flight) — the spinner takes back over.
       setRenderedHeight(container, 0);
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
     });
 
     it('keeps the empty challenge container out of the layout until the widget renders', async () => {
@@ -334,7 +337,7 @@ describe('SignUpProtectCheck', () => {
         return new Promise(() => {}); // never resolves; the check stays running
       });
 
-      const { rerender, queryByText, findByText } = render(<SignUpProtectCheck />, { wrapper });
+      const { rerender, queryByText, queryByLabelText, findByLabelText } = render(<SignUpProtectCheck />, { wrapper });
 
       // Direct visit with no challenge: the card renders nothing (the flow-start redirect is scheduled).
       expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
@@ -349,10 +352,10 @@ describe('SignUpProtectCheck', () => {
       rerender(<SignUpProtectCheck />);
 
       await waitFor(() => expect(mockExecute).toHaveBeenCalled());
-      expect(await findByText(/loading/i)).toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
 
       setRenderedHeight(container!, 65);
-      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
     });
   });
 

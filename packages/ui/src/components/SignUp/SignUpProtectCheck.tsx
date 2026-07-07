@@ -129,18 +129,13 @@ function SignUpProtectCheckInternal({
               style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
             {isRunning && !hasError && !isWidgetVisible ? (
-              <Flex
-                direction='col'
-                center
-                gap={4}
-                aria-live='polite'
-              >
+              <Flex center>
                 <Spinner
                   size='lg'
                   colorScheme='primary'
                   elementDescriptor={descriptors.spinner}
+                  aria-label={t(localizationKeys('signUp.protectCheck.loading'))}
                 />
-                <Box>{t(localizationKeys('signUp.protectCheck.loading'))}</Box>
               </Flex>
             ) : null}
             {hasError ? (
