@@ -14,7 +14,7 @@ import { MarkdownPageEvent, MarkdownTheme, MarkdownThemeContext } from 'typedoc-
 
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { applyCatchAllMdReplacements, applyRelativeLinkReplacements } from './custom-plugin.mjs';
-import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
+import { backTicks, escapeChars, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { BACKEND_API_CONFIG, REFERENCE_OBJECT_CONFIG, REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
 import { toFileSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
@@ -2280,23 +2280,6 @@ function codeBlock(content) {
       ? trimLastLine(content)
       : content;
   return '```ts\n' + unEscapeChars(trimmedContent) + '\n```';
-}
-
-/**
- * @param {string} str
- */
-function escapeChars(str) {
-  return str
-    .replace(/>/g, '\\>')
-    .replace(/</g, '\\<')
-    .replace(/{/g, '\\{')
-    .replace(/}/g, '\\}')
-    .replace(/_/g, '\\_')
-    .replace(/`/g, '\\`')
-    .replace(/\|/g, '\\|')
-    .replace(/\[/g, '\\[')
-    .replace(/\]/g, '\\]')
-    .replace(/\*/g, '\\*');
 }
 
 // ---------------------------------------------------------------------------
