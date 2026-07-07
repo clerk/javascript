@@ -39,7 +39,7 @@ describe('timeLimit', () => {
     await vi.advanceTimersByTimeAsync(10_000);
   });
 
-  it('aborts the provided controller with the timeout error when ms elapses first', async () => {
+  it('aborts the provided controller with no reason when ms elapses first', async () => {
     vi.useFakeTimers();
     const abort = vi.fn();
     const neverSettles = new Promise<string>(() => {});
@@ -47,9 +47,10 @@ describe('timeLimit', () => {
 
     await vi.advanceTimersByTimeAsync(50);
 
-    const error = await result;
+    await result;
+    // Abort carries no reason so the internal timeout error is never exposed via signal.reason.
     expect(abort).toHaveBeenCalledTimes(1);
-    expect(abort).toHaveBeenCalledWith(error);
+    expect(abort).toHaveBeenCalledWith();
   });
 
   it('does not abort when the value settles before ms', async () => {

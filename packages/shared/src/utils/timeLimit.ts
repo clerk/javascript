@@ -1,7 +1,7 @@
 export function timeLimit<T>(
   value: T | PromiseLike<T>,
   ms: number,
-  controller?: Pick<AbortController, 'abort'>,
+  abortController?: Pick<AbortController, 'abort'>,
 ): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout>;
 
@@ -9,7 +9,9 @@ export function timeLimit<T>(
     timeoutId = setTimeout(() => {
       const error = new Error(`Timed out after ${ms}ms`);
       // Abort the underlying operation (e.g. a fetch) so it stops running instead of settling later.
-      controller?.abort(error);
+      // Abort with no reason on purpose: the descriptive timeout error stays on this promise's
+      // rejection, so it never leaks to host fetch instrumentation that reads `signal.reason`.
+      abortController?.abort();
       reject(error);
     }, ms);
 

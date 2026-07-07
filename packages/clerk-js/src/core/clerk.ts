@@ -77,6 +77,7 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
   ConfigureSSOProps,
@@ -3183,7 +3184,7 @@ export class Clerk implements ClerkInterface {
           // detached instance later; the background retry below owns recovery from then on.
           const clientFetchController = new AbortController();
           return timeLimit(
-            Client.getOrCreateInstance().fetch({ signal: clientFetchController.signal }),
+            Client.getOrCreateInstance().fetch({ abortSignal: clientFetchController.signal }),
             INITIALIZATION_TIMEOUT_MS,
             clientFetchController,
           )
@@ -3205,39 +3206,46 @@ export class Clerk implements ClerkInterface {
                */
               this.#authService?.stopPollingForToken();
 
-              const jwtInCookie = this.#authService?.getSessionCookie();
-              const localClient = createClientFromJwt(jwtInCookie);
-              const session = this.#defaultSession(localClient);
+              try {
+                const jwtInCookie = this.#authService?.getSessionCookie();
+                const localClient = createClientFromJwt(jwtInCookie);
+                const session = this.#defaultSession(localClient);
 
-              if (session) {
-                // Prefer minting a fresh token for the degraded identity: the minter can serve it
-                // during an origin outage and its claims are fresher than the cookie's. Fall back
-                // to the cookie identity only when the mint fails or times out.
-                session.clearCache();
-                const freshJwt = await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
-                  // On timeout the recovery getToken is still in flight with a pending resolver in the cache;
-                  // clear it so the poller's next getToken starts fresh instead of awaiting the abandoned one.
+                if (session) {
+                  // Prefer minting a fresh token for the degraded identity: the minter can serve it
+                  // during an origin outage and its claims are fresher than the cookie's. Fall back
+                  // to the cookie identity only when the mint fails or times out.
                   session.clearCache();
-                  return null;
-                });
-                this.updateClient(freshJwt ? createClientFromJwt(freshJwt) : localClient);
-              } else {
-                this.updateClient(localClient);
+                  const freshJwt = await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
+                    // On timeout the recovery getToken is still in flight with a pending resolver in the cache;
+                    // clear it so the poller's next getToken starts fresh instead of awaiting the abandoned one.
+                    session.clearCache();
+                    return null;
+                  });
+                  this.updateClient(freshJwt ? createClientFromJwt(freshJwt) : localClient);
+                } else {
+                  this.updateClient(localClient);
+                }
+              } finally {
+                // Always restart the poller, no matter what in the recovery block above threw (a failed
+                // mint, a throwing updateClient listener). Otherwise the session-refresh poller would stay
+                // stopped until a full page reload.
+                this.#authService?.startPollingForToken();
               }
-              this.#authService?.startPollingForToken();
 
-              // Retry /client in the background through the normal fetch flow (network-level
-              // retries, no time limit) now that load no longer blocks on it. The response is
-              // applied only if nothing else updated the client while it was in flight; anything
-              // newer (a sign-out, a mutation's piggybacked client) must win over the late response.
-              // A 5xx failure is not retried (fapiClient only retries network errors); in that
-              // case the client heals via the piggybacked client of the next mutation.
+              // Retry /client in the background (network-level retries, no time limit) now that load no
+              // longer blocks on it. We fetch the raw JSON and apply it only if nothing else updated the
+              // client while it was in flight; anything newer (a sign-out, a mutation's piggybacked client)
+              // must win. Fetching the JSON with Client._fetch instead of Client.fetch() means a superseded
+              // response is dropped without ever mutating the shared Client instance in place.
+              // A 5xx failure is not retried (fapiClient only retries network errors); in that case the
+              // client heals via the piggybacked client of the next mutation.
               const clientGenerationAtDispatch = this.#clientUpdateGeneration;
-              void Client.getOrCreateInstance()
-                .fetch()
+              void Client._fetch<ClientJSON>({ method: 'GET', path: '/client' })
                 .then(res => {
-                  if (this.#clientUpdateGeneration === clientGenerationAtDispatch) {
-                    this.updateClient(res);
+                  const clientJson = res?.response;
+                  if (clientJson && this.#clientUpdateGeneration === clientGenerationAtDispatch) {
+                    this.updateClient(Client.getOrCreateInstance().fromJSON(clientJson));
                   }
                 })
                 .catch(noop);
