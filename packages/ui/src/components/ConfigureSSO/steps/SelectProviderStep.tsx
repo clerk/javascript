@@ -21,9 +21,10 @@ import { handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
+import { isOidcProvider } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
-import type { ProviderType } from '../types';
+import type { EnterpriseConnectionProviderType, ProviderType } from '../types';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 const PROVIDER_GROUPS: ReadonlyArray<{
@@ -69,6 +70,14 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
 
+/**
+ * The picker works in input aliases; an existing connection reports back its real
+ * provider (OIDC as an open `oidc_<slug>` family), so collapse it onto the card
+ * that represents it — every OIDC family maps to the single `oidc_custom` card.
+ */
+const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
+  isOidcProvider(provider) ? 'oidc_custom' : provider;
+
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
@@ -85,7 +94,9 @@ export const SelectProviderStep = (): JSX.Element => {
     [isOIDCFlowEnabled],
   );
 
-  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
+  const currentCard = c.provider ? toProviderCard(c.provider) : null;
+
+  const [selected, setSelected] = React.useState<ProviderType | null>(currentCard);
   const card = useCardState();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -96,20 +107,20 @@ export const SelectProviderStep = (): JSX.Element => {
     setSelected(next);
   };
 
-  const isChangingProvider = c.hasConnection && selected !== null && selected !== c.provider;
+  const isChangingProvider = c.hasConnection && selected !== null && selected !== currentCard;
 
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    if (c.hasConnection && selected === c.provider) {
+    if (c.hasConnection && selected === currentCard) {
       void goNext();
       return;
     }
 
     if (isChangingProvider) {
-      setChangeFromProvider(c.provider ?? null);
+      setChangeFromProvider(currentCard);
       setIsChangeDialogOpen(true);
       return;
     }

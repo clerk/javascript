@@ -4,9 +4,10 @@ import { descriptors, Flow } from '@/customizables';
 import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
+import { isOidcProvider } from '../../domain/organizationEnterpriseConnection';
 import { Step } from '../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../elements/Wizard';
-import type { ProviderType } from '../../types';
+import type { EnterpriseConnectionProviderType, SamlProviderType } from '../../types';
 import { SelectProviderStep } from '../SelectProviderStep';
 import { OidcCustomConfigureSteps } from './oidc';
 import {
@@ -16,13 +17,25 @@ import {
   SamlOktaConfigureSteps,
 } from './saml';
 
-const STEPS_BY_PROVIDER: Record<ProviderType, () => JSX.Element> = {
+type ConfigureStepsComponent = () => JSX.Element;
+
+const STEPS_BY_SAML_PROVIDER: Record<SamlProviderType, ConfigureStepsComponent> = {
   saml_custom: SamlCustomConfigureSteps,
   saml_okta: SamlOktaConfigureSteps,
   saml_google: SamlGoogleConfigureSteps,
   saml_microsoft: SamlMicrosoftConfigureSteps,
-  oidc_custom: OidcCustomConfigureSteps,
 };
+
+/**
+ * Resolves the configure sub-flow for a created connection's provider. OIDC is an
+ * open, backend-derived family (`oidc_<slug>`), so every OIDC provider shares one
+ * sub-flow and is matched by protocol prefix; SAML stays an exact-literal lookup.
+ * Returns `undefined` for an unrecognized provider so the caller can degrade.
+ */
+export const resolveConfigureSteps = (
+  provider: EnterpriseConnectionProviderType,
+): ConfigureStepsComponent | undefined =>
+  isOidcProvider(provider) ? OidcCustomConfigureSteps : STEPS_BY_SAML_PROVIDER[provider];
 
 export const ConfigureStep = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
@@ -55,7 +68,7 @@ export const ConfigureStep = (): JSX.Element => {
   );
 };
 
-const ConfigureProviderStep = (): JSX.Element | null => {
+export const ConfigureProviderStep = (): JSX.Element | null => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
   // Type guard: the provider should be defined by the time we reach configure.
@@ -63,12 +76,7 @@ const ConfigureProviderStep = (): JSX.Element | null => {
     return null;
   }
 
-  // Adding a provider to the select step without a mapping here fails the build.
-  const StepsByProvider = STEPS_BY_PROVIDER[c.provider];
-
-  if (!StepsByProvider) {
-    throw new Error(`No steps found for provider: ${c.provider}`);
-  }
+  const ConfigureSteps = resolveConfigureSteps(c.provider);
 
   return (
     <Flow.Part part='configureCreateApp'>
@@ -76,7 +84,19 @@ const ConfigureProviderStep = (): JSX.Element | null => {
         elementDescriptor={descriptors.configureSSOStep}
         elementId={descriptors.configureSSOStep.setId('configure')}
       >
-        <StepsByProvider />
+        {ConfigureSteps ? (
+          <ConfigureSteps />
+        ) : (
+          // A provider the SDK doesn't recognize (e.g. a newer backend family)
+          // degrades to a terminal state instead of white-screening the wizard.
+          <>
+            <Step.Header
+              title='Unsupported provider'
+              description='This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.'
+            />
+            <Step.Body />
+          </>
+        )}
       </Step>
     </Flow.Part>
   );

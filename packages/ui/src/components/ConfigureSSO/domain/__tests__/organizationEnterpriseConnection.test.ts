@@ -93,6 +93,11 @@ describe('organizationEnterpriseConnection', () => {
     it('connection → its provider', () => {
       expect(derive({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
     });
+    it('carries a derived OIDC key verbatim — the open family, not the oidc_custom alias', () => {
+      // The backend derives `oidc_<slug>` from the connection name; the entity must
+      // expose that real value so dispatch can prefix-match it.
+      expect(derive({ connection: makeConnection({ provider: 'oidc_clerk_dev' }) }).provider).toBe('oidc_clerk_dev');
+    });
   });
 
   describe('isActive', () => {

@@ -5,7 +5,15 @@ import type {
   UserResource,
 } from '@clerk/shared/types';
 
-import type { ProviderType } from '../types';
+import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
+
+/**
+ * OIDC providers are recognized by protocol prefix, never by literal: the backend
+ * stores a derived `oidc_<slug>` key (open family), so the read-back provider is
+ * not a fixed enum. SAML providers stay exact literals. Single source of the
+ * prefix notion — dispatch and configuration checks both read it from here.
+ */
+export const isOidcProvider = (provider: string): provider is OidcProviderType => provider.startsWith('oidc');
 
 /**
  * The email whose domain backs the connection: the user's primary address if
@@ -40,7 +48,7 @@ export type OrganizationEnterpriseConnectionStatus = 'unconfigured' | 'in_progre
  * object the wizard makes every flow decision from. A snapshot of flattened booleans/values.
  */
 export interface OrganizationEnterpriseConnection {
-  readonly provider: ProviderType | undefined;
+  readonly provider: EnterpriseConnectionProviderType | undefined;
   readonly hasConnection: boolean;
   readonly isActive: boolean;
   readonly hasMinimumConfiguration: boolean;
@@ -55,7 +63,7 @@ export const isEnterpriseConnectionConfigured = (
     return false;
   }
   // OIDC exposes only the client ID on the resource; the secret and manual endpoints are write-only.
-  if (connection.provider.startsWith('oidc')) {
+  if (isOidcProvider(connection.provider)) {
     return Boolean(connection.oauthConfig?.clientId);
   }
   return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
@@ -94,7 +102,10 @@ export const organizationEnterpriseConnection = ({
   const hasMinimumConfiguration = isEnterpriseConnectionConfigured(connection);
 
   return {
-    provider: connection?.provider as ProviderType | undefined,
+    // Boundary cast at the FAPI edge: SAML returns exact literals, OIDC an open
+    // `oidc_<slug>` family. An unrecognized value degrades downstream (dispatch
+    // falls back), so the honest open type — not the `oidc_custom` input alias — holds here.
+    provider: connection?.provider as EnterpriseConnectionProviderType | undefined,
     hasConnection,
     isActive,
     hasMinimumConfiguration,
