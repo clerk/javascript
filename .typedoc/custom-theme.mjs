@@ -21,48 +21,6 @@ import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs
 import { unwrapOptional } from './type-utils.mjs';
 
 /**
- * Unwrap optional TypeDoc types so referenced object shapes are still found.
- *
- * @param {import('typedoc').Type} t
- * @returns {import('typedoc').Type}
- */
-/**
- * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded (otherwise `instanceof IntersectionType` is false at render time).
- *
- * @param {import('typedoc').Type | undefined} t
- * @returns {t is import('typedoc').IntersectionType}
- */
-function isIntersectionTypeDoc(t) {
-  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
-  return Boolean(o && typeof o === 'object' && o.type === 'intersection' && Array.isArray(o.types));
-}
-
-/**
- * @param {import('typedoc').Type | undefined} t
- * @returns {t is import('typedoc').ReferenceType}
- */
-function isReferenceTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
-  return Boolean(t && typeof t === 'object' && /** @type {{ type?: string }} */ (t).type === 'reference');
-}
-
-/**
- * @param {import('typedoc').Type | undefined} t
- * @returns {t is import('typedoc').ReflectionType}
- */
-function isReflectionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
-  return Boolean(t && typeof t === 'object' && /** @type {{ type?: string }} */ (t).type === 'reflection');
-}
-
-/**
- * @param {import('typedoc').Type | undefined} t
- * @returns {boolean}
- */
-function isUnionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
-  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
-  return Boolean(o && typeof o === 'object' && o.type === 'union' && Array.isArray(o.types));
-}
-
-/**
  * Stock `typedoc-plugin-markdown` `arrayType` only wraps `elementType.type === 'union'`.
  * For `T | T[]` where `T` is an `@inline` alias to a union, the element is still a `reference` in the model but renders as `"a" \| "b"`, producing `"a" \| "b"[]` (wrong binding). Instead, parens the array type whenever the reference inlines to a union RHS so it produces `("a" \| "b")[]`.
  * E.g. `status` in `GetUserOrganizationSuggestionsParams`.
@@ -71,21 +29,17 @@ function isUnionTypeDoc(/** @type {import('typedoc').Type | undefined} */ t) {
  * @returns {boolean}
  */
 function isArrayElementReferenceInliningToUnion(elementType) {
-  if (!isReferenceTypeDoc(elementType)) {
+  if (!(elementType instanceof ReferenceType) || !elementType.reflection) {
     return false;
   }
-  const ref = /** @type {import('typedoc').ReferenceType} */ (elementType);
-  if (!ref.reflection) {
+  if (!isInlineModifierWithoutStandalonePage(elementType.reflection)) {
     return false;
   }
-  if (!isInlineModifierWithoutStandalonePage(ref.reflection)) {
-    return false;
-  }
-  const decl = /** @type {import('typedoc').DeclarationReflection} */ (ref.reflection);
+  const decl = /** @type {import('typedoc').DeclarationReflection} */ (elementType.reflection);
   if (!decl.kindOf?.(ReflectionKind.TypeAlias) || !decl.type) {
     return false;
   }
-  return isUnionTypeDoc(decl.type);
+  return decl.type instanceof UnionType;
 }
 
 /**
@@ -111,7 +65,7 @@ function findNamedTypeDeclaration(project, name) {
 }
 
 /**
- * Prefer `packages/shared/src/types/strategies.ts` when multiple type aliases share the name `OAuthStrategy`.
+ * Prefer `packages/shared/src/types/strategies.ts` when multiple type aliases share the name `OAuthStrategy` (also declared in `packages/backend`).
  *
  * @param {import('typedoc').ProjectReflection | undefined} project
  * @returns {import('typedoc').DeclarationReflection | undefined}
@@ -120,54 +74,16 @@ function findOAuthStrategyDeclaration(project) {
   if (!project) {
     return undefined;
   }
-  /** @param {import('typedoc').Reflection} r */
-  const sourcePath = r => {
-    const sources = /** @type {{ sources?: object[] }} */ (r).sources;
-    const s = sources?.[0];
-    if (!s) {
-      return '';
-    }
-    const raw = /** @type {{ file?: { fullFileName?: string }; fullFileName?: string }} */ (s);
-    const p = raw.file?.fullFileName ?? raw.fullFileName ?? '';
-    return String(p).replace(/\\/g, '/');
-  };
-
-  const byKind =
-    typeof project.getReflectionsByKind === 'function'
-      ? project.getReflectionsByKind(ReflectionKind.TypeAlias).filter(r => r.name === 'OAuthStrategy')
-      : Object.values(project.reflections ?? {}).filter(
-          r =>
-            r.name === 'OAuthStrategy' &&
-            /** @type {import('typedoc').Reflection} */ (r).kindOf?.(ReflectionKind.TypeAlias),
-        );
-  if (byKind.length === 0) {
-    return findNamedTypeDeclaration(project, 'OAuthStrategy');
+  const candidates = /** @type {import('typedoc').DeclarationReflection[]} */ (
+    project.getReflectionsByKind(ReflectionKind.TypeAlias).filter(r => r.name === 'OAuthStrategy')
+  );
+  if (candidates.length <= 1) {
+    return candidates[0];
   }
-  if (byKind.length === 1) {
-    return /** @type {import('typedoc').DeclarationReflection} */ (byKind[0]);
-  }
-  const fromStrategies = byKind.find(r => sourcePath(r).includes('strategies'));
-  return /** @type {import('typedoc').DeclarationReflection | undefined} */ (fromStrategies ?? byKind[0]);
-}
-
-/**
- * Stock `someType` uses `instanceof UnionType`; duplicate Typedoc copies in the tree break that check and unions fall through to `backTicks(model.toString())`, bypassing {@link unionType} entirely (including OAuth collapse).
- *
- * @param {import('typedoc').Type | undefined} model
- * @returns {import('typedoc').UnionType | undefined}
- */
-function coerceUnionTypeIfNeeded(model) {
-  if (!model || typeof model !== 'object') {
-    return undefined;
-  }
-  if (model instanceof UnionType) {
-    return model;
-  }
-  const o = /** @type {{ type?: string; types?: import('typedoc').SomeType[] }} */ (model);
-  if (o.type === 'union' && Array.isArray(o.types) && o.types.length) {
-    return new UnionType(o.types);
-  }
-  return undefined;
+  const fromStrategies = candidates.find(r =>
+    (r.sources?.[0]?.fileName ?? '').replace(/\\/g, '/').includes('strategies'),
+  );
+  return fromStrategies ?? candidates[0];
 }
 
 /**
@@ -179,14 +95,13 @@ function coerceUnionTypeIfNeeded(model) {
  * @returns {import('typedoc').Type[]}
  */
 function flattenUnionTypeMembersForOAuthCollapse(t) {
-  if (!t || typeof t !== 'object') {
+  if (!t) {
     return [];
   }
-  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] }} */ (t);
-  if (o.type === 'union' && Array.isArray(o.types)) {
+  if (t instanceof UnionType) {
     /** @type {import('typedoc').Type[]} */
     const acc = [];
-    for (const inner of o.types) {
+    for (const inner of t.types) {
       acc.push(...flattenUnionTypeMembersForOAuthCollapse(inner));
     }
     return acc;
@@ -287,7 +202,7 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
     return [];
   }
 
-  if (isReflectionTypeDoc(unwrapped)) {
+  if (unwrapped instanceof ReflectionType) {
     const decl = unwrapped.declaration;
     if (!decl) {
       return [];
@@ -298,7 +213,7 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
     return (decl.children ?? []).filter(c => c.kind === ReflectionKind.Property);
   }
 
-  if (isReferenceTypeDoc(unwrapped)) {
+  if (unwrapped instanceof ReferenceType) {
     let ref = unwrapped.reflection;
     if (!ref && unwrapped.name && project) {
       ref = findNamedTypeDeclaration(project, unwrapped.name);
@@ -349,7 +264,7 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
     return [];
   }
 
-  if (isIntersectionTypeDoc(unwrapped)) {
+  if (unwrapped instanceof IntersectionType) {
     /** @type {import('typedoc').DeclarationReflection[]} */
     const out = [];
     for (const arm of unwrapped.types) {
@@ -358,7 +273,7 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
     return out;
   }
 
-  if (isUnionTypeDoc(unwrapped)) {
+  if (unwrapped instanceof UnionType) {
     return collectPropertyReflectionsFromUnionObjectArms(unwrapped, visitedReflectionIds, project);
   }
 
@@ -1263,7 +1178,7 @@ function swapParentPageParametersSections(contents, decl, ctx) {
   /** @type {import('typedoc').SignatureReflection | undefined} */
   const sig =
     /** @type {any} */ (decl).signatures?.[0] ??
-    /** @type {any} */ ((decl).kind && getPrimaryCallSignature(declWithChildren)) ??
+    /** @type {any} */ (decl.kind && getPrimaryCallSignature(declWithChildren)) ??
     undefined;
   if (!sig) return result;
   const paramsMatch = result.match(/(^|\n)(##+) Parameters\n[\s\S]*?(?=\n(?:##+ |---)|$)/);
@@ -1605,6 +1520,20 @@ function wrapPropertiesSectionWithMarkers(contents) {
 }
 
 /**
+ * Strip inline-code markers (backticks, `<code>` tags) from a type-rendering partial's output and rewrap the whole span in a single `<code>…</code>`. When rendering inside a function signature (`signatureTitle`), the outer code block wraps the whole span so return the stripped text unwrapped.
+ *
+ * @param {string} output
+ * @param {boolean} insideFunctionSignature
+ */
+function wrapInlineTypeAsCode(output, insideFunctionSignature) {
+  const stripped = output
+    .replace(/`/g, '')
+    .replace(/<code>/g, '')
+    .replace(/<\/code>/g, '');
+  return insideFunctionSignature ? stripped : `<code>${stripped}</code>`;
+}
+
+/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
@@ -1765,23 +1694,17 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * Ensure unions always route through `unionType` (OAuth collapse) even when `instanceof UnionType` fails.
+       * Run the OAuth-strategy collapse before delegating to the stock partial when the model is a union.
        *
-       * @param {import('typedoc').Type | undefined} model
+       * @param {import('typedoc').SomeType | undefined} model
        * @param {Parameters<typeof superPartials.someType>[1]} [options]
        */
       someType: (model, options) => {
-        const ut = coerceUnionTypeIfNeeded(model);
-        if (ut) {
-          const collapsed = tryCollapseExpandedOAuthStrategyUnion(ut, this);
-          const toRender = collapsed ?? ut;
-          return superPartials.someType.call(this, toRender, options);
+        if (model instanceof UnionType) {
+          const collapsed = tryCollapseExpandedOAuthStrategyUnion(model, this);
+          return superPartials.someType.call(this, collapsed ?? model, options);
         }
-        return superPartials.someType.call(
-          this,
-          /** @type {import('typedoc').SomeType | undefined} */ (/** @type {unknown} */ (model)),
-          options,
-        );
+        return superPartials.someType.call(this, model, options);
       },
       /**
        * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
@@ -2160,11 +2083,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        if (!opts.nested && model.type && isIntersectionTypeDoc(model.type)) {
-          const merged = mergeIntersectionPropertyReflections(
-            /** @type {import('typedoc').IntersectionType} */ (model.type),
-            model.project,
-          );
+        if (!opts.nested && model.type instanceof IntersectionType) {
+          const merged = mergeIntersectionPropertyReflections(model.type, model.project);
           if (merged.length > 0) {
             const output = renderMergedIntersectionDeclaration(this, customizedModel, opts, merged, superPartials);
             return output.replace(/^## Type declaration$/gm, '');
@@ -2194,19 +2114,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
             ? defaultOutput.replace('\\{', '\\{ ')
             : defaultOutput;
 
-        const output = withCorrectWhitespaceAtStart
-          // Remove any backticks
-          .replace(/`/g, '')
-          // Remove any `<code>` and `</code>` tags
-          .replace(/<code>/g, '')
-          .replace(/<\/code>/g, '');
-
-        // Only wrap in <code> if NOT inside a function signature
-        if (this._insideFunctionSignature) {
-          return output;
-        }
-
-        return `<code>${output}</code>`;
+        return wrapInlineTypeAsCode(withCorrectWhitespaceAtStart, this._insideFunctionSignature);
       },
       /**
        * This modifies the output of union types by wrapping everything in a single `<code>foo | bar</code>` tag instead of doing `<code>foo</code>` | `<code>bar</code>`
@@ -2214,23 +2122,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        */
       unionType: model => {
         const collapsed = tryCollapseExpandedOAuthStrategyUnion(model, this);
-        const defaultOutput = superPartials.unionType(collapsed ?? model);
-
-        const output = defaultOutput
-          // Escape stuff that would be turned into markdown
-          .replace(/__experimental_/g, '\\_\\_experimental\\_')
-          // Remove any backticks
-          .replace(/`/g, '')
-          // Remove any `<code>` and `</code>` tags
-          .replace(/<code>/g, '')
-          .replace(/<\/code>/g, '');
-
-        // Only wrap in <code> if NOT inside a function signature
-        if (this._insideFunctionSignature) {
-          return output;
-        }
-
-        return `<code>${output}</code>`;
+        // Escape `__experimental_` before wrap-as-code so the double-underscore isn't parsed as markdown bold.
+        const escaped = superPartials
+          .unionType(collapsed ?? model)
+          .replace(/__experimental_/g, '\\_\\_experimental\\_');
+        return wrapInlineTypeAsCode(escaped, this._insideFunctionSignature);
       },
       /**
        * This ensures that everything is wrapped in a single codeblock
@@ -2238,27 +2134,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ forceParameterType?: boolean; typeSeparator?: string }} [options]
        */
       functionType: (model, options) => {
-        const defaultOutput = superPartials.functionType(model, options);
-        const delimiter = this.options.getValue('useCodeBlocks') ? ';\n' : '; ';
-
-        const output = defaultOutput
-          .split(delimiter)
-          .map(fn =>
-            fn
-              // Remove any backticks
-              .replace(/`/g, '')
-              // Remove any `<code>` and `</code>` tags
-              .replace(/<code>/g, '')
-              .replace(/<\/code>/g, ''),
-          )
-          .join(delimiter);
-
-        // Only wrap in <code> if NOT inside a function signature
-        if (this._insideFunctionSignature) {
-          return output;
-        }
-
-        return `<code>${output}</code>`;
+        return wrapInlineTypeAsCode(superPartials.functionType(model, options), this._insideFunctionSignature);
       },
       /**
        * Copied from original theme.
@@ -2365,41 +2241,14 @@ ${tabs}
         const theType = this.partials.someType(el);
         const needsParens = el.type === 'union' || isArrayElementReferenceInliningToUnion(el);
         const defaultOutput = needsParens ? `(${theType})[]` : `${theType}[]`;
-
-        const output = defaultOutput
-          // Remove any backticks
-          .replace(/`/g, '')
-          // Remove any `<code>` and `</code>` tags
-          .replace(/<code>/g, '')
-          .replace(/<\/code>/g, '');
-
-        // Only wrap in <code> if NOT inside a function signature
-        if (this._insideFunctionSignature) {
-          return output;
-        }
-
-        return `<code>${output}</code>`;
+        return wrapInlineTypeAsCode(defaultOutput, this._insideFunctionSignature);
       },
       /**
        * Ensures that reflection types (like Simplify wrapped types) are wrapped in a single codeblock
        * @param {import('typedoc').ReflectionType} model
        */
       reflectionType: model => {
-        const defaultOutput = superPartials.reflectionType(model);
-
-        const output = defaultOutput
-          // Remove any backticks
-          .replace(/`/g, '')
-          // Remove any `<code>` and `</code>` tags
-          .replace(/<code>/g, '')
-          .replace(/<\/code>/g, '');
-
-        // Only wrap in <code> if NOT inside a function signature
-        if (this._insideFunctionSignature) {
-          return output;
-        }
-
-        return `<code>${output}</code>`;
+        return wrapInlineTypeAsCode(superPartials.reflectionType(model), this._insideFunctionSignature);
       },
       /**
        * Hide "Extends" and "Extended by" sections
