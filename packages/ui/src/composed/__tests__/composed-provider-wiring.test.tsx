@@ -1,14 +1,17 @@
 import { setModuleManager as setModuleManagerShared } from '@clerk/shared/moduleManager';
 import { act } from '@testing-library/react';
+import { useContext } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
 import { useModuleManager, useOptions } from '@/ui/contexts';
 import { useAppearance } from '@/ui/customizables/AppearanceContext';
 import { setModuleManager } from '@/ui/internal/moduleManagerStore';
 import { useRouter } from '@/ui/router';
-import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen } from '@/test/utils';
 
+import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
+import { UserProfileContext } from '../../contexts/components/UserProfile';
 import { clearFetchCache } from '../../hooks';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
@@ -265,8 +268,12 @@ describe('UserProfileProvider wiring', () => {
     const expectedLocalization = { locale: 'fr-FR', signIn: { start: { title: 'Bienvenue' } } };
     const expectedSupportEmail = 'help@clerk.dev';
     fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
-      if (key === 'localization') return expectedLocalization;
-      if (key === 'supportEmail') return expectedSupportEmail;
+      if (key === 'localization') {
+        return expectedLocalization;
+      }
+      if (key === 'supportEmail') {
+        return expectedSupportEmail;
+      }
       return undefined;
     });
 
@@ -307,6 +314,32 @@ describe('UserProfileProvider wiring', () => {
     );
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
+  });
+
+  it('forwards apiKeysProps into the UserProfile context', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+
+    function ApiKeysProbe() {
+      const ctx = useContext(UserProfileContext);
+      return (
+        <div
+          data-testid='apikeys-probe'
+          data-api-keys={JSON.stringify(ctx?.apiKeysProps)}
+        />
+      );
+    }
+
+    render(
+      <UserProfileProvider apiKeysProps={{ perPage: 5 }}>
+        <ApiKeysProbe />
+      </UserProfileProvider>,
+      { wrapper },
+    );
+
+    expect(JSON.parse(screen.getByTestId('apikeys-probe').dataset.apiKeys || 'null')).toEqual({ perPage: 5 });
   });
 });
 
@@ -358,5 +391,44 @@ describe('OrganizationProfileProvider wiring', () => {
     );
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
+  });
+
+  it('forwards afterLeaveOrganizationUrl and apiKeysProps into the OrganizationProfile context', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        first_name: 'Test',
+        last_name: 'User',
+        organization_memberships: [{ name: 'TestOrg' }],
+      });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
+
+    function OrgProbe() {
+      const ctx = useContext(OrganizationProfileContext);
+      return (
+        <div
+          data-testid='org-probe'
+          data-after-leave={ctx?.afterLeaveOrganizationUrl ?? ''}
+          data-api-keys={JSON.stringify(ctx?.apiKeysProps)}
+        />
+      );
+    }
+
+    render(
+      <OrganizationProfileProvider
+        afterLeaveOrganizationUrl='/bye'
+        apiKeysProps={{ showDescription: true }}
+      >
+        <OrgProbe />
+      </OrganizationProfileProvider>,
+      { wrapper },
+    );
+
+    const probe = screen.getByTestId('org-probe');
+    expect(probe.dataset.afterLeave).toBe('/bye');
+    expect(JSON.parse(probe.dataset.apiKeys || 'null')).toEqual({ showDescription: true });
   });
 });

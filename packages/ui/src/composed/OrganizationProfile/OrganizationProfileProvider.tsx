@@ -1,22 +1,24 @@
 'use client';
 
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource } from '@clerk/shared/types';
+import type { EnvironmentResource, OrganizationProfileProps } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
 import { getModuleManager } from '@/ui/internal/moduleManagerStore';
 
-import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
-import { ProfileProviderShell, fallbackModuleManager } from '../ProfileProviderShell';
+import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
+import { fallbackModuleManager, ProfileProviderShell } from '../ProfileProviderShell';
 
 type OrganizationProfileProviderProps = PropsWithChildren<{
   appearance?: Appearance;
+  afterLeaveOrganizationUrl?: OrganizationProfileProps['afterLeaveOrganizationUrl'];
+  apiKeysProps?: OrganizationProfileProps['apiKeysProps'];
 }>;
 
 export const OrganizationProfileProvider = (props: OrganizationProfileProviderProps): ReactNode => {
-  const { children, appearance } = props;
+  const { children, appearance, afterLeaveOrganizationUrl, apiKeysProps } = props;
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const { organization } = useOrganization();
@@ -33,6 +35,8 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
     mode: 'mounted' as const,
     routing: 'hash' as const,
     path: undefined,
+    afterLeaveOrganizationUrl,
+    apiKeysProps,
     customPages: [],
   };
 

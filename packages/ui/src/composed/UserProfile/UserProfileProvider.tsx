@@ -1,22 +1,23 @@
 'use client';
 
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, OAuthProvider, OAuthScope } from '@clerk/shared/types';
+import type { EnvironmentResource, OAuthProvider, OAuthScope, UserProfileProps } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
 import { getModuleManager } from '@/ui/internal/moduleManagerStore';
 
 import { UserProfileContext } from '../../contexts/components/UserProfile';
-import { ProfileProviderShell, fallbackModuleManager } from '../ProfileProviderShell';
+import { fallbackModuleManager, ProfileProviderShell } from '../ProfileProviderShell';
 
 type UserProfileProviderProps = PropsWithChildren<{
   appearance?: Appearance;
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
+  apiKeysProps?: UserProfileProps['apiKeysProps'];
 }>;
 
 export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode => {
-  const { children, appearance, additionalOAuthScopes } = props;
+  const { children, appearance, additionalOAuthScopes, apiKeysProps } = props;
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
 
@@ -33,6 +34,7 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
     routing: 'hash' as const,
     path: undefined,
     additionalOAuthScopes,
+    apiKeysProps,
     customPages: [],
   };
 
