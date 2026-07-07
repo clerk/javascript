@@ -156,9 +156,12 @@ export class Billing implements BillingNamespace {
   /**
    * Registers an in-app purchase made through an app store (Apple App Store or Google Play) with Clerk.
    *
-   * Posts the store purchase payload form-encoded (`store`, `payload`) to `/me/billing/store_purchases`. The
-   * endpoint is idempotent by store transaction lineage, so replays (restore purchases, out-of-band transaction
-   * listeners) resolve with the current subscription item. Store purchases are only supported for user payers.
+   * Posts the store purchase payload form-encoded (`store`, `payload`, and optionally `source`) to
+   * `/me/billing/store_purchases`. The endpoint is idempotent by store transaction lineage, so replays (restore
+   * purchases, out-of-band transaction listeners) resolve with the current subscription item. When `source` is
+   * `'restore'`, a transaction bound to a different user transfers the subscription to the current user instead of
+   * being rejected; when omitted, the backend defaults to `'purchase'` semantics. Store purchases are only supported
+   * for user payers.
    *
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */

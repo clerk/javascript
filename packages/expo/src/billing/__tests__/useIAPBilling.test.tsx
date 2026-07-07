@@ -217,6 +217,9 @@ describe('useIAPBilling', () => {
 
       expect(registerStorePurchase).toHaveBeenCalledTimes(1);
       expect(registerStorePurchase).toHaveBeenCalledWith({ store: 'apple', payload: 'signed.jws.transaction' });
+      // Initiated purchases omit `source` entirely (backend defaults to purchase semantics): the transaction was
+      // just bound to this user, so a binding mismatch must still reject rather than transfer.
+      expect(registerStorePurchase.mock.calls[0][0]).not.toHaveProperty('source');
       // Server-first ordering: Clerk registration strictly precedes finishTransaction.
       expect(mocks.callLog).toEqual(['registerStorePurchase', 'finishTransaction']);
       expect(mocks.iap.finishTransaction).toHaveBeenCalledWith({ purchase: applePurchase, isConsumable: false });
@@ -282,6 +285,8 @@ describe('useIAPBilling', () => {
       });
 
       expect(registerStorePurchase).toHaveBeenCalledWith({ store: 'google', payload: 'play-purchase-token' });
+      // Initiated purchases omit `source` (backend defaults to purchase semantics; mismatches must reject).
+      expect(registerStorePurchase.mock.calls[0][0]).not.toHaveProperty('source');
       // The Clerk backend acknowledges Google purchases; expo-iap's finishTransaction would acknowledge client-side.
       expect(mocks.iap.finishTransaction).not.toHaveBeenCalled();
       expect(purchaseResult).toEqual({ status: 'success', subscriptionItem });
@@ -412,8 +417,17 @@ describe('useIAPBilling', () => {
       });
 
       expect(registerStorePurchase).toHaveBeenCalledTimes(2);
-      expect(registerStorePurchase).toHaveBeenNthCalledWith(1, { store: 'apple', payload: 'signed.jws.transaction' });
-      expect(registerStorePurchase).toHaveBeenNthCalledWith(2, { store: 'google', payload: 'play-purchase-token' });
+      // Restores send source: 'restore' so a transaction bound to a different user transfers to the current user.
+      expect(registerStorePurchase).toHaveBeenNthCalledWith(1, {
+        store: 'apple',
+        payload: 'signed.jws.transaction',
+        source: 'restore',
+      });
+      expect(registerStorePurchase).toHaveBeenNthCalledWith(2, {
+        store: 'google',
+        payload: 'play-purchase-token',
+        source: 'restore',
+      });
       // Restored purchases are already-completed transactions: nothing to finish, and the server acknowledges Google.
       expect(mocks.iap.finishTransaction).not.toHaveBeenCalled();
       expect(restoreResult.registered).toEqual([subscriptionItem, subscriptionItem]);
@@ -460,7 +474,14 @@ describe('useIAPBilling', () => {
       });
 
       await waitFor(() => expect(registerStorePurchase).toHaveBeenCalledTimes(1));
-      expect(registerStorePurchase).toHaveBeenCalledWith({ store: 'apple', payload: 'signed.jws.transaction' });
+      // Out-of-band transactions are store-driven replays and register with source: 'restore': a renewal of the
+      // current user's own subscription matches the binding regardless, and a mismatched one (e.g. family-shared
+      // Apple ID renewing under another signed-in account) transfers like a restore instead of rejecting.
+      expect(registerStorePurchase).toHaveBeenCalledWith({
+        store: 'apple',
+        payload: 'signed.jws.transaction',
+        source: 'restore',
+      });
       expect(mocks.callLog).toEqual(['registerStorePurchase', 'finishTransaction']);
       expect(getToken).toHaveBeenCalledWith({ skipCache: true });
     });

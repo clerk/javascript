@@ -1317,6 +1317,13 @@ export type RegisterStorePurchaseParams = {
    * Play Billing purchase token.
    */
   payload: string;
+  /**
+   * How the purchase reached the client. Defaults to `'purchase'` when omitted. Pass `'restore'` for store-driven
+   * replays (restore purchases, out-of-band transaction events): when the store transaction is bound to a different
+   * user, `'restore'` transfers the subscription to the current user instead of rejecting the registration, while
+   * `'purchase'` (or omitting the field) keeps the binding mismatch rejection.
+   */
+  source?: 'purchase' | 'restore';
 };
 
 /**

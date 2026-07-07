@@ -154,9 +154,20 @@ export function useIAPBilling(): UseIAPBillingReturn {
    *   backend when the purchase is registered.
    */
   const registerWithClerk = useCallback(
-    async (iap: ExpoIapModule, purchase: Purchase, store: BillingStore): Promise<BillingSubscriptionItemResource> => {
+    async (
+      iap: ExpoIapModule,
+      purchase: Purchase,
+      store: BillingStore,
+      source?: 'purchase' | 'restore',
+    ): Promise<BillingSubscriptionItemResource> => {
       const payload = extractPurchasePayload(purchase);
-      const subscriptionItem = await clerk.billing.registerStorePurchase({ store, payload });
+      // `source` is omitted (not sent as `undefined`) so initiated purchases stay wire-identical to older clients;
+      // the backend treats an absent `source` as `'purchase'`.
+      const subscriptionItem = await clerk.billing.registerStorePurchase({
+        store,
+        payload,
+        ...(source ? { source } : {}),
+      });
 
       if (store === 'apple') {
         await iap.finishTransaction({ purchase, isConsumable: false });
@@ -206,7 +217,13 @@ export function useIAPBilling(): UseIAPBillingReturn {
       }
       try {
         const store = purchaseStore(purchase, platformToStore(Platform.OS));
-        await registerWithClerk(iap, purchase, store);
+        // Out-of-band transactions are store-driven replays, so they register with `source: 'restore'`
+        // (transfer-on-restore). For the common case -- a renewal of the current user's own subscription -- the
+        // transaction's user binding matches anyway and `source` changes nothing. In the mismatch case (for example,
+        // a family-shared Apple ID renews while a different Clerk account is signed in on the device), the store is
+        // asserting possession of the subscription exactly as in restorePurchases(), so it transfers to the current
+        // user instead of being rejected.
+        await registerWithClerk(iap, purchase, store, 'restore');
         await refreshSessionAndState();
       } catch {
         // Registration is idempotent and unfinished transactions are replayed by the store, so a failed attempt is
@@ -331,10 +348,13 @@ export function useIAPBilling(): UseIAPBillingReturn {
         const payload = extractPurchasePayload(availablePurchase);
         // Registration is idempotent by store transaction lineage: replays resolve with the current item. Restored
         // purchases are already-completed transactions, so they are intentionally not finished/acknowledged here.
+        // `source: 'restore'` transfers a subscription bound to a different user to the current user
+        // (transfer-on-restore) instead of rejecting the registration.
         registered.push(
           await clerk.billing.registerStorePurchase({
             store: purchaseStore(availablePurchase, fallbackStore),
             payload,
+            source: 'restore',
           }),
         );
       } catch (error) {

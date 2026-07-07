@@ -84,6 +84,39 @@ describe('Billing namespace', () => {
       });
     });
 
+    it('passes the source form field through to the request body when provided', async () => {
+      // @ts-expect-error - _fetch is protected
+      BaseResource._fetch = vi.fn().mockResolvedValue({ response: subscriptionItemJSON });
+
+      await billing.registerStorePurchase({
+        store: 'apple',
+        payload: 'signed.jws.transaction',
+        source: 'restore',
+      });
+
+      // @ts-expect-error - _fetch is protected
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        path: '/me/billing/store_purchases',
+        method: 'POST',
+        body: {
+          store: 'apple',
+          payload: 'signed.jws.transaction',
+          source: 'restore',
+        },
+      });
+    });
+
+    it('omits the source form field when not provided', async () => {
+      // @ts-expect-error - _fetch is protected
+      BaseResource._fetch = vi.fn().mockResolvedValue({ response: subscriptionItemJSON });
+
+      await billing.registerStorePurchase({ store: 'apple', payload: 'signed.jws.transaction' });
+
+      // @ts-expect-error - _fetch is protected
+      const body = (BaseResource._fetch as ReturnType<typeof vi.fn>).mock.calls[0][0].body;
+      expect(body).not.toHaveProperty('source');
+    });
+
     it('deserializes the response into a BillingSubscriptionItem', async () => {
       // @ts-expect-error - _fetch is protected
       BaseResource._fetch = vi.fn().mockResolvedValue({ response: subscriptionItemJSON });
