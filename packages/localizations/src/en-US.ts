@@ -996,6 +996,7 @@ export const enUS: LocalizationResource = {
     membersPage: {
       action__invite: 'Invite',
       action__search: 'Search',
+      action__clearSearch: 'Clear search',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',

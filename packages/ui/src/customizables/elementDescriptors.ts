@@ -222,6 +222,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'organizationProfileMembersSearchInputIcon',
   'organizationProfileMembersSearchInput',
+  'organizationProfileMembersSearchClearButton',
 
   'organizationProfileSecuritySsoBadge',
   'organizationProfileSecuritySsoDescription',

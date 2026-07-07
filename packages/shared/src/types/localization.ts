@@ -1188,6 +1188,7 @@ export type __internal_LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       action__search: LocalizationValue;
+      action__clearSearch: LocalizationValue;
       start: {
         headerTitle__members: LocalizationValue;
         headerTitle__invitations: LocalizationValue;

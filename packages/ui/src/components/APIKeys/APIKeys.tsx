@@ -1,9 +1,8 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { inertProps } from '@clerk/shared/inert';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { __internal_useOrganizationBase, useAPIKeys, useClerk, useUser } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
-import { lazy, useRef, useState } from 'react';
+import { lazy, useState } from 'react';
 
 import { useProtect } from '@/ui/common';
 import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
@@ -20,12 +19,11 @@ import {
 } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { IconButton } from '@/ui/elements/IconButton';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { useDebounce } from '@/ui/hooks';
-import { Close, MagnifyingGlass } from '@/ui/icons';
-import { common, mqu } from '@/ui/styledSystem';
+import { MagnifyingGlass } from '@/ui/icons';
+import { mqu } from '@/ui/styledSystem';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { APIKeysTable } from './ApiKeysTable';
@@ -60,17 +58,6 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const canManageAPIKeys = useProtect({ permission: 'org:sys_api_keys:manage' });
 
   const [searchValue, setSearchValue] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const clearSearch = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setSearchValue('');
-    // Keyboard activation produces a synthetic click with detail === 0. In that case the button
-    // is about to go inert and drop out of the tab order, so return focus to the input. A real
-    // pointer click (detail >= 1) leaves focus alone.
-    if (event.detail === 0) {
-      searchInputRef.current?.focus();
-    }
-  };
   const debouncedSearchValue = useDebounce(searchValue, apiKeysSearchDebounceMs);
   const query = debouncedSearchValue.trim();
 
@@ -173,10 +160,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           }}
           elementDescriptor={descriptors.apiKeysHeader}
         >
-          <Box
-            elementDescriptor={descriptors.apiKeysSearchBox}
-            sx={{ position: 'relative' }}
-          >
+          <Box elementDescriptor={descriptors.apiKeysSearchBox}>
             <InputWithIcon
               name='apiKeysSearch'
               placeholder={t(localizationKeys('apiKeys.action__search'))}
@@ -193,28 +177,10 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               autoCapitalize='none'
               spellCheck={false}
               onChange={e => setSearchValue(e.target.value)}
-              ref={searchInputRef}
+              onClear={() => setSearchValue('')}
+              clearButtonLabel={t(localizationKeys('apiKeys.action__clearSearch'))}
+              clearButtonElementDescriptor={descriptors.apiKeysSearchClearButton}
               elementDescriptor={descriptors.apiKeysSearchInput}
-              sx={t => ({
-                paddingInlineEnd: t.space.$10,
-                '::-webkit-search-cancel-button': {
-                  display: 'none',
-                },
-              })}
-            />
-            <IconButton
-              icon={Close}
-              aria-label={t(localizationKeys('apiKeys.action__clearSearch'))}
-              variant='ghost'
-              size='xs'
-              onClick={clearSearch}
-              {...inertProps(!searchValue)}
-              elementDescriptor={descriptors.apiKeysSearchClearButton}
-              sx={theme => ({
-                ...common.inputTrailingButton(theme),
-                opacity: searchValue ? 1 : 0,
-                transition: `opacity ${theme.transitionDuration.$fast} ${theme.transitionTiming.$common}`,
-              })}
             />
           </Box>
           {((isOrg && canManageAPIKeys) || !isOrg) && (

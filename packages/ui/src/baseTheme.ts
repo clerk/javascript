@@ -319,6 +319,7 @@ const clerkTheme: Appearance = {
       },
       formFieldInputShowPasswordButton: inputTrailingButtonStyles(theme),
       apiKeysSearchClearButton: inputTrailingButtonStyles(theme),
+      organizationProfileMembersSearchClearButton: inputTrailingButtonStyles(theme),
     };
   },
 } satisfies Appearance;

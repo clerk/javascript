@@ -362,6 +362,7 @@ export type ElementsConfig = {
 
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
+  organizationProfileMembersSearchClearButton: WithOptions;
 
   organizationProfileSecuritySsoBadge: WithOptions<string>;
   organizationProfileSecuritySsoDescription: WithOptions;

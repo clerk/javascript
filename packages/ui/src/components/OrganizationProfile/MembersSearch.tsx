@@ -63,6 +63,15 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
     }, membersSearchDebounceMs);
   }
 
+  const handleClear = () => {
+    // Cancel any pending debounce so it can't re-trigger the query with the stale value.
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    onSearchChange('');
+    onQueryTrigger('');
+  };
+
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
   useEffect(() => {
@@ -108,6 +117,9 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
           }
           onKeyUp={handleKeyUp}
           onChange={handleChange}
+          onClear={handleClear}
+          clearButtonLabel={t(localizationKeys('organizationProfile.membersPage.action__clearSearch'))}
+          clearButtonElementDescriptor={descriptors.organizationProfileMembersSearchClearButton}
           elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />
       </Flex>
