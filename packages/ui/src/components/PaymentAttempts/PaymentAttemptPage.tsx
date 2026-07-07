@@ -371,8 +371,14 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
 
 const RECEIPT_MUTED = '#757575';
 
+// NOTE: The receipt below is styled with inline `style` attributes rather than the `sx`/emotion
+// system on purpose. `PrintableComponent` clones this markup into a print iframe and copies emotion
+// styles by reading the `<style>` tags' text — which is empty in production ("speedy" mode inserts
+// rules straight into the CSSOM), so emotion styling is dropped in the print output. Inline styles
+// travel with the cloned HTML and render reliably in both dev and production.
+
 function ReceiptDivider() {
-  return <Box sx={{ borderBlockStart: '1px dashed #B7B8C2', marginBlock: '12px' }} />;
+  return <div style={{ borderBlockStart: '1px dashed #B7B8C2', marginBlock: '12px' }} />;
 }
 
 function ReceiptDetailRow({ label, value }: { label: string; value: string }) {
@@ -380,10 +386,10 @@ function ReceiptDetailRow({ label, value }: { label: string; value: string }) {
     return null;
   }
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '12px' }}>
-      <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>{label}</Text>
-      <Text sx={{ color: '#000000', fontSize: '12px', lineHeight: '18px' }}>{value}</Text>
-    </Box>
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '12px' }}>
+      <span style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>{label}</span>
+      <span style={{ color: '#000000', fontSize: '12px', lineHeight: '18px' }}>{value}</span>
+    </div>
   );
 }
 
@@ -479,8 +485,8 @@ function PaymentReceiptDocument({ paymentAttempt }: { paymentAttempt: BillingPay
     : '';
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         fontFamily: 'Helvetica, Arial, sans-serif',
         color: '#111827',
         maxWidth: '600px',
@@ -496,83 +502,85 @@ function PaymentReceiptDocument({ paymentAttempt }: { paymentAttempt: BillingPay
           style={{ height: '32px', display: 'block', marginBlockEnd: '16px' }}
         />
       ) : (
-        <Text sx={{ fontSize: '18px', lineHeight: '26px', fontWeight: 700, color: '#111827', paddingBlockEnd: '16px' }}>
+        <div
+          style={{ fontSize: '18px', lineHeight: '26px', fontWeight: 700, color: '#111827', marginBlockEnd: '16px' }}
+        >
           {applicationName}
-        </Text>
+        </div>
       )}
 
-      <Box sx={{ border: '1px solid #EEEEF0', borderRadius: '10px', padding: '24px' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '16px' }}>
-          <Text sx={{ fontSize: '16px', lineHeight: '24px', fontWeight: 700, color: '#000000' }}>Receipt</Text>
-          <Text sx={{ fontSize: '14px', lineHeight: '21px', color: RECEIPT_MUTED }}>
+      <div style={{ border: '1px solid #EEEEF0', borderRadius: '10px', padding: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '16px' }}>
+          <span style={{ fontSize: '16px', lineHeight: '24px', fontWeight: 700, color: '#000000' }}>Receipt</span>
+          <span style={{ fontSize: '14px', lineHeight: '21px', color: RECEIPT_MUTED }}>
             {formatDate(receiptDate, 'long')}
-          </Text>
-        </Box>
+          </span>
+        </div>
 
         <ReceiptDivider />
 
-        <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px', paddingBlockEnd: '8px' }}>Plan</Text>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
-          <Text sx={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>{subscriptionItem.plan.name}</Text>
-          <Text sx={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
+        <div style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px', paddingBlockEnd: '8px' }}>Plan</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
+          <span style={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>{subscriptionItem.plan.name}</span>
+          <span style={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
             {subscriptionItem.planPeriod === 'annual' ? 'x12 ' : ''}
             {$(fee)}
-          </Text>
-        </Box>
+          </span>
+        </div>
 
         {seatSummary && (
           <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '4px' }}>
-              <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '4px' }}>
+              <span style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>
                 {seatsChargeable} seats × {$(seatSummary.paidTier.feePerBlock)} per seat
-              </Text>
-              <Text sx={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
+              </span>
+              <span style={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
                 {$(seatSummary.paidTier.total)}
-              </Text>
-            </Box>
-            <Text sx={{ color: '#aaaaaa', fontSize: '11px', lineHeight: '17px', paddingBlockEnd: '8px' }}>
+              </span>
+            </div>
+            <div style={{ color: '#aaaaaa', fontSize: '11px', lineHeight: '17px', paddingBlockEnd: '8px' }}>
               {planSeatLimit != null
                 ? `Seats (${seatSummary.totalSeats} of ${planSeatLimit} used)`
                 : `Seats (${seatSummary.totalSeats} used)`}
               {seatSummary.included > 0 ? ` (${seatSummary.included} included)` : ''}
-            </Text>
+            </div>
           </>
         )}
 
         {hasProration && proration && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
-            <Box>
-              <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Proration</Text>
-              <Text sx={{ color: RECEIPT_MUTED, fontSize: '10px', lineHeight: '15px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
+            <div>
+              <div style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Proration</div>
+              <div style={{ color: RECEIPT_MUTED, fontSize: '10px', lineHeight: '15px' }}>
                 Prorated credit for the remainder of your subscription.
-              </Text>
-            </Box>
-            <Text sx={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
+              </div>
+            </div>
+            <span style={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
               {$(toNegativeAmount(proration.amount))}
-            </Text>
-          </Box>
+            </span>
+          </div>
         )}
 
         {hasPayerCredit && payerCredit && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
-            <Box>
-              <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Credit</Text>
-              <Text sx={{ color: RECEIPT_MUTED, fontSize: '10px', lineHeight: '15px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', paddingBlockEnd: '8px' }}>
+            <div>
+              <div style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Credit</div>
+              <div style={{ color: RECEIPT_MUTED, fontSize: '10px', lineHeight: '15px' }}>
                 Applied from your credit balance.
-              </Text>
-            </Box>
-            <Text sx={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
+              </div>
+            </div>
+            <span style={{ fontSize: '14px', lineHeight: '21px', color: '#000000' }}>
               {$(toNegativeAmount(payerCredit.appliedAmount))}
-            </Text>
-          </Box>
+            </span>
+          </div>
         )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-          <Text sx={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Total paid</Text>
-          <Text sx={{ fontSize: '24px', lineHeight: '36px', fontWeight: 700, color: '#000000' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <span style={{ color: RECEIPT_MUTED, fontSize: '12px', lineHeight: '18px' }}>Total paid</span>
+          <span style={{ fontSize: '24px', lineHeight: '36px', fontWeight: 700, color: '#000000' }}>
             {$(paymentAttempt.amount)}
-          </Text>
-        </Box>
+          </span>
+        </div>
 
         <ReceiptDivider />
 
@@ -597,11 +605,11 @@ function PaymentReceiptDocument({ paymentAttempt }: { paymentAttempt: BillingPay
           value={payerName}
         />
 
-        <Text sx={{ fontSize: '12px', lineHeight: '18px', color: '#000000', paddingBlockStart: '4px' }}>
+        <div style={{ fontSize: '12px', lineHeight: '18px', color: '#000000', paddingBlockStart: '4px' }}>
           If you have questions about this receipt, please contact an administrator.
-        </Text>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 
