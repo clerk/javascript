@@ -306,6 +306,7 @@ export type ElementsConfig = {
   formFieldInputShowPasswordIcon: WithOptions;
   formFieldInputCopyToClipboardButton: WithOptions;
   formFieldInputCopyToClipboardIcon: WithOptions;
+  searchInputClearButton: WithOptions;
 
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
@@ -362,7 +363,6 @@ export type ElementsConfig = {
 
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
-  organizationProfileMembersSearchClearButton: WithOptions;
 
   organizationProfileSecuritySsoBadge: WithOptions<string>;
   organizationProfileSecuritySsoDescription: WithOptions;
@@ -650,7 +650,6 @@ export type ElementsConfig = {
   apiKeysHeader: WithOptions;
   apiKeysSearchBox: WithOptions;
   apiKeysSearchInput: WithOptions;
-  apiKeysSearchClearButton: WithOptions;
   apiKeysAddButton: WithOptions;
   apiKeysTable: WithOptions;
   apiKeysCopyButton: WithOptions<string>;

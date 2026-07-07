@@ -4,7 +4,6 @@ export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKeys: {
     action__add: 'Add new key',
-    action__clearSearch: 'Clear search',
     action__search: 'Search keys',
     copySecret: {
       formButtonPrimary__copyAndClose: 'Copy & Close',
@@ -861,6 +860,9 @@ export const enUS: LocalizationResource = {
     title: 'Signed in as {{identifier}}',
   },
   lastAuthenticationStrategy: 'Last used',
+  searchInput: {
+    action__clear: 'Clear search',
+  },
   maintenanceMode:
     "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
@@ -996,7 +998,6 @@ export const enUS: LocalizationResource = {
     membersPage: {
       action__invite: 'Invite',
       action__search: 'Search',
-      action__clearSearch: 'Clear search',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',

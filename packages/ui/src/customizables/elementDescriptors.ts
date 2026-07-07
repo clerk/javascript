@@ -177,6 +177,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputShowPasswordIcon',
   'formFieldInputCopyToClipboardButton',
   'formFieldInputCopyToClipboardIcon',
+  'searchInputClearButton',
 
   'phoneInputBox',
   'formInputGroup',
@@ -222,7 +223,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'organizationProfileMembersSearchInputIcon',
   'organizationProfileMembersSearchInput',
-  'organizationProfileMembersSearchClearButton',
 
   'organizationProfileSecuritySsoBadge',
   'organizationProfileSecuritySsoDescription',
@@ -514,7 +514,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysHeader',
   'apiKeysSearchBox',
   'apiKeysSearchInput',
-  'apiKeysSearchClearButton',
   'apiKeysAddButton',
   'apiKeysTable',
   'apiKeysCopyButton',

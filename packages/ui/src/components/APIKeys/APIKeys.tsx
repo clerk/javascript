@@ -6,23 +6,12 @@ import { lazy, useState } from 'react';
 
 import { useProtect } from '@/ui/common';
 import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  Icon,
-  localizationKeys,
-  useLocalizations,
-} from '@/ui/customizables';
+import { Box, Button, Col, descriptors, Flex, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
+import { SearchInput } from '@/ui/elements/SearchInput';
 import { useDebounce } from '@/ui/hooks';
-import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { handleError } from '@/ui/utils/errorHandler';
 
@@ -161,25 +150,13 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           elementDescriptor={descriptors.apiKeysHeader}
         >
           <Box elementDescriptor={descriptors.apiKeysSearchBox}>
-            <InputWithIcon
+            <SearchInput
               name='apiKeysSearch'
               placeholder={t(localizationKeys('apiKeys.action__search'))}
               aria-label={t(localizationKeys('apiKeys.action__search'))}
-              leftIcon={
-                <Icon
-                  icon={MagnifyingGlass}
-                  sx={t => ({ color: t.colors.$colorMutedForeground })}
-                />
-              }
               value={searchValue}
-              type='search'
-              autoComplete='off'
-              autoCapitalize='none'
-              spellCheck={false}
               onChange={e => setSearchValue(e.target.value)}
               onClear={() => setSearchValue('')}
-              clearButtonLabel={t(localizationKeys('apiKeys.action__clearSearch'))}
-              clearButtonElementDescriptor={descriptors.apiKeysSearchClearButton}
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>

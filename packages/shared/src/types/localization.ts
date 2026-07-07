@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
@@ -1188,7 +1192,6 @@ export type __internal_LocalizationResource = {
       detailsTitle__emptyRow: LocalizationValue;
       action__invite: LocalizationValue;
       action__search: LocalizationValue;
-      action__clearSearch: LocalizationValue;
       start: {
         headerTitle__members: LocalizationValue;
         headerTitle__invitations: LocalizationValue;
@@ -1881,7 +1884,6 @@ export type __internal_LocalizationResource = {
     formButtonPrimary__add: LocalizationValue;
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
-    action__clearSearch: LocalizationValue;
     action__add: LocalizationValue;
     tableHeader__name: LocalizationValue;
     tableHeader__lastUsed: LocalizationValue;
