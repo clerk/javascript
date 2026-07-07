@@ -1,5 +1,21 @@
 # @clerk/swingset
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`3995e8a`](https://github.com/clerk/javascript/commit/3995e8a0edc721a972d7d817c830f48867bedb6c), [`409cdae`](https://github.com/clerk/javascript/commit/409cdaebfb5bfb05a6d78b92a78171b0c7edb772), [`5f2e749`](https://github.com/clerk/javascript/commit/5f2e74908c434848ab863dd9ece05c7ea4d36c98), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`4aebb88`](https://github.com/clerk/javascript/commit/4aebb88c51423132911ee87445c631d373e76981), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1), [`f9afa48`](https://github.com/clerk/javascript/commit/f9afa489a10b47e7609743ad2d2eddc019661acb)]:
+  - @clerk/ui@1.25.0
+  - @clerk/headless@0.0.8
+
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`883ea48`](https://github.com/clerk/javascript/commit/883ea489b604836a1f75e4c86ec978940a555902), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`c01b937`](https://github.com/clerk/javascript/commit/c01b93741cdb6d71ef7a7b18f38f0d4e8962465f), [`8a30cfe`](https://github.com/clerk/javascript/commit/8a30cfee85c7b77c6387892899643eb35687911b), [`5a51943`](https://github.com/clerk/javascript/commit/5a51943916654dc1734cfb21e18ec97eb8f87e72)]:
+  - @clerk/ui@1.24.2
+  - @clerk/headless@0.0.7
+
 ## 0.0.13
 
 ### Patch Changes

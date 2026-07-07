@@ -1,6 +1,6 @@
 {
   "name": "@clerk/headless",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -40,6 +40,18 @@
     "./dialog": {
       "import": "./dist/primitives/dialog/index.js",
       "types": "./dist/primitives/dialog/index.d.ts"
+    },
+    "./drawer": {
+      "import": "./dist/primitives/drawer/index.js",
+      "types": "./dist/primitives/drawer/index.d.ts"
+    },
+    "./file-upload": {
+      "import": "./dist/primitives/file-upload/index.js",
+      "types": "./dist/primitives/file-upload/index.d.ts"
+    },
+    "./otp": {
+      "import": "./dist/primitives/otp/index.js",
+      "types": "./dist/primitives/otp/index.d.ts"
     },
     "./hooks": {
       "import": "./dist/hooks/index.js",

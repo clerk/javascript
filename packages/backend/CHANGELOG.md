@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.11.1
+
+### Patch Changes
+
+- Enforce the `azp` (authorized party) claim when `authorizedParties` is configured. Previously, a session token that was missing the `azp` claim was accepted even when `authorizedParties` was set, allowing the authorized-parties check to be bypassed by omitting the claim. Now, when `authorizedParties` is configured, a token with a missing or empty `azp` claim is rejected. Tokens without `azp` continue to be accepted when no `authorizedParties` are configured. ([#8877](https://github.com/clerk/javascript/pull/8877)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+
+## 3.11.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+
 ## 3.10.0
 
 ### Minor Changes
