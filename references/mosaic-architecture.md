@@ -527,6 +527,12 @@ To migrate a component from the old system to Mosaic:
 6. Update token references — e.g. `theme.colors.$primary500` → `theme.color.primary`.
 7. Ensure the component is inside a `MosaicProvider` in the tree.
 
+The steps above cover the **styling** migration (recipes + tokens). For **flow**
+components — where the legacy component also fuses data-fetching and flow logic —
+splitting that logic into the machine/controller/view layers and verifying no
+implicit behavior is dropped is its own end-to-end workflow. See the
+`mosaic-migration` Claude Code skill (`.claude/skills/mosaic-migration/`).
+
 ## Files
 
 | File                                              | Purpose                                                                     |

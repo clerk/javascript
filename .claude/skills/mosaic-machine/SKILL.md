@@ -25,6 +25,8 @@ import { assign } from './assign';
 
 `setup<TContext, TEvent>()` returns `{ createMachine, assign, fromPromise }`. Use `fromPromise` for promise-based `invoke` configurations — it carries the resolved type to `e.output` in `onDone.actions`.
 
+> **See also:** migrating a legacy component _into_ this pattern (splitting a component into machine/controller/view and verifying no behavior is dropped) is the `mosaic-migration` skill. This skill covers authoring the machine itself.
+
 ---
 
 ## Anatomy
