@@ -69,7 +69,7 @@ function SignUpProtectCheckInternal({
     }
   }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
 
-  const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignUpResource>({
+  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
     getResource: () => signUp,
     reload: () => signUp.reload(),
@@ -124,9 +124,11 @@ function SignUpProtectCheckInternal({
               ref={containerRef}
               id='clerk-protect-check'
               aria-busy={isRunning}
-              style={{ display: 'block', alignSelf: 'center', minHeight: '60px' }}
+              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
+              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
+              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
-            {isRunning && !hasError ? (
+            {isRunning && !hasError && !isWidgetVisible ? (
               <Flex
                 direction='col'
                 center

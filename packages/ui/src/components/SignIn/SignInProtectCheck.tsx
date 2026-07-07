@@ -63,7 +63,7 @@ function SignInProtectCheckInternal(): JSX.Element {
   const { setActive } = useClerk();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
 
-  const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignInResource>({
+  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignInResource>({
     getProtectCheck: () => signIn.protectCheck,
     getResource: () => signIn,
     reload: () => signIn.reload(),
@@ -105,9 +105,11 @@ function SignInProtectCheckInternal(): JSX.Element {
               ref={containerRef}
               id='clerk-protect-check'
               aria-busy={isRunning}
-              style={{ display: 'block', alignSelf: 'center', minHeight: '60px' }}
+              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
+              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
+              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
-            {isRunning && !hasError ? (
+            {isRunning && !hasError && !isWidgetVisible ? (
               <Flex
                 direction='col'
                 center

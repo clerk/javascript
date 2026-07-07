@@ -44,6 +44,12 @@ export interface ProtectCheckRunnerParams<TResource> {
 export interface ProtectCheckRunner {
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
   isRunning: boolean;
+  /**
+   * Whether the challenge SDK has rendered visible content (e.g. a Turnstile widget) into the
+   * container. While true, the widget owns the progress UI — callers should hide their own
+   * spinner and give the container layout space.
+   */
+  isWidgetVisible: boolean;
   /** Whether the card is currently showing a (recoverable) error. */
   hasError: boolean;
   /** Clears the error and re-runs the challenge from scratch. */
@@ -65,7 +71,26 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
   const [isRunning, setIsRunning] = React.useState(false);
+  const [isWidgetVisible, setIsWidgetVisible] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
+
+  // The challenge SDK is a black box: it renders into the container and only resolves its promise
+  // once the whole check completes, with no signal when a widget becomes visible in between. Track
+  // rendered height instead — visible content means the widget owns the progress UI, zero height
+  // means we're in an invisible phase (loading the SDK, a collapsed widget, or submitting the
+  // proof) and the caller's spinner should show. Height also stays correct under a future
+  // interaction-only SDK that keeps its widget collapsed until user input is required.
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    const update = () => setIsWidgetVisible(el.offsetHeight > 0);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
   // (e.g. an expired-challenge reload that advances the flow) flips the token dependency and
@@ -268,5 +293,5 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { containerRef, isRunning, hasError: !!card.error, retry };
+  return { containerRef, isRunning, isWidgetVisible, hasError: !!card.error, retry };
 }
