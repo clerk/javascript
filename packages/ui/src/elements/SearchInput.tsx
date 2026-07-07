@@ -31,10 +31,17 @@ type SearchInputProps = Omit<
  * appearance element and a shared clear label, so new search inputs don't introduce their own.
  */
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(function SearchInput(
-  { isLoading, leftIconElementDescriptor, clearButtonLabel, ...rest },
+  { isLoading, leftIconElementDescriptor, clearButtonLabel, elementDescriptor, ...rest },
   ref,
 ) {
   const { t } = useLocalizations();
+
+  // Every search input shares the `searchInput` element, layered with any consumer-specific
+  // descriptor so both `cl-searchInput` and e.g. `cl-apiKeysSearchInput` are themeable.
+  const inputDescriptors = [
+    descriptors.searchInput,
+    ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
+  ];
 
   return (
     <InputWithIcon
@@ -43,6 +50,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       autoComplete='off'
       autoCapitalize='none'
       spellCheck={false}
+      elementDescriptor={inputDescriptors}
       leftIcon={
         isLoading ? (
           <Spinner size='xs' />

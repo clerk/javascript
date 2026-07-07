@@ -177,6 +177,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputShowPasswordIcon',
   'formFieldInputCopyToClipboardButton',
   'formFieldInputCopyToClipboardIcon',
+  'searchInput',
   'searchInputClearButton',
 
   'phoneInputBox',

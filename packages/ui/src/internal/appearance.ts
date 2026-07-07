@@ -306,6 +306,7 @@ export type ElementsConfig = {
   formFieldInputShowPasswordIcon: WithOptions;
   formFieldInputCopyToClipboardButton: WithOptions;
   formFieldInputCopyToClipboardIcon: WithOptions;
+  searchInput: WithOptions;
   searchInputClearButton: WithOptions;
 
   phoneInputBox: WithOptions<never, ControlState>;
