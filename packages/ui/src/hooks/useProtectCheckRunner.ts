@@ -75,17 +75,6 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
 
-  // The script owns the widget-visibility decision: it receives this callback in its init
-  // payload (as `setWidgetVisible`) and calls it right before revealing UI in the container,
-  // and again with `false` once its widget is done. flushSync so the returned promise only
-  // resolves after the change is committed to the DOM — the caller's spinner is genuinely gone
-  // when the script reveals its widget, with no frame of overlap (same guarantee BaseRouter
-  // relies on flushSync for).
-  const setWidgetVisible = React.useCallback((visible: boolean): Promise<void> => {
-    flushSync(() => setIsWidgetVisibleState(visible));
-    return Promise.resolve();
-  }, []);
-
   // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
   // (e.g. an expired-challenge reload that advances the flow) flips the token dependency and
   // re-runs/cancels the main effect — but that re-run is exactly our cue to route, so the routing
@@ -132,6 +121,22 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       isRunningRef.current = false;
       setIsRunning(false);
       handleError(new ClerkRuntimeError(message, { code }), [], card.setError);
+    };
+
+    // The script owns the widget-visibility decision: it receives this callback in its init
+    // payload (as `setWidgetVisible`) and calls it right before revealing UI in the container,
+    // and again with `false` once its widget is done. flushSync so the returned promise only
+    // resolves after the change is committed to the DOM — the caller's spinner is genuinely
+    // gone when the script reveals its widget, with no frame of overlap (same guarantee
+    // BaseRouter relies on flushSync for). Scoped to THIS run: the abort contract is
+    // best-effort, so a zombie script from a timed-out, retried, or superseded run can still
+    // call it late — those signals must not flip visibility under the active run.
+    const setWidgetVisible = (visible: boolean): Promise<void> => {
+      if (cancelled || abortController.signal.aborted || !mountedRef.current) {
+        return Promise.resolve();
+      }
+      flushSync(() => setIsWidgetVisibleState(visible));
+      return Promise.resolve();
     };
 
     // Fail closed in no-RHC builds (chrome extension / clerk.no-rhc.js): the gate requires a

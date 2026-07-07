@@ -309,6 +309,40 @@ describe('SignInProtectCheck', () => {
       expect(container.style.position).toBe('static');
     });
 
+    it('ignores visibility signals from an abandoned run', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      let staleSetWidgetVisible: ((visible: boolean) => Promise<void>) | undefined;
+      let rejectRun: ((err: Error) => void) | undefined;
+      mockExecute
+        .mockImplementationOnce((_protectCheck, _el, opts) => {
+          staleSetWidgetVisible = opts?.setWidgetVisible;
+          return new Promise((_, reject) => {
+            rejectRun = reject;
+          });
+        })
+        .mockImplementation(() => new Promise(() => {})); // retry run stays pending
+
+      const { findByRole, findByLabelText, queryByLabelText } = render(<SignInProtectCheck />, { wrapper });
+      await waitFor(() => expect(mockExecute).toHaveBeenCalled());
+
+      rejectRun!(
+        new ClerkRuntimeError('Protect check script execution failed', { code: 'protect_check_execution_failed' }),
+      );
+      const retryButton = await findByRole('button', { name: /try again/i });
+      fireEvent.click(retryButton);
+      await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+
+      // The failed run's script is a zombie (the abort signal is best-effort); a late signal
+      // from it must not flip visibility under the active run.
+      await act(async () => {
+        await staleSetWidgetVisible!(true);
+      });
+      expect(queryByLabelText(/loading/i)).toBeInTheDocument();
+    });
+
     it('clears leftovers from a failed run so the retry starts with the spinner', async () => {
       const { wrapper } = await createFixtures(f => {
         f.startSignInWithProtectCheck();
