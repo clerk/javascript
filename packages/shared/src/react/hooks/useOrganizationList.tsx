@@ -20,6 +20,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
  * @interface
+ * @noHeading
  */
 export type UseOrganizationListParams = {
   /**
@@ -71,7 +72,10 @@ const undefinedPaginatedResource = {
   setData: undefined,
 } as const;
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /** Whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)). */

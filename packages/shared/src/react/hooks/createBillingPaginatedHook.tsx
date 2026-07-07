@@ -26,6 +26,7 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 /**
  * @interface
  * @standalonePage
+ * @noHeading
  */
 export interface HookParams extends PaginatedHookConfig<
   PagesOrInfiniteOptions & {

@@ -1,7 +1,10 @@
 import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope' | 'redirectUri'> & {
   /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `true`. */
   keepPreviousData?: boolean;
@@ -9,7 +12,10 @@ export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClient
   enabled?: boolean;
 };
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseOAuthConsentReturn = {
   /** The OAuth consent screen metadata returned by Clerk, or `undefined` before the first successful fetch. */
   data: OAuthConsentInfo | undefined;

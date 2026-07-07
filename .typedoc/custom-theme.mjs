@@ -1631,6 +1631,18 @@ export function load(app) {
         }
         output.contents = wrapPropertiesSectionWithMarkers(output.contents ?? '');
       }
+
+      // `@noHeading` on the source declaration: strip the leading H1/H2/H3 heading (typically
+      // typedoc-plugin-markdown's `## Properties` group heading) so the emitted `.mdx` starts
+      // straight at the property table. Used by types that clerk-docs embeds via `<Typedoc />`
+      // inside pages that already provide their own heading structure.
+      // `@noHeading` on the source declaration: strip the first heading (any level H1-H6) in the
+      // emitted page (typically typedoc-plugin-markdown's `## Properties` group heading, sometimes
+      // preceded by descriptive prose from the type's summary). Used by types that clerk-docs
+      // embeds via `<Typedoc />` inside pages that already provide their own heading structure.
+      if (decl.comment?.hasModifier('@noHeading') && output.contents) {
+        output.contents = output.contents.replace(/^#{1,6} .+\n+/m, '');
+      }
     },
     -100,
   );
@@ -1707,7 +1719,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return superPartials.someType.call(this, model, options);
       },
       /**
-       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are router/type hints; `@experimental` is SDK-only guidance — none of these must appear in property tables or prose.
+       * Stock `comments.comment` prints every {@link Comment.modifierTags} as **`TitleCase`** before the summary (it does not consult `notRenderedTags`; that option only filters block tags). `@inline` / `@inlineType` are router/type hints; `@experimental` is SDK-only guidance; `@noHeading` opts the page into the leading-heading strip below — none of these must appear in property tables or prose.
        *
        * @param {import('typedoc').Comment} model
        * @param {Parameters<typeof superPartials.comment>[1]} [options]
@@ -1717,7 +1729,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           return superPartials.comment.call(this, model, options);
         }
         const modelToRender = applyTodoStrippingToComment(model) ?? model;
-        const hidden = new Set(['@inline', '@inlineType', '@experimental', '@standalonePage']);
+        const hidden = new Set(['@inline', '@inlineType', '@experimental', '@standalonePage', '@noHeading']);
         const modTags = Array.from(modelToRender.modifierTags ?? []);
         if (modTags.some(/** @param {string} t */ t => hidden.has(t))) {
           const clone = Object.assign(Object.create(Object.getPrototypeOf(modelToRender)), modelToRender, {

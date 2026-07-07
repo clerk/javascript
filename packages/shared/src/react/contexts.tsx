@@ -55,7 +55,10 @@ export function useInitialStateContext(): InitialState | undefined {
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseCheckoutOptions = {
   /** Specifies if the checkout is for an Organization. Defaults to `'user'`. */
   for?: ForPayerType;

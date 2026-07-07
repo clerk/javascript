@@ -214,7 +214,10 @@ export type UpdateEnrollmentModeParams = Pick<OrganizationDomainResource, 'enrol
   deletePending?: boolean;
 };
 
-/** @generateWithEmptyComment */
+/**
+ * @generateWithEmptyComment
+ * @noHeading
+ */
 export type CreateOrganizationDomainParams = {
   /**
    * The domain name, for example `clerk.com`.

@@ -90,7 +90,10 @@ export type CheckoutErrors = {
   global: ClerkGlobalHookError[] | null;
 };
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export interface CheckoutSignalValue {
   /** Represents the errors that occurred during the last fetch of the parent resource. */
   errors: CheckoutErrors;
@@ -2683,6 +2686,7 @@ export type CreateBulkOrganizationInvitationParams = {
 
 /**
  * @interface
+ * @noHeading
  */
 export interface CreateOrganizationParams {
   /**

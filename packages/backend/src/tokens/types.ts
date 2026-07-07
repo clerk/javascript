@@ -15,6 +15,7 @@ import type { VerifyTokenOptions } from './verify';
 
 /**
  * @interface
+ * @noHeading
  */
 export type AuthenticateRequestOptions = {
   /**

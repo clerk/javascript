@@ -7,7 +7,10 @@ export type CacheSetter<CData = any> = (
   data?: CData | ((currentData?: CData) => Promise<undefined | CData> | undefined | CData),
 ) => Promise<CData | undefined>;
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type PaginatedResources<T = unknown, Infinite = false> = {
   /** An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/reference/types/organization-membership) objects. */
   data: T[];
@@ -53,6 +56,7 @@ export type PaginatedResourcesWithDefault<T> = {
 /**
  * @inline
  * @standalonePage
+ * @noHeading
  */
 export type PaginatedHookConfig<T> = T & {
   /** Whether newly fetched data will be appended to the existing list rather than replacing it. Useful for implementing infinite scroll functionality. Defaults to `false`. */
@@ -83,7 +87,10 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
   isSignedIn?: boolean;
 }>;
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type PagesOrInfiniteOptions = {
   /** A number that specifies which page to fetch. For example, if `initialPage` is set to 10, it will skip the first 9 pages and fetch the 10th page. Defaults to `1`. */
   initialPage?: number;

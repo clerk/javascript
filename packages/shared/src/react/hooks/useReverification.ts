@@ -36,6 +36,7 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 
 /**
  * @interface
+ * @noHeading
  */
 export type NeedsReverificationParameters = {
   /**
@@ -56,6 +57,7 @@ export type NeedsReverificationParameters = {
  * The optional options object.
  *
  * @interface
+ * @noHeading
  */
 export type UseReverificationOptions = {
   /**

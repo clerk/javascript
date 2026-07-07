@@ -20,7 +20,10 @@ import { createCacheKeys } from './createCacheKeys';
 import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseOrganizationParams = {
   /**
    * If set to `true`, all default properties will be used.<br />
@@ -61,7 +64,10 @@ export type UseOrganizationParams = {
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /** Whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (for example, when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)). */

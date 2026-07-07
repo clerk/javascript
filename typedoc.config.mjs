@@ -95,6 +95,8 @@ const config = {
     '@inlineType',
     /** Opts into a dedicated reference page despite `@inline` (see `.typedoc/standalone-page-tag.mjs`). */
     '@standalonePage',
+    /** Strips the first heading (any level) from the emitted page; see `.typedoc/custom-theme.mjs`. */
+    '@noHeading',
   ],
   packageOptions: {
     includeVersion: false,
@@ -127,6 +129,10 @@ const config = {
        * Handled by `.typedoc/custom-plugin.mjs`.
        */
       '@expandProperties',
+      /**
+       * Strips the first heading (any level H1-H6, typically `## Properties`) from the emitted page so the file can be embedded via `<Typedoc />` inside a hand-written docs page without doubling up headings. Handled by `.typedoc/custom-theme.mjs`'s `MarkdownPageEvent.END` listener.
+       */
+      '@noHeading',
     ],
     /**
      * Keep `@inline` / `@inlineType` / `@standalonePage` in the model so the custom router and theme can read them.

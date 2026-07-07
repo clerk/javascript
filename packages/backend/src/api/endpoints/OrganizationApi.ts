@@ -250,7 +250,10 @@ export type GetOrganizationDomainListParams = {
   offset?: number;
 };
 
-/** @generateWithEmptyComment */
+/**
+ * @generateWithEmptyComment
+ * @noHeading
+ */
 export type CreateOrganizationDomainParams = {
   /** The ID of the Organization to create the domain for. */
   organizationId: string;

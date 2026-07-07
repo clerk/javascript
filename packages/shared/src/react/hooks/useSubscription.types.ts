@@ -1,6 +1,9 @@
 import type { BillingSubscriptionResource, ForPayerType } from '../../types';
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type UseSubscriptionParams = {
   /** Specifies whether to fetch the Subscription for an Organization or a user. Defaults to `'user'`. */
   for?: ForPayerType;
@@ -10,7 +13,10 @@ export type UseSubscriptionParams = {
   enabled?: boolean;
 };
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type SubscriptionResult = {
   /** The subscription object, `undefined` before the first fetch, or `null` if no subscription exists. */
   data: BillingSubscriptionResource | undefined | null;

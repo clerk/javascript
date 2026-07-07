@@ -93,7 +93,10 @@ type internalStripeAppearance = {
   spacingUnit: string;
 };
 
-/** @interface */
+/**
+ * @interface
+ * @noHeading
+ */
 export type PaymentElementProviderProps = {
   /** A checkout resource object. When provided, the payment element is scoped to the specific checkout session. */
   checkout?: CheckoutFlowResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
@@ -185,6 +188,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
 
 /**
  * @interface
+ * @noHeading
  */
 export type PaymentElementProps = {
   /**
@@ -262,6 +266,7 @@ const throwLibsMissingError = () => {
 
 /**
  * @interface
+ * @noHeading
  */
 export type UsePaymentElementReturn = {
   /**
