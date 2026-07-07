@@ -40,10 +40,13 @@ const mocks = vi.hoisted(() => {
       callLog.push('finishTransaction');
     }),
     getAvailablePurchases: vi.fn(async (): Promise<any[]> => []),
+    showManageSubscriptionsIOS: vi.fn(async (): Promise<any[]> => []),
+    deepLinkToSubscriptions: vi.fn(async () => undefined),
   };
 
   return {
     Platform: { OS: 'ios' },
+    Linking: { openURL: vi.fn(async () => true) },
     iap,
     callLog,
     purchaseListeners,
@@ -54,7 +57,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('react-native', () => ({ Platform: mocks.Platform }));
+vi.mock('react-native', () => ({ Platform: mocks.Platform, Linking: mocks.Linking }));
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 
@@ -462,6 +465,92 @@ describe('useIAPBilling', () => {
       });
 
       expect(getToken).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('manageSubscriptions', () => {
+    it('presents the native StoreKit manage-subscriptions sheet on iOS', async () => {
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.manageSubscriptions();
+      });
+
+      expect(mocks.iap.showManageSubscriptionsIOS).toHaveBeenCalledTimes(1);
+      expect(mocks.Linking.openURL).not.toHaveBeenCalled();
+    });
+
+    it('opens the Play subscriptions deep link on Android', async () => {
+      mocks.Platform.OS = 'android';
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.manageSubscriptions();
+      });
+
+      expect(mocks.iap.deepLinkToSubscriptions).toHaveBeenCalledTimes(1);
+      expect(mocks.iap.showManageSubscriptionsIOS).not.toHaveBeenCalled();
+      expect(mocks.Linking.openURL).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the App Store subscriptions URL when the native sheet API is unavailable', async () => {
+      const original = mocks.iap.showManageSubscriptionsIOS;
+      (mocks.iap as any).showManageSubscriptionsIOS = undefined;
+      try {
+        const { result } = await renderIAPBilling();
+
+        await act(async () => {
+          await result.current.manageSubscriptions();
+        });
+
+        expect(mocks.Linking.openURL).toHaveBeenCalledWith('https://apps.apple.com/account/subscriptions');
+      } finally {
+        (mocks.iap as any).showManageSubscriptionsIOS = original;
+      }
+    });
+
+    it('falls back to the Play Store subscriptions URL when the deep-link API is unavailable', async () => {
+      mocks.Platform.OS = 'android';
+      const original = mocks.iap.deepLinkToSubscriptions;
+      (mocks.iap as any).deepLinkToSubscriptions = undefined;
+      try {
+        const { result } = await renderIAPBilling();
+
+        await act(async () => {
+          await result.current.manageSubscriptions();
+        });
+
+        expect(mocks.Linking.openURL).toHaveBeenCalledWith('https://play.google.com/store/account/subscriptions');
+      } finally {
+        (mocks.iap as any).deepLinkToSubscriptions = original;
+      }
+    });
+
+    it('wraps failures to open the management surface in a typed error', async () => {
+      mocks.iap.showManageSubscriptionsIOS.mockRejectedValue(new Error('sheet failed'));
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await expect(result.current.manageSubscriptions()).rejects.toMatchObject({
+          name: 'IAPBillingError',
+          code: 'manage_subscriptions_failed',
+        });
+      });
+    });
+
+    it('throws a typed error on unsupported platforms', async () => {
+      const { result } = await renderIAPBilling();
+      mocks.Platform.OS = 'web';
+
+      await act(async () => {
+        await result.current.manageSubscriptions().then(
+          () => expect.unreachable(),
+          (error: unknown) => {
+            expect(isIAPBillingError(error)).toBe(true);
+            expect((error as IAPBillingError).code).toBe('unsupported_platform');
+          },
+        );
+      });
     });
   });
 

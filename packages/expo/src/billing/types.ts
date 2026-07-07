@@ -78,6 +78,19 @@ export type UseIAPBillingReturn = {
    */
   restorePurchases: () => Promise<IAPRestorePurchasesResult>;
   /**
+   * Opens the platform store's own subscription management surface: the native StoreKit
+   * manage-subscriptions sheet on iOS (iOS 15+), or the Google Play subscriptions screen on Android. Falls back to
+   * opening the store's subscriptions web URL when the native affordance is unavailable at runtime.
+   *
+   * This is how apps should handle "cancel my subscription" for store-managed subscription items
+   * (`managedBy: 'apple' | 'google'`): store-billed subscriptions can only be cancelled in the store itself — Apple
+   * provides no developer API to cancel a subscription on the user's behalf. Cancellations made there flow back to
+   * Clerk through the store's server notifications.
+   *
+   * Throws an `IAPBillingError` with code `'manage_subscriptions_failed'` when the surface cannot be opened.
+   */
+  manageSubscriptions: () => Promise<void>;
+  /**
    * Re-fetches the plans and current subscription items.
    */
   refetch: () => Promise<void>;

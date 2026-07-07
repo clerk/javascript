@@ -31,7 +31,11 @@ export type IAPBillingErrorCode =
   /**
    * The store rejected or failed the purchase for a reason other than user cancellation.
    */
-  | 'purchase_failed';
+  | 'purchase_failed'
+  /**
+   * The store's subscription management surface could not be opened.
+   */
+  | 'manage_subscriptions_failed';
 
 /**
  * A typed error thrown by the in-app purchase billing surface. Inspect `code` to branch on the failure reason.

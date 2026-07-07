@@ -8,7 +8,7 @@ import type {
 } from '@clerk/shared/types';
 import type { Purchase } from 'expo-iap';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 import { IAPBillingError } from './errors';
 import type { ExpoIapModule } from './expoIap';
@@ -22,6 +22,13 @@ import {
   platformToStore,
   resolveStoreProduct,
 } from './utils';
+
+/**
+ * Web fallbacks for the stores' subscription management surfaces, used when the corresponding expo-iap API is
+ * missing at runtime (for example, an older expo-iap version).
+ */
+const APPLE_MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
+const GOOGLE_MANAGE_SUBSCRIPTIONS_URL = 'https://play.google.com/store/account/subscriptions';
 
 function purchaseStore(purchase: Purchase, fallback: BillingStore): BillingStore {
   return purchase.store === 'apple' || purchase.store === 'google' ? purchase.store : fallback;
@@ -383,12 +390,64 @@ export function useIAPBilling(): UseIAPBillingReturn {
     return { registered, failed };
   }, [clerk, refreshSessionAndState]);
 
+  /**
+   * Routes "cancel/manage my subscription" intent to the store's own surface. Store-managed subscriptions can only
+   * be cancelled in the store (Apple provides no developer API to cancel on the user's behalf), so the best an app
+   * can do — and what the stores expect — is to open the store's subscription management UI:
+   * - iOS: `expo-iap`'s `showManageSubscriptionsIOS()` presents StoreKit's native manage-subscriptions sheet
+   *   (iOS 15+).
+   * - Android: `expo-iap`'s `deepLinkToSubscriptions()` opens the Google Play subscriptions screen (the native
+   *   module targets the current app's package).
+   * When the expo-iap API is missing at runtime, the store's subscriptions web URL is opened instead.
+   */
+  const manageSubscriptions = useCallback(async (): Promise<void> => {
+    const store = platformToStore(Platform.OS);
+
+    let iap: ExpoIapModule | undefined;
+    try {
+      iap = loadExpoIap();
+    } catch {
+      // expo-iap is an optional dependency; fall back to the store's subscriptions web URL below.
+    }
+
+    try {
+      if (store === 'apple') {
+        if (iap && typeof iap.showManageSubscriptionsIOS === 'function') {
+          await ensureIapConnection(iap);
+          // Resolves when the user dismisses the sheet; status changes are delivered as out-of-band events.
+          await iap.showManageSubscriptionsIOS();
+        } else {
+          await Linking.openURL(APPLE_MANAGE_SUBSCRIPTIONS_URL);
+        }
+        return;
+      }
+
+      if (iap && typeof iap.deepLinkToSubscriptions === 'function') {
+        await ensureIapConnection(iap);
+        await iap.deepLinkToSubscriptions();
+      } else {
+        await Linking.openURL(GOOGLE_MANAGE_SUBSCRIPTIONS_URL);
+      }
+    } catch (error) {
+      if (error instanceof IAPBillingError) {
+        throw error;
+      }
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new IAPBillingError(
+        'manage_subscriptions_failed',
+        `Unable to open the ${store} subscription management surface: ${message}`,
+        { cause: error },
+      );
+    }
+  }, []);
+
   return {
     plans,
     loading,
     currentSubscriptionItems,
     purchase,
     restorePurchases,
+    manageSubscriptions,
     refetch,
   };
 }
