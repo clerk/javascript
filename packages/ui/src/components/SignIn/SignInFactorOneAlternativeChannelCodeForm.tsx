@@ -12,6 +12,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
@@ -62,6 +63,10 @@ export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOne
       .attemptFirstFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
+
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
+        }
 
         switch (res.status) {
           case 'complete':

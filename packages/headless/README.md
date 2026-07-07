@@ -13,6 +13,7 @@ This package is **internal** (`private: true`) and consumed by `@clerk/ui`. It e
 | Dialog       | `@clerk/headless/dialog`       | Modal dialog with focus trapping and scroll lock              |
 | FileUpload   | `@clerk/headless/file-upload`  | File picker + drag-and-drop upload with image previews        |
 | Menu         | `@clerk/headless/menu`         | Dropdown and nested context menus with safe hover zones       |
+| OTP          | `@clerk/headless/otp`          | One-time-password / PIN input split into per-character slots  |
 | Popover      | `@clerk/headless/popover`      | Non-modal floating content triggered by click                 |
 | Select       | `@clerk/headless/select`       | Dropdown select with typeahead and keyboard navigation        |
 | Tabs         | `@clerk/headless/tabs`         | Tab navigation with animated indicator                        |

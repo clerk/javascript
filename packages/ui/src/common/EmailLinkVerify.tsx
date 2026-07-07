@@ -37,6 +37,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         signUp,
         verifyEmailPath,
         verifyPhonePath,
+        protectCheckPath: '../protect-check',
         continuePath,
         navigate,
       });

@@ -820,6 +820,167 @@ describe('Clerk singleton', () => {
     );
   });
 
+  describe('updateSessionCookie monotonic backstop', () => {
+    const sessionId = 'sess_active';
+    // The cookie guard treats an expired current cookie as no baseline, so test
+    // tokens must carry real, non-expired timestamps rather than tiny literals.
+    const T0 = Math.floor(Date.now() / 1000);
+
+    const createJwtWithOiat = (
+      iat: number,
+      oiat: number | undefined,
+      opts: { sid?: string; org?: string; ttl?: number } = {},
+    ): string => {
+      const { sid = sessionId, org, ttl = 60 } = opts;
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (oiat !== undefined) {
+        header.oiat = oiat;
+      }
+      const payload: Record<string, unknown> = { sid, iat, exp: iat + ttl };
+      if (org) {
+        payload.org_id = org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    };
+
+    const loadClerkWithSession = async () => {
+      const mockSession = {
+        id: sessionId,
+        status: 'active',
+        user: {},
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => mockJwt },
+      };
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      return sut;
+    };
+
+    const emitToken = (raw: string | null) => {
+      eventBus.emit(events.TokenUpdate, {
+        token: raw === null ? null : ({ jwt: {}, getRawString: () => raw } as any),
+      });
+    };
+
+    it('drops a strictly-staler same-context token and keeps the fresher cookie', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(T0, 200, { ttl: 600 });
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      const stale = createJwtWithOiat(T0 - 10, 100);
+      emitToken(stale);
+      expect(document.cookie).not.toContain(stale);
+      expect(document.cookie).toContain(fresh);
+    });
+
+    it('applies a lower-oiat token when the current cookie is expired (no freshness baseline)', async () => {
+      await loadClerkWithSession();
+
+      const expiredFresher = createJwtWithOiat(T0 - 120, 500, { ttl: 60 });
+      emitToken(expiredFresher);
+      expect(document.cookie).toContain(expiredFresher);
+
+      const validStaler = createJwtWithOiat(T0, 100);
+      emitToken(validStaler);
+      expect(document.cookie).toContain(validStaler);
+    });
+
+    it('applies a fresher same-context token', async () => {
+      await loadClerkWithSession();
+
+      const older = createJwtWithOiat(T0, 100);
+      emitToken(older);
+      expect(document.cookie).toContain(older);
+
+      const newer = createJwtWithOiat(T0 + 10, 200);
+      emitToken(newer);
+      expect(document.cookie).toContain(newer);
+    });
+
+    it('applies a token with equal oiat and iat (publish on tie)', async () => {
+      await loadClerkWithSession();
+
+      const first = createJwtWithOiat(T0, 100, { ttl: 60 });
+      emitToken(first);
+      expect(document.cookie).toContain(first);
+
+      const second = createJwtWithOiat(T0, 100, { ttl: 120 });
+      emitToken(second);
+      expect(document.cookie).toContain(second);
+    });
+
+    it('writes a token for a different session (cross-context cookies are not compared)', async () => {
+      await loadClerkWithSession();
+
+      const otherSession = createJwtWithOiat(T0, 200, { sid: 'sess_other' });
+      emitToken(otherSession);
+      expect(document.cookie).toContain(otherSession);
+    });
+
+    it('writes a token for a different organization (cross-context cookies are not compared)', async () => {
+      await loadClerkWithSession();
+
+      const otherOrg = createJwtWithOiat(T0, 200, { org: 'org_other' });
+      emitToken(otherOrg);
+      expect(document.cookie).toContain(otherOrg);
+    });
+
+    it('applies a personal-workspace token (no org) for the active personal workspace', async () => {
+      await loadClerkWithSession();
+
+      const personal = createJwtWithOiat(T0, 200);
+      emitToken(personal);
+      expect(document.cookie).toContain(personal);
+    });
+
+    it('applies an active-context token even when the current cookie is a different session with higher oiat', async () => {
+      const sut = await loadClerkWithSession();
+
+      // Plant a different-session, higher-oiat cookie by temporarily making it the active context.
+      (sut.session as any).id = 'sess_other';
+      const otherContext = createJwtWithOiat(T0 + 20, 999, { sid: 'sess_other' });
+      emitToken(otherContext);
+      expect(document.cookie).toContain(otherContext);
+
+      // Restore the active session; a lower-oiat active-context token must still apply,
+      // because the different-session cookie is not a valid freshness baseline.
+      (sut.session as any).id = sessionId;
+      const active = createJwtWithOiat(T0, 100, { sid: sessionId });
+      emitToken(active);
+      expect(document.cookie).toContain(active);
+    });
+
+    it('applies a token without an oiat header (fail open)', async () => {
+      await loadClerkWithSession();
+
+      const noOiat = createJwtWithOiat(T0, undefined);
+      emitToken(noOiat);
+      expect(document.cookie).toContain(noOiat);
+    });
+
+    it('applies a malformed token (fail open)', async () => {
+      await loadClerkWithSession();
+
+      emitToken('garbage.token');
+      expect(document.cookie).toContain('garbage.token');
+    });
+
+    it('removes the cookie when the token is null', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(T0, 200);
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      emitToken(null);
+      expect(document.cookie).not.toContain(fresh);
+    });
+  });
+
   describe('.signOut()', () => {
     const mockClientDestroy = vi.fn();
     const mockClientRemoveSessions = vi.fn();
@@ -2255,6 +2416,97 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/reset-password');
+      });
+    });
+
+    it('does not route a sign-up callback into a stale sign-in protect_check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      // An abandoned sign-in keeps serializing its pending protect_check on the client.
+      const staleSignIn = new SignIn({
+        status: 'needs_protect_check',
+        identifier: 'user@example.com',
+        first_factor_verification: null,
+        second_factor_verification: null,
+        user_data: null,
+        created_session_id: null,
+        created_user_id: null,
+        protect_check: { status: 'pending', token: 'stale-token', sdk_url: 'https://example.com/sdk.js' },
+      } as any as SignInJSON);
+      const completeSignUp = new SignUp({ status: 'complete', created_session_id: 'sess_signup' } as any as SignUpJSON);
+      // The intent-driven reload at the top of the handler is a no-op here; keep the state stable.
+      (staleSignIn as any).reload = vi.fn().mockResolvedValue(staleSignIn);
+      (completeSignUp as any).reload = vi.fn().mockResolvedValue(completeSignUp);
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: staleSignIn,
+          signUp: completeSignUp,
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback({ reloadResource: 'signUp' });
+
+      await waitFor(() => {
+        // Completes the sign-up rather than routing into the stale sign-in's challenge.
+        expect(mockSetActive).toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalledWith('/sign-in#/protect-check');
+      });
+    });
+
+    it('routes a sign-in callback to the protect-check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_protect_check',
+            identifier: 'user@example.com',
+            first_factor_verification: null,
+            second_factor_verification: null,
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+            protect_check: { status: 'pending', token: 'fresh-token', sdk_url: 'https://example.com/sdk.js' },
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/protect-check');
       });
     });
   });

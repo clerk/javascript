@@ -222,7 +222,26 @@ export const itIT: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -233,26 +252,25 @@ export const itIT: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -262,7 +280,6 @@ export const itIT: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -303,7 +320,6 @@ export const itIT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -351,7 +367,6 @@ export const itIT: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -388,7 +403,6 @@ export const itIT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -418,6 +432,8 @@ export const itIT: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -437,21 +453,17 @@ export const itIT: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -499,7 +511,6 @@ export const itIT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -531,7 +542,6 @@ export const itIT: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -572,7 +582,6 @@ export const itIT: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -619,38 +628,9 @@ export const itIT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -662,8 +642,11 @@ export const itIT: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Non verificato',
         badge__verified: 'Verificato',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -674,6 +657,7 @@ export const itIT: LocalizationResource = {
           valueLabel: 'Valore',
         },
         verifiedAtLabel: "Verificato il {{ date | shortDate('it-IT') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Aggiungi {{domain}}',
@@ -904,6 +888,15 @@ export const itIT: LocalizationResource = {
     badge__manualInvitation: 'Nessuna iscrizione automatica',
     badge__unverified: 'Non verificato',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nessuno storico pagamenti',
         notFound: 'Tentativo di pagamento non trovato',
@@ -1105,6 +1098,9 @@ export const itIT: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1375,6 +1371,12 @@ export const itIT: LocalizationResource = {
       subtitle: 'per accedere a {{applicationName}}',
       title: 'Controlla il tuo telefono',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Resetta la password',
       requiredMessage: 'Per motivi di sicurezza, è richiesto di resettare la tua password.',
@@ -1479,6 +1481,12 @@ export const itIT: LocalizationResource = {
       resendButton: 'Rinvia codice',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Verifica il tuo numero di telefono',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Contatta il supporto',
@@ -1619,6 +1627,7 @@ export const itIT: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1690,6 +1699,14 @@ export const itIT: LocalizationResource = {
       sentencePrefix: undefined,
     },
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Hai rifiutato la richiesta di firma. Riprova per continuare.',
@@ -1742,9 +1759,9 @@ export const itIT: LocalizationResource = {
     action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
-    label__userButtonPopover: 'Pannello account',
     label__accountActions: 'Azioni account',
     label__activeSessions: 'Sessioni attive',
+    label__userButtonPopover: 'Pannello account',
   },
   userProfile: {
     apiKeysPage: {
@@ -1767,6 +1784,15 @@ export const itIT: LocalizationResource = {
       title__codelist: 'Codici di backup',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nessuno storico pagamenti',
         notFound: 'Tentativo di pagamento non trovato',

@@ -1,0 +1,166 @@
+import * as OtpStories from './otp.stories';
+
+# OTP
+
+A one-time-password / PIN input from `@clerk/headless`. It is a **headless** primitive: it owns the
+value (a single string), splits it across per-character `Input` slots, and handles focus movement,
+keyboard editing, and paste distribution, but ships **no styles** — you bring your own CSS by
+targeting the `data-cl-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its behavior.
+Type digits and focus advances slot to slot; `Backspace` walks back; arrow keys (plus `Home`/`End`
+and `Ctrl`/`Cmd` variants) move between slots; and pasting a full code distributes it across the
+slots. Focus can't skip past the first empty slot, so an empty field always focuses the first slot.
+
+<Story
+  name='Default'
+  storyModule={OtpStories}
+/>
+
+## Usage
+
+The value lives in `Otp.Root`. Read the slots with the `useOtp` hook and render one `Otp.Input` per
+slot, passing each its `index`:
+
+```tsx
+import { Otp } from '@clerk/headless/otp';
+
+function VerifyCode() {
+  return (
+    <Otp.Root
+      length={6}
+      aria-label='Verification code'
+      onComplete={code => submit(code)}
+    >
+      <Slots />
+    </Otp.Root>
+  );
+}
+
+function Slots() {
+  const { slots } = Otp.useOtp();
+  return slots.map(slot => (
+    <Otp.Input
+      key={slot.index}
+      index={slot.index}
+    />
+  ));
+}
+```
+
+### Controlled
+
+```tsx
+const [code, setCode] = useState('');
+
+<Otp.Root
+  length={6}
+  value={code}
+  onValueChange={setCode}
+>
+  <Slots />
+</Otp.Root>;
+```
+
+### Inside a form
+
+Pass `name` to submit the combined value through a hidden input:
+
+```tsx
+<form action={verify}>
+  <Otp.Root
+    length={6}
+    name='code'
+  >
+    <Slots />
+  </Otp.Root>
+  <button type='submit'>Verify</button>
+</form>
+```
+
+### Masked / alphanumeric
+
+```tsx
+<Otp.Root
+  length={4}
+  mask
+  pattern='alphanumeric'
+>
+  <Slots />
+</Otp.Root>
+```
+
+## Parts
+
+| Part        | Default Element | Description                                                    |
+| ----------- | --------------- | -------------------------------------------------------------- |
+| `Otp.Root`  | `<div>`         | Owns the value + focus, provides context, submits the value    |
+| `Otp.Input` | `<input>`       | A single character slot; render one per `useOtp().slots` entry |
+
+Both parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their
+default element. `Otp.Input` (and the `useOtp` hook) throw if used outside `Otp.Root`.
+
+`Otp.useOtp()` is a hook (not a component) that returns
+`{ value, length, disabled, complete, slots, activeIndex, clear, focus }` for reading the value and
+driving custom UI. Each `slots` entry is `{ index, char, isActive, isFilled }`. It must be called
+inside `Otp.Root`.
+
+## Props
+
+### `Otp.Root`
+
+| Prop            | Type                                     | Default      | Description                                         |
+| --------------- | ---------------------------------------- | ------------ | --------------------------------------------------- |
+| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code            |
+| `value`         | `string`                                 | —            | Controlled value                                    |
+| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                        |
+| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change          |
+| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                    |
+| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped             |
+| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                     |
+| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name |
+| `disabled`      | `boolean`                                | `false`      | Disable every slot                                  |
+
+### `Otp.Input`
+
+| Prop    | Type     | Default      | Description                                           |
+| ------- | -------- | ------------ | ----------------------------------------------------- |
+| `index` | `number` | — (required) | The slot's `0`-based position (from `useOtp().slots`) |
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute          | Applies To  | Description                                   |
+| ------------------ | ----------- | --------------------------------------------- |
+| `data-cl-slot`     | All parts   | Part identifier (`"otp-root"`, `"otp-input"`) |
+| `data-cl-empty`    | Root        | Present when no character has been entered    |
+| `data-cl-complete` | Root        | Present when every slot is filled             |
+| `data-cl-disabled` | Root, Input | Present when disabled                         |
+| `data-cl-active`   | Input       | Present when the slot holds focus             |
+| `data-cl-filled`   | Input       | Present when the slot holds a character       |
+
+```css
+[data-cl-slot='otp-root'] {
+  display: flex;
+  gap: 8px;
+}
+[data-cl-slot='otp-input'] {
+  width: 40px;
+  height: 48px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+[data-cl-slot='otp-input'][data-cl-active] {
+  border-color: var(--color-accent);
+}
+```
+
+`Otp.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
+Each `Otp.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
+a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
+hidden form input is `aria-hidden` and out of the tab order. Arrow keys follow reading order — under
+`dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.
