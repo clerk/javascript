@@ -59,6 +59,11 @@ function waitForPurchase(iap: ExpoIapModule, productId: string): { promise: Prom
     );
   });
 
+  // The purchase-error event and `requestPurchase()`'s own rejection can both fire for one failure. When the caller
+  // exits through the `requestPurchase()` rejection it never awaits this promise, so mark the duplicate rejection as
+  // observed to keep it from surfacing as an unhandled promise rejection.
+  promise.catch(() => {});
+
   return { promise, remove };
 }
 

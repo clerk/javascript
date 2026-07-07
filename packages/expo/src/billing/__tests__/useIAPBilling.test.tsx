@@ -361,6 +361,44 @@ describe('useIAPBilling', () => {
         });
       });
     });
+
+    it('does not leak an unhandled rejection when requestPurchase rejects and the purchase-error event also fires', async () => {
+      const unhandledRejections: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandledRejections.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        // A single store failure (e.g. sku-not-found) surfaces twice in expo-iap: the purchase-error event rejects
+        // the internal waiter promise while requestPurchase() rejects its own returned promise. The caller exits
+        // through the latter, so the waiter rejection must not surface as an unhandled rejection.
+        mocks.iap.requestPurchase.mockImplementation(async () => {
+          mocks.emitPurchaseError({
+            code: 'sku-not-found',
+            message: 'SKU not found',
+            productId: 'com.acme.pro.monthly',
+          });
+          throw Object.assign(new Error('SKU not found'), { code: 'sku-not-found' });
+        });
+        const { result } = await renderIAPBilling();
+
+        await act(async () => {
+          await expect(result.current.purchase(plan, 'month')).rejects.toMatchObject({
+            name: 'IAPBillingError',
+            code: 'purchase_failed',
+          });
+        });
+
+        // Give a dangling rejection the macrotask it needs to be reported before asserting none surfaced.
+        await act(async () => {
+          await new Promise(resolve => setImmediate(resolve));
+        });
+        expect(unhandledRejections).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
   });
 
   describe('restorePurchases', () => {
