@@ -384,6 +384,85 @@ describe('OrganizationProfileProvider wiring', () => {
     expect(probe.dataset.hasMm).toBe('true');
   });
 
+  // Mirror of the UserProfileProvider getter test: OrganizationProfileProvider
+  // was changed identically, so pin the same dedup-independent read channel.
+  it('resolves the moduleManager from clerk.__internal_moduleManager (getter), not a shared registry', async () => {
+    const getterImport = vi.fn(() => Promise.resolve(undefined));
+    const getterModuleManager = { import: getterImport };
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        first_name: 'Test',
+        last_name: 'User',
+        organization_memberships: [{ name: 'TestOrg' }],
+      });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      value: getterModuleManager,
+      configurable: true,
+    });
+
+    function ModuleManagerIdentityProbe() {
+      const mm = useModuleManager();
+      return (
+        <div
+          data-testid='org-mm-getter-probe'
+          data-from-getter={String(mm?.import === getterImport)}
+        />
+      );
+    }
+
+    render(
+      <OrganizationProfileProvider>
+        <ModuleManagerIdentityProbe />
+      </OrganizationProfileProvider>,
+      { wrapper },
+    );
+
+    expect(screen.getByTestId('org-mm-getter-probe').dataset.fromGetter).toBe('true');
+  });
+
+  it('falls back to fallbackModuleManager when the clerk instance exposes no moduleManager', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        first_name: 'Test',
+        last_name: 'User',
+        organization_memberships: [{ name: 'TestOrg' }],
+      });
+    });
+    patchEnvironment(fixtures.clerk, fixtures.environment);
+    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
+    Object.defineProperty(fixtures.clerk, '__internal_moduleManager', {
+      value: undefined,
+      configurable: true,
+    });
+
+    function FallbackProbe() {
+      const mm = useModuleManager();
+      return (
+        <div
+          data-testid='org-mm-fallback-probe'
+          data-is-fallback={String(mm === fallbackModuleManager)}
+        />
+      );
+    }
+
+    render(
+      <OrganizationProfileProvider>
+        <FallbackProbe />
+      </OrganizationProfileProvider>,
+      { wrapper },
+    );
+
+    expect(screen.getByTestId('org-mm-fallback-probe').dataset.isFallback).toBe('true');
+  });
+
   it('returns null when organization is not loaded', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
@@ -437,5 +516,18 @@ describe('OrganizationProfileProvider wiring', () => {
     const probe = screen.getByTestId('org-probe');
     expect(probe.dataset.afterLeave).toBe('/bye');
     expect(JSON.parse(probe.dataset.apiKeys || 'null')).toEqual({ showDescription: true });
+  });
+});
+
+// The fallback exists to fail loudly instead of silently resolving `undefined`.
+// This is the contract the whole getter refactor protects: when a too-old
+// clerk-js exposes no manager, the first dynamic import (Web3, billing,
+// password strength) must reject with a stable, diagnosable code rather than
+// degrade to an opaque access on a missing module.
+describe('fallbackModuleManager', () => {
+  it('rejects dynamic imports with a composed_module_manager_unavailable code', async () => {
+    await expect(fallbackModuleManager.import('@zxcvbn-ts/core')).rejects.toMatchObject({
+      code: 'composed_module_manager_unavailable',
+    });
   });
 });

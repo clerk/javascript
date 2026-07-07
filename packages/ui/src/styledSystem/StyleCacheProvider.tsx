@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
-import createCache from '@emotion/cache';
-// eslint-disable-next-line no-restricted-imports
-import { CacheProvider, type SerializedStyles } from '@emotion/react';
+import { CacheProvider } from '@emotion/react';
 import React, { useMemo } from 'react';
+
+import { createEmotionCache } from './createEmotionCache';
 
 type StyleCacheProviderProps = React.PropsWithChildren<{
   /** The nonce value for CSP (Content Security Policy). */
@@ -12,28 +12,10 @@ type StyleCacheProviderProps = React.PropsWithChildren<{
 }>;
 
 export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
-  const cache = useMemo(() => {
-    const el = typeof document !== 'undefined' ? document.querySelector('style#cl-style-insertion-point') : null;
-    const emotionCache = createCache({
-      key: 'cl-internal',
-      prepend: props.cssLayerName ? false : !el,
-      insertionPoint: el ? (el as HTMLElement) : undefined,
-      nonce: props.nonce,
-    });
-
-    if (props.cssLayerName) {
-      const prevInsert = emotionCache.insert.bind(emotionCache);
-      emotionCache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
-        if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
-          const newSerialized = { ...serialized };
-          newSerialized.styles = `@layer ${props.cssLayerName} {${serialized.styles}}`;
-          return prevInsert(selector, newSerialized, sheet, shouldCache);
-        }
-        return prevInsert(selector, serialized, sheet, shouldCache);
-      };
-    }
-    return emotionCache;
-  }, [props.nonce, props.cssLayerName]);
+  const cache = useMemo(
+    () => createEmotionCache({ nonce: props.nonce, cssLayerName: props.cssLayerName }),
+    [props.nonce, props.cssLayerName],
+  );
 
   return <CacheProvider value={cache}>{props.children}</CacheProvider>;
 };

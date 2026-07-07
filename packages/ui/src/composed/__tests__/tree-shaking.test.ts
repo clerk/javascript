@@ -1,14 +1,14 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 /**
  * Each composed section lives in its own file so bundlers can tree-shake
- * unused sections. The namespace barrel (index.tsx) imports each leaf
- * individually so property-access tree-shaking on `UserProfile.X` /
- * `OrganizationProfile.X` can drop unused leaves under `sideEffects: false`.
- * Leaves must not import siblings — that would couple sections and defeat
- * dead-code elimination.
+ * unused sections. The namespace barrel (index.tsx) re-exports each leaf
+ * individually via a direct `export { X } from './X'` (never `export *`) so
+ * bundlers can drop unused leaves under `sideEffects: false`. Leaves must not
+ * import siblings — that would couple sections and defeat dead-code elimination.
  */
 
 const composedDir = resolve(__dirname, '..');
@@ -33,13 +33,15 @@ describe('tree-shaking: namespace barrel imports each leaf individually', () => 
       expect(content).not.toMatch(/export\s+\*/);
     });
 
-    it(`${label}/index.tsx imports each leaf via a direct relative path`, () => {
+    it(`${label}/index.tsx re-exports each leaf via a direct relative path`, () => {
       const content = readFileSync(indexPath, 'utf-8');
-      const importLines = content.split('\n').filter(l => l.trim().startsWith('import'));
-      expect(importLines.length).toBeGreaterThan(0);
-      for (const line of importLines) {
+      const reExportLines = content.split('\n').filter(l => /^\s*export\s.*\sfrom\s/.test(l));
+      expect(reExportLines.length).toBeGreaterThan(0);
+      for (const line of reExportLines) {
         const match = line.match(/from\s+['"](.+)['"]/);
-        if (!match) continue;
+        if (!match) {
+          continue;
+        }
         expect(match[1]).toMatch(/^\.\/[^./]+$/);
       }
     });
@@ -64,7 +66,9 @@ describe('tree-shaking: section files are self-contained', () => {
 
         for (const imp of importLines) {
           const match = imp.match(/from\s+['"](.+)['"]/);
-          if (!match) continue;
+          if (!match) {
+            continue;
+          }
           const target = match[1];
 
           // Sibling imports (./OtherSection) would couple sections together.

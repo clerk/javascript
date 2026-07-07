@@ -1,23 +1,10 @@
-import { OrganizationProfileAPIKeysPanel } from './APIKeys';
-import { OrganizationProfileBillingPanel } from './Billing';
-import { OrganizationProfileGeneralPanel } from './General';
-import { OrganizationProfileDeleteSection } from './GeneralDeleteOrganization';
-import { OrganizationProfileLeaveSection } from './GeneralLeaveOrganization';
-import { OrganizationProfileProfileSection } from './GeneralOrganizationProfile';
-import { OrganizationProfileDomainsSection } from './GeneralVerifiedDomains';
-import { OrganizationProfileMembersPanel } from './Members';
-import { OrganizationProfileProvider } from './OrganizationProfileProvider';
-import { OrganizationProfileSecurityPanel } from './Security';
-
-export {
-  OrganizationProfileProvider,
-  OrganizationProfileGeneralPanel,
-  OrganizationProfileMembersPanel,
-  OrganizationProfileBillingPanel,
-  OrganizationProfileAPIKeysPanel,
-  OrganizationProfileSecurityPanel,
-  OrganizationProfileProfileSection,
-  OrganizationProfileDomainsSection,
-  OrganizationProfileLeaveSection,
-  OrganizationProfileDeleteSection,
-};
+export { OrganizationProfileProvider } from './OrganizationProfileProvider';
+export { OrganizationProfileGeneralPanel } from './General';
+export { OrganizationProfileMembersPanel } from './Members';
+export { OrganizationProfileBillingPanel } from './Billing';
+export { OrganizationProfileAPIKeysPanel } from './APIKeys';
+export { OrganizationProfileSecurityPanel } from './Security';
+export { OrganizationProfileProfileSection } from './GeneralOrganizationProfile';
+export { OrganizationProfileDomainsSection } from './GeneralVerifiedDomains';
+export { OrganizationProfileLeaveSection } from './GeneralLeaveOrganization';
+export { OrganizationProfileDeleteSection } from './GeneralDeleteOrganization';
