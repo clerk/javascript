@@ -1,0 +1,207 @@
+import * as DrawerStories from './drawer.stories';
+
+# Drawer
+
+A modal bottom sheet that slides up from the bottom edge and is dismissed by dragging it
+down, from `@clerk/headless`. It is a **headless** primitive: it supplies open state,
+portalling, an overlay surface, a scroll-locked viewport, focus management, dismissal
+(drag / outside press / Escape), optional snap points, virtual-keyboard awareness, nesting,
+and ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the
+`data-cl-*` state attributes each part emits and composing the raw `--cl-drawer-*` custom
+properties it writes. It reuses the same Floating UI infrastructure as `Dialog` with a
+hand-rolled drag engine layered on top; prefer `Dialog` for centered modals with no drag.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Open it, then drag the sheet down, press Escape, or click outside
+the popup to dismiss.
+
+<Story
+  name='Default'
+  storyModule={DrawerStories}
+/>
+
+## Usage
+
+```tsx
+import { Drawer } from '@clerk/headless/drawer';
+
+<Drawer.Root>
+  <Drawer.Trigger>Open</Drawer.Trigger>
+  <Drawer.Portal>
+    <Drawer.Backdrop />
+    <Drawer.Viewport>
+      <Drawer.Popup>
+        <Drawer.Handle />
+        <Drawer.Title>Sheet title</Drawer.Title>
+        <Drawer.Description>Optional description.</Drawer.Description>
+        <p>Sheet content.</p>
+        <Drawer.Close>Close</Drawer.Close>
+      </Drawer.Popup>
+    </Drawer.Viewport>
+  </Drawer.Portal>
+</Drawer.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Drawer.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  {/* trigger + portal */}
+</Drawer.Root>;
+```
+
+### Detached trigger
+
+A trigger rendered **outside** `Drawer.Root` can drive it through a shared handle.
+`handle.open()` / `handle.close()` / `handle.toggle()` work imperatively, and
+`handle.isOpen` / `handle.subscribe(cb)` make it `useSyncExternalStore`-compatible.
+
+```tsx
+import { createDrawerHandle } from '@clerk/headless/drawer';
+
+const handle = createDrawerHandle();
+
+<>
+  <Drawer.Trigger handle={handle}>Open from anywhere</Drawer.Trigger>
+  <Drawer.Root handle={handle}>{/* portal */}</Drawer.Root>
+</>;
+```
+
+### Snap points
+
+Ascending viewport fractions the sheet can rest at (`1` = full height). A slow release
+settles to the nearest point; a fast flick steps one point (up = larger, down = smaller, or
+dismiss from the first point when `dismissible`).
+
+```tsx
+<Drawer.Root
+  snapPoints={[0.4, 0.75, 1]}
+  defaultActiveSnapPoint={0}
+>
+  {/* portal */}
+</Drawer.Root>
+```
+
+### Handle-only dragging
+
+Only a press starting on `Drawer.Handle` initiates the drag; the body scrolls normally.
+
+```tsx
+<Drawer.Root handleOnly>{/* portal */}</Drawer.Root>
+```
+
+## Parts
+
+| Part                 | Default Element | Description                                                        |
+| -------------------- | --------------- | ------------------------------------------------------------------ |
+| `Drawer.Root`        | none (context)  | Owns open, drag, snap, and nesting state plus the ARIA ids         |
+| `Drawer.Trigger`     | `<button>`      | Opens the drawer on click (in-tree, or via a detached `handle`)    |
+| `Drawer.Portal`      | none (portal)   | Portals its children; renders nothing until mounted                |
+| `Drawer.Backdrop`    | `<div>`         | Semi-transparent overlay surface behind the sheet                  |
+| `Drawer.Viewport`    | `<div>`         | Fixed full-viewport container; owns body scroll lock               |
+| `Drawer.Popup`       | `<div>`         | The sheet (`role="dialog"`); hosts the drag gesture and focus trap |
+| `Drawer.Handle`      | `<div>`         | Visual drag grip; the hit-test target when `handleOnly`            |
+| `Drawer.Title`       | `<h2>`          | Heading; wired to the popup's `aria-labelledby`                    |
+| `Drawer.Description` | `<p>`           | Description; wired to the popup's `aria-describedby`               |
+| `Drawer.Close`       | `<button>`      | Closes the drawer on click                                         |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. Compound parts throw if used outside `Drawer.Root`.
+`Drawer.Handle` is presentational (no ARIA role); keyboard users dismiss via `Escape` or
+`Drawer.Close`. Unlike `Dialog`, `autoFocus` defaults to `false` so opening on touch does
+not summon the virtual keyboard.
+
+## Props
+
+### `Drawer.Root`
+
+| Prop                                 | Type                                 | Default            | Description                                     |
+| ------------------------------------ | ------------------------------------ | ------------------ | ----------------------------------------------- |
+| <code>open</code>                    | <code>boolean</code>                 | —                  | Controlled open state                           |
+| <code>defaultOpen</code>             | <code>boolean</code>                 | <code>false</code> | Initial open state (uncontrolled)               |
+| <code>onOpenChange</code>            | <code>(open: boolean) => void</code> | —                  | Called when the open state changes              |
+| <code>modal</code>                   | <code>boolean</code>                 | <code>true</code>  | Trap focus and make the rest of the page inert  |
+| <code>dismissible</code>             | <code>boolean</code>                 | <code>true</code>  | Allow drag / outside press / Escape to close    |
+| <code>handleOnly</code>              | <code>boolean</code>                 | <code>false</code> | Only `Drawer.Handle` starts a drag              |
+| <code>handle</code>                  | <code>DrawerHandle</code>            | —                  | Shared handle for a detached trigger            |
+| <code>snapPoints</code>              | <code>number[]</code>                | —                  | Ascending viewport fractions (0..1) to rest at  |
+| <code>activeSnapPoint</code>         | <code>number</code>                  | —                  | Controlled active snap index                    |
+| <code>defaultActiveSnapPoint</code>  | <code>number</code>                  | last               | Uncontrolled initial active snap index          |
+| <code>onActiveSnapPointChange</code> | <code>(index: number) => void</code> | —                  | Called when the active snap index changes       |
+| <code>repositionInputs</code>        | <code>boolean</code>                 | <code>true</code>  | Keep a focused field above the virtual keyboard |
+| <code>autoFocus</code>               | <code>boolean</code>                 | <code>false</code> | Move focus into the sheet on open               |
+
+### `Drawer.Trigger`
+
+| Prop                | Type                      | Default | Description                                                      |
+| ------------------- | ------------------------- | ------- | ---------------------------------------------------------------- |
+| <code>handle</code> | <code>DrawerHandle</code> | —       | Drive a detached handle instead of the surrounding `Drawer.Root` |
+
+### `Drawer.Viewport`
+
+| Prop                    | Type                 | Default           | Description                               |
+| ----------------------- | -------------------- | ----------------- | ----------------------------------------- |
+| <code>lockScroll</code> | <code>boolean</code> | <code>true</code> | Lock body scroll while the drawer is open |
+
+`Drawer.Portal` accepts a `root` container; `Drawer.Backdrop`, `Drawer.Popup`,
+`Drawer.Handle`, `Drawer.Title`, `Drawer.Description`, and `Drawer.Close` take no
+additional props beyond standard HTML attributes for their default element.
+
+## Styling
+
+The headless parts don't emit `data-cl-slot` — slot identity is applied by the styled
+(Mosaic) layer. Target a part with your own class (or `render` prop) and combine it with the
+`data-cl-*` state attributes each part emits:
+
+| Attribute                                         | Applies To                         | Description                                         |
+| ------------------------------------------------- | ---------------------------------- | --------------------------------------------------- |
+| `data-cl-open` / `data-cl-closed`                 | Trigger, Backdrop, Viewport, Popup | Present while open / closed (still mounted exiting) |
+| `data-cl-starting-style` / `data-cl-ending-style` | Backdrop, Viewport, Popup          | Present on the entering / exiting frame             |
+| `data-cl-swiping`                                 | Popup, Backdrop                    | Present while a drag is in progress                 |
+| `data-cl-snap`                                    | Popup                              | The active snap index                               |
+| `data-cl-expanded`                                | Popup                              | Present when resting at the full-height snap        |
+| `data-cl-nested`                                  | Popup                              | This drawer is itself nested                        |
+| `data-cl-nested-drawer-open`                      | Popup                              | A nested child drawer is open                       |
+| `data-cl-drawer-handle`                           | Handle                             | Grip / `handleOnly` hit-test target                 |
+| `data-cl-drawer-no-drag`                          | (consumer-set)                     | Opt a subtree out of the drag gesture               |
+
+The drag engine and snap layer write raw inputs as CSS custom properties on `Drawer.Popup`;
+the styled layer composes them into the actual `transform` / `opacity` chains (the headless
+layer never writes `calc()`). The high-frequency properties are registered as non-inheriting
+via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` is unavailable):
+
+| Property                        | Written by    | Meaning                                          |
+| ------------------------------- | ------------- | ------------------------------------------------ |
+| `--cl-drawer-swipe-movement-y`  | drag engine   | px live drag delta on the Y axis (0 at rest)     |
+| `--cl-drawer-swipe-progress`    | drag engine   | 0..1 dismiss progress (drives backdrop fade)     |
+| `--cl-drawer-snap-point-offset` | snap layer    | px resting translateY of the active snap point   |
+| `--cl-drawer-swipe-strength`    | drag engine   | 0.1..1 from release velocity (scales exit speed) |
+| `--cl-drawer-nested-drawers`    | nesting layer | count of open nested children                    |
+
+The backdrop, viewport, and popup stay mounted through the exit animation, so enter/exit
+transitions are CSS-driven. Sum the resting snap offset with the live drag delta so the sheet
+follows the finger, and drop the transition while `data-cl-swiping` is present:
+
+```css
+.drawer-popup {
+  transform: translateY(calc(var(--cl-drawer-snap-point-offset, 0px) + var(--cl-drawer-swipe-movement-y, 0px)));
+  transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.drawer-popup[data-cl-starting-style],
+.drawer-popup[data-cl-ending-style] {
+  transform: translateY(100%);
+}
+.drawer-popup[data-cl-swiping] {
+  transition-duration: 0ms;
+}
+.drawer-backdrop {
+  opacity: calc(0.2 * (1 - var(--cl-drawer-swipe-progress, 0)));
+}
+```
