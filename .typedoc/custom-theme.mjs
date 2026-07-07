@@ -1086,10 +1086,7 @@ function configEntryForPageUrl(pageUrl) {
 
 /**
  * Wrap the name portion of bare method headings on a parent page in backticks:
- * `^## methodName()` → `` ^## `methodName()` ``. Applies to H2–H4 headings whose full text is
- * an identifier followed by `()` with no other content — matches typedoc's natural rendering of
- * callable signature titles on aggregator pages (e.g. `agent-task-api.mdx`). Idempotent: headings
- * that already contain a backtick are left alone.
+ * `^## methodName()` → `` ^## `methodName()` ``. Applies to H2–H4 headings whose full text is an identifier followed by `()` with no other content — matches typedoc's natural rendering of callable signature titles on aggregator pages (e.g. `agent-task-api.mdx`). Idempotent: headings that already contain a backtick are left alone.
  *
  * @param {string} contents
  * @returns {string}
@@ -1100,9 +1097,7 @@ function addBackticksToBareMethodHeadings(contents) {
 }
 
 /**
- * Replace each method's natural `### Parameters` (or `## Parameters` on single-callable pages)
- * section with the canonical `parametersMarkdownTable` output for the same signature at the same
- * heading level. Routes every parameters table through the same code path:
+ * Replace each method's natural `### Parameters` (or `## Parameters` on single-callable pages) section with the canonical `parametersMarkdownTable` output for the same signature at the same heading level. Routes every parameters table through the same code path:
  *
  * - single nominal param (e.g. `create(params: CreateAgentTaskParams)`): section becomes
  *   `` `TypeName` `` (backticked) + the propertiesTable-based expanded rows.
@@ -1110,15 +1105,10 @@ function addBackticksToBareMethodHeadings(contents) {
  *   + parametersTable output.
  *
  * Handles two page shapes:
- * 1. **Aggregator pages** (backend API parents, namespaces like `api-keys-namespace.mdx`): each
- *    method is a `## `methodName()` ` section with `### Parameters` inside. Iterates `decl.children`.
- * 2. **Single-callable pages** (`server-get-token.mdx`, React hooks): no method heading, `## Parameters`
- *    at top-level. Uses `decl`'s own signature.
+ * 1. **Aggregator pages** (backend API parents, namespaces like `api-keys-namespace.mdx`): each method is a `## `methodName()` ` section with `### Parameters` inside. Iterates `decl.children`.
+ * 2. **Single-callable pages** (`server-get-token.mdx`, React hooks): no method heading, `## Parameters` at top-level. Uses `decl`'s own signature.
  *
- * Runs uniformly across all pages. `extract-returns-and-params.mjs` is responsible for renaming
- * `` ## `TypeName` `` back to `## Parameters` on the react-package pages it post-processes (so the
- * sibling `-params.mdx` extraction still finds the section) — this keeps theme output uniform and
- * pushes downstream-consumer knowledge into the downstream tool.
+ * Runs uniformly across all pages. `extract-returns-and-params.mjs` is responsible for renaming `` ## `TypeName` `` back to `## Parameters` on the react-package pages it post-processes (so the sibling `-params.mdx` extraction still finds the section) — this keeps theme output uniform and pushes downstream-consumer knowledge into the downstream tool.
  *
  * Applies link replacements manually because this listener runs after `custom-plugin.mjs`'s pass.
  *
@@ -1194,10 +1184,7 @@ function swapParentPageParametersSections(contents, decl, ctx) {
 }
 
 /**
- * Check whether the page contents already include a `## methodName()` H2 heading (either bare or
- * backticked) for the given method name. Used to avoid duplicating a synthesized aggregator section
- * on pages where typedoc-plugin-markdown already emits per-method headings naturally (backend
- * class-based API pages).
+ * Check whether the page contents already include a `## methodName()` H2 heading (either bare or backticked) for the given method name. Used to avoid duplicating a synthesized aggregator section on pages where typedoc-plugin-markdown already emits per-method headings naturally (backend class-based API pages).
  *
  * @param {string} contents
  * @param {string} name
@@ -1217,12 +1204,9 @@ function contentsHaveMethodHeading(contents, name) {
  *     <description>
  *     <property table>
  *
- * `namespacePropertyTable` entries list the non-callable members of an `@extractMethods` namespace
- * (e.g. `## `verifications`` lists `emailAddress`, `phoneNumber`, ...). `memberPropertyTable`
- * entries expand one non-callable member's object shape (e.g. `## `emailLink.verification``).
+ * `namespacePropertyTable` entries list the non-callable members of an `@extractMethods` namespace (e.g. `## `verifications`` lists `emailAddress`, `phoneNumber`, ...). `memberPropertyTable` entries expand one non-callable member's object shape (e.g. `## `emailLink.verification``).
  *
- * Sub-doc equivalents produced by the marker-block path use H3 (`### `name``); text-slice demotes
- * the H2 back to H3 on reshape, so the sub-doc is byte-identical to the marker-block output.
+ * Sub-doc equivalents produced by the marker-block path use H3 (`### `name``); text-slice demotes the H2 back to H3 on reshape, so the sub-doc is byte-identical to the marker-block output.
  *
  * @param {Extract<AggregatorMethodEntry, { kind: 'namespacePropertyTable' | 'memberPropertyTable' }>} entry
  * @param {import('typedoc-plugin-markdown').MarkdownThemeContext} ctx
@@ -1258,9 +1242,7 @@ function renderAggregatorPropertyTableSection(entry, ctx) {
 }
 
 /**
- * Render one method's canonical "aggregator" H2 section for a parent page — the shape every parent
- * page uses so `extract-methods.mjs` can slice it and reshape into the per-method extracted file
- * with pure text ops (no reflection access needed downstream):
+ * Render one method's canonical "aggregator" H2 section for a parent page — the shape every parent page uses so `extract-methods.mjs` can slice it and reshape into the per-method extracted file with pure text ops (no reflection access needed downstream):
  *
  *     ## `name()`
  *     <description>          (summary + non-@returns block tags)
@@ -1272,10 +1254,7 @@ function renderAggregatorPropertyTableSection(entry, ctx) {
  *     ### Returns
  *     `Type` — <returns text> (from ctx.partials.signatureReturns)
  *
- * Used to synthesize sections for callable members typedoc doesn't render as separate H2s —
- * function-typed properties on interfaces (`end: () => Promise<X>`) and members declared on
- * `extraMethodInterfaces`. Sections synthesized here are indistinguishable from natural sections
- * on the same page after all reshapers have run.
+ * Used to synthesize sections for callable members typedoc doesn't render as separate H2s — function-typed properties on interfaces (`end: () => Promise<X>`) and members declared on `extraMethodInterfaces`. Sections synthesized here are indistinguishable from natural sections on the same page after all reshapers have run.
  *
  * Applies link replacements manually because this listener runs after `custom-plugin.mjs`'s pass.
  * For property-table entries, delegates to {@link renderAggregatorPropertyTableSection}.
@@ -1340,11 +1319,7 @@ function renderAggregatorMethodSection(entry, ctx) {
 }
 
 /**
- * Delete a `## methodName()` H2 section (heading through the next `## ` or end-of-file) from the
- * page contents. Used when a natural typedoc-emitted section needs to be replaced by a synthesized
- * one — e.g. overloaded backend-class methods where typedoc emits `### Call Signature` sub-headings
- * per overload, but the aggregator synthesizes a single section for the primary signature only
- * (via `getPrimaryCallSignature`).
+ * Delete a `## methodName()` H2 section (heading through the next `## ` or end-of-file) from the page contents. Used when a natural typedoc-emitted section needs to be replaced by a synthesized one — e.g. overloaded backend-class methods where typedoc emits `### Call Signature` sub-headings per overload, but the aggregator synthesizes a single section for the primary signature only (via `getPrimaryCallSignature`).
  *
  * @param {string} contents
  * @param {string} name
@@ -1369,20 +1344,12 @@ function removeMethodH2Section(contents, name) {
 }
 
 /**
- * Insert a `` ```typescript ... ``` `` signature code block into each natural (typedoc-emitted)
- * `## methodName()` H2 section on the parent page. Positioned after the section's description
- * prose and before the first `### ` subheading — matching the position `renderAggregatorMethodSection`
- * uses for synthesized sections. This is what makes the parent's H2 sections a self-contained
- * source for `extract-methods.mjs`: the extracted file's signature can be sliced out of the parent
- * verbatim rather than regenerated downstream.
+ * Insert a `` ```typescript ... ``` `` signature code block into each natural (typedoc-emitted) `## methodName()` H2 section on the parent page. Positioned after the section's description prose and before the first `### ` subheading — matching the position `renderAggregatorMethodSection` uses for synthesized sections. This is what makes the parent's H2 sections a self-contained source for `extract-methods.mjs`: the extracted file's signature can be sliced out of the parent verbatim rather than regenerated downstream.
  *
- * Idempotent-ish: relies on `contentsHaveMethodHeading` matching the (possibly-backticked) title,
- * and looks for the absence of a fenced ```typescript block already inside the section.
+ * Idempotent-ish: relies on `contentsHaveMethodHeading` matching the (possibly-backticked) title, and looks for the absence of a fenced ```typescript block already inside the section.
  *
  * @param {string} contents
- * @param {import('typedoc').DeclarationReflection[]} callableDecls - direct callable members that
- *   may have natural sections. Callers pass the same list they enumerate for synthesis-vs-natural
- *   decisions.
+ * @param {import('typedoc').DeclarationReflection[]} callableDecls - direct callable members that may have natural sections. Callers pass the same list they enumerate for synthesis-vs-natural decisions.
  * @returns {string}
  */
 function insertSignatureBlocksIntoNaturalMethodSections(contents, callableDecls) {
@@ -2457,14 +2424,9 @@ function signatureIsDeprecated(sig) {
 }
 
 /**
- * typedoc maps `@param paramName description` to `parameter.comment` during conversion of the
- * signature that physically owns the JSDoc. With overloads + an implementation, the impl's `@param`
- * tags don't transfer to overload parameters — even when typedoc copies the impl's comment onto
- * each overload's `sig.comment.blockTags`. Without descriptions on `param.comment`, typedoc-plugin-markdown
- * drops the Description column from the parameters table.
+ * typedoc maps `@param paramName description` to `parameter.comment` during conversion of the signature that physically owns the JSDoc. With overloads + an implementation, the impl's `@param` tags don't transfer to overload parameters — even when typedoc copies the impl's comment onto each overload's `sig.comment.blockTags`. Without descriptions on `param.comment`, typedoc-plugin-markdown drops the Description column from the parameters table.
  *
- * Overlay missing parameter comments from any matching `@param` block tag on the signature comment
- * so the rendered table shows the descriptions the author wrote on the implementation's JSDoc.
+ * Overlay missing parameter comments from any matching `@param` block tag on the signature comment so the rendered table shows the descriptions the author wrote on the implementation's JSDoc.
  *
  * @param {import('typedoc').SignatureReflection} sig
  */
@@ -2877,22 +2839,17 @@ function mergePropertyArms(arms, options) {
 }
 
 /**
- * Resolve a parameter / property type to the list of `Property` reflections that should populate
- * a nested rows table. TypeDoc applies `@param parent.prop` descriptions onto these reflections.
+ * Resolve a parameter / property type to the list of `Property` reflections that should populate a nested rows table. TypeDoc applies `@param parent.prop` descriptions onto these reflections.
  *
  * Cases:
  * - `reflection` (inline `{...}`): the declaration's own children.
- * - `reference` to a named interface/alias: the target's children, or — for generic instantiations
- *   like `ClerkPaginationParams<{ status?: … }>` — the base properties merged with each typeArg's.
+ * - `reference` to a named interface/alias: the target's children, or — for generic instantiations like `ClerkPaginationParams<{ status?: … }>` — the base properties merged with each typeArg's.
  * - `intersection`: every `&` arm's properties combined (later arm wins on name collision).
- * - `union`: every `|` arm's properties combined, dropping `prop?: never` discriminators and
- *   preferring the branch with more documentation on collisions.
+ * - `union`: every `|` arm's properties combined, dropping `prop?: never` discriminators and preferring the branch with more documentation on collisions.
  * - `optional`: unwrap and recurse.
  *
  * Returns `undefined` when nothing resolves (so callers can `if (!children?.length)` cheaply).
- * The children list may include non-`Property` kinds for direct `reflection` / `reference` cases —
- * callers that need only `Property` should filter; merge cases (typeArgs / intersection / union)
- * pre-filter via {@link mergePropertyArms}.
+ * The children list may include non-`Property` kinds for direct `reflection` / `reference` cases — callers that need only `Property` should filter; merge cases (typeArgs / intersection / union) pre-filter via {@link mergePropertyArms}.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection | undefined} [project] For resolving references when `ref.reflection` is missing (intersections like `Foo & WithOptionalOrgType<…>`).
@@ -3081,9 +3038,7 @@ function lookupInterfaceOrTypeAliasByName(project, name) {
 }
 
 /**
- * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an
- * object shape, returns the section title (the type's name), the resolved property list, and the
- * source `typeDecl` for `@experimental` / `@deprecated` checks.
+ * Unwrap optional wrappers. When the parameter is a single named interface or type alias for an  object shape, returns the section title (the type's name), the resolved property list, and the source `typeDecl` for `@experimental` / `@deprecated` checks.
  *
  * @param {import('typedoc').SomeType | undefined} t
  * @param {import('typedoc').ProjectReflection} project
@@ -3277,8 +3232,7 @@ function parametersMarkdownTable(sig, ctx, instantiationMap, headingLevel = 4) {
 
 /**
  * Detects whether a markdown parameter table (pipe-format) already has a `Description` column.
- * HTML tables render on a single line — treat those as "already correct" (they carry their own
- * column structure via `<th>` cells and aren't concatenated with pipe-row nested output).
+ * HTML tables render on a single line — treat those as "already correct" (they carry their own column structure via `<th>` cells and aren't concatenated with pipe-row nested output).
  *
  * @param {string} tableMd
  */
@@ -3290,9 +3244,7 @@ function parameterTableHasDescriptionColumn(tableMd) {
 }
 
 /**
- * Append an empty Description column to a 2-column pipe-format parameter table so that appending
- * 3-column nested-row output doesn't malform it. Header gets ` Description |`, divider gets
- * ` ------ |`, data rows get ` - |`.
+ * Append an empty Description column to a 2-column pipe-format parameter table so that appending 3-column nested-row output doesn't malform it. Header gets ` Description |`, divider gets ` ------ |`, data rows get ` - |`.
  *
  * @param {string} tableMd
  */
