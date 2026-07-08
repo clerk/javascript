@@ -63,6 +63,12 @@ export type UseIAPBillingReturn = {
    */
   currentSubscriptionItems: BillingSubscriptionItemResource[];
   /**
+   * The processor the user's active paid subscription is billed through (`stripe`, `apple` or `google`), or `null`
+   * when there is none. When non-null, suppress the purchase affordance: a `purchase()` call would resolve to
+   * `{ status: 'already_subscribed' }` without opening the store's payment sheet.
+   */
+  alreadySubscribedVia: 'stripe' | 'apple' | 'google' | null;
+  /**
    * Purchases the given Plan through the platform app store and registers the purchase with Clerk. A plan can map
    * any number of store products per store (each billed on its own store term): with exactly one mapped product no
    * options are needed; with several, name the one to buy via `options.productId` (see `plan.storeProducts`).

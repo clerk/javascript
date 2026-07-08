@@ -364,6 +364,44 @@ describe('useIAPBilling', () => {
       });
     });
 
+    it('preflights against an active paid subscription without opening the payment sheet', async () => {
+      clerk.billing.getSubscription = vi.fn(async () => ({
+        subscriptionItems: [
+          { id: 'sub_item_stripe', status: 'active', managedBy: 'clerk', plan: { id: 'plan_123', isDefault: false } },
+        ],
+      }));
+      const { result } = await renderIAPBilling();
+
+      expect(result.current.alreadySubscribedVia).toBe('stripe');
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult).toEqual({ status: 'already_subscribed', alreadySubscribedVia: 'stripe' });
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
+    it('does not preflight-block on free/default-plan or ended items', async () => {
+      clerk.billing.getSubscription = vi.fn(async () => ({
+        subscriptionItems: [
+          { id: 'sub_item_free', status: 'active', managedBy: 'clerk', plan: { id: 'plan_free', isDefault: true } },
+          { id: 'sub_item_old', status: 'ended', managedBy: 'apple', plan: { id: 'plan_123', isDefault: false } },
+        ],
+      }));
+      const { result } = await renderIAPBilling();
+
+      expect(result.current.alreadySubscribedVia).toBeNull();
+
+      await act(async () => {
+        await result.current.purchase(plan);
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalled();
+    });
+
     it('resolves with a cancelled result when the user dismisses the purchase sheet', async () => {
       mocks.iap.requestPurchase.mockImplementation(async () => {
         mocks.emitPurchaseError({ code: 'user-cancelled', message: 'cancelled', productId: 'com.acme.pro.monthly' });

@@ -60,6 +60,19 @@ function isUserCancelledPurchaseError(error: unknown, depth = 0): boolean {
 }
 
 /**
+ * The processor an active paid subscription is billed through, in the same vocabulary the backend's
+ * cross-processor guard reports (`already_subscribed_via`): Clerk-managed items map to `stripe`,
+ * store-managed items to their store. `null` when the user holds no active paid subscription.
+ */
+function activePaidSubscribedVia(items: BillingSubscriptionItemResource[]): 'stripe' | 'apple' | 'google' | null {
+  const active = items.find(item => item.status === 'active' && item.plan && !item.plan.isDefault);
+  if (!active) {
+    return null;
+  }
+  return active.managedBy === 'apple' || active.managedBy === 'google' ? active.managedBy : 'stripe';
+}
+
+/**
  * Waits for the purchase-updated / purchase-error event for the given product ID. `expo-iap`'s `requestPurchase()`
  * is event-based: the actual outcome is delivered through `purchaseUpdatedListener` / `purchaseErrorListener`, not
  * the returned promise. Listeners must be attached before `requestPurchase()` is called.
@@ -151,6 +164,8 @@ export function useIAPBilling(): UseIAPBillingReturn {
   const lastRefetchAtRef = useRef(0);
   /** Whether an initial load has completed — subsequent refetches revalidate silently instead of flipping `loading`. */
   const hasLoadedOnceRef = useRef(false);
+  /** Mirror of `currentSubscriptionItems` for the purchase() preflight, so the callback never closes over stale state. */
+  const currentSubscriptionItemsRef = useRef<BillingSubscriptionItemResource[]>([]);
 
   clerk.telemetry?.record(eventMethodCalled('useIAPBilling'));
 
@@ -160,6 +175,7 @@ export function useIAPBilling(): UseIAPBillingReturn {
     if (!clerk.loaded || !clerk.user) {
       setPlans([]);
       setCurrentSubscriptionItems([]);
+      currentSubscriptionItemsRef.current = [];
       hasLoadedOnceRef.current = false;
       setLoading(false);
       return;
@@ -179,6 +195,7 @@ export function useIAPBilling(): UseIAPBillingReturn {
       ]);
       setPlans(plansResponse.data);
       setCurrentSubscriptionItems(subscription.subscriptionItems ?? []);
+      currentSubscriptionItemsRef.current = subscription.subscriptionItems ?? [];
       hasLoadedOnceRef.current = true;
     } finally {
       setLoading(false);
@@ -225,7 +242,9 @@ export function useIAPBilling(): UseIAPBillingReturn {
   const applySubscriptionItem = useCallback((item: BillingSubscriptionItemResource): void => {
     setCurrentSubscriptionItems(previous => {
       const others = previous.filter(existing => existing.id !== item.id);
-      return [...others, item];
+      const next = [...others, item];
+      currentSubscriptionItemsRef.current = next;
+      return next;
     });
   }, []);
 
@@ -346,6 +365,15 @@ export function useIAPBilling(): UseIAPBillingReturn {
       const purchaserId = clerk.user?.id;
       if (!purchaserId) {
         throw new IAPBillingError('user_unavailable', 'A signed-in user is required to make an in-app purchase.');
+      }
+
+      // Preflight against already-loaded state: an active paid subscription through any processor
+      // would be rejected by the backend's cross-processor guard AFTER the store charged the user,
+      // so fail before the payment sheet ever opens. Zero latency (no network); the backend guard
+      // remains the source of truth for races this state can't see.
+      const preflightVia = activePaidSubscribedVia(currentSubscriptionItemsRef.current);
+      if (preflightVia) {
+        return { status: 'already_subscribed', alreadySubscribedVia: preflightVia };
       }
 
       const iap = loadExpoIap();
@@ -518,6 +546,7 @@ export function useIAPBilling(): UseIAPBillingReturn {
     plans,
     loading,
     currentSubscriptionItems,
+    alreadySubscribedVia: activePaidSubscribedVia(currentSubscriptionItems),
     purchase,
     restorePurchases,
     manageSubscriptions,
