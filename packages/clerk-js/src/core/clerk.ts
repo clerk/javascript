@@ -3272,19 +3272,18 @@ export class Clerk implements ClerkInterface {
               this.#authService?.stopPollingForToken();
 
               try {
-                const jwtInCookie = this.#authService?.getSessionCookie();
-                const session = this.#defaultSession(createClientFromJwt(jwtInCookie));
+                const session = this.#defaultSession(createClientFromJwt(this.#authService?.getSessionCookie()));
 
                 if (session) {
                   // Prefer minting a fresh token as its claims are fresher than the cookie's
                   session.clearCache();
                   const jwt = await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
                     session.clearCache();
-                    return jwtInCookie;
+                    return this.#authService?.getSessionCookie();
                   });
                   this.updateClient(createClientFromJwt(jwt));
                 } else {
-                  this.updateClient(createClientFromJwt(jwtInCookie));
+                  this.updateClient(createClientFromJwt(this.#authService?.getSessionCookie()));
                 }
               } finally {
                 this.#authService?.startPollingForToken();

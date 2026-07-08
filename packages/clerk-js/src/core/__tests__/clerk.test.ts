@@ -879,7 +879,10 @@ describe('Clerk singleton', () => {
 
       it('fails fast and marks Clerk degraded when the client fetch hangs', async () => {
         vi.useFakeTimers();
-        mockClientFetch.mockReturnValue(new Promise(() => {}));
+        // Only the primary fetch hangs; the background retry must resolve so it can't stall the test.
+        mockClientFetch
+          .mockReturnValueOnce(new Promise(() => {}))
+          .mockResolvedValue({ signedInSessions: [], lastActiveSessionId: null });
 
         const sut = new Clerk(productionPublishableKey);
         await pumpUntilSettled(sut.load());
@@ -887,7 +890,6 @@ describe('Clerk singleton', () => {
         expect(sut.status).toBe('degraded');
         expect(stopPollSpy).toHaveBeenCalled();
         expect(startPollSpy).toHaveBeenCalled();
-        // The timed-out /client request gets aborted instead of being left in flight.
         expect(mockClientFetch.mock.calls[0]?.[0]?.abortSignal?.aborted).toBe(true);
       });
 
