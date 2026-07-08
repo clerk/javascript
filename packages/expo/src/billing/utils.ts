@@ -1,10 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type {
-  BillingPlanResource,
-  BillingPlanStoreProduct,
-  BillingStore,
-  BillingSubscriptionPlanPeriod,
-} from '@clerk/shared/types';
+import type { BillingPlanResource, BillingPlanStoreProduct, BillingStore } from '@clerk/shared/types';
 
 import { IAPBillingError } from './errors';
 import { loadExpoCrypto } from './expoCrypto';
@@ -36,27 +31,46 @@ export function platformToStore(os: string): BillingStore {
 }
 
 /**
- * Resolves the store product mapped to a Plan for the given store and billing period.
+ * Resolves the store product to purchase for a Plan on the given store. A plan
+ * can map any number of store products per store (the store's own renewal term
+ * governs billing): with exactly one, it is the product; with several, the
+ * caller must name one via productId.
  *
  * @internal
  */
 export function resolveStoreProduct(
   plan: BillingPlanResource,
   store: BillingStore,
-  period: BillingSubscriptionPlanPeriod,
+  productId?: string,
 ): BillingPlanStoreProduct {
-  const product = (plan.storeProducts || []).find(
-    storeProduct => storeProduct.store === store && storeProduct.period === period,
-  );
+  const candidates = (plan.storeProducts || []).filter(storeProduct => storeProduct.store === store);
 
-  if (!product) {
-    throw new IAPBillingError(
-      'store_product_not_found',
-      `Plan "${plan.id}" has no ${store} store product mapped for the "${period}" period. Map the store product ID to this plan in the Clerk Dashboard.`,
-    );
+  if (productId) {
+    const product = candidates.find(storeProduct => storeProduct.productId === productId);
+    if (!product) {
+      throw new IAPBillingError(
+        'store_product_not_found',
+        `Plan "${plan.id}" has no ${store} store product "${productId}" mapped. Map the store product ID to this plan in the Clerk Dashboard.`,
+      );
+    }
+    return product;
   }
 
-  return product;
+  if (candidates.length === 0) {
+    throw new IAPBillingError(
+      'store_product_not_found',
+      `Plan "${plan.id}" has no ${store} store product mapped. Map the store product ID to this plan in the Clerk Dashboard.`,
+    );
+  }
+  if (candidates.length > 1) {
+    throw new IAPBillingError(
+      'ambiguous_store_product',
+      `Plan "${plan.id}" maps ${candidates.length} ${store} store products (${candidates
+        .map(storeProduct => storeProduct.productId)
+        .join(', ')}). Pass options.productId to purchase() to choose one.`,
+    );
+  }
+  return candidates[0];
 }
 
 /**

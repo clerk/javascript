@@ -397,8 +397,6 @@ export interface BillingPlanStoreProduct {
   store: BillingStore;
   /** The identifier of the product in the app store. */
   productId: string;
-  /** The billing period of the store product. */
-  period: BillingSubscriptionPlanPeriod;
 }
 
 /**

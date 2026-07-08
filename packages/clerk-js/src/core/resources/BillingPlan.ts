@@ -70,7 +70,6 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.storeProducts = (data.store_products || []).map(product => ({
       store: product.store,
       productId: product.product_id,
-      period: product.period,
     }));
 
     return this;

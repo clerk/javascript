@@ -22,7 +22,7 @@ const subscriptionItemJSON = {
     publicly_visible: true,
     slug: 'pro',
     avatar_url: null,
-    store_products: [{ store: 'apple', product_id: 'com.acme.pro.monthly', period: 'month' }],
+    store_products: [{ store: 'apple', product_id: 'com.acme.pro.monthly' }],
   },
   plan_period: 'month',
   price_id: 'price_123',
@@ -133,7 +133,7 @@ describe('Billing namespace', () => {
         planPeriod: 'month',
         managedBy: 'apple',
       });
-      expect(item.plan.storeProducts).toEqual([{ store: 'apple', productId: 'com.acme.pro.monthly', period: 'month' }]);
+      expect(item.plan.storeProducts).toEqual([{ store: 'apple', productId: 'com.acme.pro.monthly' }]);
     });
 
     it('propagates API errors', async () => {

@@ -20,6 +20,7 @@ export type IAPBillingErrorCode =
    * The Plan has no store product mapped for the current platform and requested period.
    */
   | 'store_product_not_found'
+  | 'ambiguous_store_product'
   /**
    * The store purchase did not carry a payload (JWS transaction / purchase token) to register with Clerk.
    */

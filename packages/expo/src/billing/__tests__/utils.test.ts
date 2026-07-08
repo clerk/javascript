@@ -53,21 +53,36 @@ describe('resolveStoreProduct', () => {
   const plan = {
     id: 'plan_123',
     storeProducts: [
-      { store: 'apple', productId: 'com.acme.pro.monthly', period: 'month' },
-      { store: 'apple', productId: 'com.acme.pro.annual', period: 'annual' },
-      { store: 'google', productId: 'acme_pro_monthly', period: 'month' },
+      { store: 'apple', productId: 'com.acme.pro.monthly' },
+      { store: 'apple', productId: 'com.acme.pro.annual' },
+      { store: 'google', productId: 'acme_pro_monthly' },
     ],
   } as BillingPlanResource;
 
-  it('resolves the product for the given store and period', () => {
-    expect(resolveStoreProduct(plan, 'apple', 'month').productId).toBe('com.acme.pro.monthly');
-    expect(resolveStoreProduct(plan, 'apple', 'annual').productId).toBe('com.acme.pro.annual');
-    expect(resolveStoreProduct(plan, 'google', 'month').productId).toBe('acme_pro_monthly');
+  it('resolves the single mapped product for a store without options', () => {
+    expect(resolveStoreProduct(plan, 'google').productId).toBe('acme_pro_monthly');
   });
 
-  it('throws a typed error when the mapping is missing', () => {
+  it('resolves by productId when several products are mapped for the store', () => {
+    expect(resolveStoreProduct(plan, 'apple', 'com.acme.pro.annual').productId).toBe('com.acme.pro.annual');
+    expect(resolveStoreProduct(plan, 'apple', 'com.acme.pro.monthly').productId).toBe('com.acme.pro.monthly');
+  });
+
+  it('throws a typed ambiguity error when several products are mapped and none is named', () => {
     try {
-      resolveStoreProduct(plan, 'google', 'annual');
+      resolveStoreProduct(plan, 'apple');
+      expect.unreachable();
+    } catch (error) {
+      expect(isIAPBillingError(error)).toBe(true);
+      expect((error as IAPBillingError).code).toBe('ambiguous_store_product');
+      expect((error as IAPBillingError).message).toContain('com.acme.pro.monthly');
+      expect((error as IAPBillingError).message).toContain('com.acme.pro.annual');
+    }
+  });
+
+  it('throws a typed error when the named product is not mapped', () => {
+    try {
+      resolveStoreProduct(plan, 'google', 'acme_pro_annual');
       expect.unreachable();
     } catch (error) {
       expect(isIAPBillingError(error)).toBe(true);

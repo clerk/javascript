@@ -101,8 +101,8 @@ const GOOGLE_OBFUSCATED_ACCOUNT_ID = createHash('sha256').update(USER_ID, 'utf8'
 const plan = {
   id: 'plan_123',
   storeProducts: [
-    { store: 'apple', productId: 'com.acme.pro.monthly', period: 'month' },
-    { store: 'google', productId: 'acme_pro_monthly', period: 'month' },
+    { store: 'apple', productId: 'com.acme.pro.monthly' },
+    { store: 'google', productId: 'acme_pro_monthly' },
   ],
 } as any;
 
@@ -205,7 +205,7 @@ describe('useIAPBilling', () => {
       const { result } = await renderIAPBilling();
 
       await act(async () => {
-        await result.current.purchase(plan, 'month');
+        await result.current.purchase(plan);
       });
 
       expect(mocks.iap.requestPurchase).toHaveBeenCalledWith({
@@ -224,7 +224,7 @@ describe('useIAPBilling', () => {
 
       let purchaseResult: any;
       await act(async () => {
-        purchaseResult = await result.current.purchase(plan, 'month');
+        purchaseResult = await result.current.purchase(plan);
       });
 
       expect(registerStorePurchase).toHaveBeenCalledTimes(1);
@@ -243,7 +243,7 @@ describe('useIAPBilling', () => {
       const { result } = await renderIAPBilling();
 
       await act(async () => {
-        await expect(result.current.purchase(plan, 'month')).rejects.toThrow('store_transaction_invalid');
+        await expect(result.current.purchase(plan)).rejects.toThrow('store_transaction_invalid');
       });
 
       expect(mocks.iap.finishTransaction).not.toHaveBeenCalled();
@@ -255,7 +255,7 @@ describe('useIAPBilling', () => {
       clerk.billing.getPlans.mockClear();
 
       await act(async () => {
-        await result.current.purchase(plan, 'month');
+        await result.current.purchase(plan);
       });
 
       expect(getToken).toHaveBeenCalledWith({ skipCache: true });
@@ -272,7 +272,7 @@ describe('useIAPBilling', () => {
       const { result } = await renderIAPBilling();
 
       await act(async () => {
-        await result.current.purchase(plan, 'month');
+        await result.current.purchase(plan);
       });
 
       expect(mocks.iap.fetchProducts).toHaveBeenCalledWith({ skus: ['acme_pro_monthly'], type: 'subs' });
@@ -293,7 +293,7 @@ describe('useIAPBilling', () => {
 
       let purchaseResult: any;
       await act(async () => {
-        purchaseResult = await result.current.purchase(plan, 'month');
+        purchaseResult = await result.current.purchase(plan);
       });
 
       expect(registerStorePurchase).toHaveBeenCalledWith({ store: 'google', payload: 'play-purchase-token' });
@@ -306,17 +306,47 @@ describe('useIAPBilling', () => {
   });
 
   describe('purchase failure modes', () => {
-    it('throws a typed error when the plan has no store product for the platform and period', async () => {
+    it('throws a typed ambiguity error when several products are mapped and none is named', async () => {
+      const multiProductPlan = {
+        ...plan,
+        storeProducts: [
+          { store: 'apple', productId: 'com.acme.pro.monthly' },
+          { store: 'apple', productId: 'com.acme.pro.annual' },
+        ],
+      } as any;
       const { result } = await renderIAPBilling();
 
       await act(async () => {
-        await expect(result.current.purchase(plan, 'annual')).rejects.toMatchObject({
+        await expect(result.current.purchase(multiProductPlan)).rejects.toMatchObject({
           name: 'IAPBillingError',
-          code: 'store_product_not_found',
+          code: 'ambiguous_store_product',
         });
       });
 
       expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+    });
+
+    it('purchases a named product when several are mapped', async () => {
+      const multiProductPlan = {
+        ...plan,
+        storeProducts: [
+          { store: 'apple', productId: 'com.acme.pro.monthly' },
+          { store: 'apple', productId: 'com.acme.pro.annual' },
+        ],
+      } as any;
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(multiProductPlan, { productId: 'com.acme.pro.monthly' });
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith(
+        expect.objectContaining({
+          request: expect.objectContaining({
+            apple: expect.objectContaining({ sku: 'com.acme.pro.monthly' }),
+          }),
+        }),
+      );
     });
 
     it('throws a typed error on unsupported platforms', async () => {
@@ -324,7 +354,7 @@ describe('useIAPBilling', () => {
       mocks.Platform.OS = 'web';
 
       await act(async () => {
-        await result.current.purchase(plan, 'month').then(
+        await result.current.purchase(plan).then(
           () => expect.unreachable(),
           (error: unknown) => {
             expect(isIAPBillingError(error)).toBe(true);
@@ -343,7 +373,7 @@ describe('useIAPBilling', () => {
 
       let purchaseResult: any;
       await act(async () => {
-        purchaseResult = await result.current.purchase(plan, 'month');
+        purchaseResult = await result.current.purchase(plan);
       });
 
       expect(purchaseResult).toEqual({ status: 'cancelled' });
@@ -356,7 +386,7 @@ describe('useIAPBilling', () => {
 
       let purchaseResult: any;
       await act(async () => {
-        purchaseResult = await result.current.purchase(plan, 'month');
+        purchaseResult = await result.current.purchase(plan);
       });
 
       expect(purchaseResult).toEqual({ status: 'already_subscribed', alreadySubscribedVia: 'stripe' });
@@ -372,7 +402,7 @@ describe('useIAPBilling', () => {
       const { result } = await renderIAPBilling();
 
       await act(async () => {
-        await expect(result.current.purchase(plan, 'month')).rejects.toMatchObject({
+        await expect(result.current.purchase(plan)).rejects.toMatchObject({
           name: 'IAPBillingError',
           code: 'purchase_failed',
         });
@@ -401,7 +431,7 @@ describe('useIAPBilling', () => {
         const { result } = await renderIAPBilling();
 
         await act(async () => {
-          await expect(result.current.purchase(plan, 'month')).rejects.toMatchObject({
+          await expect(result.current.purchase(plan)).rejects.toMatchObject({
             name: 'IAPBillingError',
             code: 'purchase_failed',
           });
@@ -681,7 +711,7 @@ describe('useIAPBilling', () => {
       let purchasePromise: Promise<any> | undefined;
       // Start the purchase and flush so its waiter listeners attach and the product ID is marked in-flight.
       await act(async () => {
-        purchasePromise = result.current.purchase(plan, 'month');
+        purchasePromise = result.current.purchase(plan);
       });
 
       await act(async () => {

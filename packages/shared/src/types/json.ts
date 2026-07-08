@@ -754,7 +754,6 @@ export interface BillingPriceJSON extends ClerkResourceJSON {
 export interface BillingPlanStoreProductJSON {
   store: BillingStore;
   product_id: string;
-  period: BillingSubscriptionPlanPeriod;
 }
 
 /**

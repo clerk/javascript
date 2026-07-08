@@ -1,11 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type {
-  BillingPlanResource,
-  BillingStore,
-  BillingSubscriptionItemResource,
-  BillingSubscriptionPlanPeriod,
-} from '@clerk/shared/types';
+import type { BillingPlanResource, BillingStore, BillingSubscriptionItemResource } from '@clerk/shared/types';
 import type { Purchase } from 'expo-iap';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
@@ -324,9 +319,9 @@ export function useIAPBilling(): UseIAPBillingReturn {
   }, [userId, registerWithClerk, refreshSessionAndState]);
 
   const purchase = useCallback(
-    async (plan: BillingPlanResource, period: BillingSubscriptionPlanPeriod): Promise<IAPPurchaseResult> => {
+    async (plan: BillingPlanResource, options?: { productId?: string }): Promise<IAPPurchaseResult> => {
       const store = platformToStore(Platform.OS);
-      const product = resolveStoreProduct(plan, store, period);
+      const product = resolveStoreProduct(plan, store, options?.productId);
 
       const purchaserId = clerk.user?.id;
       if (!purchaserId) {

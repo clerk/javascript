@@ -1,8 +1,4 @@
-import type {
-  BillingPlanResource,
-  BillingSubscriptionItemResource,
-  BillingSubscriptionPlanPeriod,
-} from '@clerk/shared/types';
+import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/shared/types';
 
 /**
  * The result of a `purchase()` call. Branch on `status`:
@@ -67,11 +63,14 @@ export type UseIAPBillingReturn = {
    */
   currentSubscriptionItems: BillingSubscriptionItemResource[];
   /**
-   * Purchases the given Plan for the given billing period through the platform app store and registers the purchase
-   * with Clerk. Throws an `IAPBillingError` when the purchase cannot be started (for example, when the Plan has no
-   * store product mapped for the current platform).
+   * Purchases the given Plan through the platform app store and registers the purchase with Clerk. A plan can map
+   * any number of store products per store (each billed on its own store term): with exactly one mapped product no
+   * options are needed; with several, name the one to buy via `options.productId` (see `plan.storeProducts`).
+   * Throws an `IAPBillingError` when the purchase cannot be started — for example `store_product_not_found` when
+   * the Plan has no product mapped for the current platform, or `ambiguous_store_product` when several are mapped
+   * and no `productId` was given.
    */
-  purchase: (plan: BillingPlanResource, period: BillingSubscriptionPlanPeriod) => Promise<IAPPurchaseResult>;
+  purchase: (plan: BillingPlanResource, options?: { productId?: string }) => Promise<IAPPurchaseResult>;
   /**
    * Enumerates the user's available store purchases and registers each with Clerk. Registration is idempotent, so
    * restoring is safe to run repeatedly (reinstalls, new devices).
