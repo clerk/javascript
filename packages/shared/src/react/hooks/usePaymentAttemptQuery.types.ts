@@ -17,7 +17,7 @@ export type UsePaymentAttemptQueryParams = {
 export type PaymentAttemptQueryResult = {
   /** The payment attempt object, `undefined` before the first fetch, or `null` if no payment attempt exists. */
   data: BillingPaymentResource | undefined | null;
-  /** Any error that occurred during the data fetch, or `undefined` if no error occurred. */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
   /** Whether the initial data is still being fetched. */
   isLoading: boolean;

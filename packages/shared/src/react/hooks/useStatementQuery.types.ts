@@ -16,7 +16,7 @@ export type UseStatementQueryParams = {
 export type StatementQueryResult = {
   /** The statement object, `undefined` before the first fetch, or `null` if no statement exists. */
   data: BillingStatementResource | undefined | null;
-  /** Any error that occurred during the data fetch, or `undefined` if no error occurred. */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
   /** Whether the initial data is still being fetched. */
   isLoading: boolean;

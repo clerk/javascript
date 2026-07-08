@@ -17,7 +17,7 @@ export type UsePlanDetailsQueryParams = {
 export type PlanDetailsQueryResult = {
   /** The plan object, `undefined` before the first fetch, or `null` if no plan exists. */
   data: BillingPlanResource | undefined | null;
-  /** Any error that occurred during the data fetch, or `undefined` if no error occurred. */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
   /** Whether the initial data is still being fetched. */
   isLoading: boolean;
