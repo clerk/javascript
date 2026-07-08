@@ -35,8 +35,28 @@ function purchaseStore(purchase: Purchase, fallback: BillingStore): BillingStore
   return purchase.store === 'apple' || purchase.store === 'google' ? purchase.store : fallback;
 }
 
-function isUserCancelledPurchaseError(error: unknown): boolean {
-  return !!error && typeof error === 'object' && (error as { code?: unknown }).code === 'user-cancelled';
+const USER_CANCELLED_CODES = new Set(['user-cancelled', 'user_cancelled', 'e_user_cancelled']);
+
+/**
+ * Whether a purchase error represents the user dismissing the purchase sheet.
+ * expo-iap emits a `user-cancelled` code, but on iOS the cancellation often
+ * arrives wrapped in Expo's native-call rejection ("Calling the
+ * 'requestPurchase' function has failed") with the real cancellation in the
+ * `cause` chain — so match known codes AND a cancellation message anywhere in
+ * the chain.
+ */
+function isUserCancelledPurchaseError(error: unknown, depth = 0): boolean {
+  if (!error || typeof error !== 'object' || depth > 4) {
+    return false;
+  }
+  const { code, message, cause } = error as { code?: unknown; message?: unknown; cause?: unknown };
+  if (typeof code === 'string' && USER_CANCELLED_CODES.has(code.toLowerCase())) {
+    return true;
+  }
+  if (typeof message === 'string' && /cancel(l)?ed/i.test(message)) {
+    return true;
+  }
+  return isUserCancelledPurchaseError(cause, depth + 1);
 }
 
 /**

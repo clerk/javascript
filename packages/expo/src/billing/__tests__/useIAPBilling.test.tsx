@@ -380,6 +380,27 @@ describe('useIAPBilling', () => {
       expect(registerStorePurchase).not.toHaveBeenCalled();
     });
 
+    it("treats a cancellation wrapped in Expo's native-call rejection as cancelled", async () => {
+      // iOS surfaces the cancellation through requestPurchase()'s own rejection,
+      // wrapped by Expo modules, with the real reason in the cause chain and a
+      // non-cancellation top-level code/message.
+      mocks.iap.requestPurchase.mockRejectedValue(
+        Object.assign(new Error("Calling the 'requestPurchase' function has failed"), {
+          code: 'ERR_UNEXPECTED',
+          cause: { message: 'User cancelled the purchase flow' },
+        }),
+      );
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult).toEqual({ status: 'cancelled' });
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
     it('maps the already_subscribed API conflict to a typed result and does not finish the transaction', async () => {
       registerStorePurchase.mockRejectedValue(alreadySubscribedError);
       const { result } = await renderIAPBilling();
