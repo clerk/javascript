@@ -22,8 +22,6 @@ import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
 const mockClientFetch = vi.fn();
-// Static raw-JSON fetch used by the background /client retry after a degraded load.
-const mockClientStaticFetch = vi.fn();
 const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
 
 vi.mock('../resources/Client');
@@ -44,9 +42,8 @@ vi.mock('../auth/devBrowser', () => ({
 }));
 
 Client.getOrCreateInstance = vi.fn().mockImplementation(() => {
-  return { fetch: mockClientFetch, fromJSON: (data: any) => data };
+  return { fetch: mockClientFetch };
 });
-Client._fetch = mockClientStaticFetch as any;
 Environment.getInstance = vi.fn().mockImplementation(() => {
   return { fetch: mockEnvironmentFetch };
 });
@@ -870,10 +867,6 @@ describe('Clerk singleton', () => {
           .spyOn(AuthCookieService.prototype, 'stopPollingForToken')
           .mockImplementation(() => void callLog.push('stopPoll'));
         mockClientFetch.mockClear();
-        // Client._fetch must return a promise; default to a no-op null so degraded paths that don't
-        // assert on the background retry don't hit undefined.then. The two background tests override this.
-        mockClientStaticFetch.mockReset();
-        mockClientStaticFetch.mockResolvedValue(null);
         mockCreateClientFromJwt.mockReturnValue({ signedInSessions: [], lastActiveSessionId: null });
       });
 
@@ -979,47 +972,22 @@ describe('Clerk singleton', () => {
         const realSession = { id: 'sess_1', status: 'active', user: { id: 'user_real' } };
         const realClient = { id: 'client_real', signedInSessions: [realSession], lastActiveSessionId: 'sess_1' };
         const refetch = createDeferredPromise();
-        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed'));
-        mockClientStaticFetch.mockReturnValueOnce(refetch.promise);
+        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed')).mockReturnValueOnce(refetch.promise);
         mockCreateClientFromJwt.mockReturnValue(sessionClient(stubSession));
 
         const sut = new Clerk(productionPublishableKey);
         await pumpUntilSettled(sut.load());
 
         expect(sut.status).toBe('degraded');
-        // The primary /client fetch is Client.fetch(); the background retry is the raw Client._fetch().
-        expect(mockClientFetch).toHaveBeenCalledTimes(1);
-        expect(mockClientStaticFetch).toHaveBeenCalledTimes(1);
+        expect(mockClientFetch).toHaveBeenCalledTimes(2);
 
         // The background retry is not bounded by INITIALIZATION_TIMEOUT_MS.
         await vi.advanceTimersByTimeAsync(60_000);
-        refetch.resolve({ response: realClient });
+        refetch.resolve(realClient);
         await vi.advanceTimersByTimeAsync(0);
 
         expect(sut.client).toBe(realClient);
         expect(sut.session).toBe(realSession);
-      });
-
-      it('discards the background /client response when something else updated the client while it was in flight', async () => {
-        const stubSession = makeSession();
-        const refetch = createDeferredPromise();
-        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed'));
-        mockClientStaticFetch.mockReturnValueOnce(refetch.promise);
-        mockCreateClientFromJwt.mockReturnValue(sessionClient(stubSession));
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        // Something newer lands while the background retry is still in flight, e.g. a sign-out
-        // or a mutation's piggybacked client.
-        const interimClient = { id: 'client_interim', signedInSessions: [], lastActiveSessionId: null };
-        sut.updateClient(interimClient as any);
-
-        const staleClient = { id: 'client_stale', signedInSessions: [stubSession], lastActiveSessionId: 'sess_1' };
-        refetch.resolve({ response: staleClient });
-        await new Promise(resolve => setTimeout(resolve, 0));
-
-        expect(sut.client).toBe(interimClient);
       });
     });
   });

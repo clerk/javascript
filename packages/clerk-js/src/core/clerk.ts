@@ -77,7 +77,6 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
-  ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
   ConfigureSSOProps,
@@ -216,8 +215,6 @@ const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_o
 const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
 const CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE =
   'cannot_render_configure_sso_email_address_disabled';
-// Bounds a single origin request at load; a slow response gets no fapiClient retry,
-// so this needs to sit above real-world /client latency including cold-mobile DNS+TLS.
 const INITIALIZATION_TIMEOUT_MS = 7_000;
 const defaultOptions: ClerkOptions = {
   polling: true,
@@ -271,7 +268,6 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #status: ClerkInterface['status'] = 'loading';
-  #clientUpdateGeneration = 0;
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
@@ -2981,7 +2977,6 @@ export class Clerk implements ClerkInterface {
   // and emitting, library consumers that both read state directly and set up listeners
   // could end up in a inconsistent state.
   updateClient = (newClient: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }): void => {
-    this.#clientUpdateGeneration++;
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -3251,8 +3246,7 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
-          // Abort the /client request on timeout so it stops running instead of settling on a
-          // detached instance later; the background retry below owns recovery from then on.
+          // Abort the /client request on timeout so clerkjs loading does not hang
           const clientFetchController = new AbortController();
           return timeLimit(
             Client.getOrCreateInstance().fetch({ abortSignal: clientFetchController.signal }),
@@ -3279,46 +3273,26 @@ export class Clerk implements ClerkInterface {
 
               try {
                 const jwtInCookie = this.#authService?.getSessionCookie();
-                const localClient = createClientFromJwt(jwtInCookie);
-                const session = this.#defaultSession(localClient);
+                const session = this.#defaultSession(createClientFromJwt(jwtInCookie));
 
                 if (session) {
-                  // Prefer minting a fresh token for the degraded identity: the minter can serve it
-                  // during an origin outage and its claims are fresher than the cookie's. Fall back
-                  // to the cookie identity only when the mint fails or times out.
+                  // Prefer minting a fresh token as its claims are fresher than the cookie's
                   session.clearCache();
-                  const freshJwt = await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
-                    // On timeout the recovery getToken is still in flight with a pending resolver in the cache;
-                    // clear it so the poller's next getToken starts fresh instead of awaiting the abandoned one.
+                  const jwt = await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
                     session.clearCache();
-                    return null;
+                    return jwtInCookie;
                   });
-                  this.updateClient(freshJwt ? createClientFromJwt(freshJwt) : localClient);
+                  this.updateClient(createClientFromJwt(jwt));
                 } else {
-                  this.updateClient(localClient);
+                  this.updateClient(createClientFromJwt(jwtInCookie));
                 }
               } finally {
-                // Always restart the poller, no matter what in the recovery block above threw (a failed
-                // mint, a throwing updateClient listener). Otherwise the session-refresh poller would stay
-                // stopped until a full page reload.
                 this.#authService?.startPollingForToken();
               }
 
-              // Retry /client in the background (network-level retries, no time limit) now that load no
-              // longer blocks on it. We fetch the raw JSON and apply it only if nothing else updated the
-              // client while it was in flight; anything newer (a sign-out, a mutation's piggybacked client)
-              // must win. Fetching the JSON with Client._fetch instead of Client.fetch() means a superseded
-              // response is dropped without ever mutating the shared Client instance in place.
-              // A 5xx failure is not retried (fapiClient only retries network errors); in that case the
-              // client heals via the piggybacked client of the next mutation.
-              const clientGenerationAtDispatch = this.#clientUpdateGeneration;
-              void Client._fetch<ClientJSON>({ method: 'GET', path: '/client' })
-                .then(res => {
-                  const clientJson = res?.response;
-                  if (clientJson && this.#clientUpdateGeneration === clientGenerationAtDispatch) {
-                    this.updateClient(Client.getOrCreateInstance().fromJSON(clientJson));
-                  }
-                })
+              void Client.getOrCreateInstance()
+                .fetch()
+                .then(res => this.updateClient(res))
                 .catch(noop);
 
               return null;
