@@ -8,9 +8,6 @@ export function timeLimit<T>(
   const timeoutPromise = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
       const error = new Error(`Timed out after ${ms}ms`);
-      // Abort the underlying operation (e.g. a fetch) so it stops running instead of settling later.
-      // Abort with no reason on purpose: the descriptive timeout error stays on this promise's
-      // rejection, so it never leaks to host fetch instrumentation that reads `signal.reason`.
       abortController?.abort();
       reject(error);
     }, ms);

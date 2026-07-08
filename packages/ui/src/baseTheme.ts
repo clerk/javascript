@@ -305,6 +305,14 @@ const clerkTheme: Appearance = {
         borderWidth: 0,
         boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$borderAlpha100}`,
       },
+      formFieldInputShowPasswordButton: {
+        insetInlineEnd: theme.space.$0x75,
+        insetBlock: theme.space.$0x75,
+        borderRadius: `calc(${theme.radii.$md} - ${theme.space.$0x75})`,
+        '&::before': {
+          inset: `calc(${theme.space.$0x75} * -1)`,
+        },
+      },
     };
   },
 } satisfies Appearance;

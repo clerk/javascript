@@ -148,6 +148,21 @@ export interface SignUpJSON extends ClerkResourceJSON {
   legal_accepted_at: number | null;
   locale: string | null;
   verifications: SignUpVerificationsJSON | null;
+  protect_check?: ProtectCheckJSON | null;
+}
+
+export interface ProtectCheckJSON {
+  /**
+   * Always `'pending'` when surfaced to clients. Completed checks are never emitted on the wire.
+   */
+  status: 'pending';
+  token: string;
+  sdk_url: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
+  expires_at?: number;
+  ui_hints?: Record<string, string>;
 }
 
 /**

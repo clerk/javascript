@@ -1,5 +1,40 @@
 # @clerk/nuxt
 
+## 2.6.13
+
+### Patch Changes
+
+- Deprecate `createRouteMatcher()` in favor of Nuxt's native route matching. ([#9092](https://github.com/clerk/javascript/pull/9092)) by [@jacekradko](https://github.com/jacekradko)
+
+  To protect API routes, match paths natively inside `clerkMiddleware()`:
+
+  ```ts
+  export default clerkMiddleware(event => {
+    const { isAuthenticated } = event.context.auth();
+    const { pathname } = getRequestURL(event);
+
+    if (!isAuthenticated && pathname.startsWith('/api/admin')) {
+      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+    }
+  });
+  ```
+
+  To protect pages, use Nuxt's built-in route middleware with `definePageMeta({ middleware: 'auth' })`.
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1), [`80afb69`](https://github.com/clerk/javascript/commit/80afb69ecf2d1a3525e46a919952a47ff1fe924b)]:
+  - @clerk/shared@4.25.0
+  - @clerk/backend@3.11.1
+  - @clerk/vue@2.4.12
+
+## 2.6.12
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/backend@3.11.0
+  - @clerk/shared@4.24.0
+  - @clerk/vue@2.4.11
+
 ## 2.6.11
 
 ### Patch Changes

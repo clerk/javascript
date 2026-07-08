@@ -1253,6 +1253,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     verifyPhoneNumberUrl?: string | null;
     /**
+     * The full URL or path to navigate to if the sign-in is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-in component.
+     */
+    signInProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
+     */
+    signUpProtectCheckUrl?: string | null;
+    /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
@@ -1391,7 +1401,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
@@ -2773,6 +2783,15 @@ export interface ClerkAuthenticateWithWeb3Params {
    * The URL to navigate to if [second factor](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is required.
    */
   secondFactorUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-in flow.
+   */
+  protectCheckUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-up flow (when the web3
+   * attempt falls back to sign-up).
+   */
+  signUpProtectCheckUrl?: string;
   /**
    * The name of the wallet to use for authentication.
    */

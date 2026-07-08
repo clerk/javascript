@@ -2384,6 +2384,7 @@ export class Clerk implements ClerkInterface {
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
       sessionId: signUp.createdSessionId,
+      protectCheck: signUp.protectCheck,
     };
 
     const si = {
@@ -2392,6 +2393,7 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
+      protectCheck: signIn.protectCheck,
     };
 
     const makeNavigate = (to: string) => () => navigate(to);
@@ -2415,6 +2417,11 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      params.signInProtectCheckUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const redirectUrls = new RedirectUrls(this.#options, params);
 
     const navigateToContinueSignUp = makeNavigate(
@@ -2428,7 +2435,19 @@ export class Clerk implements ClerkInterface {
         ),
     );
 
+    const navigateToSignUpProtectCheck = makeNavigate(
+      params.signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
+      // check must run BEFORE the generic missing-fields short-circuit below — otherwise the
+      // OAuth/SAML callback would land on /continue instead of the challenge.
+      if (signUp.protectCheck || missingFields.includes('protect_check')) {
+        return navigateToSignUpProtectCheck();
+      }
+
       if (missingFields.length) {
         return navigateToContinueSignUp();
       }
@@ -2447,6 +2466,9 @@ export class Clerk implements ClerkInterface {
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        protectCheckPath:
+          params.signUpProtectCheckUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
         navigate,
       });
     };
@@ -2497,12 +2519,36 @@ export class Clerk implements ClerkInterface {
       });
     }
 
+    // OAuth/SAML callbacks can resolve into a protect_check gate that surfaces on the next
+    // /v1/client read, so check for it here before continuing with the transfer logic below.
+    // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
+    //
+    // Scope to the callback's intent: an abandoned sign-in keeps serializing its pending
+    // `protect_check` on the client for up to a day (and a later sign-up doesn't clear it in
+    // multi-session mode), so an unscoped check would route a *sign-up* callback into the stale
+    // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
+    // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
+    // response for the gate.
+    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
+      return navigateToSignInProtectCheck();
+    }
+
+    // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
+    // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
+    // shouldn't hijack a sign-in callback.
+    if (params.reloadResource !== 'signIn' && su.protectCheck) {
+      return navigateToSignUpProtectCheck();
+    }
+
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' &&
       su.externalAccountErrorCode === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS;
 
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
+      if (res.protectCheck || res.status === 'needs_protect_check') {
+        return navigateToSignInProtectCheck();
+      }
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -2761,6 +2807,8 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    protectCheckUrl,
+    signUpProtectCheckUrl,
     walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
@@ -2803,6 +2851,15 @@ export class Clerk implements ClerkInterface {
       secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      protectCheckUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
+    const navigateToSignUpProtectCheck = makeNavigate(
+      signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToContinueSignUp = makeNavigate(
       signUpContinueUrl ||
         buildURL(
@@ -2815,6 +2872,7 @@ export class Clerk implements ClerkInterface {
     );
 
     let signInOrSignUp: SignInResource | SignUpResource;
+    let viaSignUp = false;
     try {
       signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
         identifier,
@@ -2824,6 +2882,7 @@ export class Clerk implements ClerkInterface {
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+        viaSignUp = true;
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
           identifier,
           generateSignature,
@@ -2836,7 +2895,10 @@ export class Clerk implements ClerkInterface {
         if (
           signUpContinueUrl &&
           signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
+          // A protect_check gate also surfaces as missing_requirements; don't skip past it into
+          // the continue step. The gate is handled by the sign-up protect-check route instead.
+          !signInOrSignUp.protectCheck
         ) {
           await navigateToContinueSignUp();
         }
@@ -2856,6 +2918,15 @@ export class Clerk implements ClerkInterface {
         navigate: this.navigate,
       });
     };
+
+    // A Clerk Protect challenge can gate the inline web3 attempt (no redirect happens, so the
+    // centralized _handleRedirectCallback check never runs). Route to the challenge before the
+    // status switch below, otherwise the user is stranded on the wallet step. The sign-up fallback
+    // gates as `missing_requirements` + `protectCheck`, so it has no status branch below either.
+    if (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check') {
+      await (viaSignUp ? navigateToSignUpProtectCheck : navigateToSignInProtectCheck)();
+      return;
+    }
 
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':
