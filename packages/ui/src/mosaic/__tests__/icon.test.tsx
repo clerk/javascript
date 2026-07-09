@@ -24,16 +24,9 @@ describe('Icon', () => {
     expect(svg?.querySelector('path')).not.toBeNull();
   });
 
-  it('renders the override instead of the default glyph', () => {
+  it('renders the override element instead of the default glyph', () => {
     const appearance: MosaicAppearance = {
-      icons: {
-        'chevron-right': props => (
-          <span
-            {...props}
-            data-testid='override'
-          />
-        ),
-      },
+      icons: { 'chevron-right': <span data-testid='override' /> },
     };
     const { getByTestId, container } = wrap(<Icon name='chevron-right' />, appearance);
     expect(getByTestId('override')).not.toBeNull();
@@ -41,16 +34,9 @@ describe('Icon', () => {
     expect(container.querySelector('svg')).toBeNull();
   });
 
-  it('applies Mosaic styling (className) and the slot attr to the override', () => {
+  it('injects Mosaic styling (className) and the slot attr into the override element', () => {
     const appearance: MosaicAppearance = {
-      icons: {
-        'chevron-right': props => (
-          <span
-            {...props}
-            data-testid='override'
-          />
-        ),
-      },
+      icons: { 'chevron-right': <span data-testid='override' /> },
     };
     const { getByTestId } = wrap(
       <Icon
@@ -64,17 +50,42 @@ describe('Icon', () => {
     expect(el.getAttribute('data-cl-slot')).toBe('icon');
   });
 
-  it('applies appearance.elements.icon styling to an overridden glyph (consistent with the built-in)', () => {
+  it("merges the override element's own className with Mosaic's rather than clobbering it", () => {
     const appearance: MosaicAppearance = {
-      elements: { icon: { opacity: 0.5 } },
       icons: {
-        'chevron-right': props => (
+        'chevron-right': (
           <span
-            {...props}
             data-testid='override'
+            className='consumer-glyph'
           />
         ),
       },
+    };
+    const { getByTestId } = wrap(<Icon name='chevron-right' />, appearance);
+    const el = getByTestId('override');
+    expect(el.classList.contains('consumer-glyph')).toBe(true);
+    // Mosaic's serialized class is applied alongside the consumer's, not in place of it.
+    expect(el.classList.length).toBeGreaterThan(1);
+  });
+
+  it('forwards svg props from the Icon call site onto the override element', () => {
+    const appearance: MosaicAppearance = {
+      icons: { 'chevron-right': <span data-testid='override' /> },
+    };
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        aria-label='Next'
+      />,
+      appearance,
+    );
+    expect(getByTestId('override').getAttribute('aria-label')).toBe('Next');
+  });
+
+  it('applies appearance.elements.icon styling to an overridden glyph (consistent with the built-in)', () => {
+    const appearance: MosaicAppearance = {
+      elements: { icon: { opacity: 0.5 } },
+      icons: { 'chevron-right': <span data-testid='override' /> },
     };
     const { getByTestId } = wrap(<Icon name='chevron-right' />, appearance);
     // The override carries a serialized Mosaic class...
@@ -85,14 +96,7 @@ describe('Icon', () => {
 
   it('falls through to the default when a different name is overridden', () => {
     const appearance: MosaicAppearance = {
-      icons: {
-        'chevron-left': props => (
-          <span
-            {...props}
-            data-testid='override'
-          />
-        ),
-      },
+      icons: { 'chevron-left': <span data-testid='override' /> },
     };
     const { container, queryByTestId } = wrap(<Icon name='chevron-right' />, appearance);
     expect(queryByTestId('override')).toBeNull();
