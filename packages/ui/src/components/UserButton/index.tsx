@@ -41,7 +41,7 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
       <Popover
         nodeId={nodeId}
         context={context}
-        isOpen={isOpen}
+        animateExit
         order={['content']}
         initialFocus={popoverRef}
       >

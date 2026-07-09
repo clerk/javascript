@@ -19,7 +19,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const close = () => unsafeClose?.(false);
   const { session } = useSession() as { session: SignedInSessionResource };
   const userButtonContext = useUserButtonContext();
-  const { __experimental_asStandalone } = userButtonContext;
   const { authConfig } = useEnvironment();
   const { user } = useUser();
   const { t } = useLocalizations();
@@ -40,7 +39,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         ref={ref}
         role='dialog'
         aria-label={t(localizationKeys('userButton.label__userButtonPopover'))}
-        shouldEntryAnimate={!__experimental_asStandalone}
+        shouldEntryAnimate={false}
         {...rest}
       >
         <PopoverCard.Content elementDescriptor={descriptors.userButtonPopoverMain}>
