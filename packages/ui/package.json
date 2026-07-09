@@ -35,11 +35,6 @@
       "import": "./dist/entry.js",
       "default": "./dist/entry.js"
     },
-    "./experimental/mosaic": {
-      "types": "./dist/experimental/mosaic.d.ts",
-      "import": "./dist/experimental/mosaic.js",
-      "default": "./dist/experimental/mosaic.js"
-    },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
       "import": "./dist/internal/index.js",

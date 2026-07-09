@@ -2,7 +2,7 @@
 //
 // Runs in a real node environment (no jsdom `document`) so `renderToString` exercises the actual
 // server path: `ensureInsertionPoint` returns null and Emotion inserts through the wrapped cache.
-// `@clerk/ui/experimental/mosaic` is a `'use client'` boundary, but Next.js still server-renders it,
+// Every Mosaic component sits behind a `'use client'` boundary, but Next.js still server-renders it,
 // so the provider must render without touching the DOM and its layer wrapping must hold on the server.
 import React from 'react';
 import { renderToString } from 'react-dom/server';
