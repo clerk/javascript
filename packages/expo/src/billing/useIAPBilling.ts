@@ -1,14 +1,14 @@
 import { useClerk } from '@clerk/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { BillingPlanResource, BillingStore, BillingSubscriptionItemResource } from '@clerk/shared/types';
-import type { Purchase } from 'expo-iap';
+import type { DiscountOffer, ProductOrSubscription, Purchase, SubscriptionOffer } from 'expo-iap';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
 
 import { IAPBillingError } from './errors';
 import type { ExpoIapModule } from './expoIap';
 import { ensureIapConnection, loadExpoIap } from './expoIap';
-import type { IAPPurchaseResult, IAPRestorePurchasesResult, UseIAPBillingReturn } from './types';
+import type { IAPPurchaseOptions, IAPPurchaseResult, IAPRestorePurchasesResult, UseIAPBillingReturn } from './types';
 import {
   deriveAppleAppAccountToken,
   deriveGoogleObfuscatedAccountId,
@@ -108,18 +108,108 @@ function waitForPurchase(iap: ExpoIapModule, productId: string): { promise: Prom
   return { promise, remove };
 }
 
-/**
- * Resolves the Play Billing offer token required to purchase an Android subscription. Falls back to the first
- * available offer for the product; the Clerk store product mapping is per `(plan, period, store)` product ID, so any
- * eligible offer of that product resolves to the same Clerk plan.
- */
-async function resolveAndroidOfferToken(iap: ExpoIapModule, productId: string): Promise<string | undefined> {
-  const products = await iap.fetchProducts({ skus: [productId], type: 'subs' });
-  const androidProduct = (products ?? []).find(
-    product => product.id === productId && product.platform === 'android',
-  ) as { subscriptionOffers?: { offerTokenAndroid?: string | null }[] | null } | undefined;
+/** Fetches the product exactly as the store currently exposes it. */
+async function fetchStoreProduct(iap: ExpoIapModule, productId: string): Promise<ProductOrSubscription> {
+  const products = await iap.fetchProducts({ skus: [productId], type: 'all' });
+  const product = (products ?? []).find(candidate => candidate.id === productId);
+  if (!product) {
+    throw new IAPBillingError('store_product_not_found', `The store did not return product "${productId}".`);
+  }
+  return product;
+}
 
-  return androidProduct?.subscriptionOffers?.find(offer => !!offer.offerTokenAndroid)?.offerTokenAndroid ?? undefined;
+function isoPeriodDays(period: string): number {
+  const match = /^P(?:(\d+)D)?(?:(\d+)W)?(?:(\d+)M)?(?:(\d+)Y)?$/.exec(period);
+  if (!match) {
+    return 0;
+  }
+  return Number(match[1] || 0) + Number(match[2] || 0) * 7 + Number(match[3] || 0) * 30 + Number(match[4] || 0) * 365;
+}
+
+function freeTrialDays(offer: SubscriptionOffer): number {
+  return (offer.pricingPhasesAndroid?.pricingPhaseList ?? []).reduce((days, phase) => {
+    if (Number(phase.priceAmountMicros) !== 0) {
+      return days;
+    }
+    return days + isoPeriodDays(phase.billingPeriod) * Math.max(phase.billingCycleCount, 1);
+  }, 0);
+}
+
+function introductoryPriceMicros(offer: SubscriptionOffer): number | undefined {
+  const phases = offer.pricingPhasesAndroid?.pricingPhaseList ?? [];
+  if (phases.length < 2) {
+    return undefined;
+  }
+  return Number(phases[0]?.priceAmountMicros);
+}
+
+/** RevenueCat-style automatic selection: longest trial, cheapest intro, then base plan. */
+function resolveAndroidSubscriptionOffer(
+  offers: SubscriptionOffer[],
+  basePlanId: string,
+  offerId?: string,
+): SubscriptionOffer {
+  const eligible = offers.filter(offer => offer.basePlanIdAndroid === basePlanId && offer.offerTokenAndroid);
+  if (offerId) {
+    const exact = eligible.find(offer => offer.id === offerId);
+    if (!exact) {
+      throw new IAPBillingError(
+        'offer_not_available',
+        `Google Play did not return offer "${offerId}" for base plan "${basePlanId}". The user may not be eligible.`,
+      );
+    }
+    return exact;
+  }
+  const trial = [...eligible]
+    .sort((a, b) => freeTrialDays(b) - freeTrialDays(a))
+    .find(offer => freeTrialDays(offer) > 0);
+  if (trial) {
+    return trial;
+  }
+  const introductory = eligible
+    .map(offer => ({ offer, price: introductoryPriceMicros(offer) }))
+    .filter((entry): entry is { offer: SubscriptionOffer; price: number } => entry.price !== undefined)
+    .sort((a, b) => a.price - b.price)[0]?.offer;
+  if (introductory) {
+    return introductory;
+  }
+  const basePlan = eligible.find(offer => !offer.id) ?? eligible[0];
+  if (!basePlan) {
+    throw new IAPBillingError(
+      'offer_not_available',
+      `Google Play did not return an eligible offer token for base plan "${basePlanId}".`,
+    );
+  }
+  return basePlan;
+}
+
+function resolveAndroidOneTimeOffer(
+  offers: DiscountOffer[],
+  purchaseOptionId: string,
+  offerId?: string,
+): DiscountOffer {
+  const eligible = offers.filter(
+    offer => offer.purchaseOptionIdAndroid === purchaseOptionId && offer.offerTokenAndroid,
+  );
+  if (offerId) {
+    const exact = eligible.find(offer => offer.id === offerId);
+    if (!exact) {
+      throw new IAPBillingError(
+        'offer_not_available',
+        `Google Play did not return offer "${offerId}" for purchase option "${purchaseOptionId}".`,
+      );
+    }
+    return exact;
+  }
+  const baseOffer = eligible.find(offer => !offer.id);
+  const selected = baseOffer ?? [...eligible].sort((a, b) => a.price - b.price)[0];
+  if (!selected) {
+    throw new IAPBillingError(
+      'offer_not_available',
+      `Google Play did not return an eligible offer token for purchase option "${purchaseOptionId}".`,
+    );
+  }
+  return selected;
 }
 
 /**
@@ -127,9 +217,9 @@ async function resolveAndroidOfferToken(iap: ExpoIapModule, productId: string): 
  * by Clerk Billing. It requires the optional `expo-iap` module (`npx expo install expo-iap`) and a signed-in user.
  *
  * Purchases follow a server-first flow: the store transaction is registered with Clerk before it is finished. On
- * iOS, the transaction is finished through `expo-iap` after Clerk accepts it. On Android, the transaction is never
- * finished client-side because the Clerk backend acknowledges Google Play purchases (and `expo-iap`'s
- * `finishTransaction()` would acknowledge client-side).
+ * iOS, the transaction is finished through `expo-iap` after Clerk accepts it. Clerk acknowledges Google Play
+ * subscriptions server-side; one-time Google Play products are consumed or acknowledged through `expo-iap` only
+ * after Clerk accepts the purchase.
  *
  * @example
  * ```tsx
@@ -206,16 +296,16 @@ export function useIAPBilling(): UseIAPBillingReturn {
   /**
    * Registers a store purchase with Clerk, then finishes the transaction where appropriate (server-first ordering):
    * - iOS: finishing after Clerk accepts the purchase is required so StoreKit stops replaying the transaction.
-   * - Android: `finishTransaction()` is intentionally never called. `expo-iap` acknowledges the purchase on Android
-   *   (`acknowledgePurchaseAndroid`) with no way to suppress it, and acknowledgment is performed by the Clerk
-   *   backend when the purchase is registered.
+   * - Android subscriptions: Clerk acknowledges the purchase server-side, so the SDK must not acknowledge it first.
+   * - Android one-time products: `expo-iap` consumes or acknowledges the purchase after Clerk accepts it.
    */
   const registerWithClerk = useCallback(
     async (
       iap: ExpoIapModule,
       purchase: Purchase,
       store: BillingStore,
-      source?: 'purchase' | 'restore',
+      source?: 'purchase' | 'restore' | 'sync',
+      finish?: { isConsumable: boolean; onAndroid: boolean },
     ): Promise<BillingSubscriptionItemResource> => {
       const payload = extractPurchasePayload(purchase);
       // `source` is omitted (not sent as `undefined`) so initiated purchases stay wire-identical to older clients;
@@ -226,8 +316,8 @@ export function useIAPBilling(): UseIAPBillingReturn {
         ...(source ? { source } : {}),
       });
 
-      if (store === 'apple') {
-        await iap.finishTransaction({ purchase, isConsumable: false });
+      if (store === 'apple' || finish?.onAndroid) {
+        await iap.finishTransaction({ purchase, isConsumable: finish?.isConsumable ?? false });
       }
 
       return subscriptionItem;
@@ -326,13 +416,9 @@ export function useIAPBilling(): UseIAPBillingReturn {
       }
       try {
         const store = purchaseStore(purchase, platformToStore(Platform.OS));
-        // Out-of-band transactions are store-driven replays, so they register with `source: 'restore'`
-        // (transfer-on-restore). For the common case -- a renewal of the current user's own subscription -- the
-        // transaction's user binding matches anyway and `source` changes nothing. In the mismatch case (for example,
-        // a family-shared Apple ID renews while a different Clerk account is signed in on the device), the store is
-        // asserting possession of the subscription exactly as in restorePurchases(), so it transfers to the current
-        // user instead of being rejected.
-        await registerWithClerk(iap, purchase, store, 'restore');
+        // Passive listener delivery is synchronization, not a customer-initiated restore. It must never opt into
+        // transfer-on-restore (especially for Apple Family Sharing transactions).
+        await registerWithClerk(iap, purchase, store, 'sync');
         await refreshSessionAndState();
       } catch {
         // Registration is idempotent and unfinished transactions are replayed by the store, so a failed attempt is
@@ -358,9 +444,9 @@ export function useIAPBilling(): UseIAPBillingReturn {
   }, [userId, registerWithClerk, refreshSessionAndState]);
 
   const purchase = useCallback(
-    async (plan: BillingPlanResource, options?: { productId?: string }): Promise<IAPPurchaseResult> => {
+    async (plan: BillingPlanResource, options?: IAPPurchaseOptions): Promise<IAPPurchaseResult> => {
       const store = platformToStore(Platform.OS);
-      const product = resolveStoreProduct(plan, store, options?.productId);
+      const product = resolveStoreProduct(plan, store, options?.productId, options?.purchaseOptionId);
 
       const purchaserId = clerk.user?.id;
       if (!purchaserId) {
@@ -378,6 +464,39 @@ export function useIAPBilling(): UseIAPBillingReturn {
 
       const iap = loadExpoIap();
       await ensureIapConnection(iap);
+      const storeProduct = await fetchStoreProduct(iap, product.productId);
+      const appleProductType =
+        storeProduct.platform === 'ios' && 'typeIOS' in storeProduct ? storeProduct.typeIOS : undefined;
+      const isSubscription = storeProduct.type === 'subs' || appleProductType === 'auto-renewable-subscription';
+      const isConsumable = store === 'apple' ? appleProductType === 'consumable' : options?.isConsumable === true;
+
+      // The catalog is intentionally generic, but the current Clerk endpoint returns a subscription item and only
+      // has subscription entitlement semantics. Never charge a one-time/non-renewing product and discover that
+      // mismatch during server registration. Supporting these product types requires a generic purchase ledger and
+      // an explicit fulfillment model (including the app-owned consumability decision for Google one-time products).
+      if (!isSubscription) {
+        throw new IAPBillingError(
+          'unsupported_product_type',
+          `Clerk can display ${store} product "${product.productId}", but purchases currently support auto-renewing subscriptions only.`,
+        );
+      }
+
+      // Ask Clerk after the exact live store product has been resolved, immediately before opening the payment
+      // sheet. This catches stale local billing state, missing mappings, and invalid store connections before the
+      // user can be charged; Create still verifies the final store transaction authoritatively.
+      try {
+        await clerk.billing.preflightStorePurchase({
+          store,
+          productId: product.productId,
+          purchaseOptionId: product.purchaseOptionId,
+        });
+      } catch (error) {
+        const alreadySubscribed = findAlreadySubscribedError(error);
+        if (alreadySubscribed) {
+          return { status: 'already_subscribed', alreadySubscribedVia: alreadySubscribed.alreadySubscribedVia };
+        }
+        throw error;
+      }
 
       pendingProductIdsRef.current.add(product.productId);
       const waiter = waitForPurchase(iap, product.productId);
@@ -386,29 +505,85 @@ export function useIAPBilling(): UseIAPBillingReturn {
         let storePurchase: Purchase;
         try {
           if (store === 'apple') {
-            await iap.requestPurchase({
-              request: {
-                apple: {
-                  sku: product.productId,
-                  // Binds the store transaction to the Clerk user; the backend cross-checks it on registration.
-                  appAccountToken: await deriveAppleAppAccountToken(purchaserId),
+            if (options?.offerId && !options.appleOffer) {
+              throw new IAPBillingError(
+                'offer_signature_required',
+                `Apple promotional offer "${options.offerId}" requires fresh server-signed offer parameters.`,
+              );
+            }
+            if (options?.appleOffer && options.offerId && options.appleOffer.identifier !== options.offerId) {
+              throw new IAPBillingError(
+                'offer_not_available',
+                `The signed Apple offer identifier does not match requested offer "${options.offerId}".`,
+              );
+            }
+            const appleRequest = {
+              sku: product.productId,
+              // Binds the store transaction to the Clerk user; the backend cross-checks it on registration.
+              appAccountToken: await deriveAppleAppAccountToken(purchaserId),
+              ...(options?.appleOffer ? { withOffer: options.appleOffer } : {}),
+            };
+            if (isSubscription) {
+              await iap.requestPurchase({ request: { apple: appleRequest }, type: 'subs' });
+            } else {
+              await iap.requestPurchase({
+                request: {
+                  apple: {
+                    ...appleRequest,
+                    ...(options?.quantity ? { quantity: options.quantity } : {}),
+                  },
                 },
-              },
-              type: 'subs',
-            });
+                type: 'in-app',
+              });
+            }
           } else {
-            const offerToken = await resolveAndroidOfferToken(iap, product.productId);
-            await iap.requestPurchase({
-              request: {
-                google: {
-                  skus: [product.productId],
-                  // Binds the store transaction to the Clerk user; the backend cross-checks it on registration.
-                  obfuscatedAccountId: await deriveGoogleObfuscatedAccountId(purchaserId),
-                  ...(offerToken ? { subscriptionOffers: [{ sku: product.productId, offerToken }] } : {}),
+            const purchaseOptionId = product.purchaseOptionId;
+            if (!purchaseOptionId) {
+              throw new IAPBillingError(
+                'store_product_not_found',
+                `Google product "${product.productId}" is missing its mapped base plan or purchase option ID.`,
+              );
+            }
+            const googleAccountId = await deriveGoogleObfuscatedAccountId(purchaserId);
+            if (isSubscription) {
+              const androidProduct = storeProduct as ProductOrSubscription & {
+                subscriptionOffers?: SubscriptionOffer[] | null;
+              };
+              const offer = resolveAndroidSubscriptionOffer(
+                androidProduct.subscriptionOffers ?? [],
+                purchaseOptionId,
+                options?.offerId,
+              );
+              await iap.requestPurchase({
+                request: {
+                  google: {
+                    skus: [product.productId],
+                    obfuscatedAccountId: googleAccountId,
+                    subscriptionOffers: [{ sku: product.productId, offerToken: offer.offerTokenAndroid as string }],
+                  },
                 },
-              },
-              type: 'subs',
-            });
+                type: 'subs',
+              });
+            } else {
+              const androidProduct = storeProduct as ProductOrSubscription & {
+                discountOffers?: DiscountOffer[] | null;
+              };
+              const offer = resolveAndroidOneTimeOffer(
+                androidProduct.discountOffers ?? [],
+                purchaseOptionId,
+                options?.offerId,
+              );
+              await iap.requestPurchase({
+                request: {
+                  google: {
+                    skus: [product.productId],
+                    obfuscatedAccountId: googleAccountId,
+                    offerToken: offer.offerTokenAndroid,
+                  },
+                },
+                type: 'in-app',
+              });
+            }
           }
 
           storePurchase = await waiter.promise;
@@ -431,7 +606,10 @@ export function useIAPBilling(): UseIAPBillingReturn {
         let subscriptionItem: BillingSubscriptionItemResource;
         try {
           // Server-first: the purchase is registered with Clerk before the transaction is finished.
-          subscriptionItem = await registerWithClerk(iap, storePurchase, store);
+          subscriptionItem = await registerWithClerk(iap, storePurchase, store, undefined, {
+            isConsumable,
+            onAndroid: store === 'google' && !isSubscription,
+          });
         } catch (error) {
           const alreadySubscribed = findAlreadySubscribedError(error);
           if (alreadySubscribed) {

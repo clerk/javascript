@@ -32,9 +32,10 @@ export function platformToStore(os: string): BillingStore {
 
 /**
  * Resolves the store product to purchase for a Plan on the given store. A plan
- * can map any number of store products per store (the store's own renewal term
- * governs billing): with exactly one, it is the product; with several, the
- * caller must name one via productId.
+ * can map any number of store purchase identities per store (the store's own
+ * product type, purchase option, and renewal term govern billing): with
+ * exactly one, it is the product; with several, the caller must identify the
+ * product and, when needed, its purchase option.
  *
  * @internal
  */
@@ -42,18 +43,29 @@ export function resolveStoreProduct(
   plan: BillingPlanResource,
   store: BillingStore,
   productId?: string,
+  purchaseOptionId?: string,
 ): BillingPlanStoreProduct {
   const candidates = (plan.storeProducts || []).filter(storeProduct => storeProduct.store === store);
 
-  if (productId) {
-    const product = candidates.find(storeProduct => storeProduct.productId === productId);
-    if (!product) {
+  if (productId || purchaseOptionId) {
+    const matches = candidates.filter(
+      storeProduct =>
+        (!productId || storeProduct.productId === productId) &&
+        (!purchaseOptionId || storeProduct.purchaseOptionId === purchaseOptionId),
+    );
+    if (matches.length === 0) {
       throw new IAPBillingError(
         'store_product_not_found',
-        `Plan "${plan.id}" has no ${store} store product "${productId}" mapped. Map the store product ID to this plan in the Clerk Dashboard.`,
+        `Plan "${plan.id}" has no ${store} mapping for product "${productId ?? '*'}"${purchaseOptionId ? ` and purchase option "${purchaseOptionId}"` : ''}. Map the exact store purchase option to this plan in the Clerk Dashboard.`,
       );
     }
-    return product;
+    if (matches.length > 1) {
+      throw new IAPBillingError(
+        'ambiguous_store_product',
+        `Product "${productId}" has multiple ${store} purchase options mapped. Pass options.purchaseOptionId to purchase() to choose one.`,
+      );
+    }
+    return matches[0];
   }
 
   if (candidates.length === 0) {
@@ -63,11 +75,18 @@ export function resolveStoreProduct(
     );
   }
   if (candidates.length > 1) {
+    const requiresPurchaseOption = new Set(candidates.map(candidate => candidate.productId)).size === 1;
     throw new IAPBillingError(
       'ambiguous_store_product',
       `Plan "${plan.id}" maps ${candidates.length} ${store} store products (${candidates
-        .map(storeProduct => storeProduct.productId)
-        .join(', ')}). Pass options.productId to purchase() to choose one.`,
+        .map(storeProduct =>
+          storeProduct.purchaseOptionId
+            ? `${storeProduct.productId}/${storeProduct.purchaseOptionId}`
+            : storeProduct.productId,
+        )
+        .join(', ')}). Pass ${
+        requiresPurchaseOption ? 'options.productId and options.purchaseOptionId' : 'options.productId'
+      } to purchase() to choose one.`,
     );
   }
   return candidates[0];

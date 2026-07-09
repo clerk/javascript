@@ -102,7 +102,7 @@ const plan = {
   id: 'plan_123',
   storeProducts: [
     { store: 'apple', productId: 'com.acme.pro.monthly' },
-    { store: 'google', productId: 'acme_pro_monthly' },
+    { store: 'google', productId: 'acme_pro_monthly', purchaseOptionId: 'monthly' },
   ],
 } as any;
 
@@ -168,6 +168,7 @@ describe('useIAPBilling', () => {
       billing: {
         getPlans: vi.fn(async () => ({ data: [plan], total_count: 1 })),
         getSubscription: vi.fn(async () => ({ subscriptionItems: [subscriptionItem] })),
+        preflightStorePurchase: vi.fn(async () => undefined),
         registerStorePurchase: registerStorePurchase,
       },
     };
@@ -177,13 +178,28 @@ describe('useIAPBilling', () => {
       mocks.emitPurchase(mocks.Platform.OS === 'ios' ? applePurchase : googlePurchase);
       return null;
     });
-    mocks.iap.fetchProducts.mockResolvedValue([
-      {
-        id: 'acme_pro_monthly',
-        platform: 'android',
-        subscriptionOffers: [{ offerTokenAndroid: 'offer_token_1' }],
-      },
-    ]);
+    mocks.iap.fetchProducts.mockImplementation(async ({ skus }: { skus: string[] }) => {
+      if (skus[0] === 'com.acme.pro.monthly') {
+        return [
+          {
+            id: 'com.acme.pro.monthly',
+            platform: 'ios',
+            type: 'subs',
+            typeIOS: 'auto-renewable-subscription',
+          },
+        ];
+      }
+      return [
+        {
+          id: 'acme_pro_monthly',
+          platform: 'android',
+          type: 'subs',
+          subscriptionOffers: [
+            { basePlanIdAndroid: 'monthly', offerTokenAndroid: 'offer_token_1', pricingPhasesAndroid: null },
+          ],
+        },
+      ];
+    });
     mocks.iap.getAvailablePurchases.mockResolvedValue([]);
   });
 
@@ -216,6 +232,11 @@ describe('useIAPBilling', () => {
           },
         },
         type: 'subs',
+      });
+      expect(clerk.billing.preflightStorePurchase).toHaveBeenCalledWith({
+        store: 'apple',
+        productId: 'com.acme.pro.monthly',
+        purchaseOptionId: undefined,
       });
     });
 
@@ -275,7 +296,7 @@ describe('useIAPBilling', () => {
         await result.current.purchase(plan);
       });
 
-      expect(mocks.iap.fetchProducts).toHaveBeenCalledWith({ skus: ['acme_pro_monthly'], type: 'subs' });
+      expect(mocks.iap.fetchProducts).toHaveBeenCalledWith({ skus: ['acme_pro_monthly'], type: 'all' });
       expect(mocks.iap.requestPurchase).toHaveBeenCalledWith({
         request: {
           google: {
@@ -286,6 +307,106 @@ describe('useIAPBilling', () => {
         },
         type: 'subs',
       });
+      expect(clerk.billing.preflightStorePurchase).toHaveBeenCalledWith({
+        store: 'google',
+        productId: 'acme_pro_monthly',
+        purchaseOptionId: 'monthly',
+      });
+    });
+
+    it('resolves the exact mapped base plan when several options share a product ID', async () => {
+      const multiOptionPlan = {
+        ...plan,
+        storeProducts: [
+          { store: 'google', productId: 'acme_pro', purchaseOptionId: 'monthly' },
+          { store: 'google', productId: 'acme_pro', purchaseOptionId: 'annual' },
+        ],
+      } as any;
+      mocks.iap.fetchProducts.mockResolvedValue([
+        {
+          id: 'acme_pro',
+          platform: 'android',
+          type: 'subs',
+          subscriptionOffers: [
+            { basePlanIdAndroid: 'monthly', offerTokenAndroid: 'monthly_token' },
+            { basePlanIdAndroid: 'annual', offerTokenAndroid: 'annual_token' },
+          ],
+        },
+      ]);
+      mocks.iap.requestPurchase.mockImplementation(async () => {
+        mocks.emitPurchase({ ...googlePurchase, productId: 'acme_pro' });
+        return null;
+      });
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(multiOptionPlan, { purchaseOptionId: 'annual' });
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith(
+        expect.objectContaining({
+          request: expect.objectContaining({
+            google: expect.objectContaining({
+              subscriptionOffers: [{ sku: 'acme_pro', offerToken: 'annual_token' }],
+            }),
+          }),
+        }),
+      );
+      expect(clerk.billing.preflightStorePurchase).toHaveBeenCalledWith({
+        store: 'google',
+        productId: 'acme_pro',
+        purchaseOptionId: 'annual',
+      });
+    });
+
+    it('automatically selects the longest eligible free trial for the mapped base plan', async () => {
+      mocks.iap.fetchProducts.mockResolvedValue([
+        {
+          id: 'acme_pro_monthly',
+          platform: 'android',
+          type: 'subs',
+          subscriptionOffers: [
+            {
+              id: 'trial_7',
+              basePlanIdAndroid: 'monthly',
+              offerTokenAndroid: 'trial_7_token',
+              pricingPhasesAndroid: {
+                pricingPhaseList: [
+                  { priceAmountMicros: '0', billingPeriod: 'P1W', billingCycleCount: 1 },
+                  { priceAmountMicros: '9990000', billingPeriod: 'P1M', billingCycleCount: 0 },
+                ],
+              },
+            },
+            {
+              id: 'trial_14',
+              basePlanIdAndroid: 'monthly',
+              offerTokenAndroid: 'trial_14_token',
+              pricingPhasesAndroid: {
+                pricingPhaseList: [
+                  { priceAmountMicros: '0', billingPeriod: 'P2W', billingCycleCount: 1 },
+                  { priceAmountMicros: '9990000', billingPeriod: 'P1M', billingCycleCount: 0 },
+                ],
+              },
+            },
+            { basePlanIdAndroid: 'monthly', offerTokenAndroid: 'base_token' },
+          ],
+        },
+      ]);
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(plan);
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith(
+        expect.objectContaining({
+          request: expect.objectContaining({
+            google: expect.objectContaining({
+              subscriptionOffers: [{ sku: 'acme_pro_monthly', offerToken: 'trial_14_token' }],
+            }),
+          }),
+        }),
+      );
     });
 
     it('registers the purchase token with Clerk and never finishes (acknowledges) the transaction client-side', async () => {
@@ -400,6 +521,72 @@ describe('useIAPBilling', () => {
       });
 
       expect(mocks.iap.requestPurchase).toHaveBeenCalled();
+    });
+
+    it('uses the server preflight after fetching the live product and before opening the payment sheet', async () => {
+      const order: string[] = [];
+      mocks.iap.fetchProducts.mockImplementation(async () => {
+        order.push('fetchProducts');
+        return [
+          {
+            id: 'com.acme.pro.monthly',
+            platform: 'ios',
+            type: 'subs',
+            typeIOS: 'auto-renewable-subscription',
+          },
+        ];
+      });
+      clerk.billing.preflightStorePurchase.mockImplementation(async () => {
+        order.push('preflightStorePurchase');
+      });
+      mocks.iap.requestPurchase.mockImplementation(async () => {
+        order.push('requestPurchase');
+        mocks.emitPurchase(applePurchase);
+        return null;
+      });
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(plan);
+      });
+
+      expect(order).toEqual(['fetchProducts', 'preflightStorePurchase', 'requestPurchase']);
+    });
+
+    it('does not open the payment sheet when the server preflight rejects', async () => {
+      clerk.billing.preflightStorePurchase.mockRejectedValue(alreadySubscribedError);
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult).toEqual({ status: 'already_subscribed', alreadySubscribedVia: 'stripe' });
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+    });
+
+    it('never charges a product whose Clerk fulfillment model is not implemented', async () => {
+      mocks.iap.fetchProducts.mockResolvedValue([
+        {
+          id: 'com.acme.pro.monthly',
+          platform: 'ios',
+          type: 'in-app',
+          typeIOS: 'non-consumable',
+        },
+      ]);
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await expect(result.current.purchase(plan)).rejects.toMatchObject({
+          name: 'IAPBillingError',
+          code: 'unsupported_product_type',
+        });
+      });
+
+      expect(clerk.billing.preflightStorePurchase).not.toHaveBeenCalled();
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
     });
 
     it('resolves with a cancelled result when the user dismisses the purchase sheet', async () => {
@@ -750,13 +937,12 @@ describe('useIAPBilling', () => {
       });
 
       await waitFor(() => expect(registerStorePurchase).toHaveBeenCalledTimes(1));
-      // Out-of-band transactions are store-driven replays and register with source: 'restore': a renewal of the
-      // current user's own subscription matches the binding regardless, and a mismatched one (e.g. family-shared
-      // Apple ID renewing under another signed-in account) transfers like a restore instead of rejecting.
+      // Out-of-band transactions are passive syncs. They may refresh the current owner's transaction, but must not
+      // silently transfer ownership to whichever Clerk user happens to be signed in when the listener fires.
       expect(registerStorePurchase).toHaveBeenCalledWith({
         store: 'apple',
         payload: 'signed.jws.transaction',
-        source: 'restore',
+        source: 'sync',
       });
       expect(mocks.callLog).toEqual(['registerStorePurchase', 'finishTransaction']);
       expect(getToken).toHaveBeenCalledWith({ skipCache: true });

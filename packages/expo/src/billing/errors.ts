@@ -16,11 +16,17 @@ export type IAPBillingErrorCode =
    * In-app purchases are only available on iOS and Android.
    */
   | 'unsupported_platform'
+  /** The store product can be displayed, but Clerk does not yet have a matching fulfillment model for it. */
+  | 'unsupported_product_type'
   /**
    * The Plan has no store product mapped for the current platform and requested period.
    */
   | 'store_product_not_found'
   | 'ambiguous_store_product'
+  /** The requested offer is not currently eligible/available from the store. */
+  | 'offer_not_available'
+  /** Apple promotional offers require a fresh server-generated signature. */
+  | 'offer_signature_required'
   /**
    * The store purchase did not carry a payload (JWS transaction / purchase token) to register with Clerk.
    */

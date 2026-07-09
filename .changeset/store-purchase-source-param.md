@@ -3,4 +3,4 @@
 '@clerk/shared': minor
 ---
 
-Add an optional `source` parameter (`'purchase' | 'restore'`) to `clerk.billing.registerStorePurchase()`. Passing `source: 'restore'` marks the registration as a store-driven replay: when the store transaction is bound to a different user, the subscription is transferred to the current user instead of the registration being rejected. Omitting the parameter keeps the existing strict purchase semantics.
+Add an optional `source` parameter (`'purchase' | 'restore' | 'sync'`) to `clerk.billing.registerStorePurchase()`. Passing `source: 'restore'` marks an explicit user restore that may transfer a purchased subscription to the current user. Passive listener updates use `source: 'sync'`, which keeps strict user binding and never transfers ownership. Omitting the parameter keeps the existing strict purchase semantics.

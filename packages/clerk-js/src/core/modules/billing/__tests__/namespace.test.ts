@@ -22,7 +22,7 @@ const subscriptionItemJSON = {
     publicly_visible: true,
     slug: 'pro',
     avatar_url: null,
-    store_products: [{ store: 'apple', product_id: 'com.acme.pro.monthly' }],
+    store_products: [{ store: 'apple', product_id: 'com.acme.pro.monthly', purchase_option_id: null }],
   },
   plan_period: 'month',
   price_id: 'price_123',
@@ -41,6 +41,30 @@ describe('Billing namespace', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe('preflightStorePurchase', () => {
+    it('POSTs the exact mapped store purchase option before purchase', async () => {
+      // @ts-expect-error - _fetch is protected
+      BaseResource._fetch = vi.fn().mockResolvedValue({ response: { allowed: true } });
+
+      await billing.preflightStorePurchase({
+        store: 'google',
+        productId: 'acme_pro',
+        purchaseOptionId: 'annual',
+      });
+
+      // @ts-expect-error - _fetch is protected
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        path: '/me/billing/store_purchases/preflight',
+        method: 'POST',
+        body: {
+          store: 'google',
+          product_id: 'acme_pro',
+          purchase_option_id: 'annual',
+        },
+      });
+    });
   });
 
   describe('registerStorePurchase', () => {
@@ -102,6 +126,28 @@ describe('Billing namespace', () => {
           store: 'apple',
           payload: 'signed.jws.transaction',
           source: 'restore',
+        },
+      });
+    });
+
+    it('supports passive sync without granting restore transfer semantics', async () => {
+      // @ts-expect-error - _fetch is protected
+      BaseResource._fetch = vi.fn().mockResolvedValue({ response: subscriptionItemJSON });
+
+      await billing.registerStorePurchase({
+        store: 'apple',
+        payload: 'signed.jws.transaction',
+        source: 'sync',
+      });
+
+      // @ts-expect-error - _fetch is protected
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        path: '/me/billing/store_purchases',
+        method: 'POST',
+        body: {
+          store: 'apple',
+          payload: 'signed.jws.transaction',
+          source: 'sync',
         },
       });
     });

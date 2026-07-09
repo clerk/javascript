@@ -94,6 +94,24 @@ describe('resolveStoreProduct', () => {
     const webOnlyPlan = { id: 'plan_456', storeProducts: [] } as unknown as BillingPlanResource;
     expect(() => resolveStoreProduct(webOnlyPlan, 'apple', 'month')).toThrowError(IAPBillingError);
   });
+
+  it('uses the purchase option as part of a Google product identity', () => {
+    const multiOptionPlan = {
+      id: 'plan_456',
+      storeProducts: [
+        { store: 'google', productId: 'acme_pro', purchaseOptionId: 'monthly' },
+        { store: 'google', productId: 'acme_pro', purchaseOptionId: 'annual' },
+      ],
+    } as BillingPlanResource;
+
+    expect(resolveStoreProduct(multiOptionPlan, 'google', 'acme_pro', 'annual')).toMatchObject({
+      productId: 'acme_pro',
+      purchaseOptionId: 'annual',
+    });
+    expect(() => resolveStoreProduct(multiOptionPlan, 'google', 'acme_pro')).toThrowError(
+      expect.objectContaining({ code: 'ambiguous_store_product' }),
+    );
+  });
 });
 
 describe('extractPurchasePayload', () => {

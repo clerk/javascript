@@ -120,6 +120,8 @@ export interface BillingNamespace {
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   registerStorePurchase: (params: RegisterStorePurchaseParams) => Promise<BillingSubscriptionItemResource>;
+  /** Checks Clerk-owned constraints before opening the native store sheet. */
+  preflightStorePurchase: (params: PreflightStorePurchaseParams) => Promise<void>;
 }
 
 /**
@@ -397,6 +399,8 @@ export interface BillingPlanStoreProduct {
   store: BillingStore;
   /** The identifier of the product in the app store. */
   productId: string;
+  /** Google basePlanId / purchaseOptionId. Undefined for Apple. */
+  purchaseOptionId?: string;
 }
 
 /**
@@ -1321,7 +1325,19 @@ export type RegisterStorePurchaseParams = {
    * user, `'restore'` transfers the subscription to the current user instead of rejecting the registration, while
    * `'purchase'` (or omitting the field) keeps the binding mismatch rejection.
    */
-  source?: 'purchase' | 'restore';
+  source?: 'purchase' | 'restore' | 'sync';
+};
+
+/**
+ * The exact store catalog identity Clerk validates before a native purchase.
+ *
+ * @experimental
+ */
+export type PreflightStorePurchaseParams = {
+  store: BillingStore;
+  productId: string;
+  /** Required for Google, omitted for Apple. */
+  purchaseOptionId?: string;
 };
 
 /**

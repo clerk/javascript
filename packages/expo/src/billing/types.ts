@@ -44,6 +44,27 @@ export type IAPRestorePurchasesResult = {
   failed: { productId: string; error: unknown }[];
 };
 
+export type IAPPurchaseOptions = {
+  /** Selects a product when the plan has more than one mapping for this store. */
+  productId?: string;
+  /** Selects an exact Google base plan or one-time purchase option. */
+  purchaseOptionId?: string;
+  /** Selects an eligible store offer. Omit for RevenueCat-style automatic selection. */
+  offerId?: string;
+  /** Quantity for consumable products where the store supports multi-quantity purchases. */
+  quantity?: number;
+  /** Google does not store consumability; the app owns this fulfillment choice. */
+  isConsumable?: boolean;
+  /** Server-signed Apple promotional offer parameters. */
+  appleOffer?: {
+    identifier: string;
+    keyIdentifier: string;
+    nonce: string;
+    signature: string;
+    timestamp: number;
+  };
+};
+
 /**
  * The return value of the `useIAPBilling()` hook.
  *
@@ -76,7 +97,7 @@ export type UseIAPBillingReturn = {
    * the Plan has no product mapped for the current platform, or `ambiguous_store_product` when several are mapped
    * and no `productId` was given.
    */
-  purchase: (plan: BillingPlanResource, options?: { productId?: string }) => Promise<IAPPurchaseResult>;
+  purchase: (plan: BillingPlanResource, options?: IAPPurchaseOptions) => Promise<IAPPurchaseResult>;
   /**
    * Enumerates the user's available store purchases and registers each with Clerk. Registration is idempotent, so
    * restoring is safe to run repeatedly (reinstalls, new devices).

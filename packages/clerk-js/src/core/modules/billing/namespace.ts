@@ -23,6 +23,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
+  PreflightStorePurchaseParams,
   RegisterStorePurchaseParams,
 } from '@clerk/shared/types';
 
@@ -176,6 +177,18 @@ export class Billing implements BillingNamespace {
     )?.response as unknown as BillingSubscriptionItemJSON;
 
     return new BillingSubscriptionItem(json);
+  };
+
+  preflightStorePurchase = async (params: PreflightStorePurchaseParams): Promise<void> => {
+    await BaseResource._fetch({
+      path: Billing.path('/store_purchases/preflight'),
+      method: 'POST',
+      body: {
+        store: params.store,
+        product_id: params.productId,
+        ...(params.purchaseOptionId ? { purchase_option_id: params.purchaseOptionId } : {}),
+      } as any,
+    });
   };
 
   getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {
