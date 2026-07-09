@@ -94,6 +94,7 @@ const LINK_REPLACEMENTS = [
   ],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
+  ['protect-check-resource', '/docs/reference/types/protect-check-resource'],
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
   ['invitation', '/docs/reference/backend/types/backend-invitation'],
