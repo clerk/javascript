@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { useOrganizationProfileController } from './organization-profile.controller';
+import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
@@ -29,4 +30,5 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   ProfileSection: OrganizationProfileProfileSection,
   LeaveSection: OrganizationProfileLeaveSection,
   DeleteSection: OrganizationProfileDeleteSection,
+  ApiKeysPanel: OrganizationProfileApiKeysPanel,
 });
