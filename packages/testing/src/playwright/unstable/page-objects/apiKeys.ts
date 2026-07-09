@@ -61,7 +61,10 @@ export const createAPIKeysComponentPageObject = (testArgs: { page: EnhancedPage 
       return page.getByLabel(/Type "Revoke" to confirm/i).fill(value);
     },
     clickConfirmRevokeButton: () => {
-      return page.getByText(/Revoke key/i).click();
+      // Target the modal's submit button by its descriptor class rather than by text: the menu
+      // action that opens this modal is also labelled "Revoke key", and it now lingers through an
+      // exit animation, so a text locator transiently matches both (strict-mode violation).
+      return page.locator('.cl-apiKeysRevokeModal .cl-apiKeysRevokeModalSubmitButton').click();
     },
   };
   return self;
