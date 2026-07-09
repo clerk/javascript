@@ -245,6 +245,7 @@ export function OrganizationProfileApiKeysPanelView({
                   <td>
                     <button
                       type='button'
+                      disabled={revokeState !== 'idle'}
                       onClick={() => revoke.send({ type: 'REQUEST', keyId: row.id, keyName: row.name })}
                     >
                       Revoke

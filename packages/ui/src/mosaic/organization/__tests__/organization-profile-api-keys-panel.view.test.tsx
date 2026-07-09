@@ -180,6 +180,17 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(revokeSend).toHaveBeenCalledWith({ type: 'REQUEST', keyId: 'ak_1', keyName: 'CI token' });
   });
 
+  it('disables the row revoke action while a revoke is already in progress', () => {
+    const { revokeSend } = setup({
+      list: { rows: [row] },
+      revoke: { snapshot: revokeSnap('confirming', { selectedKeyName: 'CI token' }) },
+    });
+    const revokeButton = screen.getByRole('button', { name: 'Revoke' });
+    expect(revokeButton).toBeDisabled();
+    fireEvent.click(revokeButton);
+    expect(revokeSend).not.toHaveBeenCalled();
+  });
+
   it('hides the row revoke action when the caller cannot manage keys', () => {
     setup({ canManage: false, list: { rows: [row] } });
     expect(screen.queryByRole('button', { name: 'Revoke' })).not.toBeInTheDocument();
