@@ -29,7 +29,9 @@
  */
 
 export { AuthView } from './AuthView';
+export type { AuthViewRef } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export type { HostedNavigationProps, HostedNavigationRef, HostedNavigationState } from './HostedNavigation.types';
 export { UserButton } from './UserButton';
 export { UserProfileView } from './UserProfileView';
-export type { UserProfileViewProps } from './UserProfileView';
+export type { UserProfileViewProps, UserProfileViewRef } from './UserProfileView';
