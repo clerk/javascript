@@ -1223,6 +1223,9 @@ export const beBY: LocalizationResource = {
       title: 'Код TOTP',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Дадаць уліковы запіс',

@@ -1212,6 +1212,9 @@ export const kkKZ: LocalizationResource = {
       title: 'Растау қажет',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Есептік жазба қосу',

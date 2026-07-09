@@ -1231,6 +1231,9 @@ export const nbNO: LocalizationResource = {
       title: 'Verifisering påkrevd',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Legg til konto',

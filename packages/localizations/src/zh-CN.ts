@@ -1209,6 +1209,9 @@ export const zhCN: LocalizationResource = {
       title: undefined,
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: '添加账户',

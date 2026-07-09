@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;

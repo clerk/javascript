@@ -1228,6 +1228,9 @@ export const itIT: LocalizationResource = {
       title: 'Verifica TOTP (MFA)',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Aggiungi account',

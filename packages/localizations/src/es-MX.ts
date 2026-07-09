@@ -1225,6 +1225,9 @@ export const esMX: LocalizationResource = {
       title: 'Verificación requerida',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Agregar cuenta',

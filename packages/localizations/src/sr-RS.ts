@@ -1218,6 +1218,9 @@ export const srRS: LocalizationResource = {
       title: undefined,
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Dodaj nalog',

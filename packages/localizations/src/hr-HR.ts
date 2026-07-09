@@ -1229,6 +1229,9 @@ export const hrHR: LocalizationResource = {
       title: 'Potrebna verifikacija',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Dodaj račun',

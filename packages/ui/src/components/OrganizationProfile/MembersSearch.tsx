@@ -2,12 +2,10 @@ import type { useOrganization } from '@clerk/shared/react';
 import type { GetMembersParams } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
-import { descriptors, Flex, Icon, localizationKeys, useLocalizations } from '@/customizables';
-import { MagnifyingGlass } from '@/icons';
-import { Spinner } from '@/primitives';
+import { descriptors, Flex, localizationKeys, useLocalizations } from '@/customizables';
 import { mqu } from '@/styledSystem';
 import { Animated } from '@/ui/elements/Animated';
-import { InputWithIcon } from '@/ui/elements/InputWithIcon';
+import { SearchInput } from '@/ui/elements/SearchInput';
 
 import { ACTIVE_MEMBERS_PAGE_SIZE } from './OrganizationMembers';
 
@@ -63,6 +61,15 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
     }, membersSearchDebounceMs);
   }
 
+  const handleClear = () => {
+    // Cancel any pending debounce so it can't re-trigger the query with the stale value.
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    onSearchChange('');
+    onQueryTrigger('');
+  };
+
   // If search is not performed on a initial page, resets pagination offset
   // based on the response count
   useEffect(() => {
@@ -88,26 +95,15 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
           },
         }}
       >
-        <InputWithIcon
+        <SearchInput
           value={value}
-          type='search'
-          autoCapitalize='none'
-          spellCheck={false}
+          isLoading={!!isFetchingNewData}
           aria-label='Search'
           placeholder={t(localizationKeys('organizationProfile.membersPage.action__search'))}
-          leftIcon={
-            isFetchingNewData ? (
-              <Spinner size='xs' />
-            ) : (
-              <Icon
-                icon={MagnifyingGlass}
-                elementDescriptor={descriptors.organizationProfileMembersSearchInputIcon}
-                sx={t => ({ color: t.colors.$colorMutedForeground })}
-              />
-            )
-          }
+          leftIconElementDescriptor={descriptors.organizationProfileMembersSearchInputIcon}
           onKeyUp={handleKeyUp}
           onChange={handleChange}
+          onClear={handleClear}
           elementDescriptor={descriptors.organizationProfileMembersSearchInput}
         />
       </Flex>

@@ -1228,6 +1228,9 @@ export const hiIN: LocalizationResource = {
       title: 'सत्यापन आवश्यक है',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'खाता जोड़ें',

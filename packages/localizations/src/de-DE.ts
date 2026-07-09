@@ -1235,6 +1235,9 @@ export const deDE: LocalizationResource = {
       title: 'TOTP-Verifizierung (MFA)',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Konto hinzufügen',

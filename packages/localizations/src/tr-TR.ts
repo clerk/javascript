@@ -1219,6 +1219,9 @@ export const trTR: LocalizationResource = {
       title: 'TOTP Kodunu Girin',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Hesap ekle',

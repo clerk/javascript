@@ -1220,6 +1220,9 @@ export const thTH: LocalizationResource = {
       title: 'ต้องการการยืนยัน',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'เพิ่มบัญชี',

@@ -1222,6 +1222,9 @@ export const nlNL: LocalizationResource = {
       title: 'Tweestapsverificatie',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Account toevoegen',

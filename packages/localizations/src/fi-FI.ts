@@ -1230,6 +1230,9 @@ export const fiFI: LocalizationResource = {
       title: 'Vahvistus vaaditaan',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Lisää tili',

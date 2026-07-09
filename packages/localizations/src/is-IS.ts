@@ -1230,6 +1230,9 @@ export const isIS: LocalizationResource = {
       title: 'Staðfesting nauðsynleg',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Bæta við reikningi',

@@ -1228,6 +1228,9 @@ export const faIR: LocalizationResource = {
       title: 'تایید هویت الزامی است',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'افزودن حساب',

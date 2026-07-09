@@ -1228,6 +1228,9 @@ export const caES: LocalizationResource = {
       title: 'Verificació per TOTP (2FA)',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Afegeix compte',

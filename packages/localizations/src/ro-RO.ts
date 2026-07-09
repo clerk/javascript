@@ -1231,6 +1231,9 @@ export const roRO: LocalizationResource = {
       title: 'Verificare în doi pași',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Adaugă cont',
