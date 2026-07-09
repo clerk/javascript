@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { useOrganizationProfileController } from './organization-profile.controller';
+import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
@@ -12,7 +13,12 @@ function OrganizationProfileRoot(): ReactElement | null {
   if (controller.status !== 'ready') {
     return null;
   }
-  return <OrganizationProfileView general={<OrganizationProfileGeneralPanel />} />;
+  return (
+    <OrganizationProfileView
+      general={<OrganizationProfileGeneralPanel />}
+      apiKeys={<OrganizationProfileApiKeysPanel />}
+    />
+  );
 }
 
 // Standalone parts of the profile, exposed via the compound namespace. Each part is
@@ -29,4 +35,5 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   ProfileSection: OrganizationProfileProfileSection,
   LeaveSection: OrganizationProfileLeaveSection,
   DeleteSection: OrganizationProfileDeleteSection,
+  ApiKeysPanel: OrganizationProfileApiKeysPanel,
 });
