@@ -155,6 +155,7 @@ export const Popover = (props: PopoverProps) => {
         <FloatingFocusManager
           context={context}
           initialFocus={initialFocus}
+          outsideElementsInert={outsideElementsInert}
           order={order}
           modal={modal}
         >
