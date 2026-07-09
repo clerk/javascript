@@ -18,7 +18,6 @@ import { Col, descriptors, SimpleButton } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
@@ -124,20 +123,24 @@ type MenuListProps = PropsOfComponent<typeof Col> & {
 export const MenuList = (props: MenuListProps) => {
   const { sx, asPortal, ...rest } = props;
   const { popoverCtx, elementId, getFloatingProps, elementsRef } = useMenuState();
-  const { floating, styles, isOpen, context, nodeId } = popoverCtx;
+  const { floating, styles, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mergedRef = useMergeRefs([containerRef, floating]);
 
+  // `FloatingList` only provides list-navigation context (no DOM), so it wraps the `Popover`
+  // rather than nesting inside it — that keeps the `Col` as the `Popover`'s direct child, which is
+  // the element the `animateExit` transition (origin-aware scale + fade) is applied to.
   return (
-    <Popover
-      context={context}
-      nodeId={nodeId}
-      isOpen={isOpen}
-      portal={asPortal}
-      order={['content']}
-      modal={false}
-    >
-      <FloatingList elementsRef={elementsRef}>
+    <FloatingList elementsRef={elementsRef}>
+      <Popover
+        context={context}
+        nodeId={nodeId}
+        animateExit
+        initialScale={0.88}
+        portal={asPortal}
+        order={['content']}
+        modal={false}
+      >
         <Col
           elementDescriptor={descriptors.menuList}
           elementId={descriptors.menuList.setId(elementId)}
@@ -153,8 +156,6 @@ export const MenuList = (props: MenuListProps) => {
               padding: t.space.$0x5,
               overflow: 'hidden',
               top: `calc(100% + ${t.space.$2})`,
-              animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-              transformOrigin: 'top center',
               zIndex: t.zIndices.$dropdown,
               gap: t.space.$0x5,
             }),
@@ -164,8 +165,8 @@ export const MenuList = (props: MenuListProps) => {
           {...getFloatingProps()}
           {...rest}
         />
-      </FloatingList>
-    </Popover>
+      </Popover>
+    </FloatingList>
   );
 };
 

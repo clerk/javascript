@@ -3,6 +3,7 @@ const transitionDurationValues = Object.freeze({
   slower: 280,
   slow: 200,
   fast: 120,
+  faster: 90,
   focusRing: 200,
   controls: 100,
   textField: 450,
