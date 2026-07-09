@@ -39,13 +39,17 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
     await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-    await waitFor(() => {
-      expect(fixtures.signUp.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          transfer: true,
-        }),
-      );
-    });
+    // The transfer runs after the OTP card's ~750ms success animation resolves.
+    await waitFor(
+      () => {
+        expect(fixtures.signUp.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            transfer: true,
+          }),
+        );
+      },
+      { timeout: 3000 },
+    );
   });
 
   it('navigates to create/continue when transfer results in missing_requirements', async () => {
@@ -76,9 +80,13 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
     await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-    await waitFor(() => {
-      expect(fixtures.router.navigate).toHaveBeenCalledWith(expect.stringContaining('continue'));
-    });
+    // Relative path keeps the transferred sign-up inside the combined <SignIn> flow.
+    await waitFor(
+      () => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
+      },
+      { timeout: 3000 },
+    );
   });
 
   it('does not trigger transfer when enumeration protection is disabled', async () => {
@@ -197,7 +205,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
           transfer: true,
         }),
       );
-      expect(fixtures.router.navigate).toHaveBeenCalledWith(expect.stringContaining('continue'));
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
     });
   });
 
@@ -227,10 +235,15 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
 
     await userEvent.type(input, '123456');
 
-    await waitFor(() => {
-      expect(fixtures.signUp.create).toHaveBeenCalled();
-      expect(input).toHaveValue('');
-      expect(input).not.toBeDisabled();
-    });
+    // Success animation (~750ms) precedes the transfer, and the error feedback
+    // resets the input after another ~750ms.
+    await waitFor(
+      () => {
+        expect(fixtures.signUp.create).toHaveBeenCalled();
+        expect(input).toHaveValue('');
+        expect(input).not.toBeDisabled();
+      },
+      { timeout: 5000 },
+    );
   });
 });

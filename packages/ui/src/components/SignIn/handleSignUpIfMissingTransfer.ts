@@ -1,16 +1,15 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { navigateToNextStepSignUp } from '@clerk/shared/internal/clerk-js/navigateToNextStepSignUp';
-import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import type { LoadedClerk } from '@clerk/shared/types';
 
+import type { SignInContextType } from '../../contexts';
 import type { RouteContextValue } from '../../router/RouteContext';
 
 type HandleSignUpIfMissingTransferProps = {
   clerk: LoadedClerk;
   navigate: RouteContextValue['navigate'];
   afterSignUpUrl: string;
-  signUpUrl: string;
+  navigateOnSetActive: SignInContextType['navigateOnSetActive'];
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
@@ -19,13 +18,21 @@ type HandleSignUpIfMissingTransferProps = {
  * `firstFactorVerification.status === 'transferable'` (i.e. the user does not
  * exist and `signUpIfMissing` was used).
  *
- * This mirrors the OAuth transfer handling in `_handleRedirectCallback`.
+ * This mirrors the OAuth transfer handling in `_handleRedirectCallback`, but
+ * navigates with paths relative to the combined `<SignIn withSignUp>` flow so
+ * the transferred sign-up stays inside the mounted component (an absolute
+ * `signUpUrl`-based URL would leave the component and trigger a full page
+ * reload, or break apps without a standalone SignUp route).
+ *
+ * `navigate` must come from a route mounted directly under the SignIn root
+ * (e.g. `factor-one`), so the sign-up screens nested at `create/...` resolve
+ * as `../create/...`.
  */
 export async function handleSignUpIfMissingTransfer({
   clerk,
   navigate,
   afterSignUpUrl,
-  signUpUrl,
+  navigateOnSetActive,
   unsafeMetadata,
 }: HandleSignUpIfMissingTransferProps): Promise<unknown> {
   const res = await clerk.client.signUp.create({
@@ -38,38 +45,22 @@ export async function handleSignUpIfMissingTransfer({
       return clerk.setActive({
         session: res.createdSessionId,
         navigate: async ({ session, decorateUrl }) => {
-          if (!session.currentTask) {
-            // Absolute URL leaving the sign-in flow. Use clerk.navigate so we
-            // don't depend on the component-tree router, which is in a
-            // transitional state after setActive's #setTransitiveState. Wrap
-            // the destination in decorateUrl so Safari ITP is handled.
-            return clerk.navigate(decorateUrl(afterSignUpUrl));
-          }
-
-          // Pending task: route to the task within the sign-in component using
-          // an absolute URL built from signUpUrl. Wrap clerk.navigate to
-          // normalize the return type, since the public LoadedClerk type
-          // declares it as `Promise<unknown> | void`.
-          await navigateIfTaskExists(session, {
-            baseUrl: signUpUrl,
-            navigate: async to => {
-              await clerk.navigate(to);
-            },
-          });
+          // navigateOnSetActive routes pending session tasks to the combined
+          // flow's `create/...` task routes and handles Safari ITP via decorateUrl.
+          await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
         },
       });
     case 'missing_requirements':
       // Same routing logic as the OAuth transfer flow: if the sign-up is
-      // protect-gated go to /protect-check; if there are missing fields go to
-      // /continue; otherwise let completeSignUpFlow route any unverified
+      // protect-gated go to protect-check; if there are missing fields go to
+      // continue; otherwise let completeSignUpFlow route any unverified
       // email/phone identifications to their verify pages.
       return navigateToNextStepSignUp({
         signUp: res,
-        missingFields: res.missingFields,
-        continueSignUpUrl: buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true }),
-        verifyEmailAddressUrl: buildURL({ base: signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
-        verifyPhoneNumberUrl: buildURL({ base: signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
-        signUpProtectCheckUrl: buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+        continueSignUpUrl: '../create/continue',
+        verifyEmailAddressUrl: '../create/verify-email-address',
+        verifyPhoneNumberUrl: '../create/verify-phone-number',
+        signUpProtectCheckUrl: '../create/protect-check',
         navigate,
       });
     default:

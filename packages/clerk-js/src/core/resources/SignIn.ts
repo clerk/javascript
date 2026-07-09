@@ -99,6 +99,16 @@ import {
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
+/**
+ * Terminal states for email-link verification polling: `verified` (success), `expired`
+ * (link timed out), or `transferable` (`signUpIfMissing` flows — the address was verified
+ * but no user exists, so the caller transfers to sign-up). Shared by the legacy
+ * `createEmailLinkFlow` poll and `SignInFuture.waitForEmailLinkVerification` so the two
+ * loops can't drift apart.
+ */
+const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
+  status === 'verified' || status === 'expired' || status === 'transferable';
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -333,8 +343,7 @@ export class SignIn extends BaseResource implements SignInResource {
         void run(() => {
           return this.reload()
             .then(res => {
-              const status = res[verificationKey].status;
-              if (status === 'verified' || status === 'expired' || status === 'transferable') {
+              if (isTerminalEmailLinkVerificationStatus(res[verificationKey].status)) {
                 stop();
                 resolve(res);
               }
@@ -1145,8 +1154,7 @@ class SignInFuture implements SignInFutureResource {
         void run(async () => {
           try {
             const res = await this.#resource.__internal_baseGet();
-            const status = res.firstFactorVerification.status;
-            if (status === 'verified' || status === 'expired' || status === 'transferable') {
+            if (isTerminalEmailLinkVerificationStatus(res.firstFactorVerification.status)) {
               stop();
               resolve(res);
             }

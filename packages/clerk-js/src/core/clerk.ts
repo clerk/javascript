@@ -2586,8 +2586,7 @@ export class Clerk implements ClerkInterface {
           });
         case 'missing_requirements':
           return navigateToNextStepSignUp({
-            signUp,
-            missingFields: res.missingFields,
+            signUp: res,
             continueSignUpUrl,
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
@@ -2650,7 +2649,6 @@ export class Clerk implements ClerkInterface {
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({
         signUp,
-        missingFields: signUp.missingFields,
         continueSignUpUrl,
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,

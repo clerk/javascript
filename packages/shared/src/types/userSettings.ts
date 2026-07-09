@@ -128,7 +128,11 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   password_settings: PasswordSettingsData;
   passkey_settings: PasskeySettingsData;
   username_settings: UsernameSettingsData;
-  attack_protection: AttackProtectionData;
+  /**
+   * Optional because older environment payloads (and existing mocks) predate the field.
+   * `UserSettings.fromJSON` falls back to enumeration protection disabled.
+   */
+  attack_protection?: AttackProtectionData;
 }
 
 export interface UserSettingsResource extends ClerkResource {

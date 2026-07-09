@@ -31,7 +31,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -49,7 +48,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -67,7 +65,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -85,7 +82,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -103,7 +99,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -121,7 +116,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });
@@ -139,7 +133,6 @@ describe('navigateToNextStepSignUp', () => {
 
     await navigateToNextStepSignUp({
       signUp,
-      missingFields: signUp.missingFields,
       ...URLS,
       navigate: mockNavigate,
     });

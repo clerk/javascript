@@ -90,7 +90,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
@@ -388,17 +388,11 @@ function SignInStartInternal(): JSX.Element {
       } as any);
     }
     try {
-      // Sign up if missing sign-in-or-sign-up flows only support public sign-up
-      // instances and identifiers that can be verified out-of-band.
+      // On top of the context-level preconditions, sign-up-if-missing only
+      // supports identifiers that can be verified out-of-band.
       const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
       const signUpAttribute = getSignUpAttributeFromIdentifier(identifierField);
-      const supportsSignUpIfMissing =
-        signUpAttribute !== 'username' && userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC;
-      const shouldSignUpIfMissing =
-        isCombinedFlow &&
-        userSettings.attackProtection.enumeration_protection.enabled &&
-        supportsSignUpIfMissing &&
-        !hasPassword;
+      const shouldSignUpIfMissing = signUpIfMissingEnabled && signUpAttribute !== 'username' && !hasPassword;
 
       const res = await safePasswordSignInForEnterpriseSSOInstance(
         signIn.create({

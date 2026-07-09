@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handleSignUpIfMissingTransfer } from '../handleSignUpIfMissingTransfer';
 
 const mockNavigate = vi.fn();
+const mockNavigateOnSetActive = vi.fn();
 
 const createMockClerk = (signUpCreateResult: unknown = {}) => {
   return {
@@ -31,7 +32,7 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
     expect(clerk.client.signUp.create).toHaveBeenCalledWith({
@@ -48,7 +49,7 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
       unsafeMetadata,
     });
 
@@ -65,7 +66,7 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
     expect(clerk.setActive).toHaveBeenCalledWith(
@@ -76,59 +77,33 @@ describe('handleSignUpIfMissingTransfer', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('uses clerk.navigate with the decorated afterSignUpUrl when the session has no pending task', async () => {
+  it('delegates post-setActive navigation to navigateOnSetActive with afterSignUpUrl', async () => {
     const clerk = createMockClerk({ status: 'complete', createdSessionId: 'sess_123' }) as LoadedClerk & {
-      navigate: ReturnType<typeof vi.fn>;
       setActive: ReturnType<typeof vi.fn>;
     };
 
-    const decorateUrl = vi.fn((url: string) => `${url}?decorated`);
+    const session = { currentTask: null } as any;
+    const decorateUrl = (url: string) => url;
 
     clerk.setActive.mockImplementation(async params => {
-      await params.navigate({
-        session: { currentTask: null } as any,
-        decorateUrl,
-      });
+      await params.navigate({ session, decorateUrl });
     });
 
     await handleSignUpIfMissingTransfer({
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
-    expect(decorateUrl).toHaveBeenCalledWith('https://test.com');
-    expect(clerk.navigate).toHaveBeenCalledWith('https://test.com?decorated');
+    expect(mockNavigateOnSetActive).toHaveBeenCalledWith({
+      session,
+      redirectUrl: 'https://test.com',
+      decorateUrl,
+    });
   });
 
-  it('routes to the pending task via clerk.navigate when the session has a current task', async () => {
-    const clerk = createMockClerk({ status: 'complete', createdSessionId: 'sess_123' }) as LoadedClerk & {
-      navigate: ReturnType<typeof vi.fn>;
-      setActive: ReturnType<typeof vi.fn>;
-    };
-
-    clerk.setActive.mockImplementation(async params => {
-      await params.navigate({
-        session: { currentTask: { key: 'choose-organization' } } as any,
-        decorateUrl: (url: string) => url,
-      });
-    });
-
-    await handleSignUpIfMissingTransfer({
-      clerk,
-      navigate: mockNavigate,
-      afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
-    });
-
-    // navigateIfTaskExists builds an absolute task URL from signUpUrl and calls clerk.navigate
-    expect(clerk.navigate).toHaveBeenCalledTimes(1);
-    const target = (clerk.navigate as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(target).toContain('choose-organization');
-  });
-
-  it('routes to the continue page when sign-up has missing fields', async () => {
+  it('routes to the combined-flow continue page when sign-up has missing fields', async () => {
     const clerk = createMockClerk({
       status: 'missing_requirements',
       missingFields: ['first_name'],
@@ -139,11 +114,11 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate.mock.calls[0][0] as string).toContain('/continue');
+    expect(mockNavigate.mock.calls[0][0] as string).toBe('../create/continue');
     expect(clerk.setActive).not.toHaveBeenCalled();
   });
 
@@ -158,11 +133,11 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate.mock.calls[0][0] as string).toContain('/verify-email-address');
+    expect(mockNavigate.mock.calls[0][0] as string).toBe('../create/verify-email-address');
     expect(clerk.setActive).not.toHaveBeenCalled();
   });
 
@@ -177,11 +152,30 @@ describe('handleSignUpIfMissingTransfer', () => {
       clerk,
       navigate: mockNavigate,
       afterSignUpUrl: 'https://test.com',
-      signUpUrl: 'https://test.com/sign-up',
+      navigateOnSetActive: mockNavigateOnSetActive,
     });
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate.mock.calls[0][0] as string).toContain('/verify-phone-number');
+    expect(mockNavigate.mock.calls[0][0] as string).toBe('../create/verify-phone-number');
+    expect(clerk.setActive).not.toHaveBeenCalled();
+  });
+
+  it('routes to protect-check when the sign-up is protect-gated', async () => {
+    const clerk = createMockClerk({
+      status: 'missing_requirements',
+      missingFields: ['protect_check', 'first_name'],
+      unverifiedFields: [],
+    });
+
+    await handleSignUpIfMissingTransfer({
+      clerk,
+      navigate: mockNavigate,
+      afterSignUpUrl: 'https://test.com',
+      navigateOnSetActive: mockNavigateOnSetActive,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate.mock.calls[0][0] as string).toBe('../create/protect-check');
     expect(clerk.setActive).not.toHaveBeenCalled();
   });
 
@@ -193,7 +187,7 @@ describe('handleSignUpIfMissingTransfer', () => {
         clerk,
         navigate: mockNavigate,
         afterSignUpUrl: 'https://test.com',
-        signUpUrl: 'https://test.com/sign-up',
+        navigateOnSetActive: mockNavigateOnSetActive,
       }),
     ).rejects.toThrow('Unexpected sign-up status after transfer: abandoned');
   });

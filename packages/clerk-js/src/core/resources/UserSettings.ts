@@ -216,7 +216,15 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       this.attributes,
     );
     this.actions = this.withDefault(data.actions, this.actions);
-    this.attackProtection = this.withDefault(data.attack_protection, this.attackProtection);
+    // Normalize field-by-field rather than withDefault: a present-but-partial
+    // attack_protection object must not leave enumeration_protection undefined.
+    this.attackProtection = {
+      enumeration_protection: {
+        enabled:
+          data.attack_protection?.enumeration_protection?.enabled ??
+          this.attackProtection.enumeration_protection.enabled,
+      },
+    };
     this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
     this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
     this.passwordSettings = data.password_settings

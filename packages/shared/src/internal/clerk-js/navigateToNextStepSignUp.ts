@@ -1,9 +1,8 @@
-import type { SignUpField, SignUpResource } from '../../types';
+import type { SignUpResource } from '../../types';
 import { completeSignUpFlow } from './completeSignUpFlow';
 
 type NavigateToNextStepSignUpProps = {
   signUp: SignUpResource;
-  missingFields: SignUpField[];
   continueSignUpUrl: string;
   verifyEmailAddressUrl: string;
   verifyPhoneNumberUrl: string;
@@ -28,7 +27,6 @@ type NavigateToNextStepSignUpProps = {
  */
 export const navigateToNextStepSignUp = ({
   signUp,
-  missingFields,
   continueSignUpUrl,
   verifyEmailAddressUrl,
   verifyPhoneNumberUrl,
@@ -38,11 +36,11 @@ export const navigateToNextStepSignUp = ({
   // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
   // check must run BEFORE the generic missing-fields short-circuit below — otherwise the
   // callback would land on /continue instead of the challenge.
-  if (signUp.protectCheck || missingFields.includes('protect_check')) {
+  if (signUp.protectCheck || signUp.missingFields.includes('protect_check')) {
     return navigate(signUpProtectCheckUrl);
   }
 
-  if (missingFields.length) {
+  if (signUp.missingFields.length) {
     return navigate(continueSignUpUrl);
   }
 

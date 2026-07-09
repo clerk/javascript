@@ -9,7 +9,7 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey } from '../../localization';
@@ -39,9 +39,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const card = useCardState();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, afterSignUpUrl, signUpUrl, isCombinedFlow, navigateOnSetActive } = ctx;
+  const { afterSignInUrl, afterSignUpUrl, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const { setActive } = useClerk();
-  const { userSettings } = useEnvironment();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
@@ -144,18 +143,22 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        if (
-          isCombinedFlow &&
-          userSettings.attackProtection.enumeration_protection.enabled &&
-          signIn.firstFactorVerification.status === 'transferable'
-        ) {
-          return handleSignUpIfMissingTransfer({
-            clerk,
-            navigate,
-            afterSignUpUrl,
-            signUpUrl,
-            unsafeMetadata: ctx.unsafeMetadata,
-          }).catch(reject);
+        if (signUpIfMissingEnabled && signIn.firstFactorVerification.status === 'transferable') {
+          // The code itself was correct (`transferable` = verified, but no matching user), so
+          // mirror the success path above: resolve the OTP card, then navigate. Resolving also
+          // guarantees the card doesn't sit in a loading state forever if the transferred
+          // sign-up requires no further routing.
+          return resolve()
+            .then(() =>
+              handleSignUpIfMissingTransfer({
+                clerk,
+                navigate,
+                afterSignUpUrl,
+                navigateOnSetActive,
+                unsafeMetadata: ctx.unsafeMetadata,
+              }),
+            )
+            .catch(reject);
         }
 
         return reject(err);
