@@ -33,14 +33,11 @@ export type SignUpField = SignUpAttributeField | SignUpIdentificationField | Pro
 /**
  * A pending Clerk Protect challenge that must be completed before the current sign-in or sign-up attempt can continue.
  *
- * This resource is only returned when Protect mid-flow challenges are enabled for the instance. When present, load
- * the challenge SDK from `sdkUrl`, initialize it with `token` and `uiHints`, and submit the proof token returned by
- * the SDK with `submitProtectCheck()`.
+ * This resource is only returned when Protect mid-flow challenges are enabled for the instance. When present, load the challenge SDK from `sdkUrl`, initialize it with `token` and `uiHints`, and submit the proof token returned by the SDK with `submitProtectCheck()`.
  */
 export interface ProtectCheckResource {
   /**
-   * The current state of the Protect challenge. Protect check resources are only returned while the challenge is
-   * waiting to be completed.
+   * The current state of the Protect challenge. Protect check resources are only returned while the challenge is waiting to be completed.
    */
   status: 'pending';
   /**
