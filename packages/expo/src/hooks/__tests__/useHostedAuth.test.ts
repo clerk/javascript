@@ -20,6 +20,13 @@ const mocks = vi.hoisted(() => {
     randomUUID: vi.fn(),
     useClerk: vi.fn(),
     getClerkInstance: vi.fn(),
+    platformOS: 'ios',
+    expoConfig: undefined as
+      | {
+          ios?: { bundleIdentifier?: string };
+          android?: { package?: string };
+        }
+      | undefined,
   };
 });
 
@@ -38,7 +45,9 @@ vi.mock('../../provider/singleton', () => {
 vi.mock('react-native', () => {
   return {
     Platform: {
-      OS: 'ios',
+      get OS() {
+        return mocks.platformOS;
+      },
     },
   };
 });
@@ -107,8 +116,17 @@ describe('useHostedAuth', () => {
           randomUUID: mocks.randomUUID,
         };
       }
+      if (request === 'expo-constants') {
+        return {
+          default: {
+            expoConfig: mocks.expoConfig,
+          },
+        };
+      }
       return originalModuleLoad.call(Module, request, parent, isMain);
     });
+    mocks.platformOS = 'ios';
+    mocks.expoConfig = undefined;
     mockClient.lastActiveSessionId = null;
     mockClient.fromJSON.mockImplementation((clientJSON: ClientJSON) => {
       mockClient.lastActiveSessionId = clientJSON.last_active_session_id;
@@ -191,6 +209,48 @@ describe('useHostedAuth', () => {
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_123' });
     expect(response.createdSessionId).toBe('sess_123');
+  });
+
+  test.each([
+    {
+      platform: 'ios',
+      expoConfig: { ios: { bundleIdentifier: 'com.example.ios' } },
+      redirectUrl: 'com.example.ios://callback',
+    },
+    {
+      platform: 'android',
+      expoConfig: { android: { package: 'com.example.android' } },
+      redirectUrl: 'clerk://com.example.android.callback',
+    },
+  ])('uses the canonical $platform callback registered by Clerk', async ({ platform, expoConfig, redirectUrl }) => {
+    mocks.platformOS = platform;
+    mocks.expoConfig = expoConfig;
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: `${redirectUrl}?state=state-123&rotating_token_nonce=nonce-123&created_session_id=sess_123`,
+    });
+    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_123' });
+
+    const { result } = renderHook(() => useHostedAuth());
+    await result.current.startHostedAuth({ state: 'state-123' });
+
+    expect(mockFapiRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      path: '/client/hosted_auth',
+      body: {
+        redirectUrl,
+        codeChallenge: mockCodeChallenge,
+        mode: undefined,
+        state: 'state-123',
+      },
+    });
+    expect(mocks.openAuthSessionAsync).toHaveBeenCalledWith(
+      'https://example.accounts.dev/sign-in',
+      redirectUrl,
+      undefined,
+    );
+    expect(mocks.makeRedirectUri).not.toHaveBeenCalled();
   });
 
   test('falls back to the reloaded client session when callback session id is absent', async () => {
@@ -305,7 +365,7 @@ describe('useHostedAuth', () => {
       body: {
         redirectUrl: 'myapp:///hosted-auth-callback',
         codeChallenge: mockCodeChallenge,
-        mode: 'sign_up',
+        mode: 'sign-up',
         state: 'state-123',
       },
     });

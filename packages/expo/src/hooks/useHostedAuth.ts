@@ -3,9 +3,10 @@ import type { ClientResource } from '@clerk/shared/types';
 import type * as AuthSession from 'expo-auth-session';
 import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
-import { createHostedAuth, type FapiHostedAuthMode, redeemHostedAuth } from '../utils/hostedAuth';
+import { createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
 
 /**
  * Controls which Account Portal auth screen opens for hosted auth.
@@ -18,8 +19,9 @@ export type HostedAuthMode = 'sign-in' | 'sign-up';
 export type StartHostedAuthParams = {
   /**
    * Native deep-link URL that Account Portal redirects to after auth completes.
-   * Defaults to `AuthSession.makeRedirectUri({ path: 'hosted-auth-callback', isTripleSlashed: true })`.
-   * Production instances must allowlist this URL in the Clerk Dashboard.
+   * Defaults to the canonical callback Clerk registers for the configured iOS
+   * bundle identifier or Android package name. Expo Go and projects without a
+   * configured application identifier fall back to `AuthSession.makeRedirectUri`.
    */
   redirectUrl?: string;
   /**
@@ -105,19 +107,14 @@ export function useHostedAuth(): {
       );
     }
 
-    const redirectUrl =
-      params.redirectUrl ??
-      AuthSessionModule.makeRedirectUri({
-        path: 'hosted-auth-callback',
-        isTripleSlashed: true,
-      });
+    const redirectUrl = params.redirectUrl ?? getDefaultRedirectUrl(AuthSessionModule);
     const state = params.state ?? createState();
     const pkce = await createPKCE();
     const hostedAuth = await createHostedAuth(
       {
         redirectUrl,
         codeChallenge: pkce.codeChallenge,
-        mode: toFapiMode(params.mode),
+        mode: params.mode,
         state,
       },
       clerk,
@@ -188,24 +185,47 @@ export function useHostedAuth(): {
   };
 }
 
+function getDefaultRedirectUrl(AuthSessionModule: typeof AuthSession): string {
+  const appIdentifier = getExpoAppIdentifier();
+  if (appIdentifier && Platform.OS === 'ios') {
+    return `${appIdentifier}://callback`;
+  }
+  if (appIdentifier && Platform.OS === 'android') {
+    return `clerk://${appIdentifier}.callback`;
+  }
+
+  return AuthSessionModule.makeRedirectUri({
+    path: 'hosted-auth-callback',
+    isTripleSlashed: true,
+  });
+}
+
+function getExpoAppIdentifier(): string | undefined {
+  try {
+    // expo-constants is already an optional @clerk/expo peer and is present in
+    // standard Expo projects. Keep the fallback below for Expo Go and bare apps.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const constantsModule = require('expo-constants') as {
+      default?: {
+        expoConfig?: {
+          ios?: { bundleIdentifier?: string };
+          android?: { package?: string };
+        };
+      };
+    };
+    const expoConfig = constantsModule.default?.expoConfig;
+    return Platform.OS === 'ios' ? expoConfig?.ios?.bundleIdentifier : expoConfig?.android?.package;
+  } catch {
+    return undefined;
+  }
+}
+
 function getClientUpdater(clerk: ReturnType<typeof useClerk>): ((client: ClientResource) => void) | undefined {
   const maybeClerkWithClientUpdater = clerk as typeof clerk & {
     updateClient?: (client: ClientResource) => void;
   };
 
   return maybeClerkWithClientUpdater.updateClient;
-}
-
-function toFapiMode(mode: HostedAuthMode | undefined): FapiHostedAuthMode | undefined {
-  if (mode === 'sign-in') {
-    return 'sign_in';
-  }
-
-  if (mode === 'sign-up') {
-    return 'sign_up';
-  }
-
-  return undefined;
 }
 
 function normalizeSessionId(sessionId: string | null | undefined): string | null {

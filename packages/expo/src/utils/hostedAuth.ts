@@ -4,7 +4,7 @@ import type { ClerkAPIErrorJSON, ClientJSON, ClientResource } from '@clerk/share
 import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from './errors';
 
-export type FapiHostedAuthMode = 'sign_in' | 'sign_up';
+export type FapiHostedAuthMode = 'sign-in' | 'sign-up';
 
 export type CreateHostedAuthParams = {
   redirectUrl: string;
