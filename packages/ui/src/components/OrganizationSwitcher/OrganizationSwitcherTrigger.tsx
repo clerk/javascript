@@ -43,6 +43,10 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           t => ({
             padding: `${t.space.$1} ${t.space.$2}`,
             position: 'relative',
+            '&[aria-expanded="true"]': {
+              backgroundColor: 'var(--alpha)',
+              color: 'var(--accentHover)',
+            },
           }),
           sx,
         ]}
