@@ -1316,6 +1316,10 @@ export const isIS: LocalizationResource = {
         subtitleNewTab: 'Farðu aftur í nýopnaða flipann til að halda áfram',
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',

@@ -1296,6 +1296,10 @@ export const kkKZ: LocalizationResource = {
         subtitleNewTab: 'Жалғастыру үшін жаңа бетке оралыңыз',
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Электрондық поштаңызға жіберілген растау сілтемесін пайдаланыңыз',

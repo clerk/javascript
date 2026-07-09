@@ -1303,6 +1303,10 @@ export const daDK: LocalizationResource = {
         subtitleNewTab: 'Vend tilbage til den nyligt åbnede fane for at fortsætte',
         titleNewTab: 'Logget ind på anden fane',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Brug bekræftelseslinket, der er sendt til din e-mail',

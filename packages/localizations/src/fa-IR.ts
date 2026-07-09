@@ -1314,6 +1314,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه تازه باز شده برگردید',
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',

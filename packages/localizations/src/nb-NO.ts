@@ -1316,6 +1316,10 @@ export const nbNO: LocalizationResource = {
         subtitleNewTab: 'Gå tilbake til den nyåpnede fanen for å fortsette',
         titleNewTab: 'Logget inn på en annen fane',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',

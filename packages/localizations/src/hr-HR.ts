@@ -1315,6 +1315,10 @@ export const hrHR: LocalizationResource = {
         subtitleNewTab: 'Vratite se na novootvorenu karticu za nastavak',
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',

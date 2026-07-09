@@ -1321,6 +1321,10 @@ export const frFR: LocalizationResource = {
         subtitleNewTab: "Revenez à l'onglet nouvellement ouvert pour continuer",
         titleNewTab: 'Connecté sur un autre onglet',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',

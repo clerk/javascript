@@ -1301,6 +1301,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 새로 연 탭으로 돌아가세요',
         titleNewTab: '다른 탭에서 로그인',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',

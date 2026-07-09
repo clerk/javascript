@@ -1333,6 +1333,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      verifiedTransferable: {
+        subtitle: 'Return to original tab to continue',
+        title: 'Email verified',
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Use the verification link sent to your email',

@@ -1320,6 +1320,10 @@ export const deDE: LocalizationResource = {
         subtitleNewTab: 'Kehren Sie zum neu geöffneten Tab zurück, um fortzufahren',
         titleNewTab: 'In einem anderen Tab angemeldet',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Verwenden Sie den an Ihre E-Mail gesendeten Bestätigungslink',

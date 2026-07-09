@@ -1313,6 +1313,10 @@ export const ruRU: LocalizationResource = {
         subtitleNewTab: 'Вернитесь на только что открытую вкладку, чтобы продолжить',
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',

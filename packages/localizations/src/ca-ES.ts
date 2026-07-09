@@ -1313,6 +1313,10 @@ export const caES: LocalizationResource = {
         subtitleNewTab: 'Torna a la pestanya recentment oberta per continuar',
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",

@@ -1306,6 +1306,10 @@ export const plPL: LocalizationResource = {
         subtitleNewTab: 'Powróć do nowo otwartej karty, aby kontynuować',
         titleNewTab: 'Zalogowano na innej karcie',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój e-mail',

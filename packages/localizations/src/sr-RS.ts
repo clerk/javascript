@@ -1303,6 +1303,10 @@ export const srRS: LocalizationResource = {
         subtitleNewTab: 'Vrati se na novootvoreni tab da nastaviš',
         titleNewTab: 'Prijavljen na drugom tabu',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',

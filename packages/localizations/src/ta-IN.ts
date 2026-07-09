@@ -1319,6 +1319,10 @@ export const taIN: LocalizationResource = {
         subtitleNewTab: 'தொடர புதிதாகத் திறக்கப்பட்ட தாவலுக்குத் திரும்பவும்',
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',

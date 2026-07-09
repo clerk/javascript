@@ -1313,6 +1313,10 @@ export const elGR: LocalizationResource = {
         subtitleNewTab: 'Επιστροφή στη νέα καρτέλα που άνοιξε για να συνεχίσετε',
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
