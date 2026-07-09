@@ -49,9 +49,6 @@ import {
   Default as OrganizationProfileLeaveSectionDefault,
   meta as organizationProfileLeaveSectionMeta,
 } from '../stories/organization-profile-leave-section.stories';
-  Default as OrganizationProfileGeneralDefault,
-  meta as organizationProfileGeneralMeta,
-} from '../stories/organization-profile-general.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
