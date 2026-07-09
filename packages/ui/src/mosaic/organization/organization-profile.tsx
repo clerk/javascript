@@ -4,6 +4,7 @@ import { useOrganizationProfileController } from './organization-profile.control
 import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
+import { OrganizationProfileProfileSection } from './organization-profile-profile-section';
 import { OrganizationProfileView } from './organization-profile-view';
 
 function OrganizationProfileRoot(): ReactElement | null {
@@ -25,6 +26,7 @@ function OrganizationProfileRoot(): ReactElement | null {
 // them into the exported binding's initializer keeps them attached across that boundary.
 export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   GeneralPanel: OrganizationProfileGeneralPanel,
+  ProfileSection: OrganizationProfileProfileSection,
   LeaveSection: OrganizationProfileLeaveSection,
   DeleteSection: OrganizationProfileDeleteSection,
 });
