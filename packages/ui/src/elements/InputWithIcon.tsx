@@ -1,4 +1,5 @@
 import { inertProps } from '@clerk/shared/inert';
+import { isVirtualClick } from '@floating-ui/react/utils';
 import React from 'react';
 
 import { Box, Flex, Input } from '../customizables';
@@ -30,11 +31,12 @@ export const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIcon>((
 
   const handleClear = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClear?.();
-    // Keyboard activation produces a synthetic click with detail === 0. The button is about to go
-    // inert and drop out of the tab order, so return focus to the input. A pointer click leaves
-    // focus alone.
-    if (event.detail === 0) {
-      internalRef.current?.focus();
+    // The button is about to go inert and drop out of the tab order. On keyboard or assistive-tech
+    // activation, return focus to the input; a real pointer or touch click leaves focus alone so the
+    // on-screen keyboard is not forced open. `isVirtualClick` guards `detail === 0` with a pointer
+    // check plus Firefox/Android quirks, which a bare `detail === 0` check misses on touch devices.
+    if (isVirtualClick(event.nativeEvent)) {
+      internalRef.current?.focus({ preventScroll: true });
     }
   };
 
