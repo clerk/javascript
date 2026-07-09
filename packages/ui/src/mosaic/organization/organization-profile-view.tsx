@@ -6,9 +6,11 @@ import { Tabs } from '../components/tabs';
 interface OrganizationProfileViewProps {
   /** The General tab's panel content. */
   general: ReactNode;
+  /** The API keys tab's panel content. */
+  apiKeys: ReactNode;
 }
 
-export function OrganizationProfileView({ general }: OrganizationProfileViewProps) {
+export function OrganizationProfileView({ general, apiKeys }: OrganizationProfileViewProps) {
   return (
     <Box
       sx={{
@@ -29,6 +31,7 @@ export function OrganizationProfileView({ general }: OrganizationProfileViewProp
         <Tabs.List>
           <Tabs.Tab value='general'>General</Tabs.Tab>
           <Tabs.Tab value='members'>Members</Tabs.Tab>
+          <Tabs.Tab value='api-keys'>API keys</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='general'>{general}</Tabs.Panel>
         <Tabs.Panel value='members'>
@@ -43,6 +46,7 @@ export function OrganizationProfileView({ general }: OrganizationProfileViewProp
             Members content
           </Box>
         </Tabs.Panel>
+        <Tabs.Panel value='api-keys'>{apiKeys}</Tabs.Panel>
       </Tabs.Root>
     </Box>
   );

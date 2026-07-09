@@ -39,6 +39,10 @@ import {
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OrganizationProfileDeleteSectionDefault,
   meta as organizationProfileDeleteSectionMeta,
 } from '../stories/organization-profile-delete-section.stories';
@@ -87,6 +91,10 @@ const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, 
 const organizationProfileGeneralPanelModule: StoryModule = {
   meta: organizationProfileGeneralPanelMeta,
   Default: OrganizationProfileGeneralPanelDefault,
+};
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
@@ -138,6 +146,7 @@ export const registry: StoryModule[] = [
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
   organizationProfileProfileSectionModule,
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,

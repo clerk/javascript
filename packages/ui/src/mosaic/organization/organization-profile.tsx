@@ -13,7 +13,12 @@ function OrganizationProfileRoot(): ReactElement | null {
   if (controller.status !== 'ready') {
     return null;
   }
-  return <OrganizationProfileView general={<OrganizationProfileGeneralPanel />} />;
+  return (
+    <OrganizationProfileView
+      general={<OrganizationProfileGeneralPanel />}
+      apiKeys={<OrganizationProfileApiKeysPanel />}
+    />
+  );
 }
 
 // Standalone parts of the profile, exposed via the compound namespace. Each part is
