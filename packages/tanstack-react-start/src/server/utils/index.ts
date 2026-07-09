@@ -27,6 +27,14 @@ function getPrefetchUIFromEnv(): boolean | undefined {
   return undefined;
 }
 
+function getUnsafeDisableDevelopmentModeConsoleWarningFromEnv(): boolean | undefined {
+  const value =
+    getEnvVariable('VITE_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING') ||
+    getEnvVariable('CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING');
+
+  return value ? isTruthy(value) : undefined;
+}
+
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
 
@@ -48,6 +56,7 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
     __prefetchUI: getPrefetchUIFromEnv(),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),
+    __unsafeDisableDevelopmentModeConsoleWarning: getUnsafeDisableDevelopmentModeConsoleWarningFromEnv(),
     __signInForceRedirectUrl:
       additionalStateOptions.signInForceRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL') || '',
     __signUpForceRedirectUrl:
@@ -69,12 +78,17 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
  * @internal
  */
 export const patchRequest = (request: Request) => {
+  // Omit `signal` from the clone: Node 24's bundled undici tightened the
+  // instanceof AbortSignal check on RequestInit.signal and rejects any signal
+  // it does not recognize as its own — including the standard AbortSignal from
+  // framework Request subclasses or from `new AbortController()`. Until the
+  // ecosystem stabilizes, abort propagation through this clone is intentionally
+  // dropped. See packages/backend/src/proxy.ts for the same workaround.
   const clonedRequest = new Request(request.url, {
     headers: request.headers,
     method: request.method,
     redirect: request.redirect,
     cache: request.cache,
-    signal: request.signal,
   });
 
   // If duplex is not set, set it to 'half' to avoid duplex issues with unidici

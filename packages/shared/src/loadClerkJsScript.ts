@@ -1,7 +1,7 @@
 import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
-import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
+import { isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 import type { SDKMetadata } from './types';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
@@ -230,8 +230,13 @@ export const clerkJSScriptUrl = (opts: LoadClerkJSScriptOptions) => {
     return __internal_clerkJSUrl;
   }
 
-  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const version = versionSelector(__internal_clerkJSVersion);
+
+  if (proxyUrl && isProxyUrlRelative(proxyUrl)) {
+    return buildRelativeProxyScriptUrl(proxyUrl, 'clerk-js', version, 'clerk.browser.js');
+  }
+
+  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.browser.js`;
 };
 
@@ -242,8 +247,13 @@ export const clerkUIScriptUrl = (opts: LoadClerkUIScriptOptions) => {
     return __internal_clerkUIUrl;
   }
 
-  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   const version = versionSelector(__internal_clerkUIVersion, UI_PACKAGE_VERSION);
+
+  if (proxyUrl && isProxyUrlRelative(proxyUrl)) {
+    return buildRelativeProxyScriptUrl(proxyUrl, 'ui', version, 'ui.browser.js');
+  }
+
+  const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 
@@ -280,11 +290,29 @@ const applyAttributesToScript = (attributes: Record<string, string>) => (script:
   }
 };
 
+const stripTrailingSlashes = (value: string) => {
+  while (value.endsWith('/')) {
+    value = value.slice(0, -1);
+  }
+
+  return value;
+};
+
+const buildRelativeProxyScriptUrl = (proxyUrl: string, packageName: string, version: string, fileName: string) => {
+  return `${stripTrailingSlashes(proxyUrl)}/npm/@clerk/${packageName}@${version}/dist/${fileName}`;
+};
+
 export const buildScriptHost = (opts: { publishableKey: string; proxyUrl?: string; domain?: string }) => {
   const { proxyUrl, domain, publishableKey } = opts;
 
   if (!!proxyUrl && isValidProxyUrl(proxyUrl)) {
-    return proxyUrlToAbsoluteURL(proxyUrl).replace(/http(s)?:\/\//, '');
+    const resolvedProxyUrl = proxyUrlToAbsoluteURL(proxyUrl);
+
+    if (isProxyUrlRelative(resolvedProxyUrl)) {
+      return parsePublishableKey(publishableKey)?.frontendApi || '';
+    }
+
+    return resolvedProxyUrl.replace(/http(s)?:\/\//, '');
   } else if (domain && !isDevOrStagingUrl(parsePublishableKey(publishableKey)?.frontendApi || '')) {
     return addClerkPrefix(domain);
   } else {

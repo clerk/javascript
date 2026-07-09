@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 
 import { Icon } from '../customizables';
-import { CheckCircle } from '../icons';
+import { CheckmarkCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { animations, createVariants } from '../styledSystem';
 import { Text } from './Text';
@@ -33,7 +33,7 @@ export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, re
     >
       <Icon
         colorScheme={'success'}
-        icon={CheckCircle}
+        icon={CheckmarkCircle}
       />
       {children}
     </Text>

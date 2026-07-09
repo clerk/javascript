@@ -164,6 +164,29 @@ function createTokenSignature(token: string, key: string): string {
 }
 
 /**
+ * Constant-time string equality. Used to compare HMAC signatures without leaking
+ * timing information about how many leading characters matched — `===` and `!==`
+ * on strings short-circuit on the first mismatching character, which would let an
+ * attacker reconstruct the expected signature byte-by-byte across many timed
+ * requests against the Next.js origin.
+ *
+ * Synchronous and runtime-agnostic so it works in Edge Runtime, where
+ * `node:crypto.timingSafeEqual` isn't reliably available. The early length check
+ * leaks length, but is safe here because the only caller compares HMAC-SHA1 hex
+ * digests of fixed length (40 chars).
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+/**
  * Assert that the provided token generates a matching signature.
  */
 export function assertTokenSignature(token: string, key: string, signature?: string | null) {
@@ -172,7 +195,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 
   const expectedSignature = createTokenSignature(token, key);
-  if (expectedSignature !== signature) {
+  if (!constantTimeEqual(expectedSignature, signature)) {
     throw new Error(authSignatureInvalid);
   }
 }

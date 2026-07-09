@@ -1,10 +1,17 @@
+import type { RequestState } from '@clerk/backend/internal';
 import { constants, debugRequestState } from '@clerk/backend/internal';
 import { parse as parseCookie } from 'cookie';
-import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
+import type { UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
 import { canUseKeyless } from '../utils/feature-flags';
-import type { RequestStateWithRedirectUrls } from './types';
+import type { AdditionalStateOptions } from './types';
+
+// AppLoadContext was removed from React Router v8. Keep a structural type for the context shape we use.
+type ReactRouterContext = Record<string, any> & {
+  get?: <T>(context: unknown) => T | undefined;
+  set?: <T>(context: unknown, value: T) => void;
+};
 
 export function isResponse(value: any): value is Response {
   return (
@@ -42,23 +49,25 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
 }
 
 /**
- * `get` and `set` properties will only be available if v8_middleware flag is enabled
- * See: https://reactrouter.com/upgrading/future#futurev8_middleware
+ * `get` and `set` properties are available when React Router middleware is enabled.
  */
-export const IsOptIntoMiddleware = (context: AppLoadContext) => {
+export const IsOptIntoMiddleware = (
+  context: ReactRouterContext,
+): context is ReactRouterContext & Required<Pick<ReactRouterContext, 'get' | 'set'>> => {
   return 'get' in context && 'set' in context;
 };
 
 export const injectRequestStateIntoResponse = async (
   response: Response,
-  requestState: RequestStateWithRedirectUrls,
-  context: AppLoadContext,
+  requestState: RequestState,
+  context: ReactRouterContext,
+  additionalStateOptions: AdditionalStateOptions = {},
   includeClerkHeaders = false,
 ) => {
   const clone = new Response(response.body, response);
   const data = await clone.json();
 
-  const { clerkState, headers } = getResponseClerkState(requestState, context);
+  const { clerkState, headers } = getResponseClerkState(requestState, context, additionalStateOptions);
 
   // set the correct content-type header in case the user returned a `Response` directly
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
@@ -78,9 +87,14 @@ export const injectRequestStateIntoResponse = async (
  *
  * @internal
  */
-export function getResponseClerkState(requestState: RequestStateWithRedirectUrls, context: AppLoadContext) {
-  const { reason, message, isSignedIn, __keylessClaimUrl, __keylessApiKeysUrl, ...rest } = requestState;
+export function getResponseClerkState(
+  requestState: RequestState,
+  context: ReactRouterContext,
+  additionalStateOptions: AdditionalStateOptions = {},
+) {
+  const { reason, message, isSignedIn, ...rest } = requestState;
   const envVars = getPublicEnvVariables(context);
+  const { __keylessClaimUrl, __keylessApiKeysUrl, ...redirectUrlOptions } = additionalStateOptions;
 
   const baseState: Record<string, unknown> = {
     __clerk_ssr_state: rest.toAuth(),
@@ -90,10 +104,10 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __isSatellite: requestState.isSatellite,
     __signInUrl: requestState.signInUrl,
     __signUpUrl: requestState.signUpUrl,
-    __signInForceRedirectUrl: requestState.signInForceRedirectUrl,
-    __signUpForceRedirectUrl: requestState.signUpForceRedirectUrl,
-    __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
-    __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
+    __signInForceRedirectUrl: redirectUrlOptions.signInForceRedirectUrl,
+    __signUpForceRedirectUrl: redirectUrlOptions.signUpForceRedirectUrl,
+    __signInFallbackRedirectUrl: redirectUrlOptions.signInFallbackRedirectUrl,
+    __signUpFallbackRedirectUrl: redirectUrlOptions.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: envVars.clerkJsUrl,
     __clerkJSVersion: envVars.clerkJsVersion,
@@ -102,6 +116,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __prefetchUI: envVars.prefetchUI,
     __telemetryDisabled: envVars.telemetryDisabled,
     __telemetryDebug: envVars.telemetryDebug,
+    __unsafeDisableDevelopmentModeConsoleWarning: envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   if (canUseKeyless && __keylessClaimUrl) {
@@ -135,12 +150,14 @@ export const wrapWithClerkState = (data: any) => {
  * @internal
  */
 export const patchRequest = (request: Request) => {
+  // Omit `signal` from the clone: Node 24's bundled undici tightened the
+  // instanceof AbortSignal check, which rejects cross-realm signals (e.g.
+  // those carried by framework Request subclasses).
   const clonedRequest = new Request(request.url, {
     headers: request.headers,
     method: request.method,
     redirect: request.redirect,
     cache: request.cache,
-    signal: request.signal,
   });
 
   // If duplex is not set, set it to 'half' to avoid duplex issues with unidici

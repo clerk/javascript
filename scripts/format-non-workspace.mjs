@@ -7,7 +7,6 @@ const ROOT_FILE_PATTERNS = ['*.cjs', '*.js', '*.json', '*.md', '*.mjs', '*.ts', 
 const NON_WORKSPACE_PATTERNS = [
   'docs/**/*.{js,jsx,ts,tsx,json,md,mdx}',
   'integration/**/*.{js,jsx,ts,tsx,json,md,mdx}',
-  'playground/**/*.{js,jsx,ts,tsx,json,md,mdx}',
   'scripts/**/*.{js,jsx,ts,tsx,json,md,mdx}',
 ];
 

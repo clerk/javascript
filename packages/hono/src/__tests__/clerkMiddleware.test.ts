@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clerkMiddleware, getAuth } from '../index';
 

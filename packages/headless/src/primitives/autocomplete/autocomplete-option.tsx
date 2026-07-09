@@ -1,0 +1,84 @@
+'use client';
+
+import { useListItem, useMergeRefs } from '@floating-ui/react';
+import React, { useEffect, useId } from 'react';
+
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { useAutocompleteContext } from './autocomplete-context';
+
+export interface AutocompleteOptionProps extends ComponentProps<'div'> {
+  value: string;
+  label?: string;
+  disabled?: boolean;
+}
+
+export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteOptionProps>(
+  function AutocompleteOption(props, ref) {
+    const { render, value, label, disabled, ...otherProps } = props;
+    const { activeIndex, selectedValue, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
+      useAutocompleteContext();
+
+    const id = useId();
+    const displayLabel = label ?? value;
+    const { ref: itemRef, index } = useListItem({ label: displayLabel });
+    const combinedRef = useMergeRefs([itemRef, ref]);
+
+    const isSelected = selectedValue === value;
+    const isActive = activeIndex === index;
+
+    useEffect(() => {
+      const map = valuesByIndexRef.current;
+      if (!disabled) {
+        map.set(index, value);
+      }
+      registerSelectedIndex(index, value);
+      return () => {
+        map.delete(index);
+      };
+    }, [index, value, disabled, valuesByIndexRef, registerSelectedIndex]);
+
+    const state = {
+      selected: isSelected,
+      active: isActive,
+      disabled: !!disabled,
+    };
+
+    const ownProps = {
+      'data-cl-slot': 'autocomplete-option',
+      id,
+      ref: combinedRef,
+      role: 'option',
+      'aria-selected': isActive,
+      'aria-disabled': disabled || undefined,
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = {
+      ...ownProps,
+      ...getItemProps({
+        onClick() {
+          if (!disabled) {
+            handleSelect(value, index, displayLabel);
+            (refs.domReference.current as HTMLElement | null)?.focus();
+          }
+        },
+      }),
+    };
+
+    const merged = mergeProps<'div'>(defaultProps, otherProps);
+    // The option id is owned by the primitive and drives the input's
+    // aria-activedescendant linkage: a consumer-supplied id must not override it.
+    merged.id = id;
+
+    return renderElement({
+      defaultTagName: 'div',
+      render,
+      state,
+      stateAttributesMapping: {
+        selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
+        active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
+        disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      },
+      props: merged,
+    });
+  },
+);

@@ -2,10 +2,12 @@ import type {
   BillingMoneyAmount,
   BillingPayerResourceType,
   BillingPlanJSON,
+  BillingPlanPrice,
   BillingPlanResource,
+  BillingPlanUnitPrice,
 } from '@clerk/shared/types';
 
-import { billingMoneyAmountFromJSON } from '@/utils/billing';
+import { billingMoneyAmountFromJSON, billingUnitPriceFromJSON } from '@/utils/billing';
 
 import { BaseResource, Feature } from './internal';
 
@@ -24,6 +26,8 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   slug!: string;
   avatarUrl: string | null = null;
   features!: Feature[];
+  unitPrices?: BillingPlanUnitPrice[];
+  availablePrices?: BillingPlanPrice[];
   freeTrialDays!: number | null;
   freeTrialEnabled!: boolean;
 
@@ -53,6 +57,14 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.freeTrialDays = this.withDefault(data.free_trial_days, null);
     this.freeTrialEnabled = this.withDefault(data.free_trial_enabled, false);
     this.features = (data.features || []).map(feature => new Feature(feature));
+    this.unitPrices = data.unit_prices?.map(billingUnitPriceFromJSON);
+    this.availablePrices = data.available_prices?.map(price => ({
+      id: price.id,
+      fee: price.fee ? billingMoneyAmountFromJSON(price.fee) : null,
+      annualMonthlyFee: price.annual_monthly_fee ? billingMoneyAmountFromJSON(price.annual_monthly_fee) : null,
+      isDefault: price.is_default,
+      unitPrices: price.unit_prices?.map(billingUnitPriceFromJSON),
+    }));
 
     return this;
   }

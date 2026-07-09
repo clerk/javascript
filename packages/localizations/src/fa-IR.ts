@@ -51,10 +51,15 @@ export const faIR: LocalizationResource = {
       formButtonPrimary__revoke: 'لغو کلید',
       formHint: 'آیا مطمئن هستید که می‌خواهید این کلید محرمانه را حذف کنید؟',
       formTitle: 'کلید محرمانه "{{apiKeyName}}" لغو شود؟',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'بازگشت',
   badge__activePlan: 'فعال',
+  badge__banned: undefined,
   badge__canceledEndsAt: "لغو شد • پایان می‌یابد {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'طرح فعلی',
   badge__default: 'پیش فرض',
@@ -75,11 +80,14 @@ export const faIR: LocalizationResource = {
   badge__userDevice: 'دستگاه کاربر',
   badge__you: 'شما',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'افزودن روش پرداخت',
     alwaysFree: 'همیشه رایگان',
     annually: 'سالانه',
     availableFeatures: 'ویژگی ها',
     billedAnnually: 'صورتحساب سالانه',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'صورتحساب هر ماه',
     cancelFreeTrial: undefined,
     cancelFreeTrialAccessUntil: undefined,
@@ -117,20 +125,25 @@ export const faIR: LocalizationResource = {
       title__subscriptionSuccessful: 'موفقیت آمیز!',
       title__trialSuccess: undefined,
       totalDueAfterTrial: undefined,
+      totalDuePerPeriod: undefined,
     },
     credit: 'اعتبار',
     creditRemainder: 'اعتبار برای باقیمانده اشتراک فعلی شما.',
     defaultFreePlanActive: 'شما در حال حاضر در طرح رایگان هستید',
     free: 'رایگان',
     getStarted: 'شروع کنید',
+    highlightedPlanBadge: 'محبوب',
     keepFreeTrial: undefined,
     keepSubscription: 'حفظ اشتراک',
     manage: 'مدیریت',
     manageSubscription: 'مدیریت اشتراک',
     month: 'ماه',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
@@ -146,12 +159,32 @@ export const faIR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'روش های پرداخت',
-    popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
       included: 'شامل',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'اشتراک مجدد',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'مشاهده همه ویژگی‌ها',
     startFreeTrial: undefined,
     startFreeTrial__days: 'شروع آزمایش رایگان {{days}} روزه',
@@ -172,16 +205,560 @@ export const faIR: LocalizationResource = {
       trialStartedOn: undefined,
     },
     subtotal: 'جمع فرعی',
+    subtotalRenewal: undefined,
     switchPlan: 'به این طرح تغییر دهید',
     switchToAnnual: 'به سالانه تغییر دهید',
-    switchToAnnualWithAnnualPrice: 'تغییر به سالانه {{currency}}{{price}} / سال',
+    switchToAnnualWithAnnualPrice: 'تغییر به سالانه {{price}} / سال',
     switchToMonthly: 'به ماهانه تغییر دهید',
-    switchToMonthlyWithPrice: 'تغییر به ماهانه {{currency}}{{price}} / ماه',
+    switchToMonthlyWithPrice: 'تغییر به ماهانه {{price}} / ماه',
     totalDue: 'کل مبلغ سررسید',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'سررسید کل امروز',
     viewFeatures: 'مشاهده ویژگی ها',
     viewPayment: 'مشاهده پرداخت',
     year: 'سال',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
+  },
+  configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'برای ارتقای مجوزهای خود با مدیر سازمان تماس بگیرید.',
+      title: 'شما اجازه مدیریت ورود یکپارچه (SSO) را ندارید',
+    },
+    navbar: {
+      title: 'پیکربندی ورود یکپارچه (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: 'تأییدنشده',
+        badge__verified: 'تأییدشده',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'میزبان / نام',
+          instructions:
+            'این رکورد TXT را به ارائه‌دهنده DNS خود اضافه کنید. به‌محض فعال شدن رکورد، به‌طور خودکار آن را تأیید می‌کنیم.',
+          typeLabel: 'نوع',
+          valueLabel: 'مقدار',
+        },
+        verifiedAtLabel: "تأیید‌شده در {{ date | shortDate('fa-IR') }}",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'افزودن {{domain}}',
+        messageLabel: 'ایمیل شما از {{domain}} استفاده می‌کند. آیا می‌خواهید آن را اضافه کنید؟',
+      },
+      formButtonPrimary__add: 'افزودن',
+      formFieldInputPlaceholder__domain: 'افزودن دامنه',
+      formFieldLabel__domain: 'دامنه',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'مالکیت دامنه‌هایی را که سازمان شما برای ورود استفاده می‌کند، اضافه و تأیید کنید.',
+      title: 'افزودن دامنه‌های SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'ارائه‌دهنده SAML سفارشی',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'ارائه‌دهنده‌ای را که می‌خواهید SSO را برای آن راه‌اندازی کنید، انتخاب کنید.',
+      title: 'ارائه‌دهنده را انتخاب کنید',
+      warning: 'پس از انتخاب یک ارائه‌دهنده، نمی‌توانید آن را تا پایان پیکربندی تغییر دهید',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
+    },
   },
   createOrganization: {
     formButtonSubmit: 'ایجاد سازمان',
@@ -229,6 +806,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'کلید API',
@@ -259,6 +837,9 @@ export const faIR: LocalizationResource = {
   formFieldLabel__role: 'نقش',
   formFieldLabel__signOutOfOtherSessions: 'از همه دستگاه‌های دیگر خارج شوید',
   formFieldLabel__username: 'نام کاربری',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
@@ -268,6 +849,22 @@ export const faIR: LocalizationResource = {
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',
   membershipRole__guestMember: 'مهمان',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
@@ -285,9 +882,19 @@ export const faIR: LocalizationResource = {
     },
     badge__automaticInvitation: 'دعوت نامه های خودکار',
     badge__automaticSuggestion: 'پیشنهادات خودکار',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'بدون ثبت نام خودکار',
     badge__unverified: 'تایید نشده',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'تاریخچه پرداخت خالی است',
         notFound: 'هیچ پرداختی یافت نشد',
@@ -322,6 +929,7 @@ export const faIR: LocalizationResource = {
       statementsSection: {
         empty: 'بیانیه‌ها خالی است',
         itemCaption__paidForPlan: 'پرداخت شده برای طرح {{plan}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'اعتبار تناسبی',
         itemCaption__subscribedAndPaidForPlan: 'مشترک و پرداخت شده برای طرح {{plan}}',
         notFound: 'هیچ بیانیه‌ای یافت نشد',
@@ -334,6 +942,11 @@ export const faIR: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: undefined,
         tableHeader__plan: undefined,
         tableHeader__startDate: undefined,
@@ -356,6 +969,7 @@ export const faIR: LocalizationResource = {
       detailsTitle__inviteFailed:
         'دعوت‌نامه‌ها ارسال نشدند. در حال حاضر دعوت‌نامه‌هایی برای آدرس‌های ایمیل زیر در انتظار ارسال هستند: {{email_addresses}}.',
       formButtonPrimary__continue: 'ارسال دعوت‌ نامه‌ها',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'انتخاب نقش',
       subtitle: 'یک یا چند آدرس ایمیل را وارد یا جای‌گذاری کنید، که با فاصله یا ویرگول از هم جدا شده‌اند.',
       successMessage: 'دعوتنامه‌ها با موفقیت ارسال شدند',
@@ -416,11 +1030,13 @@ export const faIR: LocalizationResource = {
       description: 'سازمان خود را مدیریت کنید',
       general: 'عمومی',
       members: 'اعضا',
+      security: undefined,
       title: 'سازمان',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'شما مجوز مدیریت صورتحساب این سازمان را ندارید.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'طرح ها',
     },
@@ -461,9 +1077,36 @@ export const faIR: LocalizationResource = {
       successMessage: '{{domain}} حذف شده است.',
       title: 'حذف دامنه',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'عمومی',
       headerTitle__members: 'اعضا',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'به روز رسانی نمایه',
         title: 'نمایه سازمان',
@@ -584,6 +1227,9 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه، کد تولید شده توسط برنامه تأیید هویت خود را وارد کنید',
       title: 'تایید هویت الزامی است',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -730,6 +1376,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه، لطفاً کد تأیید ارسال شده به تلفن خود را وارد کنید',
       title: 'تلفن همراه خود را چک کنید',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'بازنشانی رمز عبور',
       requiredMessage: 'به دلایل امنیتی، لازم است رمز عبور خود را مجدداً تنظیم کنید.',
@@ -834,6 +1486,12 @@ export const faIR: LocalizationResource = {
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'کد تایید ارسال شده به تلفن خود را وارد کنید',
       title: 'تلفن همراه خود را تایید کنید',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'ورود',
@@ -975,7 +1633,10 @@ export const faIR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'حجم فایل از حداکثر مجاز ۱۰ مگابایت بیشتر است. لطفاً فایل کوچکتری انتخاب کنید.',
     avatar_file_type_invalid: 'نوع فایل پشتیبانی نمی‌شود. لطفاً تصویری با فرمت JPG، PNG، GIF یا WEBP آپلود کنید.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
@@ -1017,7 +1678,10 @@ export const faIR: LocalizationResource = {
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
     form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: 'دسترسی مجاز نیست.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
     organization_domain_common: 'دامنه سازمان عمومی است و قابل قبول نیست.',
     organization_domain_exists_for_enterprise_connection: 'این دامنه برای اتصال سازمانی موجود است.',
@@ -1040,6 +1704,14 @@ export const faIR: LocalizationResource = {
       sentencePrefix: 'رمز عبور شما باید حاوی',
     },
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
     web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
@@ -1091,6 +1763,9 @@ export const faIR: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
+    label__accountActions: 'اقدامات حساب',
+    label__activeSessions: 'جلسات فعال',
+    label__userButtonPopover: 'پنل حساب',
   },
   userProfile: {
     apiKeysPage: {
@@ -1113,6 +1788,15 @@ export const faIR: LocalizationResource = {
       title__codelist: 'کدهای پشتیبان',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'تاریخچه پرداخت خالی است',
         notFound: 'هیچ پرداختی یافت نشد',
@@ -1147,6 +1831,7 @@ export const faIR: LocalizationResource = {
       statementsSection: {
         empty: 'بیانیه‌ها خالی است',
         itemCaption__paidForPlan: 'پرداخت شده برای طرح {{plan}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'اعتبار تناسبی',
         itemCaption__subscribedAndPaidForPlan: 'مشترک و پرداخت شده برای طرح {{plan}}',
         notFound: 'هیچ بیانیه‌ای یافت نشد',
@@ -1159,6 +1844,7 @@ export const faIR: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
+        overview: undefined,
         tableHeader__edit: 'ویرایش',
         tableHeader__plan: 'طرح',
         tableHeader__startDate: 'تاریخ شروع',
@@ -1357,6 +2043,7 @@ export const faIR: LocalizationResource = {
         title: 'آدرس های ایمیل',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'اتصال حساب',
         title: 'حساب های سازمانی',
       },
       headerTitle__account: 'جزئیات نمایه',

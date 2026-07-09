@@ -47,6 +47,9 @@ describe('UserButton', () => {
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
     await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+    expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByRole('menuitem')).toBeNull();
     expect(getByText('Manage account')).not.toBeNull();
   });
 
@@ -191,6 +194,124 @@ describe('UserButton', () => {
         expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
         expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
       });
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('uses dialog semantics for the trigger button', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+
+      expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+      await userEvent.click(trigger);
+
+      expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('menuitem')).toBeNull();
+    });
+
+    it('focuses the dialog container on open, not the first interactive item', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+      await userEvent.click(trigger);
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveFocus();
+    });
+
+    it('traps focus within the popover when open', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+      await userEvent.click(trigger);
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      expect(dialog).toBeInTheDocument();
+
+      for (let i = 0; i < 10; i++) {
+        await userEvent.tab();
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+
+      expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+    });
+
+    it('labels action groups for screen readers', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      const groups = dialog.querySelectorAll('[role="group"]');
+      expect(groups.length).toBeGreaterThan(0);
+      for (const group of groups) {
+        expect(group).toHaveAttribute('aria-label');
+        expect(group.getAttribute('aria-label')).not.toBe('');
+      }
+    });
+
+    it('closes on escape and restores focus to the trigger', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+
+      await userEvent.click(trigger);
+
+      const clerkLogoLink = await screen.findByRole('link', { name: 'Clerk logo' });
+      for (let i = 0; i < 4 && document.activeElement !== clerkLogoLink; i++) {
+        await userEvent.tab();
+      }
+      expect(clerkLogoLink).toHaveFocus();
+
+      await userEvent.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog', { name: 'Account panel' })).not.toBeInTheDocument();
+      });
+      expect(trigger).toHaveFocus();
     });
   });
 

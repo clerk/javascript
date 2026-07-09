@@ -1,5 +1,5 @@
 import { logger } from '@clerk/shared/logger';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import * as publicExports from '../index';
 import * as legacyExports from '../legacy';

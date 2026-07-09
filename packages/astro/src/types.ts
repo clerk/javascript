@@ -72,7 +72,7 @@ export type InternalRuntimeOptions = {
 
 // Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
-  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  load: (opts?: ClerkOptions) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 

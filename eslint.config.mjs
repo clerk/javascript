@@ -2,7 +2,6 @@ import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
 import pluginImport from 'eslint-plugin-import';
-import pluginJest from 'eslint-plugin-jest';
 import pluginJsDoc from 'eslint-plugin-jsdoc';
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
@@ -268,7 +267,6 @@ export default tseslint.config([
       'commitlint.config.ts',
       'packages/*/dist/**',
       'packages/*/examples',
-      'playground/*',
       'pnpm-lock.json',
       'eslint.config.mjs',
       'typedoc.config.mjs',
@@ -497,16 +495,12 @@ export default tseslint.config([
     name: 'repo/test',
     files: TEST_FILES,
     languageOptions: {
-      globals: pluginJest.environments.globals.globals,
-    },
-    plugins: {
-      jest: pluginJest,
+      globals: globals.vitest,
     },
     rules: {
       '@typescript-eslint/await-thenable': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/unbound-method': 'off',
-      'jest/unbound-method': 'error',
     },
   },
   {
@@ -543,10 +537,32 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/ui/mosaic',
+    files: ['packages/ui/src/mosaic/**/*'],
+    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Property > Literal.key[value='&:hover']",
+          message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (hover: hover)']",
+          message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
+        },
+        {
+          selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
+          message:
+            "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
+        },
+      ],
+    },
+  },
+  {
     name: 'packages - vitest',
     files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
-      'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',
     },
   },

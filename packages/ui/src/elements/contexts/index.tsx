@@ -98,6 +98,7 @@ export type FlowMetadata = {
     | 'planDetails'
     | 'pricingTable'
     | 'apiKeys'
+    | 'configureSSO'
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
@@ -132,7 +133,15 @@ export type FlowMetadata = {
     | 'chooseWallet'
     | 'enterpriseConnections'
     | 'organizationCreationDisabled'
-    | 'methodSelectionMFA';
+    | 'methodSelectionMFA'
+    | 'provideEmail'
+    | 'selectProvider'
+    | 'organizationDomains'
+    | 'configureCreateApp'
+    | 'configureMapAttributes'
+    | 'testSso'
+    | 'ssoActivate'
+    | 'protectCheck';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

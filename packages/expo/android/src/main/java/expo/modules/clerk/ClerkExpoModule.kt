@@ -1,24 +1,34 @@
 package expo.modules.clerk
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
-import com.facebook.react.bridge.ActivityEventListener
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableNativeMap
+import com.clerk.api.ClerkConfigurationOptions
+import com.clerk.api.network.model.client.Client
+import com.clerk.api.network.model.error.firstMessage
+import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.ui.ClerkColors
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
+import expo.modules.kotlin.Promise
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
+private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
+private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
+private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
+private const val HOST_SDK = "expo"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -26,198 +36,327 @@ private fun debugLog(tag: String, message: String) {
     }
 }
 
-class ClerkExpoModule(reactContext: ReactApplicationContext) :
-    NativeClerkModuleSpec(reactContext),
-    ActivityEventListener {
+class ClerkExpoModule : Module() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var clientStateObserverJob: Job? = null
+    private var lastObservedClientState: ClientStateSnapshot? = null
+    private var jsOriginatedClientSyncDepth = 0
+    private var configuredPublishableKey: String? = null
+
+    private data class ClientStateSnapshot(
+        val client: Client?,
+        val deviceToken: String?
+    )
+
+    private data class ClientStateChanges(
+        val client: Boolean,
+        val deviceToken: Boolean
+    )
 
     companion object {
-        const val CLERK_AUTH_REQUEST_CODE = 9001
-        const val CLERK_PROFILE_REQUEST_CODE = 9002
+        private var sharedInstance: ClerkExpoModule? = null
 
-        // Intent extras
-        const val EXTRA_DISMISSABLE = "dismissable"
-        const val EXTRA_PUBLISHABLE_KEY = "publishableKey"
-        const val EXTRA_MODE = "mode"
-
-        // Result extras
-        const val RESULT_SESSION_ID = "sessionId"
-        const val RESULT_CANCELLED = "cancelled"
-
-        // Pending promises for activity results
-        private var pendingAuthPromise: Promise? = null
-        private var pendingProfilePromise: Promise? = null
-
-        // Store publishable key for passing to activities
-        private var publishableKey: String? = null
+        fun emitClientChanged(sourceId: String? = null) {
+            val instance = sharedInstance ?: return
+            instance.sendEvent(
+                NATIVE_CLIENT_CHANGED_EVENT,
+                instance.clientChangedPayload(
+                    sourceId = sourceId,
+                    changes = ClientStateChanges(client = true, deviceToken = true)
+                )
+            )
+        }
     }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    override fun definition() = ModuleDefinition {
+        Name("ClerkExpo")
 
-    init {
-        reactContext.addActivityEventListener(this)
+        Events(NATIVE_CLIENT_CHANGED_EVENT)
+
+        OnCreate {
+            sharedInstance = this@ClerkExpoModule
+        }
+
+        OnDestroy {
+            if (sharedInstance === this@ClerkExpoModule) {
+                sharedInstance = null
+            }
+            clientStateObserverJob?.cancel()
+            clientStateObserverJob = null
+        }
+
+        AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
+            configure(pubKey, bearerToken, promise)
+        }
+
+        AsyncFunction("getClientToken") { promise: Promise ->
+            getClientToken(promise)
+        }
+
+        AsyncFunction("syncClientStateFromJs") {
+                deviceToken: String?,
+                sourceId: String?,
+                didChangeClient: Boolean,
+                didChangeDeviceToken: Boolean,
+                promise: Promise ->
+            syncClientStateFromJs(
+                deviceToken,
+                sourceId,
+                didChangeClient,
+                didChangeDeviceToken,
+                promise
+            )
+        }
     }
 
-    override fun getName(): String = "ClerkExpo"
+    private val reactContext: Context?
+        get() = appContext.reactContext
+
+    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+        val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
+        val customHeaders = buildMap {
+            put(HOST_SDK_HEADER, HOST_SDK)
+            if (hostSdkVersion.isNotEmpty()) {
+                put(HOST_SDK_VERSION_HEADER, hostSdkVersion)
+            }
+        }
+
+        return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
+    }
+
+    private fun startClientStateObserver() {
+        if (clientStateObserverJob != null) {
+            return
+        }
+
+        lastObservedClientState = clientStateSnapshot()
+
+        clientStateObserverJob = coroutineScope.launch {
+            Clerk.clientFlow.collect { client ->
+                val previousClientState = lastObservedClientState
+                val newClientState = clientStateSnapshot(client)
+
+                if (newClientState == previousClientState) {
+                    return@collect
+                }
+
+                lastObservedClientState = newClientState
+                if (jsOriginatedClientSyncDepth > 0) {
+                    return@collect
+                }
+
+                sendEvent(
+                    NATIVE_CLIENT_CHANGED_EVENT,
+                    clientChangedPayload(
+                        deviceToken = newClientState.deviceToken,
+                        changes = ClientStateChanges(
+                            client = newClientState.client != previousClientState?.client,
+                            deviceToken = newClientState.deviceToken != previousClientState?.deviceToken
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private fun clientStateSnapshot(client: Client? = Clerk.clientFlow.value): ClientStateSnapshot {
+        return ClientStateSnapshot(
+            client = client,
+            deviceToken = try {
+                Clerk.getDeviceToken()
+            } catch (e: Exception) {
+                debugLog(TAG, "clientStateSnapshot - getDeviceToken failed: ${e.message}")
+                null
+            }
+        )
+    }
+
+    private fun clientChangedPayload(
+        sourceId: String? = null,
+        changes: ClientStateChanges,
+        deviceToken: String? = clientStateSnapshot().deviceToken
+    ): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>(
+            "changed" to mapOf(
+                "client" to changes.client,
+                "deviceToken" to changes.deviceToken
+            ),
+            "deviceToken" to deviceToken
+        )
+        if (!sourceId.isNullOrEmpty()) {
+            result["sourceId"] = sourceId
+        }
+        return result
+    }
+
+    private fun emitSyncedClientChanged(
+        sourceId: String?,
+        changes: ClientStateChanges,
+        snapshot: ClientStateSnapshot = clientStateSnapshot()
+    ) {
+        lastObservedClientState = snapshot
+        sendEvent(
+            NATIVE_CLIENT_CHANGED_EVENT,
+            clientChangedPayload(
+                sourceId = sourceId,
+                changes = changes,
+                deviceToken = snapshot.deviceToken
+            )
+        )
+    }
 
     // MARK: - configure
 
-    @ReactMethod
-    override fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+    private fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+        val context = reactContext ?: run {
+            promise.reject("E_INIT_FAILED", "React context is not available", null)
+            return
+        }
+
         coroutineScope.launch {
             try {
-                publishableKey = pubKey
-
-                // If the JS SDK has a bearer token, write it to the native SDK's
-                // SharedPreferences so both SDKs share the same Clerk API client.
-                if (!bearerToken.isNullOrEmpty()) {
-                    reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-                        .edit()
-                        .putString("DEVICE_TOKEN", bearerToken)
-                        .apply()
-                    debugLog(TAG, "configure - wrote JS bearer token to native SharedPreferences")
-                }
-
-                Clerk.initialize(reactApplicationContext, pubKey)
-
-                // Wait for initialization to complete with timeout
-                try {
-                    withTimeout(10_000L) {
-                        Clerk.isInitialized.first { it }
+                if (!Clerk.isInitialized.value) {
+                    // First-time initialization — write the bearer token to SharedPreferences
+                    // before initializing so the SDK boots with the correct client.
+                    if (!bearerToken.isNullOrEmpty()) {
+                        context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", bearerToken)
+                            .apply()
                     }
-                } catch (e: TimeoutCancellationException) {
-                    val initError = Clerk.initializationError.value
-                    val message = if (initError != null) {
-                        "Clerk initialization timed out: ${initError.message}"
+
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                    startClientStateObserver()
+                    // clerk-android registers ActivityLifecycleCallbacks during
+                    // initialize(), but in React Native MainActivity has already passed
+                    // onResume() by the time <ClerkProvider> mounts and we reach this
+                    // line, so the callbacks miss the initial activity. Without seeding,
+                    // the first Credential Manager call (Google sign-in / passkeys)
+                    // fails with MissingActivity until the user backgrounds and
+                    // foregrounds the app. currentActivity can be null here on
+                    // cold start before React's host-resume sync — AuthView and
+                    // UserProfile also call attachActivity() on mount as a backstop.
+                    appContext.currentActivity?.let { Clerk.attachActivity(it) }
+                    // Must be set AFTER Clerk.initialize() because initialize()
+                    // resets customTheme to its `theme` parameter (default null).
+                    loadThemeFromAssets(context)
+
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                        // If a bearer token was provided, wait for native client state to hydrate
+                        // before resolving the configure call.
+                        if (!bearerToken.isNullOrEmpty()) {
+                            withTimeout(5_000L) {
+                                Clerk.clientFlow.first { it != null }
+                            }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message, null)
+                        return@launch
+                    }
+
+                    // Check for initialization errors
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
-                        "Clerk initialization timed out after 10 seconds"
+                        configuredPublishableKey = pubKey
+                        promise.resolve(null)
                     }
-                    promise.reject("E_TIMEOUT", message)
                     return@launch
                 }
 
-                // Check for initialization errors
-                val error = Clerk.initializationError.value
-                if (error != null) {
-                    promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}")
-                } else {
+                val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
+                if (activePublishableKey != null && activePublishableKey != pubKey) {
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                    startClientStateObserver()
+                    appContext.currentActivity?.let { Clerk.attachActivity(it) }
+                    loadThemeFromAssets(context)
+
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk reconfiguration timed out: ${initError.message}"
+                        } else {
+                            "Clerk reconfiguration timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message, null)
+                        return@launch
+                    }
+
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_RECONFIGURE_FAILED", "Failed to reconfigure Clerk SDK: ${error.message}", null)
+                        return@launch
+                    }
+
+                    if (!bearerToken.isNullOrEmpty()) {
+                        val result = Clerk.updateDeviceToken(bearerToken)
+                        if (result is ClerkResult.Failure) {
+                            debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                        }
+
+                        try {
+                            withTimeout(5_000L) {
+                                Clerk.clientFlow.first { it != null }
+                            }
+                        } catch (_: TimeoutCancellationException) {
+                            debugLog(TAG, "configure - client did not appear after reconfigure token update")
+                        }
+                    }
+
+                    configuredPublishableKey = pubKey
                     promise.resolve(null)
+                    return@launch
                 }
+
+                // Already initialized — use the public SDK API to update
+                // the device token and trigger a client/environment refresh.
+                startClientStateObserver()
+                if (!bearerToken.isNullOrEmpty()) {
+                    val result = Clerk.updateDeviceToken(bearerToken)
+                    if (result is ClerkResult.Failure) {
+                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                    }
+
+                    // Wait for client state to hydrate with the new token (up to 5s).
+                    try {
+                        withTimeout(5_000L) {
+                            Clerk.clientFlow.first { it != null }
+                        }
+                    } catch (_: TimeoutCancellationException) {
+                        debugLog(TAG, "configure - client did not appear after token update")
+                    }
+                }
+
+                promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
             }
         }
     }
 
-    // MARK: - presentAuth
-
-    @ReactMethod
-    override fun presentAuth(options: ReadableMap, promise: Promise) {
-        val activity = getCurrentActivity() ?: run {
-            promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
-            return
-        }
-
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        // Check if user is already signed in
-        if (Clerk.session != null) {
-            promise.reject("already_signed_in", "User is already signed in")
-            return
-        }
-
-        pendingAuthPromise?.reject("E_SUPERSEDED", "Auth presentation was superseded")
-        pendingAuthPromise = promise
-
-        val mode = if (options.hasKey("mode")) options.getString("mode") ?: "signInOrUp" else "signInOrUp"
-        val dismissable = if (options.hasKey("dismissable")) options.getBoolean("dismissable") else true
-
-        val intent = Intent(activity, ClerkAuthActivity::class.java).apply {
-            putExtra(EXTRA_MODE, mode)
-            putExtra(EXTRA_DISMISSABLE, dismissable)
-        }
-
-        activity.startActivityForResult(intent, CLERK_AUTH_REQUEST_CODE)
-    }
-
-    // MARK: - presentUserProfile
-
-    @ReactMethod
-    override fun presentUserProfile(options: ReadableMap, promise: Promise) {
-        val activity = getCurrentActivity() ?: run {
-            promise.reject("E_ACTIVITY_UNAVAILABLE", "No activity available to present Clerk UI.")
-            return
-        }
-
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        pendingProfilePromise?.reject("E_SUPERSEDED", "Profile presentation was superseded")
-        pendingProfilePromise = promise
-
-        val dismissable = if (options.hasKey("dismissable")) options.getBoolean("dismissable") else true
-
-        val intent = Intent(activity, ClerkUserProfileActivity::class.java).apply {
-            putExtra(EXTRA_DISMISSABLE, dismissable)
-            putExtra(EXTRA_PUBLISHABLE_KEY, publishableKey)
-        }
-
-        activity.startActivityForResult(intent, CLERK_PROFILE_REQUEST_CODE)
-    }
-
-    // MARK: - getSession
-
-    @ReactMethod
-    override fun getSession(promise: Promise) {
-        if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
-            return
-        }
-
-        val session = Clerk.session
-        val user = Clerk.user
-
-        debugLog(TAG, "getSession - hasSession: ${session != null}, hasUser: ${user != null}")
-
-        val result = WritableNativeMap()
-
-        session?.let {
-            val sessionMap = WritableNativeMap()
-            sessionMap.putString("id", it.id)
-            sessionMap.putString("status", it.status.name)
-            sessionMap.putString("userId", it.user?.id)
-            result.putMap("session", sessionMap)
-        }
-
-        user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-            val primaryPhone = it.phoneNumbers.find { p -> p.id == it.primaryPhoneNumberId }
-
-            val userMap = WritableNativeMap()
-            userMap.putString("id", it.id)
-            userMap.putString("firstName", it.firstName)
-            userMap.putString("lastName", it.lastName)
-            userMap.putString("imageUrl", it.imageUrl)
-            userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-            userMap.putString("primaryPhoneNumber", primaryPhone?.phoneNumber)
-            result.putMap("user", userMap)
-        }
-
-        promise.resolve(result)
-    }
-
     // MARK: - getClientToken
 
-    @ReactMethod
-    override fun getClientToken(promise: Promise) {
+    private fun getClientToken(promise: Promise) {
         try {
-            val prefs = reactApplicationContext.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
-            val deviceToken = prefs.getString("DEVICE_TOKEN", null)
-            debugLog(TAG, "getClientToken - deviceToken: ${if (deviceToken != null) "found" else "null"}")
+            // Use the SDK's public API which handles encrypted storage transparently.
+            // Direct SharedPreferences reads break on clerk-android >= 1.0.11 where
+            // DEVICE_TOKEN is encrypted via StorageCipher.
+            val deviceToken = Clerk.getDeviceToken()
             promise.resolve(deviceToken)
         } catch (e: Exception) {
             debugLog(TAG, "getClientToken failed: ${e.message}")
@@ -225,116 +364,177 @@ class ClerkExpoModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    // MARK: - signOut
+    // MARK: - syncClientStateFromJs
 
-    @ReactMethod
-    override fun signOut(promise: Promise) {
+    private fun syncClientStateFromJs(
+        deviceToken: String?,
+        sourceId: String?,
+        didChangeClient: Boolean,
+        didChangeDeviceToken: Boolean,
+        promise: Promise
+    ) {
         if (!Clerk.isInitialized.value) {
-            promise.reject("E_NOT_INITIALIZED", "Clerk SDK is not initialized. Call configure() first.")
+            promise.resolve(null)
             return
         }
 
         coroutineScope.launch {
             try {
-                Clerk.auth.signOut()
+                jsOriginatedClientSyncDepth += 1
+                val previousClientState = clientStateSnapshot()
+
+                if (didChangeDeviceToken && !deviceToken.isNullOrBlank()) {
+                    val currentDeviceToken = try {
+                        Clerk.getDeviceToken()
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    if (currentDeviceToken != deviceToken) {
+                        when (val result = Clerk.updateDeviceToken(deviceToken)) {
+                            is ClerkResult.Failure -> {
+                                promise.reject(
+                                    "E_SYNC_FROM_JS_FAILED",
+                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Device token sync failed",
+                                    null
+                                )
+                                return@launch
+                            }
+                            is ClerkResult.Success -> {
+                                try {
+                                    withTimeout(5_000L) {
+                                        Clerk.clientFlow.first { it != null }
+                                    }
+                                } catch (_: TimeoutCancellationException) {
+                                    debugLog(TAG, "syncClientStateFromJs - client did not appear after token update")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (didChangeClient || didChangeDeviceToken) {
+                    when (val result = Clerk.refreshClient()) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                                null
+                            )
+                        }
+                        is ClerkResult.Success -> {
+                            val newClientState = clientStateSnapshot()
+                            emitSyncedClientChanged(
+                                sourceId,
+                                ClientStateChanges(
+                                    client = newClientState.client != previousClientState.client,
+                                    deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                                ),
+                                newClientState
+                            )
+                            promise.resolve(null)
+                        }
+                    }
+                    return@launch
+                }
+
+                val newClientState = clientStateSnapshot()
+                emitSyncedClientChanged(
+                    sourceId,
+                    ClientStateChanges(
+                        client = newClientState.client != previousClientState.client,
+                        deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                    ),
+                    newClientState
+                )
                 promise.resolve(null)
             } catch (e: Exception) {
-                promise.reject("E_SIGN_OUT_FAILED", e.message ?: "Sign out failed", e)
+                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client state sync failed", e)
+            } finally {
+                jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
             }
         }
     }
 
-    // MARK: - Activity Result Handling
+    // MARK: - Theme Loading
 
-    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            CLERK_AUTH_REQUEST_CODE -> handleAuthResult(resultCode, data)
-            CLERK_PROFILE_REQUEST_CODE -> handleProfileResult(resultCode, data)
+    private fun loadThemeFromAssets(context: Context) {
+        try {
+            val jsonString = context.assets
+                .open("clerk_theme.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val json = JSONObject(jsonString)
+            Clerk.customTheme = parseClerkTheme(json)
+        } catch (e: java.io.FileNotFoundException) {
+            // No theme file provided — use defaults
+        } catch (e: Exception) {
+            debugLog(TAG, "Failed to load clerk_theme.json: ${e.message}")
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        // Not used
+    private fun parseClerkTheme(json: JSONObject): ClerkTheme {
+        val colors = json.optJSONObject("colors")?.let { parseColors(it) }
+        val darkColors = json.optJSONObject("darkColors")?.let { parseColors(it) }
+        val design = json.optJSONObject("design")?.let { parseDesign(it) }
+        return ClerkTheme(
+            colors = colors,
+            darkColors = darkColors,
+            design = design
+        )
     }
 
-    private fun handleAuthResult(resultCode: Int, data: Intent?) {
-        debugLog(TAG, "handleAuthResult - resultCode: $resultCode")
+    private fun parseColors(json: JSONObject): ClerkColors {
+        return ClerkColors(
+            primary = json.optStringColor("primary"),
+            background = json.optStringColor("background"),
+            input = json.optStringColor("input"),
+            danger = json.optStringColor("danger"),
+            success = json.optStringColor("success"),
+            warning = json.optStringColor("warning"),
+            foreground = json.optStringColor("foreground"),
+            mutedForeground = json.optStringColor("mutedForeground"),
+            primaryForeground = json.optStringColor("primaryForeground"),
+            inputForeground = json.optStringColor("inputForeground"),
+            neutral = json.optStringColor("neutral"),
+            border = json.optStringColor("border"),
+            ring = json.optStringColor("ring"),
+            muted = json.optStringColor("muted"),
+            shadow = json.optStringColor("shadow"),
+            secondaryButtonBackground = json.optStringColor("secondaryButtonBackground"),
+            secondaryButtonForeground = json.optStringColor("secondaryButtonForeground")
+        )
+    }
 
-        val promise = pendingAuthPromise ?: return
-        pendingAuthPromise = null
-
-        if (resultCode == Activity.RESULT_OK) {
-            val session = Clerk.session
-            val user = Clerk.user
-
-            debugLog(TAG, "handleAuthResult - hasSession: ${session != null}, hasUser: ${user != null}")
-
-            val result = WritableNativeMap()
-
-            // Top-level sessionId for JS SDK compatibility (matches iOS response format)
-            result.putString("sessionId", session?.id)
-
-            session?.let {
-                val sessionMap = WritableNativeMap()
-                sessionMap.putString("id", it.id)
-                sessionMap.putString("status", it.status.name)
-                sessionMap.putString("userId", it.user?.id)
-                result.putMap("session", sessionMap)
-            }
-
-            user?.let {
-                val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-
-                val userMap = WritableNativeMap()
-                userMap.putString("id", it.id)
-                userMap.putString("firstName", it.firstName)
-                userMap.putString("lastName", it.lastName)
-                userMap.putString("imageUrl", it.imageUrl)
-                userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-                result.putMap("user", userMap)
-            }
-
-            promise.resolve(result)
+    private fun parseDesign(json: JSONObject): ClerkDesign {
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
         } else {
-            debugLog(TAG, "handleAuthResult - user cancelled")
-            val result = WritableNativeMap()
-            result.putBoolean("cancelled", true)
-            promise.resolve(result)
+            ClerkDesign()
         }
     }
 
-    private fun handleProfileResult(resultCode: Int, data: Intent?) {
-        val promise = pendingProfilePromise ?: return
-        pendingProfilePromise = null
-
-        // Profile always returns current session state
-        val session = Clerk.session
-        val user = Clerk.user
-
-        val result = WritableNativeMap()
-
-        session?.let {
-            val sessionMap = WritableNativeMap()
-            sessionMap.putString("id", it.id)
-            sessionMap.putString("status", it.status.name)
-            sessionMap.putString("userId", it.user?.id)
-            result.putMap("session", sessionMap)
+    private fun parseHexColor(hex: String): Color? {
+        val cleaned = hex.removePrefix("#")
+        return try {
+            when (cleaned.length) {
+                6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
+                // Theme JSON uses RRGGBBAA; Android parseColor expects AARRGGBB
+                8 -> {
+                    val rrggbb = cleaned.substring(0, 6)
+                    val aa = cleaned.substring(6, 8)
+                    Color(android.graphics.Color.parseColor("#$aa$rrggbb"))
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
         }
+    }
 
-        user?.let {
-            val primaryEmail = it.emailAddresses?.find { e -> e.id == it.primaryEmailAddressId }
-
-            val userMap = WritableNativeMap()
-            userMap.putString("id", it.id)
-            userMap.putString("firstName", it.firstName)
-            userMap.putString("lastName", it.lastName)
-            userMap.putString("imageUrl", it.imageUrl)
-            userMap.putString("primaryEmailAddress", primaryEmail?.emailAddress)
-            result.putMap("user", userMap)
-        }
-
-        result.putBoolean("dismissed", resultCode == Activity.RESULT_CANCELED)
-
-        promise.resolve(result)
+    private fun JSONObject.optStringColor(key: String): Color? {
+        if (!has(key) || isNull(key)) return null
+        val value = optString(key)
+        return parseHexColor(value)
     }
 }

@@ -7,9 +7,6 @@ out-tsc
 out
 **/dist/*
 **/build/*
-!playground/browser-extension-js/build/manifest.json
-!playground/browser-extension-js/build/popup.html
-!playground/browser-extension-js/build/popup.css
 packages/*/dist/**
 **/.pnpm-store/**
 
@@ -64,17 +61,10 @@ lerna-debug.log
 .next
 .dev.vars
 .env.local
-playground/*/build
-!playground/browser-extension-js/build
-playground/*/public/build
-playground/*/.cache
-playground/custom
 
-# Examples & Playground apps dependency locks
+# Examples apps dependency locks
 packages/*/examples/*/package-lock.json
 packages/*/examples/*/yarn.lock
-playground/*/package-lock.json
-playground/*/yarn.lock
 /test-results/
 /playwright-report/
 /playwright/.cache/
@@ -117,6 +107,9 @@ CLAUDE.local.md
 
 # Claude Code local settings (user-specific permissions)
 .claude/settings.local.json
+
+# Claude Code per-session runtime lock (not shareable)
+.claude/scheduled_tasks.lock
 
 # Git worktrees
 .worktrees

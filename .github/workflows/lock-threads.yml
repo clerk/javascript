@@ -8,7 +8,6 @@ on:
     - cron: '0 0 * * *'
 
 permissions:
-  contents: write # only for delete-branch option
   issues: write
   pull-requests: write
 
@@ -20,7 +19,7 @@ jobs:
     timeout-minutes: 3
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9
         name: Regular stale action
         with:
           days-before-issue-stale: 30
@@ -57,7 +56,7 @@ jobs:
             After 60 days of no activity, we'll close this PR. Keep in mind, I'm just a robot, so if I've closed this PR in error, please reply here and my human colleagues will reopen it.
 
             Thanks for being a part of the Clerk community! 🙏
-      - uses: actions/stale@v9
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9
         name: Stale action for needs-reproduction issues
         with:
           days-before-issue-stale: 7
@@ -74,7 +73,7 @@ jobs:
             Thanks for being a part of the Clerk community! 🙏
           close-issue-message: |
             After 8 days without a reproduction being supplied, we are closing this issue. Keep in mind, I'm just a robot, so if I've closed this issue in error, please reply here and my human colleagues will reopen it. Likewise if a reproduction is prepared after it has been closed.
-      - uses: dessant/lock-threads@v4
+      - uses: dessant/lock-threads@be8aa5be94131386884a6da4189effda9b14aa21 # v4
         with:
           issue-inactive-days: '365'
           issue-comment: 'This issue has been automatically locked since there has not been any recent activity after it was closed. Please open a new issue for related bugs.'

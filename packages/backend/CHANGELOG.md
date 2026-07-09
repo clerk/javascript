@@ -1,5 +1,464 @@
 # Change Log
 
+## 3.11.2
+
+### Patch Changes
+
+- Improve satellite-domain redirect loop diagnostics. ([#8636](https://github.com/clerk/javascript/pull/8636)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+
+## 3.11.1
+
+### Patch Changes
+
+- Enforce the `azp` (authorized party) claim when `authorizedParties` is configured. Previously, a session token that was missing the `azp` claim was accepted even when `authorizedParties` was set, allowing the authorized-parties check to be bypassed by omitting the claim. Now, when `authorizedParties` is configured, a token with a missing or empty `azp` claim is rejected. Tokens without `azp` continue to be accepted when no `authorizedParties` are configured. ([#8877](https://github.com/clerk/javascript/pull/8877)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+
+## 3.11.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+
+## 3.10.0
+
+### Minor Changes
+
+- Add an experimental `clerkClient.emails.create()` method for sending transactional emails. It accepts address- or user-based recipients, supports optional `replyTo`, `subject`, and HTML and/or text content, and returns the created `Email` resource. ([#9010](https://github.com/clerk/javascript/pull/9010)) by [@cbnsndwch](https://github.com/cbnsndwch)
+
+  This method is marked `@experimental` and may change in a future release.
+
+## 3.9.0
+
+### Minor Changes
+
+- Add `clerkClient.oauthApplications.revokeToken()` for revoking opaque OAuth application access and refresh tokens. ([#9040](https://github.com/clerk/javascript/pull/9040)) by [@jfoshee](https://github.com/jfoshee)
+
+### Patch Changes
+
+- `organizations.deleteOrganization()` now validates that an organization ID was provided. Calling it with an empty ID throws `A valid resource ID is required.` locally instead of issuing a `DELETE` request to the organizations collection endpoint, matching the other ID-based methods on the API. ([#9036](https://github.com/clerk/javascript/pull/9036)) by [@jacekradko](https://github.com/jacekradko)
+
+- M2M JWT verification now validates the token-category (`cat`) header and rejects M2M JWTs tagged as a different token class. M2M JWTs minted by Clerk carry the correct category and are unaffected; M2M JWTs without the header continue to verify. ([#9038](https://github.com/clerk/javascript/pull/9038)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
+## 3.8.5
+
+### Patch Changes
+
+- Add an optional `externalAccountId` to the backend `ExternalAccount` resource. For Google and Facebook accounts the resource `id` is the `idn_`-prefixed identification id, which `users.deleteUserExternalAccount()` rejects; `externalAccountId` now exposes the `eac_`-prefixed id those calls expect. For all other providers `id` is already the `eac_` id and `externalAccountId` is `undefined`, so use `externalAccountId ?? id` to get an id you can delete with. ([#8995](https://github.com/clerk/javascript/pull/8995)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+
+## 3.8.4
+
+### Patch Changes
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+
+## 3.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`c38d853`](https://github.com/clerk/javascript/commit/c38d8534b916936acbe4131fac58c8743e684eab), [`7e3174a`](https://github.com/clerk/javascript/commit/7e3174a4f861ad89667c3d0c63b6f2d0c001bcb6), [`97039bb`](https://github.com/clerk/javascript/commit/97039bb871a33ccc2c9e46f011e4cbbc1459fb1e), [`f43071d`](https://github.com/clerk/javascript/commit/f43071d8d98194c22e34d1d72ed8d0cf0b6b0f0e), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0039618`](https://github.com/clerk/javascript/commit/003961810786af49daba5a3e82e34378d52b885c), [`a536a0d`](https://github.com/clerk/javascript/commit/a536a0d5b31a5fcba31813ed34f9494a4ec4851b)]:
+  - @clerk/shared@4.21.0
+
+## 3.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/shared@4.20.0
+
+## 3.8.1
+
+### Patch Changes
+
+- Updated dependencies [[`c84f8df`](https://github.com/clerk/javascript/commit/c84f8df4222c212ecce6ae5ff8c47958b5b5d972), [`53e7b11`](https://github.com/clerk/javascript/commit/53e7b11058096d5ce15da53af12fe7236e88db2c), [`e51e22a`](https://github.com/clerk/javascript/commit/e51e22a2aec03293e8ccf5a5372cd9906aeccbb7)]:
+  - @clerk/shared@4.19.1
+
+## 3.8.0
+
+### Minor Changes
+
+- Add support for the `preferredSignInStrategyWhenPasswordRequired` parameter to `clerkClient.instance.update()`. Accepts `'password'` or `'otp'` to override the preferred sign-in strategy when a password is required, or an empty string to clear the override. ([#8878](https://github.com/clerk/javascript/pull/8878)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`d5968d0`](https://github.com/clerk/javascript/commit/d5968d026d6b2a1b399b6967fd8727613a5bc3cd), [`ffbc650`](https://github.com/clerk/javascript/commit/ffbc650ebbcee48171c95aa5d2b497273b0276b0)]:
+  - @clerk/shared@4.19.0
+
+## 3.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`f4167ec`](https://github.com/clerk/javascript/commit/f4167eccb19e0de98340d48e221b950e3dad189e), [`17e4164`](https://github.com/clerk/javascript/commit/17e416471a5409e5a4c02f4f94f687c428c071de), [`ed2cf75`](https://github.com/clerk/javascript/commit/ed2cf75ce713703d8e2c258fc3ca0cf43dc964dc), [`67c04a4`](https://github.com/clerk/javascript/commit/67c04a43db64b70819d68333f99e3483523d1d47), [`51c8fdc`](https://github.com/clerk/javascript/commit/51c8fdcb7160457e44cfe7cc86524f7d728a030a), [`c2ba971`](https://github.com/clerk/javascript/commit/c2ba971aad55df570507b7b117786ab048415ad3), [`8744728`](https://github.com/clerk/javascript/commit/8744728e6610b2229f56dd3b31975c3f57395f02), [`d9b5c7d`](https://github.com/clerk/javascript/commit/d9b5c7d79fe641d08f45f0df7d4f5146b6b2c3ab)]:
+  - @clerk/shared@4.18.0
+
+## 3.7.0
+
+### Minor Changes
+
+- Add `clerkClient.organizations.replaceOrganizationMetadata(organizationId, params)` for replacing an organization's metadata fields in full. ([#8787](https://github.com/clerk/javascript/pull/8787)) by [@brunol95](https://github.com/brunol95)
+
+  Use `replaceOrganizationMetadata` when the provided metadata should become the complete value for that metadata field:
+
+  ```ts
+  await clerkClient.organizations.replaceOrganizationMetadata(organizationId, {
+    publicMetadata: { plan: 'pro' },
+  });
+  ```
+
+  Use `clerkClient.organizations.updateOrganizationMetadata(organizationId, params)` when you want to partially update metadata with deep-merge semantics:
+
+  ```ts
+  await clerkClient.organizations.updateOrganizationMetadata(organizationId, {
+    publicMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  The `publicMetadata` and `privateMetadata` parameters on `clerkClient.organizations.updateOrganization()` are now deprecated. They continue to work, but new code should use `updateOrganizationMetadata()` for partial updates or `replaceOrganizationMetadata()` for full replacement.
+
+- Add `clerkClient.users.replaceUserMetadata(userId, params)` for replacing a user's metadata fields in full. ([#8587](https://github.com/clerk/javascript/pull/8587)) by [@brunol95](https://github.com/brunol95)
+
+  Use `replaceUserMetadata` when the provided metadata should become the complete value for that metadata field:
+
+  ```ts
+  await clerkClient.users.replaceUserMetadata(userId, {
+    publicMetadata: { plan: 'pro' },
+  });
+  ```
+
+  Use `clerkClient.users.updateUserMetadata(userId, params)` when you want to partially update metadata with deep-merge semantics:
+
+  ```ts
+  await clerkClient.users.updateUserMetadata(userId, {
+    publicMetadata: { onboardingComplete: true },
+  });
+  ```
+
+  The `publicMetadata`, `privateMetadata`, and `unsafeMetadata` parameters on `clerkClient.users.updateUser()` are now deprecated. They continue to work, but new code should use `updateUserMetadata()` for partial updates or `replaceUserMetadata()` for full replacement.
+
+### Patch Changes
+
+- Migrate the build pipeline to tsdown and TypeScript 6.0. This is an internal tooling change with no intended changes to the public API or runtime behavior. ([#8177](https://github.com/clerk/javascript/pull/8177)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`f046c49`](https://github.com/clerk/javascript/commit/f046c491d99c880b61e335645ad3ced4fee602d8), [`b5fa9f6`](https://github.com/clerk/javascript/commit/b5fa9f6ab2f01f1bbf6de52e16b4c9d9516f966c), [`3d5b2fe`](https://github.com/clerk/javascript/commit/3d5b2fe959171770bb7e8493d8a204317b7101a7)]:
+  - @clerk/shared@4.17.1
+
+## 3.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`a5c7bc7`](https://github.com/clerk/javascript/commit/a5c7bc74dabfa78d4748516ccc252f68cae82264)]:
+  - @clerk/shared@4.17.0
+
+## 3.6.0
+
+### Minor Changes
+
+- Add Backend API support for managing instance-level organization RBAC. `createClerkClient()` now exposes: ([#8774](https://github.com/clerk/javascript/pull/8774)) by [@dmoerner](https://github.com/dmoerner)
+  - `organizationPermissions` — list, get, create, update, and delete organization permissions.
+  - `organizationRoles` — list, get, create, update, and delete organization roles, plus assign/remove a permission to/from a role.
+  - `roleSets` — list, get, create, update, add roles to, replace a role in, and replace a role set.
+
+### Patch Changes
+
+- Fix the return type of `clerkClient.organizations.createOrganizationInvitationBulk()` to `PaginatedResourceResponse<OrganizationInvitation[]>`. The Backend API returns the bulk-created invitations in a `{ data, totalCount }` envelope (the same shape as `getOrganizationInvitationList()`), but the method was typed as `OrganizationInvitation[]`, which did not match the value returned at runtime. ([#8751](https://github.com/clerk/javascript/pull/8751)) by [@VihAMBR](https://github.com/VihAMBR)
+
+- Return `IdPOAuthAccessToken` timestamps in milliseconds when an OAuth access token is verified as a JWT. The `expiration`, `createdAt`, and `updatedAt` fields were previously populated with the JWT's raw second-based `exp`/`iat` values, making them inconsistent with the same fields on `M2MToken` and with the values returned when the token is fetched from the API. Comparing `expiration` against `Date.now()` now behaves as expected. The `expired` flag was already computed correctly and is unaffected. ([#8771](https://github.com/clerk/javascript/pull/8771)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent an unhandled exception when verifying a machine token whose JWT payload has a missing or non-string `sub`. Such tokens are now classified and rejected with a typed verification error instead of throwing, so a crafted `Authorization` header can no longer surface as an unhandled error during request authentication. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Redact raw bearer credentials from the `auth` object's debug output. The debug payload (surfaced when an SDK enables middleware debug logging) previously included full session, machine, refresh, dev-browser and handshake tokens; each now exposes only a short, non-reconstructable prefix, matching how `secretKey` and `jwtKey` are already handled. ([#8744](https://github.com/clerk/javascript/pull/8744)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add and improve JSDoc comments across public types and methods to support generated reference documentation for the `/objects` docs section. Exports a few previously-internal types (`OnEventListener`, `OffEventListener`, `ClerkOptionsNavigation`) so they can be referenced from the generated docs. ([#8276](https://github.com/clerk/javascript/pull/8276)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`2d6670c`](https://github.com/clerk/javascript/commit/2d6670c6c05c59901709283921b5d65c43f3a676), [`af706e3`](https://github.com/clerk/javascript/commit/af706e35420a16c028fd34b70dd50d663d42e006), [`032632c`](https://github.com/clerk/javascript/commit/032632c6982297e53e28559b59b4a435de4c9adc), [`0fece6f`](https://github.com/clerk/javascript/commit/0fece6ff5d2b1babb59a285dbce9d46723e33d73), [`b295af3`](https://github.com/clerk/javascript/commit/b295af3d5bb12e09a502cae4a935d2e7f5d35d5c), [`8e1bd48`](https://github.com/clerk/javascript/commit/8e1bd48a91dc07751493f41416d2a68b89e114cc)]:
+  - @clerk/shared@4.16.0
+
+## 3.5.0
+
+### Minor Changes
+
+- Add support for new Backend API user endpoints: ([#8694](https://github.com/clerk/javascript/pull/8694)) by [@dmoerner](https://github.com/dmoerner)
+  - `users.replaceUserEmailAddress(userId, { emailAddress })` replaces all of a user's email addresses with a single verified, primary email address (`PUT /users/{user_id}/email_address`).
+  - `users.replaceUserPhoneNumber(userId, { phoneNumber })` replaces all of a user's phone numbers with a single verified, primary phone number (`PUT /users/{user_id}/phone_number`).
+  - `users.createUser` now accepts `banned` and `locked` parameters to create a user that is already banned or locked.
+
+### Patch Changes
+
+- Emit the "session token from cookie is missing the `azp` claim" warning once per process instead of on every authenticated request. An `azp`-less cookie token is reused across requests, so the previous unguarded `console.warn` could flood production logs. ([#8698](https://github.com/clerk/javascript/pull/8698)) by [@jacekradko](https://github.com/jacekradko)
+
+- Stop `authenticateRequest` from consuming the incoming request body, which previously left downstream handlers unable to read it (for example a Hono POST route calling `c.req.json()`). ([#8708](https://github.com/clerk/javascript/pull/8708)) by [@jacekradko](https://github.com/jacekradko)
+
+- Prevent keyless mode from activating in CI and other automated environments in framework SDKs. ([#8676](https://github.com/clerk/javascript/pull/8676)) by [@mwickett](https://github.com/mwickett)
+
+- Preserve custom claims when verifying JWT-format M2M tokens. `M2MToken.fromJwtPayload` previously hardcoded `claims` to `null`, so `client.m2m.verify()` (and request-level `auth()`) dropped any custom claims embedded in the token. Custom claims are now reconstructed from the verified payload by stripping only the structural claims the backend adds when minting the token (`iss`, `sub`, `exp`, `nbf`, `iat`, `jti`). User-supplied claims such as `aud` are preserved. Tokens without custom claims still return `claims: null`, consistent with the opaque-token path. ([#8697](https://github.com/clerk/javascript/pull/8697)) by [@jacekradko](https://github.com/jacekradko)
+
+- Strip `private_metadata` from the backend resource `_raw` payload in `stripPrivateDataFromObject`, preventing it from leaking into `__clerk_ssr_state` when a `User`/`Organization` resource is passed to `buildClerkProps`. ([#8702](https://github.com/clerk/javascript/pull/8702)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`afb75e6`](https://github.com/clerk/javascript/commit/afb75e68efa561ff18f6ae5359df1cf336e861a5), [`c3df67a`](https://github.com/clerk/javascript/commit/c3df67a231adff73fa36563718d9b94e6bb2a540), [`86fd38f`](https://github.com/clerk/javascript/commit/86fd38f4e39ab89b6a9fbb7515a5d9b7b37aa3ab), [`8d6bb56`](https://github.com/clerk/javascript/commit/8d6bb56de25692e0f9c350f16c8f45fbedaad2ac), [`43dfefa`](https://github.com/clerk/javascript/commit/43dfefaabf0bad1a6d92b75b1cb6de1860ea87e4), [`5fc7b21`](https://github.com/clerk/javascript/commit/5fc7b21573cab36b9184dd6277396f7c38b91e1f), [`c2ba134`](https://github.com/clerk/javascript/commit/c2ba1344db5fd50f1d4e04d01d0455f0181c8d96)]:
+  - @clerk/shared@4.15.0
+
+## 3.4.14
+
+### Patch Changes
+
+- Updated dependencies [[`79cdd1f`](https://github.com/clerk/javascript/commit/79cdd1f9c9d8aa5d9a98d8d245b5f7f98c0cabb4), [`4d5027b`](https://github.com/clerk/javascript/commit/4d5027b15873dc6637e49f51142be64ef5f8e9bf), [`4e08924`](https://github.com/clerk/javascript/commit/4e089248a3dfdf99fc110c06b699a084d4e8a7ee), [`bcf0e77`](https://github.com/clerk/javascript/commit/bcf0e776231c6ec675d3a3a8bfd122513d3c57ef)]:
+  - @clerk/shared@4.14.0
+
+## 3.4.13
+
+### Patch Changes
+
+- Updated dependencies [[`a036ce8`](https://github.com/clerk/javascript/commit/a036ce8fef3b3ee2b49fd05d592b083ffc37f463)]:
+  - @clerk/shared@4.13.1
+
+## 3.4.12
+
+### Patch Changes
+
+- Updated dependencies [[`6eaf4d6`](https://github.com/clerk/javascript/commit/6eaf4d66fe0b21fb96a5cd19d61e6c3b2302ff97), [`1aab31e`](https://github.com/clerk/javascript/commit/1aab31e5070b7223402ff71f65a0d829bbc29cfd)]:
+  - @clerk/shared@4.13.0
+
+## 3.4.11
+
+### Patch Changes
+
+- Adds `agentTaskId` and deprecates `taskId` to Agent Tasks Create response. ([#8013](https://github.com/clerk/javascript/pull/8013)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`95f6c2f`](https://github.com/clerk/javascript/commit/95f6c2f8b7154b11dc64c864dcd994baab637c70)]:
+  - @clerk/shared@4.12.2
+
+## 3.4.10
+
+### Patch Changes
+
+- Updated dependencies [[`4fc38a0`](https://github.com/clerk/javascript/commit/4fc38a097cb9ed1d37c9c3faa274e5c44e405c68)]:
+  - @clerk/shared@4.12.1
+
+## 3.4.9
+
+### Patch Changes
+
+- Updated dependencies [[`9fa6642`](https://github.com/clerk/javascript/commit/9fa6642de6a734faf532ca70c411431c5d0d2bbb), [`930047f`](https://github.com/clerk/javascript/commit/930047f3ea9b603a7f254f7764c3dc5e0fa7c769), [`b45777c`](https://github.com/clerk/javascript/commit/b45777c5723b01b8c7ee3d37b712c639067b36ab), [`5a7225e`](https://github.com/clerk/javascript/commit/5a7225ef119edf551e20bdce8af465b42981c8f2)]:
+  - @clerk/shared@4.12.0
+
+## 3.4.8
+
+### Patch Changes
+
+- Fix JWT array audience validation ([#8470](https://github.com/clerk/javascript/pull/8470)) by [@jescalan](https://github.com/jescalan)
+
+- Require configured JWT header type. ([#8471](https://github.com/clerk/javascript/pull/8471)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`1a4d7d1`](https://github.com/clerk/javascript/commit/1a4d7d1c711c25f4f83c0773616b799df2feb010), [`a6916b1`](https://github.com/clerk/javascript/commit/a6916b15658625a0e627c474a62212a65868bfb6), [`1084180`](https://github.com/clerk/javascript/commit/1084180797722ff113df8404a3c967bc6abeb12d), [`39099b6`](https://github.com/clerk/javascript/commit/39099b62308fc9b0ebbb25988c0ae4b655efe744), [`18e0a1a`](https://github.com/clerk/javascript/commit/18e0a1aa48e7f65a6610ec3c6ffe105deb3474b2)]:
+  - @clerk/shared@4.11.0
+
+## 3.4.7
+
+### Patch Changes
+
+- Support `min_remaining_ttl_seconds` for M2M token creation. ([#8513](https://github.com/clerk/javascript/pull/8513)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.m2m.createToken({
+    machineSecretKey: 'ak_xxxxx',
+    minRemainingTtlSeconds: 240,
+  });
+  ```
+
+- Add `RoleSetJSON`, `RoleSetItemJSON`, and `RoleSetMigrationJSON` types matching the BAPI OpenAPI schema. Add `role_set_key`, `last_active_at`, and `missing_member_with_elevated_permissions` to `OrganizationJSON`. ([#8502](https://github.com/clerk/javascript/pull/8502)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`5cda3ee`](https://github.com/clerk/javascript/commit/5cda3ee8451cc9af375895824d24a5c3ed7fbee6)]:
+  - @clerk/shared@4.10.2
+
+## 3.4.6
+
+### Patch Changes
+
+- Fix OAuth consent component and hook related types. ([#8483](https://github.com/clerk/javascript/pull/8483)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`7a5892f`](https://github.com/clerk/javascript/commit/7a5892f9bcaa1a6212e6e6d3741160929ffd027e)]:
+  - @clerk/shared@4.10.1
+
+## 3.4.5
+
+### Patch Changes
+
+- Updated dependencies [[`9e9230c`](https://github.com/clerk/javascript/commit/9e9230c8c3cbdb1c253ca7cdd24cc8d681b5ee5a), [`68d32df`](https://github.com/clerk/javascript/commit/68d32dfcc453080ef93edf69be8de765a342d88c), [`1c27d4d`](https://github.com/clerk/javascript/commit/1c27d4dd41a27cf41c3823306fe88e026fed08fb), [`1001193`](https://github.com/clerk/javascript/commit/10011936981fc22bf7d3750f1591f0873ea78bcb)]:
+  - @clerk/shared@4.10.0
+
+## 3.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`785f057`](https://github.com/clerk/javascript/commit/785f057f5cda202c26a9f34bde7c1873a6cbd6ea), [`90beaeb`](https://github.com/clerk/javascript/commit/90beaeb8319d5bccb8fa52343f4b241c6d2d3ebe), [`244920d`](https://github.com/clerk/javascript/commit/244920d1ebb5d420a96bfc2a79d84cccafe9b61c)]:
+  - @clerk/shared@4.9.0
+
+## 3.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`1bfd8ab`](https://github.com/clerk/javascript/commit/1bfd8ab89c62e428038b8c565f118c582ed395ea)]:
+  - @clerk/shared@4.8.7
+
+## 3.4.2
+
+### Patch Changes
+
+- Auto-proxy FAPI requests for `.vercel.app` subdomains. When deployed to a `.vercel.app` domain without explicit proxy or domain configuration, the SDK automatically routes Frontend API requests through `/__clerk` on the app's own origin. This enables Clerk production mode on Vercel deployments without manual proxy setup. ([#8035](https://github.com/clerk/javascript/pull/8035)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `Request` cloning and outbound `fetch` to omit cross-realm `AbortSignal`. Node 24's bundled undici tightened the `instanceof AbortSignal` check on `RequestInit.signal`, which broke: ([#8351](https://github.com/clerk/javascript/pull/8351)) by [@jacekradko](https://github.com/jacekradko)
+  - Cloning framework-specific requests such as `NextRequest` in `@clerk/backend`'s `ClerkRequest`.
+  - Subclassed `Request`s passed through `patchRequest` in `@clerk/react-router` and `@clerk/tanstack-react-start`.
+  - Frontend API proxying in `@clerk/backend`'s `clerkFrontendApiProxy`, which forwarded the inbound request's signal to the upstream `fetch`. Abort propagation will be restored in a follow-up via an in-realm `AbortController` bridge.
+
+- Updated dependencies [[`9b57986`](https://github.com/clerk/javascript/commit/9b5798696eb0c6cc6ab548ade100b504f691895c), [`a9f9b29`](https://github.com/clerk/javascript/commit/a9f9b2971a026d04571ceb1865ec8dafedbbe863)]:
+  - @clerk/shared@4.8.6
+
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`da76490`](https://github.com/clerk/javascript/commit/da7649075e24351737271318e81842b5c298dee1)]:
+  - @clerk/shared@4.8.5
+
+## 3.4.0
+
+### Minor Changes
+
+- Add backend query to GET organization settings for an instance. ([#8367](https://github.com/clerk/javascript/pull/8367)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Updated dependencies [[`083c4c5`](https://github.com/clerk/javascript/commit/083c4c50a2d2e1cedc8ffb85d8ba749170ea4f90), [`dcaf694`](https://github.com/clerk/javascript/commit/dcaf694fbc7fd1b80fd10661225aa6d61eb3c2a9)]:
+  - @clerk/shared@4.8.4
+
+## 3.3.0
+
+### Minor Changes
+
+- Add `createBootstrapSignedOutState` helper to `@clerk/backend/internal`. Returns a synthetic `UnauthenticatedState<'session_token'>` without requiring a publishable key or an `AuthenticateContext`. Intended for framework integrations that need to run authorization logic before real Clerk keys are available (e.g. the Next.js keyless bootstrap window). Accepts optional `signInUrl`, `signUpUrl`, `isSatellite`, `domain`, and `proxyUrl` so that `createRedirect`-driven flows (including cross-origin satellite sign-in with the `__clerk_status=needs-sync` handshake marker) behave correctly during bootstrap. ([#8368](https://github.com/clerk/javascript/pull/8368)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.14
+
+### Patch Changes
+
+- A clock skew of 0 will not fall back to the default value anymore. ([#8359](https://github.com/clerk/javascript/pull/8359)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`d52b311`](https://github.com/clerk/javascript/commit/d52b311f16453e834df5c81594a1bfead30c935f)]:
+  - @clerk/shared@4.8.3
+
+## 3.2.13
+
+### Patch Changes
+
+- Add path traversal protections in `joinPaths` ([#8331](https://github.com/clerk/javascript/pull/8331)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.2.12
+
+### Patch Changes
+
+- Introduce `samlConnection` and `oauthConfig` into the `EnterpriseConnection` resource. ([#8326](https://github.com/clerk/javascript/pull/8326)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The JWT claims are verified after the signature to avoid leaking information through error messages on forged tokens. ([#8332](https://github.com/clerk/javascript/pull/8332)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`c7b0f47`](https://github.com/clerk/javascript/commit/c7b0f4789c47d4d7eeed767a06d3b257a24a50dd), [`34762e8`](https://github.com/clerk/javascript/commit/34762e8f2772034e6abb5f4f4daec902f74b30b6)]:
+  - @clerk/shared@4.8.2
+
+## 3.2.11
+
+### Patch Changes
+
+- Updated dependencies [[`b0b6675`](https://github.com/clerk/javascript/commit/b0b6675bad09eb3dd5b711ad5b45539162664c7a)]:
+  - @clerk/shared@4.8.1
+
+## 3.2.10
+
+### Patch Changes
+
+- Updated dependencies [[`dc2de16`](https://github.com/clerk/javascript/commit/dc2de16480086f376449d452d31ae0d2a319af17)]:
+  - @clerk/shared@4.8.0
+
+## 3.2.9
+
+### Patch Changes
+
+- Updated dependencies [[`3fd586d`](https://github.com/clerk/javascript/commit/3fd586d171e9c281c4b96f620ee9070b47ba00f4), [`f9ff9e9`](https://github.com/clerk/javascript/commit/f9ff9e937d70713abf96fdd92071cd6e84b8eb80)]:
+  - @clerk/shared@4.7.0
+
+## 3.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`fdac10e`](https://github.com/clerk/javascript/commit/fdac10e96ad60c0176cde4e1e3ddc89e40cd0a15), [`4e3cb0a`](https://github.com/clerk/javascript/commit/4e3cb0abed1f8aa1cba032c15da3a94a49162b0c), [`aa32bbc`](https://github.com/clerk/javascript/commit/aa32bbc94e76ea726056810885208c59269b2d2b)]:
+  - @clerk/shared@4.6.0
+
+## 3.2.7
+
+### Patch Changes
+
+- Fix POST requests with `sec-fetch-dest: document` incorrectly triggering handshake redirects, resulting in 405 errors from FAPI. Non-GET requests (e.g. native form submissions) are now excluded from handshake and multi-domain sync eligibility. ([#8045](https://github.com/clerk/javascript/pull/8045)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.2.6
+
+### Patch Changes
+
+- Export `OrganizationInvitationAcceptedWebhookEvent` type. ([#8235](https://github.com/clerk/javascript/pull/8235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`2c06a5f`](https://github.com/clerk/javascript/commit/2c06a5f1859ce4f1f64111f7c0a61f0093002667)]:
+  - @clerk/shared@4.5.0
+
+## 3.2.5
+
+### Patch Changes
+
+- Export `ClerkAPIResponseError` and `ClerkRuntimeError` classes from error subpaths for consistency with the already-exported type guards. ([#8228](https://github.com/clerk/javascript/pull/8228)) by [@jacekradko](https://github.com/jacekradko)
+
+- feat: add `orderBy` argument to `getInvitationList` to control sorting (supports leading '+' for ascending and '-' for descending) ([#7137](https://github.com/clerk/javascript/pull/7137)) by [@mario-jerkovic](https://github.com/mario-jerkovic)
+
+- Updated dependencies [[`b289566`](https://github.com/clerk/javascript/commit/b28956617555c21f703a40f8f14fb2ff23d509ae), [`636b496`](https://github.com/clerk/javascript/commit/636b496e42d4afff28187966acf1777be880a5c9), [`aa63796`](https://github.com/clerk/javascript/commit/aa63796b67aa862b100cc04f62d944c19cf03ce9)]:
+  - @clerk/shared@4.4.1
+
+## 3.2.4
+
+### Patch Changes
+
+- Fix frontend API proxy following redirects server-side instead of passing them to the browser. The proxy's `fetch()` call now uses `redirect: 'manual'` so that 3xx responses from FAPI (e.g. after OAuth callbacks) are returned to the client as-is, matching standard HTTP proxy behavior. ([#8186](https://github.com/clerk/javascript/pull/8186)) by [@brkalow](https://github.com/brkalow)
+
+- Improve the built-in Clerk Frontend API proxy, adding support for abort signals and addressing a number of small edge cases. ([#8163](https://github.com/clerk/javascript/pull/8163)) by [@brkalow](https://github.com/brkalow)
+
+- Add EnterpriseAccount and EnterpriseAccountConnection classes to @clerk/backend, restoring enterprise SSO account data on the User object that was lost when samlAccounts was removed in v3. ([#8181](https://github.com/clerk/javascript/pull/8181)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`9a00a1c`](https://github.com/clerk/javascript/commit/9a00a1cc9753a49ea96e520a8e4918075f3efff4), [`00715a6`](https://github.com/clerk/javascript/commit/00715a6d9ea8cf412c989e870a3eff03973fa505), [`b8c73d3`](https://github.com/clerk/javascript/commit/b8c73d34ee30616e63b6320e7a8724630670eeb3), [`1827b50`](https://github.com/clerk/javascript/commit/1827b50a6ef9ab14c48cddc120796a9bf3c965b6), [`7707a31`](https://github.com/clerk/javascript/commit/7707a31eb1977d0c5f2bb72f7ad0768606a55d16)]:
+  - @clerk/shared@4.4.0
+
+## 3.2.3
+
+### Patch Changes
+
+- Fix `ERR_CONTENT_DECODING_FAILED` when loading proxied assets by requesting uncompressed responses from FAPI and stripping `Content-Encoding`/`Content-Length` headers that `fetch()` invalidates through auto-decompression. ([#8159](https://github.com/clerk/javascript/pull/8159)) by [@brkalow](https://github.com/brkalow)
+
+- Fix `satelliteAutoSync` to default to `false` as documented. Previously, not passing the prop resulted in `undefined`, which was treated as `true` due to a strict equality check (`=== false`). This preserved Core 2 auto-sync behavior instead of the intended Core 3 default. The check is now `!== true`, so both `undefined` and `false` skip automatic satellite sync. ([#8001](https://github.com/clerk/javascript/pull/8001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix an issue where multiple `set-cookie` headers were being dropped by the frontend API proxy. ([#8162](https://github.com/clerk/javascript/pull/8162)) by [@brkalow](https://github.com/brkalow)
+
 ## 3.2.2
 
 ### Patch Changes
@@ -3694,7 +4153,7 @@
 - b3a3dcdf4: Add OrganizationRoleAPI for CRUD operations regarding instance level organization roles.
 - 935b0886e: The `emails` endpoint helper and the corresponding `createEmail` method have been removed from the `@clerk/backend` SDK and `apiClint.emails.createEmail` will no longer be available.
 
-  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/support) so we can assist you.
+  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/contact/support) so we can assist you.
 
 - 93d05c868: Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI.
 - 4aaf5103d: Remove createSms functions from @clerk/backend and @clerk/sdk-node.
@@ -4123,7 +4582,7 @@
 
 - The `emails` endpoint helper and the corresponding `createEmail` method have been removed from the `@clerk/backend` SDK and `apiClint.emails.createEmail` will no longer be available. ([#2548](https://github.com/clerk/javascript/pull/2548)) by [@Nikpolik](https://github.com/Nikpolik)
 
-  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/support) so we can assist you.
+  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/contact/support) so we can assist you.
 
 - Update README for v5 ([#2577](https://github.com/clerk/javascript/pull/2577)) by [@LekoArts](https://github.com/LekoArts)
 

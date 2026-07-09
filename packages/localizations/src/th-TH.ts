@@ -51,10 +51,15 @@ export const thTH: LocalizationResource = {
       formButtonPrimary__revoke: 'เพิกถอนคีย์',
       formHint: 'คุณแน่ใจหรือไม่ว่าต้องการลบคีย์ลับนี้?',
       formTitle: 'เพิกถอนคีย์ลับ "{{apiKeyName}}"?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'ย้อนกลับ',
   badge__activePlan: 'ใช้งานอยู่',
+  badge__banned: undefined,
   badge__canceledEndsAt: "ถูกยกเลิก • สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__currentPlan: 'แผนปัจจุบัน',
   badge__default: 'ค่าเริ่มต้น',
@@ -75,11 +80,14 @@ export const thTH: LocalizationResource = {
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'เพิ่มวิธีชำระเงิน',
     alwaysFree: 'ฟรีตลอดไป',
     annually: 'รายปี',
     availableFeatures: 'ฟีเจอร์ที่มี',
     billedAnnually: 'เรียกเก็บรายปี',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'เรียกเก็บรายเดือนเท่านั้น',
     cancelFreeTrial: 'ยกเลิกทดลองใช้ฟรี',
     cancelFreeTrialAccessUntil:
@@ -116,20 +124,25 @@ export const thTH: LocalizationResource = {
       title__subscriptionSuccessful: 'สำเร็จ!',
       title__trialSuccess: 'เริ่มทดลองใช้สำเร็จ!',
       totalDueAfterTrial: 'ยอดรวมที่ต้องชำระหลังจากทดลองใช้สิ้นสุดใน {{days}} วัน',
+      totalDuePerPeriod: undefined,
     },
     credit: 'เครดิต',
     creditRemainder: 'เครดิตสำหรับส่วนที่เหลือของการสมัครสมาชิกปัจจุบันของคุณ',
     defaultFreePlanActive: 'คุณกำลังใช้แผนฟรีอยู่',
     free: 'ฟรี',
     getStarted: 'เริ่มต้นใช้งาน',
+    highlightedPlanBadge: 'ยอดนิยม',
     keepFreeTrial: 'ใช้ทดลองใช้ฟรีต่อ',
     keepSubscription: 'ใช้การสมัครสมาชิกต่อ',
     manage: 'จัดการ',
     manageSubscription: 'จัดการการสมัครสมาชิก',
     month: 'เดือน',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'รายเดือน',
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'ชำระรายปี',
@@ -145,12 +158,32 @@ export const thTH: LocalizationResource = {
       },
     },
     paymentMethods__label: 'วิธีการชำระเงิน',
-    popular: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
       included: 'รวมอยู่',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'สมัครใหม่',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'ดูฟีเจอร์ทั้งหมด',
     startFreeTrial: 'เริ่มทดลองใช้ฟรี',
     startFreeTrial__days: 'เริ่มทดลองใช้ฟรี {{days}} วัน',
@@ -171,16 +204,559 @@ export const thTH: LocalizationResource = {
       trialStartedOn: 'เริ่มทดลองใช้เมื่อ',
     },
     subtotal: 'ยอดรวมย่อย',
+    subtotalRenewal: undefined,
     switchPlan: 'เปลี่ยนไปใช้แผนนี้',
     switchToAnnual: 'เปลี่ยนเป็นรายปี',
-    switchToAnnualWithAnnualPrice: 'เปลี่ยนเป็นรายปี {{currency}}{{price}} / ปี',
+    switchToAnnualWithAnnualPrice: 'เปลี่ยนเป็นรายปี {{price}} / ปี',
     switchToMonthly: 'เปลี่ยนเป็นรายเดือน',
-    switchToMonthlyWithPrice: 'เปลี่ยนเป็นรายเดือน {{currency}}{{price}} / เดือน',
+    switchToMonthlyWithPrice: 'เปลี่ยนเป็นรายเดือน {{price}} / เดือน',
     totalDue: 'ยอดรวมที่ต้องชำระ',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'ยอดรวมที่ต้องชำระวันนี้',
     viewFeatures: 'ดูฟีเจอร์',
     viewPayment: 'ดูการชำระเงิน',
     year: 'ปี',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
+  },
+  configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่ออัปเกรดสิทธิ์ของคุณ',
+      title: 'คุณไม่มีสิทธิ์จัดการการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+    navbar: {
+      title: 'กำหนดค่าการลงชื่อเข้าใช้แบบครั้งเดียว (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: 'ยังไม่ได้ยืนยัน',
+        badge__verified: 'ยืนยันแล้ว',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'โฮสต์ / ชื่อ',
+          instructions: 'เพิ่มระเบียน TXT นี้ไปยังผู้ให้บริการ DNS ของคุณ เราจะยืนยันโดยอัตโนมัติเมื่อระเบียนทำงาน',
+          typeLabel: 'ประเภท',
+          valueLabel: 'ค่า',
+        },
+        verifiedAtLabel: "ยืนยันเมื่อ {{ date | shortDate('th-TH') }}",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'เพิ่ม {{domain}}',
+        messageLabel: 'อีเมลของคุณใช้ {{domain}} คุณต้องการเพิ่มหรือไม่?',
+      },
+      formButtonPrimary__add: 'เพิ่ม',
+      formFieldInputPlaceholder__domain: 'เพิ่มโดเมน',
+      formFieldLabel__domain: 'โดเมน',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'เพิ่มและยืนยันความเป็นเจ้าของโดเมนที่องค์กรของคุณใช้ในการลงชื่อเข้าใช้',
+      title: 'เพิ่มโดเมน SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'ผู้ให้บริการ SAML แบบกำหนดเอง',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'เลือกผู้ให้บริการที่คุณจะตั้งค่า SSO ให้',
+      title: 'เลือกผู้ให้บริการ',
+      warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
+    },
   },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
@@ -227,6 +803,7 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'ใส่รหัสผ่านของคุณ',
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKey: 'คีย์ API',
@@ -257,6 +834,9 @@ export const thTH: LocalizationResource = {
   formFieldLabel__role: 'บทบาท',
   formFieldLabel__signOutOfOtherSessions: 'ออกจากระบบในอุปกรณ์อื่นทั้งหมด',
   formFieldLabel__username: 'ชื่อผู้ใช้',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'ออกจากระบบ',
     title: 'เข้าสู่ระบบในนาม {{identifier}}',
@@ -266,6 +846,22 @@ export const thTH: LocalizationResource = {
   membershipRole__admin: 'ผู้ดูแลระบบ',
   membershipRole__basicMember: 'สมาชิก',
   membershipRole__guestMember: 'แขก',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'สร้างองค์กร',
     action__invitationAccept: 'เข้าร่วม',
@@ -283,9 +879,19 @@ export const thTH: LocalizationResource = {
     },
     badge__automaticInvitation: 'การเชิญอัตโนมัติ',
     badge__automaticSuggestion: 'คำแนะนำอัตโนมัติ',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'ไม่มีประวัติการชำระเงิน',
         notFound: 'ไม่พบความพยายามในการชำระเงิน',
@@ -320,6 +926,7 @@ export const thTH: LocalizationResource = {
       statementsSection: {
         empty: 'ไม่มีใบแจ้งหนี้ที่จะแสดง',
         itemCaption__paidForPlan: 'ชำระสำหรับแผน {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'เครดิตตามสัดส่วนสำหรับการใช้งานบางส่วนของการสมัครสมาชิกก่อนหน้า',
         itemCaption__subscribedAndPaidForPlan: 'สมัครสมาชิกและชำระสำหรับแผน {{plan}} {{period}}',
         notFound: 'ไม่พบใบแจ้งหนี้',
@@ -332,6 +939,11 @@ export const thTH: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'แก้ไข',
         tableHeader__plan: 'แผน',
         tableHeader__startDate: 'วันที่เริ่มต้น',
@@ -354,6 +966,7 @@ export const thTH: LocalizationResource = {
       detailsTitle__inviteFailed:
         'ไม่สามารถส่งคำเชิญได้ มีคำเชิญที่รอดำเนินการอยู่แล้วสำหรับที่อยู่อีเมลต่อไปนี้: {{email_addresses}}',
       formButtonPrimary__continue: 'ส่งคำเชิญ',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'เลือกบทบาท',
       subtitle: 'ใส่หรือวางที่อยู่อีเมลตั้งแต่หนึ่งรายการขึ้นไป คั่นด้วยช่องว่างหรือเครื่องหมายจุลภาค',
       successMessage: 'ส่งคำเชิญสำเร็จ',
@@ -412,11 +1025,13 @@ export const thTH: LocalizationResource = {
       description: 'จัดการองค์กรของคุณ',
       general: 'ทั่วไป',
       members: 'สมาชิก',
+      security: undefined,
       title: 'องค์กร',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'คุณไม่มีสิทธิ์ในการจัดการการเรียกเก็บเงินสำหรับองค์กรนี้',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'แผน',
     },
@@ -455,9 +1070,36 @@ export const thTH: LocalizationResource = {
       successMessage: '{{domain}} ได้ถูกลบแล้ว',
       title: 'ลบโดเมน',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'ทั่วไป',
       headerTitle__members: 'สมาชิก',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'อัปเดตโปรไฟล์',
         title: 'โปรไฟล์องค์กร',
@@ -577,6 +1219,9 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสที่สร้างโดยแอป Authenticator ของคุณเพื่อดำเนินการต่อ',
       title: 'ต้องการการยืนยัน',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -721,6 +1366,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อ โปรดใส่รหัสยืนยันที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ตรวจสอบโทรศัพท์ของคุณ',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'รีเซ็ตรหัสผ่าน',
       requiredMessage: 'เพื่อความปลอดภัย จำเป็นต้องรีเซ็ตรหัสผ่านของคุณ',
@@ -825,6 +1476,12 @@ export const thTH: LocalizationResource = {
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'ใส่รหัสยืนยันที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ยืนยันโทรศัพท์ของคุณ',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'เข้าสู่ระบบ',
@@ -964,7 +1621,10 @@ export const thTH: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'ขนาดไฟล์เกินขีดจำกัดสูงสุด 10MB กรุณาเลือกไฟล์ที่เล็กกว่า',
     avatar_file_type_invalid: 'ประเภทไฟล์ไม่รองรับ กรุณาอัปโหลดรูปภาพ JPG, PNG, GIF หรือ WEBP',
     captcha_invalid: undefined,
@@ -1004,7 +1664,10 @@ export const thTH: LocalizationResource = {
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
     form_username_needs_non_number_char: 'ชื่อผู้ใช้ของคุณต้องมีอักขระที่ไม่ใช่ตัวเลขอย่างน้อยหนึ่งตัว',
     identification_deletion_failed: undefined,
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1028,6 +1691,14 @@ export const thTH: LocalizationResource = {
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
     web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
@@ -1079,6 +1750,9 @@ export const thTH: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
+    label__accountActions: 'การดำเนินการบัญชี',
+    label__activeSessions: 'เซสชันที่ใช้งานอยู่',
+    label__userButtonPopover: 'แผงบัญชี',
   },
   userProfile: {
     apiKeysPage: {
@@ -1100,6 +1774,15 @@ export const thTH: LocalizationResource = {
       title__codelist: 'รหัสสำรอง',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'ไม่มีประวัติการชำระเงิน',
         notFound: 'ไม่พบความพยายามในการชำระเงิน',
@@ -1134,6 +1817,7 @@ export const thTH: LocalizationResource = {
       statementsSection: {
         empty: 'ไม่มีใบแจ้งหนี้ที่จะแสดง',
         itemCaption__paidForPlan: 'ชำระสำหรับแผน {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'เครดิตตามสัดส่วนสำหรับการใช้งานบางส่วนของการสมัครสมาชิกก่อนหน้า',
         itemCaption__subscribedAndPaidForPlan: 'สมัครสมาชิกและชำระสำหรับแผน {{plan}} {{period}}',
         notFound: 'ไม่พบใบแจ้งหนี้',
@@ -1146,6 +1830,7 @@ export const thTH: LocalizationResource = {
         actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'สมัครสมาชิกแผน',
         actionLabel__switchPlan: 'เปลี่ยนแผน',
+        overview: undefined,
         tableHeader__edit: 'แก้ไข',
         tableHeader__plan: 'แผน',
         tableHeader__startDate: 'วันที่เริ่มต้น',
@@ -1340,6 +2025,7 @@ export const thTH: LocalizationResource = {
         title: 'ที่อยู่อีเมล',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'เชื่อมต่อบัญชี',
         title: 'บัญชีองค์กร',
       },
       headerTitle__account: 'รายละเอียดโปรไฟล์',

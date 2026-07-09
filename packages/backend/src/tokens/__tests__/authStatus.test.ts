@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../../tokens/authenticateContext';
-import { handshake, signedIn, signedOut } from '../authStatus';
+import { createBootstrapSignedOutState, handshake, signedIn, signedOut } from '../authStatus';
 
 describe('signed-in', () => {
   describe('session tokens', () => {
@@ -129,6 +129,48 @@ describe('signed-out', () => {
       expect(signedOutAuthObject.claims).toBeNull();
       expect(signedOutAuthObject.scopes).toBeNull();
     });
+  });
+});
+
+describe('createBootstrapSignedOutState', () => {
+  it('returns a signed-out session_token state with no publishable key', () => {
+    const state = createBootstrapSignedOutState();
+
+    expect(state.status).toBe('signed-out');
+    expect(state.tokenType).toBe('session_token');
+    expect(state.isSignedIn).toBe(false);
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.publishableKey).toBe('');
+    expect(state.token).toBeNull();
+  });
+
+  it('applies provided signInUrl and signUpUrl', () => {
+    const state = createBootstrapSignedOutState({
+      signInUrl: '/sign-in',
+      signUpUrl: '/sign-up',
+    });
+
+    expect(state.signInUrl).toBe('/sign-in');
+    expect(state.signUpUrl).toBe('/sign-up');
+  });
+
+  it('toAuth() returns a signed-out auth object without throwing', () => {
+    const authObject = createBootstrapSignedOutState().toAuth();
+
+    expect(authObject.userId).toBeNull();
+    expect(authObject.sessionId).toBeNull();
+    expect(authObject.tokenType).toBe('session_token');
+  });
+
+  it('includes debug headers on the state', () => {
+    const state = createBootstrapSignedOutState({
+      reason: 'session-token-and-uat-missing',
+      message: 'no keys yet',
+    });
+
+    expect(state.headers.get('x-clerk-auth-status')).toBe('signed-out');
+    expect(state.headers.get('x-clerk-auth-reason')).toBe('session-token-and-uat-missing');
+    expect(state.headers.get('x-clerk-auth-message')).toBe('no keys yet');
   });
 });
 

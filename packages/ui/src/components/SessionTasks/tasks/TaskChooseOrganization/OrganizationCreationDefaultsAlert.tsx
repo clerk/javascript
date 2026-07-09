@@ -6,7 +6,7 @@ import { localizationKeys } from '@/localization';
 export function OrganizationCreationDefaultsAlert({
   organizationCreationDefaults,
 }: {
-  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
 }) {
   const localizationKey = advisoryToLocalizationKey(organizationCreationDefaults?.advisory);
   if (!localizationKey) {

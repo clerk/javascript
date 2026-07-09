@@ -1,0 +1,139 @@
+import * as MenuStories from './menu.stories';
+
+# Menu
+
+A floating list of actions opened from a trigger, from `@clerk/headless`. It is a
+**headless** primitive: it supplies open state, portalling, floating-ui positioning,
+roving-focus keyboard navigation with typeahead, submenu coordination, and ARIA wiring, but
+ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes each
+part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see its
+behavior and ARIA wiring. Open it, then use the arrow keys or type to move between items;
+Escape or selecting an item closes it.
+
+<Story
+  name='Default'
+  storyModule={MenuStories}
+/>
+
+## Usage
+
+```tsx
+import { Menu } from '@clerk/headless/menu';
+
+<Menu.Root>
+  <Menu.Trigger>Actions</Menu.Trigger>
+  <Menu.Portal>
+    <Menu.Positioner>
+      <Menu.Popup>
+        <Menu.Item
+          label='Edit'
+          onClick={() => {}}
+        >
+          Edit
+        </Menu.Item>
+        <Menu.Separator />
+        <Menu.Item
+          label='Delete'
+          onClick={() => {}}
+        >
+          Delete
+        </Menu.Item>
+      </Menu.Popup>
+    </Menu.Positioner>
+  </Menu.Portal>
+</Menu.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Menu.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  {/* trigger + portal */}
+</Menu.Root>;
+```
+
+## Parts
+
+| Part              | Default Element | Description                                                 |
+| ----------------- | --------------- | ----------------------------------------------------------- |
+| `Menu.Root`       | none (context)  | Owns open state, positioning, and the submenu tree          |
+| `Menu.Trigger`    | `<button>`      | Opens/closes the menu (renders as a `menuitem` when nested) |
+| `Menu.Portal`     | none (portal)   | Portals its children; renders nothing until mounted         |
+| `Menu.Positioner` | `<div>`         | Floating-positioned container (`role="menu"`)               |
+| `Menu.Popup`      | `<div>`         | Visual wrapper for the menu items                           |
+| `Menu.Item`       | `<button>`      | A menu action (`role="menuitem"`); roving focus + typeahead |
+| `Menu.Separator`  | `<div>`         | Visual divider (`role="separator"`)                         |
+| `Menu.Arrow`      | `<svg>`         | Optional arrow pointing at the trigger                      |
+
+All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
+attributes for their default element. `Menu.Arrow` accepts floating-ui `FloatingArrow`
+props. `Menu.Portal` is optional.
+
+## Props
+
+### `Menu.Root`
+
+| Prop                      | Type                                 | Default                     | Description                                                     |
+| ------------------------- | ------------------------------------ | --------------------------- | --------------------------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                 | —                           | Controlled open state                                           |
+| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                               |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                              |
+| <code>placement</code>    | <code>Placement</code>               | <code>'bottom-start'</code> | Placement relative to the trigger (`'right-start'` when nested) |
+| <code>sideOffset</code>   | <code>number</code>                  | <code>4</code>              | Gap in px between the trigger and the popup (`0` when nested)   |
+
+### `Menu.Item`
+
+| Prop                      | Type                 | Default           | Description                                                |
+| ------------------------- | -------------------- | ----------------- | ---------------------------------------------------------- |
+| <code>label</code>        | <code>string</code>  | — (required)      | Text used for typeahead matching                           |
+| <code>disabled</code>     | <code>boolean</code> | —                 | Prevent activation (uses `aria-disabled`, stays focusable) |
+| <code>closeOnClick</code> | <code>boolean</code> | <code>true</code> | Close the whole menu on click                              |
+
+### `Menu.Portal`
+
+| Prop              | Type                                                             | Default | Description         |
+| ----------------- | ---------------------------------------------------------------- | ------- | ------------------- |
+| <code>root</code> | <code>HTMLElement \| null \| RefObject&lt;HTMLElement&gt;</code> | —       | Portal mount target |
+
+`Menu.Trigger`, `Menu.Positioner`, `Menu.Popup`, and `Menu.Separator` take no additional
+props beyond standard HTML attributes for their default element.
+
+## Styling
+
+Each part emits `data-cl-*` attributes you can target with any CSS solution:
+
+| Attribute                | Applies To        | Description                                        |
+| ------------------------ | ----------------- | -------------------------------------------------- |
+| `data-cl-slot`           | All parts         | Part identifier                                    |
+| `data-cl-open`           | Trigger, Popup    | Present when the menu is open                      |
+| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-cl-active`         | Item              | Present on the keyboard-highlighted item           |
+| `data-cl-disabled`       | Item              | Present when the item is disabled                  |
+| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
+| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+
+The positioner exposes anchor/viewport geometry as CSS variables:
+
+| Variable                | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `--cl-anchor-width`     | Trigger width                                         |
+| `--cl-anchor-height`    | Trigger height                                        |
+| `--cl-available-width`  | Available width between the anchor and viewport edge  |
+| `--cl-available-height` | Available height between the anchor and viewport edge |
+| `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |
+
+```css
+[data-cl-slot='menu-item'][data-cl-active] {
+  background: rgba(0, 0, 0, 0.06);
+}
+```

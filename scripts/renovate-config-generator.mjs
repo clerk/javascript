@@ -18,7 +18,6 @@ const rules = new Map();
  * @property {string[]} [matchUpdateTypes]
  * @property {string[]} [matchDepTypes]
  * @property {string[]} [matchPackageNames]
- * @property {string[]} [matchPackagePatterns]
  * @property {boolean} [automerge]
  * @property {boolean} [dependencyDashboardApproval]
  * @property {string} [additionalBranchPrefix]
@@ -37,7 +36,7 @@ const defaultRules = [
   },
   // Don't bump @clerk/ packages since changesets will handle this
   {
-    matchPackagePatterns: ['^@clerk/'],
+    matchPackageNames: ['/^@clerk//'],
     enabled: false,
   },
   {
@@ -75,17 +74,14 @@ const defaultRules = [
     groupName: 'testing',
     matchPackageNames: [
       '@types/chai',
-      '@types/jest',
       '@types/sinon',
       'nock',
       'nyc',
-      'ts-jest',
       'vitest',
       '@testing-library{/,}**',
       '@types/testing-library__{/,}**',
       '@vitest{/,}**',
       'chai{/,}**',
-      'jest{/,}**',
       'qunit{/,}**',
       'should{/,}**',
       'sinon{/,}**',
@@ -106,6 +102,22 @@ const defaultRules = [
     extends: ['monorepo:remix'],
     groupName: 'Remix monorepo',
     matchUpdateTypes: ['patch', 'minor', 'major'],
+  },
+  {
+    matchManagers: ['github-actions'],
+    pinDigests: true,
+    groupName: 'GitHub Actions',
+    groupSlug: 'github-actions',
+    matchUpdateTypes: ['patch', 'minor', 'digest'],
+    semanticCommitScope: 'repo',
+    automerge: false,
+  },
+  {
+    matchManagers: ['github-actions'],
+    matchUpdateTypes: ['major'],
+    groupName: 'GitHub Actions (major)',
+    groupSlug: 'github-actions-major',
+    semanticCommitScope: 'repo',
   },
 ];
 
@@ -185,8 +197,13 @@ const renovateConfig = {
     'group:monorepos',
     'group:recommended',
   ],
-  ignorePaths: ['**/node_modules/**', '.nvmrc', 'integration/templates/**', 'playground/**'],
-  includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
+  ignorePaths: [
+    '**/node_modules/**',
+    '.nvmrc',
+    'integration/templates/**',
+    'packages/upgrade/src/__tests__/fixtures/**',
+  ],
+  includePaths: ['.github/actions/**', '.github/workflows/**', 'package.json', 'packages/**', 'pnpm-workspace.yaml'],
   major: { dependencyDashboardApproval: true },
   minimumReleaseAge: '3 days',
   nvm: { enabled: false },

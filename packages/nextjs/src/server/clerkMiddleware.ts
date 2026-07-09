@@ -1,4 +1,4 @@
-import type { AuthObject, ClerkClient } from '@clerk/backend';
+import type { AccountlessApplication, AuthObject, ClerkClient } from '@clerk/backend';
 import type {
   AuthenticatedState,
   AuthenticateRequestOptions,
@@ -12,6 +12,7 @@ import type {
 import {
   AuthStatus,
   constants,
+  createBootstrapSignedOutState,
   createClerkRequest,
   createRedirect,
   getAuthObjectForAcceptedToken,
@@ -21,8 +22,10 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isMalformedURLError } from '@clerk/shared/pathMatcher';
+import { shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -30,10 +33,11 @@ import { NextResponse } from 'next/server';
 import type { AuthFn } from '../app-router/server/auth';
 import type { GetAuthOptions } from '../server/createGetAuth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
+import type { Logger, LoggerNoCommit } from '../utils/debugLogger';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getHeader } from './headers-utils';
@@ -159,12 +163,20 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       );
 
       // Handle Frontend API proxy requests early, before authentication
-      const frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+      const requestUrl = new URL(request.nextUrl.href);
+      let frontendApiProxyConfig = resolvedParams.frontendApiProxy;
+
+      // Auto-detect when no explicit proxy or domain is configured
+      const hasExplicitProxyOrDomain = resolvedParams.proxyUrl || PROXY_URL || resolvedParams.domain || DOMAIN;
+      if (!frontendApiProxyConfig && !hasExplicitProxyOrDomain && isProductionFromPublishableKey(publishableKey)) {
+        if (shouldAutoProxy(requestUrl.hostname)) {
+          frontendApiProxyConfig = { enabled: true };
+        }
+      }
       if (frontendApiProxyConfig) {
         const { enabled, path: proxyPath = DEFAULT_PROXY_PATH } = frontendApiProxyConfig;
 
         // Resolve enabled - either boolean or function
-        const requestUrl = new URL(request.url);
         const isEnabled = typeof enabled === 'function' ? enabled(requestUrl) : enabled;
 
         if (isEnabled && matchProxyPath(request, { proxyPath })) {
@@ -215,114 +227,61 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         createAuthenticateRequestOptions(clerkRequest, options),
       );
 
-      logger.debug('requestState', () => ({
-        status: requestState.status,
-        headers: JSON.stringify(Object.fromEntries(requestState.headers)),
-        reason: requestState.reason,
-      }));
+      return runHandlerWithRequestState({
+        clerkRequest,
+        request,
+        event,
+        requestState,
+        handler,
+        options,
+        resolvedParams,
+        keyless,
+        logger,
+      });
+    });
 
-      const locationHeader = requestState.headers.get(constants.Headers.Location);
-      if (locationHeader) {
-        handleNetlifyCacheInDevInstance({
-          locationHeader,
-          requestStateHeaders: requestState.headers,
-          publishableKey: requestState.publishableKey,
-        });
+    /**
+     * Runs the user's handler against a synthetic signed-out `RequestState` during the keyless
+     * bootstrap window, so authorization fails closed until a publishable key is provisioned.
+     */
+    const bootstrapNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
-        const res = NextResponse.redirect(requestState.headers.get(constants.Headers.Location) || locationHeader);
-        requestState.headers.forEach((value, key) => {
-          if (key === constants.Headers.Location) {
-            return;
-          }
-          res.headers.append(key, value);
-        });
-        return res;
-      } else if (requestState.status === AuthStatus.Handshake) {
-        throw new Error('Clerk: handshake status without redirect');
-      }
+      const signInUrl = resolvedParams.signInUrl || SIGN_IN_URL || '';
+      const signUpUrl = resolvedParams.signUpUrl || SIGN_UP_URL || '';
 
-      const authObject = requestState.toAuth();
-      logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
+      const options = {
+        publishableKey: '',
+        secretKey: '',
+        signInUrl,
+        signUpUrl,
+        ...resolvedParams,
+      };
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
-      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
-
-      const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
-      authHandler.protect = protect;
-
-      let handlerResult: Response = NextResponse.next();
-      try {
-        const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(
-          clerkMiddlewareRequestDataStore,
-          async () => handler?.(authHandler, request, event),
-        );
-        handlerResult = userHandlerResult || handlerResult;
-      } catch (e: any) {
-        handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
-      }
-      if (options.contentSecurityPolicy) {
-        const { headers } = createContentSecurityPolicyHeaders(
-          (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
-          options.contentSecurityPolicy,
-        );
-
-        const cspRequestHeaders: Record<string, string> = {};
-        headers.forEach(([key, value]) => {
-          setHeader(handlerResult, key, value);
-          cspRequestHeaders[key] = value;
-        });
-
-        // Forward CSP headers as request headers so server components
-        // can access the nonce via headers()
-        setRequestHeadersOnNextResponse(handlerResult, clerkRequest, cspRequestHeaders);
-
-        logger.debug('Clerk generated CSP', () => ({
-          headers,
-        }));
-      }
-
-      // TODO @nikos: we need to make this more generic
-      // and move the logic in clerk/backend
-      if (requestState.headers) {
-        requestState.headers.forEach((value, key) => {
-          if (key === constants.Headers.ContentSecurityPolicy) {
-            logger.debug('Content-Security-Policy detected', () => ({
-              value,
-            }));
-          }
-          handlerResult.headers.append(key, value);
-        });
-      }
-
-      if (isRedirect(handlerResult)) {
-        logger.debug('handlerResult is redirect');
-        return serverRedirectWithAuth(clerkRequest, handlerResult, options);
-      }
+      clerkMiddlewareRequestDataStore.set('requestData', options);
 
       if (options.debug) {
-        setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
+        logger.enable();
       }
 
-      const keylessKeysForRequestData =
-        // Only pass keyless credentials when there are no explicit keys
-        secretKey === keyless?.secretKey
-          ? {
-              publishableKey: keyless?.publishableKey,
-              secretKey: keyless?.secretKey,
-            }
-          : {};
+      const clerkRequest = createClerkRequest(request);
+      logger.debug('keyless bootstrap (no publishable key)', () => ({ signInUrl, signUpUrl }));
+      logger.debug('url', () => clerkRequest.toJSON());
 
-      decorateRequest(
+      const requestState = createBootstrapSignedOutState({ signInUrl, signUpUrl });
+
+      return runHandlerWithRequestState({
         clerkRequest,
-        handlerResult,
+        request,
+        event,
         requestState,
+        handler,
+        options,
         resolvedParams,
-        keylessKeysForRequestData,
-        authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
-      );
-
-      return handlerResult;
+        keyless,
+        logger,
+      });
     });
 
     const keylessMiddleware: NextMiddleware = async (request, event) => {
@@ -339,15 +298,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
 
-      /**
-       * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
-       */
       if (isMissingPublishableKey && !isMachineTokenByPrefix(authHeader)) {
-        const res = NextResponse.next();
-        setRequestHeadersOnNextResponse(res, request, {
-          [constants.Headers.AuthStatus]: 'signed-out',
-        });
-        return res;
+        return bootstrapNextMiddleware(request, event);
       }
 
       return baseNextMiddleware(request, event);
@@ -388,6 +340,151 @@ const parseHandlerAndOptions = (args: unknown[]) => {
     (args.length === 2 ? args[1] : typeof args[0] === 'function' ? {} : args[0]) || {},
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback];
 };
+
+type RunHandlerWithRequestStateArgs = {
+  clerkRequest: ClerkRequest;
+  request: NextMiddlewareRequestParam;
+  event: NextMiddlewareEvtParam;
+  requestState: RequestState<'session_token'>;
+  handler: ClerkMiddlewareHandler | undefined;
+  options: ClerkMiddlewareOptions & {
+    publishableKey: string;
+    secretKey: string;
+    signInUrl: string;
+    signUpUrl: string;
+  };
+  resolvedParams: ClerkMiddlewareOptions;
+  keyless: AccountlessApplication | undefined;
+  logger: LoggerNoCommit<Logger>;
+};
+
+/**
+ * Drives the post-authentication pipeline: handler invocation, CSP, redirects, header propagation,
+ * and response decoration. Accepts a pre-computed `requestState` so callers can supply either a
+ * real authentication result from `authenticateRequest()` or a synthetic signed-out state
+ * (e.g. during keyless bootstrap when no publishable key is available yet).
+ */
+async function runHandlerWithRequestState({
+  clerkRequest,
+  request,
+  event,
+  requestState,
+  handler,
+  options,
+  resolvedParams,
+  keyless,
+  logger,
+}: RunHandlerWithRequestStateArgs): Promise<Response> {
+  const { publishableKey, secretKey } = options;
+
+  logger.debug('requestState', () => ({
+    status: requestState.status,
+    headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+    reason: requestState.reason,
+  }));
+
+  const locationHeader = requestState.headers.get(constants.Headers.Location);
+  if (locationHeader) {
+    handleNetlifyCacheInDevInstance({
+      locationHeader,
+      requestStateHeaders: requestState.headers,
+      publishableKey: requestState.publishableKey,
+    });
+
+    const res = NextResponse.redirect(requestState.headers.get(constants.Headers.Location) || locationHeader);
+    requestState.headers.forEach((value, key) => {
+      if (key === constants.Headers.Location) {
+        return;
+      }
+      res.headers.append(key, value);
+    });
+    return res;
+  } else if (requestState.status === AuthStatus.Handshake) {
+    throw new Error('Clerk: handshake status without redirect');
+  }
+
+  const authObject = requestState.toAuth();
+  logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
+
+  const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+  const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
+  const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+
+  const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
+  authHandler.protect = protect;
+
+  let handlerResult: Response = NextResponse.next();
+  try {
+    const userHandlerResult = await clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, async () =>
+      handler?.(authHandler, request, event),
+    );
+    handlerResult = userHandlerResult || handlerResult;
+  } catch (e: any) {
+    handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
+  }
+  if (options.contentSecurityPolicy) {
+    const { headers } = createContentSecurityPolicyHeaders(
+      (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
+      options.contentSecurityPolicy,
+    );
+
+    const cspRequestHeaders: Record<string, string> = {};
+    headers.forEach(([key, value]) => {
+      setHeader(handlerResult, key, value);
+      cspRequestHeaders[key] = value;
+    });
+
+    // Forward CSP headers as request headers so server components
+    // can access the nonce via headers()
+    setRequestHeadersOnNextResponse(handlerResult, clerkRequest, cspRequestHeaders);
+
+    logger.debug('Clerk generated CSP', () => ({
+      headers,
+    }));
+  }
+
+  // TODO @nikos: we need to make this more generic
+  // and move the logic in clerk/backend
+  if (requestState.headers) {
+    requestState.headers.forEach((value, key) => {
+      if (key === constants.Headers.ContentSecurityPolicy) {
+        logger.debug('Content-Security-Policy detected', () => ({
+          value,
+        }));
+      }
+      handlerResult.headers.append(key, value);
+    });
+  }
+
+  if (isRedirect(handlerResult)) {
+    logger.debug('handlerResult is redirect');
+    return serverRedirectWithAuth(clerkRequest, handlerResult, options);
+  }
+
+  if (options.debug) {
+    setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
+  }
+
+  const keylessKeysForRequestData =
+    // Only pass keyless credentials when there are no explicit keys
+    secretKey === keyless?.secretKey
+      ? {
+          publishableKey: keyless?.publishableKey,
+          secretKey: keyless?.secretKey,
+        }
+      : {};
+
+  decorateRequest(
+    clerkRequest,
+    handlerResult,
+    requestState,
+    resolvedParams,
+    keylessKeysForRequestData,
+    authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
+  );
+
+  return handlerResult;
+}
 
 const isKeylessSyncRequest = (request: NextMiddlewareRequestParam) =>
   request.nextUrl.pathname === '/clerk-sync-keyless';
@@ -519,6 +616,10 @@ const handleControlFlowErrors = (
   nextRequest: NextRequest,
   requestState: RequestState,
 ): Response => {
+  if (isMalformedURLError(e)) {
+    return new NextResponse(null, { status: 400, statusText: 'Bad Request' });
+  }
+
   if (isNextjsUnauthorizedError(e)) {
     const response = new NextResponse(null, { status: 401 });
 

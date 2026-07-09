@@ -1,3 +1,4 @@
+import type { RoutingOptions } from '@clerk/shared/types';
 import {
   CreateOrganization as BaseCreateOrganization,
   OrganizationList as BaseOrganizationList,
@@ -49,7 +50,7 @@ const wrapComponentWithRouting = <T extends Component>(baseComponent: T, compone
     const path = usePathnameWithoutSplatRouteParams();
     const routingProps = useRoutingProps(
       componentName,
-      () => attrs,
+      () => attrs as RoutingOptions,
       () => ({ path: path.value }),
     );
     return () => h(baseComponent, routingProps.value, slots);
@@ -57,13 +58,13 @@ const wrapComponentWithRouting = <T extends Component>(baseComponent: T, compone
 };
 
 const _UserProfile = wrapComponentWithRouting(BaseUserProfile, 'UserProfile');
-export const UserProfile = Object.assign(_UserProfile, {
+export const UserProfile: typeof BaseUserProfile = Object.assign(_UserProfile, {
   Page: BaseUserProfile.Page,
   Link: BaseUserProfile.Link,
 });
 
 const _OrganizationProfile = wrapComponentWithRouting(BaseOrganizationProfile, 'OrganizationProfile');
-export const OrganizationProfile = Object.assign(_OrganizationProfile, {
+export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign(_OrganizationProfile, {
   Page: BaseOrganizationProfile.Page,
   Link: BaseOrganizationProfile.Link,
 });

@@ -18,22 +18,24 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
+import { JWT_CATEGORY_M2M_TOKEN } from '../machine';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
-function createOAuthJwt(
+async function createSignedOAuthJwt(
   payload = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
-  return createJwt({
-    header: { typ, kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
-    payload,
-  });
-}
-
-async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
   const { data } = await signJwt(payload, signingJwks, {
     algorithm: 'RS256',
-    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    header: { typ, kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+  });
+  return data!;
+}
+
+async function createSignedM2MJwt(payload = mockM2MJwtPayload, cat: string | undefined = JWT_CATEGORY_M2M_TOKEN) {
+  const { data } = await signJwt(payload, signingJwks, {
+    algorithm: 'RS256',
+    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...(cat !== undefined ? { cat } : {}) },
   });
   return data!;
 }
@@ -84,6 +86,32 @@ describe('tokens.verify(token, options)', () => {
     });
 
     expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('returns signature error before claims error when both are invalid', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    // Create a JWT with expired claims AND an invalid signature
+    const expiredJwt = createJwt({
+      payload: { ...mockJwtPayload, exp: mockJwtPayload.iat - 100 },
+    });
+
+    const { errors } = await verifyToken(expiredJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      skipJwksCache: true,
+    });
+
+    expect(errors).toBeDefined();
+    expect(errors?.[0].message).toContain('signature');
   });
 });
 
@@ -380,6 +408,10 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+      // Timestamps are exposed in milliseconds, matching M2MToken and the API JSON shape
+      expect(data.expiration).toBe(mockOAuthAccessTokenJwtPayload.exp * 1000);
+      expect(data.createdAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
+      expect(data.updatedAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
     });
 
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
@@ -392,7 +424,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
+      const oauthJwt = await createSignedOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -472,7 +504,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         exp: mockOAuthAccessTokenJwtPayload.iat - 100,
       };
 
-      const oauthJwt = createOAuthJwt(expiredPayload, 'at+jwt');
+      const oauthJwt = await createSignedOAuthJwt(expiredPayload);
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -482,6 +514,45 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toContain('expired');
     });
+
+    // Regression: `decodedResult.payload.sub.startsWith(...)` previously threw a
+    // TypeError for a missing or non-string `sub` before OAuth verification ran, so a
+    // crafted at+jwt bearer token surfaced as an unhandled error in request auth.
+    it.each([
+      ['a missing', undefined],
+      ['a null', null],
+      ['a numeric', 123],
+      ['an object', {}],
+    ] as Array<[string, unknown]>)(
+      'classifies an at+jwt token with %s sub as OAuth instead of throwing',
+      async (_label, sub) => {
+        server.use(
+          http.get(
+            'https://api.clerk.test/v1/jwks',
+            validateHeaders(() => {
+              return HttpResponse.json(mockJwks);
+            }),
+          ),
+        );
+
+        const payload: Record<string, unknown> = { ...mockOAuthAccessTokenJwtPayload };
+        if (sub === undefined) {
+          delete payload.sub;
+        } else {
+          payload.sub = sub;
+        }
+
+        const oauthJwt = await createSignedOAuthJwt(payload as typeof mockOAuthAccessTokenJwtPayload, 'at+jwt');
+
+        const result = await verifyMachineAuthToken(oauthJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        });
+
+        // Reaching a typed OAuth result proves the M2M `sub` check no longer throws.
+        expect(result.tokenType).toBe('oauth_token');
+      },
+    );
   });
 
   describe('verifyM2MToken with JWT', () => {
@@ -569,6 +640,49 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toContain('expired');
+    });
+
+    it('verifies a valid M2M JWT with no cat header (rollout window)', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, undefined);
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeUndefined();
+      expect(result.tokenType).toBe('m2m_token');
+    });
+
+    describe.each([
+      ['session-token', 'cl_B7d4PD111AAA'],
+      ['jwt-template', 'cl_B7d4PD222AAA'],
+      ['unknown', 'cl_some_future_unknown_cat'],
+    ])('rejects M2M JWT masquerading with a non-M2M cat', (label, cat) => {
+      it(`rejects cat=${label} without attempting signature verification`, async () => {
+        // No JWKS handler registered: if the cat check did not short-circuit,
+        // resolveKeyAndVerifyJwt would attempt a JWKS fetch and the failure
+        // message would differ from the category error below.
+        const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, cat);
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        });
+
+        expect(result.tokenType).toBe('m2m_token');
+        expect(result.errors).toBeDefined();
+        expect(result.errors?.[0].code).toBe('token-invalid');
+      });
     });
   });
 });

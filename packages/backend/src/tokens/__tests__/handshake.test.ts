@@ -94,6 +94,7 @@ describe('HandshakeService', () => {
       clerkUrl: new URL('https://example.com'),
       frontendApi: 'api.clerk.com',
       instanceType: 'production',
+      method: 'GET',
       usesSuffixedCookies: () => true,
       secFetchDest: 'document',
       accept: 'text/html',
@@ -137,6 +138,25 @@ describe('HandshakeService', () => {
     it('should return false for non-eligible requests', () => {
       mockAuthenticateContext.secFetchDest = 'image';
       mockAuthenticateContext.accept = 'image/png';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for POST requests with document secFetchDest', () => {
+      mockAuthenticateContext.method = 'POST';
+      mockAuthenticateContext.secFetchDest = 'document';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for PUT requests with document secFetchDest', () => {
+      mockAuthenticateContext.method = 'PUT';
+      mockAuthenticateContext.secFetchDest = 'document';
+      expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
+    });
+
+    it('should return false for POST requests with text/html accept without secFetchDest', () => {
+      mockAuthenticateContext.method = 'POST';
+      mockAuthenticateContext.secFetchDest = undefined;
+      mockAuthenticateContext.accept = 'text/html';
       expect(handshakeService.isRequestEligibleForHandshake()).toBe(false);
     });
   });
@@ -427,7 +447,7 @@ describe('HandshakeService', () => {
 
       // Verify all required parameters are present
       expect(url.searchParams.get('redirect_url')).toBeDefined();
-      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-11-10');
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2026-05-12');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
     });

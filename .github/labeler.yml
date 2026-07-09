@@ -20,6 +20,10 @@ elements:
   - changed-files:
       - any-glob-to-any-file: packages/elements/**
 
+eslint-plugin:
+  - changed-files:
+      - any-glob-to-any-file: packages/eslint-plugin/**
+
 expo:
   - changed-files:
       - any-glob-to-any-file: packages/expo/**
@@ -80,10 +84,6 @@ vue:
   - changed-files:
       - any-glob-to-any-file: packages/vue/**
 
-playground:
-  - changed-files:
-      - any-glob-to-any-file: playground/**
-
 actions:
   - changed-files:
       - any-glob-to-any-file: .github/workflows/**
@@ -91,10 +91,6 @@ actions:
 integration:
   - changed-files:
       - any-glob-to-any-file: integration/**
-
-agent-toolkit:
-  - changed-files:
-      - any-glob-to-any-file: packages/agent-toolkit/**
 
 # Base branch labels
 core-2:

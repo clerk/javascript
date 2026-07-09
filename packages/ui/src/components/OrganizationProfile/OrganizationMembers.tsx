@@ -2,16 +2,18 @@ import { useOrganization } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useFetchRoles } from '@/hooks/useFetchRoles';
+import { Users } from '@/icons';
 import { Alert } from '@/ui/elements/Alert';
 import { Animated } from '@/ui/elements/Animated';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
@@ -33,7 +35,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
 
-  const { membershipRequests, memberships, invitations } = useOrganization({
+  const { membershipRequests, memberships, invitations, organization } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
     memberships: canReadMemberships
@@ -49,130 +51,175 @@ export const OrganizationMembers = withCardStateProvider(() => {
   }
 
   return (
-    <Col
-      elementDescriptor={descriptors.page}
-      gap={2}
-    >
+    <ProfileCard.Page>
       <Col
-        elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('organizationMembers')}
-        gap={4}
+        elementDescriptor={descriptors.page}
+        gap={2}
       >
-        <Action.Root animate={false}>
-          <Animated asChild>
-            <Header.Root
-              contentSx={{
-                [mqu.md]: {
-                  flexDirection: 'row',
-                  width: '100%',
-                  justifyContent: 'space-between',
-                },
-              }}
-            >
-              <Header.Title
-                localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-                textVariant='h2'
-              />
-            </Header.Root>
-          </Animated>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Tabs>
-            <TabsList sx={t => ({ gap: t.space.$2 })}>
-              {canReadMemberships && (
-                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
-                  {!!memberships?.count && (
-                    <NotificationCountBadge
-                      shouldAnimate={!query}
-                      notificationCount={memberships.count}
-                      colorScheme='outline'
-                    />
-                  )}
-                </Tab>
-              )}
-              {canManageMemberships && (
-                <Tab
-                  localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
-                >
-                  {invitations?.data && !invitations.isLoading && (
-                    <NotificationCountBadge
-                      notificationCount={invitations.count}
-                      colorScheme='outline'
-                    />
-                  )}
-                </Tab>
-              )}
-              {canManageMemberships && isDomainsEnabled && (
-                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
-                  {membershipRequests?.data && !membershipRequests.isLoading && (
-                    <NotificationCountBadge
-                      notificationCount={membershipRequests.count}
-                      colorScheme='outline'
-                    />
-                  )}
-                </Tab>
-              )}
-            </TabsList>
-            <TabPanels>
-              {canReadMemberships && (
-                <TabPanel sx={{ width: '100%' }}>
-                  <Flex
-                    gap={4}
-                    direction='col'
-                    sx={{
-                      width: '100%',
-                    }}
+        <Col
+          elementDescriptor={descriptors.profilePage}
+          elementId={descriptors.profilePage.setId('organizationMembers')}
+          gap={4}
+          sx={theme => ({ paddingBottom: theme.space.$13 })}
+        >
+          <Action.Root animate={false}>
+            <Animated asChild>
+              <Header.Root
+                contentSx={{
+                  [mqu.md]: {
+                    flexDirection: 'row',
+                    width: '100%',
+                    justifyContent: 'space-between',
+                  },
+                }}
+              >
+                <Header.Title
+                  localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+                  textVariant='h2'
+                />
+              </Header.Root>
+            </Animated>
+            <Card.Alert>{card.error}</Card.Alert>
+            <Tabs>
+              <TabsList sx={t => ({ gap: t.space.$2 })}>
+                {canReadMemberships && (
+                  <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
+                    {!!memberships?.count && (
+                      <NotificationCountBadge
+                        shouldAnimate={!query}
+                        notificationCount={memberships.count}
+                        colorScheme='outline'
+                      />
+                    )}
+                  </Tab>
+                )}
+                {canManageMemberships && (
+                  <Tab
+                    localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
                   >
+                    {invitations?.data && !invitations.isLoading && (
+                      <NotificationCountBadge
+                        notificationCount={invitations.count}
+                        colorScheme='outline'
+                      />
+                    )}
+                  </Tab>
+                )}
+                {canManageMemberships && isDomainsEnabled && (
+                  <Tab
+                    localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}
+                  >
+                    {membershipRequests?.data && !membershipRequests.isLoading && (
+                      <NotificationCountBadge
+                        notificationCount={membershipRequests.count}
+                        colorScheme='outline'
+                      />
+                    )}
+                  </Tab>
+                )}
+              </TabsList>
+              <TabPanels>
+                {canReadMemberships && (
+                  <TabPanel sx={{ width: '100%' }}>
                     <Flex
-                      gap={2}
+                      gap={4}
                       direction='col'
                       sx={{
                         width: '100%',
                       }}
                     >
-                      <MembersActionsRow
-                        actionSlot={
-                          <MembersSearch
-                            query={query}
-                            value={search}
-                            memberships={memberships}
-                            onSearchChange={query => setSearch(query)}
-                            onQueryTrigger={query => setQuery(query)}
-                          />
-                        }
-                      />
-                      {hasRoleSetMigration && (
-                        <Alert
-                          variant='warning'
-                          title={localizationKeys(
-                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title',
-                          )}
-                          subtitle={localizationKeys(
-                            'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
-                          )}
+                      <Flex
+                        gap={2}
+                        direction='col'
+                        sx={{
+                          width: '100%',
+                        }}
+                      >
+                        <MembersActionsRow
+                          actionSlot={
+                            <MembersSearch
+                              query={query}
+                              value={search}
+                              memberships={memberships}
+                              onSearchChange={query => setSearch(query)}
+                              onQueryTrigger={query => setQuery(query)}
+                            />
+                          }
                         />
-                      )}
-                      <ActiveMembersList
-                        pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
-                        memberships={memberships}
-                      />
+                        {hasRoleSetMigration && (
+                          <Alert
+                            variant='warning'
+                            title={localizationKeys(
+                              'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title',
+                            )}
+                            subtitle={localizationKeys(
+                              'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
+                            )}
+                          />
+                        )}
+                        <ActiveMembersList
+                          pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
+                          memberships={memberships}
+                        />
+                      </Flex>
                     </Flex>
-                  </Flex>
-                </TabPanel>
-              )}
-              {canManageMemberships && (
-                <TabPanel sx={{ width: '100%' }}>
-                  <OrganizationMembersTabInvitations />
-                </TabPanel>
-              )}
-              {canManageMemberships && isDomainsEnabled && (
-                <TabPanel sx={{ width: '100%' }}>
-                  <OrganizationMembersTabRequests />
-                </TabPanel>
-              )}
-            </TabPanels>
-          </Tabs>
-        </Action.Root>
+                  </TabPanel>
+                )}
+                {canManageMemberships && (
+                  <TabPanel sx={{ width: '100%' }}>
+                    <OrganizationMembersTabInvitations />
+                  </TabPanel>
+                )}
+                {canManageMemberships && isDomainsEnabled && (
+                  <TabPanel sx={{ width: '100%' }}>
+                    <OrganizationMembersTabRequests />
+                  </TabPanel>
+                )}
+              </TabPanels>
+            </Tabs>
+          </Action.Root>
+        </Col>
+
+        {canReadMemberships && !!memberships?.count && organization && organization.maxAllowedMemberships > 0 ? (
+          <Box
+            sx={theme => ({
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: theme.colors.$colorBackground,
+              borderTop: `1px solid ${theme.colors.$borderAlpha100}`,
+              paddingInline: theme.space.$4,
+              height: theme.space.$13,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            })}
+          >
+            <Text
+              sx={t => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: t.space.$2,
+              })}
+            >
+              <Icon
+                icon={Users}
+                size='md'
+                colorScheme='neutral'
+              />
+              <Text
+                as='span'
+                colorScheme='inherit'
+                localizationKey={localizationKeys('organizationProfile.start.membershipSeatUsageLabel', {
+                  count: organization.membersCount + organization.pendingInvitationsCount,
+                  limit: organization.maxAllowedMemberships,
+                })}
+              />
+            </Text>
+          </Box>
+        ) : null}
       </Col>
-    </Col>
+    </ProfileCard.Page>
   );
 });

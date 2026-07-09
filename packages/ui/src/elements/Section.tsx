@@ -1,4 +1,5 @@
 import type { ProfileSectionId } from '@clerk/shared/types';
+import type { ReactNode } from 'react';
 import { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
@@ -13,12 +14,14 @@ import { Menu, MenuItem, MenuList, MenuTrigger } from './Menu';
 
 type ProfileSectionProps = Omit<PropsOfComponent<typeof Flex>, 'title'> & {
   title: LocalizationKey;
+  titleId?: string;
   centered?: boolean;
   id: ProfileSectionId;
+  badge?: ReactNode;
 };
 
 const ProfileSectionRoot = (props: ProfileSectionProps) => {
-  const { title, centered = true, children, id, sx, ...rest } = props;
+  const { title, titleId, centered = true, children, id, sx, badge, ...rest } = props;
   const ref = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState(0);
 
@@ -87,11 +90,15 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       >
         <SectionHeader
           localizationKey={title}
+          textId={titleId}
           elementDescriptor={descriptors.profileSectionTitle}
           elementId={descriptors.profileSectionTitle.setId(id)}
           textElementDescriptor={descriptors.profileSectionTitleText}
           textElementId={descriptors.profileSectionTitleText.setId(id)}
-        />
+          sx={badge ? t => ({ alignItems: 'center', gap: t.space.$2 }) : undefined}
+        >
+          {badge}
+        </SectionHeader>
       </Col>
     </Flex>
   );
@@ -347,18 +354,21 @@ type SectionHeaderProps = PropsOfComponent<typeof Flex> & {
   localizationKey: LocalizationKey;
   textElementDescriptor?: ElementDescriptor;
   textElementId?: ElementId;
+  textId?: string;
 };
 
 export const SectionHeader = (props: SectionHeaderProps) => {
-  const { textElementDescriptor, textElementId, localizationKey, ...rest } = props;
+  const { textElementDescriptor, textElementId, textId, localizationKey, children, ...rest } = props;
   return (
     <Flex {...rest}>
       <Text
+        id={textId}
         localizationKey={localizationKey}
         variant='subtitle'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />
+      {children}
     </Flex>
   );
 };

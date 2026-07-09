@@ -1,0 +1,75 @@
+name: Labeler (apply)
+
+# Privileged half of the labeler. Triggered by completion of the "Labeler" workflow,
+# so it always runs the base-branch copy of this file (a PR cannot modify it) with
+# write access. It reads the PR number from the trigger run's artifact, validates it,
+# checks out only the trusted base .github/labeler.yml, and applies labels via
+# actions/labeler driven by pr-number. Replaces the previous pull_request_target
+# trigger while preserving fork-PR labeling (SDK-80).
+
+on:
+  workflow_run:
+    workflows: [Labeler]
+    types:
+      - completed
+
+permissions: {}
+
+jobs:
+  apply:
+    name: Apply labels
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 3 }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    permissions:
+      actions: read # download the artifact from the triggering run
+      contents: read # checkout the trusted base labeler config
+      pull-requests: write # apply labels
+    steps:
+      - name: Download PR number
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: pr-number
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve and verify PR number
+        id: pr
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const fs = require('fs');
+            const raw = fs.readFileSync('number', 'utf8').trim();
+            if (!/^[0-9]+$/.test(raw)) {
+              return core.setFailed(`Invalid PR number from artifact: '${raw}'`);
+            }
+            // The artifact comes from the untrusted pull_request leg, so its number
+            // could point at any PR. Bind it to the run that actually triggered this
+            // workflow_run before handing it to the privileged labeler: the claimed
+            // PR's head commit and head repository must match the trigger run.
+            const run = context.payload.workflow_run;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(raw),
+            });
+            if (pr.head.sha !== run.head_sha) {
+              return core.setFailed(`PR #${raw} head ${pr.head.sha} does not match triggering run head ${run.head_sha}`);
+            }
+            const prHeadRepo = pr.head.repo ? pr.head.repo.full_name : null;
+            const runHeadRepo = run.head_repository ? run.head_repository.full_name : null;
+            if (prHeadRepo !== runHeadRepo) {
+              return core.setFailed(`PR #${raw} head repo ${prHeadRepo} does not match triggering run head repo ${runHeadRepo}`);
+            }
+            core.setOutput('number', raw);
+      - name: Check out trusted labeler config
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout: .github/labeler.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/labeler@f27b608878404679385c85cfa523b85ccb86e213 # v6
+        with:
+          pr-number: ${{ steps.pr.outputs.number }}
+          configuration-path: .github/labeler.yml

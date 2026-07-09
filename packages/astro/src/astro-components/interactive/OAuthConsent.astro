@@ -1,0 +1,11 @@
+---
+import type { OAuthConsentProps } from '@clerk/shared/types';
+type Props = OAuthConsentProps;
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
+---
+
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='oauth-consent'
+/>

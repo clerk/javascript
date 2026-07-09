@@ -7,6 +7,7 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
 
 import { SignInFactorOne } from '../SignInFactorOne';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -105,6 +106,34 @@ describe('SignInFactorOne', () => {
         expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
     });
+
+    it('routes to the protect-check card when the first-factor attempt is gated by Clerk Protect', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithEmailAddress({ supportPassword: true });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      // A protect_check gate can fire on attempt_first_factor; the card must route to the gate
+      // instead of dispatching on the (now-irrelevant) underlying status.
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_protect_check',
+          protectCheck: { status: 'pending', token: 'challenge-token', sdkUrl: 'https://protect.example.com/sdk.js' },
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText('Password'), '123456');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
+        // and must not fall through to a status-based route
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('Selected First Factor Method', () => {
@@ -118,6 +147,7 @@ describe('SignInFactorOne', () => {
         });
         render(<SignInFactorOne />, { wrapper });
         await screen.findByText('Password');
+        screen.getByPlaceholderText('Enter your password');
       });
 
       it('should render the other methods component when clicking on "Forgot password"', async () => {
@@ -139,6 +169,46 @@ describe('SignInFactorOne', () => {
         expect(screen.queryByText('Or, sign in with another method')).not.toBeInTheDocument();
         await screen.findByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
+      });
+
+      describe('reset password intent from start page', () => {
+        const { createFixtures: createFixturesWithResetIntent } = bindCreateFixtures('SignIn', {
+          router: { queryParams: { [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' } },
+        });
+
+        it('opens the forgot password screen when a reset factor exists', async () => {
+          const { wrapper } = await createFixturesWithResetIntent(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPreferredSignInStrategy({ strategy: 'password' });
+            f.startSignInWithEmailAddress({
+              supportEmailCode: true,
+              supportPassword: true,
+              supportResetPassword: true,
+            });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          await screen.findByText('Forgot Password?');
+          await screen.findByText('Reset your password');
+        });
+
+        it('opens use another method when no reset factor exists', async () => {
+          const email = 'test@clerk.com';
+          const { wrapper } = await createFixturesWithResetIntent(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPreferredSignInStrategy({ strategy: 'password' });
+            f.startSignInWithEmailAddress({
+              supportEmailCode: true,
+              supportPassword: true,
+              supportResetPassword: false,
+              identifier: email,
+            });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          await screen.findByText('Use another method');
+          await screen.findByText(`Email code to ${email}`);
+        });
       });
 
       it('should render the Forgot Password alternative methods component when clicking on "Forgot password" (email)', async () => {
@@ -300,57 +370,6 @@ describe('SignInFactorOne', () => {
 
         await userEvent.click(screen.getByText('Reset your password'));
         await screen.findByText('First, enter the code sent to your phone');
-      });
-
-      it('entering a pwned password, then going back and clicking forgot password should result in the correct title', async () => {
-        const { wrapper, fixtures } = await createFixtures(f => {
-          f.withEmailAddress();
-          f.withPassword();
-          f.withPreferredSignInStrategy({ strategy: 'password' });
-          f.startSignInWithEmailAddress({
-            supportPassword: true,
-            supportEmailCode: true,
-            supportResetPassword: true,
-          });
-        });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-        const errJSON = {
-          code: 'form_password_pwned',
-          long_message:
-            'Password has been found in an online data breach. For account safety, please reset your password.',
-          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
-          meta: { param_name: 'password' },
-        };
-
-        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
-          new ClerkAPIResponseError('Error', {
-            data: [errJSON],
-            status: 422,
-          }),
-        );
-
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.type(screen.getByLabelText('Password'), '123456');
-        await userEvent.click(screen.getByText('Continue'));
-
-        await screen.findByText('Password compromised');
-        await screen.findByText(
-          'This password has been found as part of a breach and can not be used, please reset your password.',
-        );
-        await screen.findByText('Or, sign in with another method');
-
-        // Go back
-        await userEvent.click(screen.getByText('Back'));
-
-        // Choose to reset password via "Forgot password" instead
-        await userEvent.click(screen.getByText(/Forgot password/i));
-        await screen.findByText('Forgot Password?');
-        expect(
-          screen.queryByText(
-            'This password has been found as part of a breach and can not be used, please reset your password.',
-          ),
-        ).not.toBeInTheDocument();
       });
 
       it('using an compromised password should show the compromised password screen', async () => {

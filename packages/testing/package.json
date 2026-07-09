@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "2.0.6",
+  "version": "2.2.5",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -67,12 +67,14 @@
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
@@ -85,7 +87,7 @@
   },
   "peerDependencies": {
     "@playwright/test": "^1",
-    "cypress": "^13 || ^14"
+    "cypress": "^13 || ^14 || ^15"
   },
   "peerDependenciesMeta": {
     "@playwright/test": {

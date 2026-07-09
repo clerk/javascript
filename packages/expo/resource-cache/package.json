@@ -1,0 +1,4 @@
+{
+  "main": "../dist/resource-cache/index.js",
+  "types": "../dist/resource-cache/index.d.ts"
+}

@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import { createPathMatcher, type PathMatcherParam } from '@clerk/shared/pathMatcher';
 import type { RouteMiddleware } from 'nuxt/app';
 
@@ -14,8 +15,29 @@ export type RouteMatcherParam = PathMatcherParam;
  * ['/foo', '/bar(.*)']
  * @example
  * [/^\/foo\/.*$/]
+ *
+ * @deprecated This function will be removed in the next major version. Use Nuxt's built-in
+ * route middleware to protect pages instead: create a named middleware that checks the user's
+ * authentication status and opt pages into it with `definePageMeta()`. Child routes inherit
+ * the middleware applied to their parent, so a single declaration can protect a whole section.
+ *
+ * ```ts
+ * // app/middleware/auth.ts
+ * export default defineNuxtRouteMiddleware(() => {
+ *   const { isSignedIn } = useAuth();
+ *
+ *   if (!isSignedIn.value) {
+ *     return navigateTo('/sign-in');
+ *   }
+ * });
+ * ```
  */
 export const createRouteMatcher = (routes: RouteMatcherParam) => {
+  deprecated(
+    'createRouteMatcher',
+    "Use Nuxt's built-in route middleware to protect pages instead: create a named middleware that checks the user's authentication status and opt pages into it with `definePageMeta({ middleware: 'auth' })`.",
+  );
+
   const matcher = createPathMatcher(routes);
   return (to: RouteLocation) => matcher(to.path);
 };

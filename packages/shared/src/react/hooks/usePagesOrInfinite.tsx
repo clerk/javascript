@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
-import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
-import { useClerkQuery } from '../clerk-rq/useQuery';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQueryClient } from '../query/use-clerk-query-client';
+import { useClerkInfiniteQuery } from '../query/useInfiniteQuery';
+import { useClerkQuery } from '../query/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
 import { useClearQueriesOnSignOut, withInfiniteKey } from './useClearQueriesOnSignOut';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';

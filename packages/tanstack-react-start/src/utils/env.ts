@@ -20,6 +20,9 @@ export const getPublicEnvVariables = () => {
     prefetchUI: getValue('CLERK_PREFETCH_UI') === 'false' ? false : undefined,
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
+    unsafeDisableDevelopmentModeConsoleWarning: isTruthy(
+      getValue('CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING'),
+    ),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
     newSubscriptionRedirectUrl: getValue('CLERK_CHECKOUT_CONTINUE_URL'),

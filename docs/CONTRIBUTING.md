@@ -11,6 +11,7 @@ Please note we have a [code of conduct](https://github.com/clerk/javascript/blob
     - [Monorepo setup](#monorepo-setup)
     - [Prerequisites](#prerequisites)
     - [Setting up your local environment](#setting-up-your-local-environment)
+    - [Working with AI assistants](#working-with-ai-assistants)
     - [Documenting your changes](#documenting-your-changes)
     - [Writing tests](#writing-tests)
     - [Authoring Typedoc information](#authoring-typedoc-information)
@@ -90,6 +91,14 @@ This ensures that all internal TypeScript types are generated and any dependenci
 Once you're ready to make changes, run `pnpm dev` from the monorepo root.
 
 If you want to run the `dev` script of an individual package, navigate to the folder and run the script from there. This way you can also individually run the `build` script.
+
+### Working with AI assistants
+
+The repo ships configuration for AI coding agents, picked up automatically from the checkout with no setup:
+
+- [`AGENTS.md`](../AGENTS.md) holds the hard rules (package manager, changesets, commit conventions, backwards compatibility) and is read by most agents.
+- Claude Code also loads the `clerk-monorepo` skill from [`.claude/skills/`](../.claude/skills/README.md). It activates on its own for monorepo questions, or explicitly via `/clerk-monorepo`. The README in that directory explains how skills work and how to maintain them.
+- Cursor reads the rules in `.cursor/rules/`.
 
 ### Documenting your changes
 

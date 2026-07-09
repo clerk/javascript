@@ -1,6 +1,6 @@
 import { userEvent } from '@testing-library/user-event';
 import { render, screen } from '@testing-library/vue';
-import { vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 
 import SignInWithMetamaskButton from '../SignInWithMetamaskButton.vue';

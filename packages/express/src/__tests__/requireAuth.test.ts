@@ -1,10 +1,10 @@
 import type { RequestHandler } from 'express';
 import type { Mock } from 'vitest';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { requireAuth } from '../requireAuth';
-import type { ExpressRequestWithAuth } from '../types';
+import { brandRequestAuth, requestHasAuthObject } from '../utils';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
 let mockAuthenticateAndDecorateRequest: Mock;
@@ -15,11 +15,19 @@ vi.mock('../authenticateRequest', () => ({
   authenticateRequest: (options = {}) => mockAuthenticateRequest(options),
 }));
 
+const { mockDeprecated } = vi.hoisted(() => ({
+  mockDeprecated: vi.fn(),
+}));
+vi.mock('@clerk/shared/deprecated', () => ({
+  deprecated: mockDeprecated,
+}));
+
 describe('requireAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthenticateAndDecorateRequest = vi.fn();
     mockAuthenticateRequest = vi.fn();
+    mockDeprecated.mockClear();
   });
 
   it('should redirect to sign-in page when user is not authenticated', async () => {
@@ -79,11 +87,11 @@ describe('requireAuth', () => {
 
     mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
       return (req, _res, next) => {
-        if ((req as ExpressRequestWithAuth).auth) {
+        if (requestHasAuthObject(req)) {
           return next();
         }
         const requestState = mockAuthenticateRequest({ request: req });
-        Object.assign(req, { auth: () => requestState.toAuth() });
+        Object.assign(req, { auth: brandRequestAuth(() => requestState.toAuth()) });
         next();
       };
     });
@@ -96,5 +104,21 @@ describe('requireAuth', () => {
     // Redirect should still happen
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/sign-in');
+  });
+
+  it('should emit a deprecation warning when called', async () => {
+    mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
+      return (req, _res, next) => {
+        Object.assign(req, mockRequestWithAuth({ userId: 'user_123' }));
+        next();
+      };
+    });
+
+    await runMiddleware(requireAuth());
+
+    expect(mockDeprecated).toHaveBeenCalledWith(
+      'requireAuth',
+      'Use `clerkMiddleware()` with `getAuth()` instead. `requireAuth` will be removed in the next major version.',
+    );
   });
 });

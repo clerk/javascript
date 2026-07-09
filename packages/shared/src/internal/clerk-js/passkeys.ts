@@ -118,7 +118,10 @@ function handlePublicKeyError(error: Error): ClerkWebAuthnError | ClerkRuntimeEr
     return new ClerkWebAuthnError(error.message, { code: 'passkey_operation_aborted' });
   }
   if (error.name === 'SecurityError') {
-    return new ClerkWebAuthnError(error.message, { code: 'passkey_invalid_rpID_or_domain' });
+    return new ClerkWebAuthnError(error.message, {
+      code: 'passkey_invalid_rpID_or_domain',
+      docsUrl: 'https://clerk.com/docs/deployments/overview#authentication-across-subdomains',
+    });
   }
   return error;
 }

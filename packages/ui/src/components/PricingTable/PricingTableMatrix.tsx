@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
@@ -21,7 +22,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { usePrefersReducedMotion } from '../../hooks';
-import { Check, InformationCircle } from '../../icons';
+import { Checkmark, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
@@ -46,7 +47,7 @@ export function PricingTableMatrix({
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
   const { buttonPropsForPlan } = usePlansContext();
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -157,10 +158,12 @@ export function PricingTableMatrix({
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 const planFee = !plan.annualMonthlyFee
-                  ? plan.fee
+                  ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    plan.fee!
                   : planPeriod === 'annual'
                     ? plan.annualMonthlyFee
-                    : plan.fee;
+                    : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                      plan.fee!;
 
                 return (
                   <Box
@@ -210,7 +213,7 @@ export function PricingTableMatrix({
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                              localizationKey={localizationKeys('billing.popular')}
+                              localizationKey={localizationKeys('billing.highlightedPlanBadge')}
                             />
                           ) : null}
                         </Span>
@@ -236,8 +239,7 @@ export function PricingTableMatrix({
                               variant='h2'
                               colorScheme='body'
                             >
-                              {planFee.currencySymbol}
-                              {planFee.amountFormatted}
+                              {$(planFee)}
                             </Text>
                             <Text
                               elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
@@ -263,8 +265,7 @@ export function PricingTableMatrix({
                                   }),
                                   feePeriodNoticeAnimation,
                                 ]}
-                                // @ts-ignore - Needed until React 19 support
-                                inert={planPeriod !== 'annual' ? 'true' : undefined}
+                                {...inertProps(planPeriod !== 'annual')}
                               >
                                 <Box
                                   elementDescriptor={descriptors.pricingTableMatrixFeePeriodNoticeInner}
@@ -394,7 +395,7 @@ export function PricingTableMatrix({
                       >
                         {hasFeature && (
                           <Icon
-                            icon={Check}
+                            icon={Checkmark}
                             colorScheme='neutral'
                             size='sm'
                             aria-label={t(localizationKeys('billing.pricingTable.included'))}

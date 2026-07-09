@@ -51,10 +51,15 @@ export const fiFI: LocalizationResource = {
       formButtonPrimary__revoke: 'Peruuta avain',
       formHint: 'Haluatko varmasti poistaa tämän salaisen avaimen?',
       formTitle: 'Peruuttaako "{{apiKeyName}}" salainen avain?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Takaisin',
   badge__activePlan: 'Aktiivinen',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Peruutettu • Päättyy {{ date | shortDate('fi-FI') }}",
   badge__currentPlan: 'Nykyinen paketti',
   badge__default: 'Oletus',
@@ -75,11 +80,14 @@ export const fiFI: LocalizationResource = {
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
   billing: {
+    accountCredit: 'Tilihyvitys',
     addPaymentMethod__label: 'Lisää maksutapa',
     alwaysFree: 'Aina ilmainen',
     annually: 'Vuosittain',
     availableFeatures: 'Sisältyvät ominaisuudet',
     billedAnnually: 'Laskutetaan vuosittain',
+    billedAnnuallyOnly: 'Laskutus vain vuosittain',
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Laskutus vain kuukausittain',
     cancelFreeTrial: 'Peruuta ilmainen kokeilu',
     cancelFreeTrialAccessUntil:
@@ -118,20 +126,25 @@ export const fiFI: LocalizationResource = {
       title__subscriptionSuccessful: 'Onnistui!',
       title__trialSuccess: 'Kokeilu aloitettu onnistuneesti!',
       totalDueAfterTrial: 'Erääntyy kokeilun päätyttyä {{days}} päivän kuluttua',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Hyvitys',
     creditRemainder: 'Hyvitys nykyisen tilauksesi jäljellä olevalta ajalta.',
     defaultFreePlanActive: 'Olet tällä hetkellä ilmaisella tilauksella.',
     free: 'Ilmainen',
     getStarted: 'Aloita',
+    highlightedPlanBadge: 'Suosittu',
     keepFreeTrial: 'Pidä ilmainen kokeilu',
     keepSubscription: 'Pidä tilaus',
     manage: 'Hallinnoi',
     manageSubscription: 'Hallinnoi tilausta',
     month: 'Kuukausi',
+    monthAbbreviation: 'kk',
+    monthPerUnit: 'Kuukausi per {{unitName}}',
     monthly: 'Kuukausittain',
     pastDue: 'Erääntynyt',
     pay: 'Maksa {{amount}}',
+    payerCreditRemainder: 'Hyvitys tilin saldosta.',
     paymentMethod: {
       applePayDescription: {
         annual: 'Vuosimaksu',
@@ -147,12 +160,32 @@ export const fiFI: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Maksutavat',
-    popular: 'Suosittu',
     pricingTable: {
       billingCycle: 'Laskutusjakso',
       included: 'Sisältyy',
+      seatCost: {
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} lisäpaikoista)',
+        freeUpToSeats: 'Ilmainen enintään {{endsAfterBlock}} paikalle',
+        includedSeats: '{{includedSeats}} paikkaa sisältyy',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per paikka',
+        tooltip: {
+          additionalSeatsEach: 'Lisäpaikat {{feePerBlockAmount}}/{{period}} kappale.',
+          firstSeatsIncludedInPlan: 'Ensimmäiset {{endsAfterBlock}} paikkaa sisältyvät tilaukseen.',
+          freeForUpToSeats: 'Ilmainen enintään {{endsAfterBlock}} paikalle.',
+        },
+        unlimitedSeats: 'Rajattomasti paikkoja',
+        upToSeats: 'Enintään {{endsAfterBlock}} paikkaa',
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: 'Suhteutettu hyvitys',
     reSubscribe: 'Tilaa uudelleen',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: 'Paikat',
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Näytä kaikki ominaisuudet',
     startFreeTrial: 'Aloita ilmainen kokeilu',
     startFreeTrial__days: 'Aloita {{days}} päivän ilmainen kokeilu',
@@ -173,16 +206,560 @@ export const fiFI: LocalizationResource = {
       trialStartedOn: 'Kokeilu alkanut',
     },
     subtotal: 'Välisumma',
+    subtotalRenewal: undefined,
     switchPlan: 'Vaihda tähän tilaukseen',
     switchToAnnual: 'Vaihda vuositilaukseen',
     switchToAnnualWithAnnualPrice: 'Vaihda vuositilaukseen {{price}}{{currency}} / vuosi',
     switchToMonthly: 'Vaihda kuukausitilaukseen',
     switchToMonthlyWithPrice: 'Vaihda kuukausitilaukseen {{price}}{{currency}} / kuukausi',
     totalDue: 'Maksettava yhteensä',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Maksettava tänään',
     viewFeatures: 'Näytä ominaisuudet',
     viewPayment: 'Näytä maksu',
     year: 'Vuosi',
+    yearAbbreviation: 'v',
+    yearPerUnit: 'Vuosi per {{unitName}}',
+  },
+  configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan päivittääksesi oikeuksiasi.',
+      title: 'Sinulla ei ole oikeutta hallita kertakirjautumista (SSO)',
+    },
+    navbar: {
+      title: 'Määritä kertakirjautuminen (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: 'Vahvistamaton',
+        badge__verified: 'Vahvistettu',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Isäntä / Nimi',
+          instructions:
+            'Lisää tämä TXT-tietue DNS-palveluntarjoajallesi. Vahvistamme sen automaattisesti, kun tietue on aktiivinen.',
+          typeLabel: 'Tyyppi',
+          valueLabel: 'Arvo',
+        },
+        verifiedAtLabel: "Vahvistettu {{ date | shortDate('fi-FI') }}",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Lisää {{domain}}',
+        messageLabel: 'Sähköpostisi käyttää osoitetta {{domain}}. Haluatko lisätä sen?',
+      },
+      formButtonPrimary__add: 'Lisää',
+      formFieldInputPlaceholder__domain: 'Lisää verkkotunnus',
+      formFieldLabel__domain: 'Verkkotunnus',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Lisää ja vahvista niiden verkkotunnusten omistajuus, joita organisaatiosi käyttää kirjautumiseen.',
+      title: 'Lisää SSO-verkkotunnuksia',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Mukautettu SAML-palveluntarjoaja',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Valitse palveluntarjoaja, jolle määrität SSO:n.',
+      title: 'Valitse palveluntarjoaja',
+      warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
@@ -224,13 +801,14 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__emailAddresses: 'esimerkki@domain.fi, esimerkki2@domain.fi',
   formFieldInputPlaceholder__firstName: 'Etunimi',
   formFieldInputPlaceholder__lastName: 'Sukunimi',
-  formFieldInputPlaceholder__organizationDomain: undefined,
-  formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
+  formFieldInputPlaceholder__organizationDomain: 'esimerkki.fi',
+  formFieldInputPlaceholder__organizationDomainEmailAddress: 'sinä@esimerkki.fi',
   formFieldInputPlaceholder__organizationName: 'Organisaation nimi',
   formFieldInputPlaceholder__organizationSlug: 'minun-org',
   formFieldInputPlaceholder__password: 'Syötä salasanasi',
   formFieldInputPlaceholder__phoneNumber: 'Syötä puhelinnumerosi',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__signUpPassword: 'Luo salasana',
+  formFieldInputPlaceholder__username: 'Syötä käyttäjänimesi',
   formFieldInput__emailAddress_format: 'Esimerkki: nimi@esimerkki.fi',
   formFieldLabel__apiKey: 'API-avain',
   formFieldLabel__apiKeyDescription: 'Kuvaus',
@@ -260,6 +838,9 @@ export const fiFI: LocalizationResource = {
   formFieldLabel__role: 'Rooli',
   formFieldLabel__signOutOfOtherSessions: 'Kirjaudu ulos kaikista muista laitteista',
   formFieldLabel__username: 'Käyttäjänimi',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Kirjaudu ulos',
     title: 'Kirjautuneena käyttäjänä {{identifier}}',
@@ -269,6 +850,22 @@ export const fiFI: LocalizationResource = {
   membershipRole__admin: 'Ylläpitäjä',
   membershipRole__basicMember: 'Jäsen',
   membershipRole__guestMember: 'Vieras',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
@@ -286,9 +883,19 @@ export const fiFI: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automaattiset kutsut',
     badge__automaticSuggestion: 'Automaattiset ehdotukset',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Ei automaattista liittymistä',
     badge__unverified: 'Vahvistamaton',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Ei maksuhistoriaa',
         notFound: 'Maksuyritystä ei löytynyt',
@@ -323,6 +930,7 @@ export const fiFI: LocalizationResource = {
       statementsSection: {
         empty: 'Ei tositteita näytettäväksi',
         itemCaption__paidForPlan: 'Maksettu {{plan}} {{period}} -tilauksesta',
+        itemCaption__payerCredit: 'Hyvitys tilin saldosta',
         itemCaption__proratedCredit: 'Suhteutettu hyvitys edellisen tilauksen osittaisesta käytöstä',
         itemCaption__subscribedAndPaidForPlan: 'Tilattu ja maksettu {{plan}} {{period}} -tilaus',
         notFound: 'Tosite ei löytynyt',
@@ -335,6 +943,11 @@ export const fiFI: LocalizationResource = {
         actionLabel__manageSubscription: 'Hallinnoi',
         actionLabel__newSubscription: 'Tilaa',
         actionLabel__switchPlan: 'Vaihda tilausta',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Muokkaa',
         tableHeader__plan: 'Paketti',
         tableHeader__startDate: 'Aloituspäivä',
@@ -357,6 +970,7 @@ export const fiFI: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Kutsuja ei voitu lähettää. Seuraaville sähköpostiosoitteille on jo odottavia kutsuja: {{email_addresses}}.',
       formButtonPrimary__continue: 'Lähetä kutsuja',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Valitse rooli',
       subtitle: 'Kirjoita tai liitä yksi tai useampi sähköpostiosoite, erotettuna välilyönneillä tai pilkuilla.',
       successMessage: 'Kutsut lähetetty onnistuneesti',
@@ -416,11 +1030,14 @@ export const fiFI: LocalizationResource = {
       description: 'Hallitse organisaatiotasi.',
       general: 'Yleinen',
       members: 'Jäsenet',
+      security: undefined,
       title: 'Organisaatio',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Sinulla ei ole oikeuksia hallinnoida tämän organisaation laskutusta.',
+        planMembershipLimitExceeded:
+          'Organisaatiossasi on {{count}} jäsentä (sisältäen odottavat kutsut). Tämä paketti sallii vain {{limit}} jäsentä.',
       },
       title: 'Tilaukset',
     },
@@ -461,9 +1078,36 @@ export const fiFI: LocalizationResource = {
       successMessage: '{{domain}} on poistettu.',
       title: 'Poista verkkotunnus',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Yleinen',
       headerTitle__members: 'Jäsenet',
+      membershipSeatUsageLabel: '{{count}} / {{limit}} paikkaa käytössä',
       profileSection: {
         primaryButton: 'Päivitä profiili',
         title: 'Organisaation profiili',
@@ -585,6 +1229,9 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä todennussovelluksesi luoma koodi jatkaaksesi',
       title: 'Vahvistus vaaditaan',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -710,13 +1357,13 @@ export const fiFI: LocalizationResource = {
       title: 'Syötä salasanasi',
     },
     passwordCompromised: {
-      title: undefined,
+      title: 'Salasana vaarantunut',
     },
     passwordPwned: {
       title: 'Salasana tietomurrossa',
     },
     passwordUntrusted: {
-      title: undefined,
+      title: 'Salasana epäluotettava',
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -729,6 +1376,12 @@ export const fiFI: LocalizationResource = {
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Syötä jatkaaksesi puhelimeesi lähetetty vahvistuskoodi',
       title: 'Tarkista puhelimesi',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'Nollaa salasana',
@@ -758,7 +1411,7 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Tervetuloa takaisin! Kirjaudu sisään jatkaaksesi',
       subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
-      titleCombined: undefined,
+      titleCombined: 'Jatka kohteeseen {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Todennuskoodi',
@@ -835,6 +1488,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä puhelimeesi lähetetty koodi jatkaaksesi.',
       title: 'Tarkista puhelimesi',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     restrictedAccess: {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
@@ -894,8 +1553,8 @@ export const fiFI: LocalizationResource = {
       title: 'Määritä organisaatiosi',
     },
     organizationCreationDisabled: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
+      title: 'Sinun on kuuluttava organisaatioon',
     },
     signOut: {
       actionLink: 'Kirjaudu ulos',
@@ -908,74 +1567,85 @@ export const fiFI: LocalizationResource = {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
-    subtitle: undefined,
-    title: undefined,
+    subtitle: 'Tilisi vaatii uuden salasanan ennen kuin voit jatkaa',
+    title: 'Nollaa salasanasi',
   },
   taskSetupMfa: {
-    badge: undefined,
+    badge: 'Kaksivaiheisen todennuksen asennus',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kirjaudu ulos',
+      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
     smsCode: {
       addPhone: {
-        formButtonPrimary: undefined,
-        infoText: undefined,
+        formButtonPrimary: 'Jatka',
+        infoText:
+          'Vahvistuskoodin sisältävä tekstiviesti lähetetään tähän puhelinnumeroon. Viesti- ja tiedonsiirtomaksuja saatetaan periä.',
       },
-      addPhoneNumber: undefined,
-      cancel: undefined,
-      subtitle: undefined,
+      addPhoneNumber: 'Lisää puhelinnumero',
+      cancel: 'Peruuta',
+      subtitle: 'Valitse puhelinnumero, jota haluat käyttää SMS-koodin kaksivaiheiseen todennukseen',
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: 'Jatka',
+        message1:
+          'Kaksivaiheinen todennus on nyt käytössä. Kirjautuessasi sinun on syötettävä tähän puhelinnumeroon lähetetty vahvistuskoodi lisävaiheena.',
+        message2:
+          'Tallenna nämä varakoodit ja säilytä ne turvallisessa paikassa. Jos menetät pääsyn todennuslaitteeseesi, voit käyttää varakoodeja kirjautuaksesi sisään.',
+        title: 'SMS-koodin todennus käytössä',
       },
-      title: undefined,
+      title: 'Lisää SMS-koodin todennus',
       verifyPhone: {
-        formButtonPrimary: undefined,
-        formTitle: undefined,
-        resendButton: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: 'Jatka',
+        formTitle: 'Vahvistuskoodi',
+        resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+        subtitle: 'Syötä vahvistuskoodi, joka lähetettiin numeroon',
+        title: 'Vahvista puhelinnumerosi',
       },
     },
     start: {
       methodSelection: {
-        phoneCode: undefined,
-        totp: undefined,
+        phoneCode: 'SMS-koodi',
+        totp: 'Todennussovellus',
       },
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse menetelmä, jolla haluat suojata tilisi ylimääräisellä turvallisuustasolla',
+      title: 'Ota kaksivaiheinen todennus käyttöön',
     },
     totpCode: {
       addAuthenticatorApp: {
-        buttonAbleToScan__nonPrimary: undefined,
-        buttonUnableToScan__nonPrimary: undefined,
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        infoText__ableToScan: undefined,
-        infoText__unableToScan: undefined,
-        inputLabel__unableToScan1: undefined,
+        buttonAbleToScan__nonPrimary: 'Skannaa sen sijaan QR-koodi',
+        buttonUnableToScan__nonPrimary: 'Etkö voi skannata QR-koodia?',
+        formButtonPrimary: 'Jatka',
+        formButtonReset: 'Peruuta',
+        infoText__ableToScan:
+          'Aseta uusi kirjautumistapa todennussovellukseesi ja skannaa seuraava QR-koodi linkittääksesi se tilillesi.',
+        infoText__unableToScan: 'Aseta uusi kirjautumistapa todennussovellukseesi ja syötä alla annettu avain.',
+        inputLabel__unableToScan1:
+          'Varmista, että Aikaperusteiset tai Yksittäiset salasanat on käytössä ja viimeistele tilin linkitys.',
       },
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: 'Jatka',
+        message1:
+          'Kaksivaiheinen todennus on nyt käytössä. Kirjautuessasi sinun on syötettävä vahvistuskoodi tästä todennussovelluksesta lisävaiheena.',
+        message2:
+          'Tallenna nämä varakoodit ja säilytä ne turvallisessa paikassa. Jos menetät pääsyn todennuslaitteeseesi, voit käyttää varakoodeja kirjautuaksesi sisään.',
+        title: 'Todennussovelluksen todennus käytössä',
       },
-      title: undefined,
+      title: 'Lisää todennussovellus',
       verifyTotp: {
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        formTitle: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: 'Jatka',
+        formButtonReset: 'Peruuta',
+        formTitle: 'Vahvistuskoodi',
+        subtitle: 'Syötä todennussovelluksesi luoma vahvistuskoodi',
+        title: 'Lisää todennussovellus',
       },
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} on jo tämän organisaation jäsen.',
+    api_key_name_already_exists: 'API-avaimen nimi on jo olemassa.',
+    api_key_usage_exceeded:
+      'Olet saavuttanut käyttörajasi. Voit poistaa rajoituksen siirtymällä maksulliseen tilaukseen.',
     avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
     avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
@@ -989,7 +1659,7 @@ export const fiFI: LocalizationResource = {
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
     form_identifier_not_found: 'Ei voi löytää tiliä näillä tiedoilla.',
-    form_new_password_matches_current: undefined,
+    form_new_password_matches_current: 'Uusi salasana ei voi olla sama kuin nykyinen salasana.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',
@@ -1003,7 +1673,7 @@ export const fiFI: LocalizationResource = {
     form_param_value_invalid: undefined,
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
-    form_password_length_too_short: undefined,
+    form_password_length_too_short: 'Salasanasi on liian lyhyt. Sen on oltava vähintään 8 merkkiä pitkä.',
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_or_identifier_incorrect:
       'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
@@ -1011,18 +1681,23 @@ export const fiFI: LocalizationResource = {
     form_password_pwned__sign_in: 'Salasana on ollut mukana julkisissa tietovuodoissa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:
       'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
-    form_password_untrusted__sign_in: undefined,
+    form_password_untrusted__sign_in:
+      'Salasanasi on saattanut vaarantua. Tilisi suojaamiseksi jatka vaihtoehtoisella kirjautumismenetelmällä. Sinun on vaihdettava salasanasi kirjautumisen jälkeen.',
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
-    form_username_invalid_length: undefined,
+    form_username_invalid_length: 'Käyttäjänimen on oltava {{min_length}}–{{max_length}} merkkiä pitkä.',
     form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'Olet saavuttanut organisaation jäsenmäärän ylärajan, mukaan lukien odottavat kutsut.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'Et ole enää tämän organisaation jäsen. Valitse tai luo toinen organisaatio.',
@@ -1043,6 +1718,14 @@ export const fiFI: LocalizationResource = {
       sentencePrefix: 'Salasanan on sisällettävä',
     },
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',
     web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
@@ -1094,6 +1777,9 @@ export const fiFI: LocalizationResource = {
     action__openUserMenu: 'Avaa käyttäjävalikko',
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikilta tileiltä',
+    label__accountActions: 'Tilin toiminnot',
+    label__activeSessions: 'Aktiiviset istunnot',
+    label__userButtonPopover: 'Tilin paneeli',
   },
   userProfile: {
     apiKeysPage: {
@@ -1116,6 +1802,15 @@ export const fiFI: LocalizationResource = {
       title__codelist: 'Varakoodit',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Ei maksuhistoriaa',
         notFound: 'Maksuyritystä ei löytynyt',
@@ -1150,6 +1845,7 @@ export const fiFI: LocalizationResource = {
       statementsSection: {
         empty: 'Ei tositteita näytettäväksi',
         itemCaption__paidForPlan: 'Maksettu {{plan}} {{period}} -paketista',
+        itemCaption__payerCredit: 'Hyvitys tilin saldosta',
         itemCaption__proratedCredit: 'Suhteutettu hyvitys edellisen tilauksen osittaisesta käytöstä',
         itemCaption__subscribedAndPaidForPlan: 'Tilattu ja maksettu {{plan}} {{period}} -paketti',
         notFound: 'Tosite ei löytynyt',
@@ -1162,6 +1858,7 @@ export const fiFI: LocalizationResource = {
         actionLabel__manageSubscription: 'Hallinnoi',
         actionLabel__newSubscription: 'Tilaa paketti',
         actionLabel__switchPlan: 'Vaihda pakettia',
+        overview: undefined,
         tableHeader__edit: 'Muokkaa',
         tableHeader__plan: 'Paketti',
         tableHeader__startDate: 'Aloituspäivä',
@@ -1363,6 +2060,7 @@ export const fiFI: LocalizationResource = {
         title: 'Sähköpostiosoitteet',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Yhdistä tili',
         title: 'Yritystilit',
       },
       headerTitle__account: 'Tili',

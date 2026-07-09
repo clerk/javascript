@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import type { RequestHandler } from 'express';
 
 import { authenticateAndDecorateRequest } from './authenticateRequest';
@@ -7,30 +8,27 @@ import type { ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
  * Middleware to require authentication for user requests.
  * Redirects unauthenticated requests to the sign-in url.
  *
- * @example
- * // Basic usage
- * import { requireAuth } from '@clerk/express'
+ * @deprecated Use `clerkMiddleware()` with `getAuth()` instead.
+ * `requireAuth` will be removed in the next major version.
  *
- * router.use(requireAuth())
- * //or
+ * @example
+ * // Before (deprecated)
+ * import { requireAuth } from '@clerk/express'
  * router.get('/path', requireAuth(), getHandler)
  *
  * @example
- * // Customizing the sign-in path
- * router.use(requireAuth({ signInUrl: '/sign-in' }))
+ * // After (recommended)
+ * import { clerkMiddleware, getAuth } from '@clerk/express'
  *
- * @example
- * // Combining with permission check
- * import { getAuth, requireAuth } from '@clerk/express'
+ * app.use(clerkMiddleware())
  *
- * const hasPermission = (req, res, next) => {
- *    const auth = getAuth(req)
- *    if (!auth.has({ permission: 'permission' })) {
- *      return res.status(403).send('Forbidden')
- *    }
- *    return next()
- * }
- * router.get('/path', requireAuth(), hasPermission, getHandler)
+ * app.get('/api/protected', (req, res) => {
+ *   const { userId } = getAuth(req);
+ *   if (!userId) {
+ *     return res.status(401).json({ error: 'Unauthorized' });
+ *   }
+ *   // handle authenticated request
+ * })
  */
 export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandler => {
   const authMiddleware = authenticateAndDecorateRequest({
@@ -39,6 +37,11 @@ export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandle
   });
 
   return (request, response, next) => {
+    deprecated(
+      'requireAuth',
+      'Use `clerkMiddleware()` with `getAuth()` instead. `requireAuth` will be removed in the next major version.',
+    );
+
     authMiddleware(request, response, err => {
       if (err) {
         return next(err);

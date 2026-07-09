@@ -65,6 +65,9 @@ function SignUpStartInternal(): JSX.Element {
   );
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = React.useState(false);
 
   const {
     userSettings: { passwordSettings, usernameSettings },
@@ -109,7 +112,7 @@ function SignUpStartInternal(): JSX.Element {
     password: useFormControl('password', '', {
       type: 'password',
       label: localizationKeys('formFieldLabel__password'),
-      placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__signUpPassword'),
       validatePassword: true,
       buildErrorMessage: errors => createPasswordError(errors, { t, locale, passwordSettings }),
     }),
@@ -164,6 +167,7 @@ function SignUpStartInternal(): JSX.Element {
           redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          protectCheckPath: 'protect-check',
           continuePath: 'continue',
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
@@ -259,7 +263,15 @@ function SignUpStartInternal(): JSX.Element {
     }, [] as Array<FormControlState>);
 
     if (unsafeMetadata) {
-      fieldsToSubmit.push({ id: 'unsafeMetadata', value: unsafeMetadata } as any);
+      const noop = () => {};
+      fieldsToSubmit.push({
+        id: 'unsafeMetadata',
+        value: unsafeMetadata,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     if (fields.ticket || hasExistingSignUpWithTicket) {
@@ -345,6 +357,7 @@ function SignUpStartInternal(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          protectCheckPath: 'protect-check',
           handleComplete: () =>
             setActive({
               session: res.createdSessionId,
@@ -434,6 +447,13 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
@@ -456,8 +476,11 @@ function SignUpStartInternal(): JSX.Element {
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
-              {!shouldShowForm && <CaptchaElement />}
             </Flex>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
           </Card.Content>
 
           <Card.Footer>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSSOCallbackURL, buildVerificationRedirectUrl } from '../redirects';
+import { buildVerificationRedirectUrl } from '../redirects';
 
 describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
   it('defaults to hash based routing strategy on empty routing', function () {
@@ -168,56 +168,5 @@ describe('buildVerificationRedirectUrl(routing, baseUrl)', () => {
         intent: 'sign-in',
       }),
     ).toBe('http://localhost:3000/sign-in/verify');
-  });
-});
-
-describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
-  it('returns the SSO callback URL based on sign in|up component routing or the provided base URL', () => {
-    // Default callback URLS
-    expect(buildSSOCallbackURL({}, '')).toBe('http://localhost:3000/#/sso-callback');
-    expect(buildSSOCallbackURL({}, 'http://test.host')).toBe('http://localhost:3000/#/sso-callback');
-    expect(buildSSOCallbackURL({ authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host')).toBe(
-      'http://localhost:3000/#/sso-callback?redirect_url=%2Ffoo',
-    );
-
-    // Components mounted with hash routing
-    expect(buildSSOCallbackURL({ routing: 'hash' }, 'http://test.host')).toBe('http://localhost:3000/#/sso-callback');
-    expect(buildSSOCallbackURL({ routing: 'hash', authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host')).toBe(
-      'http://localhost:3000/#/sso-callback?redirect_url=%2Ffoo',
-    );
-
-    // Components mounted with path routing
-    expect(buildSSOCallbackURL({ routing: 'path', path: 'sign-in' }, 'http://test.host')).toBe(
-      'http://localhost:3000/sign-in/sso-callback',
-    );
-    expect(
-      buildSSOCallbackURL(
-        {
-          routing: 'path',
-          path: 'sign-in',
-          authQueryString: 'redirect_url=%2Ffoo',
-        },
-        'http://test.host',
-      ),
-    ).toBe('http://localhost:3000/sign-in/sso-callback?redirect_url=%2Ffoo');
-
-    // Components mounted with virtual routing
-    expect(buildSSOCallbackURL({ routing: 'virtual' }, 'http://test.host')).toBe('http://test.host/#/sso-callback');
-    expect(
-      buildSSOCallbackURL({ routing: 'virtual', authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host'),
-    ).toBe('http://test.host/#/sso-callback?redirect_url=%2Ffoo');
-
-    // Custom SSO callback URL in the context
-    expect(buildSSOCallbackURL({ isCombinedFlow: true, ssoCallbackUrl: 'http://test.host/ctx-sso-callback' })).toBe(
-      'http://test.host/ctx-sso-callback',
-    );
-    // Does not use SSO callback URL from context when routing is virtual
-    expect(
-      buildSSOCallbackURL({
-        isCombinedFlow: true,
-        ssoCallbackUrl: 'http://test.host/ctx-sso-callback',
-        routing: 'virtual',
-      }),
-    ).toBe('http://localhost:3000/#/sso-callback');
   });
 });

@@ -137,8 +137,9 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
     <>
       <Header.Root
         sx={t => ({
-          padding: `${t.space.$none} ${t.space.$8}`,
+          padding: `${t.space.$4} ${t.space.$4} ${t.space.$none}`,
         })}
+        showLogo
       >
         <Header.Title
           localizationKey={localizationKeys(
@@ -154,7 +155,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
       <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
-          <Actions role='menu'>
+          <Actions>
             <PersonalAccountPreview />
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {

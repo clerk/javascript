@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
+import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
@@ -25,6 +26,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -35,6 +37,8 @@ import type {
   ListenerCallback,
   ListenerOptions,
   LoadedClerk,
+  OAuthApplicationNamespace,
+  OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -88,12 +92,10 @@ const SDK_METADATA = {
   environment: process.env.NODE_ENV,
 };
 
-export interface Global {
-  Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __internal_ClerkUICtor?: ClerkUIConstructor;
+declare global {
+  var Clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
+  var __internal_ClerkUICtor: ClerkUIConstructor | undefined;
 }
-
-declare const global: Global;
 
 type GenericFunction<TArgs = never> = (...args: TArgs[]) => unknown;
 
@@ -118,11 +120,13 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | 'billing'
   | 'apiKeys'
+  | 'oauthApplication'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   billing: BillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
+  oauthApplication: OAuthApplicationNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -155,6 +159,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
@@ -261,6 +266,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
   }
 
+  public __internal_windowNavigate: Clerk['__internal_windowNavigate'] = (to, opts) => {
+    const clerkjs = this.clerkjs;
+    if (typeof clerkjs?.__internal_windowNavigate === 'function') {
+      clerkjs.__internal_windowNavigate(to, opts);
+      return;
+    }
+
+    // Older clerk-js lacks this navigation chokepoint, so delegating would silently no-op. Fall back to
+    // the shared helper (browser-only, it touches window.location) so newer @clerk/ui still navigates and
+    // rejects disallowed protocols on an older clerk-js, honoring allowedRedirectProtocols unless opted out.
+    if (!inBrowser()) {
+      return;
+    }
+    const allowedProtocols = opts?.useStaticAllowlistOnly
+      ? ALLOWED_PROTOCOLS
+      : [...ALLOWED_PROTOCOLS, ...(this.options.allowedRedirectProtocols ?? [])];
+    windowNavigate(to, { allowedProtocols });
+  };
+
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
@@ -338,11 +362,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get isStandardBrowser() {
     return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
-  }
-
-  get __internal_queryClient() {
-    // @ts-expect-error - __internal_queryClient is not typed
-    return this.clerkjs?.__internal_queryClient;
   }
 
   get isSatellite() {
@@ -547,19 +566,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     }
 
-    // Otherwise, set global.Clerk to the bundled ctor or instance
+    // Otherwise, set globalThis.Clerk to the bundled ctor or instance
     if (this.options.Clerk && !this.options.__internal_clerkJSUrl) {
-      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+      globalThis.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
         ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
         : this.options.Clerk;
     }
 
-    if (!global.Clerk) {
+    if (!globalThis.Clerk) {
       // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
     }
 
-    return global.Clerk;
+    return globalThis.Clerk;
   }
 
   private async getClerkUIEntryChunk(): Promise<ClerkUIConstructor | undefined> {
@@ -575,19 +594,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return undefined;
     }
 
-    await loadClerkUIScript({
-      ...this.options,
-      publishableKey: this.#publishableKey,
-      proxyUrl: this.proxyUrl,
-      domain: this.domain,
-      nonce: this.options.nonce,
-    });
+    // Skip the remote UI loader in no-RHC builds (e.g. Chrome extensions) so the CDN script
+    // injector is dead-code-eliminated from the bundle, mirroring getClerkJsEntryChunk.
+    if (!__BUILD_DISABLE_RHC__) {
+      await loadClerkUIScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
 
-    if (!global.__internal_ClerkUICtor) {
-      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      if (!globalThis.__internal_ClerkUICtor) {
+        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      }
+
+      return globalThis.__internal_ClerkUICtor;
     }
 
-    return global.__internal_ClerkUICtor;
+    return undefined;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -650,13 +675,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
       // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
       this.on('status', listener, { notify: true });
-    });
-
-    // @ts-expect-error - queryClientStatus is not typed
-    this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
-      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
-      // @ts-expect-error - queryClientStatus is not typed
-      this.on('queryClientStatus', listener, { notify: true });
     });
 
     if (this.preopenSignIn !== null) {
@@ -743,6 +761,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountAPIKeys(node, props);
     });
 
+    this.premountConfigureSSONodes.forEach((props, node) => {
+      clerkjs.__internal_mountConfigureSSO(node, props);
+    });
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
@@ -772,6 +794,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get version() {
     return this.clerkjs?.version;
+  }
+
+  get uiVersion(): string | undefined {
+    return this.clerkjs?.uiVersion;
   }
 
   get client(): ClientResource | undefined {
@@ -844,6 +870,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.apiKeys;
   }
 
+  get oauthApplication(): OAuthApplicationNamespace | undefined {
+    return this.clerkjs?.oauthApplication;
+  }
+
   __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
     return this.loaded && this.clerkjs
       ? this.clerkjs.__experimental_checkout(...args)
@@ -869,6 +899,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get __internal_lastEmittedResources(): Resources | undefined {
     return this.clerkjs?.__internal_lastEmittedResources;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.clerkjs?.__internal_hasOAuthTransport || false;
+  }
+
+  get __internal_oauthTransport() {
+    return this.clerkjs?.__internal_oauthTransport || null;
   }
 
   /**
@@ -1275,7 +1313,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_mountConfigureSSO(node, props);
+    } else {
+      this.premountConfigureSSONodes.set(node, props);
+    }
+  };
+
+  __internal_unmountConfigureSSO = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_unmountConfigureSSO(node);
+    } else {
+      this.premountConfigureSSONodes.delete(node);
+    }
+  };
+
+  __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_mountOAuthConsent(node, props);
     } else {
@@ -1289,6 +1343,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountOAuthConsentNodes.delete(node);
     }
+  };
+
+  mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {
+    this.__internal_mountOAuthConsent(node, props);
+  };
+
+  unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.__internal_unmountOAuthConsent(node);
   };
 
   mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps): void => {
@@ -1506,6 +1568,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountMethodCalls.set('handleGoogleOneTapCallback', callback);
     }
+  };
+
+  __internal_handleResourceCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    const callback = () => this.clerkjs?.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    }
+
+    this.premountMethodCalls.set('__internal_handleResourceCallback', callback);
+    return;
   };
 
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams) => {

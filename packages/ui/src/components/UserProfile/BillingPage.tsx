@@ -1,6 +1,7 @@
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { SubscriberTypeContext } from '../../contexts';
@@ -10,6 +11,7 @@ import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
+import { AccountCredits } from '../AccountCredits';
 
 const tabMap = {
   0: 'subscriptions',
@@ -22,59 +24,62 @@ const BillingPageInternal = withCardStateProvider(() => {
   const { selectedTab, handleTabChange } = useTabState(tabMap);
 
   return (
-    <Col
-      elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
-    >
+    <ProfileCard.Page>
       <Col
-        elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('billing')}
-        gap={4}
+        elementDescriptor={descriptors.page}
+        sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
       >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('userProfile.billingPage.title')}
-            textVariant='h2'
-          />
-        </Header.Root>
-
-        <Card.Alert>{card.error}</Card.Alert>
-
-        <Tabs
-          value={selectedTab}
-          onChange={handleTabChange}
+        <Col
+          elementDescriptor={descriptors.profilePage}
+          elementId={descriptors.profilePage.setId('billing')}
+          gap={4}
         >
-          <TabsList sx={t => ({ gap: t.space.$6 })}>
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__payments')} />
-          </TabsList>
-          <TabPanels>
-            <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-              <SubscriptionsList
-                title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
-                switchPlansLabel={localizationKeys(
-                  'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
-                )}
-                newSubscriptionLabel={localizationKeys(
-                  'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
-                )}
-                manageSubscriptionLabel={localizationKeys(
-                  'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
-                )}
-              />
-              <PaymentMethods />
-            </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>
-              <StatementsList />
-            </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>
-              <PaymentAttemptsList />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+          <Header.Root>
+            <Header.Title
+              localizationKey={localizationKeys('userProfile.billingPage.title')}
+              textVariant='h2'
+            />
+          </Header.Root>
+
+          <Card.Alert>{card.error}</Card.Alert>
+
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+          >
+            <TabsList sx={t => ({ gap: t.space.$6 })}>
+              <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
+              <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
+              <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__payments')} />
+            </TabsList>
+            <TabPanels>
+              <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
+                <SubscriptionsList
+                  title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                  switchPlansLabel={localizationKeys(
+                    'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                  )}
+                  newSubscriptionLabel={localizationKeys(
+                    'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                  )}
+                  manageSubscriptionLabel={localizationKeys(
+                    'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
+                  )}
+                />
+                <PaymentMethods />
+                <AccountCredits />
+              </TabPanel>
+              <TabPanel sx={{ width: '100%' }}>
+                <StatementsList />
+              </TabPanel>
+              <TabPanel sx={{ width: '100%' }}>
+                <PaymentAttemptsList />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Col>
       </Col>
-    </Col>
+    </ProfileCard.Page>
   );
 });
 

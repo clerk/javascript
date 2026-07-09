@@ -67,6 +67,21 @@ const dedent = (strings: string | Array<string>, ...values: Array<string>) => {
 
 export const hash = () => randomBytes(5).toString('hex');
 
+/**
+ * Generates a strong, unique password for fake test users.
+ *
+ * Avoids any pattern derived from the user's email or other guessable inputs,
+ * so it doesn't collide with HIBP / compromised-password lists that would
+ * cause FAPI to reject sign-in with `form_password_compromised` (HTTP 422).
+ *
+ * Includes upper, lower, digit, and symbol to satisfy default Clerk password
+ * complexity rules.
+ */
+export const fakerPassword = () => {
+  const bytes = randomBytes(18).toString('base64url');
+  return `Aa1!${bytes}`;
+};
+
 export const waitUntilMessage = async (stream: Readable, message: string) => {
   return new Promise<void>(resolve => {
     stream.on('data', chunk => {

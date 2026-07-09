@@ -39,10 +39,15 @@ export const enUS: LocalizationResource = {
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
+      inputLabel: 'Type "Revoke" to confirm',
     },
+    tableHeader__actions: 'Actions',
+    tableHeader__lastUsed: 'Last used',
+    tableHeader__name: 'Name',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
+  badge__banned: 'Banned',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
@@ -63,13 +68,15 @@ export const enUS: LocalizationResource = {
   badge__userDevice: 'User device',
   badge__you: 'You',
   billing: {
+    accountCredit: 'Account credit',
     addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
     annually: 'Annually',
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
-    billedMonthlyOnly: 'Only billed monthly',
     billedAnnuallyOnly: 'Only billed annually',
+    billedMonthly: 'Billed monthly',
+    billedMonthlyOnly: 'Only billed monthly',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
       "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
@@ -108,23 +115,25 @@ export const enUS: LocalizationResource = {
       title__subscriptionSuccessful: 'Success!',
       title__trialSuccess: 'Trial successfully started!',
       totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
+      totalDuePerPeriod: 'Total Due per period',
     },
     credit: 'Credit',
-    prorationCredit: 'Prorated credit',
-    accountCredit: 'Account credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
-    payerCreditRemainder: 'Credit from account balance.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
     getStarted: 'Get started',
+    highlightedPlanBadge: 'Popular',
     keepFreeTrial: 'Keep free trial',
     keepSubscription: 'Keep subscription',
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthAbbreviation: 'mo',
+    monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
+    payerCreditRemainder: 'Credit from account balance.',
     paymentMethod: {
       applePayDescription: {
         annual: 'Annual payment',
@@ -140,12 +149,32 @@ export const enUS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Payment Methods',
-    popular: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
+      seatCost: {
+        additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
+        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
+        includedSeats: '{{includedSeats}} seats included',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
+        tooltip: {
+          additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',
+          firstSeatsIncludedInPlan: 'First {{endsAfterBlock}} seats are included in the plan.',
+          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
+        },
+        unlimitedSeats: 'Unlimited seats',
+        upToSeats: 'Up to {{endsAfterBlock}} seats',
+      },
     },
+    proratedDiscount: 'Prorated discount',
+    prorationCredit: 'Prorated credit',
     reSubscribe: 'Resubscribe',
+    seatBreakdownIncludedPlural: '{{chargeable}} seats at {{rate}}/mo ({{totalSeats}} total - {{included}} included)',
+    seatBreakdownIncludedSingular: '1 seat at {{rate}}/mo ({{totalSeats}} total - {{included}} included)',
+    seatBreakdownPlural: '{{chargeable}} seats at {{rate}}/mo',
+    seatBreakdownSingular: '1 seat at {{rate}}/mo',
+    seats: 'Seats',
+    seatsWithLimit: 'Seats (up to {{limit}})',
     seeAllFeatures: 'See all features',
     startFreeTrial: 'Start free trial',
     startFreeTrial__days: 'Start {{days}}-day free trial',
@@ -166,16 +195,586 @@ export const enUS: LocalizationResource = {
       trialStartedOn: 'Trial started on',
     },
     subtotal: 'Subtotal',
+    subtotalRenewal: 'Subtotal per period',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{price}} / year',
     switchToMonthly: 'Switch to monthly',
-    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToMonthlyWithPrice: 'Switch to monthly {{price}} / month',
     totalDue: 'Total due',
-    totalDueToday: 'Total Due Today',
+    totalDuePerPeriod: 'Total per period',
+    totalDueToday: 'Total due today',
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
+    yearAbbreviation: 'yr',
+    yearPerUnit: 'Year per {{unitName}}',
+  },
+  configureSSO: {
+    activate: {
+      activateButton: 'Activate SSO',
+      activeSubtitle: 'Anyone signing in with {{domain}} must use your identity provider.',
+      activeTitle: 'SSO connection is active',
+      doneButton: 'Done',
+      skipButton: 'Skip for now',
+      subtitle:
+        'Your SSO connection is ready. Once activated, anyone signing in with {{domain}} must use your identity provider.',
+      title: 'SSO connection configured',
+    },
+    changeProviderDialog: {
+      cancelButton: 'Cancel',
+      confirmButton: 'Change provider',
+      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      title: 'Change provider to {{provider}}',
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: 'Dismiss',
+        title:
+          'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: 'Optional',
+          required: 'Required',
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: 'Assign users or groups to your SAML application',
+          paragraph: 'Assign users or groups to your app before they can sign in with SSO.',
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: 'Attribute Name',
+              userAttribute: 'User Attribute',
+            },
+            rows: {
+              email: {
+                attributeName: 'Primary email',
+                userAttribute: 'mail',
+              },
+              firstName: {
+                attributeName: 'First name',
+                userAttribute: 'firstName',
+              },
+              lastName: {
+                attributeName: 'Last name',
+                userAttribute: 'lastName',
+              },
+            },
+          },
+          headerSubtitle: 'Map user attributes from your identity provider to your application.',
+          paragraph: 'Your SAML response must include the following attributes:',
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph:
+              'In your identity provider’s dashboard, create a new SAML 2.0 application and use the following service provider details:',
+          },
+          headerSubtitle: 'Create a new SAML application in your identity provider’s dashboard',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Assertion consumer service (ACS) URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          manual: {
+            description: 'In your identity provider SAML application, retrieve these values.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificate',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description: 'In your identity provider SAML application, retrieve the metadata URL. Paste it below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration ',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: 'App attribute',
+              googleAttribute: 'Google attribute',
+            },
+            rows: {
+              email: {
+                appAttribute: 'email',
+                googleAttribute: 'Primary email',
+              },
+              firstName: {
+                appAttribute: 'firstName',
+                googleAttribute: 'First name',
+              },
+              lastName: {
+                appAttribute: 'lastName',
+                googleAttribute: 'Last name',
+              },
+            },
+          },
+          headerSubtitle: 'Map user attributes from Google Workspace to your application',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
+          step1: 'In the <bold>Google Admin Console</bold>, find the <bold>Attributes</bold> section.',
+          step2:
+            'Select <bold>Add mapping</bold> for each attribute, and enter the following Google and app attribute:',
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1:
+              "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
+            paragraph2:
+              'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
+            step1: 'Open the <bold>User access</bold> section.',
+            step2: 'Select <bold>ON for everyone.</bold>',
+            step3: 'Select <bold>Save</bold>.',
+          },
+          headerSubtitle: 'Enable your Google Workspace SAML application',
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
+            step2: 'Select <bold>Add app</bold>, then <bold>Add custom SAML app.</bold>',
+            step3: 'Enter an <bold>App name.</bold>',
+            step4: 'Select <bold>Continue</bold>.',
+            title: 'In Google Workspace, create a new SAML application:',
+          },
+          headerSubtitle: 'Create a new SAML application in Google Workspace',
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Google Workspace application metadata',
+          manual: {
+            description: 'In your Google Workspace app, retrieve these values.',
+            issuer: {
+              label: 'Entity ID',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'SSO URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificate',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataFile: {
+            description: 'In your Google Workspace app, download the IdP metadata and upload it below.',
+            fileUploaded: 'File uploaded',
+            label: 'IdP metadata',
+            removeFile: 'Remove file',
+            replaceFile: 'Replace file',
+            uploadFile: 'Upload file',
+          },
+          modes: {
+            ariaLabel: 'Configuration',
+            manual: 'Configure manually',
+            metadataFile: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Google Workspace',
+        serviceProviderStep: {
+          headerSubtitle: 'Configure service provider',
+          nameIdInstructions: {
+            step1:
+              'Under the <bold>Name ID</bold> section, select the <bold>Name ID</bold> format dropdown and select <bold>Email</bold>.',
+            step2: 'Select <bold>Continue</bold>',
+          },
+          paragraph:
+            'To configure your service provider, you must add these two fields to your Google Workspace SAML application:',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'ACS URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+          title: 'Configure service provider',
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: 'Attribute',
+              claimName: 'Claim name',
+              value: 'Value',
+            },
+            copyClaimName: 'Copy claim name',
+            copyClaimNameCopied: 'Copied',
+            rows: {
+              email: {
+                attribute: 'Email address',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+                value: 'user.mail',
+              },
+              firstName: {
+                attribute: 'First name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+                value: 'user.givenname',
+              },
+              lastName: {
+                attribute: 'Last name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+                value: 'user.surname',
+              },
+            },
+          },
+          headerSubtitle: 'Set the attributes Microsoft Entra includes in your SAML response',
+          step1: 'On the <bold>SAML-based Sign-on</bold> page, find the <bold>Attributes & Claims</bold> section.',
+          step2: 'Select <bold>Edit.</bold>',
+          title: 'Your SAML response must include the following attributes:',
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: 'In the <bold>Getting Started</bold> section, select the <bold>Assign users and groups.</bold>',
+            step2: "Select <bold>Add user/group.</bold> You'll be redirected to the <bold>Add Assignment page.</bold>",
+            step3: 'Select the <bold>None Selected link.</bold>',
+            step4:
+              "Select <bold>Select</bold> at the bottom of the page. You'll be redirected to the <bold>Add Assignment</bold> page.",
+            step5: 'Select <bold>Assign</bold>',
+            title: 'Assign your users or groups in Microsoft',
+          },
+          createAppInstructions: {
+            step1: 'Sign in to Microsoft Azure Portal and go to <bold>Enterprise applications.</bold>',
+            step2:
+              "Click <bold>New application.</bold> You'll be redirected to the <bold>Browse Microsoft Entra Gallery</bold> page.",
+            step3: 'Select <bold>Create your own application.</bold>',
+            step4: {
+              label: 'In the modal that opens:',
+              subSteps: {
+                appName: 'Fill out your application name.',
+                create: 'Select <bold>Create</bold>.',
+                nonGallery:
+                  "Select <bold>Integrate any other application you don't find in the gallery (Non-gallery)</bold>.",
+              },
+            },
+            title: 'Create a new enterprise application',
+          },
+          headerSubtitle: 'Create a new enterprise application in your Azure Portal',
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Microsoft Entra application metadata',
+          manual: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificate',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section and copy the <bold>App Federation Metadata Url</bold>. Paste below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration ',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Microsoft Entra',
+        serviceProviderStep: {
+          headerSubtitle: 'Add service provider configuration to Microsoft Entra',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Reply URL (Assertion Consumer Service URL)',
+            },
+            spEntityId: {
+              label: 'Identifier (Entity ID)',
+            },
+          },
+          step1: 'In the side navigation, open the <bold>Manage</bold> dropdown and select Single sign-on.',
+          step2: 'In the <bold>Select a single sign-on method</bold> section, select <bold>SAML</bold>.',
+          step3: 'Find the <bold>Basic SAML Configuration</bold> section.',
+          step4: 'Select <bold>Edit</bold>. The <bold>Basic SAML Configuration</bold> panel will open.',
+          step5:
+            'Copy the following values into <bold>Identifier (Entity ID)</bold> and <bold>Reply URL (ACS URL)</bold>:',
+          step6: 'Select <bold>Save</bold> at the top of the panel. Close the panel.',
+          title: 'Add service provider details',
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: 'Assign users or groups to your Okta application before they can sign in with SSO',
+            step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+            step2:
+              'Open the <bold>Assign</bold> dropdown and select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
+            step3: 'Search for the user or group to assign.',
+            step4: 'Click <bold>Assign</bold> next to the user or group.',
+            step5: 'Click <bold>Done.</bold>',
+          },
+          headerSubtitle: 'Assign users to your Okta application',
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: 'Expression',
+              name: 'Attribute name',
+            },
+            rows: {
+              email: {
+                expression: 'user.profile.email',
+                name: 'mail',
+              },
+              firstName: {
+                expression: 'user.profile.firstName',
+                name: 'firstName',
+              },
+              lastName: {
+                expression: 'user.profile.lastName',
+                name: 'lastName',
+              },
+            },
+          },
+          headerSubtitle: 'Set the attributes Okta includes in your SAML response',
+          paragraph: 'Your SAML response must include the following attributes:',
+          step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
+          step2:
+            'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: 'From the <bold>Feedback</bold>, select <bold>This is an internal app that we have created.</bold>',
+            step2: 'Click <bold>Finish</bold> to complete the integration.',
+            title: 'Complete the SAML integration',
+          },
+          createAppInstructions: {
+            step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+            step2: 'Click <bold>Create App Integration.</bold> and select <bold>SAML 2.0.</bold>',
+            step3: 'Fill in the General Settings. The app name is required.',
+            step4: 'Click <bold>Next</bold> to finish creating the application.',
+            title: 'Create a new SAML application in Okta',
+          },
+          headerSubtitle: 'Create and configure a SAML application in your Okta Dashboard',
+          serviceProviderInstructions: {
+            paragraph1:
+              "After completing <bold>General Settings</bold>, you'll see the <bold>Configure SAML</bold> page.",
+            paragraph2: 'Add these two fields to your Okta application to configure your service provider.',
+            serviceProviderFields: {
+              acsUrl: {
+                label: 'Single sign-on URL',
+              },
+              spEntityId: {
+                label: 'Audience URI (SP Entity ID)',
+              },
+            },
+            title: 'Configure service provider',
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Okta application metadata',
+          manual: {
+            description: 'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve these values.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificate',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description:
+              'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Okta Workforce',
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: "Contact your organization's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-on (SSO)',
+    },
+    navbar: {
+      title: 'Configure Single Sign-On (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: 'Expired',
+        badge__unverified: 'Unverified',
+        badge__verified: 'Verified',
+        expiredAtLabel:
+          "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
+        expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
+        txtRecord: {
+          hostLabel: 'Host / Name',
+          instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
+          typeLabel: 'Type',
+          valueLabel: 'Value',
+        },
+        verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        verifyAgainButton: 'Verify again',
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Add {{domain}}',
+        messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
+      },
+      formButtonPrimary__add: 'Add',
+      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
+      formFieldLabel__domain: 'Domain',
+      removeDomainDialog: {
+        cancelButton: 'Cancel',
+        removeButton: 'Remove domain',
+        subtitle__active:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        title: 'Removing domain',
+      },
+      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      title: 'Add SSO domains',
+    },
+    resetConnectionDialog: {
+      cancelButton: 'Cancel',
+      confirmationFieldLabel: 'Type "{{name}}" below to continue',
+      confirmationFieldPlaceholder: '{{name}}',
+      resetButton: 'Reset connection',
+      subtitle:
+        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+      title: 'Reset connection',
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Custom SAML Provider',
+        google: 'Google Workspace',
+        groupLabel: 'SAML',
+        microsoft: 'Microsoft Entra (formerly AD)',
+        okta: 'Okta Workforce',
+      },
+      subtitle: "You'll configure the connection details in the next step",
+      title: 'Select your identity provider',
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test URL and complete the sign-in flow.',
+      subtitle: 'Sign in through the test URL to verify your SSO connection is configured correctly',
+      testResults: {
+        actionLabel__refresh: 'Refresh logs',
+        empty: {
+          subtitle: 'Select <bold>Open test URL</bold> to run your first test',
+          title: 'No test results',
+        },
+        polling: 'Waiting for the test run to complete…',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+        status__success: 'Success',
+        title: 'Your test results',
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: 'View documentation',
+          oauth_access_denied: {
+            description:
+              "This error occurs when the user clicked Cancel or Deny on the OAuth provider's authorization screen, or the provider rejected the authorization request. Verify that the OAuth application credentials (Client ID and Client Secret) are correctly configured.",
+          },
+          oauth_fetch_user_error: {
+            intro: 'To fix this error, follow these steps:',
+            step1:
+              'Verify that the OAuth scopes configured in your connection settings include the necessary permissions to read user profile information.',
+            step2: 'Ensure that the user info endpoint URL is correctly configured.',
+          },
+          oauth_token_exchange_error: {
+            description:
+              "Verify that your OAuth application's Client ID and Client Secret are correctly configured and match the credentials from your OAuth provider's dashboard.",
+          },
+          saml_email_address_domain_mismatch: {
+            description:
+              'Verify that the user is signing in with an email address that matches one of the allowed domains for this connection. If you need to add additional domains, update the allowed domains in your connection settings.',
+          },
+          saml_response_relaystate_missing: {
+            description:
+              'Check that your identity provider is correctly returning the RelayState parameter that was sent in the original request.',
+          },
+          saml_user_attribute_missing: {
+            intro: 'To fix this error, follow these steps:',
+            step1: "Access your identity provider's configuration dashboard.",
+            step2: "Navigate to your application's SAML settings or attribute mapping configuration.",
+            step3: "Ensure that the 'mail' attribute is properly mapped to the user's email address field.",
+          },
+          sectionTitle: 'How to fix',
+        },
+        parsedUserInfo: {
+          email: 'Email',
+          firstName: 'First name',
+          sectionTitle: 'Parsed user info',
+        },
+        runDetails: {
+          actionLabel__copied: 'Copied',
+          actionLabel__copy: 'Copy message',
+          errorCode: 'Error code',
+          fullMessage: 'Full message',
+          sectionTitle: 'Run details',
+          status: 'Status',
+          timestamp: 'Timestamp',
+        },
+        title: 'Test run',
+      },
+      testUrl: {
+        actionLabel__open: 'Open test URL',
+      },
+      title: 'Test your SSO connection',
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
@@ -222,6 +821,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
   formFieldLabel__apiKey: 'API key',
@@ -252,6 +852,9 @@ export const enUS: LocalizationResource = {
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__username: 'Username',
+  identityPreviewEditButton__emailAddress: 'Edit email address',
+  identityPreviewEditButton__identifier: 'Edit identifier',
+  identityPreviewEditButton__phoneNumber: 'Edit phone number',
   impersonationFab: {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
@@ -262,6 +865,23 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
+  oauthConsent: {
+    action__allow: 'Allow',
+    action__deny: 'Deny',
+    offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
+    redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
+    redirectUriModal: {
+      subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
+      title: 'Redirect URL',
+    },
+    scopeList: {
+      title: 'This will allow {{applicationName}} access to:',
+    },
+    subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
+    viewFullUrl: 'View full URL',
+    warning:
+      'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
+  },
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
@@ -279,9 +899,19 @@ export const enUS: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
+    badge__enterpriseSso: 'Enterprise SSO',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -316,8 +946,8 @@ export const enUS: LocalizationResource = {
       statementsSection: {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__payerCredit: 'Credit from account balance',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -329,6 +959,11 @@ export const enUS: LocalizationResource = {
         actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        includedSeatsUsage: '{{includedSeats}} seats included',
+        overview: 'Overview',
+        paidSeatsUsage: '{{seatsQuantity}} seats x {{amount}}',
+        seatLimit: 'Up to {{seatLimit}} seats',
+        seatLimitAndIncludedSeats: 'Up to {{seatLimit}} seats ({{includedSeats}} included)',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Start date',
@@ -351,6 +986,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
+      formButtonPrimary__purchaseSeats: 'Purchase additional seats',
       selectDropdown__role: 'Select role',
       subtitle: 'Enter or paste one or more email addresses, separated by spaces or commas.',
       successMessage: 'Invitations successfully sent',
@@ -410,11 +1046,14 @@ export const enUS: LocalizationResource = {
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
+      security: 'Security',
       title: 'Organization',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+        planMembershipLimitExceeded:
+          'Your organization has {{count}} members (including pending invitations). This plan only allows {{limit}} members.',
       },
       title: 'Plans',
     },
@@ -455,12 +1094,41 @@ export const enUS: LocalizationResource = {
       successMessage: '{{domain}} has been removed.',
       title: 'Remove domain',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: 'Remove connection',
+        subtitle:
+          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+        title: 'Remove SSO connection',
+      },
+      ssoSection: {
+        badge__active: 'Active',
+        badge__inProgress: 'In Progress',
+        badge__inactive: 'Inactive',
+        badge__unconfigured: 'Unconfigured',
+        descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
+        domainLabel: 'Domains:',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__continueConfiguration: 'Continue configuration',
+        primaryButton__startConfiguration: 'Start configuration',
+        title: 'SSO',
+        tooltip:
+          'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
+        tooltipLabel: 'More information',
+        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
+      },
+      title: 'Security',
+    },
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },
@@ -578,6 +1246,9 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the code generated by your authenticator app to continue',
       title: 'Verification required',
     },
+  },
+  searchInput: {
+    action__clear: 'Clear search',
   },
   signIn: {
     accountSwitcher: {
@@ -723,6 +1394,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'To continue, please enter the verification code sent to your phone',
       title: 'Check your phone',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
       requiredMessage: 'For security reasons, it is required to reset your password.',
@@ -828,6 +1505,12 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
     restrictedAccess: {
       actionLink: 'Sign in',
@@ -974,7 +1657,10 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    api_key_name_already_exists: 'API Key name already exists.',
+    api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
     avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
     avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
@@ -1015,11 +1701,17 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
+    insufficient_seats_change_plan:
+      'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
+    insufficient_seats_contact_support:
+      'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
     not_allowed_access: undefined,
+    oauth_access_denied: 'You did not grant access to your account.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
+    organization_membership_quota_exceeded:
+      'You have reached your limit of organization memberships, including outstanding invitations.',
     organization_minimum_permissions_needed: undefined,
     organization_not_found_or_unauthorized:
       'You are no longer a member of this organization. Please choose or create another one.',
@@ -1040,6 +1732,16 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: "Verification didn't complete. Please try again.",
+    protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
+    protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_script_load_failed:
+      "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
+    protect_check_timed_out: "Verification didn't complete in time. Please try again.",
+    protect_check_unsupported_environment:
+      "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
@@ -1092,6 +1794,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
+    label__userButtonPopover: 'Account panel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1114,6 +1819,15 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -1148,8 +1862,8 @@ export const enUS: LocalizationResource = {
       statementsSection: {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__payerCredit: 'Credit from account balance',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -1161,6 +1875,7 @@ export const enUS: LocalizationResource = {
         actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        overview: 'Overview',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Start date',
@@ -1360,6 +2075,7 @@ export const enUS: LocalizationResource = {
         title: 'Email addresses',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'Connect account',
         title: 'Enterprise accounts',
       },
       headerTitle__account: 'Profile details',

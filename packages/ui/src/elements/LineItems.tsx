@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { LocalizationKey } from '../customizables';
 import { Box, Button, Dd, descriptors, Dl, Dt, Icon, Span } from '../customizables';
 import { useClipboard } from '../hooks';
-import { Check, Copy } from '../icons';
+import { Checkmark, Copy } from '../icons';
 import { common } from '../styledSystem';
 import { truncateWithEndVisible } from '../utils/truncateTextWithEndVisible';
 
@@ -82,7 +82,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
 
 interface TitleProps {
   title?: string | LocalizationKey;
-  description?: string | LocalizationKey;
+  description?: string | LocalizationKey | (string | LocalizationKey)[];
   icon?: React.ComponentType;
   badge?: React.ReactNode;
 }
@@ -94,6 +94,9 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
   }
   const { variant } = context;
   const textVariant = variant === 'primary' ? 'subtitle' : 'caption';
+
+  const descriptionElements = description ? (Array.isArray(description) ? description : [description]) : [];
+
   return (
     <Dt
       ref={ref}
@@ -110,7 +113,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
           sx={t => ({
             display: 'inline-flex',
             alignItems: 'center',
-            gap: t.space.$1,
+            gap: t.space.$2,
           })}
         >
           {icon ? (
@@ -121,18 +124,23 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
             />
           ) : null}
           <Span localizationKey={title} />
-          {badge}
+          {badge ? <Box>{badge}</Box> : null}
         </Span>
       ) : null}
-      {description ? (
-        <Span
-          localizationKey={description}
-          elementDescriptor={descriptors.lineItemsTitleDescription}
-          sx={t => ({
-            fontSize: t.fontSizes.$sm,
-            color: t.colors.$colorMutedForeground,
-          })}
-        />
+      {descriptionElements.length > 0 ? (
+        <>
+          {descriptionElements.map((el, i) => (
+            <Span
+              key={i}
+              localizationKey={el}
+              elementDescriptor={descriptors.lineItemsTitleDescription}
+              sx={t => ({
+                fontSize: t.fontSizes.$sm,
+                color: t.colors.$colorMutedForeground,
+              })}
+            />
+          ))}
+        </>
       ) : null}
     </Dt>
   );
@@ -184,7 +192,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'center',
+          alignItems: 'end',
           gap: t.space.$1,
           minWidth: '0',
         })}
@@ -262,7 +270,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
   return (
     <Button
       variant='unstyled'
-      onClick={onCopy}
+      onClick={() => onCopy()}
       sx={t => ({
         color: 'inherit',
         width: t.sizes.$4,
@@ -279,7 +287,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

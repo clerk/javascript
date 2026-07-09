@@ -6,13 +6,16 @@ import {
   mockJwt,
   mockJwtHeader,
   mockJwtPayload,
+  mockM2MJwtPayload,
   mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
+  pemEncodedSignKey,
   publicJwks,
   signedJwt,
   someOtherPublicKey,
 } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
+import { signJwt } from '../signJwt';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
 const invalidTokenError = {
@@ -189,6 +192,22 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error?.message).toContain('Expected "at+jwt"');
   });
 
+  it('rejects JWT with missing type when headerType is configured', async () => {
+    const jwtWithoutTyp = createJwt({
+      header: { typ: undefined },
+    });
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      headerType: 'at+jwt',
+    };
+    const { errors: [error] = [] } = await verifyJwt(jwtWithoutTyp, inputVerifyJwtOptions);
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT type undefined');
+    expect(error?.message).toContain('Expected "at+jwt"');
+  });
+
   it('rejects OAuth JWT when headerType does not match', async () => {
     const inputVerifyJwtOptions = {
       key: mockJwks.keys[0],
@@ -216,5 +235,101 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error).toBeDefined();
     expect(error?.message).toContain('Invalid JWT type');
     expect(error?.message).toContain('Expected "at+jwt, application/at+jwt"');
+  });
+
+  it('verifies JWT when array aud includes the configured audience', async () => {
+    const audience = 'https://my-resource.example.com';
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://other-resource.example.com', audience],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { data } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience,
+    });
+
+    expect(data?.aud).toEqual(['https://other-resource.example.com', audience]);
+  });
+
+  it('rejects JWT when array aud does not include the configured audience', async () => {
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://attacker.example.com'],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { errors: [error] = [] } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience: 'https://my-resource.example.com',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT audience claim array');
+  });
+
+  it('rejects an expired JWT when clockSkewInMs is explicitly 0', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: 0,
+    };
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('JWT is expired');
+  });
+
+  it('accepts a recently expired JWT within the default clock skew when clockSkewInMs is undefined', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    };
+    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('falls back to the default clock skew when clockSkewInMs is NaN', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 1) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.NaN,
+    };
+    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 60) * 1000));
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
+  });
+
+  it('falls back to the default clock skew when clockSkewInMs is Infinity', async () => {
+    vi.setSystemTime(new Date((mockJwtPayload.exp + 3600) * 1000));
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      clockSkewInMs: Number.POSITIVE_INFINITY,
+    };
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(error?.message).toContain('JWT is expired');
   });
 });

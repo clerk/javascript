@@ -11,11 +11,9 @@ export {
   useWaitlist,
   useUser,
   useReverification,
+  useAPIKeys,
 } from '@clerk/react';
 
 export * from './useSSO';
 export * from './useOAuth';
 export * from './useAuth';
-export * from './useNativeSession';
-export * from './useNativeAuthEvents';
-export * from './useUserProfileModal';

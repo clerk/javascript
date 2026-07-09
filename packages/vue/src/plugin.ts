@@ -32,7 +32,7 @@ export type PluginOptions<TUi extends Ui = Ui> = Without<
     initialState?: InitialState;
     appearance?: Appearance<TUi>;
     /**
-     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * An object to use the bundled Clerk UI instead of loading from CDN.
      * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
      * When omitted, UI is loaded from Clerk's CDN.
      */

@@ -14,6 +14,7 @@ import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -84,6 +85,11 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   };
 
   const completeSignInFlow = async (si: SignInResource) => {
+    // An email-link verification can resolve into a protect_check gate; route to it before
+    // dispatching on the underlying status, otherwise the user is stranded on the link card.
+    if (navigateOnSignInProtectGate(si, navigate, '../protect-check')) {
+      return;
+    }
     if (si.status === 'complete') {
       return setActive({
         session: si.createdSessionId,
@@ -112,6 +118,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         formTitle={localizationKeys('signIn.emailLink.formTitle')}
         formSubtitle={localizationKeys('signIn.emailLink.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLink.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.imageUrl}

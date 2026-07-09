@@ -1,34 +1,19 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
-import {
-  __experimental_useAPIKeys as useAPIKeys,
-  __internal_useOrganizationBase,
-  useClerk,
-  useUser,
-} from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useAPIKeys, useClerk, useUser } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 
 import { useProtect } from '@/ui/common';
 import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  Icon,
-  localizationKeys,
-  useLocalizations,
-} from '@/ui/customizables';
+import { Box, Button, Col, descriptors, Flex, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
+import { SearchInput } from '@/ui/elements/SearchInput';
 import { useDebounce } from '@/ui/hooks';
-import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { APIKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateAPIKeyForm';
@@ -114,15 +99,25 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         ...params,
         subject,
       });
-      invalidateAll();
+      void invalidateAll();
       card.setError(undefined);
       setIsCopyModalOpen(true);
       setAPIKey(apiKey);
     } catch (err: any) {
-      if (isClerkAPIResponseError(err)) {
-        if (err.status === 409) {
-          card.setError('API Key name already exists');
-        }
+      if (!isClerkAPIResponseError(err)) {
+        handleError(err, [], card.setError);
+        return;
+      }
+
+      switch (err.errors?.[0]?.code) {
+        case 'token_quota_exceeded':
+          card.setError(t(localizationKeys('unstable__errors.api_key_usage_exceeded')));
+          break;
+        case 'token_creation_conflict':
+          card.setError(t(localizationKeys('unstable__errors.api_key_name_already_exists')));
+          break;
+        default:
+          handleError(err, [], card.setError);
       }
     } finally {
       card.setIdle();
@@ -155,19 +150,13 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           elementDescriptor={descriptors.apiKeysHeader}
         >
           <Box elementDescriptor={descriptors.apiKeysSearchBox}>
-            <InputWithIcon
+            <SearchInput
+              name='apiKeysSearch'
               placeholder={t(localizationKeys('apiKeys.action__search'))}
-              leftIcon={
-                <Icon
-                  icon={MagnifyingGlass}
-                  sx={t => ({ color: t.colors.$colorMutedForeground })}
-                />
-              }
+              aria-label={t(localizationKeys('apiKeys.action__search'))}
               value={searchValue}
-              type='search'
-              autoCapitalize='none'
-              spellCheck={false}
               onChange={e => setSearchValue(e.target.value)}
+              onClear={() => setSearchValue('')}
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>

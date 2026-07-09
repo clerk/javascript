@@ -1,0 +1,4 @@
+{
+  "main": "../dist/passkeys/index.js",
+  "types": "../dist/passkeys/index.d.ts"
+}

@@ -2,12 +2,13 @@ import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
-  BillingPlanResource,
   BillingSubscriptionItemResource,
 } from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
+import { Users } from '@/icons';
+import { common } from '@/styledSystem';
 import { useProtect } from '@/ui/common/Gate';
 import {
   SubscriptionDetailsContext,
@@ -18,16 +19,12 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
+import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 import { handleError } from '@/ui/utils/errorHandler';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import {
-  normalizeFormatted,
-  SubscriberTypeContext,
-  usePlansContext,
-  useSubscriberTypeContext,
-  useSubscription,
-} from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -36,14 +33,13 @@ import {
   Flex,
   Flow,
   Heading,
+  Icon,
   localizationKeys,
   Spinner,
   Text,
   useLocalizations,
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
-
-const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 // We cannot derive the state of confirmation modal from the existence subscription, as it will make the animation laggy when the confirmation closes.
 const SubscriptionForCancellationContext = React.createContext<{
@@ -317,6 +313,7 @@ function SubscriptionDetailsSummary() {
     or: 'throw',
   });
   const { data: subscription } = useSubscription();
+  const { $ } = useLocalizations();
 
   if (
     // Missing nextPayment means that an upcoming subscription is for the free plan
@@ -356,7 +353,7 @@ function SubscriptionDetailsSummary() {
         />
         <LineItems.Description
           prefix={subscription.nextPayment.amount.currency}
-          text={`${subscription.nextPayment.amount.currencySymbol}${subscription.nextPayment.amount.amountFormatted}`}
+          text={$(subscription.nextPayment.amount)}
         />
       </LineItems.Group>
     </LineItems.Root>
@@ -370,17 +367,18 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const { setIsOpen } = useDrawerContext();
   const { revalidateAll } = usePlansContext();
   const { setSubscription, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
+  const { $ } = useLocalizations();
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
+  const isManageable = isManageableSubscriptionItem(subscription);
   const isSwitchable =
     ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       (subscription.planPeriod === 'annual' && Boolean(subscription.plan.fee))) &&
     subscription.status !== 'past_due' &&
-    !subscription.plan.isDefault;
-  const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree;
-  const isReSubscribable = subscription.canceledAt !== null && !isFree;
+    isManageable;
+  const isCancellable = subscription.canceledAt === null && isManageable;
+  const isReSubscribable = subscription.canceledAt !== null && isManageable;
 
   const openCheckout = useCallback(
     (params?: __internal_CheckoutProps) => {
@@ -411,13 +409,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
               subscription.planPeriod === 'month'
                 ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    currency: subscription.plan.annualFee!.currencySymbol,
+                    price: $(subscription.plan.annualFee!, { style: 'short' }),
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
-                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
-                    currency: subscription.plan.fee.currencySymbol,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: $(subscription.plan.fee!, { style: 'short' }),
                   }),
             onClick: () => {
               openCheckout({
@@ -465,6 +461,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
     canManageBilling,
     isReSubscribable,
     setConfirmationOpen,
+    $,
   ]);
 
   if (actions.length === 0) {
@@ -505,11 +502,16 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
 // New component for individual subscription cards
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
+  const subItemSeatsQty = subscription.seats?.quantity;
+  const firstPaidSeatTier = subscription.seats?.tiers?.find(tier => tier.total.amount > 0);
+  const monthLabel = t(localizationKeys('billing.month')).toLowerCase();
+  const seatLimitAndIncludedSeatsLocalizationKey = getSeatLimitAndIncludedSeatsLocalizationKey(subscription.plan);
 
   const fee =
     subscription.planPeriod === 'month'
-      ? subscription.plan.fee
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.fee!
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         subscription.plan.annualFee!;
 
@@ -519,6 +521,7 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
       sx={t => ({
         borderRadius: t.radii.$md,
         boxShadow: t.shadows.$tableBodyShadow,
+        overflow: 'hidden',
       })}
     >
       <Col
@@ -526,12 +529,14 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
         gap={3}
         sx={t => ({
           padding: t.space.$3,
+          background: common.mutedBackground(t),
         })}
       >
         {/* Header with name and badge */}
         <Flex
           elementDescriptor={descriptors.subscriptionDetailsCardHeader}
-          align='center'
+          // align='center'
+          justify='between'
           gap={2}
         >
           {subscription.plan.avatarUrl ? (
@@ -544,43 +549,97 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
             />
           ) : null}
 
-          <Text
-            elementDescriptor={descriptors.subscriptionDetailsCardTitle}
-            variant='h2'
-            sx={t => ({
-              fontSize: t.fontSizes.$lg,
-              fontWeight: t.fontWeights.$semibold,
-              color: t.colors.$colorForeground,
-              marginInlineEnd: 'auto',
-            })}
+          {/* Pricing details */}
+          <Flex
+            direction='col'
+            justify='between'
           >
-            {subscription.plan.name}
-          </Text>
-          <SubscriptionBadge
-            subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
-            elementDescriptor={descriptors.subscriptionDetailsCardBadge}
-          />
-        </Flex>
-
-        {/* Pricing details */}
-        <Flex
-          justify='between'
-          align='center'
-        >
-          <Text
-            variant='body'
-            colorScheme='secondary'
-            sx={t => ({
-              fontWeight: t.fontWeights.$medium,
-              textTransform: 'lowercase',
-            })}
-          >
-            {fee.currencySymbol}
-            {fee.amountFormatted} /{' '}
-            {t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
-          </Text>
+            <Text
+              elementDescriptor={descriptors.subscriptionDetailsCardTitle}
+              variant='h2'
+              sx={t => ({
+                fontSize: t.fontSizes.$lg,
+                fontWeight: t.fontWeights.$semibold,
+                color: t.colors.$colorForeground,
+              })}
+            >
+              {subscription.plan.name}
+            </Text>
+            <Flex>
+              <Text
+                variant='body'
+                as='span'
+                sx={t => ({
+                  fontWeight: t.fontWeights.$medium,
+                  textTransform: 'lowercase',
+                })}
+              >
+                {$(fee)}
+              </Text>
+              <Text
+                variant='body'
+                as='span'
+                colorScheme='secondary'
+                sx={t => ({
+                  fontWeight: t.fontWeights.$medium,
+                  textTransform: 'lowercase',
+                  whiteSpace: 'pre',
+                })}
+              >
+                {` / ${t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}`}
+              </Text>
+            </Flex>
+          </Flex>
+          <Flex align='start'>
+            <SubscriptionBadge
+              subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription}
+              elementDescriptor={descriptors.subscriptionDetailsCardBadge}
+            />
+          </Flex>
         </Flex>
       </Col>
+
+      {typeof subItemSeatsQty !== 'undefined' ? (
+        <DetailRow
+          variant='header'
+          labelNode={
+            <Flex
+              align='center'
+              gap={1}
+            >
+              <Icon
+                icon={Users}
+                size='md'
+                colorScheme='neutral'
+              />
+              <Text localizationKey={localizationKeys('billing.seats')} />
+            </Flex>
+          }
+          valueNode={
+            <Col
+              gap={1}
+              align='end'
+            >
+              {seatLimitAndIncludedSeatsLocalizationKey ? (
+                <Text
+                  variant='subtitle'
+                  localizationKey={seatLimitAndIncludedSeatsLocalizationKey}
+                />
+              ) : null}
+              {firstPaidSeatTier && firstPaidSeatTier.quantity ? (
+                <Text variant='subtitle'>
+                  {t(
+                    localizationKeys('organizationProfile.billingPage.subscriptionsListSection.paidSeatsUsage', {
+                      seatsQuantity: firstPaidSeatTier.quantity,
+                      amount: `${$(firstPaidSeatTier.feePerBlock)} / ${monthLabel}`,
+                    }),
+                  )}
+                </Text>
+              ) : null}
+            </Col>
+          }
+        />
+      ) : null}
 
       {subscription.pastDueAt ? (
         <DetailRow
@@ -628,28 +687,58 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 };
 
 // Helper component for detail rows
-const DetailRow = ({ label, value }: { label: LocalizationKey; value: string }) => (
+const DetailRow = ({
+  label,
+  labelNode,
+  value,
+  valueNode,
+  variant,
+}: {
+  label?: LocalizationKey;
+  labelNode?: React.ReactNode;
+  value?: string | LocalizationKey;
+  valueNode?: React.ReactNode;
+  variant?: 'header';
+}) => (
   <Flex
     elementDescriptor={descriptors.subscriptionDetailsDetailRow}
     justify='between'
-    align='center'
+    align={valueNode ? 'start' : 'center'}
     sx={t => ({
       paddingInline: t.space.$3,
       paddingBlock: t.space.$3,
       borderBlockStartWidth: t.borderWidths.$normal,
       borderBlockStartStyle: t.borderStyles.$solid,
       borderBlockStartColor: t.colors.$borderAlpha100,
+      ...(variant === 'header'
+        ? {
+            background: common.mutedBackground(t),
+          }
+        : {}),
     })}
   >
-    <Text
-      elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}
-      localizationKey={label}
-    />
-    <Text
-      elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
-      colorScheme='secondary'
-    >
-      {value}
-    </Text>
+    {label ? (
+      <Text
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowLabel}
+        localizationKey={label}
+      />
+    ) : null}
+    {labelNode ? labelNode : null}
+    {valueNode ? (
+      valueNode
+    ) : typeof value === 'string' ? (
+      <Text
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
+        colorScheme='secondary'
+      >
+        {value}
+      </Text>
+    ) : value ? (
+      <Text
+        localizationKey={value}
+        elementDescriptor={descriptors.subscriptionDetailsDetailRowValue}
+        colorScheme='secondary'
+      />
+    ) : null}
   </Flex>
 );

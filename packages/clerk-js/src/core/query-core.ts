@@ -1,3 +1,1 @@
-import { QueryClient } from '@tanstack/query-core';
-
-export { QueryClient };
+export { QueryClient } from '@tanstack/query-core';

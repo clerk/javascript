@@ -79,7 +79,10 @@ describe('clerkMiddleware', () => {
     });
 
     expect(mockContext.set).toHaveBeenCalledWith(authFnContext, expect.any(Function));
-    expect(mockContext.set).toHaveBeenCalledWith(requestStateContext, mockRequestState);
+    expect(mockContext.set).toHaveBeenCalledWith(
+      requestStateContext,
+      expect.objectContaining({ requestState: mockRequestState }),
+    );
 
     expect(mockNext).toHaveBeenCalled();
 
@@ -117,6 +120,54 @@ describe('clerkMiddleware', () => {
     await middleware(args, mockNext);
 
     expect(mockLoadOptions).toHaveBeenCalledWith(args, options);
+  });
+
+  it('should set redirect URL options from loadOptions in additionalStateContext', async () => {
+    mockLoadOptions.mockReturnValue({
+      audience: '',
+      authorizedParties: [],
+      signInUrl: '',
+      signUpUrl: '',
+      secretKey: 'sk_test_...',
+      publishableKey: 'pk_test_...',
+      signInForceRedirectUrl: '/dashboard',
+      signUpForceRedirectUrl: '/welcome',
+      signInFallbackRedirectUrl: '/home',
+      signUpFallbackRedirectUrl: '/home',
+    } as unknown as ReturnType<typeof loadOptions>);
+
+    const mockRequestState = {
+      status: AuthStatus.SignedIn,
+      headers: new Headers(),
+      toAuth: vi.fn().mockReturnValue({ userId: 'user_xxx', tokenType: TokenType.SessionToken }),
+    };
+
+    mockClerkClient.mockReturnValue({
+      authenticateRequest: vi.fn().mockResolvedValue(mockRequestState),
+    } as unknown as ClerkClient);
+
+    const middleware = clerkMiddleware();
+    const args = {
+      request: new Request('http://clerk.com'),
+      context: mockContext,
+    } as LoaderFunctionArgs;
+
+    mockNext.mockResolvedValue(new Response('OK'));
+
+    await middleware(args, mockNext);
+
+    expect(mockContext.set).toHaveBeenCalledWith(
+      requestStateContext,
+      expect.objectContaining({
+        requestState: mockRequestState,
+        additionalState: expect.objectContaining({
+          signInForceRedirectUrl: '/dashboard',
+          signUpForceRedirectUrl: '/welcome',
+          signInFallbackRedirectUrl: '/home',
+          signUpFallbackRedirectUrl: '/home',
+        }),
+      }),
+    );
   });
 
   it('should append request state headers to response', async () => {

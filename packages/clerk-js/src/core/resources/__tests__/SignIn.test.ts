@@ -19,12 +19,14 @@ import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPop
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
-  CaptchaChallenge: vi.fn().mockImplementation(() => ({
-    managedOrInvisible: vi.fn().mockResolvedValue({
-      captchaToken: 'mock_captcha_token',
-      captchaWidgetType: 'invisible',
-    }),
-  })),
+  CaptchaChallenge: vi.fn().mockImplementation(function () {
+    return {
+      managedOrInvisible: vi.fn().mockResolvedValue({
+        captchaToken: 'mock_captcha_token',
+        captchaWidgetType: 'invisible',
+      }),
+    };
+  }),
 }));
 
 describe('SignIn', () => {
@@ -32,6 +34,47 @@ describe('SignIn', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('authenticateWithRedirect with an OAuth transport', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    it('routes through the transport instead of windowNavigate when one is registered', async () => {
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' });
+      const handleResourceCallback = vi.fn().mockResolvedValue(undefined);
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_oauthTransport: { getRedirectUrl: () => 'myapp://sso-callback', open },
+        __internal_handleResourceCallback: handleResourceCallback,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        client: null,
+        response: {
+          id: 'signin_123',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://provider.example/auth',
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        __internal_callbackParams: { signInUrl: '/sign-in' },
+      } as any);
+
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(handleResourceCallback).toHaveBeenCalledWith(signIn, { signInUrl: '/sign-in' });
+    });
   });
 
   describe('signIn.create', () => {
@@ -2141,6 +2184,167 @@ describe('SignIn', () => {
         });
       });
 
+      it('reuses an existing ticket sign-in when preparing enterprise SSO', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_ticket',
+              status: 'needs_first_factor',
+              supported_first_factors: [{ strategy: 'enterprise_sso' }],
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_ticket',
+              first_factor_verification: {
+                status: 'unverified',
+                external_verification_redirect_url: 'https://sso.example.com/auth',
+              },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'ticket_123' });
+        await signIn.__internal_future.sso({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(2, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_ticket/prepare_first_factor',
+          body: {
+            strategy: 'enterprise_sso',
+            redirectUrl: 'https://example.com/sso-callback',
+            actionCompleteRedirectUrl: 'https://complete.example.com',
+          },
+        });
+      });
+
+      it('reuses an existing ticket sign-in when starting OAuth rather than creating a new one', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_ticket',
+            status: 'needs_first_factor',
+            supported_first_factors: [{ strategy: 'oauth_google' }],
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'ticket_123' });
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        // The ticket sign-in carries no conflicting OAuth verification, so the OAuth call
+        // reuses it instead of POSTing a fresh `/client/sign_ins` (which would drop the ticket).
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+      });
+
+      it('reuses an existing enterprise SSO sign-in and uses the fresh redirect URL when retrying after an abandoned attempt', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_enterprise',
+              first_factor_verification: {
+                status: 'unverified',
+                external_verification_redirect_url: 'https://sso.example.com/auth/fresh',
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_enterprise',
+              status: 'complete',
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        const signIn = new SignIn({
+          id: 'signin_enterprise',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'enterprise_sso',
+            external_verification_redirect_url: 'https://sso.example.com/auth/stale',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins/signin_enterprise/prepare_first_factor',
+          body: expect.objectContaining({
+            strategy: 'enterprise_sso',
+          }),
+        });
+        expect(mockFetch).not.toHaveBeenCalledWith(
+          expect.objectContaining({ method: 'POST', path: '/client/sign_ins' }),
+        );
+        expect(mockPopup.location.href).toBe('https://sso.example.com/auth/fresh');
+      });
+
       it('handles relative redirectUrl by converting to absolute', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
@@ -2182,6 +2386,161 @@ describe('SignIn', () => {
             actionCompleteRedirectUrl: 'https://example.com/complete',
           },
         });
+      });
+
+      it('creates a new OAuth sign-in when retrying after a previous provider redirect was abandoned', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+        const mockBuildUrlWithAuth = vi.fn().mockImplementation(url => {
+          if (url.startsWith('/')) {
+            return 'https://example.com' + url;
+          }
+          return url;
+        });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
+          frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn();
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_github',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://github.com/login/oauth/authorize',
+            },
+          },
+        });
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_github',
+            status: 'complete',
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        const signIn = new SignIn({
+          id: 'signin_google',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_github',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            strategy: 'oauth_github',
+          }),
+        });
+        expect(mockPopup.location.href).toBe('https://github.com/login/oauth/authorize');
+      });
+
+      it('creates a fresh OAuth sign-in when retrying the same provider after an abandoned redirect (SDK-75)', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockPopup = { location: { href: '' } } as Window;
+        const mockBuildUrlWithAuth = vi.fn().mockImplementation(url => {
+          if (url.startsWith('/')) {
+            return 'https://example.com' + url;
+          }
+          return url;
+        });
+
+        SignIn.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
+          frontendApi: 'clerk.example.com',
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn();
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_google_2',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth?attempt=2',
+            },
+          },
+        });
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_google_2',
+            status: 'complete',
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
+        });
+
+        // Existing sign-in left over from a first, abandoned Google attempt (stale redirect).
+        const signIn = new SignIn({
+          id: 'signin_google_1',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: 'https://accounts.google.com/o/oauth2/auth?attempt=1',
+          },
+        } as any);
+
+        const result = await signIn.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: 'https://complete.example.com',
+          redirectCallbackUrl: '/sso-callback',
+          popup: mockPopup,
+        });
+
+        // Same provider, but the stale redirect must not be replayed: a fresh sign-in is
+        // POSTed and we navigate to the new redirect rather than the abandoned one.
+        expect(result.error).toBeNull();
+        expect(mockFetch).toHaveBeenNthCalledWith(1, {
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({
+            strategy: 'oauth_google',
+          }),
+        });
+        expect(mockPopup.location.href).toBe('https://accounts.google.com/o/oauth2/auth?attempt=2');
       });
 
       it('uses popup when provided', async () => {
@@ -2229,9 +2588,10 @@ describe('SignIn', () => {
         });
         BaseResource._fetch = mockFetch;
 
-        vi.mocked(_futureAuthenticateWithPopup).mockImplementation(async (_clerk, params) => {
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
           // Simulate the actual behavior of setting popup href
           params.popup.location.href = params.externalVerificationRedirectURL.toString();
+          return Promise.resolve();
         });
 
         const signIn = new SignIn();
@@ -2301,7 +2661,43 @@ describe('SignIn', () => {
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ins',
-            body: { ticket: 'ticket_from_query' },
+            body: { strategy: 'ticket', ticket: 'ticket_from_query' },
+          }),
+        );
+      });
+
+      it('uses provided ticket parameter', async () => {
+        const mockSearchParams = new URLSearchParams('?__clerk_ticket=ticket_from_query');
+        vi.stubGlobal('window', {
+          location: {
+            search: '?__clerk_ticket=ticket_from_query',
+            href: 'https://example.com?__clerk_ticket=ticket_from_query',
+          },
+        });
+        vi.stubGlobal('URLSearchParams', vi.fn().mockReturnValue(mockSearchParams));
+
+        SignIn.clerk = {
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.ticket({ ticket: 'provided_ticket' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins',
+            body: { strategy: 'ticket', ticket: 'provided_ticket' },
           }),
         );
       });
@@ -2461,6 +2857,182 @@ describe('SignIn', () => {
         expect(mockClient.signIn.status).toBeNull();
         expect(mockClient.signIn.identifier).toBeNull();
       });
+    });
+  });
+
+  describe('protectCheck', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      // Restore the patched _fetch so the mock can't leak into any block added below.
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+    });
+
+    it('deserializes protect_check from JSON', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+          expires_at: 1741564800000,
+          ui_hints: { theme: 'dark' },
+        },
+      });
+
+      expect(signIn.status).toBe('needs_protect_check');
+      expect(signIn.protectCheck?.status).toBe('pending');
+      expect(signIn.protectCheck?.token).toBe('challenge-token-abc');
+      expect(signIn.protectCheck?.sdkUrl).toBe('https://sdk.example.com/challenge.js');
+      expect(signIn.protectCheck?.expiresAt).toBe(1741564800000);
+      expect(signIn.protectCheck?.uiHints).toEqual({ theme: 'dark' });
+    });
+
+    it('sets protectCheck to null when not present in JSON', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_first_factor',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+      } as any);
+
+      expect(signIn.protectCheck).toBeNull();
+    });
+
+    it('handles protect_check with optional fields omitted', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'minimal-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      expect(signIn.protectCheck?.expiresAt).toBeUndefined();
+      expect(signIn.protectCheck?.uiHints).toBeUndefined();
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'minimal-token',
+        sdk_url: 'https://example.com/sdk.js',
+      });
+    });
+
+    it('round-trips protectCheck through snapshot', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'test-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'test-token',
+        sdk_url: 'https://example.com/sdk.js',
+        expires_at: 1700000000000,
+        ui_hints: {},
+      });
+
+      const signIn2 = new SignIn(snapshot);
+      expect(signIn2.protectCheck?.token).toBe('test-token');
+    });
+
+    it('calls _basePatch with correct params for submitProtectCheck', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          supported_identifiers: [],
+          identifier: 'user@example.com',
+          user_data: {},
+          supported_first_factors: [],
+          supported_second_factors: [],
+          first_factor_verification: null,
+          second_factor_verification: null,
+          created_session_id: null,
+          protect_check: null,
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      const result = await signIn.submitProtectCheck({ proofToken: 'proof-abc' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          path: '/client/sign_ins/signin_123/protect_check',
+          body: { proof_token: 'proof-abc' },
+        }),
+      );
+      expect(result.status).toBe('needs_first_factor');
+      expect(result.protectCheck).toBeNull();
     });
   });
 });

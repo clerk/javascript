@@ -1,10 +1,12 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { AppLoadContext } from 'react-router';
 
-export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
+export const getPublicEnvVariables = (context: object | undefined) => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
+    return (
+      getEnvVariable(`VITE_${name}`, context as Record<string, any>) ||
+      getEnvVariable(name, context as Record<string, any>)
+    );
   };
 
   return {
@@ -21,6 +23,9 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     prefetchUI: getValue('CLERK_PREFETCH_UI') === 'false' ? false : undefined,
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
+    unsafeDisableDevelopmentModeConsoleWarning: isTruthy(
+      getValue('CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING'),
+    ),
     signInForceRedirectUrl: getValue('CLERK_SIGN_IN_FORCE_REDIRECT_URL'),
     signUpForceRedirectUrl: getValue('CLERK_SIGN_UP_FORCE_REDIRECT_URL'),
     signInFallbackRedirectUrl: getValue('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL'),

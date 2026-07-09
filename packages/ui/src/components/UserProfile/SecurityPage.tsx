@@ -3,6 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { getSecondFactors } from '@/ui/utils/mfa';
 
 import { useEnvironment, useUserProfileContext } from '../../contexts';
@@ -24,28 +25,30 @@ export const SecurityPage = withCardStateProvider(() => {
   const showDelete = user?.deleteSelfEnabled;
 
   return (
-    <Col
-      elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8 })}
-    >
+    <ProfileCard.Page>
       <Col
-        elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('security')}
+        elementDescriptor={descriptors.page}
+        sx={t => ({ gap: t.space.$8 })}
       >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
-            sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h2'
-          />
-        </Header.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        {showPassword && <PasswordSection />}
-        {showPasskey && <PasskeySection />}
-        {showMfa && <MfaSection />}
-        <ActiveDevicesSection />
-        {showDelete && <DeleteSection />}
+        <Col
+          elementDescriptor={descriptors.profilePage}
+          elementId={descriptors.profilePage.setId('security')}
+        >
+          <Header.Root>
+            <Header.Title
+              localizationKey={localizationKeys('userProfile.start.headerTitle__security')}
+              sx={t => ({ marginBottom: t.space.$4 })}
+              textVariant='h2'
+            />
+          </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
+          {showPassword && <PasswordSection />}
+          {showPasskey && <PasskeySection />}
+          {showMfa && <MfaSection />}
+          <ActiveDevicesSection />
+          {showDelete && <DeleteSection />}
+        </Col>
       </Col>
-    </Col>
+    </ProfileCard.Page>
   );
 });

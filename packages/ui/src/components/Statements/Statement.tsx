@@ -3,7 +3,7 @@ import React from 'react';
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
 import { useClipboard } from '../../hooks';
-import { Check, Copy, Plans } from '../../icons';
+import { Checkmark, Copy, Files } from '../../icons';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 /* -------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ function SectionContentDetailsHeader({
         >
           <Icon
             elementDescriptor={descriptors.statementSectionContentDetailsHeaderItemIcon}
-            icon={Plans}
+            icon={Files}
             colorScheme='neutral'
           />
           <Heading
@@ -423,7 +423,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     <Button
       elementDescriptor={descriptors.statementCopyButton}
       variant='unstyled'
-      onClick={onCopy}
+      onClick={() => onCopy()}
       sx={t => ({
         color: 'inherit',
         width: t.sizes.$4,
@@ -440,7 +440,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     >
       <Icon
         size='sm'
-        icon={hasCopied ? Check : Copy}
+        icon={hasCopied ? Checkmark : Copy}
         aria-hidden
       />
     </Button>

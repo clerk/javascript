@@ -59,15 +59,17 @@ export async function handleSignUpIfMissingTransfer({
         },
       });
     case 'missing_requirements':
-      // Same routing logic as the OAuth transfer flow: if there are missing
-      // fields, go to /continue; otherwise let completeSignUpFlow route any
-      // unverified email/phone identifications to their verify pages.
+      // Same routing logic as the OAuth transfer flow: if the sign-up is
+      // protect-gated go to /protect-check; if there are missing fields go to
+      // /continue; otherwise let completeSignUpFlow route any unverified
+      // email/phone identifications to their verify pages.
       return navigateToNextStepSignUp({
         signUp: res,
         missingFields: res.missingFields,
         continueSignUpUrl: buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true }),
         verifyEmailAddressUrl: buildURL({ base: signUpUrl, hashPath: '/verify-email-address' }, { stringify: true }),
         verifyPhoneNumberUrl: buildURL({ base: signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        signUpProtectCheckUrl: buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
         navigate,
       });
     default:

@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import type { JwtPayload } from '@clerk/shared/types';
 
 import { constants } from '../constants';
@@ -338,7 +339,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // proceed with triggering handshake.
     const isRedirectLoop = handshakeService.checkAndTrackRedirectLoop(handshakeHeaders);
     if (isRedirectLoop) {
-      const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
+      const msg = getHandshakeRedirectLoopMessage(reason);
       console.log(msg);
       return signedOut({
         tokenType: TokenType.SessionToken,
@@ -349,6 +350,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     return handshake(authenticateContext, reason, message, handshakeHeaders);
+  }
+
+  function getHandshakeRedirectLoopMessage(reason: string): string {
+    if (reason === AuthErrorReason.SatelliteCookieNeedsSyncing) {
+      return `Clerk: Satellite-domain authentication resulted in an infinite redirect loop. Check that this request is using a configured primary or satellite domain for the production instance. For preview deployments, use a development/staging Clerk instance or a supported configured preview-domain setup.`;
+    }
+    return `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
   }
 
   /**
@@ -475,7 +483,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
     }
     const isRequestEligibleForMultiDomainSync =
-      authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
+      authenticateContext.isSatellite &&
+      authenticateContext.secFetchDest === 'document' &&
+      authenticateContext.method === 'GET';
 
     /**
      * Begin multi-domain sync flows
@@ -633,7 +643,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
 
       if (!data.azp) {
-        console.warn(
+        // Warn once per process rather than per request: a single azp-less cookie
+        // token is reused across every authenticated request until it refreshes,
+        // so an unguarded console.warn floods production logs (see issue #8231).
+        logger.warnOnce(
           'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
         );
       }
@@ -650,6 +663,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       // Check for cross-origin requests from satellite domains to primary domain
       const shouldForceHandshakeForCrossDomain =
         !authenticateContext.isSatellite && // We're on primary
+        authenticateContext.method === 'GET' && // Only GET navigations (POST form submissions set sec-fetch-dest: document too)
         authenticateContext.secFetchDest === 'document' && // Document navigation
         authenticateContext.isCrossOriginReferrer() && // Came from different domain
         !authenticateContext.isKnownClerkReferrer() && // Not from Clerk accounts portal or FAPI

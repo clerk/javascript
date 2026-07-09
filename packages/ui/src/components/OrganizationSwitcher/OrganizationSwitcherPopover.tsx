@@ -12,7 +12,7 @@ import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { RootBox } from '../../elements/RootBox';
-import { CogFilled } from '../../icons';
+import { Cog } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
@@ -101,7 +101,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         iconBoxElementId={descriptors.organizationSwitcherPopoverActionButtonIconBox.setId('manageOrganization')}
         iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
-        icon={CogFilled}
+        icon={Cog}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={() => handleItemClick()}
         trailing={<NotificationCountBadgeManageButton />}
@@ -127,7 +127,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             padding: `${t.space.$4} ${t.space.$5}`,
           })}
         />
-        <Actions role='menu'>{manageOrganizationButton}</Actions>
+        <Actions>{manageOrganizationButton}</Actions>
       </Flex>
     );
 
@@ -142,10 +142,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
-            <Actions
-              elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-              role='menu'
-            >
+            <Actions elementDescriptor={descriptors.organizationSwitcherPopoverActions}>
               {currentOrg
                 ? selectedOrganizationPreview(currentOrg)
                 : !hidePersonal && (

@@ -27,7 +27,7 @@ export const jaJP: LocalizationResource = {
     createdAndExpirationStatus__never: "{{ createdDate | shortDate('ja-JP') }}に作成 • 有効期限なし",
     detailsTitle__emptyRow: 'APIキーが見つかりません',
     formButtonPrimary__add: 'キーを作成',
-    formFieldCaption__expiration__expiresOn: '有効期限 {{date}}',
+    formFieldCaption__expiration__expiresOn: '{{ date }} に失効',
     formFieldCaption__expiration__never: 'このキーは有効期限がありません',
     formFieldOption__expiration__180d: '180日',
     formFieldOption__expiration__1d: '1日',
@@ -51,17 +51,22 @@ export const jaJP: LocalizationResource = {
       formButtonPrimary__revoke: 'キーを取り消す',
       formHint: 'このシークレットキーを削除してもよろしいですか？',
       formTitle: 'シークレットキー "{{apiKeyName}}" を取り消しますか？',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: '戻る',
   badge__activePlan: '有効',
+  badge__banned: undefined,
   badge__canceledEndsAt: "キャンセル済み • {{ date | shortDate('ja-JP') }}に終了",
   badge__currentPlan: '現在のプラン',
   badge__default: 'デフォルト',
   badge__endsAt: "{{ date | shortDate('ja-JP') }}に終了",
   badge__expired: '期限切れ',
   badge__freeTrial: '無料トライアル',
-  badge__otherImpersonatorDevice: '他の模倣者デバイス',
+  badge__otherImpersonatorDevice: '別の代理ログイン中のデバイス',
   badge__pastDueAt: "{{ date | shortDate('ja-JP') }}に支払い期限切れ",
   badge__pastDuePlan: '支払い遅延',
   badge__primary: 'プライマリ',
@@ -75,11 +80,14 @@ export const jaJP: LocalizationResource = {
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
   billing: {
+    accountCredit: 'アカウントクレジット',
     addPaymentMethod__label: '支払い方法を追加',
     alwaysFree: '常に無料',
     annually: '年払い',
     availableFeatures: '利用可能な機能',
     billedAnnually: '年ごとに請求',
+    billedAnnuallyOnly: '年払いのみ',
+    billedMonthly: undefined,
     billedMonthlyOnly: '月単位でのみ請求',
     cancelFreeTrial: '無料トライアルをキャンセル',
     cancelFreeTrialAccessUntil:
@@ -90,7 +98,7 @@ export const jaJP: LocalizationResource = {
       "{{ date | longDate('ja-JP') }}までは '{{plan}}' の機能を利用できますが、その後はアクセスできなくなります。",
     cancelSubscriptionNoCharge: 'このサブスクリプションの料金は請求されません。',
     cancelSubscriptionPastDue:
-      'サブスクリプションは直ちに終了し、すべてのプラン機能へのアクセスが失われます。次回のサブスクリプションで未払い分のお支払いをお願いする場合があります。',
+      'サブスクリプションは直ちに終了し、全てのプラン機能へのアクセスが失われます。次回のサブスクリプションで未払い分のお支払いをお願いする場合があります。',
     cancelSubscriptionTitle: '{{plan}} のサブスクリプションをキャンセルしますか？',
     cannotSubscribeMonthly:
       'このプランは月払いで契約できません。このプランを契約するには、年払いを選択する必要があります。',
@@ -119,20 +127,25 @@ export const jaJP: LocalizationResource = {
       title__subscriptionSuccessful: '成功しました！',
       title__trialSuccess: 'トライアルを開始しました！',
       totalDueAfterTrial: 'トライアル終了まで{{days}}日後に支払う合計金額',
+      totalDuePerPeriod: undefined,
     },
     credit: 'クレジット',
     creditRemainder: '現在のサブスクリプションの残り期間に対するクレジット。',
     defaultFreePlanActive: '現在は無料プランをご利用中です',
     free: '無料',
     getStarted: 'はじめる',
+    highlightedPlanBadge: '人気',
     keepFreeTrial: '無料トライアルを続ける',
     keepSubscription: 'サブスクリプションを継続',
     manage: '管理',
     manageSubscription: 'サブスクリプションを管理',
     month: '月',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: '月払い',
     pastDue: '支払い遅延',
     pay: '{{amount}}を支払う',
+    payerCreditRemainder: 'アカウント残高からのクレジット。',
     paymentMethod: {
       applePayDescription: {
         annual: '年払い',
@@ -148,13 +161,33 @@ export const jaJP: LocalizationResource = {
       },
     },
     paymentMethods__label: '支払い方法',
-    popular: '人気',
     pricingTable: {
       billingCycle: '請求サイクル',
       included: '含まれる内容',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: '按分クレジット',
     reSubscribe: '再契約する',
-    seeAllFeatures: 'すべての機能を見る',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
+    seeAllFeatures: '全ての機能を見る',
     startFreeTrial: '無料トライアルを開始',
     startFreeTrial__days: '{{days}}日間の無料トライアルを開始',
     subscribe: '契約する',
@@ -174,16 +207,560 @@ export const jaJP: LocalizationResource = {
       trialStartedOn: 'トライアル開始日',
     },
     subtotal: '小計',
+    subtotalRenewal: undefined,
     switchPlan: 'このプランに切り替える',
     switchToAnnual: '年払いに切り替える',
-    switchToAnnualWithAnnualPrice: '年払い {{currency}}{{price}} / 年 に切り替える',
+    switchToAnnualWithAnnualPrice: '年払い {{price}} / 年 に切り替える',
     switchToMonthly: '月払いに切り替える',
-    switchToMonthlyWithPrice: '月払い {{currency}}{{price}} / 月 に切り替える',
-    totalDue: '支払合計',
+    switchToMonthlyWithPrice: '月払い {{price}} / 月 に切り替える',
+    totalDue: '支払い合計',
+    totalDuePerPeriod: undefined,
     totalDueToday: '本日のお支払合計',
     viewFeatures: '機能を見る',
     viewPayment: '支払いを表示',
     year: '年',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
+  },
+  configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '権限をアップグレードするには、組織の管理者にお問い合わせください。',
+      title: 'シングルサインオン（SSO）を管理する権限がありません',
+    },
+    navbar: {
+      title: 'シングルサインオン（SSO）を設定',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: '未確認',
+        badge__verified: '確認済み',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'ホスト / 名前',
+          instructions:
+            'この TXT レコードを DNS プロバイダーに追加してください。レコードが有効になると自動的に確認します。',
+          typeLabel: 'タイプ',
+          valueLabel: '値',
+        },
+        verifiedAtLabel: "{{ date | shortDate('ja-JP') }} に確認",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} を追加',
+        messageLabel: 'あなたのメールは {{domain}} を使用しています。追加しますか？',
+      },
+      formButtonPrimary__add: '追加',
+      formFieldInputPlaceholder__domain: 'ドメインを追加',
+      formFieldLabel__domain: 'ドメイン',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: '組織がサインインに使用するドメインを追加し、所有権を確認します。',
+      title: 'SSO ドメインを追加',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'カスタムSAMLプロバイダー',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'SSOを設定するプロバイダーを選択してください。',
+      title: 'プロバイダーを選択',
+      warning: 'プロバイダーを選択すると、設定が完了するまで変更できません',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
+    },
   },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
@@ -213,7 +790,7 @@ export const jaJP: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'パスワードが一致しません。',
   formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
   formFieldHintText__optional: '任意',
-  formFieldHintText__slug: 'スラグは人間が読めるユニークなIDです。URLで良く使われます。',
+  formFieldHintText__slug: 'Slugは人間が読める一意なIDで、URLでよく使われます。',
   formFieldInputPlaceholder__apiKeyDescription: 'このキーを生成する理由を記入してください',
   formFieldInputPlaceholder__apiKeyExpirationDate: '日付を選択',
   formFieldInputPlaceholder__apiKeyName: 'シークレットキー名を入力',
@@ -230,7 +807,8 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'パスワードを入力',
   formFieldInputPlaceholder__phoneNumber: '電話番号を入力',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__signUpPassword: undefined,
+  formFieldInputPlaceholder__username: 'ユーザー名を入力',
   formFieldInput__emailAddress_format: '例: name@example.com',
   formFieldLabel__apiKey: 'APIキー',
   formFieldLabel__apiKeyDescription: '説明',
@@ -253,29 +831,48 @@ export const jaJP: LocalizationResource = {
   formFieldLabel__organizationDomainEmailAddressDescription:
     'このドメインを確認するためのコードを受け取るメールアドレスを入力してください。',
   formFieldLabel__organizationName: '組織名',
-  formFieldLabel__organizationSlug: 'スラグURL',
+  formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__passkeyName: 'パスキー名',
   formFieldLabel__password: 'パスワード',
   formFieldLabel__phoneNumber: '電話番号',
   formFieldLabel__role: '役割',
-  formFieldLabel__signOutOfOtherSessions: '他のデバイスからサインアウト',
+  formFieldLabel__signOutOfOtherSessions: '他の全てのデバイスからサインアウト',
   formFieldLabel__username: 'ユーザー名',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'サインアウト',
-    title: '{{identifier}}としてサインイン中',
+    title: '{{identifier}} としてサインイン中',
   },
   lastAuthenticationStrategy: '最後に使用したもの',
   maintenanceMode: '現在メンテナンス中です。数分程度で完了する予定ですので、そのままお待ちください。',
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',
   membershipRole__guestMember: 'ゲスト',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: '組織を作成する',
     action__invitationAccept: '参加する',
     action__suggestionsAccept: '参加をリクエストする',
     createOrganization: '組織を作成',
     invitationAcceptedLabel: '参加しました',
-    subtitle: '{{applicationName}}に進む',
+    subtitle: '{{applicationName}} へ進む',
     suggestionsAcceptedLabel: '承認待ち',
     title: 'アカウントを選択',
     titleWithoutPersonal: '組織を選択',
@@ -285,10 +882,20 @@ export const jaJP: LocalizationResource = {
       title: 'APIキー',
     },
     badge__automaticInvitation: '自動招待',
-    badge__automaticSuggestion: '自動サジェスト',
+    badge__automaticSuggestion: '自動提案',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未確認',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '支払い履歴はありません',
         notFound: '該当する支払いが見つかりません',
@@ -323,6 +930,7 @@ export const jaJP: LocalizationResource = {
       statementsSection: {
         empty: '表示する明細はありません',
         itemCaption__paidForPlan: '{{plan}} {{period}} プランの支払い',
+        itemCaption__payerCredit: 'アカウント残高からのクレジット',
         itemCaption__proratedCredit: '前のサブスクリプションの未使用分に対する按分クレジット',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} プランの契約と支払いが完了しました',
         notFound: '明細が見つかりません',
@@ -335,6 +943,11 @@ export const jaJP: LocalizationResource = {
         actionLabel__manageSubscription: '管理',
         actionLabel__newSubscription: 'プランに申し込む',
         actionLabel__switchPlan: 'プランを切り替える',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: '編集',
         tableHeader__plan: 'プラン',
         tableHeader__startDate: '開始日',
@@ -357,6 +970,7 @@ export const jaJP: LocalizationResource = {
       detailsTitle__inviteFailed:
         '招待状を送信できませんでした。以下のメールアドレスには既に保留中の招待があります: {{email_addresses}}',
       formButtonPrimary__continue: '招待状を送信する',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: '役割を選択',
       subtitle: '1つ以上のメールアドレスを入力または貼り付けてください（スペースまたはカンマで区切る）',
       successMessage: '招待状が正常に送信されました',
@@ -416,11 +1030,13 @@ export const jaJP: LocalizationResource = {
       description: '組織を管理します。',
       general: '一般',
       members: 'メンバー',
+      security: undefined,
       title: '組織',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'この組織の請求を管理する権限がありません。',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'プラン',
     },
@@ -461,9 +1077,36 @@ export const jaJP: LocalizationResource = {
       successMessage: '{{domain}} が削除されました。',
       title: 'ドメインの削除',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: '一般',
       headerTitle__members: 'メンバー',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'プロフィールを更新',
         title: '組織プロフィール',
@@ -586,6 +1229,9 @@ export const jaJP: LocalizationResource = {
       title: '確認が必要です',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'アカウントを追加',
@@ -615,7 +1261,7 @@ export const jaJP: LocalizationResource = {
     alternativePhoneCodeProvider: {
       formTitle: '検証コード',
       resendButton: 'コードが届いていませんか？再送信',
-      subtitle: '{{applicationName}} への続行のため',
+      subtitle: '{{applicationName}} へ進む',
       title: '{{provider}} を確認してください',
     },
     backupCodeMfa: {
@@ -625,13 +1271,13 @@ export const jaJP: LocalizationResource = {
     emailCode: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
-      subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitle: '{{applicationName}} へ進む',
       title: 'メールを確認',
     },
     emailCodeMfa: {
       formTitle: 'メールを確認',
       resendButton: 'コードが届いていませんか？再送信',
-      subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitle: '{{applicationName}} へ進む',
       title: 'メールを確認',
     },
     emailLink: {
@@ -654,14 +1300,14 @@ export const jaJP: LocalizationResource = {
         title: 'サインイン中...',
       },
       resendButton: 'リンクを再送信',
-      subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitle: '{{applicationName}} へ進む',
       title: 'メールを確認',
       unusedTab: {
         title: 'このタブを閉じてもかまいません',
       },
       verified: {
         subtitle: 'まもなくリダイレクトされます',
-        title: '正常にサインインしました',
+        title: 'サインインが完了しました',
       },
       verifiedSwitchTab: {
         subtitle: '続行するには元のタブに戻ってください',
@@ -672,7 +1318,7 @@ export const jaJP: LocalizationResource = {
     emailLinkMfa: {
       formSubtitle: 'メールに送信された確認リンクを使用してください',
       resendButton: 'リンクが届いていませんか？再送信',
-      subtitle: '{{applicationName}} に続行',
+      subtitle: '{{applicationName}} へ進む',
       title: 'メールを確認してください',
     },
     enterpriseConnections: {
@@ -683,7 +1329,7 @@ export const jaJP: LocalizationResource = {
       formTitle: 'パスワードリセットコード',
       resendButton: 'コードを再送信',
       subtitle: 'パスワードをリセットするために',
-      subtitle_email: 'まず、メールIDに送信されたコードを入力してください',
+      subtitle_email: 'まず、メールアドレスに送信されたコードを入力してください',
       subtitle_phone: 'まず、電話に送信されたコードを入力してください',
       title: 'パスワードをリセット',
     },
@@ -710,18 +1356,18 @@ export const jaJP: LocalizationResource = {
       title: 'パスワードを入力',
     },
     passwordCompromised: {
-      title: undefined,
+      title: '漏洩したパスワード',
     },
     passwordPwned: {
-      title: 'パスワードが漏えいしました',
+      title: '漏洩したパスワード',
     },
     passwordUntrusted: {
-      title: undefined,
+      title: '信頼できないパスワード',
     },
     phoneCode: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
-      subtitle: '{{applicationName}} への続行のため',
+      subtitle: '{{applicationName}} へ進む',
       title: '電話を確認してください',
     },
     phoneCodeMfa: {
@@ -729,6 +1375,12 @@ export const jaJP: LocalizationResource = {
       resendButton: 'コードを再送信',
       subtitle: '続行するには、電話に送信された検証コードを入力してください',
       title: '電話を確認してください',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'パスワードをリセット',
@@ -744,7 +1396,7 @@ export const jaJP: LocalizationResource = {
       actionLink__join_waitlist: 'ウェイトリストに登録',
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
-      actionLink__use_passkey: 'パスキーを使用',
+      actionLink__use_passkey: '代わりにパスキーを使用',
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
@@ -756,8 +1408,8 @@ export const jaJP: LocalizationResource = {
         title: '{{provider}} を使って {{applicationName}} にサインイン',
       },
       subtitle: 'お帰りなさい！続行するにはサインインしてください',
-      subtitleCombined: undefined,
-      title: '{{applicationName}}にサインイン',
+      subtitleCombined: 'お帰りなさい！続行するにはサインインしてください',
+      title: '{{applicationName}} にサインイン',
       titleCombined: '{{applicationName}} へ進む',
     },
     totpMfa: {
@@ -801,7 +1453,7 @@ export const jaJP: LocalizationResource = {
         title: '登録中...',
       },
       resendButton: 'リンクを再送信',
-      subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitle: '{{applicationName}} へ進む',
       title: 'メールアドレスを確認',
       verified: {
         title: '登録が完了しました',
@@ -834,6 +1486,12 @@ export const jaJP: LocalizationResource = {
       resendButton: 'コードを再送信',
       subtitle: '電話に送信された確認コードを入力してください',
       title: '電話番号を確認',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'サインイン',
@@ -872,7 +1530,7 @@ export const jaJP: LocalizationResource = {
   taskChooseOrganization: {
     alerts: {
       organizationAlreadyExists:
-        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} の組織がすでに存在します。招待を通じて参加してください。',
+        '検出された会社名 ({{organizationName}}) と {{organizationDomain}} に対応する組織は既に存在します。招待を受けて参加してください。',
     },
     chooseOrganization: {
       action__createOrganization: '新しい組織を作成',
@@ -889,7 +1547,7 @@ export const jaJP: LocalizationResource = {
       formFieldInputPlaceholder__name: '私の組織',
       formFieldInputPlaceholder__slug: 'my-organization',
       formFieldLabel__name: '名前',
-      formFieldLabel__slug: 'スラグ',
+      formFieldLabel__slug: 'Slug',
       subtitle: '続行するには組織の詳細を入力してください',
       title: '組織をセットアップ',
     },
@@ -903,106 +1561,116 @@ export const jaJP: LocalizationResource = {
     },
   },
   taskResetPassword: {
-    formButtonPrimary: undefined,
+    formButtonPrimary: 'パスワードをリセット',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'サインアウト',
+      actionText: '{{identifier}} としてサインイン中',
     },
-    subtitle: undefined,
-    title: undefined,
+    subtitle: '続行するには、アカウントの新しいパスワードを設定する必要があります',
+    title: 'パスワードをリセット',
   },
   taskSetupMfa: {
-    badge: undefined,
+    badge: '二段階認証の設定',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'サインアウト',
+      actionText: '{{identifier}} としてサインイン中',
     },
     smsCode: {
       addPhone: {
-        formButtonPrimary: undefined,
-        infoText: undefined,
+        formButtonPrimary: '続行',
+        infoText: 'この電話番号に確認コードを含むSMSが送信されます。通信料がかかる場合があります。',
       },
-      addPhoneNumber: undefined,
-      cancel: undefined,
-      subtitle: undefined,
+      addPhoneNumber: '電話番号を追加',
+      cancel: 'キャンセル',
+      subtitle: 'SMSコードによる二段階認証に使用する電話番号を選択してください',
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: '続行',
+        message1:
+          '二段階認証が有効になりました。サインイン時に、この電話番号に送信される確認コードを追加の手順として入力する必要があります。',
+        message2:
+          'これらのバックアップコードを保存し、安全な場所に保管してください。認証デバイスにアクセスできなくなった場合は、バックアップコードを使ってサインインできます。',
+        title: 'SMSコード認証が有効になりました',
       },
-      title: undefined,
+      title: 'SMSコード認証を追加',
       verifyPhone: {
-        formButtonPrimary: undefined,
-        formTitle: undefined,
-        resendButton: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: '続行',
+        formTitle: '検証コード',
+        resendButton: 'コードを再送信',
+        subtitle: '次の宛先に送信された確認コードを入力してください',
+        title: '電話番号を確認',
       },
     },
     start: {
       methodSelection: {
-        phoneCode: undefined,
-        totp: undefined,
+        phoneCode: 'SMSコード',
+        totp: '認証アプリ',
       },
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '追加のセキュリティでアカウントを保護するために、希望する方法を選択してください',
+      title: '二段階認証を設定',
     },
     totpCode: {
       addAuthenticatorApp: {
-        buttonAbleToScan__nonPrimary: undefined,
-        buttonUnableToScan__nonPrimary: undefined,
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        infoText__ableToScan: undefined,
-        infoText__unableToScan: undefined,
-        inputLabel__unableToScan1: undefined,
+        buttonAbleToScan__nonPrimary: '代わりにQRコードをスキャン',
+        buttonUnableToScan__nonPrimary: 'QRコードをスキャンできませんか？',
+        formButtonPrimary: '続行',
+        formButtonReset: 'キャンセル',
+        infoText__ableToScan:
+          '認証アプリで新しいサインイン方法を設定し、次のQRコードをスキャンしてアカウントにリンクしてください。',
+        infoText__unableToScan: '認証アプリで新しいサインイン方法を設定し、以下のキーを入力してください。',
+        inputLabel__unableToScan1:
+          '時間ベースまたはワンタイムパスワードが有効になっていることを確認してから、アカウントのリンクを完了してください。',
       },
       success: {
-        finishButton: undefined,
-        message1: undefined,
-        message2: undefined,
-        title: undefined,
+        finishButton: '続行',
+        message1:
+          '二段階認証が有効になりました。サインイン時に、この認証アプリの確認コードを追加の手順として入力する必要があります。',
+        message2:
+          'これらのバックアップコードを保存し、安全な場所に保管してください。認証デバイスにアクセスできなくなった場合は、バックアップコードを使ってサインインできます。',
+        title: '認証アプリ認証が有効になりました',
       },
-      title: undefined,
+      title: '認証アプリを追加',
       verifyTotp: {
-        formButtonPrimary: undefined,
-        formButtonReset: undefined,
-        formTitle: undefined,
-        subtitle: undefined,
-        title: undefined,
+        formButtonPrimary: '続行',
+        formButtonReset: 'キャンセル',
+        formTitle: '検証コード',
+        subtitle: '認証アプリで生成された確認コードを入力してください',
+        title: '認証アプリを追加',
       },
     },
   },
   unstable__errors: {
-    already_a_member_in_organization: '{{email}} はすでにこの組織のメンバーです。',
+    action_blocked: undefined,
+    already_a_member_in_organization: '{{email}} は既にこの組織のメンバーです。',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: 'ファイルサイズが10MBの上限を超えています。より小さいファイルを選択してください。',
     avatar_file_type_invalid:
       'サポートされていないファイル形式です。JPG、PNG、GIF、またはWEBP画像をアップロードしてください。',
-    captcha_invalid: undefined,
+    captcha_invalid: 'セキュリティ検証に失敗しました。もう一度お試しください。',
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
-    form_code_incorrect: undefined,
+    form_code_incorrect: '入力されたコードが正しくありません。',
     form_email_address_blocked:
       '一時的なメールサービスはサポートされていません。アカウントを作成するには、通常のメールアドレスを使用してください。',
-    form_identifier_exists__email_address: undefined,
-    form_identifier_exists__phone_number: undefined,
-    form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
-    form_new_password_matches_current: undefined,
-    form_param_format_invalid: undefined,
-    form_param_format_invalid__email_address: undefined,
-    form_param_format_invalid__phone_number: undefined,
-    form_param_max_length_exceeded__first_name: undefined,
-    form_param_max_length_exceeded__last_name: undefined,
-    form_param_max_length_exceeded__name: undefined,
-    form_param_nil: undefined,
-    form_param_type_invalid: undefined,
-    form_param_type_invalid__email_address: undefined,
-    form_param_type_invalid__phone_number: undefined,
-    form_param_value_invalid: undefined,
-    form_password_compromised__sign_in: undefined,
-    form_password_incorrect: undefined,
+    form_identifier_exists__email_address: 'このメールアドレスは既に使用されています。別のものをお試しください。',
+    form_identifier_exists__phone_number: 'この電話番号は既に使用されています。別のものをお試しください。',
+    form_identifier_exists__username: 'このユーザー名は既に使用されています。別のものをお試しください。',
+    form_identifier_not_found: 'その情報に一致するアカウントが見つかりませんでした。',
+    form_new_password_matches_current: '新しいパスワードを現在のパスワードと同じにすることはできません。',
+    form_param_format_invalid: '入力された値の形式が正しくありません。確認して修正してください。',
+    form_param_format_invalid__email_address: 'メールアドレスの形式が正しくありません。',
+    form_param_format_invalid__phone_number: '電話番号は有効な国際形式で入力してください。',
+    form_param_max_length_exceeded__first_name: '名は256文字以内で入力してください。',
+    form_param_max_length_exceeded__last_name: '姓は256文字以内で入力してください。',
+    form_param_max_length_exceeded__name: '名前は256文字以内で入力してください。',
+    form_param_nil: 'この項目は必須です。空欄にはできません。',
+    form_param_type_invalid: '入力された値の型が正しくありません。',
+    form_param_type_invalid__email_address: 'メールアドレスは有効な文字列である必要があります。',
+    form_param_type_invalid__phone_number: '電話番号は有効な文字列である必要があります。',
+    form_param_value_invalid: '入力された値が無効です。修正してください。',
+    form_password_compromised__sign_in:
+      'このパスワードは侵害された可能性があります。アカウントを保護するため、別のサインイン方法を使用してください。サインイン後にパスワードのリセットが必要になります。',
+    form_password_incorrect: '入力されたパスワードが正しくありません。もう一度お試しください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_or_identifier_incorrect:
@@ -1013,19 +1681,23 @@ export const jaJP: LocalizationResource = {
       'このパスワードは侵害の一部として見つかったため使用できません。パスワードをリセットしてください。',
     form_password_size_in_bytes_exceeded:
       'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
-    form_password_untrusted__sign_in: undefined,
+    form_password_untrusted__sign_in:
+      'このパスワードは安全でない可能性があります。アカウントを保護するため、別のサインイン方法を使用してください。サインイン後にパスワードのリセットが必要になります。',
     form_password_validation_failed: 'パスワードが間違っています',
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名は{{min_length}}文字以上{{max_length}}文字以下である必要があります。',
     form_username_needs_non_number_char: 'ユーザー名には少なくとも1つの数字以外の文字が含まれている必要があります。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
-    organization_domain_blocked: undefined,
-    organization_domain_common: undefined,
-    organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
-    organization_minimum_permissions_needed: undefined,
+    oauth_access_denied: undefined,
+    organization_domain_blocked: 'このメールプロバイダーのドメインはブロックされています。別のものを使用してください。',
+    organization_domain_common: 'これは一般的なメールプロバイダーのドメインです。別のものを使用してください。',
+    organization_domain_exists_for_enterprise_connection: 'このドメインは組織の SSO で既に使用されています。',
+    organization_membership_quota_exceeded: '保留中の招待を含め、組織のメンバー数の上限に達しました。',
+    organization_minimum_permissions_needed: '必要な最小権限を持つ組織メンバーが少なくとも1人必要です。',
     organization_not_found_or_unauthorized:
       'この組織のメンバーではなくなりました。別の組織を選択するか、新しく作成してください。',
     organization_not_found_or_unauthorized_with_create_organization_disabled:
@@ -1044,14 +1716,22 @@ export const jaJP: LocalizationResource = {
       requireUppercase: '大文字を含む',
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
-    phone_number_exists: undefined,
-    session_exists: undefined,
+    phone_number_exists: 'この電話番号は既に使用されています。別のものをお試しください。',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
+    session_exists: '既にサインインしています。',
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
     web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',
     web3_solana_signature_generation_failed: '署名の生成中にエラーが発生しました。続行するにはもう一度お試しください。',
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',
-      goodPassword: 'パスワードはすべての要件を満たしています。',
+      goodPassword: 'パスワードは全ての要件を満たしています。',
       notEnough: 'パスワードの強度が十分ではありません。',
       suggestions: {
         allUppercase: '全ての文字を大文字にするのではなく、一部の文字を大文字にしてください。',
@@ -1096,6 +1776,9 @@ export const jaJP: LocalizationResource = {
     action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
+    label__accountActions: 'アカウント操作',
+    label__activeSessions: 'アクティブセッション',
+    label__userButtonPopover: 'アカウントパネル',
   },
   userProfile: {
     apiKeysPage: {
@@ -1103,7 +1786,7 @@ export const jaJP: LocalizationResource = {
     },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
-      actionLabel__copy: 'すべてコピー',
+      actionLabel__copy: '全てコピー',
       actionLabel__download: '.txtでダウンロード',
       actionLabel__print: '印刷',
       infoText1: 'このアカウントではバックアップコードが有効になります。',
@@ -1117,6 +1800,15 @@ export const jaJP: LocalizationResource = {
       title__codelist: 'バックアップコード',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '支払い履歴はありません',
         notFound: '該当する支払いが見つかりません',
@@ -1151,6 +1843,7 @@ export const jaJP: LocalizationResource = {
       statementsSection: {
         empty: '表示する明細はありません',
         itemCaption__paidForPlan: '{{plan}} {{period}} プランの支払い',
+        itemCaption__payerCredit: 'アカウント残高からのクレジット',
         itemCaption__proratedCredit: '前のサブスクリプションの未使用分に対する按分クレジット',
         itemCaption__subscribedAndPaidForPlan: '{{plan}} {{period}} プランの契約と支払いが完了しました',
         notFound: '明細が見つかりません',
@@ -1163,6 +1856,7 @@ export const jaJP: LocalizationResource = {
         actionLabel__manageSubscription: '管理',
         actionLabel__newSubscription: 'プランに申し込む',
         actionLabel__switchPlan: 'プランを切り替える',
+        overview: undefined,
         tableHeader__edit: '編集',
         tableHeader__plan: 'プラン',
         tableHeader__startDate: '開始日',
@@ -1280,7 +1974,7 @@ export const jaJP: LocalizationResource = {
     },
     mobileButton__menu: 'メニュー',
     navbar: {
-      account: 'プロファイル',
+      account: 'プロフィール',
       apiKeys: 'APIキー',
       billing: '請求',
       description: 'アカウント情報管理',
@@ -1297,10 +1991,10 @@ export const jaJP: LocalizationResource = {
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        '古いパスワードを使用している可能性のあるすべてのデバイスからサインアウトすることをお勧めします。',
+        '古いパスワードを使用している可能性のある全てのデバイスからサインアウトすることをお勧めします。',
       readonly: '現在、エンタープライズ接続のみでサインインしているため、パスワードは編集できません。',
       successMessage__set: 'パスワードが設定されました。',
-      successMessage__signOutOfOtherSessions: '他のすべてのデバイスからサインアウトされました。',
+      successMessage__signOutOfOtherSessions: '他の全てのデバイスからサインアウトされました。',
       successMessage__update: 'パスワードが更新されました。',
       title__set: 'パスワードの設定',
       title__update: 'パスワードの更新',
@@ -1327,7 +2021,7 @@ export const jaJP: LocalizationResource = {
       imageFormDestructiveActionSubtitle: '削除',
       imageFormSubtitle: 'アップロード',
       imageFormTitle: 'プロフィール画像',
-      readonly: 'プロファイル情報はエンタープライズ接続によって提供されており、編集できません。',
+      readonly: 'プロフィール情報はエンタープライズ接続によって提供されており、編集できません。',
       successMessage: 'プロフィールが更新されました。',
       title: 'プロフィールの更新',
     },
@@ -1359,6 +2053,7 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレス',
       },
       enterpriseAccountsSection: {
+        primaryButton: 'アカウントを連携する',
         title: 'エンタープライズアカウント',
       },
       headerTitle__account: 'プロフィール詳細',
@@ -1458,6 +2153,6 @@ export const jaJP: LocalizationResource = {
     connect: '{{walletName}} で接続',
     continue: '{{walletName}} で続行',
     noneAvailable:
-      'Solana Web3 ウォレットが検出されませんでした。Web3 に対応した {{ solanaWalletsLink || link("wallet extension") }} をインストールしてください。',
+      'Solana Web3 ウォレットが検出されませんでした。Web3 に対応した {{ solanaWalletsLink || link("ウォレット拡張機能") }} をインストールしてください。',
   },
 } as const;

@@ -1,5 +1,6 @@
 export * from './APIKeys';
 export * from './Checkout';
+export * from './ConfigureSSO';
 export * from './CreateOrganization';
 export * from './GoogleOneTap';
 export * from './OAuthConsent';

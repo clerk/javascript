@@ -13,8 +13,10 @@ import {
 import {
   disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
+  disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
   noOrganizationExists,
@@ -38,7 +40,13 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import {
+  AUTO_PROXY_PATH,
+  isHttpOrHttps,
+  isValidProxyUrl,
+  proxyUrlToAbsoluteURL,
+  shouldAutoProxy,
+} from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -71,6 +79,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  ConfigureSSOProps,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -88,6 +97,8 @@ import type {
   ListenerOptions,
   LoadedClerk,
   NavigateOptions,
+  OAuthApplicationNamespace,
+  OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -176,6 +187,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
@@ -199,6 +211,9 @@ const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_se
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
 const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
+const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
+const CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE =
+  'cannot_render_configure_sso_email_address_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -223,6 +238,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
   public client: ClientResource | undefined;
@@ -253,6 +269,7 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
@@ -277,6 +294,14 @@ export class Clerk implements ClerkInterface {
           client: this.#queryClient,
         }
       : undefined;
+  }
+
+  get __internal_hasOAuthTransport(): boolean {
+    return this.#oauthTransport !== null;
+  }
+
+  get __internal_oauthTransport(): OAuthTransport | null {
+    return this.#oauthTransport;
   }
 
   public __internal_getCachedResources:
@@ -309,6 +334,14 @@ export class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get uiVersion(): string | undefined {
+    // `@clerk/ui` publishes its constructor (which carries its package version) on this global when hot-loaded
+    // from the CDN; bundled (no-RHC) builds pass the constructor directly via `options.ui.ClerkUI` instead.
+    const globalCtor = typeof window !== 'undefined' ? window.__internal_ClerkUICtor : undefined;
+    const bundledCtor = this.#options.ui?.ClerkUI;
+    return globalCtor?.version ?? (bundledCtor instanceof Promise ? undefined : bundledCtor?.version);
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -357,7 +390,14 @@ export class Clerk implements ClerkInterface {
       if (!isValidProxyUrl(_unfilteredProxy)) {
         errorThrower.throwInvalidProxyUrl({ url: _unfilteredProxy });
       }
-      return proxyUrlToAbsoluteURL(_unfilteredProxy);
+      const resolved = proxyUrlToAbsoluteURL(_unfilteredProxy);
+      if (resolved) {
+        return resolved;
+      }
+      // Auto-detect when no explicit proxy or domain is configured (production only)
+      if (!this.#domain && this.#instanceType === 'production' && shouldAutoProxy(window.location.hostname)) {
+        return `${window.location.origin}${AUTO_PROXY_PATH}`;
+      }
     }
 
     if (typeof this.#proxyUrl === 'function') {
@@ -400,6 +440,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get oauthApplication(): OAuthApplicationNamespace {
+    if (!Clerk._oauthApplication) {
+      Clerk._oauthApplication = new OAuthApplication();
+    }
+    return Clerk._oauthApplication;
   }
 
   __experimental_checkout(options: __experimental_CheckoutOptions): CheckoutSignalValue {
@@ -499,6 +546,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+    this.#oauthTransport = this.#options.__internal_oauthTransport ?? null;
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
@@ -930,7 +978,7 @@ export class Clerk implements ClerkInterface {
 
     if (noOrganizationExists(this)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
@@ -1101,7 +1149,7 @@ export class Clerk implements ClerkInterface {
     const userExists = !noUserExists(this);
     if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
@@ -1324,7 +1372,16 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
-  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+  public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     this.assertComponentsReady(this.#clerkUI);
     const component = 'OAuthConsent';
     void this.#clerkUI
@@ -1339,20 +1396,30 @@ export class Clerk implements ClerkInterface {
       );
   };
 
-  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+  public unmountOAuthConsent = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Mount a API keys component at the target element.
+   * @deprecated Use mountOAuthConsent instead.
+   */
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
+    return this.mountOAuthConsent(node, props);
+  };
+
+  /**
+   * @deprecated Use unmountOAuthConsent instead.
+   */
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    return this.unmountOAuthConsent(node);
+  };
+
+  /**
+   * Mount an API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
   public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
-    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
-
     if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
@@ -1397,14 +1464,89 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Unmount a API keys component from the target element.
+   * Unmount an API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
    * @param targetNode Target node to unmount the APIKeys component from.
    */
   public unmountAPIKeys = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount a configure SSO component at the target element.
+   *
+   * @param targetNode Target to mount the ConfigureSSO component.
+   * @param props Configuration parameters.
+   * @hidden
+   */
+  public __internal_mountConfigureSSO = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureSSO',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureSSO'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureSSO'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledSelfServeSSOFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledEmailAddressAttribute(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureSSOComponentWhenEmailAddressDisabled, {
+          code: CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureSSO';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureSSO',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount a configure SSO component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureSSO component from.
+   * @hidden
+   */
+  public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -1773,7 +1915,7 @@ export class Clerk implements ClerkInterface {
 
       if (customNavigate) {
         debugLogger.info(`Clerk is navigating to: ${to}`);
-        return await customNavigate(to, { windowNavigate });
+        return await customNavigate(to, { windowNavigate: this.__internal_windowNavigate });
       }
 
       // No window.location and no custom router - can't navigate
@@ -1812,13 +1954,13 @@ export class Clerk implements ClerkInterface {
 
     // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
     if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
-      windowNavigate(toURL);
+      this.__internal_windowNavigate(toURL);
       return;
     }
 
     const metadata = {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
-      windowNavigate,
+      windowNavigate: this.__internal_windowNavigate,
     };
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
@@ -2169,7 +2311,7 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
-  public handleGoogleOneTapCallback = async (
+  public __internal_handleResourceCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -2192,6 +2334,14 @@ export class Clerk implements ClerkInterface {
       signIn,
       navigate,
     });
+  };
+
+  public handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    return this.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
   };
 
   private _handleRedirectCallback = async (
@@ -2236,6 +2386,7 @@ export class Clerk implements ClerkInterface {
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
       sessionId: signUp.createdSessionId,
+      protectCheck: signUp.protectCheck,
     };
 
     const si = {
@@ -2244,6 +2395,7 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
+      protectCheck: signIn.protectCheck,
     };
 
     const makeNavigate = (to: string) => () => navigate(to);
@@ -2267,6 +2419,11 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      params.signInProtectCheckUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const redirectUrls = new RedirectUrls(this.#options, params);
 
     const continueSignUpUrl =
@@ -2278,9 +2435,15 @@ export class Clerk implements ClerkInterface {
     const verifyPhoneNumberUrl =
       params.verifyPhoneNumberUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true });
+    const signUpProtectCheckUrl =
+      params.signUpProtectCheckUrl ||
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+
+    const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
       session,
@@ -2291,6 +2454,15 @@ export class Clerk implements ClerkInterface {
       baseUrl: string;
       redirectUrl: string;
     }) => {
+      if (internalNavigateOnSetActive) {
+        await internalNavigateOnSetActive({
+          session,
+          redirectUrl,
+          decorateUrl: url => this.buildUrlWithAuth(url),
+        });
+        return;
+      }
+
       if (!session.currentTask) {
         await this.navigate(redirectUrl);
         return;
@@ -2306,22 +2478,55 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: si.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signInUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signInUrl,
+            redirectUrl: redirectUrls.getAfterSignInUrl(),
+          });
         },
       });
     }
 
+    // OAuth/SAML callbacks can resolve into a protect_check gate that surfaces on the next
+    // /v1/client read, so check for it here before continuing with the transfer logic below.
+    // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
+    //
+    // Scope to the callback's intent: an abandoned sign-in keeps serializing its pending
+    // `protect_check` on the client for up to a day (and a later sign-up doesn't clear it in
+    // multi-session mode), so an unscoped check would route a *sign-up* callback into the stale
+    // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
+    // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
+    // response for the gate.
+    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
+      return navigateToSignInProtectCheck();
+    }
+
+    // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
+    // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
+    // shouldn't hijack a sign-in callback.
+    if (params.reloadResource !== 'signIn' && su.protectCheck) {
+      return navigateToSignUpProtectCheck();
+    }
+
     const userExistsButNeedsToSignIn =
-      su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
+      su.externalAccountStatus === 'transferable' &&
+      su.externalAccountErrorCode === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS;
 
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
+      if (res.protectCheck || res.status === 'needs_protect_check') {
+        return navigateToSignInProtectCheck();
+      }
       switch (res.status) {
         case 'complete':
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignInUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignInUrl(),
+              });
             },
           });
         case 'needs_first_factor':
@@ -2372,7 +2577,11 @@ export class Clerk implements ClerkInterface {
           return this.setActive({
             session: res.createdSessionId,
             navigate: async ({ session }) => {
-              await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+              await setActiveNavigate({
+                session,
+                baseUrl: signUpUrl,
+                redirectUrl: redirectUrls.getAfterSignUpUrl(),
+              });
             },
           });
         case 'missing_requirements':
@@ -2382,6 +2591,7 @@ export class Clerk implements ClerkInterface {
             continueSignUpUrl,
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
+            signUpProtectCheckUrl,
             navigate,
           });
         default:
@@ -2393,7 +2603,11 @@ export class Clerk implements ClerkInterface {
       return this.setActive({
         session: su.sessionId,
         navigate: async ({ session }) => {
-          await setActiveNavigate({ session, baseUrl: signUpUrl, redirectUrl: redirectUrls.getAfterSignUpUrl() });
+          await setActiveNavigate({
+            session,
+            baseUrl: signUpUrl,
+            redirectUrl: redirectUrls.getAfterSignUpUrl(),
+          });
         },
       });
     }
@@ -2440,6 +2654,7 @@ export class Clerk implements ClerkInterface {
         continueSignUpUrl,
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,
+        signUpProtectCheckUrl,
         navigate,
       });
     }
@@ -2576,6 +2791,8 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    protectCheckUrl,
+    signUpProtectCheckUrl,
     walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
@@ -2618,6 +2835,15 @@ export class Clerk implements ClerkInterface {
       secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      protectCheckUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
+    const navigateToSignUpProtectCheck = makeNavigate(
+      signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToContinueSignUp = makeNavigate(
       signUpContinueUrl ||
         buildURL(
@@ -2630,6 +2856,7 @@ export class Clerk implements ClerkInterface {
     );
 
     let signInOrSignUp: SignInResource | SignUpResource;
+    let viaSignUp = false;
     try {
       signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
         identifier,
@@ -2639,6 +2866,7 @@ export class Clerk implements ClerkInterface {
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+        viaSignUp = true;
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
           identifier,
           generateSignature,
@@ -2651,7 +2879,10 @@ export class Clerk implements ClerkInterface {
         if (
           signUpContinueUrl &&
           signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
+          // A protect_check gate also surfaces as missing_requirements; don't skip past it into
+          // the continue step. The gate is handled by the sign-up protect-check route instead.
+          !signInOrSignUp.protectCheck
         ) {
           await navigateToContinueSignUp();
         }
@@ -2671,6 +2902,15 @@ export class Clerk implements ClerkInterface {
         navigate: this.navigate,
       });
     };
+
+    // A Clerk Protect challenge can gate the inline web3 attempt (no redirect happens, so the
+    // centralized _handleRedirectCallback check never runs). Route to the challenge before the
+    // status switch below, otherwise the user is stranded on the wallet step. The sign-up fallback
+    // gates as `missing_requirements` + `protectCheck`, so it has no status branch below either.
+    if (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check') {
+      await (viaSignUp ? navigateToSignUpProtectCheck : navigateToSignInProtectCheck)();
+      return;
+    }
 
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':
@@ -3398,6 +3638,21 @@ export class Clerk implements ClerkInterface {
 
     return allowedProtocols;
   }
+
+  /**
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (the static `ALLOWED_PROTOCOLS` ∪ the customer extension),
+   * so internal callers honor customer protocols automatically.
+   *
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension when a call site
+   * must reject any protocol the customer added. There is no current internal consumer of the
+   * opt-out; it exists for future security-critical paths.
+   */
+  public __internal_windowNavigate = (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }): void => {
+    const allowedProtocols = opts?.useStaticAllowlistOnly ? ALLOWED_PROTOCOLS : this.#allowedRedirectProtocols;
+    windowNavigate(to, { allowedProtocols });
+  };
 
   #isLoaded(): this is LoadedClerk {
     return this.client !== undefined;

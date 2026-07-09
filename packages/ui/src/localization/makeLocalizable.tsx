@@ -4,12 +4,14 @@ import React from 'react';
 
 import { useOptions } from '../contexts';
 import { readObjectPath } from '../utils/readObjectPath';
+import { applyMarkupAndTokens, stripMarkup } from './applyMarkupToNodes';
 import type { GlobalTokens } from './applyTokensToString';
 import { applyTokensToString, useGlobalTokens } from './applyTokensToString';
 import { defaultResource } from './defaultEnglishResource';
 import type { LocalizationKey } from './localizationKeys';
 import { localizationKeys } from './localizationKeys';
 import { useParsedLocalizationResource } from './parseLocalization';
+import { useCurrencyFormatter } from './useCurrencyFormatter';
 
 type Localizable<T> = T & {
   localizationKey?: LocalizationKey | string;
@@ -49,7 +51,7 @@ export const makeLocalizable = <P,>(Component: React.FunctionComponent<P>): Loca
         ref={ref}
         data-localization-key={localizationKeyAttribute(localizationKey)}
       >
-        {localizedStringFromKey(localizationKey, parsedResource, globalTokens) || restProps.children}
+        {localizedNodeFromKey(localizationKey, parsedResource, globalTokens) || restProps.children}
       </Component>
     );
   });
@@ -63,12 +65,14 @@ export const useLocalizations = () => {
   const { localization } = useOptions();
   const parsedResource = useParsedLocalizationResource();
   const globalTokens = useGlobalTokens();
+  const locale = localization?.locale || (defaultResource.locale as string);
+  const $ = useCurrencyFormatter(locale);
 
   const t = (localizationKey: LocalizationKey | string | undefined) => {
     if (!localizationKey || typeof localizationKey === 'string') {
       return localizationKey || '';
     }
-    return localizedStringFromKey(localizationKey, parsedResource, globalTokens);
+    return stripMarkup(localizedStringFromKey(localizationKey, parsedResource, globalTokens));
   };
 
   /**
@@ -103,21 +107,32 @@ export const useLocalizations = () => {
     );
   };
 
-  return { t, translateError, locale: localization?.locale || (defaultResource.locale as string) };
+  return { t, translateError, locale, $ };
 };
 
 const localizationKeyAttribute = (localizationKey: LocalizationKey) => {
   return localizationKey.key;
 };
 
+const resolveKey = (localizationKey: LocalizationKey, resource: LocalizationResource, globalTokens: GlobalTokens) => ({
+  base: readObjectPath(resource, localizationKey.key) as string,
+  tokens: { ...globalTokens, ...localizationKey.params },
+});
+
 const localizedStringFromKey = (
   localizationKey: LocalizationKey,
   resource: LocalizationResource,
   globalTokens: GlobalTokens,
 ): string => {
-  const key = localizationKey.key;
-  const base = readObjectPath(resource, key) as string;
-  const params = localizationKey.params;
-  const tokens = { ...globalTokens, ...params };
+  const { base, tokens } = resolveKey(localizationKey, resource, globalTokens);
   return applyTokensToString(base || '', tokens);
+};
+
+const localizedNodeFromKey = (
+  localizationKey: LocalizationKey,
+  resource: LocalizationResource,
+  globalTokens: GlobalTokens,
+) => {
+  const { base, tokens } = resolveKey(localizationKey, resource, globalTokens);
+  return applyMarkupAndTokens(base, tokens);
 };

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, nextTick } from 'vue';
 
 import { ClerkHostRenderer } from '../ClerkHostRenderer';

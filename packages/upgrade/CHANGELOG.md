@@ -1,5 +1,17 @@
 # @clerk/upgrade
 
+## 2.0.4
+
+### Patch Changes
+
+- Drop unused runtime dependencies ([#8753](https://github.com/clerk/javascript/pull/8753)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 2.0.3
+
+### Patch Changes
+
+- Removed unused generate-changelog script ([#8686](https://github.com/clerk/javascript/pull/8686)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 2.0.2
 
 ### Patch Changes

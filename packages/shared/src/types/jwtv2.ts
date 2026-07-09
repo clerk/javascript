@@ -25,6 +25,10 @@ export interface JwtHeader {
   'x5t#S256'?: string;
   x5t?: string;
   x5c?: string | string[];
+  /** @internal - used by Session Minter for monotonic token freshness checks. Do not depend on this field. */
+  oiat?: number;
+  /** @internal - Clerk token-category tag written by the token minter. Do not depend on this field. */
+  cat?: string;
 }
 
 declare global {
@@ -195,7 +199,13 @@ export type ActClaimType = 'agent';
  * @inline
  */
 export interface ActClaim {
+  /**
+   * The identifier for the user that is impersonating the current user.
+   */
   sub: string;
+  /**
+   * The type of the actor.
+   */
   type?: ActClaimType;
   [x: string]: unknown;
 }

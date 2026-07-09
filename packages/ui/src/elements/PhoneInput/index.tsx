@@ -5,7 +5,7 @@ import { mergeRefs } from '@/ui/utils/mergeRefs';
 import type { FeedbackType } from '@/ui/utils/useFormControl';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
-import { Check, ChevronUpDown } from '../../icons';
+import { Checkmark, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import { Select, SelectButton, SelectOptionList } from '../Select';
 import type { CountryEntry, CountryIso } from './countryCodeData';
@@ -78,8 +78,8 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        '&:focus-within,&[data-focus-within="true"]': {
-          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        '&:has(:focus-visible),&:focus-within': {
+          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus-visible'],
         },
       })}
     >
@@ -119,7 +119,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             borderEndEndRadius: '0',
             borderStartEndRadius: '0',
             paddingInlineEnd: t.space.$2,
-            ':focus': {
+            '&:focus-visible': {
               zIndex: 2,
               boxShadow: 'none',
             },
@@ -191,7 +191,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
                 borderStartStartRadius: 0,
                 borderEndStartRadius: 0,
                 paddingInlineStart: t.space.$1,
-                '&:focus': {
+                '&:focus-visible': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
                 },
@@ -230,8 +230,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       {...rest}
     >
       <Icon
-        icon={Check}
-        size='sm'
+        icon={Checkmark}
         sx={{ visibility: isSelected ? 'visible' : 'hidden' }}
       />
       <Text

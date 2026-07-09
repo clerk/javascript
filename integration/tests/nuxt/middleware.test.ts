@@ -1,34 +1,25 @@
+import { execSync } from 'node:child_process';
+
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('custom middleware @nuxt', () => {
-  test.describe.configure({ mode: 'parallel' });
-  let app: Application;
-
-  test.beforeAll(async () => {
-    app = await appConfigs.nuxt.node
-      .clone()
-      .setName('nuxt-custom-middleware')
-      .addFile(
-        'nuxt.config.js',
-        () => `export default defineNuxtConfig({
+const nuxtConfigFile = () => `export default defineNuxtConfig({
           modules: ['@clerk/nuxt'],
           devtools: { enabled: false },
           clerk: {
             skipServerMiddleware: true
           }
-        });`,
-      )
-      .addFile(
-        'server/middleware/clerk.js',
-        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+        });`;
+
+const clerkMiddlewareFile = () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+
+        const isProtectedRoute = createRouteMatcher(['/api/me', '/api/admin(.*)']);
 
         export default clerkMiddleware((event) => {
           const { userId } = event.context.auth();
-          const isProtectedRoute = createRouteMatcher(['/api/me']);
 
           if (!userId && isProtectedRoute(event)) {
             throw createError({
@@ -37,11 +28,13 @@ test.describe('custom middleware @nuxt', () => {
             })
           }
         });
-      `,
-      )
-      .addFile(
-        'app/pages/me.vue',
-        () => `<script setup>
+      `;
+
+const adminApiRouteFile = () => `export default defineEventHandler((event) => {
+          return { status: 'ok' };
+        });`;
+
+const mePageFile = () => `<script setup>
         const { data, error } = await useFetch('/api/me');
         </script>
 
@@ -49,11 +42,25 @@ test.describe('custom middleware @nuxt', () => {
           <div v-if="data">Hello, {{ data.firstName }}</div>
           <div v-else-if="error">{{ error.statusCode }}: {{ error.statusMessage }}</div>
           <div v-else>Unknown status</div>
-        </template>`,
-      )
+        </template>`;
+
+test.describe('custom middleware @nuxt', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    app = await appConfigs.nuxt.node
+      .clone()
+      .setName('nuxt-custom-middleware')
+      .addFile('nuxt.config.js', nuxtConfigFile)
+      .addFile('server/middleware/clerk.js', clerkMiddlewareFile)
+      .addFile('server/api/admin/[...action].js', adminApiRouteFile)
+      .addFile('app/pages/me.vue', mePageFile)
       .commit();
 
     await app.setup();
+    // pkglab installs with --ignore-scripts, so nuxt prepare must be run manually
+    execSync('npx nuxt prepare', { cwd: app.appDir, stdio: 'pipe' });
     await app.withEnv(appConfigs.envs.withCustomRoles);
     await app.dev();
   });
@@ -85,5 +92,118 @@ test.describe('custom middleware @nuxt', () => {
     await expect(u.page.getByText(`Hello, ${fakeUser.firstName}`)).toBeVisible();
 
     await fakeUser.deleteIfExists();
+  });
+});
+
+test.describe('percent-encoded URL handling @nuxt', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+
+  test.beforeAll(async () => {
+    test.setTimeout(90_000);
+    app = await appConfigs.nuxt.node
+      .clone()
+      .setName('nuxt-custom-middleware')
+      .addFile('nuxt.config.js', nuxtConfigFile)
+      .addFile('server/middleware/clerk.js', clerkMiddlewareFile)
+      .addFile('server/api/admin/[...action].js', adminApiRouteFile)
+      .commit();
+
+    await app.setup();
+    // pkglab installs with --ignore-scripts, so nuxt prepare must be run manually
+    execSync('npx nuxt prepare', { cwd: app.appDir, stdio: 'pipe' });
+    await app.withEnv(appConfigs.envs.withCustomRoles);
+    await app.dev();
+  });
+
+  test.afterAll(async () => {
+    await app.teardown();
+  });
+
+  test('handle percent-encoded URL on protected routes', async () => {
+    const normalRes = await fetch(app.serverUrl + '/api/admin/users');
+    expect(normalRes.status).toBe(401);
+
+    // %61 = 'a': /api/%61dmin/users decodes to /api/admin/users
+    const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
+    expect(encodedRes.status).toBe(401);
+
+    // %64 = 'd': /api/a%64min/users decodes to /api/admin/users
+    const encodedRes2 = await fetch(app.serverUrl + '/api/a%64min/users');
+    expect(encodedRes2.status).toBe(401);
+  });
+
+  test('double-encoded URLs do not match route (Nitro router rejects)', async () => {
+    // %2561 decodes one layer to %61 — Nitro's file-based router does not
+    // match %2561dmin to the admin/ directory, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded slash is not decoded into a path separator', async () => {
+    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
+    // sees /api%2Fadmin/users which does not match /api/admin(.*).
+    // The router also treats %2F as a literal segment char, not a separator.
+    const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
+    expect(res.status).not.toBe(200);
+  });
+
+  test('null byte in path is caught by middleware as protected route', async () => {
+    // %00 decodes to a null char — /api/admin\0/users still matches
+    // /api/admin(.*) so our middleware correctly blocks it with 401
+    const res = await fetch(app.serverUrl + '/api/admin%00/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('malformed percent-encoding returns 400 (clerkMiddleware catches MalformedURLError)', async () => {
+    // %zz is not valid percent-encoding — createPathMatcher throws
+    // MalformedURLError, which clerkMiddleware catches and returns 400
+    const res = await fetch(app.serverUrl + '/api/%zz/users');
+    expect(res.status).toBe(400);
+  });
+
+  test('encoded dot-current segment is caught by middleware', async () => {
+    // %2e = '.' — /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected
+    const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('encoded dot-parent segment does not reach protected route', async () => {
+    // %2e%2e = '..' — /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
+    // Nitro's router does not match this to any route, returning 404
+    const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
+    expect(res.status).toBe(404);
+  });
+
+  test('encoded dot-parent traversal through fake segment is caught by middleware', async () => {
+    // /api/foo/%2e%2e/admin/users resolves to /api/foo/../admin/users → /api/admin/users
+    // Our middleware matches the resolved path as protected, returning 401
+    const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
+    expect(res.status).toBe(401);
+  });
+
+  test('fully encoded dot segments with encoded slash are rejected (Nitro rejects)', async () => {
+    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // Nitro treats the entire sequence as a single path segment and
+    // doesn't match any route, returning 404
+    const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
+    expect(dotSlashCurrent.status).toBe(404);
+
+    const dotSlashParent = await fetch(app.serverUrl + '/api%2f%2e%2e%2fadmin/users');
+    expect(dotSlashParent.status).toBe(404);
+
+    const dotSlashTraversal = await fetch(app.serverUrl + '/api/foo%2f%2e%2e%2fadmin/users');
+    expect(dotSlashTraversal.status).toBe(404);
+  });
+
+  test('double slashes cannot bypass protected route', async () => {
+    // Double slashes before the protected segment
+    const res1 = await fetch(app.serverUrl + '//api/admin/users');
+    expect(res1.status).not.toBe(200);
+
+    // Double slashes in the middle of the path
+    const res2 = await fetch(app.serverUrl + '/api//admin/users');
+    expect(res2.status).not.toBe(200);
   });
 });

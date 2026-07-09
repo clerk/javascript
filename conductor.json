@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "setup": "pnpm install",
+    "run": "PORT=$CONDUCTOR_PORT pnpm run dev:sandbox"
+  },
+  "runScriptMode": "concurrent"
+}

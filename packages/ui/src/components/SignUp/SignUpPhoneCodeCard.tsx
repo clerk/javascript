@@ -15,6 +15,8 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const channel = signUp.verifications.phoneNumber.channel;
 
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
+  const hasPendingPhoneCodeVerification =
+    phoneVerificationStatus === 'unverified' && signUp.verifications.phoneNumber.strategy === 'phone_code';
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
 
@@ -34,7 +36,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   useFetch(
     // If an alternative phone code provider is used, we skip the prepare step
     // because the verification is already created on the Start screen
-    shouldAvoidPrepare || isAlternativePhoneCodeProvider
+    shouldAvoidPrepare || hasPendingPhoneCodeVerification || isAlternativePhoneCodeProvider
       ? undefined
       : () => signUp.preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined }),
     {
@@ -85,6 +87,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.phoneNumber}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
         alternativeMethodsLabel={
           isAlternativePhoneCodeProvider
             ? localizationKeys('footerActionLink__alternativePhoneCodeProvider')

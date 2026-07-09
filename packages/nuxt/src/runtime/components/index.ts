@@ -5,6 +5,7 @@ export {
   UserButton,
   OrganizationSwitcher,
   GoogleOneTap,
+  OAuthConsent,
   Waitlist,
   // Control components
   ClerkLoaded,

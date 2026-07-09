@@ -42,6 +42,7 @@ const mergeEnvVarsWithParams = (
     __internal_clerkUIUrl: paramClerkUIUrl,
     __internal_clerkUIVersion: paramClerkUIVersion,
     prefetchUI: paramPrefetchUI,
+    unsafe_disableDevelopmentModeConsoleWarning: paramUnsafeDisableDevelopmentModeConsoleWarning,
     ...rest
   } = params || {};
 
@@ -65,6 +66,9 @@ const mergeEnvVarsWithParams = (
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
+    unsafe_disableDevelopmentModeConsoleWarning:
+      paramUnsafeDisableDevelopmentModeConsoleWarning ??
+      isTruthy(import.meta.env.PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING),
     // Read from params (server-injected via __CLERK_ASTRO_SAFE_VARS__)
     // These are dynamically resolved by middleware, not from env vars
     __internal_keylessClaimUrl: internalOptions?.keylessClaimUrl,

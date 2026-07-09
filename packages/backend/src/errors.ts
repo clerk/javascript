@@ -1,5 +1,7 @@
 import { ClerkError } from '@clerk/shared/error';
 
+export { ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
+
 export type TokenCarrier = 'header' | 'cookie';
 
 export const TokenVerificationErrorCode = {

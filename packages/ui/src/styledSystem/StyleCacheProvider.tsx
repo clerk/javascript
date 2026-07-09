@@ -7,9 +7,9 @@ import React, { useMemo } from 'react';
 const el = document.querySelector('style#cl-style-insertion-point');
 
 type StyleCacheProviderProps = React.PropsWithChildren<{
-  /** Optional nonce value for CSP (Content Security Policy) */
+  /** The nonce value for CSP (Content Security Policy). */
   nonce?: string;
-  /** Optional CSS layer name to wrap styles in */
+  /** The CSS layer name to wrap styles in. */
   cssLayerName?: string;
 }>;
 

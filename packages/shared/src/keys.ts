@@ -30,17 +30,52 @@ const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
 const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.accounts([a-z.]*)(dev|com)$/i;
 
 /**
- * Converts a frontend API URL into a base64-encoded publishable key.
+ * Converts a frontend API URL into an unpadded base64-encoded publishable key.
  *
  * @param frontendApi - The frontend API URL (e.g., 'clerk.example.com').
- * @returns A base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
+ * @returns An unpadded base64-encoded publishable key with appropriate prefix (pk_live_ or pk_test_).
  */
 export function buildPublishableKey(frontendApi: string): string {
   const isDevKey =
     PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
     (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
   const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
-  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
+  return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`).replace(/=+$/, '')}`;
+}
+
+/**
+ * Derives a publishable key from the current hostname. Intended for multi-domain
+ * setups (e.g. custom domains on top of a default domain) where the correct key
+ * must be resolved per request.
+ *
+ * Pass the configured publishable key as `fallbackKey` so that development
+ * instances (pk_test_) are returned as-is instead of being incorrectly derived
+ * from the host (e.g. localhost).
+ *
+ * @example
+ * // React (use window.location.hostname, not window.location.host, to avoid including the port)
+ * <ClerkProvider publishableKey={publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)}>
+ *
+ * @example
+ * // Express (inside clerkMiddleware callback)
+ * // Validate req.hostname against a known allowlist before passing it in.
+ * // When `trust proxy` is enabled, req.hostname reads from X-Forwarded-Host
+ * // and can be spoofed if your proxy is not properly configured.
+ * const ALLOWED_HOSTS = ['domain-a.com', 'domain-b.com'];
+ * clerkMiddleware((req) => {
+ *   if (!ALLOWED_HOSTS.includes(req.hostname)) throw new Error('Unknown host');
+ *   return { publishableKey: publishableKeyFromHost(req.hostname, process.env.CLERK_PUBLISHABLE_KEY) };
+ * })
+ */
+export function publishableKeyFromHost(host: string, fallbackKey?: string): string {
+  if (fallbackKey && isDevelopmentFromPublishableKey(fallbackKey)) {
+    return fallbackKey;
+  }
+  const hostname = host.toLowerCase().replace(/:\d+$/, '');
+  if (!hostname) {
+    throw new Error('Host must not be empty.');
+  }
+  return buildPublishableKey(`clerk.${hostname}`);
 }
 
 /**

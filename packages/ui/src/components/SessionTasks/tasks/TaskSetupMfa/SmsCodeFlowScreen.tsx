@@ -10,7 +10,7 @@ import { Form } from '@/elements/Form';
 import { FormButtonContainer } from '@/elements/FormButtons';
 import { PreviewButton } from '@/elements/PreviewButton';
 import { type VerificationCodeCardProps, VerificationCodeContent } from '@/elements/VerificationCodeCard';
-import { Add } from '@/icons';
+import { Plus } from '@/icons';
 import { Button, Col, descriptors, Flex, Flow, localizationKeys, Text } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { Header } from '@/ui/elements/Header';
@@ -91,6 +91,7 @@ const MFAVerifyPhoneForSessionTasks = withCardStateProvider((props: MFAVerifyPho
         safeIdentifier={resourceRef.current?.phoneNumber || ''}
         inputLabel={localizationKeys('taskSetupMfa.smsCode.verifyPhone.formTitle')}
         resendButton={localizationKeys('taskSetupMfa.smsCode.verifyPhone.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
         badgeText={localizationKeys('taskSetupMfa.badge')}
         onCodeEntryFinishedAction={action}
         onResendCodeClicked={() => void prepare()}
@@ -299,7 +300,6 @@ const SmsCodeScreen = withCardStateProvider((props: SmsCodeScreenProps) => {
         )}
         <Col>
           <Actions
-            role='menu'
             elementDescriptor={descriptors.taskSetupMfaPhoneSelectionItems}
             sx={t => ({
               borderTopWidth: t.borderWidths.$normal,
@@ -321,7 +321,7 @@ const SmsCodeScreen = withCardStateProvider((props: SmsCodeScreenProps) => {
               label={localizationKeys('taskSetupMfa.smsCode.addPhoneNumber')}
               block
               onClick={onAddPhoneClick}
-              icon={Add}
+              icon={Plus}
               elementDescriptor={descriptors.taskSetupMfaPhoneSelectionAddPhoneAction}
               sx={t => ({
                 borderTopWidth: t.borderWidths.$normal,

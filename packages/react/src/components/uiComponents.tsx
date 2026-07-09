@@ -1,4 +1,5 @@
 import type {
+  __internal_OAuthConsentProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -53,7 +54,7 @@ import { withClerk } from './withClerk';
 
 type FallbackProp = {
   /**
-   * An optional element to render while the component is mounting.
+   * The element to render while the component is mounting.
    */
   fallback?: ReactNode;
 };
@@ -125,8 +126,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
-      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customPagesPortals?.map(({ key, portal }) => createElement(portal, { key }))}
+      {props?.customMenuItemsPortals?.map(({ key, portal }) => createElement(portal, { key }))}
     </>
   );
 };
@@ -641,6 +642,34 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+export const OAuthConsent = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<__internal_OAuthConsentProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.__internal_mountOAuthConsent}
+            unmount={clerk.__internal_unmountOAuthConsent}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'OAuthConsent', renderWhileLoading: true },
 );
 
 export const UserAvatar = withClerk(

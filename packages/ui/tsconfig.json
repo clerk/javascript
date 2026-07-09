@@ -27,8 +27,17 @@
       // in order to make git merges easier
       // TODO: @nikos remove after v6 release
       "@/ui*": ["./src/*"]
-    }
+    },
+    "types": ["@rspack/core/module"]
   },
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "**/__tests__/**"],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "./src/test/**"
+  ],
   "include": ["src", "src/global.d.ts"]
 }

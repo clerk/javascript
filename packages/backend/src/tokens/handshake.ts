@@ -105,7 +105,14 @@ export class HandshakeService {
    * @returns boolean indicating if the request is eligible for handshake
    */
   isRequestEligibleForHandshake(): boolean {
-    const { accept, secFetchDest } = this.authenticateContext;
+    const { accept, method, secFetchDest } = this.authenticateContext;
+
+    // Handshake involves a redirect to FAPI which only accepts GET requests.
+    // Non-GET requests (e.g. POST form submissions) also set sec-fetch-dest: document,
+    // but redirecting them would result in a 405 Method Not Allowed from FAPI.
+    if (method !== 'GET') {
+      return false;
+    }
 
     // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the data of a user navigation.
     // Also, we check for 'iframe' because it's the value set when a doc request is made by an iframe.

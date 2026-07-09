@@ -6,7 +6,7 @@ import { createMockQueryClient } from './mocks/clerk';
 
 const mockQueryClient = createMockQueryClient();
 
-vi.mock('../../clerk-rq/use-clerk-query-client', () => ({
+vi.mock('../../query/use-clerk-query-client', () => ({
   useClerkQueryClient: () => [mockQueryClient.client],
 }));
 

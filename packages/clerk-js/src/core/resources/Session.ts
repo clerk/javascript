@@ -50,6 +50,7 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
+import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -201,7 +202,7 @@ export class Session extends BaseResource implements SessionResource {
     return createCheckAuthorization({
       userId: this.user?.id,
       factorVerificationAge: this.factorVerificationAge,
-      orgId: activeMembership?.id,
+      orgId: activeMembership?.organization?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
       features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
@@ -489,17 +490,22 @@ export class Session extends BaseResource implements SessionResource {
       : {
           organizationId: organizationId ?? null,
           ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
+          ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
-    const lastActiveToken = this.lastActiveToken?.getRawString();
 
-    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+    if (sessionMinterEnabled) {
+      // Session Minter sends the token in the body, no expired_token retry needed
+      return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined);
+    }
+
+    // TODO: Remove this expired_token retry flow when the sessionMinter flag is removed
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+    return Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (MissingExpiredTokenError.is(e) && lastActiveToken) {
         return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
-
-    return tokenResolver;
   }
 
   #dispatchTokenEvents(token: TokenResource, shouldDispatch: boolean): void {
@@ -515,10 +521,28 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt) {
+    if (token.jwt && !this.#shouldKeepExistingLastActiveToken(token)) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
+  }
+
+  // Mirrors the cookie guard: only a same session+org lastActiveToken is a comparable
+  // freshness baseline, so a session or org switch always adopts the incoming token.
+  // Without this, an org-switch token minted by a stale edge (lower oiat) would lose
+  // to the previous org's token and pin lastActiveToken to the old org's claims.
+  #shouldKeepExistingLastActiveToken(incoming: TokenResource): boolean {
+    const current = this.lastActiveToken;
+    if (!current?.jwt) {
+      return false;
+    }
+    if (
+      tokenSid(current) !== tokenSid(incoming) ||
+      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
+    ) {
+      return false;
+    }
+    return pickFreshestJwt(current, incoming) !== incoming;
   }
 
   #fetchToken(
@@ -568,6 +592,20 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     Session.#backgroundRefreshInProgress.add(tokenId);
+
+    // Mobile only: skip this refresh if the token is already expired.
+    // On iOS, the OS throttles background JS threads for hours (e.g. overnight audio apps).
+    // The refresh timer fires late — well past token expiry — with stale credentials.
+    // If we send that request, the 401 response triggers handleUnauthenticated(), which
+    // destroys the session even though it's still valid on the server (30-day lifetime).
+    // Instead, bail out here and let the next foreground getToken() call recover normally.
+    const experimental = Session.clerk?.__internal_getOption?.('experimental');
+    const isHeadless = experimental?.runtimeEnvironment === 'headless';
+    const lastTokenExp = this.lastActiveToken?.jwt?.claims?.exp;
+    if (isHeadless && lastTokenExp && Date.now() / 1000 > lastTokenExp) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 

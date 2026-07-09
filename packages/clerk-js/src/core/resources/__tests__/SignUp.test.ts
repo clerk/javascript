@@ -20,12 +20,14 @@ import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
-  CaptchaChallenge: vi.fn().mockImplementation(() => ({
-    managedOrInvisible: vi.fn().mockResolvedValue({
-      captchaToken: 'mock_token',
-      captchaWidgetType: 'invisible',
-    }),
-  })),
+  CaptchaChallenge: vi.fn().mockImplementation(function () {
+    return {
+      managedOrInvisible: vi.fn().mockResolvedValue({
+        captchaToken: 'mock_token',
+        captchaWidgetType: 'invisible',
+      }),
+    };
+  }),
 }));
 
 describe('SignUp', () => {
@@ -33,6 +35,49 @@ describe('SignUp', () => {
     const signUp = new SignUp();
     const snapshot = JSON.stringify(signUp);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('authenticateWithRedirect with an OAuth transport', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      SignUp.clerk = {} as any;
+    });
+
+    it('routes through the transport instead of windowNavigate when one is registered', async () => {
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' });
+      const handleResourceCallback = vi.fn().mockResolvedValue(undefined);
+      SignUp.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_oauthTransport: { getRedirectUrl: () => 'myapp://sso-callback', open },
+        __internal_handleResourceCallback: handleResourceCallback,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        client: null,
+        response: {
+          id: 'signup_123',
+          verifications: {
+            external_account: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://provider.example/auth',
+            },
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp();
+      await signUp.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        __internal_callbackParams: { signInUrl: '/sign-in' },
+      } as any);
+
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(handleResourceCallback).toHaveBeenCalledWith(signUp, { signInUrl: '/sign-in' });
+    });
   });
 
   describe('create', () => {
@@ -364,6 +409,35 @@ describe('SignUp', () => {
       });
     });
 
+    describe('update', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        SignUp.clerk = {} as any;
+      });
+
+      it('patches the active sign up resource', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', first_name: 'Ada' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.update({ firstName: 'Ada' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              firstName: 'Ada',
+            }),
+          }),
+        );
+      });
+    });
+
     describe('sendPhoneCode', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -664,6 +738,256 @@ describe('SignUp', () => {
               strategy: 'oauth_google',
               redirectUrl: 'https://example.com/sso-callback',
               actionCompleteRedirectUrl: 'https://other.com/complete',
+            }),
+          }),
+        );
+      });
+
+      it('includes browser locale when creating a new signup', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              locale: 'fr-FR',
+            }),
+          }),
+        );
+      });
+
+      it('prefers an explicitly provided locale over the browser locale', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+          locale: 'el-GR',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
+
+      it('does not inject browser locale when continuing an existing signup', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              externalAccount: {
+                status: 'unverified',
+                externalVerificationRedirectURL: 'https://sso.example.com/auth',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.not.objectContaining({
+              locale: expect.anything(),
+            }),
+          }),
+        );
+      });
+
+      it('continues an existing sign up via the resource URL', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signup_123',
+            verifications: {
+              external_account: {
+                status: 'complete',
+              },
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
+              redirectUrl: 'https://example.com/sso-callback',
+              actionCompleteRedirectUrl: 'https://example.com/complete',
+            }),
+          }),
+        );
+      });
+
+      it('continues a ticket sign up with sso via the resource URL', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+
+        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        SignUp.clerk = {
+          buildUrlWithAuth: mockBuildUrlWithAuth,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signup_123' },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                external_account: {
+                  status: 'complete',
+                },
+              },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.ticket({ ticket: 'provided_ticket' });
+        await signUp.__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/complete',
+          redirectCallbackUrl: '/sso-callback',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'ticket',
+              ticket: 'provided_ticket',
+            }),
+          }),
+        );
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.objectContaining({
+              strategy: 'oauth_google',
             }),
           }),
         );
@@ -1042,6 +1366,63 @@ describe('SignUp', () => {
         // Verify error is returned without retry
         expect(result.error).toBeTruthy();
       });
+
+      it('passes locale and name params through to the created signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                web3_wallet: { status: 'unverified' },
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signup_123',
+              verifications: {
+                web3_wallet: { status: 'unverified', message: 'nonce_123' },
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signup_123', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithMetamask: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.web3({
+          strategy: 'web3_metamask_signature',
+          firstName: 'Vitalik',
+          lastName: 'Nakamoto',
+          locale: 'el-GR',
+        });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              firstName: 'Vitalik',
+              lastName: 'Nakamoto',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
     });
 
     describe('password', () => {
@@ -1117,6 +1498,77 @@ describe('SignUp', () => {
 
         expect(result).toHaveProperty('error', null);
       });
+
+      it('includes browser locale when creating a new signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'fr-FR',
+            }),
+          }),
+        );
+      });
+
+      it('prefers an explicitly provided locale over the browser locale', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.password({ password: 'test-password-123', locale: 'el-GR' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'password',
+              locale: 'el-GR',
+            }),
+          }),
+        );
+      });
+
+      it('does not inject browser locale when updating an existing signup', async () => {
+        vi.stubGlobal('navigator', { language: 'fr-FR' });
+
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        await signUp.__internal_future.password({ password: 'test-password-123' });
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'PATCH',
+            path: '/client/sign_ups/signup_123',
+            body: expect.not.objectContaining({
+              locale: expect.anything(),
+            }),
+          }),
+        );
+      });
     });
 
     describe('ticket', () => {
@@ -1159,6 +1611,7 @@ describe('SignUp', () => {
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
+              strategy: 'ticket',
               ticket: 'ticket_from_query',
             }),
           }),
@@ -1182,13 +1635,37 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
-        await signUp.__internal_future.ticket({ ticket: 'provided_ticket' });
+        await signUp.__internal_future.ticket({ ticket: 'provided_ticket', firstName: 'Test' });
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ups',
             body: expect.objectContaining({
+              strategy: 'ticket',
+              ticket: 'provided_ticket',
+              firstName: 'Test',
+            }),
+          }),
+        );
+      });
+
+      it('forces the ticket strategy', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp();
+        await signUp.__internal_future.ticket({ strategy: 'oauth_google', ticket: 'provided_ticket' } as any);
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ups',
+            body: expect.objectContaining({
+              strategy: 'ticket',
               ticket: 'provided_ticket',
             }),
           }),
@@ -1354,6 +1831,249 @@ describe('SignUp', () => {
         expect(mockClient.signUp.emailAddress).toBeNull();
         expect(mockClient.signUp.firstName).toBeNull();
       });
+    });
+  });
+
+  describe('protectCheck', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      // Restore the patched _fetch so the mock can't leak into any block added below.
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+    });
+
+    it('deserializes protect_check from JSON', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: 'test@example.com',
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+          expires_at: 1741564800000,
+          ui_hints: { theme: 'dark' },
+        },
+      });
+
+      expect(signUp.protectCheck).not.toBeNull();
+      expect(signUp.protectCheck?.status).toBe('pending');
+      expect(signUp.protectCheck?.token).toBe('challenge-token-abc');
+      expect(signUp.protectCheck?.sdkUrl).toBe('https://sdk.example.com/challenge.js');
+      expect(signUp.protectCheck?.expiresAt).toBe(1741564800000);
+      expect(signUp.protectCheck?.uiHints).toEqual({ theme: 'dark' });
+      expect(signUp.missingFields).toContain('protect_check');
+    });
+
+    it('handles protect_check with optional expires_at and ui_hints omitted', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'minimal-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      expect(signUp.protectCheck?.status).toBe('pending');
+      expect(signUp.protectCheck?.token).toBe('minimal-token');
+      expect(signUp.protectCheck?.expiresAt).toBeUndefined();
+      expect(signUp.protectCheck?.uiHints).toBeUndefined();
+
+      // Snapshot omits the optional fields when absent
+      const snapshot = signUp.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'minimal-token',
+        sdk_url: 'https://example.com/sdk.js',
+      });
+    });
+
+    it('sets protectCheck to null when not present in JSON', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: [],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: null,
+      });
+
+      expect(signUp.protectCheck).toBeNull();
+    });
+
+    it('round-trips protectCheck through snapshot', () => {
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'test-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const snapshot = signUp.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'test-token',
+        sdk_url: 'https://example.com/sdk.js',
+        expires_at: 1700000000000,
+        ui_hints: {},
+      });
+
+      // Re-create from snapshot
+      const signUp2 = new SignUp(snapshot);
+      expect(signUp2.protectCheck?.token).toBe('test-token');
+    });
+
+    it('calls _basePatch with correct params for submitProtectCheck', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signup_123',
+          object: 'sign_up',
+          status: 'complete',
+          required_fields: [],
+          optional_fields: [],
+          missing_fields: [],
+          unverified_fields: [],
+          verifications: null,
+          protect_check: null,
+          created_session_id: 'sess_123',
+          created_user_id: 'user_123',
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({
+        id: 'signup_123',
+        object: 'sign_up',
+        status: 'missing_requirements',
+        required_fields: [],
+        optional_fields: [],
+        missing_fields: ['protect_check'],
+        unverified_fields: [],
+        username: null,
+        first_name: null,
+        last_name: null,
+        email_address: null,
+        phone_number: null,
+        web3_wallet: null,
+        external_account_strategy: null,
+        external_account: null,
+        has_password: false,
+        unsafe_metadata: {},
+        created_session_id: null,
+        created_user_id: null,
+        abandon_at: null,
+        legal_accepted_at: null,
+        locale: null,
+        verifications: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const result = await signUp.submitProtectCheck({ proofToken: 'proof-abc' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          path: '/client/sign_ups/signup_123/protect_check',
+          body: { proof_token: 'proof-abc' },
+        }),
+      );
+      expect(result.status).toBe('complete');
+      expect(result.protectCheck).toBeNull();
     });
   });
 });

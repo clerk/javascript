@@ -81,11 +81,21 @@ const config = {
     './.typedoc/custom-router.mjs',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
+    /** Must load after custom-plugin.mjs so its END listener (link replacements) fires first. */
+    './.typedoc/extract-methods.mjs',
   ],
   theme: 'clerkTheme',
   router: 'clerk-router',
   readme: 'none',
-  notRenderedTags: [...OptionDefaults.notRenderedTags, ...CUSTOM_BLOCK_TAGS],
+  notRenderedTags: [
+    ...OptionDefaults.notRenderedTags,
+    ...CUSTOM_BLOCK_TAGS,
+    /** Parsed for router/theme; must not appear as a doc section (otherwise renders as **Inline**). */
+    '@inline',
+    '@inlineType',
+    /** Opts into a dedicated reference page despite `@inline` (see `.typedoc/standalone-page-tag.mjs`). */
+    '@standalonePage',
+  ],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -96,7 +106,34 @@ const config = {
     excludeNotDocumented: true,
     gitRevision: 'main',
     blockTags: [...OptionDefaults.blockTags, ...CUSTOM_BLOCK_TAGS],
-    modifierTags: [...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental')],
+    modifierTags: [
+      ...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental'),
+      /** Suppresses the Parameters table in `.typedoc/extract-methods.mjs` method MDX. */
+      '@skipParametersSection',
+      /**
+       * On a reference-object property whose value is an inline object type: omit the parent from the main Properties table;
+       * extract each callable member as `methods/<parent>-<child>.mdx` and each non-callable object member as a nested heading + property table (see `.typedoc/extract-methods.mjs`).
+       */
+      '@extractMethods',
+      /** Type-only / router hints; not user-facing prose (see `notRenderedTags`). */
+      '@inline',
+      '@inlineType',
+      /** With `@inline`, still emit a standalone `.mdx` page (see `.typedoc/standalone-page-tag.mjs`). */
+      '@standalonePage',
+      /** Self-documenting placeholder for declarations intentionally left without a description. */
+      '@generateWithEmptyComment',
+      /**
+       * On a generic wrapper type (e.g. `ClerkPaginationRequest<T>`), opts every alias of the form `Foo<{...}>` into a single merged properties table that includes the wrapper's own properties. Without this, typedoc-plugin-markdown renders such aliases as empty pages because the resolved type is a ReferenceType with no inline declaration.
+       * Handled by `.typedoc/custom-plugin.mjs`.
+       */
+      '@expandProperties',
+    ],
+    /**
+     * Keep `@inline` / `@inlineType` / `@standalonePage` in the model so the custom router and theme can read them.
+     */
+    excludeTags: OptionDefaults.excludeTags.filter(
+      tag => tag !== '@inline' && tag !== '@inlineType' && tag !== '@standalonePage',
+    ),
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,

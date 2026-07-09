@@ -466,7 +466,7 @@ describe('TaskSetupMFA', () => {
       await findByText(/add sms code verification/i);
       await findByText(/choose phone number you want to use/i);
       await findByText(/\+30 691 1111111/i);
-      expect(getByRole('menuitem', { name: /add phone number/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /add phone number/i })).toBeInTheDocument();
     });
 
     it('should show add phone screen when no existing phone numbers', async () => {
@@ -511,7 +511,7 @@ describe('TaskSetupMFA', () => {
       await findByText(/add sms code verification/i);
 
       await act(async () => {
-        await userEvent.click(getByRole('menuitem', { name: /add phone number/i }));
+        await userEvent.click(getByRole('button', { name: /add phone number/i }));
       });
 
       await findByText(/add phone number/i);

@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_tanstack_react_start)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
+[![Follow on X](https://img.shields.io/twitter/follow/clerk?style=social)](https://x.com/intent/follow?screen_name=clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/tanstack-react-start/CHANGELOG.md)
 ·
@@ -49,10 +49,11 @@ For further information, guides, and examples visit the [TanStack React Start re
 
 ## Support
 
-You can get in touch with us in any of the following ways:
+For help, visit our [support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
-- Join our official community [Discord server](https://clerk.com/discord)
-- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_tanstack_react_start)
+## Community
+
+Join our [Discord community](https://clerk.com/discord) to connect with other developers.
 
 ## Contributing
 

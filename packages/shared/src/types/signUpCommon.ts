@@ -22,9 +22,40 @@ import type {
 import type { SnakeToCamel } from './utils';
 import type { VerificationResource } from './verification';
 
+/** @inline */
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type SignUpField = SignUpAttributeField | SignUpIdentificationField;
+export type ProtectCheckField = 'protect_check';
+
+/** @inline */
+export type SignUpField = SignUpAttributeField | SignUpIdentificationField | ProtectCheckField;
+
+/**
+ * An interface that represents a pending Clerk Protect mid-flow challenge. Only surfaced when Protect mid-flow challenges are
+ * explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+ */
+export interface ProtectCheckResource {
+  /**
+   * Always `'pending'` when surfaced to clients.
+   */
+  status: 'pending';
+  /**
+   * Opaque challenge token to pass to the Clerk Protect challenge SDK.
+   */
+  token: string;
+  /**
+   * URL of the Clerk Protect challenge SDK to load for this challenge.
+   */
+  sdkUrl: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
+  expiresAt?: number;
+  /**
+   * Optional UI hints for rendering the challenge.
+   */
+  uiHints?: Record<string, string>;
+}
 
 export type PrepareVerificationParams =
   | {
@@ -64,9 +95,11 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
+/** @inline */
 export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute | LegalAcceptedAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
+/** @inline */
 export type SignUpVerifiableField =
   | UsernameIdentifier
   | EmailAddressIdentifier
@@ -75,6 +108,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
+/** @inline */
 export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | EnterpriseSSOStrategy;
 
 // TODO: Replace with discriminated union type

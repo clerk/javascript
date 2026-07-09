@@ -15,6 +15,9 @@ const API_KEYS_KEY = 'apiKeys';
 // Keys for `useOrganizationCreationDefaults`
 const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
 
+// Keys for `useOAuthConsent`
+const OAUTH_CONSENT_INFO_KEY = 'oauthConsentInfo';
+
 // Keys for `usePlans`
 const PLANS_KEY = 'billing-plans';
 
@@ -29,6 +32,9 @@ const PAYMENT_ATTEMPTS_KEY = 'billing-payment-attempts';
 
 // Keys for `useStatements`
 const STATEMENTS_KEY = 'billing-statements';
+
+// Keys for `useCreditBalance`
+const CREDIT_BALANCE_KEY = 'billing-credit-balance';
 
 export const STABLE_KEYS = {
   // Keys for `useOrganizationList`
@@ -54,6 +60,12 @@ export const STABLE_KEYS = {
 
   // Keys for `useOrganizationCreationDefaults`
   ORGANIZATION_CREATION_DEFAULTS_KEY,
+
+  // Keys for `useOAuthConsent`
+  OAUTH_CONSENT_INFO_KEY,
+
+  // Keys for `useCreditBalance`
+  CREDIT_BALANCE_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];
@@ -66,10 +78,24 @@ export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KE
 const PAYMENT_ATTEMPT_KEY = 'billing-payment-attempt';
 const BILLING_PLANS_KEY = 'billing-plan';
 const BILLING_STATEMENTS_KEY = 'billing-statement';
+const USER_ENTERPRISE_CONNECTIONS_KEY = 'userEnterpriseConnections';
+const ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'enterpriseConnectionTestRuns';
+const ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY = 'organizationEnterpriseConnections';
+const ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'organizationEnterpriseConnectionTestRuns';
+const ORGANIZATION_DOMAINS_KEY = 'organizationDomains';
+
+const CREDIT_HISTORY_KEY = 'billing-credit-history';
+
 export const INTERNAL_STABLE_KEYS = {
   PAYMENT_ATTEMPT_KEY,
   BILLING_PLANS_KEY,
   BILLING_STATEMENTS_KEY,
+  CREDIT_HISTORY_KEY,
+  USER_ENTERPRISE_CONNECTIONS_KEY,
+  ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
+  ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY,
+  ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
+  ORGANIZATION_DOMAINS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];

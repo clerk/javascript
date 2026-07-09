@@ -1,10 +1,9 @@
 import { ClerkContextProvider } from '@clerk/shared/react';
-import type { Ui } from '@clerk/ui/internal';
 import React from 'react';
 
 import { multipleClerkProvidersError } from '../errors/messages';
 import { IsomorphicClerk } from '../isomorphicClerk';
-import type { ClerkProviderProps, IsomorphicClerkOptions } from '../types';
+import type { ClerkProviderProps, IsomorphicClerkOptions, Ui } from '../types';
 import { mergeWithEnv, withMaxAllowedInstancesGuard } from '../utils';
 import { IS_REACT_SHARED_VARIANT_COMPATIBLE } from '../utils/versionCheck';
 

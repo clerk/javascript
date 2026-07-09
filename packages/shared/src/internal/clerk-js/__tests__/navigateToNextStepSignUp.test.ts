@@ -10,6 +10,7 @@ const URLS = {
   continueSignUpUrl: 'https://app.test/sign-up/continue',
   verifyEmailAddressUrl: 'https://app.test/sign-up/verify-email-address',
   verifyPhoneNumberUrl: 'https://app.test/sign-up/verify-phone-number',
+  signUpProtectCheckUrl: 'https://app.test/sign-up/protect-check',
 };
 
 describe('navigateToNextStepSignUp', () => {
@@ -37,6 +38,24 @@ describe('navigateToNextStepSignUp', () => {
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(URLS.continueSignUpUrl);
+  });
+
+  it('navigates to the protect-check page when the sign-up is protect-gated, before checking missing fields', async () => {
+    const signUp = {
+      status: 'missing_requirements',
+      missingFields: ['protect_check', 'first_name'] as SignUpField[],
+      unverifiedFields: [],
+    } as unknown as SignUpResource;
+
+    await navigateToNextStepSignUp({
+      signUp,
+      missingFields: signUp.missingFields,
+      ...URLS,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(URLS.signUpProtectCheckUrl);
   });
 
   it('navigates to verify-email-address when email is unverified and there are no missing fields', async () => {

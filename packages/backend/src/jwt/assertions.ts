@@ -47,12 +47,13 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertHeaderType = (typ?: unknown, allowedTypes: string | string[] = 'JWT') => {
-  if (typeof typ === 'undefined') {
+export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
+  if (typeof typ === 'undefined' && typeof allowedTypes === 'undefined') {
     return;
   }
 
-  const allowed = Array.isArray(allowedTypes) ? allowedTypes : [allowedTypes];
+  const expectedTypes = allowedTypes ?? 'JWT';
+  const allowed = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
   if (!allowed.includes(typ as string)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
@@ -83,11 +84,17 @@ export const assertSubClaim = (sub?: string) => {
 };
 
 export const assertAuthorizedPartiesClaim = (azp?: string, authorizedParties?: string[]) => {
-  if (!azp || !authorizedParties || authorizedParties.length === 0) {
+  // When no authorized parties are configured there is nothing to enforce, so
+  // an azp-less token is accepted (a warning is surfaced elsewhere).
+  if (!authorizedParties || authorizedParties.length === 0) {
     return;
   }
 
-  if (!authorizedParties.includes(azp)) {
+  // Once authorized parties are configured the azp claim must be present and
+  // match one of them. Returning early on a missing/empty azp would let any
+  // token bypass the authorized-parties check simply by omitting the claim,
+  // defeating the purpose of configuring them.
+  if (!azp || !authorizedParties.includes(azp)) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
       message: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,

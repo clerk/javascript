@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { parseUrlForNavigation } from '../client/utils';
 
 const BASE_URL = 'https://example.com';

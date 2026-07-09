@@ -1,4 +1,4 @@
-import { CLERK_ATTR_RE, CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
+import { CLERK_ATTR_RE, CLERK_CLASS_RE, CLERK_INTERNAL_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 
 type ClerkStructuralHit = {
   stylesheetHref: string | null;
@@ -7,8 +7,17 @@ type ClerkStructuralHit = {
   reason: string[];
 };
 
+/**
+ * Strips .cl-internal-* classes from a selector so they don't trigger detection.
+ * These are Clerk's own generated classes, not user-facing customization points.
+ */
+function stripInternalClasses(selector: string): string {
+  return selector.replace(CLERK_INTERNAL_CLASS_RE, '');
+}
+
 function isProbablyClerkSelector(selector: string): boolean {
-  return CLERK_CLASS_RE.test(selector) || CLERK_ATTR_RE.test(selector);
+  const stripped = stripInternalClasses(selector);
+  return CLERK_CLASS_RE.test(stripped) || CLERK_ATTR_RE.test(stripped);
 }
 
 // Split by commas safely-ish (won't perfectly handle :is(...) with commas, but good enough)

@@ -1,9 +1,11 @@
 import {
+  __internal_useCreditBalanceQuery,
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
   useClerk,
   useSession,
@@ -12,23 +14,18 @@ import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
+  OrganizationResource,
 } from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
+import { organizationExceedsPlanSeatLimit } from '@/ui/utils/billingPlanSeats';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-export function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
 
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -91,13 +88,27 @@ export const usePlans = (params?: { mode: 'cache' }) => {
   });
 };
 
+export const useCreditBalance = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditBalanceQuery(params);
+};
+
+export const useCreditHistory = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditHistoryQuery(params);
+};
+
 type HandleSelectPlanProps = {
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
+  portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export const usePlansContext = () => {
@@ -196,12 +207,14 @@ export const usePlansContext = () => {
   const buttonPropsForPlan = useCallback(
     ({
       plan,
+      organization,
       // TODO(@COMMERCE): This needs to be removed.
       subscription: sub,
       isCompact = false,
       selectedPlanPeriod = 'annual',
     }: {
-      plan?: BillingPlanResource;
+      plan: BillingPlanResource;
+      organization?: OrganizationResource | null;
       subscription?: BillingSubscriptionItemResource;
       isCompact?: boolean;
       selectedPlanPeriod?: BillingSubscriptionPlanPeriod;
@@ -214,6 +227,8 @@ export const usePlansContext = () => {
     } => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
+      const exceedsPlanSeatLimit =
+        subscriberType === 'organization' && !!organization && organizationExceedsPlanSeatLimit(plan, organization);
       let _selectedPlanPeriod = selectedPlanPeriod;
       const isEligibleForSwitchToAnnual = Boolean(plan?.annualMonthlyFee);
 
@@ -279,11 +294,17 @@ export const usePlansContext = () => {
         localizationKey: freeTrialOr(getLocalizationKey()),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
-        isDisabled: !canManageBilling,
-        disabled: !canManageBilling,
+        isDisabled: !canManageBilling || exceedsPlanSeatLimit,
+        disabled: !canManageBilling || exceedsPlanSeatLimit,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems, topLevelSubscription],
+    [
+      activeOrUpcomingSubscriptionWithPlanPeriod,
+      canManageBilling,
+      subscriberType,
+      subscriptionItems,
+      topLevelSubscription,
+    ],
   );
 
   const captionForSubscription = useCallback((subscription: BillingSubscriptionItemResource) => {
@@ -322,16 +343,30 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, mode = 'mounted', event, appearance, newSubscriptionRedirectUrl }: HandleSelectPlanProps) => {
-      const portalRoot = getClosestProfileScrollBox(mode, event);
+    ({
+      plan,
+      planPeriod,
+      seatsQuantity,
+      priceId,
+      mode = 'mounted',
+      event,
+      portalRoot: providedPortalRoot,
+      appearance,
+      newSubscriptionRedirectUrl,
+      onSubscriptionComplete,
+    }: HandleSelectPlanProps) => {
+      const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
         planPeriod: determinePlanPeriod(plan, planPeriod),
         for: subscriberType,
+        seatsQuantity,
+        priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
+          onSubscriptionComplete?.();
         },
         onClose: () => {
           if (session?.id) {

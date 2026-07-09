@@ -1,4 +1,5 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
+import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -10,8 +11,11 @@ import type {
   DeletedObjectResource,
   EmailAddressResource,
   EnterpriseAccountResource,
+  EnterpriseConnectionJSON,
+  EnterpriseConnectionResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetEnterpriseConnectionsParams,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -23,6 +27,7 @@ import type {
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
   UserJSON,
@@ -33,6 +38,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -42,6 +48,7 @@ import {
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
+  EnterpriseConnection,
   ExternalAccount,
   Image,
   OrganizationMembership,
@@ -156,7 +163,7 @@ export class User extends BaseResource implements UserResource {
   };
 
   createExternalAccount = async (params: CreateExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { strategy, redirectUrl, additionalScopes } = params || {};
+    const { strategy, redirectUrl, additionalScopes, enterpriseConnectionId } = params || {};
 
     const json = (
       await BaseResource._fetch<ExternalAccountJSON>({
@@ -166,6 +173,7 @@ export class User extends BaseResource implements UserResource {
           strategy,
           redirect_url: redirectUrl,
           additional_scope: additionalScopes,
+          enterprise_connection_id: enterpriseConnectionId,
         } as any,
       })
     )?.response as unknown as ExternalAccountJSON;
@@ -218,8 +226,57 @@ export class User extends BaseResource implements UserResource {
     return new BackupCode(json);
   };
 
-  update = (params: UpdateUserParams): Promise<UserResource> => {
+  update = async (params: UpdateUserParams): Promise<UserResource> => {
+    const { unsafeMetadata, ...rest } = params;
+    const hasMetadata = unsafeMetadata !== undefined;
+    const hasRest = Object.keys(rest).length > 0;
+
+    if (!hasMetadata) {
+      return this._basePatch({
+        body: normalizeUnsafeMetadata(params),
+      });
+    }
+
+    if (isDevelopmentFromPublishableKey(BaseResource.clerk.publishableKey)) {
+      console.warn(
+        'Clerk - DEPRECATION WARNING: "user.update({ unsafeMetadata })" is deprecated and will be removed in the next major release.\nUse user.updateMetadata({ unsafeMetadata }) for partial updates (deep merge) instead.',
+      );
+    }
+
+    // The FAPI endpoint deprecates `unsafe_metadata` on PATCH /me. Route
+    // metadata through PATCH /me/metadata (deep-merge) while preserving the
+    // *replace* semantics of `user.update({ unsafeMetadata })` by
+    // diffing the locally-cached value against the desired one and sending
+    // an RFC 7396 merge patch (null-deletes for removed keys).
+    //
+    //
+    // When `hasRest` is true the PATCH /me below refreshes `this` in place
+    // via `fromJSON` before we read `this.unsafeMetadata` for the diff.
+    // When it's false (only-metadata update), no upstream call refreshes the cache,
+    // so we `reload()` explicitly.
+    if (hasRest) {
+      await this._basePatch({
+        body: normalizeUnsafeMetadata(rest as UpdateUserParams),
+      });
+    } else {
+      await this.reload();
+    }
+
+    const patch = computeMergePatch(this.unsafeMetadata, unsafeMetadata);
+
+    // An empty patch means current already equals desired — short-circuit.
+    if (patch !== null && typeof patch === 'object' && Object.keys(patch).length === 0) {
+      return this;
+    }
+
+    return this.updateMetadata({
+      unsafeMetadata: patch as UserUnsafeMetadata,
+    });
+  };
+
+  updateMetadata = (params: UpdateUserMetadataParams): Promise<UserResource> => {
     return this._basePatch({
+      path: `${this.path()}/metadata`,
       body: normalizeUnsafeMetadata(params),
     });
   };
@@ -287,6 +344,28 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  getEnterpriseConnections = async (
+    params?: GetEnterpriseConnectionsParams,
+  ): Promise<EnterpriseConnectionResource[]> => {
+    const { withOrganizationAccountLinking } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: '/me/enterprise_connections',
+        method: 'GET',
+        ...(withOrganizationAccountLinking !== undefined
+          ? {
+              search: {
+                with_organization_account_linking: String(withOrganizationAccountLinking),
+              },
+            }
+          : {}),
+      })
+    )?.response as unknown as EnterpriseConnectionJSON[];
+
+    return (json || []).map(connection => new EnterpriseConnection(connection));
   };
 
   initializePaymentMethod: typeof initializePaymentMethod = params => {

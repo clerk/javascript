@@ -19,6 +19,7 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
+  WaitlistEntryStatus,
 } from './Enums';
 
 export type { SignUpStatus } from '@clerk/shared/types';
@@ -26,6 +27,7 @@ export type { SignUpStatus } from '@clerk/shared/types';
 export * from './CommercePlan';
 export * from './CommerceSubscription';
 export * from './CommerceSubscriptionItem';
+export * from './EnterpriseAccount';
 export * from './EnterpriseConnection';
 export * from './ExternalAccount';
 export * from './Feature';
@@ -48,9 +50,12 @@ export * from './OrganizationDomain';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './OrganizationSettings';
+export * from './Permission';
 export * from './PhoneNumber';
 export * from './ProxyCheck';
 export * from './RedirectUrl';
+export * from './Role';
+export * from './RoleSet';
 export * from './SamlConnection';
 export * from './Session';
 export * from './SignInTokens';
@@ -66,6 +71,7 @@ export * from './Web3Wallet';
 export type {
   EmailWebhookEvent,
   OrganizationDomainWebhookEvent,
+  OrganizationInvitationAcceptedWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
   OrganizationWebhookEvent,

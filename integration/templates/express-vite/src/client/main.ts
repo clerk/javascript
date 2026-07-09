@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   await clerk.load({
     ui: { ClerkUI },
   });
+  // @ts-expect-error: Make waitForSession test utility work
+  window.Clerk = clerk;
 
   if (clerk.isSignedIn) {
     document.getElementById('app')!.innerHTML = `

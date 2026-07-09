@@ -41,7 +41,7 @@ describe('Cookies', () => {
 
       getMock.mockResolvedValue(cookie);
 
-      expect(await getClientCookie({ callback: jest.fn(), name, url })).toBe(cookie);
+      expect(await getClientCookie({ callback: vi.fn(), name, url })).toBe(cookie);
 
       expectMockCalls(getMock, name, [url]);
     });
