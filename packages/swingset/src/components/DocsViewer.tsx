@@ -17,6 +17,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-profile-section': dynamic(
       () => import('../stories/organization-profile-profile-section.mdx'),
     ),
+    'organization-profile-domains-section': dynamic(
+      () => import('../stories/organization-profile-domains-section.mdx'),
+    ),
     'organization-profile-leave-section': dynamic(() => import('../stories/organization-profile-leave-section.mdx')),
     'organization-profile-delete-section': dynamic(() => import('../stories/organization-profile-delete-section.mdx')),
   },

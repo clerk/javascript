@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { useOrganizationProfileController } from './organization-profile.controller';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
+import { OrganizationProfileDomainsSection } from './organization-profile-domains-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
 import { OrganizationProfileProfileSection } from './organization-profile-profile-section';
@@ -33,6 +34,7 @@ function OrganizationProfileRoot(): ReactElement | null {
 export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   GeneralPanel: OrganizationProfileGeneralPanel,
   ProfileSection: OrganizationProfileProfileSection,
+  DomainsSection: OrganizationProfileDomainsSection,
   LeaveSection: OrganizationProfileLeaveSection,
   DeleteSection: OrganizationProfileDeleteSection,
   ApiKeysPanel: OrganizationProfileApiKeysPanel,

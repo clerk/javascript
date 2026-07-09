@@ -47,6 +47,10 @@ import {
   meta as organizationProfileDeleteSectionMeta,
 } from '../stories/organization-profile-delete-section.stories';
 import {
+  Default as OrganizationProfileDomainsSectionDefault,
+  meta as organizationProfileDomainsSectionMeta,
+} from '../stories/organization-profile-domains-section.stories';
+import {
   Default as OrganizationProfileGeneralPanelDefault,
   meta as organizationProfileGeneralPanelMeta,
 } from '../stories/organization-profile-general-panel.stories';
@@ -86,6 +90,10 @@ const organizationProfileDeleteSectionModule: StoryModule = {
 const organizationProfileProfileSectionModule: StoryModule = {
   meta: organizationProfileProfileSectionMeta,
   Default: OrganizationProfileProfileSectionDefault,
+};
+const organizationProfileDomainsSectionModule: StoryModule = {
+  meta: organizationProfileDomainsSectionMeta,
+  Default: OrganizationProfileDomainsSectionDefault,
 };
 const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
 const organizationProfileGeneralPanelModule: StoryModule = {
@@ -148,6 +156,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileProfileSectionModule,
+  organizationProfileDomainsSectionModule,
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,
   // Blocks
