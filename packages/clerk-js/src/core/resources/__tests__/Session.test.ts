@@ -429,6 +429,111 @@ describe('Session', () => {
     });
   });
 
+  describe('getToken() monotonic lastActiveToken guard', () => {
+    const NOW = 1666648250;
+    const DEFAULT_SID = 'session_1';
+
+    // Header carries `oiat`, payload carries `sid`/`iat`/`exp` (+ optional `org_id`).
+    // Pass `undefined` for oiat to emit a pre-feature token (no header).
+    function createJwtWithOiat(
+      iatSeconds: number,
+      oiatSeconds: number | undefined,
+      opts: { sid?: string; org?: string | null } = {},
+    ): string {
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (typeof oiatSeconds === 'number') {
+        header.oiat = oiatSeconds;
+      }
+      const payload: Record<string, unknown> = {
+        sid: opts.sid ?? DEFAULT_SID,
+        iat: iatSeconds,
+        exp: iatSeconds + 60,
+      };
+      if (opts.org) {
+        payload.org_id = opts.org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    }
+
+    const makeSession = (overrides: Partial<SessionJSON> = {}) =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        ...overrides,
+      } as SessionJSON);
+
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      SessionTokenCache.clear();
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock();
+    });
+
+    afterEach(() => {
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+      SessionTokenCache.clear();
+    });
+
+    it('keeps the fresher lastActiveToken when a staler same-context token is minted afterward', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: high })
+        .mockResolvedValueOnce({ object: 'token', jwt: low });
+
+      expect(await session.getToken()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+
+      // The later staler mint still returns its own token, but must not regress lastActiveToken.
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('advances lastActiveToken when a fresher same-context token is minted afterward', async () => {
+      const session = makeSession();
+      const low = createJwtWithOiat(NOW, NOW);
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: low })
+        .mockResolvedValueOnce({ object: 'token', jwt: high });
+
+      expect(await session.getToken()).toBe(low);
+      expect(session.lastActiveToken?.getRawString()).toBe(low);
+
+      expect(await session.getToken({ skipCache: true })).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('adopts an org-switch token even when it is minted with a lower oiat than the previous org token', async () => {
+      const session = makeSession();
+      const personalHigh = createJwtWithOiat(NOW, NOW + 30);
+      const orgLow = createJwtWithOiat(NOW, NOW, { org: 'org_x' });
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: personalHigh })
+        .mockResolvedValueOnce({ object: 'token', jwt: orgLow });
+
+      expect(await session.getToken()).toBe(personalHigh);
+      expect(session.lastActiveToken?.getRawString()).toBe(personalHigh);
+
+      // Switch the active org so the org token dispatches (shouldDispatchTokenUpdate needs
+      // organizationId === lastActiveOrganizationId). A different-org lastActiveToken is not a
+      // freshness baseline, so the lower-oiat org token is adopted rather than dropped.
+      session.lastActiveOrganizationId = 'org_x';
+      expect(await session.getToken({ skipCache: true })).toBe(orgLow);
+      expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
+    });
+  });
+
   describe('touch()', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
 
