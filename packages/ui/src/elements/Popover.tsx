@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { useAppearance } from '../customizables';
+import { transitionDurationValues, transitionTiming } from '../foundations/transitions';
 import { usePrefersReducedMotion } from '../hooks';
 
 type PopoverProps = PropsWithChildren<{
@@ -13,8 +14,9 @@ type PopoverProps = PropsWithChildren<{
   isOpen?: boolean;
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
   /**
-   * When `true`, the popover appears instantly but stays mounted through a short fade-out on close,
-   * instead of unmounting immediately. Opt-in so other consumers keep their current instant behavior.
+   * When `true`, the popover animates in on mount with an origin-aware scale + fade and stays
+   * mounted through a matching fade-out on close, instead of appearing/unmounting instantly.
+   * Opt-in so other consumers keep their current instant behavior.
    * @default false
    */
   animateExit?: boolean;
@@ -60,15 +62,29 @@ export const Popover = (props: PopoverProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedOptions;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const animate = animateExit && isMotionSafe;
 
-  // Appear instantly for snappiness, fade out on close. Keeping the element mounted
-  // through the close transition (via `isMounted`) is what makes the exit animation possible.
+  // Animate in on mount and out on close with an origin-aware scale + fade. Keeping the element
+  // mounted through the close transition (via `isMounted`) is what makes the exit animation
+  // possible. `transformOrigin` is derived from the resolved placement so the popover grows from
+  // the edge nearest its trigger (Floating UI's placement-aware transitions).
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    // `close` matches the theme's `$slow` (200ms) transition duration.
-    duration: { open: 0, close: animateExit && isMotionSafe ? 200 : 0 },
-    initial: { opacity: 1 },
-    open: { opacity: 1 },
-    close: { opacity: animateExit ? 0 : 1 },
+    duration: {
+      open: animate ? transitionDurationValues.fast : 0,
+      close: animate ? transitionDurationValues.slower : 0,
+    },
+    common: ({ side }) => ({
+      transformOrigin: {
+        top: 'bottom',
+        bottom: 'top',
+        left: 'right',
+        right: 'left',
+      }[side],
+      transitionTimingFunction: transitionTiming.swiftOut,
+    }),
+    initial: { opacity: animate ? 0 : 1, transform: animate ? 'scale(0.96)' : 'scale(1)' },
+    open: { opacity: 1, transform: 'scale(1)' },
+    close: { opacity: animate ? 0 : 1, transform: animate ? 'scale(0.96)' : 'scale(1)' },
   });
 
   // Non-animating consumers keep the original synchronous `isOpen` unmount.

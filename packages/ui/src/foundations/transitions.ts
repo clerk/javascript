@@ -27,6 +27,7 @@ const transitionTiming = Object.freeze({
   easeOut: 'ease-out',
   bezier: 'cubic-bezier(0.32, 0.72, 0, 1)',
   slowBezier: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  swiftOut: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
 } as const);
 
 export { transitionDuration, transitionTiming, transitionProperty, transitionDurationValues };
