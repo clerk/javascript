@@ -1,26 +1,33 @@
 import { useOrganization, useOrganizationList, useSession } from '@clerk/shared/react';
 
+import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
+import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
-import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization.machine';
-import { deleteOrgMachine } from './delete-organization.machine';
+import type {
+  OrganizationProfileDeleteSectionContext,
+  OrganizationProfileDeleteSectionEvent,
+} from './organization-profile-delete-section.machine';
+import { organizationProfileDeleteSectionMachine } from './organization-profile-delete-section.machine';
 
-type DeleteOrganizationController =
+type OrganizationProfileDeleteSectionController =
   | { status: 'loading' }
   | { status: 'hidden' }
   | {
       status: 'ready';
-      snapshot: Snapshot<DeleteOrgContext>;
-      send: (event: DeleteOrgEvent) => void;
+      snapshot: Snapshot<OrganizationProfileDeleteSectionContext>;
+      send: (event: OrganizationProfileDeleteSectionEvent) => void;
       canSubmit: boolean;
     };
 
-export function useDeleteOrganizationController(): DeleteOrganizationController {
+export function useOrganizationProfileDeleteSectionController(): OrganizationProfileDeleteSectionController {
   const { isLoaded: isOrganizationLoaded, organization } = useOrganization();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const { userMemberships } = useOrganizationList({ userMemberships: true });
+  const router = useMosaicRouter();
+  const afterLeaveUrl = useMosaicEnvironment()?.displayConfig.afterLeaveOrganizationUrl;
 
-  const [snapshot, send, actor] = useMachine(deleteOrgMachine, {
+  const [snapshot, send, actor] = useMachine(organizationProfileDeleteSectionMachine, {
     context: {
       organizationName: organization?.name ?? '',
       destroyOrganization: async () => {
@@ -28,8 +35,11 @@ export function useDeleteOrganizationController(): DeleteOrganizationController 
         // Refresh org lists elsewhere (e.g. the switcher). Not awaited: a stale
         // list must not make a successful delete look like it failed.
         void userMemberships.revalidate?.();
-        // TODO(mosaic): navigate away from the deleted org's profile once the flow
-        // has router context, mirroring legacy navigateAfterLeaveOrganization.
+        // Navigate away from the deleted org's profile, mirroring legacy
+        // navigateAfterLeaveOrganization. Fire-and-forget for the same reason.
+        if (afterLeaveUrl) {
+          void router.navigate(afterLeaveUrl);
+        }
       },
     },
   });

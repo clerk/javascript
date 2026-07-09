@@ -2,16 +2,23 @@ import { Destructive } from '../block/destructive';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import type { Snapshot } from '../machine/types';
-import type { DeleteOrgContext, DeleteOrgEvent } from './delete-organization.machine';
+import type {
+  OrganizationProfileLeaveSectionContext,
+  OrganizationProfileLeaveSectionEvent,
+} from './organization-profile-leave-section.machine';
 
-interface DeleteOrganizationViewProps {
-  snapshot: Snapshot<DeleteOrgContext>;
-  send: (event: DeleteOrgEvent) => void;
+interface OrganizationProfileLeaveSectionViewProps {
+  snapshot: Snapshot<OrganizationProfileLeaveSectionContext>;
+  send: (event: OrganizationProfileLeaveSectionEvent) => void;
   canSubmit: boolean;
 }
 
-export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrganizationViewProps) {
-  const isDeleting = snapshot.value === 'deleting';
+export function OrganizationProfileLeaveSectionView({
+  snapshot,
+  send,
+  canSubmit,
+}: OrganizationProfileLeaveSectionViewProps) {
+  const isLeaving = snapshot.value === 'leaving';
 
   return (
     <Box
@@ -40,7 +47,7 @@ export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrga
               fontWeight: t.font.semibold,
             })}
           >
-            Delete organization
+            Leave organization
           </Box>
           <Box
             render={p => <p {...p} />}
@@ -51,7 +58,7 @@ export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrga
               color: t.color.mutedForeground,
             })}
           >
-            Your organization will be permanently deleted and all members will lose access
+            You will be removed from the organization and need to be invited back
           </Box>
         </Box>
         <Destructive
@@ -63,19 +70,19 @@ export function DeleteOrganizationView({ snapshot, send, canSubmit }: DeleteOrga
                 flexShrink: 0,
               }}
             >
-              Delete organization
+              Leave organization
             </Button>
           )}
-          open={snapshot.value === 'confirming' || isDeleting}
+          open={snapshot.value === 'confirming' || isLeaving}
           onOpenChange={isOpen => send({ type: isOpen ? 'OPEN' : 'CANCEL' })}
-          title='Delete organization'
-          description='Are you sure you want to delete this organization?'
+          title='Leave organization'
+          description='Are you sure you want to leave this organization? You will lose access to this organization and its applications.'
           resourceName={snapshot.context.organizationName}
           confirmationValue={snapshot.context.confirmationValue}
           onConfirmationValueChange={value => send({ type: 'TYPE_CONFIRMATION', value })}
-          primaryActionLabel='Delete organization'
+          primaryActionLabel='Leave organization'
           onDelete={() => send({ type: 'CONFIRM' })}
-          isDeleting={isDeleting}
+          isDeleting={isLeaving}
           canSubmit={canSubmit}
           error={snapshot.context.error}
         />

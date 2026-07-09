@@ -2,12 +2,12 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type * as CSS from 'csstype';
 
 import { useMosaicAppearance } from './appearance';
-import { expandConditions } from './conditions';
 import type { MosaicConditionKey } from './conditions';
+import { expandConditions } from './conditions';
 import { useMosaicTheme } from './MosaicProvider';
 import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
-import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme } from './variables';
+import { defaultMosaicVariables, resolveVariables } from './variables';
 
 // ─── Public Types ─────────────────────────────────────────────────────────────
 

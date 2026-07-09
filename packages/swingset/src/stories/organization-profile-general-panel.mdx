@@ -1,0 +1,22 @@
+import * as OrganizationProfileGeneralPanelStories from './organization-profile-general-panel.stories';
+
+# Organization Profile General Panel
+
+The General tab panel of the Organization Profile — composes the organization-level sections shown under "General".
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileGeneralPanelStories}
+  composition={[
+    {
+      name: 'OrganizationProfileLeaveSection',
+      href: '/organization/organization-profile-leave-section',
+      layer: 'Organization',
+    },
+    {
+      name: 'OrganizationProfileDeleteSection',
+      href: '/organization/organization-profile-delete-section',
+      layer: 'Organization',
+    },
+  ]}
+/>

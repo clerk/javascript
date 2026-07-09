@@ -12,8 +12,8 @@ export interface CompositionPiece {
 }
 
 // Mosaic layers, high → low. Drives the order the composition groups render in.
-// Plural to match the sidebar group names.
-const LAYER_ORDER = ['AIO', 'Panels', 'Sections', 'Blocks', 'Components', 'Primitives'];
+// Matches the sidebar group names.
+const LAYER_ORDER = ['Organization', 'Blocks', 'Components', 'Primitives'];
 
 function layerRank(layer: string): number {
   const i = LAYER_ORDER.indexOf(layer);

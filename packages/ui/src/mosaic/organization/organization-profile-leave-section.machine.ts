@@ -1,21 +1,24 @@
 import { setup } from '../machine/setup';
 
-export interface LeaveOrgContext {
+export interface OrganizationProfileLeaveSectionContext {
   organizationName: string;
   confirmationValue: string;
   leaveOrganization: () => Promise<void>;
   error: string | null;
 }
 
-export type LeaveOrgEvent =
+export type OrganizationProfileLeaveSectionEvent =
   | { type: 'OPEN' }
   | { type: 'TYPE_CONFIRMATION'; value: string }
   | { type: 'CONFIRM' }
   | { type: 'CANCEL' };
 
-const { createMachine, assign, fromPromise } = setup<LeaveOrgContext, LeaveOrgEvent>();
+const { createMachine, assign, fromPromise } = setup<
+  OrganizationProfileLeaveSectionContext,
+  OrganizationProfileLeaveSectionEvent
+>();
 
-export const leaveOrgMachine = createMachine({
+export const organizationProfileLeaveSectionMachine = createMachine({
   id: 'leaveOrg',
   initial: 'idle',
   context: {
