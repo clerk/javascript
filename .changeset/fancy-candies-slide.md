@@ -4,4 +4,5 @@
 '@clerk/ui': minor
 ---
 
-Support signUpIfMissing with strict enumeration protection and Clerk <SignIn> component
+Support sign-in-or-sign-up combined flow with Clerk <SignIn> component
+when strict enumeration protection is enabled.
