@@ -137,7 +137,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           ref={ref}
           role='dialog'
           aria-label={`${currentOrg?.name} is active`}
-          shouldEntryAnimate={false}
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>

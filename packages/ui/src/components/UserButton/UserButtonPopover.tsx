@@ -39,7 +39,6 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
         ref={ref}
         role='dialog'
         aria-label={t(localizationKeys('userButton.label__userButtonPopover'))}
-        shouldEntryAnimate={false}
         {...rest}
       >
         <PopoverCard.Content elementDescriptor={descriptors.userButtonPopoverMain}>
