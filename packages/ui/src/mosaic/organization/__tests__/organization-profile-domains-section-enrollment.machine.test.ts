@@ -60,6 +60,20 @@ describe('organizationProfileDomainsSectionEnrollmentMachine', () => {
     expect(actor.can({ type: 'SUBMIT' })).toBe(true);
   });
 
+  it('resets deletePending when the mode selection changes', () => {
+    const { actor } = open();
+    actor.send({ type: 'TOGGLE_DELETE_PENDING', checked: true });
+    expect(actor.getSnapshot().context.deletePending).toBe(true);
+
+    // Switching the mode hides the delete-pending checkbox; it must not carry a
+    // stale value back into SUBMIT when the user returns to the committed mode.
+    actor.send({ type: 'SELECT_MODE', value: 'automatic_invitation' });
+    expect(actor.getSnapshot().context.deletePending).toBe(false);
+
+    actor.send({ type: 'SELECT_MODE', value: 'manual_invitation' });
+    expect(actor.can({ type: 'SUBMIT' })).toBe(false);
+  });
+
   it('saves the effective mode and deletePending, then closes', async () => {
     const { actor, updateEnrollmentMode } = open();
 

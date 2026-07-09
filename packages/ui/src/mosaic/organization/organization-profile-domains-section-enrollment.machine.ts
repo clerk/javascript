@@ -84,7 +84,10 @@ export const organizationProfileDomainsSectionEnrollmentMachine = createMachine(
     editing: {
       on: {
         SELECT_MODE: {
-          actions: assign((_, event) => ({ draftEnrollmentMode: event.value, error: null })),
+          // Reset deletePending: the checkbox only shows for manual_invitation, so a mode
+          // change hides it. Without this reset a stale `true` could reach SUBMIT and delete
+          // pending invitations/suggestions the user never intended to remove.
+          actions: assign((_, event) => ({ draftEnrollmentMode: event.value, deletePending: false, error: null })),
         },
         TOGGLE_DELETE_PENDING: {
           actions: assign((_, event) => ({ deletePending: event.checked })),

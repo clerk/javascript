@@ -99,7 +99,7 @@ describe('organizationProfileDomainsSectionAddVerifyMachine', () => {
     expect(actor.getSnapshot().value).toBe('selectingEnrollment');
   });
 
-  it('closes after a verification attempt that does not verify the domain', async () => {
+  it('surfaces an error and stays on the code step when the attempt does not verify', async () => {
     const attemptVerification = vi.fn(() => Promise.resolve({ verified: false }));
     const { actor } = start({ attemptVerification });
     actor.send({ type: 'OPEN_VERIFY', domain: { id: 'dmn_9', name: 'clerk.dev' } });
@@ -110,7 +110,8 @@ describe('organizationProfileDomainsSectionAddVerifyMachine', () => {
     actor.send({ type: 'SUBMIT_CODE' });
     await tick();
 
-    expect(actor.getSnapshot().value).toBe('closed');
+    expect(actor.getSnapshot().value).toBe('enteringCode');
+    expect(actor.getSnapshot().context.error).not.toBeNull();
   });
 
   it('resends by re-preparing verification from the code step', async () => {

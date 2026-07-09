@@ -170,7 +170,12 @@ export const organizationProfileDomainsSectionAddVerifyMachine = createMachine({
               guard: (_, event) => event.output.verified,
               actions: assign(() => ({ error: null })),
             },
-            { target: 'closed' },
+            // Verified came back false without throwing: keep the user on the code step with an
+            // error rather than silently closing the dialog.
+            {
+              target: 'enteringCode',
+              actions: assign(() => ({ error: 'That code could not verify the domain. Please try again.' })),
+            },
           ],
           onError: {
             target: 'enteringCode',
