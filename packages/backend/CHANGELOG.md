@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.11.2
+
+### Patch Changes
+
+- Improve satellite-domain redirect loop diagnostics. ([#8636](https://github.com/clerk/javascript/pull/8636)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+
 ## 3.11.1
 
 ### Patch Changes

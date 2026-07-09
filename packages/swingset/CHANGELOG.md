@@ -1,5 +1,13 @@
 # @clerk/swingset
 
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/headless@0.0.9
+  - @clerk/ui@1.25.1
+
 ## 0.0.15
 
 ### Patch Changes
