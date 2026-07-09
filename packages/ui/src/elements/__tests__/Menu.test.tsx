@@ -85,7 +85,9 @@ describe('Menu', () => {
       expect(getByRole('menu')).toBeInTheDocument();
 
       await userEvent.click(getByRole('button', { name: 'Open menu' }));
-      expect(queryByRole('menu')).not.toBeInTheDocument();
+      // The popover stays mounted through its exit transition, so the menu unmounts on
+      // animation-end rather than synchronously with the close.
+      await waitFor(() => expect(queryByRole('menu')).not.toBeInTheDocument());
     });
 
     it('fires the menu item onClick and closes the menu on selection', async () => {
@@ -100,7 +102,7 @@ describe('Menu', () => {
       await userEvent.click(getByRole('menuitem', { name: 'Remove' }));
 
       expect(onClick).toHaveBeenCalledTimes(1);
-      expect(queryByRole('menu')).not.toBeInTheDocument();
+      await waitFor(() => expect(queryByRole('menu')).not.toBeInTheDocument());
     });
 
     it('keeps the menu open after selection when closeAfterClick is false', async () => {
@@ -277,7 +279,7 @@ describe('Menu', () => {
       await userEvent.keyboard('{Enter}');
 
       expect(onClick).toHaveBeenCalledTimes(1);
-      expect(queryByRole('menu')).not.toBeInTheDocument();
+      await waitFor(() => expect(queryByRole('menu')).not.toBeInTheDocument());
     });
 
     it('does not trap focus — Tab exits the menu', async () => {
@@ -305,7 +307,7 @@ describe('Menu', () => {
 
       await userEvent.keyboard('{Escape}');
 
-      expect(queryByRole('menu')).not.toBeInTheDocument();
+      await waitFor(() => expect(queryByRole('menu')).not.toBeInTheDocument());
       expect(trigger).toHaveFocus();
     });
 
