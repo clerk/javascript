@@ -6,6 +6,7 @@ import { OrganizationProfileDeleteSection } from './organization-profile-delete-
 import { OrganizationProfileDomainsSection } from './organization-profile-domains-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
+import { OrganizationProfileMembersPanel } from './organization-profile-members-panel';
 import { OrganizationProfileProfileSection } from './organization-profile-profile-section';
 import { OrganizationProfileView } from './organization-profile-view';
 
@@ -17,6 +18,7 @@ function OrganizationProfileRoot(): ReactElement | null {
   return (
     <OrganizationProfileView
       general={<OrganizationProfileGeneralPanel />}
+      members={<OrganizationProfileMembersPanel />}
       apiKeys={<OrganizationProfileApiKeysPanel />}
     />
   );
@@ -38,4 +40,5 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   LeaveSection: OrganizationProfileLeaveSection,
   DeleteSection: OrganizationProfileDeleteSection,
   ApiKeysPanel: OrganizationProfileApiKeysPanel,
+  MembersPanel: OrganizationProfileMembersPanel,
 });
