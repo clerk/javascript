@@ -7,6 +7,7 @@ const formatWarning = (msg: string) => {
 const createMessageForDisabledOrganizations = (
   componentName:
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationSwitcher'
     | 'OrganizationList'
     | 'CreateOrganization'
@@ -18,7 +19,9 @@ const createMessageForDisabledOrganizations = (
   );
 };
 
-const createCannotRenderComponentWhenOrgDoesNotExist = (componentName: 'OrganizationProfile' | 'ConfigureSSO') => {
+const createCannotRenderComponentWhenOrgDoesNotExist = (
+  componentName: 'OrganizationProfile' | 'InviteMembers' | 'ConfigureSSO',
+) => {
   return formatWarning(
     `<${componentName}/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
   );

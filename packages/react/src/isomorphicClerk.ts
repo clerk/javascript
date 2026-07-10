@@ -33,6 +33,7 @@ import type {
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
+  InviteMembersModalProps,
   JoinWaitlistParams,
   ListenerCallback,
   ListenerOptions,
@@ -144,6 +145,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
+  private preopenInviteMembers?: null | InviteMembersModalProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
   private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
@@ -713,6 +715,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openOrganizationProfile(this.preopenOrganizationProfile);
     }
 
+    if (this.preopenInviteMembers !== null) {
+      clerkjs.openInviteMembers(this.preopenInviteMembers);
+    }
+
     if (this.preopenCreateOrganization !== null) {
       clerkjs.openCreateOrganization(this.preopenCreateOrganization);
     }
@@ -1061,6 +1067,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.closeOrganizationProfile();
     } else {
       this.preopenOrganizationProfile = null;
+    }
+  };
+
+  openInviteMembers = (props?: InviteMembersModalProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.openInviteMembers(props);
+    } else {
+      this.preopenInviteMembers = props ?? null;
+    }
+  };
+
+  closeInviteMembers = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.closeInviteMembers();
+    } else {
+      this.preopenInviteMembers = null;
     }
   };
 

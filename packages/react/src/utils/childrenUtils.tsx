@@ -13,7 +13,8 @@ export const assertSingleChild =
       | 'SignInWithMetamaskButton'
       | 'CheckoutButton'
       | 'SubscriptionDetailsButton'
-      | 'PlanDetailsButton',
+      | 'PlanDetailsButton'
+      | 'InviteMembersButton',
   ) => {
     try {
       return React.Children.only(children);

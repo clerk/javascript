@@ -92,6 +92,7 @@ import type {
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
+  InviteMembersModalProps,
   JoinWaitlistParams,
   ListenerCallback,
   ListenerOptions,
@@ -996,6 +997,42 @@ export class Clerk implements ClerkInterface {
 
   public closeOrganizationProfile = (): void => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('organizationProfile'));
+  };
+
+  public openInviteMembers = (props?: InviteMembersModalProps): void => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'InviteMembers',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('InviteMembers'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    if (noOrganizationExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('InviteMembers'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted())
+      .then(controls => controls.openModal('inviteMembers', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('InviteMembers', props));
+  };
+
+  public closeInviteMembers = (): void => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('inviteMembers'));
   };
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
