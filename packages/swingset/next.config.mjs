@@ -59,6 +59,10 @@ const nextConfig = {
     config.module.rules.push({ resourceQuery: /raw/, type: 'asset/source' });
 
     config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
+    // The Mosaic Security panel reuses the ConfigureSSO domain/hooks/types from `@clerk/ui`
+    // source via its internal `@/` alias, so resolve that one subtree to the ui source too
+    // (distinct from swingset's own `@/components/ui/*`, so no collision).
+    config.resolve.alias['@/components/ConfigureSSO'] = resolve(__dirname, '../ui/src/components/ConfigureSSO');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
     // `/hooks` and `/utils` live outside `primitives/`, so alias them first (more specific wins).
     config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
