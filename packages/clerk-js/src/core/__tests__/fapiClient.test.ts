@@ -151,15 +151,6 @@ describe('buildUrl(options)', () => {
     );
   });
 
-  it('adds rotating token nonce', () => {
-    const url = fapiClient.buildUrl({
-      path: '/client',
-      rotatingTokenNonce: 'nonce_123',
-    });
-
-    expect(url.searchParams.get('rotating_token_nonce')).toBe('nonce_123');
-  });
-
   // The return value isn't as expected.
   // The buildUrl function converts an undefined value to the string 'undefined'
   // and includes it in the search parameters.

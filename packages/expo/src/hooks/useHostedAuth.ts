@@ -18,10 +18,11 @@ export type HostedAuthMode = 'sign-in' | 'sign-up';
  */
 export type StartHostedAuthParams = {
   /**
-   * Native deep-link URL that Account Portal redirects to after auth completes.
+   * Native callback URL that Account Portal redirects to after auth completes.
    * Defaults to the canonical callback Clerk registers for the configured iOS
    * bundle identifier or Android package name. Expo Go and projects without a
    * configured application identifier fall back to `AuthSession.makeRedirectUri`.
+   * HTTPS callbacks use Expo's universal-link auth session support on iOS.
    */
   redirectUrl?: string;
   /**
@@ -36,9 +37,7 @@ export type StartHostedAuthParams = {
   /**
    * Options forwarded to `expo-web-browser` when opening the hosted auth session.
    */
-  authSessionOptions?: {
-    showInRecents?: boolean;
-  };
+  authSessionOptions?: WebBrowser.AuthSessionOpenOptions;
 };
 
 /**
@@ -57,7 +56,7 @@ export type StartHostedAuthReturnType = {
     url?: string | null;
   } | null;
   /**
-   * The current Clerk client after hosted auth completes.
+   * The current Clerk client after the hosted auth attempt.
    */
   client?: {
     id?: string;
@@ -120,10 +119,14 @@ export function useHostedAuth(): {
       clerk,
     );
 
+    const authSessionOptions =
+      Platform.OS === 'ios' && isHTTPSRedirectUrl(redirectUrl)
+        ? { preferUniversalLinks: true, ...params.authSessionOptions }
+        : params.authSessionOptions;
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
       hostedAuth.url,
       redirectUrl,
-      params.authSessionOptions,
+      authSessionOptions,
     );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
@@ -148,30 +151,30 @@ export function useHostedAuth(): {
       return errorThrower.throw('Hosted auth callback state did not match the initiated state.');
     }
 
-    let updatedClient: ClientResource | undefined;
-    let createdSessionId: string | null = null;
     const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
-    if (rotatingTokenNonce) {
-      updatedClient = await redeemHostedAuth(
-        {
-          rotatingTokenNonce,
-          codeVerifier: pkce.codeVerifier,
-        },
-        clerk.client,
-        clerk,
-      );
-      if (updatedClient) {
-        getClientUpdater(clerk)?.(updatedClient);
-        createdSessionId = normalizeSessionId(
-          callbackParams.get('created_session_id') || updatedClient.lastActiveSessionId,
-        );
-      }
+    if (!rotatingTokenNonce) {
+      return errorThrower.throw('Hosted auth callback did not include a rotating token nonce.');
     }
-    if (createdSessionId) {
-      await clerk.setActive({
-        session: createdSessionId,
-      });
+
+    const updatedClient = await redeemHostedAuth(
+      {
+        rotatingTokenNonce,
+        codeVerifier: pkce.codeVerifier,
+      },
+      clerk.client,
+      clerk,
+    );
+    getClientUpdater(clerk)?.(updatedClient);
+
+    const createdSessionId = normalizeSessionId(
+      callbackParams.get('created_session_id') || updatedClient.lastActiveSessionId,
+    );
+    if (!createdSessionId || !updatedClient.sessions.some(session => session.id === createdSessionId)) {
+      return errorThrower.throw('Hosted auth completion did not include the created session.');
     }
+    await clerk.setActive({
+      session: createdSessionId,
+    });
 
     return {
       createdSessionId,
@@ -287,4 +290,12 @@ function callbackUrlMatchesRedirectUrl(callbackUrl: URL, redirectUrl: string): b
   }
 
   return callbackUrl.pathname === expectedUrl.pathname;
+}
+
+function isHTTPSRedirectUrl(redirectUrl: string): boolean {
+  try {
+    return new URL(redirectUrl).protocol === 'https:';
+  } catch {
+    return false;
+  }
 }

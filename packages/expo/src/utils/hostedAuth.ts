@@ -171,8 +171,8 @@ function hasObjectType(payload: unknown, object: string): boolean {
 }
 
 function applyClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
-  // Hosted auth gets the same /client payload as Client.reload(), but the verifier-bound
-  // exchange is Expo-specific. Apply it to the existing ClerkJS client instance here
+  // Hosted auth gets the same /client payload as Client.reload(), but its verifier-bound
+  // exchange uses a request body. Apply it to the existing ClerkJS client instance here
   // instead of adding a hosted-auth branch to every resource reload path.
   const mutableClient = client as ClientResource & {
     fromJSON?: (data: ClientJSON) => ClientResource;

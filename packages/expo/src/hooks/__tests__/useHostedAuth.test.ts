@@ -85,6 +85,7 @@ const mockCodeChallenge = 'mock-code-challenge-_';
 describe('useHostedAuth', () => {
   const mockClient = {
     lastActiveSessionId: null as string | null,
+    sessions: [] as Array<{ id: string }>,
     reload: vi.fn(),
     fromJSON: vi.fn(),
   };
@@ -128,8 +129,10 @@ describe('useHostedAuth', () => {
     mocks.platformOS = 'ios';
     mocks.expoConfig = undefined;
     mockClient.lastActiveSessionId = null;
+    mockClient.sessions = [];
     mockClient.fromJSON.mockImplementation((clientJSON: ClientJSON) => {
       mockClient.lastActiveSessionId = clientJSON.last_active_session_id;
+      mockClient.sessions = clientJSON.sessions.map(session => ({ id: session.id }));
       return mockClient;
     });
     mocks.makeRedirectUri.mockReturnValue('myapp:///hosted-auth-callback');
@@ -253,6 +256,28 @@ describe('useHostedAuth', () => {
     expect(mocks.makeRedirectUri).not.toHaveBeenCalled();
   });
 
+  test('uses Expo universal-link callbacks for HTTPS redirect URLs', async () => {
+    const redirectUrl = 'https://mobile.example.com/hosted-auth-callback';
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: `${redirectUrl}?state=state-123&rotating_token_nonce=nonce-123&created_session_id=sess_123`,
+    });
+    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_123' });
+
+    const { result } = renderHook(() => useHostedAuth());
+    await result.current.startHostedAuth({
+      redirectUrl,
+      state: 'state-123',
+      authSessionOptions: { showInRecents: true },
+    });
+
+    expect(mocks.openAuthSessionAsync).toHaveBeenCalledWith('https://example.accounts.dev/sign-in', redirectUrl, {
+      preferUniversalLinks: true,
+      showInRecents: true,
+    });
+  });
+
   test('falls back to the reloaded client session when callback session id is absent', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
@@ -270,7 +295,7 @@ describe('useHostedAuth', () => {
     expect(response.client).toBe(mockClient);
   });
 
-  test('does not activate a session when the callback does not return one', async () => {
+  test('rejects a redeemed client response without a created session', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
@@ -279,15 +304,17 @@ describe('useHostedAuth', () => {
     mockHostedAuthRedeemResponse();
 
     const { result } = renderHook(() => useHostedAuth());
-    const response = await result.current.startHostedAuth({ state: 'state-123' });
+
+    await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
+      'Hosted auth completion did not include the created session.',
+    );
 
     expect(mockFapiRequest).toHaveBeenNthCalledWith(2, expect.objectContaining({ path: '/client' }));
     expect(mockUpdateClient).toHaveBeenCalledWith(mockClient);
     expect(mockSetActive).not.toHaveBeenCalled();
-    expect(response.createdSessionId).toBeNull();
   });
 
-  test('does not fall back to an existing active session when callback session params are missing', async () => {
+  test('rejects a successful callback without a rotating token nonce', async () => {
     mockClient.lastActiveSessionId = 'sess_existing';
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
@@ -296,11 +323,29 @@ describe('useHostedAuth', () => {
     });
 
     const { result } = renderHook(() => useHostedAuth());
-    const response = await result.current.startHostedAuth({ state: 'state-123' });
+
+    await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
+      'Hosted auth callback did not include a rotating token nonce.',
+    );
 
     expect(mockFapiRequest).toHaveBeenCalledTimes(1);
     expect(mockSetActive).not.toHaveBeenCalled();
-    expect(response.createdSessionId).toBeNull();
+  });
+
+  test('rejects a callback session that is absent from the redeemed client', async () => {
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({
+      type: 'success',
+      url: 'myapp:///hosted-auth-callback?state=state-123&rotating_token_nonce=nonce-123&created_session_id=sess_other',
+    });
+    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_123' });
+
+    const { result } = renderHook(() => useHostedAuth());
+
+    await expect(result.current.startHostedAuth({ state: 'state-123' })).rejects.toThrow(
+      'Hosted auth completion did not include the created session.',
+    );
+    expect(mockSetActive).not.toHaveBeenCalled();
   });
 
   test('surfaces browser session open failures', async () => {
@@ -486,7 +531,13 @@ function mockHostedAuthResponse(url = 'https://example.accounts.dev/sign-in') {
   });
 }
 
-function mockHostedAuthRedeemResponse({ lastActiveSessionId = null }: { lastActiveSessionId?: string | null } = {}) {
+function mockHostedAuthRedeemResponse({
+  lastActiveSessionId = null,
+  sessionIds = lastActiveSessionId ? [lastActiveSessionId] : [],
+}: {
+  lastActiveSessionId?: string | null;
+  sessionIds?: string[];
+} = {}) {
   mockFapiRequest.mockResolvedValueOnce({
     ok: true,
     status: 200,
@@ -495,7 +546,7 @@ function mockHostedAuthRedeemResponse({ lastActiveSessionId = null }: { lastActi
       response: {
         object: 'client',
         id: 'client_123',
-        sessions: [],
+        sessions: sessionIds.map(id => ({ id })),
         sign_in: null,
         sign_up: null,
         last_active_session_id: lastActiveSessionId,
