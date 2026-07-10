@@ -1087,7 +1087,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.openInviteMembers(props);
     } else {
-      this.preopenInviteMembers = props ?? null;
+      this.preopenInviteMembers = props;
     }
   };
 
