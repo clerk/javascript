@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Box } from '../components/box';
 import { Button } from '../components/button';
@@ -13,18 +13,32 @@ import type {
 } from './organization-profile-members-panel.machine';
 
 export interface OrganizationProfileMembersPanelViewProps {
+  /** Current machine snapshot; drives the search field, error alert, and per-row removing state. */
   snapshot: Snapshot<OrganizationProfileMembersPanelContext>;
+  /** Dispatches events to the machine (search input/submit, member removal). */
   send: (event: OrganizationProfileMembersPanelEvent) => void;
+  /** The members to render, already mapped to a Clerk-free row model by the controller. */
   rows: MemberRow[];
+  /** Whether the current user may remove members; shows the Actions column and Remove buttons. */
   canManage: boolean;
+  /** The 1-based current page number. */
   page: number;
+  /** Total number of pages; pagination controls render only when greater than 1. */
   pageCount: number;
+  /** Whether the list is loading; renders skeleton rows in place of members. */
   isLoading: boolean;
+  /** Called with the requested 1-based page when the user pages forward or back. */
   onPageChange: (page: number) => void;
 }
 
 /** Small pill used for the "You" / "Banned" row markers. */
-function Badge({ children, intent = 'neutral' }: { children: ReactNode; intent?: 'neutral' | 'destructive' }) {
+function Badge({
+  children,
+  intent = 'neutral',
+}: {
+  children: ReactNode;
+  intent?: 'neutral' | 'destructive';
+}): ReactElement {
   return (
     <Box
       render={p => <span {...p} />}
@@ -45,7 +59,7 @@ function Badge({ children, intent = 'neutral' }: { children: ReactNode; intent?:
   );
 }
 
-function HeaderCell({ children, align = 'start' }: { children?: ReactNode; align?: 'start' | 'end' }) {
+function HeaderCell({ children, align = 'start' }: { children?: ReactNode; align?: 'start' | 'end' }): ReactElement {
   return (
     <Box
       render={p => <th {...p} />}
@@ -64,7 +78,7 @@ function HeaderCell({ children, align = 'start' }: { children?: ReactNode; align
   );
 }
 
-function Cell({ children, align = 'start' }: { children?: ReactNode; align?: 'start' | 'end' }) {
+function Cell({ children, align = 'start' }: { children?: ReactNode; align?: 'start' | 'end' }): ReactElement {
   return (
     <Box
       render={p => <td {...p} />}
@@ -81,6 +95,14 @@ function Cell({ children, align = 'start' }: { children?: ReactNode; align?: 'st
   );
 }
 
+/**
+ * Renders the members panel UI from a machine snapshot and controller-derived props:
+ * a search form, the members table (Member / Joined / Role, plus Actions when
+ * `canManage`), skeleton rows while loading, an empty state, an error alert, and
+ * pagination. Rendering only — it sends events via `send` and never touches Clerk
+ * resources. Consumed by {@link OrganizationProfileMembersPanel}; also rendered
+ * directly in the swingset story with a stubbed machine.
+ */
 export function OrganizationProfileMembersPanelView({
   snapshot,
   send,
@@ -90,7 +112,7 @@ export function OrganizationProfileMembersPanelView({
   pageCount,
   isLoading,
   onPageChange,
-}: OrganizationProfileMembersPanelViewProps) {
+}: OrganizationProfileMembersPanelViewProps): ReactElement {
   const isRemoving = snapshot.value === 'removing';
   const columnCount = canManage ? 4 : 3;
 

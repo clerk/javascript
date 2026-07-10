@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Box } from '../components/box';
 import { Tabs } from '../components/tabs';
@@ -12,7 +12,13 @@ interface OrganizationProfileViewProps {
   apiKeys: ReactNode;
 }
 
-export function OrganizationProfileView({ general, members, apiKeys }: OrganizationProfileViewProps) {
+/**
+ * The organization profile shell: a heading and a tabbed layout that hosts each
+ * panel's content in the General, Members, and API keys tabs. Layout only — the
+ * caller supplies each tab's panel via the `general`, `members`, and `apiKeys`
+ * slots, so this component holds no data or Clerk state itself.
+ */
+export function OrganizationProfileView({ general, members, apiKeys }: OrganizationProfileViewProps): ReactElement {
   return (
     <Box
       sx={{
