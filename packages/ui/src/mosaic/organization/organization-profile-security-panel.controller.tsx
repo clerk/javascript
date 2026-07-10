@@ -24,6 +24,11 @@ import type {
 } from './organization-profile-security-wizard.machine';
 import { organizationProfileSecurityWizardMachine } from './organization-profile-security-wizard.machine';
 import type {
+  OrganizationProfileSecurityWizardActivateContext,
+  OrganizationProfileSecurityWizardActivateEvent,
+} from './organization-profile-security-wizard-activate.machine';
+import { organizationProfileSecurityWizardActivateMachine } from './organization-profile-security-wizard-activate.machine';
+import type {
   OrganizationProfileSecurityWizardConfigureContext,
   OrganizationProfileSecurityWizardConfigureEvent,
 } from './organization-profile-security-wizard-configure.machine';
@@ -154,6 +159,22 @@ export interface OrganizationProfileSecurityWizardTestStep {
 }
 
 /**
+ * The `activate` step's flow: the terminal `setConnectionActive(id, true)` machine plus the derived
+ * display inputs. `isActive` selects the copy + Done-vs-Activate button; `domain` fills the subtitle;
+ * `onExit` is the Skip / Done exit (legacy `onExit()`) — a plain `exitWizard` with no mutation.
+ */
+export interface OrganizationProfileSecurityWizardActivateStep {
+  snapshot: Snapshot<OrganizationProfileSecurityWizardActivateContext>;
+  send: (event: OrganizationProfileSecurityWizardActivateEvent) => void;
+  /** Whether the connection is already active — selects the copy + Done-vs-Activate button. */
+  isActive: boolean;
+  /** The connection's domain(s), joined for the subtitle copy. */
+  domain: string;
+  /** Exit the wizard back to the overview (Skip / Done). */
+  onExit: () => void;
+}
+
+/**
  * The gate that decides whether the Security panel (and, in the shell, its tab) is
  * shown. Reproduces legacy's page gate (`OrganizationProfileRoutes.tsx` +
  * `OrganizationProfileNavbar.tsx`): the enterprise-SSO feature flag
@@ -216,6 +237,7 @@ type OrganizationProfileSecurityPanelController =
       domainsStep: OrganizationProfileSecurityWizardDomainsStep;
       configureStep: OrganizationProfileSecurityWizardConfigureStep;
       testStep: OrganizationProfileSecurityWizardTestStep;
+      activateStep: OrganizationProfileSecurityWizardActivateStep;
     };
 
 /**
@@ -486,6 +508,51 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
     }
   }, [testSnapshot.value, sendWizard]);
 
+  // The `activate` step: the terminal `setConnectionActive(id, true)`. Legacy records the activate
+  // telemetry AFTER the mutation resolves (with `connectionStatus: 'active'`), so it is fired here
+  // on success — inside the injected function, before the machine reaches `activated`.
+  const [activateSnapshot, sendActivate, activateActor] = useMachine(organizationProfileSecurityWizardActivateMachine, {
+    context: {
+      isActive,
+      activateConnection: async () => {
+        if (!enterpriseConnection) {
+          return;
+        }
+        try {
+          await setConnectionActive(enterpriseConnection.id, true);
+        } catch (err) {
+          throw toConnectionError(err);
+        }
+        clerk.telemetry?.record(
+          eventFlowStepMounted('configureSSO', 'activate', {
+            timestamp: new Date().toISOString(),
+            connectionStatus: 'active',
+            connectionId: enterpriseConnection.id,
+            organizationId,
+          }),
+        );
+      },
+    },
+  });
+
+  useEffect(() => {
+    activateActor.recheck();
+  }, [activateActor, isActive]);
+
+  // The activate "bubble": legacy `onExit()` after a successful activate. On the rising edge into
+  // `activated` the controller returns the panel to the overview. One-shot via the ref.
+  const activatedRef = useRef(false);
+  useEffect(() => {
+    if (activateSnapshot.value === 'activated') {
+      if (!activatedRef.current) {
+        activatedRef.current = true;
+        setMode('overview');
+      }
+    } else {
+      activatedRef.current = false;
+    }
+  }, [activateSnapshot.value]);
+
   // Fired once when the verify-domain step mounts (legacy `eventFlowStepMounted`).
   const onDomainsStepMounted = useCallback(() => {
     clerk.telemetry?.record(
@@ -554,6 +621,13 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
       send: sendTest,
       testRuns,
       onParentPrev: () => sendWizard({ type: 'PREV' }),
+    },
+    activateStep: {
+      snapshot: activateSnapshot,
+      send: sendActivate,
+      isActive,
+      domain: (enterpriseConnection?.domains ?? []).join(', '),
+      onExit: () => setMode('overview'),
     },
   };
 }

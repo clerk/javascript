@@ -28,6 +28,7 @@ export function OrganizationProfileSecurityPanel(): ReactElement | null {
       domainsStep={controller.domainsStep}
       configureStep={controller.configureStep}
       testStep={controller.testStep}
+      activateStep={controller.activateStep}
     />
   );
 }

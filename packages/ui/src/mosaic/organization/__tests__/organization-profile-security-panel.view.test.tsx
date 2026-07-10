@@ -151,6 +151,20 @@ const buildTestStep = (): OrganizationProfileSecurityPanelViewProps['testStep'] 
   onParentPrev: vi.fn(),
 });
 
+// An activate step seated at idle — the panel-view shell tests never seat the wizard on `activate`
+// (except the loading test below), so this just needs a valid (idle) flow.
+const buildActivateStep = (): OrganizationProfileSecurityPanelViewProps['activateStep'] => ({
+  snapshot: {
+    value: 'idle',
+    status: 'active',
+    context: { isActive: false, error: null, activateConnection: async () => {} },
+  },
+  send: vi.fn(),
+  isActive: false,
+  domain: 'acme.com',
+  onExit: vi.fn(),
+});
+
 function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps> = {}) {
   const openWizard = vi.fn();
   const exitWizard = vi.fn();
@@ -170,6 +184,7 @@ function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps
     domainsStep: buildDomainsStep(),
     configureStep: buildConfigureStep(),
     testStep: buildTestStep(),
+    activateStep: buildActivateStep(),
     ...overrides,
   };
 
@@ -317,9 +332,9 @@ describe('OrganizationProfileSecurityPanelView — loading + wizard mode', () =>
   });
 
   it('keeps the wizard mounted regardless of loading and renders the current step', () => {
-    // `activate` still renders the placeholder step body (configure + test own their own views now).
+    // Every step now renders its own view; seat `activate` and assert its body renders under loading.
     renderView({ mode: 'wizard', isLoading: true, wizard: { snapshot: wizardSnapshot('activate'), send: vi.fn() } });
-    expect(screen.getByTestId('security-wizard-step')).toHaveTextContent('activate');
+    expect(screen.getByText('SSO connection configured')).toBeInTheDocument();
   });
 
   it('returns to the overview from the wizard back control', () => {
@@ -344,9 +359,7 @@ describe('OrganizationProfileSecurityPanelView — wizard navigation + breadcrum
     expect(send).toHaveBeenCalledWith({ type: 'NEXT' });
   });
 
-  it('sends PREV from the shell nav on a step that does not own its own nav (activate)', () => {
-    const send = vi.fn();
-    // activate (last) still uses the shell's generic Back; seed it reachable.
+  it('suppresses the shell nav on a step that owns its own nav (activate)', () => {
     renderView({
       mode: 'wizard',
       wizard: {
@@ -356,11 +369,12 @@ describe('OrganizationProfileSecurityPanelView — wizard navigation + breadcrum
           hasMinimumConfiguration: true,
           hasSuccessfulTestRun: true,
         }),
-        send,
+        send: vi.fn(),
       },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(send).toHaveBeenCalledWith({ type: 'PREV' });
+    // The step renders its own actions; the shell's generic Back/Continue is not present.
+    expect(screen.getByRole('button', { name: 'Activate SSO' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
   });
 
   it('marks the current breadcrumb step and jumps to a reachable step via GOTO', () => {

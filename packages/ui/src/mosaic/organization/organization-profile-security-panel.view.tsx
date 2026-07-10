@@ -13,6 +13,7 @@ import { Skeleton } from '../components/skeleton';
 import { Text } from '../components/text';
 import type { Snapshot } from '../machine/types';
 import type {
+  OrganizationProfileSecurityWizardActivateStep,
   OrganizationProfileSecurityWizardConfigureStep,
   OrganizationProfileSecurityWizardDomainsStep,
   OrganizationProfileSecurityWizardTestStep,
@@ -32,6 +33,7 @@ import {
   SECURITY_WIZARD_STEP_LABELS,
   SECURITY_WIZARD_STEP_ORDER,
 } from './organization-profile-security-wizard.machine';
+import { OrganizationProfileSecurityWizardActivateView } from './organization-profile-security-wizard-activate.view';
 import { OrganizationProfileSecurityWizardConfigureView } from './organization-profile-security-wizard-configure.view';
 import { OrganizationProfileSecurityWizardDomainsView } from './organization-profile-security-wizard-domains.view';
 import { OrganizationProfileSecurityWizardTestView } from './organization-profile-security-wizard-test.view';
@@ -77,6 +79,7 @@ export interface OrganizationProfileSecurityPanelViewProps {
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
   configureStep: OrganizationProfileSecurityWizardConfigureStep;
   testStep: OrganizationProfileSecurityWizardTestStep;
+  activateStep: OrganizationProfileSecurityWizardActivateStep;
 }
 
 const STATUS_LABEL: Record<OrganizationEnterpriseConnectionStatus, string> = {
@@ -346,11 +349,13 @@ function WizardStepBody({
   domainsStep,
   configureStep,
   testStep,
+  activateStep,
 }: {
   current: SecurityWizardStepId;
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
   configureStep: OrganizationProfileSecurityWizardConfigureStep;
   testStep: OrganizationProfileSecurityWizardTestStep;
+  activateStep: OrganizationProfileSecurityWizardActivateStep;
 }) {
   if (current === 'verify-domain') {
     return (
@@ -375,7 +380,11 @@ function WizardStepBody({
     return <OrganizationProfileSecurityWizardTestView test={testStep} />;
   }
 
-  // The activate step lands here until its Phase-3 view is built.
+  if (current === 'activate') {
+    return <OrganizationProfileSecurityWizardActivateView activate={activateStep} />;
+  }
+
+  // Unreachable: every step id has a view. The fallback keeps the render total for a future step.
   return (
     <Text
       render={p => <p {...p} />}
@@ -392,9 +401,10 @@ function WizardShell({
   domainsStep,
   configureStep,
   testStep,
+  activateStep,
 }: Pick<
   OrganizationProfileSecurityPanelViewProps,
-  'wizard' | 'exitWizard' | 'domainsStep' | 'configureStep' | 'testStep'
+  'wizard' | 'exitWizard' | 'domainsStep' | 'configureStep' | 'testStep' | 'activateStep'
 >) {
   const { snapshot, send } = wizard;
   // The machine's state values are the step ids; resolve through the known order so
@@ -403,10 +413,10 @@ function WizardShell({
   const index = SECURITY_WIZARD_STEP_ORDER.indexOf(current);
   const isFirst = index <= 0;
   const isLast = index === SECURITY_WIZARD_STEP_ORDER.length - 1;
-  // The configure and test steps drive their own nav (inner SAML sub-flow / create-run + validate)
-  // and bubble to the outer wizard themselves, so the shell's generic Back/Continue is suppressed
-  // there — otherwise it would advance the outer wizard past the step's own flow.
-  const stepOwnsNav = current === 'configure' || current === 'test';
+  // configure / test / activate drive their own nav (inner SAML sub-flow, create-run + validate,
+  // activate + skip/done) and bubble to the outer wizard themselves, so the shell's generic
+  // Back/Continue is suppressed there. Only verify-domain (the first step) uses the shell nav.
+  const stepOwnsNav = current === 'configure' || current === 'test' || current === 'activate';
 
   return (
     <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(4) })}>
@@ -431,6 +441,7 @@ function WizardShell({
         domainsStep={domainsStep}
         configureStep={configureStep}
         testStep={testStep}
+        activateStep={activateStep}
       />
 
       {!stepOwnsNav && (
@@ -470,6 +481,7 @@ export function OrganizationProfileSecurityPanelView(props: OrganizationProfileS
           domainsStep={props.domainsStep}
           configureStep={props.configureStep}
           testStep={props.testStep}
+          activateStep={props.activateStep}
         />
       ) : isLoading ? (
         <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>
