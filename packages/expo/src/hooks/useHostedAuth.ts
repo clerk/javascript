@@ -1,12 +1,12 @@
 import { useClerk } from '@clerk/react';
-import type { ClientResource } from '@clerk/shared/types';
 import type * as AuthSession from 'expo-auth-session';
 import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
-import { createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
+import type { HostedAuthClerkInstance } from '../utils/hostedAuth';
+import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
 
 /**
  * Controls which Account Portal auth screen opens for hosted auth.
@@ -22,7 +22,7 @@ export type StartHostedAuthParams = {
    * Defaults to the canonical callback Clerk registers for the configured iOS
    * bundle identifier or Android package name. Expo Go and projects without a
    * configured application identifier fall back to `AuthSession.makeRedirectUri`.
-   * HTTPS callbacks use Expo's universal-link auth session support on iOS.
+   * Custom values must use a non-HTTP URL scheme.
    */
   redirectUrl?: string;
   /**
@@ -30,14 +30,9 @@ export type StartHostedAuthParams = {
    */
   mode?: HostedAuthMode;
   /**
-   * Optional opaque state value used to bind the browser callback to this auth attempt.
-   * A cryptographically random value is generated when omitted.
-   */
-  state?: string;
-  /**
    * Options forwarded to `expo-web-browser` when opening the hosted auth session.
    */
-  authSessionOptions?: WebBrowser.AuthSessionOpenOptions;
+  authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
 };
 
 /**
@@ -51,17 +46,7 @@ export type StartHostedAuthReturnType = {
   /**
    * Result returned by the hosted browser session, or `null` when Clerk was not loaded.
    */
-  authSessionResult: {
-    type: string;
-    url?: string | null;
-  } | null;
-  /**
-   * The current Clerk client after the hosted auth attempt.
-   */
-  client?: {
-    id?: string;
-    lastActiveSessionId: string | null;
-  };
+  authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
 };
 
 type HostedAuthPKCE = {
@@ -82,12 +67,12 @@ export function useHostedAuth(): {
       return {
         createdSessionId: null,
         authSessionResult: null,
-        client: clerk.client,
       };
     }
     if (!clerk.client) {
       return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
     }
+    const hostedAuthClerk = getHostedAuthClerk(clerk);
 
     let AuthSessionModule: typeof AuthSession;
     let WebBrowserModule: typeof WebBrowser;
@@ -107,7 +92,8 @@ export function useHostedAuth(): {
     }
 
     const redirectUrl = params.redirectUrl ?? getDefaultRedirectUrl(AuthSessionModule);
-    const state = params.state ?? createState();
+    assertSupportedRedirectUrl(redirectUrl);
+    const state = createState();
     const pkce = await createPKCE();
     const hostedAuth = await createHostedAuth(
       {
@@ -116,23 +102,18 @@ export function useHostedAuth(): {
         mode: params.mode,
         state,
       },
-      clerk,
+      hostedAuthClerk,
     );
 
-    const authSessionOptions =
-      Platform.OS === 'ios' && isHTTPSRedirectUrl(redirectUrl)
-        ? { preferUniversalLinks: true, ...params.authSessionOptions }
-        : params.authSessionOptions;
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
       hostedAuth.url,
       redirectUrl,
-      authSessionOptions,
+      params.authSessionOptions,
     );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         createdSessionId: null,
         authSessionResult,
-        client: clerk.client,
       };
     }
 
@@ -156,22 +137,22 @@ export function useHostedAuth(): {
       return errorThrower.throw('Hosted auth callback did not include a rotating token nonce.');
     }
 
-    const updatedClient = await redeemHostedAuth(
+    const clientJSON = await redeemHostedAuth(
       {
         rotatingTokenNonce,
         codeVerifier: pkce.codeVerifier,
       },
-      clerk.client,
-      clerk,
+      hostedAuthClerk,
     );
-    getClientUpdater(clerk)?.(updatedClient);
 
     const createdSessionId = normalizeSessionId(
-      callbackParams.get('created_session_id') || updatedClient.lastActiveSessionId,
+      callbackParams.get('created_session_id') || clientJSON.last_active_session_id,
     );
-    if (!createdSessionId || !updatedClient.sessions.some(session => session.id === createdSessionId)) {
+    if (!createdSessionId || !clientJSON.sessions.some(session => session.id === createdSessionId)) {
       return errorThrower.throw('Hosted auth completion did not include the created session.');
     }
+
+    applyHostedAuthClientJSON(clerk.client, clientJSON);
     await clerk.setActive({
       session: createdSessionId,
     });
@@ -179,7 +160,6 @@ export function useHostedAuth(): {
     return {
       createdSessionId,
       authSessionResult,
-      client: updatedClient ?? clerk.client,
     };
   }
 
@@ -210,25 +190,33 @@ function getExpoAppIdentifier(): string | undefined {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const constantsModule = require('expo-constants') as {
       default?: {
+        appOwnership?: string | null;
+        executionEnvironment?: string;
         expoConfig?: {
           ios?: { bundleIdentifier?: string };
           android?: { package?: string };
         };
       };
     };
-    const expoConfig = constantsModule.default?.expoConfig;
+    const constants = constantsModule.default;
+    if (constants?.executionEnvironment === 'storeClient' || constants?.appOwnership === 'expo') {
+      return undefined;
+    }
+
+    const expoConfig = constants?.expoConfig;
     return Platform.OS === 'ios' ? expoConfig?.ios?.bundleIdentifier : expoConfig?.android?.package;
   } catch {
     return undefined;
   }
 }
 
-function getClientUpdater(clerk: ReturnType<typeof useClerk>): ((client: ClientResource) => void) | undefined {
-  const maybeClerkWithClientUpdater = clerk as typeof clerk & {
-    updateClient?: (client: ClientResource) => void;
-  };
+function getHostedAuthClerk(clerk: ReturnType<typeof useClerk>): HostedAuthClerkInstance {
+  const hostedAuthClerk = clerk as ReturnType<typeof useClerk> & Partial<HostedAuthClerkInstance>;
+  if (typeof hostedAuthClerk.getFapiClient !== 'function') {
+    return errorThrower.throw('Hosted auth requires a Clerk instance that can make FAPI requests.');
+  }
 
-  return maybeClerkWithClientUpdater.updateClient;
+  return hostedAuthClerk as HostedAuthClerkInstance;
 }
 
 function normalizeSessionId(sessionId: string | null | undefined): string | null {
@@ -292,10 +280,15 @@ function callbackUrlMatchesRedirectUrl(callbackUrl: URL, redirectUrl: string): b
   return callbackUrl.pathname === expectedUrl.pathname;
 }
 
-function isHTTPSRedirectUrl(redirectUrl: string): boolean {
+function assertSupportedRedirectUrl(redirectUrl: string): void {
+  let protocol: string;
   try {
-    return new URL(redirectUrl).protocol === 'https:';
+    protocol = new URL(redirectUrl).protocol;
   } catch {
-    return false;
+    return errorThrower.throw('Hosted auth redirect URL was invalid.');
+  }
+
+  if (protocol === 'http:' || protocol === 'https:') {
+    return errorThrower.throw('Hosted auth requires a custom-scheme redirect URL in Expo.');
   }
 }

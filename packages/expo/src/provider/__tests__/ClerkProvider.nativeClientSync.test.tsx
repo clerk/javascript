@@ -26,6 +26,7 @@ const mocks = vi.hoisted(() => {
         }
       | undefined,
     clerkInstance: {
+      __internal_setActiveInProgress: false,
       __internal_reloadInitialResources: vi.fn(),
       addListener: vi.fn(),
       addOnLoaded: vi.fn(),
@@ -131,6 +132,7 @@ describe('ClerkProvider native client sync', () => {
     mocks.tokenCache.saveToken.mockResolvedValue(undefined);
     mocks.tokenCache.clearToken.mockResolvedValue(undefined);
     mocks.clerkOptions = undefined;
+    mocks.clerkInstance.__internal_setActiveInProgress = false;
     mocks.clerkInstance.__internal_reloadInitialResources.mockResolvedValue(undefined);
     mocks.clerkInstance.addOnLoaded = vi.fn();
     mocks.clerkInstance.client = undefined;
@@ -760,6 +762,55 @@ describe('ClerkProvider native client sync', () => {
       signedInSessions: [remainingSession],
       lastActiveSessionId: 'session_2',
     });
+  });
+
+  test('does not start fallback activation during an explicit session transition', async () => {
+    const removedSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const replacementSession = {
+      id: 'session_2',
+      status: 'active',
+      user: { id: 'user_2' },
+    };
+    const replacementClient = {
+      signedInSessions: [replacementSession],
+      lastActiveSessionId: 'session_2',
+    };
+    const originalUpdateClient = mocks.clerkInstance.updateClient;
+
+    mocks.clerkInstance.client = {
+      signedInSessions: [removedSession],
+      lastActiveSessionId: 'session_1',
+    };
+    mocks.clerkInstance.session = removedSession;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.clerkInstance.updateClient).not.toBe(originalUpdateClient);
+    });
+
+    originalUpdateClient.mockClear();
+    mocks.clerkInstance.setActive.mockClear();
+    mocks.clerkInstance.__internal_setActiveInProgress = true;
+
+    act(() => {
+      mocks.clerkInstance.updateClient(replacementClient);
+    });
+
+    expect(originalUpdateClient).toHaveBeenCalledOnce();
+    expect(originalUpdateClient).toHaveBeenCalledWith(replacementClient, {
+      __internal_dangerouslySkipEmit: true,
+    });
+    expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
   });
 
   test('keeps follow-up client updates suppressed while reconciling a removed active session', async () => {

@@ -1,7 +1,6 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON, ClientJSON, ClientResource } from '@clerk/shared/types';
 
-import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from './errors';
 
 export type FapiHostedAuthMode = 'sign-in' | 'sign-up';
@@ -10,7 +9,7 @@ export type CreateHostedAuthParams = {
   redirectUrl: string;
   codeChallenge: string;
   mode?: FapiHostedAuthMode;
-  state?: string;
+  state: string;
 };
 
 export type RedeemHostedAuthParams = {
@@ -28,16 +27,7 @@ type HostedAuthJSON = {
 };
 
 type HostedAuthPayload = {
-  response?: HostedAuthJSON;
-  errors?: ClerkAPIErrorJSON[];
-};
-
-type ClientPayload = {
-  response?: ClientJSON;
-  client?: ClientJSON;
-  meta?: {
-    client?: ClientJSON;
-  };
+  response?: HostedAuthJSON | ClientJSON;
   errors?: ClerkAPIErrorJSON[];
 };
 
@@ -46,7 +36,7 @@ type HostedAuthResponse = {
   status: number;
   statusText: string;
   headers?: Headers;
-  payload: HostedAuthPayload | HostedAuthJSON | ClientPayload | ClientJSON | null;
+  payload: HostedAuthPayload | null;
 };
 
 type FapiClient = {
@@ -57,24 +47,23 @@ type FapiClient = {
   }) => Promise<HostedAuthResponse>;
 };
 
-type ClerkWithFapiClient = {
-  getFapiClient?: () => FapiClient | undefined;
+export type HostedAuthClerkInstance = {
+  getFapiClient: () => FapiClient;
+  handleUnauthenticated?: () => Promise<unknown>;
 };
 
-export async function createHostedAuth(params: CreateHostedAuthParams, clerk?: unknown): Promise<HostedAuthResource> {
-  const fapiClient = getHostedAuthFapiClient(clerk);
-  if (!fapiClient) {
-    return errorThrower.throw('Hosted auth requires a Clerk instance that can make FAPI requests.');
-  }
-
-  const response = await fapiClient.request({
+export async function createHostedAuth(
+  params: CreateHostedAuthParams,
+  clerk: HostedAuthClerkInstance,
+): Promise<HostedAuthResource> {
+  const response = await clerk.getFapiClient().request({
     method: 'POST',
     path: '/client/hosted_auth',
     body: params,
   });
 
   if (!response.ok) {
-    throw buildHostedAuthAPIResponseError(response);
+    await throwHostedAuthAPIResponseError(response, clerk);
   }
 
   const hostedAuthJSON = getHostedAuthJSON(response.payload);
@@ -89,15 +78,9 @@ export async function createHostedAuth(params: CreateHostedAuthParams, clerk?: u
 
 export async function redeemHostedAuth(
   params: RedeemHostedAuthParams,
-  client: ClientResource,
-  clerk?: unknown,
-): Promise<ClientResource> {
-  const fapiClient = getHostedAuthFapiClient(clerk);
-  if (!fapiClient) {
-    return errorThrower.throw('Hosted auth requires a Clerk instance that can make FAPI requests.');
-  }
-
-  const response = await fapiClient.request({
+  clerk: HostedAuthClerkInstance,
+): Promise<ClientJSON> {
+  const response = await clerk.getFapiClient().request({
     method: 'POST',
     path: '/client',
     body: {
@@ -108,7 +91,7 @@ export async function redeemHostedAuth(
   });
 
   if (!response.ok) {
-    throw buildHostedAuthAPIResponseError(response);
+    await throwHostedAuthAPIResponseError(response, clerk);
   }
 
   const clientJSON = getClientJSON(response.payload);
@@ -116,14 +99,7 @@ export async function redeemHostedAuth(
     return errorThrower.throw('Hosted auth completion returned an invalid response.');
   }
 
-  return applyClientJSON(client, clientJSON);
-}
-
-function getHostedAuthFapiClient(clerk?: unknown): FapiClient | undefined {
-  return (
-    (clerk as ClerkWithFapiClient | undefined)?.getFapiClient?.() ??
-    (getClerkInstance() as ClerkWithFapiClient | undefined)?.getFapiClient?.()
-  );
+  return clientJSON;
 }
 
 function getHostedAuthJSON(payload: HostedAuthResponse['payload']): HostedAuthJSON | null {
@@ -131,11 +107,11 @@ function getHostedAuthJSON(payload: HostedAuthResponse['payload']): HostedAuthJS
     return null;
   }
 
-  if ('response' in payload && isHostedAuthJSON(payload.response)) {
+  if (isHostedAuthJSON(payload.response)) {
     return payload.response;
   }
 
-  return isHostedAuthJSON(payload) ? payload : null;
+  return null;
 }
 
 function isHostedAuthJSON(payload: unknown): payload is HostedAuthJSON {
@@ -147,19 +123,11 @@ function getClientJSON(payload: HostedAuthResponse['payload']): ClientJSON | nul
     return null;
   }
 
-  if ('response' in payload && isClientJSON(payload.response)) {
+  if (isClientJSON(payload.response)) {
     return payload.response;
   }
 
-  if ('client' in payload && isClientJSON(payload.client)) {
-    return payload.client;
-  }
-
-  if ('meta' in payload && isClientJSON(payload.meta?.client)) {
-    return payload.meta.client;
-  }
-
-  return isClientJSON(payload) ? payload : null;
+  return null;
 }
 
 function isClientJSON(payload: unknown): payload is ClientJSON {
@@ -170,7 +138,7 @@ function hasObjectType(payload: unknown, object: string): boolean {
   return !!payload && typeof payload === 'object' && (payload as { object?: unknown }).object === object;
 }
 
-function applyClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
+export function applyHostedAuthClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
   // Hosted auth gets the same /client payload as Client.reload(), but its verifier-bound
   // exchange uses a request body. Apply it to the existing ClerkJS client instance here
   // instead of adding a hosted-auth branch to every resource reload path.
@@ -182,6 +150,17 @@ function applyClientJSON(client: ClientResource, clientJSON: ClientJSON): Client
   }
 
   return mutableClient.fromJSON(clientJSON);
+}
+
+async function throwHostedAuthAPIResponseError(
+  response: HostedAuthResponse,
+  clerk: HostedAuthClerkInstance,
+): Promise<never> {
+  if (response.status === 401) {
+    await clerk.handleUnauthenticated?.();
+  }
+
+  throw buildHostedAuthAPIResponseError(response);
 }
 
 function buildHostedAuthAPIResponseError(response: HostedAuthResponse) {
