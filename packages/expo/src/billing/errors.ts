@@ -19,10 +19,14 @@ export type IAPBillingErrorCode =
   /** The store product can be displayed, but Clerk does not yet have a matching fulfillment model for it. */
   | 'unsupported_product_type'
   /**
-   * The Plan has no store product mapped for the current platform and requested period.
+   * The Plan has no store product mapped for the current platform, or the store did not return the mapped product.
    */
   | 'store_product_not_found'
   | 'ambiguous_store_product'
+  /**
+   * The instance has no active store connection for the current platform, so purchases cannot be verified.
+   */
+  | 'store_connection_not_configured'
   /** The requested offer is not currently eligible/available from the store. */
   | 'offer_not_available'
   /** Apple promotional offers require a fresh server-generated signature. */

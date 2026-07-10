@@ -14,6 +14,7 @@ import {
   deriveGoogleObfuscatedAccountId,
   extractPurchasePayload,
   findAlreadySubscribedError,
+  findDefinitivePreflightError,
   platformToStore,
   resolveStoreProduct,
 } from './utils';
@@ -38,12 +39,19 @@ function purchaseStore(purchase: Purchase, fallback: BillingStore): BillingStore
 const USER_CANCELLED_CODES = new Set(['user-cancelled', 'user_cancelled', 'e_user_cancelled']);
 
 /**
+ * Message shapes that name the *user* as the canceller. A bare "cancelled" is not enough: system failures carry it
+ * too (NSURLErrorDomain -999's localizedDescription is literally "cancelled"), and classifying one of those as a
+ * user cancellation would swallow a real failure as a success-shaped result in a money flow.
+ */
+const USER_CANCELLED_MESSAGE = /\buser[\s_-]?cancel(l)?ed\b|\bcancel(l)?ed by (the )?user\b/i;
+
+/**
  * Whether a purchase error represents the user dismissing the purchase sheet.
  * expo-iap emits a `user-cancelled` code, but on iOS the cancellation often
  * arrives wrapped in Expo's native-call rejection ("Calling the
  * 'requestPurchase' function has failed") with the real cancellation in the
- * `cause` chain — so match known codes AND a cancellation message anywhere in
- * the chain.
+ * `cause` chain — so match known codes AND a user-cancellation message
+ * anywhere in the chain.
  */
 function isUserCancelledPurchaseError(error: unknown, depth = 0): boolean {
   if (!error || typeof error !== 'object' || depth > 4) {
@@ -53,7 +61,7 @@ function isUserCancelledPurchaseError(error: unknown, depth = 0): boolean {
   if (typeof code === 'string' && USER_CANCELLED_CODES.has(code.toLowerCase())) {
     return true;
   }
-  if (typeof message === 'string' && /cancel(l)?ed/i.test(message)) {
+  if (typeof message === 'string' && USER_CANCELLED_MESSAGE.test(message)) {
     return true;
   }
   return isUserCancelledPurchaseError(cause, depth + 1);
@@ -226,12 +234,18 @@ function resolveAndroidOneTimeOffer(
  * import { useIAPBilling } from '@clerk/expo/experimental';
  *
  * function PaywallScreen() {
- *   const { plans, loading, purchase } = useIAPBilling();
+ *   const { plans, loading, purchase, manageSubscriptions } = useIAPBilling();
  *
  *   const onSubscribe = async (plan) => {
- *     const result = await purchase(plan, 'month');
+ *     // Purchases the plan's store product mapped for this platform. Pass
+ *     // `{ productId }` to pick between multiple mapped products (for
+ *     // example, monthly vs. annual).
+ *     const result = await purchase(plan);
  *     if (result.status === 'already_subscribed') {
- *       // The user already subscribed via `result.alreadySubscribedVia` (for example, on the web).
+ *       // The user already subscribed via `result.alreadySubscribedVia` (for
+ *       // example, on the web). Plan changes go through the store's native
+ *       // surface, not a second purchase:
+ *       await manageSubscriptions();
  *     }
  *   };
  *   // ...
@@ -495,7 +509,13 @@ export function useIAPBilling(): UseIAPBillingReturn {
         if (alreadySubscribed) {
           return { status: 'already_subscribed', alreadySubscribedVia: alreadySubscribed.alreadySubscribedVia };
         }
-        throw error;
+        const definitiveRejection = findDefinitivePreflightError(error);
+        if (definitiveRejection) {
+          throw definitiveRejection;
+        }
+        // Fail open on everything else: a network blip, a 5xx, or a FAPI deployment that predates the preflight
+        // endpoint must not block every purchase. Registration after the store transaction remains the
+        // authoritative guard — the preflight is an optimization, not the gate.
       }
 
       pendingProductIdsRef.current.add(product.productId);

@@ -566,6 +566,60 @@ describe('useIAPBilling', () => {
       expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
     });
 
+    it('fails open when the server preflight is unreachable', async () => {
+      clerk.billing.preflightStorePurchase.mockRejectedValue(new TypeError('Network request failed'));
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult.status).toBe('success');
+      expect(mocks.iap.requestPurchase).toHaveBeenCalled();
+      expect(registerStorePurchase).toHaveBeenCalled();
+    });
+
+    it('fails open when the FAPI deployment predates the preflight endpoint', async () => {
+      // An older FAPI 404s the route with a code the SDK does not recognize as
+      // a purchase verdict; registration remains the authoritative guard.
+      clerk.billing.preflightStorePurchase.mockRejectedValue(
+        new ClerkAPIResponseError('not found', {
+          status: 404,
+          data: [{ code: 'resource_not_found', message: 'Not found' }],
+        }),
+      );
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult.status).toBe('success');
+      expect(mocks.iap.requestPurchase).toHaveBeenCalled();
+    });
+
+    it('blocks the purchase on a definitive preflight rejection, typed for the docs contract', async () => {
+      clerk.billing.preflightStorePurchase.mockRejectedValue(
+        new ClerkAPIResponseError('unprocessable', {
+          status: 404,
+          data: [{ code: 'product_not_mapped', message: 'Product is not mapped to a plan' }],
+        }),
+      );
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await expect(result.current.purchase(plan)).rejects.toMatchObject({
+          name: 'IAPBillingError',
+          code: 'store_product_not_found',
+        });
+      });
+
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
     it('never charges a product whose Clerk fulfillment model is not implemented', async () => {
       mocks.iap.fetchProducts.mockResolvedValue([
         {
@@ -602,6 +656,27 @@ describe('useIAPBilling', () => {
       });
 
       expect(purchaseResult).toEqual({ status: 'cancelled' });
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
+    it('does not treat a system "cancelled" failure as user cancellation', async () => {
+      // NSURLErrorDomain -999's localizedDescription is literally "cancelled";
+      // swallowing it as a user cancellation would hide a real failure.
+      mocks.iap.requestPurchase.mockRejectedValue(
+        Object.assign(new Error("Calling the 'requestPurchase' function has failed"), {
+          code: 'ERR_UNEXPECTED',
+          cause: { message: 'cancelled', code: 'NSURLErrorDomain' },
+        }),
+      );
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await expect(result.current.purchase(plan)).rejects.toMatchObject({
+          name: 'IAPBillingError',
+          code: 'purchase_failed',
+        });
+      });
+
       expect(registerStorePurchase).not.toHaveBeenCalled();
     });
 

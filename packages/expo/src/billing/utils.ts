@@ -1,6 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { BillingPlanResource, BillingPlanStoreProduct, BillingStore } from '@clerk/shared/types';
 
+import type { IAPBillingErrorCode } from './errors';
 import { IAPBillingError } from './errors';
 import { loadExpoCrypto } from './expoCrypto';
 
@@ -126,6 +127,41 @@ export function findAlreadySubscribedError(error: unknown): { alreadySubscribedV
     return undefined;
   }
   return { alreadySubscribedVia: match.meta?.alreadySubscribedVia };
+}
+
+/**
+ * Preflight verdicts the backend states definitively about this purchase — proceeding would charge the user for a
+ * purchase that registration is certain to reject.
+ */
+const DEFINITIVE_PREFLIGHT_ERROR_CODES: Record<string, IAPBillingErrorCode> = {
+  product_not_mapped: 'store_product_not_found',
+  store_connection_not_configured: 'store_connection_not_configured',
+  form_param_missing: 'purchase_failed',
+  form_param_value_invalid: 'purchase_failed',
+};
+
+/**
+ * If the error is a definitive 4xx preflight rejection (the backend affirmatively vetoed this purchase), returns it
+ * as a typed `IAPBillingError` to throw. Returns `undefined` for everything else — network failures, 5xx responses,
+ * and FAPI deployments that predate the preflight endpoint — which callers treat as "proceed; registration after the
+ * store transaction remains the authoritative guard".
+ *
+ * @internal
+ */
+export function findDefinitivePreflightError(error: unknown): IAPBillingError | undefined {
+  if (!error || !isClerkAPIResponseError(error)) {
+    return undefined;
+  }
+  if (typeof error.status === 'number' && error.status >= 500) {
+    return undefined;
+  }
+  for (const apiError of error.errors ?? []) {
+    const code = DEFINITIVE_PREFLIGHT_ERROR_CODES[apiError.code];
+    if (code) {
+      return new IAPBillingError(code, apiError.longMessage || apiError.message, { cause: error });
+    }
+  }
+  return undefined;
 }
 
 function uuidToBytes(uuid: string): Uint8Array {

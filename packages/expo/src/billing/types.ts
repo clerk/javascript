@@ -4,8 +4,9 @@ import type { BillingPlanResource, BillingSubscriptionItemResource } from '@cler
  * The result of a `purchase()` call. Branch on `status`:
  * - `'success'` — the store purchase completed and was registered with Clerk.
  * - `'cancelled'` — the user dismissed the store purchase sheet.
- * - `'already_subscribed'` — the user already holds an active subscription through another payment processor
- *   (`alreadySubscribedVia`). The store transaction was not registered.
+ * - `'already_subscribed'` — the user already holds an active paid subscription (`alreadySubscribedVia`). The store
+ *   transaction was not registered. Plan changes for an existing subscription go through the managing processor —
+ *   route store-managed subscribers to `manageSubscriptions()`, not a second purchase.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
