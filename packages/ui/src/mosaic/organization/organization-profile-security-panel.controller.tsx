@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { OrganizationEnterpriseConnection } from '@/components/ConfigureSSO/domain/organizationEnterpriseConnection';
 import { areAllOrganizationDomainsVerified } from '@/components/ConfigureSSO/domain/organizationEnterpriseConnection';
+import type { TestRunsView } from '@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import type { ProviderType } from '@/components/ConfigureSSO/types';
 import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '@/utils/errorHandler';
@@ -46,6 +47,11 @@ import type {
   OrganizationProfileSecurityWizardDomainsRemoveEvent,
 } from './organization-profile-security-wizard-domains-remove.machine';
 import { organizationProfileSecurityWizardDomainsRemoveMachine } from './organization-profile-security-wizard-domains-remove.machine';
+import type {
+  OrganizationProfileSecurityWizardTestContext,
+  OrganizationProfileSecurityWizardTestEvent,
+} from './organization-profile-security-wizard-test.machine';
+import { organizationProfileSecurityWizardTestMachine } from './organization-profile-security-wizard-test.machine';
 
 /**
  * Reproduces the legacy `handleError(err, [], setError)` global-error extraction the overview
@@ -133,6 +139,21 @@ export interface OrganizationProfileSecurityWizardConfigureStep {
 }
 
 /**
+ * The `test` step's flow: the two async actions (create-run, continue-validate) are the machine;
+ * the results table's rows / pagination / polling and the one-shot "Refresh logs" refetch are
+ * hook-owned data threaded straight through (`testRuns`). `refresh` here is the manual refetch that
+ * must NOT arm polling — only the machine's injected `createTestRun` arms it.
+ */
+export interface OrganizationProfileSecurityWizardTestStep {
+  snapshot: Snapshot<OrganizationProfileSecurityWizardTestContext>;
+  send: (event: OrganizationProfileSecurityWizardTestEvent) => void;
+  /** The test-run list state the table renders + the one-shot (non-arming) `refresh` / pagination. */
+  testRuns: TestRunsView;
+  /** Forward the footer Previous to the outer wizard. */
+  onParentPrev: () => void;
+}
+
+/**
  * The gate that decides whether the Security panel (and, in the shell, its tab) is
  * shown. Reproduces legacy's page gate (`OrganizationProfileRoutes.tsx` +
  * `OrganizationProfileNavbar.tsx`): the enterprise-SSO feature flag
@@ -194,6 +215,7 @@ type OrganizationProfileSecurityPanelController =
       wizard: OrganizationProfileSecurityWizardFlow;
       domainsStep: OrganizationProfileSecurityWizardDomainsStep;
       configureStep: OrganizationProfileSecurityWizardConfigureStep;
+      testStep: OrganizationProfileSecurityWizardTestStep;
     };
 
 /**
@@ -213,11 +235,18 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
     enterpriseConnection,
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,
+    testRuns,
     organizationDomains,
     organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
-  const { setConnectionActive, deleteConnection, updateConnection, createConnection, changeProvider } =
-    enterpriseConnectionMutations;
+  const {
+    setConnectionActive,
+    deleteConnection,
+    updateConnection,
+    createConnection,
+    changeProvider,
+    createTestRun: createTestRunMutation,
+  } = enterpriseConnectionMutations;
   const { createDomain, prepareOwnershipVerification, revalidate } = organizationDomainMutations;
   const connectionStatus = organizationEnterpriseConnection.status;
   const connectionId = enterpriseConnection?.id ?? null;
@@ -400,6 +429,63 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
     }
   }, [configureSnapshot.value, sendWizard]);
 
+  // The `test` step: the two async actions (create-run, continue-validate). The injected
+  // `createTestRun` reproduces the legacy side-effect chain 1:1 — create the run, reset to page 1,
+  // refetch the list with polling ARMED, then open the URL. Errors normalize to a plain message
+  // (legacy global `handleError`). `revalidateHasSuccessfulTestRun` is the one-shot success probe.
+  const [testSnapshot, sendTest, testActor] = useMachine(organizationProfileSecurityWizardTestMachine, {
+    context: {
+      hasSuccessfulTestRun,
+      noSuccessfulRunMessage:
+        'You need at least one successful test run before you can continue. Generate a test URL and complete the sign-in flow.',
+      createTestRun: async () => {
+        if (!enterpriseConnection) {
+          return;
+        }
+        try {
+          const { url } = await createTestRunMutation(enterpriseConnection.id);
+          // Reset to the first page and refetch with polling ARMED so the freshly-created run
+          // surfaces on its own (legacy `handleTestRunCreated`), then open the IdP test URL.
+          testRuns.setPage(1);
+          void testRuns.refresh({ armPolling: true });
+          // `noopener,noreferrer` so the IdP can't reach back into the dashboard via `window.opener`.
+          window.open(url, '_blank', 'noopener,noreferrer');
+        } catch (err) {
+          throw toConnectionError(err);
+        }
+      },
+      revalidateHasSuccessfulTestRun: async () => {
+        try {
+          return await testRuns.revalidateHasSuccessfulTestRun();
+        } catch (err) {
+          throw toConnectionError(err);
+        }
+      },
+    },
+  });
+
+  // Keep the Continue fast-path gate current: when the success probe changes, re-settle so a parked
+  // advance completes (there is no entry guard on the test states, so this only re-runs `always` —
+  // harmless, and keeps the pattern uniform with the other step actors).
+  useEffect(() => {
+    testActor.recheck();
+  }, [testActor, hasSuccessfulTestRun]);
+
+  // Same terminal bubble as configure: a successful Continue rests in `bubblingNext`; on the rising
+  // edge the controller forwards a single outer `NEXT` (the outer wizard defers it to `activate` via
+  // its `pendingNext`). One-shot via the ref so a re-render never double-advances.
+  const testBubbledRef = useRef(false);
+  useEffect(() => {
+    if (testSnapshot.value === 'bubblingNext') {
+      if (!testBubbledRef.current) {
+        testBubbledRef.current = true;
+        sendWizard({ type: 'NEXT' });
+      }
+    } else {
+      testBubbledRef.current = false;
+    }
+  }, [testSnapshot.value, sendWizard]);
+
   // Fired once when the verify-domain step mounts (legacy `eventFlowStepMounted`).
   const onDomainsStepMounted = useCallback(() => {
     clerk.telemetry?.record(
@@ -461,6 +547,12 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
       submitStepId: SAML_SUBMIT_STEP_ID,
       enteredForward: wizardSnapshot.context.direction === 1,
       onParentNext: () => sendWizard({ type: 'NEXT' }),
+      onParentPrev: () => sendWizard({ type: 'PREV' }),
+    },
+    testStep: {
+      snapshot: testSnapshot,
+      send: sendTest,
+      testRuns,
       onParentPrev: () => sendWizard({ type: 'PREV' }),
     },
   };

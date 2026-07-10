@@ -15,6 +15,7 @@ import type { Snapshot } from '../machine/types';
 import type {
   OrganizationProfileSecurityWizardConfigureStep,
   OrganizationProfileSecurityWizardDomainsStep,
+  OrganizationProfileSecurityWizardTestStep,
 } from './organization-profile-security-panel.controller';
 import type {
   OrganizationProfileSecurityPanelOverviewContext,
@@ -33,6 +34,7 @@ import {
 } from './organization-profile-security-wizard.machine';
 import { OrganizationProfileSecurityWizardConfigureView } from './organization-profile-security-wizard-configure.view';
 import { OrganizationProfileSecurityWizardDomainsView } from './organization-profile-security-wizard-domains.view';
+import { OrganizationProfileSecurityWizardTestView } from './organization-profile-security-wizard-test.view';
 
 /**
  * The Mosaic Security panel view — pure rendering over the controller's snapshots.
@@ -74,6 +76,7 @@ export interface OrganizationProfileSecurityPanelViewProps {
   wizard: WizardFlow;
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
   configureStep: OrganizationProfileSecurityWizardConfigureStep;
+  testStep: OrganizationProfileSecurityWizardTestStep;
 }
 
 const STATUS_LABEL: Record<OrganizationEnterpriseConnectionStatus, string> = {
@@ -342,10 +345,12 @@ function WizardStepBody({
   current,
   domainsStep,
   configureStep,
+  testStep,
 }: {
   current: SecurityWizardStepId;
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
   configureStep: OrganizationProfileSecurityWizardConfigureStep;
+  testStep: OrganizationProfileSecurityWizardTestStep;
 }) {
   if (current === 'verify-domain') {
     return (
@@ -366,7 +371,11 @@ function WizardStepBody({
     return <OrganizationProfileSecurityWizardConfigureView configure={configureStep} />;
   }
 
-  // Steps test / activate land here until their Phase-3 views are built.
+  if (current === 'test') {
+    return <OrganizationProfileSecurityWizardTestView test={testStep} />;
+  }
+
+  // The activate step lands here until its Phase-3 view is built.
   return (
     <Text
       render={p => <p {...p} />}
@@ -382,7 +391,11 @@ function WizardShell({
   exitWizard,
   domainsStep,
   configureStep,
-}: Pick<OrganizationProfileSecurityPanelViewProps, 'wizard' | 'exitWizard' | 'domainsStep' | 'configureStep'>) {
+  testStep,
+}: Pick<
+  OrganizationProfileSecurityPanelViewProps,
+  'wizard' | 'exitWizard' | 'domainsStep' | 'configureStep' | 'testStep'
+>) {
   const { snapshot, send } = wizard;
   // The machine's state values are the step ids; resolve through the known order so
   // `current` is a typed SecurityWizardStepId without a cast.
@@ -390,10 +403,10 @@ function WizardShell({
   const index = SECURITY_WIZARD_STEP_ORDER.indexOf(current);
   const isFirst = index <= 0;
   const isLast = index === SECURITY_WIZARD_STEP_ORDER.length - 1;
-  // The configure step drives its own inner nav (select-provider + SAML sub-flow) and bubbles to
-  // the outer wizard itself, so the shell's generic Back/Continue is suppressed there — otherwise
-  // it would advance the outer wizard past the inner flow.
-  const stepOwnsNav = current === 'configure';
+  // The configure and test steps drive their own nav (inner SAML sub-flow / create-run + validate)
+  // and bubble to the outer wizard themselves, so the shell's generic Back/Continue is suppressed
+  // there — otherwise it would advance the outer wizard past the step's own flow.
+  const stepOwnsNav = current === 'configure' || current === 'test';
 
   return (
     <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(4) })}>
@@ -417,6 +430,7 @@ function WizardShell({
         current={current}
         domainsStep={domainsStep}
         configureStep={configureStep}
+        testStep={testStep}
       />
 
       {!stepOwnsNav && (
@@ -455,6 +469,7 @@ export function OrganizationProfileSecurityPanelView(props: OrganizationProfileS
           exitWizard={props.exitWizard}
           domainsStep={props.domainsStep}
           configureStep={props.configureStep}
+          testStep={props.testStep}
         />
       ) : isLoading ? (
         <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>

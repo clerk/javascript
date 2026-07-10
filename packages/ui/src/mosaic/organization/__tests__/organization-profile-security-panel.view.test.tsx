@@ -122,6 +122,35 @@ const buildConfigureStep = (): OrganizationProfileSecurityPanelViewProps['config
   onParentPrev: vi.fn(),
 });
 
+// A test step seated at idle with an empty run list — the panel-view shell tests never seat the
+// wizard on `test`, so this just needs a valid (idle) flow to satisfy the prop type.
+const buildTestStep = (): OrganizationProfileSecurityPanelViewProps['testStep'] => ({
+  snapshot: {
+    value: 'idle',
+    status: 'active',
+    context: {
+      hasSuccessfulTestRun: false,
+      error: null,
+      noSuccessfulRunMessage: '',
+      createTestRun: async () => {},
+      revalidateHasSuccessfulTestRun: async () => false,
+    },
+  },
+  send: vi.fn(),
+  testRuns: {
+    rows: [],
+    totalCount: 0,
+    isLoading: false,
+    isFetching: false,
+    isPolling: false,
+    page: 1,
+    setPage: vi.fn(),
+    refresh: vi.fn(() => Promise.resolve()),
+    revalidateHasSuccessfulTestRun: vi.fn(() => Promise.resolve(false)),
+  },
+  onParentPrev: vi.fn(),
+});
+
 function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps> = {}) {
   const openWizard = vi.fn();
   const exitWizard = vi.fn();
@@ -140,6 +169,7 @@ function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps
     wizard: { snapshot: wizardSnapshot('verify-domain'), send: wizardSend },
     domainsStep: buildDomainsStep(),
     configureStep: buildConfigureStep(),
+    testStep: buildTestStep(),
     ...overrides,
   };
 
@@ -287,9 +317,9 @@ describe('OrganizationProfileSecurityPanelView — loading + wizard mode', () =>
   });
 
   it('keeps the wizard mounted regardless of loading and renders the current step', () => {
-    // `test` still renders the placeholder step body (configure owns its own view now).
-    renderView({ mode: 'wizard', isLoading: true, wizard: { snapshot: wizardSnapshot('test'), send: vi.fn() } });
-    expect(screen.getByTestId('security-wizard-step')).toHaveTextContent('test');
+    // `activate` still renders the placeholder step body (configure + test own their own views now).
+    renderView({ mode: 'wizard', isLoading: true, wizard: { snapshot: wizardSnapshot('activate'), send: vi.fn() } });
+    expect(screen.getByTestId('security-wizard-step')).toHaveTextContent('activate');
   });
 
   it('returns to the overview from the wizard back control', () => {
@@ -306,18 +336,29 @@ describe('OrganizationProfileSecurityPanelView — wizard navigation + breadcrum
     expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled();
   });
 
-  it('sends NEXT and PREV from the bounded nav at a middle step', () => {
+  it('sends NEXT from the shell nav on a step that does not own its own nav (verify-domain)', () => {
     const send = vi.fn();
-    // `test` is a middle step that still uses the shell's generic nav (configure owns its own).
+    // configure + test own their nav; verify-domain (first) still uses the shell's generic Continue.
+    renderView({ mode: 'wizard', wizard: { snapshot: wizardSnapshot('verify-domain'), send } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(send).toHaveBeenCalledWith({ type: 'NEXT' });
+  });
+
+  it('sends PREV from the shell nav on a step that does not own its own nav (activate)', () => {
+    const send = vi.fn();
+    // activate (last) still uses the shell's generic Back; seed it reachable.
     renderView({
       mode: 'wizard',
       wizard: {
-        snapshot: wizardSnapshot('test', { allDomainsVerified: true, hasMinimumConfiguration: true }),
+        snapshot: wizardSnapshot('activate', {
+          allDomainsVerified: true,
+          hasConnection: true,
+          hasMinimumConfiguration: true,
+          hasSuccessfulTestRun: true,
+        }),
         send,
       },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(send).toHaveBeenCalledWith({ type: 'NEXT' });
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(send).toHaveBeenCalledWith({ type: 'PREV' });
   });

@@ -72,6 +72,18 @@ vi.mock('@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection', (
       updateConnection: vi.fn(),
       createConnection: vi.fn().mockResolvedValue(undefined),
       changeProvider: vi.fn().mockResolvedValue(undefined),
+      createTestRun: vi.fn().mockResolvedValue({ url: 'https://example.com/test' }),
+    },
+    testRuns: {
+      rows: [],
+      totalCount: 0,
+      isLoading: false,
+      isFetching: false,
+      isPolling: false,
+      page: 1,
+      setPage: vi.fn(),
+      refresh: vi.fn().mockResolvedValue(undefined),
+      revalidateHasSuccessfulTestRun: vi.fn().mockResolvedValue(false),
     },
     organizationDomainMutations: {
       createDomain: vi.fn().mockResolvedValue(undefined),
