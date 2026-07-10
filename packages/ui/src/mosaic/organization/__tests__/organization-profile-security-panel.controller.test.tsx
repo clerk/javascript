@@ -66,7 +66,13 @@ vi.mock('@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection', (
     enterpriseConnection,
     organizationEnterpriseConnection: connectionEntity,
     organizationDomains,
-    enterpriseConnectionMutations: { setConnectionActive, deleteConnection, updateConnection: vi.fn() },
+    enterpriseConnectionMutations: {
+      setConnectionActive,
+      deleteConnection,
+      updateConnection: vi.fn(),
+      createConnection: vi.fn().mockResolvedValue(undefined),
+      changeProvider: vi.fn().mockResolvedValue(undefined),
+    },
     organizationDomainMutations: {
       createDomain: vi.fn().mockResolvedValue(undefined),
       prepareOwnershipVerification: vi.fn().mockResolvedValue(undefined),

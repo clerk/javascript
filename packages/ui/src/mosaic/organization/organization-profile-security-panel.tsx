@@ -26,6 +26,7 @@ export function OrganizationProfileSecurityPanel(): ReactElement | null {
       overview={controller.overview}
       wizard={controller.wizard}
       domainsStep={controller.domainsStep}
+      configureStep={controller.configureStep}
     />
   );
 }

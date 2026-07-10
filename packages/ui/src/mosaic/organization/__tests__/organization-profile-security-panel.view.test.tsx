@@ -5,10 +5,10 @@ import type { OrganizationEnterpriseConnection } from '@/components/ConfigureSSO
 
 import type { Snapshot } from '../../machine/types';
 import { MosaicProvider } from '../../MosaicProvider';
-import type { OrganizationProfileSecurityPanelOverviewContext } from '../organization-profile-security-panel-overview.machine';
-import type { OrganizationProfileSecurityWizardContext } from '../organization-profile-security-wizard.machine';
 import type { OrganizationProfileSecurityPanelViewProps } from '../organization-profile-security-panel.view';
 import { OrganizationProfileSecurityPanelView } from '../organization-profile-security-panel.view';
+import type { OrganizationProfileSecurityPanelOverviewContext } from '../organization-profile-security-panel-overview.machine';
+import type { OrganizationProfileSecurityWizardContext } from '../organization-profile-security-wizard.machine';
 
 const buildConnection = (
   overrides: Partial<OrganizationEnterpriseConnection> = {},
@@ -92,6 +92,36 @@ const buildDomainsStep = (): OrganizationProfileSecurityPanelViewProps['domainsS
   onStepMounted: vi.fn(),
 });
 
+// A configure step seated at select-provider with no connection — the panel-view shell tests only
+// need a valid (idle) flow so the step body renders without crashing.
+const buildConfigureStep = (): OrganizationProfileSecurityPanelViewProps['configureStep'] => ({
+  snapshot: {
+    value: 'selecting',
+    status: 'active',
+    context: {
+      providerSteps: [],
+      submitIndex: -1,
+      stepIndex: 0,
+      direction: 0,
+      hasConnection: false,
+      error: null,
+      pendingEnter: false,
+      pendingProvider: null,
+      pendingPayload: {},
+      createConnection: async () => {},
+      changeProvider: async () => {},
+      updateConnection: async () => {},
+    },
+  },
+  send: vi.fn(),
+  provider: undefined,
+  providerSteps: [],
+  submitStepId: 'identity-provider-metadata',
+  enteredForward: false,
+  onParentNext: vi.fn(),
+  onParentPrev: vi.fn(),
+});
+
 function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps> = {}) {
   const openWizard = vi.fn();
   const exitWizard = vi.fn();
@@ -109,6 +139,7 @@ function renderView(overrides: Partial<OrganizationProfileSecurityPanelViewProps
     overview: { snapshot: overviewSnapshot('idle'), send: overviewSend, canConfirmRemove: false },
     wizard: { snapshot: wizardSnapshot('verify-domain'), send: wizardSend },
     domainsStep: buildDomainsStep(),
+    configureStep: buildConfigureStep(),
     ...overrides,
   };
 
@@ -256,8 +287,9 @@ describe('OrganizationProfileSecurityPanelView — loading + wizard mode', () =>
   });
 
   it('keeps the wizard mounted regardless of loading and renders the current step', () => {
-    renderView({ mode: 'wizard', isLoading: true, wizard: { snapshot: wizardSnapshot('configure'), send: vi.fn() } });
-    expect(screen.getByTestId('security-wizard-step')).toHaveTextContent('configure');
+    // `test` still renders the placeholder step body (configure owns its own view now).
+    renderView({ mode: 'wizard', isLoading: true, wizard: { snapshot: wizardSnapshot('test'), send: vi.fn() } });
+    expect(screen.getByTestId('security-wizard-step')).toHaveTextContent('test');
   });
 
   it('returns to the overview from the wizard back control', () => {
@@ -276,9 +308,13 @@ describe('OrganizationProfileSecurityPanelView — wizard navigation + breadcrum
 
   it('sends NEXT and PREV from the bounded nav at a middle step', () => {
     const send = vi.fn();
+    // `test` is a middle step that still uses the shell's generic nav (configure owns its own).
     renderView({
       mode: 'wizard',
-      wizard: { snapshot: wizardSnapshot('configure', { allDomainsVerified: true }), send },
+      wizard: {
+        snapshot: wizardSnapshot('test', { allDomainsVerified: true, hasMinimumConfiguration: true }),
+        send,
+      },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(send).toHaveBeenCalledWith({ type: 'NEXT' });

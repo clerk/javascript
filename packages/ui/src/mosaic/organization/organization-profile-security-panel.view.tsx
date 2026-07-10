@@ -12,7 +12,10 @@ import { Heading } from '../components/heading';
 import { Skeleton } from '../components/skeleton';
 import { Text } from '../components/text';
 import type { Snapshot } from '../machine/types';
-import type { OrganizationProfileSecurityWizardDomainsStep } from './organization-profile-security-panel.controller';
+import type {
+  OrganizationProfileSecurityWizardConfigureStep,
+  OrganizationProfileSecurityWizardDomainsStep,
+} from './organization-profile-security-panel.controller';
 import type {
   OrganizationProfileSecurityPanelOverviewContext,
   OrganizationProfileSecurityPanelOverviewEvent,
@@ -28,6 +31,7 @@ import {
   SECURITY_WIZARD_STEP_LABELS,
   SECURITY_WIZARD_STEP_ORDER,
 } from './organization-profile-security-wizard.machine';
+import { OrganizationProfileSecurityWizardConfigureView } from './organization-profile-security-wizard-configure.view';
 import { OrganizationProfileSecurityWizardDomainsView } from './organization-profile-security-wizard-domains.view';
 
 /**
@@ -69,6 +73,7 @@ export interface OrganizationProfileSecurityPanelViewProps {
   overview: OverviewFlow;
   wizard: WizardFlow;
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
+  configureStep: OrganizationProfileSecurityWizardConfigureStep;
 }
 
 const STATUS_LABEL: Record<OrganizationEnterpriseConnectionStatus, string> = {
@@ -336,9 +341,11 @@ function WizardBreadcrumb({
 function WizardStepBody({
   current,
   domainsStep,
+  configureStep,
 }: {
   current: SecurityWizardStepId;
   domainsStep: OrganizationProfileSecurityWizardDomainsStep;
+  configureStep: OrganizationProfileSecurityWizardConfigureStep;
 }) {
   if (current === 'verify-domain') {
     return (
@@ -355,7 +362,11 @@ function WizardStepBody({
     );
   }
 
-  // Steps configure / test / activate land here until their Phase-3 views are built.
+  if (current === 'configure') {
+    return <OrganizationProfileSecurityWizardConfigureView configure={configureStep} />;
+  }
+
+  // Steps test / activate land here until their Phase-3 views are built.
   return (
     <Text
       render={p => <p {...p} />}
@@ -370,7 +381,8 @@ function WizardShell({
   wizard,
   exitWizard,
   domainsStep,
-}: Pick<OrganizationProfileSecurityPanelViewProps, 'wizard' | 'exitWizard' | 'domainsStep'>) {
+  configureStep,
+}: Pick<OrganizationProfileSecurityPanelViewProps, 'wizard' | 'exitWizard' | 'domainsStep' | 'configureStep'>) {
   const { snapshot, send } = wizard;
   // The machine's state values are the step ids; resolve through the known order so
   // `current` is a typed SecurityWizardStepId without a cast.
@@ -378,6 +390,10 @@ function WizardShell({
   const index = SECURITY_WIZARD_STEP_ORDER.indexOf(current);
   const isFirst = index <= 0;
   const isLast = index === SECURITY_WIZARD_STEP_ORDER.length - 1;
+  // The configure step drives its own inner nav (select-provider + SAML sub-flow) and bubbles to
+  // the outer wizard itself, so the shell's generic Back/Continue is suppressed there — otherwise
+  // it would advance the outer wizard past the inner flow.
+  const stepOwnsNav = current === 'configure';
 
   return (
     <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(4) })}>
@@ -400,27 +416,30 @@ function WizardShell({
       <WizardStepBody
         current={current}
         domainsStep={domainsStep}
+        configureStep={configureStep}
       />
 
-      <Box sx={t => ({ display: 'flex', gap: t.spacing(2) })}>
-        <Button
-          type='button'
-          variant='outline'
-          size='sm'
-          disabled={isFirst}
-          onClick={() => send({ type: 'PREV' })}
-        >
-          Back
-        </Button>
-        <Button
-          type='button'
-          size='sm'
-          disabled={isLast}
-          onClick={() => send({ type: 'NEXT' })}
-        >
-          Continue
-        </Button>
-      </Box>
+      {!stepOwnsNav && (
+        <Box sx={t => ({ display: 'flex', gap: t.spacing(2) })}>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            disabled={isFirst}
+            onClick={() => send({ type: 'PREV' })}
+          >
+            Back
+          </Button>
+          <Button
+            type='button'
+            size='sm'
+            disabled={isLast}
+            onClick={() => send({ type: 'NEXT' })}
+          >
+            Continue
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 }
@@ -435,6 +454,7 @@ export function OrganizationProfileSecurityPanelView(props: OrganizationProfileS
           wizard={props.wizard}
           exitWizard={props.exitWizard}
           domainsStep={props.domainsStep}
+          configureStep={props.configureStep}
         />
       ) : isLoading ? (
         <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>

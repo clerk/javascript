@@ -1,11 +1,12 @@
 import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import { eventFlowStepMounted } from '@clerk/shared/telemetry';
 import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { OrganizationEnterpriseConnection } from '@/components/ConfigureSSO/domain/organizationEnterpriseConnection';
 import { areAllOrganizationDomainsVerified } from '@/components/ConfigureSSO/domain/organizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
+import type { ProviderType } from '@/components/ConfigureSSO/types';
 import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '@/utils/errorHandler';
 
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
@@ -21,6 +22,15 @@ import type {
   OrganizationProfileSecurityWizardEvent,
 } from './organization-profile-security-wizard.machine';
 import { organizationProfileSecurityWizardMachine } from './organization-profile-security-wizard.machine';
+import type {
+  OrganizationProfileSecurityWizardConfigureContext,
+  OrganizationProfileSecurityWizardConfigureEvent,
+} from './organization-profile-security-wizard-configure.machine';
+import {
+  CONFIGURE_PROVIDER_STEPS,
+  organizationProfileSecurityWizardConfigureMachine,
+  SAML_SUBMIT_STEP_ID,
+} from './organization-profile-security-wizard-configure.machine';
 import type {
   OrganizationProfileSecurityWizardDomainsAddContext,
   OrganizationProfileSecurityWizardDomainsAddEvent,
@@ -101,6 +111,28 @@ export interface OrganizationProfileSecurityWizardDomainsStep {
 }
 
 /**
+ * The `configure` step's flow: the collapsed middle (`select-provider → configure-provider`) +
+ * inner per-provider SAML wizard. `providerSteps` / `submitStepId` are the per-provider inputs the
+ * view walks; `onParentNext` / `onParentPrev` forward the boundary navigations (terminal non-submit
+ * Continue, first Previous) to the outer wizard, which the machine cannot reach directly.
+ */
+export interface OrganizationProfileSecurityWizardConfigureStep {
+  snapshot: Snapshot<OrganizationProfileSecurityWizardConfigureContext>;
+  send: (event: OrganizationProfileSecurityWizardConfigureEvent) => void;
+  /** The provider whose SAML sub-flow is being configured (undefined until a connection exists). */
+  provider: ProviderType | undefined;
+  /** Ordered inner SAML step ids for `provider` (empty until a connection exists). */
+  providerSteps: string[];
+  /** The inner step id that submits `updateConnection`. */
+  submitStepId: string;
+  /** Direction of entry into the step, so the view can force select-provider on a forward mount. */
+  enteredForward: boolean;
+  /** Forward a boundary navigation to the outer wizard (no mutation involved). */
+  onParentNext: () => void;
+  onParentPrev: () => void;
+}
+
+/**
  * The gate that decides whether the Security panel (and, in the shell, its tab) is
  * shown. Reproduces legacy's page gate (`OrganizationProfileRoutes.tsx` +
  * `OrganizationProfileNavbar.tsx`): the enterprise-SSO feature flag
@@ -161,6 +193,7 @@ type OrganizationProfileSecurityPanelController =
       overview: OrganizationProfileSecurityOverviewFlow;
       wizard: OrganizationProfileSecurityWizardFlow;
       domainsStep: OrganizationProfileSecurityWizardDomainsStep;
+      configureStep: OrganizationProfileSecurityWizardConfigureStep;
     };
 
 /**
@@ -183,11 +216,15 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
     organizationDomains,
     organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
-  const { setConnectionActive, deleteConnection, updateConnection } = enterpriseConnectionMutations;
+  const { setConnectionActive, deleteConnection, updateConnection, createConnection, changeProvider } =
+    enterpriseConnectionMutations;
   const { createDomain, prepareOwnershipVerification, revalidate } = organizationDomainMutations;
   const connectionStatus = organizationEnterpriseConnection.status;
   const connectionId = enterpriseConnection?.id ?? null;
   const organizationId = organization?.id ?? null;
+  const provider = organizationEnterpriseConnection.provider;
+  const providerSteps = provider ? CONFIGURE_PROVIDER_STEPS[provider] : [];
+  const submitIndex = providerSteps.indexOf(SAML_SUBMIT_STEP_ID);
 
   // Controller-local, not a machine: a guardless, async-free toggle (per ADOPTION.md).
   const [mode, setMode] = useState<'overview' | 'wizard'>('overview');
@@ -300,6 +337,69 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
     },
   });
 
+  // The `configure` step: the collapsed middle + inner SAML wizard. Injected mutations reproduce
+  // the legacy select-provider (`createConnection` / `changeProvider`, global error) and the SAML
+  // save (`updateConnection` with the `saml` payload, field-first error) 1:1.
+  const [configureSnapshot, sendConfigure, configureActor] = useMachine(
+    organizationProfileSecurityWizardConfigureMachine,
+    {
+      context: {
+        providerSteps,
+        submitIndex,
+        hasConnection,
+        createConnection: async selected => {
+          try {
+            await createConnection(selected);
+          } catch (err) {
+            throw toConnectionError(err);
+          }
+        },
+        changeProvider: async selected => {
+          try {
+            await changeProvider(selected);
+          } catch (err) {
+            throw toConnectionError(err);
+          }
+        },
+        updateConnection: async payload => {
+          if (!enterpriseConnection) {
+            return;
+          }
+          try {
+            await updateConnection(enterpriseConnection.id, { saml: payload });
+          } catch (err) {
+            throw toDomainError(err);
+          }
+        },
+      },
+    },
+  );
+
+  // Same live-data recheck as the outer wizard: a create/change advance parked on a stale
+  // `hasConnection` completes once the fresh value lands, and a footer Reset that deleted the
+  // connection re-seats `configuring` back to `selecting`.
+  useEffect(() => {
+    configureActor.recheck();
+    // `provider` (stable) is the source of `providerSteps` / `submitIndex`; keying on it avoids the
+    // fresh-`[]`-every-render churn that depending on the derived array would cause.
+  }, [configureActor, hasConnection, provider, submitIndex]);
+
+  // The terminal SAML save's bubble to the outer wizard. The configure machine cannot reach the
+  // outer actor, so it rests in `bubblingNext`; on the rising edge into that state the controller
+  // forwards a single outer `NEXT` (which the outer wizard defers to `test` via its own
+  // `pendingNext`). One-shot via the ref so a re-render never double-advances the outer wizard.
+  const bubbledRef = useRef(false);
+  useEffect(() => {
+    if (configureSnapshot.value === 'bubblingNext') {
+      if (!bubbledRef.current) {
+        bubbledRef.current = true;
+        sendWizard({ type: 'NEXT' });
+      }
+    } else {
+      bubbledRef.current = false;
+    }
+  }, [configureSnapshot.value, sendWizard]);
+
   // Fired once when the verify-domain step mounts (legacy `eventFlowStepMounted`).
   const onDomainsStepMounted = useCallback(() => {
     clerk.telemetry?.record(
@@ -352,6 +452,16 @@ export function useOrganizationProfileSecurityPanelController(): OrganizationPro
       prepare: { snapshot: domainsPrepareSnapshot, send: sendDomainsPrepare },
       remove: { snapshot: domainsRemoveSnapshot, send: sendDomainsRemove },
       onStepMounted: onDomainsStepMounted,
+    },
+    configureStep: {
+      snapshot: configureSnapshot,
+      send: sendConfigure,
+      provider,
+      providerSteps,
+      submitStepId: SAML_SUBMIT_STEP_ID,
+      enteredForward: wizardSnapshot.context.direction === 1,
+      onParentNext: () => sendWizard({ type: 'NEXT' }),
+      onParentPrev: () => sendWizard({ type: 'PREV' }),
     },
   };
 }
