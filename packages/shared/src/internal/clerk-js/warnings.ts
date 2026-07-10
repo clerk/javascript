@@ -27,6 +27,12 @@ const createCannotRenderComponentWhenOrgDoesNotExist = (
   );
 };
 
+const createCannotRenderComponentWhenPermissionIsMissing = (componentName: 'InviteMembers', permission: string) => {
+  return formatWarning(
+    `<${componentName}/> cannot render unless the current user has the \`${permission}\` permission. Since the current user is missing this permission, this is no-op. Render it only for members who can manage memberships, for example by wrapping it in <Show when={{ permission: '${permission}' }}>.`,
+  );
+};
+
 const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
     `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
@@ -57,6 +63,7 @@ const warnings = {
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   createCannotRenderComponentWhenOrgDoesNotExist,
+  createCannotRenderComponentWhenPermissionIsMissing,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:
