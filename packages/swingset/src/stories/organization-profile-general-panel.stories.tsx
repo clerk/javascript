@@ -4,6 +4,7 @@ import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organizati
 import type { StoryMeta } from '@/lib/types';
 
 import { Default as OrganizationProfileDeleteSectionDemo } from './organization-profile-delete-section.stories';
+import { Default as OrganizationProfileDomainsSectionDemo } from './organization-profile-domains-section.stories';
 import { Default as OrganizationProfileLeaveSectionDemo } from './organization-profile-leave-section.stories';
 import { Default as OrganizationProfileProfileSectionDemo } from './organization-profile-profile-section.stories';
 
@@ -17,6 +18,7 @@ export function Default() {
   return (
     <OrganizationProfileGeneralPanelView
       profile={<OrganizationProfileProfileSectionDemo />}
+      domains={<OrganizationProfileDomainsSectionDemo />}
       leaveOrganization={<OrganizationProfileLeaveSectionDemo />}
       deleteOrganization={<OrganizationProfileDeleteSectionDemo />}
     />

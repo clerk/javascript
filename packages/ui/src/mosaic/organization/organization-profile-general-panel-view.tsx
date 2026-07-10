@@ -6,6 +6,8 @@ import { alpha } from '../utils';
 interface OrganizationProfileGeneralPanelViewProps {
   /** The organization-profile-profile-section (name/slug), rendered at the top. */
   profile: ReactNode;
+  /** The organization-profile-domains-section, rendered below the profile. */
+  domains: ReactNode;
   /** The organization-profile-leave-section section. */
   leaveOrganization: ReactNode;
   /** The organization-profile-delete-section section, rendered below the divider. */
@@ -14,6 +16,7 @@ interface OrganizationProfileGeneralPanelViewProps {
 
 export function OrganizationProfileGeneralPanelView({
   profile,
+  domains,
   leaveOrganization,
   deleteOrganization,
 }: OrganizationProfileGeneralPanelViewProps) {
@@ -35,6 +38,8 @@ export function OrganizationProfileGeneralPanelView({
       }}
     >
       {profile}
+      {divider}
+      {domains}
       {divider}
       {leaveOrganization}
       {divider}
