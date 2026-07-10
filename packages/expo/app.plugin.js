@@ -9,10 +9,12 @@
  * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
+  AndroidConfig,
   withXcodeProject,
   withDangerousMod,
   withInfoPlist,
   withAppBuildGradle,
+  withAndroidManifest,
   withEntitlementsPlist,
 } = require('@expo/config-plugins');
 const path = require('path');
@@ -20,6 +22,30 @@ const fs = require('fs');
 const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+
+const addHostedAuthIntentFilter = (mainActivity, packageName) => {
+  const callbackHost = `${packageName}.callback`;
+  const intentFilters = mainActivity['intent-filter'] || [];
+  const callbackIsRegistered = intentFilters.some(intentFilter =>
+    intentFilter.data?.some(
+      data => data.$?.['android:scheme'] === 'clerk' && data.$?.['android:host'] === callbackHost,
+    ),
+  );
+
+  if (callbackIsRegistered) {
+    return;
+  }
+
+  intentFilters.push({
+    action: [{ $: { 'android:name': 'android.intent.action.VIEW' } }],
+    category: [
+      { $: { 'android:name': 'android.intent.category.DEFAULT' } },
+      { $: { 'android:name': 'android.intent.category.BROWSABLE' } },
+    ],
+    data: [{ $: { 'android:scheme': 'clerk', 'android:host': callbackHost } }],
+  });
+  mainActivity['intent-filter'] = intentFilters;
+};
 
 const withClerkIOS = config => {
   console.log('✅ Clerk iOS plugin loaded');
@@ -93,6 +119,15 @@ const withClerkIOS = config => {
  */
 const withClerkAndroid = config => {
   console.log('✅ Clerk Android plugin loaded');
+
+  config = withAndroidManifest(config, modConfig => {
+    const packageName = config.android?.package;
+    if (packageName) {
+      const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(modConfig.modResults);
+      addHostedAuthIntentFilter(mainActivity, packageName);
+    }
+    return modConfig;
+  });
 
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
@@ -354,6 +389,7 @@ const withClerkExpo = (config, props = {}) => {
 
 module.exports = withClerkExpo;
 module.exports._testing = {
+  addHostedAuthIntentFilter,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,

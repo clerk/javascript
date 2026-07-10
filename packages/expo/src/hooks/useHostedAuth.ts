@@ -4,6 +4,7 @@ import type * as ExpoCrypto from 'expo-crypto';
 import type * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
+import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from '../utils/errors';
 import type { HostedAuthClerkInstance } from '../utils/hostedAuth';
 import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
@@ -72,7 +73,7 @@ export function useHostedAuth(): {
     if (!clerk.client) {
       return errorThrower.throw('Hosted auth requires a loaded Clerk client.');
     }
-    const hostedAuthClerk = getHostedAuthClerk(clerk);
+    const hostedAuthClerk = getHostedAuthClerk();
 
     let AuthSessionModule: typeof AuthSession;
     let WebBrowserModule: typeof WebBrowser;
@@ -210,9 +211,9 @@ function getExpoAppIdentifier(): string | undefined {
   }
 }
 
-function getHostedAuthClerk(clerk: ReturnType<typeof useClerk>): HostedAuthClerkInstance {
-  const hostedAuthClerk = clerk as ReturnType<typeof useClerk> & Partial<HostedAuthClerkInstance>;
-  if (typeof hostedAuthClerk.getFapiClient !== 'function') {
+function getHostedAuthClerk(): HostedAuthClerkInstance {
+  const hostedAuthClerk = getClerkInstance() as Partial<HostedAuthClerkInstance> | undefined;
+  if (typeof hostedAuthClerk?.getFapiClient !== 'function') {
     return errorThrower.throw('Hosted auth requires a Clerk instance that can make FAPI requests.');
   }
 

@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
     getRandomBytes: vi.fn(),
     randomUUID: vi.fn(),
     useClerk: vi.fn(),
+    getClerkInstance: vi.fn(),
     platformOS: 'ios',
     appOwnership: null as string | null,
     executionEnvironment: 'standalone',
@@ -34,6 +35,12 @@ const mocks = vi.hoisted(() => {
 vi.mock('@clerk/react', () => {
   return {
     useClerk: mocks.useClerk,
+  };
+});
+
+vi.mock('../../provider/singleton', () => {
+  return {
+    getClerkInstance: mocks.getClerkInstance,
   };
 });
 
@@ -138,14 +145,16 @@ describe('useHostedAuth', () => {
     mocks.getRandomBytes.mockReturnValue(Uint8Array.from(Array.from({ length: 32 }, (_, index) => index)));
     mocks.digestStringAsync.mockResolvedValue('mock-code-challenge+/=');
     mocks.randomUUID.mockReturnValue('generated-state-123');
-    mocks.useClerk.mockReturnValue({
-      loaded: true,
-      client: mockClient,
-      setActive: mockSetActive,
+    mocks.getClerkInstance.mockReturnValue({
       handleUnauthenticated: mockHandleUnauthenticated,
       getFapiClient: () => ({
         request: mockFapiRequest,
       }),
+    });
+    mocks.useClerk.mockReturnValue({
+      loaded: true,
+      client: mockClient,
+      setActive: mockSetActive,
     });
   });
 
@@ -157,6 +166,17 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
 
     expect(typeof result.current.startHostedAuth).toBe('function');
+  });
+
+  test('uses the native Clerk instance for FAPI requests', async () => {
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
+
+    const { result } = renderHook(() => useHostedAuth());
+    await result.current.startHostedAuth();
+
+    expect(mocks.getClerkInstance).toHaveBeenCalledTimes(1);
+    expect(mockFapiRequest).toHaveBeenCalledWith(expect.objectContaining({ path: '/client/hosted_auth' }));
   });
 
   test('opens the hosted URL and verifies callback state', async () => {
