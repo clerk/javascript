@@ -16,10 +16,22 @@ let organizationName: string;
 
 let enterpriseConnection: { id: string; domains: string[] } | undefined;
 let connectionEntity: OrganizationEnterpriseConnection;
-let organizationDomains: Array<{ ownershipVerification?: { status: string } }> | undefined;
+let organizationDomains:
+  | Array<{ id?: string; name?: string; delete?: () => Promise<void>; ownershipVerification?: { status: string } }>
+  | undefined;
 
 let setConnectionActive: ReturnType<typeof vi.fn>;
 let deleteConnection: ReturnType<typeof vi.fn>;
+let updateConnection: ReturnType<typeof vi.fn>;
+let createTestRunMutation: ReturnType<typeof vi.fn>;
+let refreshTestRuns: ReturnType<typeof vi.fn>;
+let setTestRunsPage: ReturnType<typeof vi.fn>;
+let revalidateHasSuccessfulTestRun: ReturnType<typeof vi.fn>;
+let revalidateDomains: ReturnType<typeof vi.fn>;
+let deleteDomain: ReturnType<typeof vi.fn>;
+/** Records the order of the remove-domain side effects so the test can assert the sequence. */
+let removeDomainCalls: string[];
+let provider: 'saml_okta' | undefined;
 
 const buildEntity = (overrides: Partial<OrganizationEnterpriseConnection> = {}): OrganizationEnterpriseConnection => ({
   provider: undefined,
@@ -64,15 +76,15 @@ vi.mock('@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection', (
     user: { primaryEmailAddress: { emailAddress: 'admin@acme.com' } },
     organization: { id: 'org_1' },
     enterpriseConnection,
-    organizationEnterpriseConnection: connectionEntity,
+    organizationEnterpriseConnection: { ...connectionEntity, provider: provider ?? connectionEntity.provider },
     organizationDomains,
     enterpriseConnectionMutations: {
       setConnectionActive,
       deleteConnection,
-      updateConnection: vi.fn(),
+      updateConnection,
       createConnection: vi.fn().mockResolvedValue(undefined),
       changeProvider: vi.fn().mockResolvedValue(undefined),
-      createTestRun: vi.fn().mockResolvedValue({ url: 'https://example.com/test' }),
+      createTestRun: createTestRunMutation,
     },
     testRuns: {
       rows: [],
@@ -81,14 +93,14 @@ vi.mock('@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection', (
       isFetching: false,
       isPolling: false,
       page: 1,
-      setPage: vi.fn(),
-      refresh: vi.fn().mockResolvedValue(undefined),
-      revalidateHasSuccessfulTestRun: vi.fn().mockResolvedValue(false),
+      setPage: setTestRunsPage,
+      refresh: refreshTestRuns,
+      revalidateHasSuccessfulTestRun,
     },
     organizationDomainMutations: {
       createDomain: vi.fn().mockResolvedValue(undefined),
       prepareOwnershipVerification: vi.fn().mockResolvedValue(undefined),
-      revalidate: vi.fn().mockResolvedValue(undefined),
+      revalidate: revalidateDomains,
     },
   }),
 }));
@@ -104,8 +116,20 @@ beforeEach(() => {
   enterpriseConnection = { id: 'ent_1', domains: ['acme.com'] };
   connectionEntity = buildEntity({ hasConnection: true, isActive: true, status: 'active' });
   organizationDomains = [{ ownershipVerification: { status: 'verified' } }];
+  provider = undefined;
   setConnectionActive = vi.fn().mockResolvedValue(undefined);
   deleteConnection = vi.fn().mockResolvedValue(undefined);
+  updateConnection = vi.fn().mockResolvedValue(undefined);
+  createTestRunMutation = vi.fn().mockResolvedValue({ url: 'https://example.com/test' });
+  refreshTestRuns = vi.fn().mockResolvedValue(undefined);
+  setTestRunsPage = vi.fn();
+  revalidateHasSuccessfulTestRun = vi.fn().mockResolvedValue(false);
+  revalidateDomains = vi.fn().mockResolvedValue(undefined);
+  removeDomainCalls = [];
+  deleteDomain = vi.fn(() => {
+    removeDomainCalls.push('delete');
+    return Promise.resolve();
+  });
 });
 
 afterEach(() => {
@@ -140,6 +164,24 @@ function Harness() {
       <button onClick={() => controller.openWizard(true)}>Open wizard forced</button>
       <button onClick={() => controller.openWizard()}>Open wizard</button>
       <button onClick={() => controller.exitWizard()}>Exit wizard</button>
+
+      <output data-testid='configure-state'>{controller.configureStep.snapshot.value}</output>
+      <output data-testid='test-state'>{controller.testStep.snapshot.value}</output>
+      <output data-testid='activate-state'>{controller.activateStep.snapshot.value}</output>
+      <button onClick={() => controller.configureStep.send({ type: 'NEXT_INNER' })}>configure next</button>
+      <button onClick={() => controller.configureStep.send({ type: 'SAVE', payload: {} })}>configure save</button>
+      <button onClick={() => controller.testStep.send({ type: 'CREATE_RUN' })}>test create run</button>
+      <button onClick={() => void controller.testStep.testRuns.refresh()}>test manual refresh</button>
+      <button onClick={() => controller.testStep.send({ type: 'CONTINUE' })}>test continue</button>
+      <button onClick={() => controller.activateStep.send({ type: 'ACTIVATE' })}>activate step</button>
+      <button
+        onClick={() =>
+          controller.domainsStep.remove.send({ type: 'OPEN', domainName: 'acme.com', isConnectionActive: false })
+        }
+      >
+        remove open
+      </button>
+      <button onClick={() => controller.domainsStep.remove.send({ type: 'CONFIRM' })}>remove confirm</button>
     </div>
   );
 }
@@ -310,5 +352,137 @@ describe('useOrganizationProfileSecurityPanelController — wizard reachability 
     connectionEntity = buildEntity();
     rerender(<Harness />);
     expect(screen.getByTestId('wizard-state')).toHaveTextContent('configure');
+  });
+});
+
+describe('useOrganizationProfileSecurityPanelController — test-step polling arm distinction', () => {
+  it('arms polling when a run is created: createTestRun(id) → setPage(1) → refresh({armPolling:true}) → open the URL', async () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    render(<Harness />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('test create run'));
+    });
+
+    expect(createTestRunMutation).toHaveBeenCalledWith('ent_1');
+    expect(setTestRunsPage).toHaveBeenCalledWith(1);
+    expect(refreshTestRuns).toHaveBeenCalledWith({ armPolling: true });
+    expect(open).toHaveBeenCalledWith('https://example.com/test', '_blank', 'noopener,noreferrer');
+
+    open.mockRestore();
+  });
+
+  it('does NOT arm polling on the manual "Refresh logs" refetch (a bare refresh() the view threads through)', () => {
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('test manual refresh'));
+
+    expect(refreshTestRuns).toHaveBeenCalledTimes(1);
+    // No `{ armPolling: true }` — the manual refetch is the raw hook refresh, not the create-run arm.
+    expect(refreshTestRuns).toHaveBeenCalledWith();
+  });
+});
+
+describe('useOrganizationProfileSecurityPanelController — terminal bubble seams', () => {
+  it('forwards the configure terminal-save bubble to the outer wizard, landing on test once the config revalidates', async () => {
+    provider = 'saml_okta';
+    // Domains verified, connection present but not yet minimally configured → wizard at configure.
+    connectionEntity = buildEntity({ hasConnection: true, status: 'in_progress' });
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('configure');
+    expect(screen.getByTestId('configure-state')).toHaveTextContent('configuring');
+
+    // Walk the inner SAML steps to the terminal metadata step (Okta submit index 3) and save.
+    fireEvent.click(screen.getByText('configure next'));
+    fireEvent.click(screen.getByText('configure next'));
+    fireEvent.click(screen.getByText('configure next'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('configure save'));
+    });
+
+    // The terminal save bubbles; the controller forwards NEXT but the outer wizard parks it on the
+    // still-stale test guard (hasMinimumConfiguration not yet revalidated).
+    expect(screen.getByTestId('configure-state')).toHaveTextContent('bubblingNext');
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('configure');
+
+    // The updateConnection revalidate lands: config is now minimal → recheck completes the parked advance.
+    connectionEntity = buildEntity({ hasConnection: true, hasMinimumConfiguration: true, status: 'in_progress' });
+    rerender(<Harness />);
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('test');
+  });
+
+  it('forwards the test-continue bubble to the outer wizard, landing on activate once the success probe revalidates', async () => {
+    connectionEntity = buildEntity({ hasConnection: true, hasMinimumConfiguration: true, status: 'in_progress' });
+    revalidateHasSuccessfulTestRun.mockResolvedValue(true);
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('test');
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('test continue'));
+    });
+
+    // Continue found a fresh successful run → bubbles; the outer wizard parks NEXT on the stale
+    // activate guard (hasSuccessfulTestRun not yet reseated into wizard context).
+    expect(screen.getByTestId('test-state')).toHaveTextContent('bubblingNext');
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('test');
+
+    connectionEntity = buildEntity({
+      hasConnection: true,
+      hasMinimumConfiguration: true,
+      hasSuccessfulTestRun: true,
+      status: 'in_progress',
+    });
+    rerender(<Harness />);
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('activate');
+  });
+
+  it('returns to the overview after the activate step completes (activate onDone → activated → overview)', async () => {
+    connectionEntity = buildEntity({
+      hasConnection: true,
+      hasMinimumConfiguration: true,
+      hasSuccessfulTestRun: true,
+      status: 'in_progress',
+    });
+    render(<Harness />);
+    expect(screen.getByTestId('wizard-state')).toHaveTextContent('activate');
+
+    fireEvent.click(screen.getByText('Open wizard'));
+    expect(screen.getByTestId('mode')).toHaveTextContent('wizard');
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('activate step'));
+    });
+
+    expect(setConnectionActive).toHaveBeenCalledWith('ent_1', true);
+    expect(screen.getByTestId('activate-state')).toHaveTextContent('activated');
+    expect(screen.getByTestId('mode')).toHaveTextContent('overview');
+  });
+});
+
+describe('useOrganizationProfileSecurityPanelController — remove-domain side-effect order', () => {
+  it('removes a domain in the legacy order: drop from the connection → delete the domain → revalidate', async () => {
+    updateConnection.mockImplementation(() => {
+      removeDomainCalls.push('update');
+      return Promise.resolve();
+    });
+    revalidateDomains.mockImplementation(() => {
+      removeDomainCalls.push('revalidate');
+      return Promise.resolve();
+    });
+    organizationDomains = [
+      { id: 'dom_1', name: 'acme.com', delete: deleteDomain, ownershipVerification: { status: 'verified' } },
+    ];
+    enterpriseConnection = { id: 'ent_1', domains: ['acme.com', 'other.com'] };
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('remove open'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('remove confirm'));
+    });
+
+    // The three side effects must fire in this exact sequence (legacy `handleRemoveDomain`).
+    expect(removeDomainCalls).toEqual(['update', 'delete', 'revalidate']);
+    // The connection is updated with the removed domain dropped, keeping the rest.
+    expect(updateConnection).toHaveBeenCalledWith('ent_1', { domains: ['other.com'] });
   });
 });

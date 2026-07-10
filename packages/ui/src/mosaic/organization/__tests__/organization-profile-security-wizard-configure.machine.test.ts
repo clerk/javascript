@@ -115,6 +115,24 @@ describe('organizationProfileSecurityWizardConfigureMachine — select provider'
     expect(actor.getSnapshot().context.pendingEnter).toBe(false);
   });
 
+  it('closes back to select-provider with an error when the provider change fails', async () => {
+    // The non-atomic delete+create swap can fail after dropping the old connection. Legacy closed the
+    // ChangeProviderDialog and surfaced the error on the step without advancing; here that is the
+    // symmetric partner of the CREATE-failure path (changingProvider.onError → selecting + error).
+    const changeProvider = vi.fn(() => Promise.reject(new Error('Swap failed')));
+    const { actor } = start({ hasConnection: true, providerSteps: OKTA_STEPS, submitIndex: 3, changeProvider });
+    actor.send({ type: 'ENTER', forward: true });
+    expect(actor.getSnapshot().value).toBe('selecting');
+
+    actor.send({ type: 'CHANGE', provider: 'saml_google' });
+    expect(changeProvider).toHaveBeenCalledWith('saml_google');
+    await tick();
+
+    expect(actor.getSnapshot().value).toBe('selecting');
+    expect(actor.getSnapshot().context.error).toBe('Swap failed');
+    expect(actor.getSnapshot().context.pendingEnter).toBe(false);
+  });
+
   it('skips straight into the SAML sub-flow for the same provider', () => {
     const { actor, createConnection, changeProvider } = start({ hasConnection: true });
     actor.send({ type: 'ENTER', forward: true });
