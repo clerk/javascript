@@ -1,0 +1,8 @@
+---
+'@clerk/shared': minor
+'@clerk/clerk-js': minor
+'@clerk/ui': minor
+'@clerk/localizations': minor
+---
+
+Support passkeys as a second factor during sign-in and session reverification. When the instance allows passkeys to satisfy the second factor and the user has a registered passkey, FAPI advertises a `passkey` entry in `supported_second_factors`; `signIn.authenticateWithPasskey()` now completes the second factor of an in-progress sign-in, `session.verifyWithPasskey({ level: 'second_factor' })` completes a multi-factor reverification, and the prebuilt `<SignIn/>` and `<UserVerification/>` flows offer the passkey alongside the enrolled second factors.

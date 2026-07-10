@@ -6,6 +6,7 @@ import { useCoreSignIn } from '../../contexts';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
+import { SignInFactorTwoPasskeyCard } from './SignInFactorTwoPasskeyCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
 
@@ -64,6 +65,8 @@ function SignInClientTrustInternal(): JSX.Element {
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
+    case 'passkey':
+      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     default:
       return <LoadingCard />;
   }

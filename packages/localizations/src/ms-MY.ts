@@ -1209,6 +1209,11 @@ export const msMY: LocalizationResource = {
         'Menggunakan kunci pas anda mengesahkan identiti anda. Peranti anda mungkin meminta cap jari, wajah, atau kunci skrin anda.',
       title: 'Gunakan kunci pas anda',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gunakan kaedah lain',
       subtitle: 'Masukkan kata laluan semasa anda untuk meneruskan',
@@ -1353,6 +1358,10 @@ export const msMY: LocalizationResource = {
       subtitle:
         'Menggunakan kunci pas anda mengesahkan bahawa itu adalah anda. Peranti anda mungkin meminta cap jari, wajah atau kunci skrin anda.',
       title: 'Gunakan kunci pas anda',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gunakan kaedah lain',

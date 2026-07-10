@@ -1211,6 +1211,11 @@ export const taIN: LocalizationResource = {
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது உங்கள் அடையாளத்தை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',
       subtitle: 'தொடர உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்',
@@ -1354,6 +1359,10 @@ export const taIN: LocalizationResource = {
       subtitle:
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது நீங்கள் தான் என்பதை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',

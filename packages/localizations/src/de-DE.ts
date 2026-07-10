@@ -1212,6 +1212,11 @@ export const deDE: LocalizationResource = {
         'Die Verwendung Ihres Passkeys bestätigt Ihre Identität. Ihr Gerät kann nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen.',
       title: 'Verwenden Sie Ihren Passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Passwort zurücksetzen',
       subtitle: 'Geben Sie Ihr Passwort ein, um fortzufahren.',
@@ -1355,6 +1360,10 @@ export const deDE: LocalizationResource = {
       subtitle:
         'Die Verwendung Ihres Passkeys bestätigt, dass Sie es sind. Ihr Gerät kann nach Ihrem Fingerabdruck, Ihrem Gesicht oder der Bildschirmsperre fragen.',
       title: 'Verwenden Sie Ihren Passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Verwenden Sie eine andere Methode',

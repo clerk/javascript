@@ -1205,6 +1205,11 @@ export const hiIN: LocalizationResource = {
         'अपनी पासकी का उपयोग करके आपकी पहचान की पुष्टि होती है। आपका डिवाइस आपके फिंगरप्रिंट, चेहरे या स्क्रीन लॉक के लिए पूछ सकता है।',
       title: 'अपनी पासकी का उपयोग करें',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'दूसरी विधि का उपयोग करें',
       subtitle: 'जारी रखने के लिए अपना वर्तमान पासवर्ड दर्ज करें',
@@ -1348,6 +1353,10 @@ export const hiIN: LocalizationResource = {
       subtitle:
         'अपनी पासकी का उपयोग करके पुष्टि होती है कि यह आप ही हैं। आपका डिवाइस आपके फिंगरप्रिंट, चेहरे या स्क्रीन लॉक के लिए पूछ सकता है।',
       title: 'अपनी पासकी का उपयोग करें',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'दूसरी विधि का उपयोग करें',

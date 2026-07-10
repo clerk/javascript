@@ -1205,6 +1205,11 @@ export const faIR: LocalizationResource = {
         'استفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه شما از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.',
       title: 'از کلید عبور خود استفاده کنید',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'استفاده از روش دیگر',
       subtitle: 'برای ادامه، رمز عبور فعلی خود را وارد کنید',
@@ -1349,6 +1354,10 @@ export const faIR: LocalizationResource = {
       subtitle:
         'ستفاده از کلید عبور، هویت شما را تأیید می‌کند. ممکن است دستگاه از شما اثر انگشت، چهره یا قفل صفحه را درخواست کند.',
       title: 'از کلید عبور خود استفاده کنید',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'استفاده از روش دیگر',

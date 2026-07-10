@@ -337,7 +337,7 @@ export interface SignInFutureResource {
    * <li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Client Trust](https://clerk.com/docs/guides/secure/client-trust). See the [Client Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/client-trust) for more information.</li>
    * <li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>
    * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>
-   * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
+   * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, `'email_link'`, or `'passkey'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
    * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>
    * </ul>
@@ -551,6 +551,14 @@ export interface SignInFutureResource {
      * Verifies a backup code to sign in with as a second factor.
      */
     verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Uses a passkey to sign in with as a second factor. Only available when
+     * the instance allows passkeys to satisfy the second factor and the user
+     * has a registered passkey (`passkey` appears in
+     * `supportedSecondFactors`).
+     */
+    passkey: () => Promise<{ error: ClerkError | null }>;
   };
 
   /**

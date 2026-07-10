@@ -1208,6 +1208,11 @@ export const nbNO: LocalizationResource = {
         'Bruk av passnøkkelen bekrefter identiteten din. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Bruk en annen metode',
       subtitle: 'Skriv inn ditt nåværende passord for å fortsette',
@@ -1351,6 +1356,10 @@ export const nbNO: LocalizationResource = {
       subtitle:
         'Bruk av passnøkkelen bekrefter at det er deg. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Bruk en annen metode',

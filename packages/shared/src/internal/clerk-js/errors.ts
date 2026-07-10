@@ -123,6 +123,15 @@ export function clerkVerifyPasskeyCalledBeforeCreate(): never {
 /**
  *
  */
+export function clerkMissingPasskeySecondFactor(): never {
+  throw new Error(
+    `${errorPrefix} Passkey is not available as a second factor for this sign-in. It is offered only when the instance allows passkeys to satisfy the second factor and the user has a registered passkey (check SignIn.supportedSecondFactors).`,
+  );
+}
+
+/**
+ *
+ */
 export function clerkMissingOptionError(name = ''): never {
   throw new Error(`${errorPrefix} Missing '${name}' option`);
 }

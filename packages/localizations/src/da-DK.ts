@@ -1195,6 +1195,11 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1337,6 +1342,10 @@ export const daDK: LocalizationResource = {
     passkey: {
       subtitle: 'Brug adgangsnøgle til at logge ind.',
       title: 'Adgangsnøgle',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Brug en anden metode',

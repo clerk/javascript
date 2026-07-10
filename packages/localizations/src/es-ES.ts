@@ -1206,6 +1206,11 @@ export const esES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
       subtitle: 'Usa tu contraseña para verificar tu identidad.',
@@ -1348,6 +1353,10 @@ export const esES: LocalizationResource = {
     passkey: {
       subtitle: 'Use su clave de acceso para continuar con la autenticación.',
       title: 'Clave de acceso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usa otro método',

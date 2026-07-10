@@ -1193,6 +1193,11 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1335,6 +1340,10 @@ export const arSA: LocalizationResource = {
       subtitle:
         'يؤدي استخدام مفتاح المرور الخاص بك إلى تأكيد هويتك. جهازك الخاص قد يقوم بسؤالك عن بصمة الإصبع, او معرف الوجة او كلمة مرور قفل الشاشة',
       title: 'إستخدم مفتاح المرور',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'أستعمل طريقة أخرى',

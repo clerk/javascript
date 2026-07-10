@@ -1203,6 +1203,11 @@ export const csCZ: LocalizationResource = {
         'Použití vašeho přístupového klíče potvrzuje vaši identitu. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použít jinou metodu',
       subtitle: 'Zadejte své aktuální heslo pro pokračování',
@@ -1347,6 +1352,10 @@ export const csCZ: LocalizationResource = {
       subtitle:
         'Použití vašeho přístupového klíče potvrzuje, že jste to vy. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Použít jinou metodu',

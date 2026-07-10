@@ -121,6 +121,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportPhoneCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
+    supportPasskey?: boolean;
     supportResetPasswordEmail?: boolean;
     supportResetPasswordPhone?: boolean;
   };
@@ -191,6 +192,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supportPhoneCode = true,
       supportTotp,
       supportBackupCode,
+      supportPasskey,
       supportResetPasswordEmail,
       supportResetPasswordPhone,
     } = params || {};
@@ -218,6 +220,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportPasskey ? [{ strategy: 'passkey' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;

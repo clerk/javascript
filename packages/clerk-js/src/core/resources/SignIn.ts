@@ -91,6 +91,7 @@ import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
+  clerkMissingPasskeySecondFactor,
   clerkMissingWebAuthnPublicKeyOptions,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
@@ -360,8 +361,19 @@ export class SignIn extends BaseResource implements SignInResource {
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
+    let config;
+    switch (params.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...params };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_second_factor',
     });
   };
@@ -557,6 +569,42 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
+      });
+    }
+
+    // When the sign-in already awaits its second factor, the passkey acts as
+    // the second factor: run the discrete prepare/attempt second-factor flow
+    // against the in-progress sign-in. `flow` is ignored here — autofill and
+    // discoverable are identifier-first concepts, and their `create()` call
+    // would discard the in-progress sign-in.
+    const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
+    if (isSecondFactor) {
+      const passkeySecondFactor = (this.supportedSecondFactors || []).find(f => f.strategy === 'passkey');
+      if (!passkeySecondFactor) {
+        clerkMissingPasskeySecondFactor();
+      }
+
+      await this.prepareSecondFactor({ strategy: 'passkey' });
+
+      const { nonce: secondFactorNonce } = this.secondFactorVerification;
+      const secondFactorPublicKeyOptions = secondFactorNonce
+        ? convertJSONToPublicKeyRequestOptions(JSON.parse(secondFactorNonce))
+        : null;
+      if (!secondFactorPublicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions: secondFactorPublicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      return this.attemptSecondFactor({
+        publicKeyCredential,
+        strategy: 'passkey',
       });
     }
 
@@ -777,6 +825,7 @@ class SignInFuture implements SignInFutureResource {
     verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
+    passkey: this.verifyMFAPasskey.bind(this),
   };
 
   #canBeDiscarded = false;
@@ -1496,6 +1545,55 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { code, strategy: 'backup_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAPasskey(): Promise<{ error: ClerkError | null }> {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.#resource, async () => {
+      const passkeyFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'passkey');
+      if (!passkeyFactor) {
+        throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'passkey' },
+        action: 'prepare_second_factor',
+      });
+
+      const { nonce } = this.#resource.secondFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+      if (!publicKeyOptions) {
+        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
         action: 'attempt_second_factor',
       });
     });

@@ -1197,6 +1197,11 @@ export const plPL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Użyj innej metody',
       subtitle: 'Wprowadź hasło, aby kontynuować',
@@ -1341,6 +1346,10 @@ export const plPL: LocalizationResource = {
       subtitle:
         'Użycie klucza dostępu potwierdza, że to Ty. Urządzenie może poprosić o twój odcisk palca, twarz lub blokadę ekranu.',
       title: 'Użyj swojego klucza dostępowego',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Użyj innego sposobu',

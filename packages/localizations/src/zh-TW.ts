@@ -1189,6 +1189,11 @@ export const zhTW: LocalizationResource = {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '使用其他方式',
       subtitle: '請輸入您的密碼以繼續',
@@ -1329,6 +1334,10 @@ export const zhTW: LocalizationResource = {
     passkey: {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '使用其他方式',

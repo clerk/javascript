@@ -1206,6 +1206,11 @@ export const jaJP: LocalizationResource = {
         'パスキーを使用すると、ご本人であることを確認できます。デバイスから指紋認証、顔認証、または画面ロックの解除を求められる場合があります。',
       title: 'パスキーを使用する',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '別の方法を使用',
       subtitle: '続行するには現在のパスワードを入力してください',
@@ -1349,6 +1354,10 @@ export const jaJP: LocalizationResource = {
       subtitle:
         'パスキーを使用すると、ご本人であることを確認できます。デバイスから指紋認証、顔認証、または画面ロックの解除を求められる場合があります。',
       title: 'パスキーを使用する',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '別の方法を使用',
