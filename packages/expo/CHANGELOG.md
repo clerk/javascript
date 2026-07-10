@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.7.4
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.34` to `1.0.35`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.35. ([#9138](https://github.com/clerk/javascript/pull/9138)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.0` to `1.3.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.1. ([#9137](https://github.com/clerk/javascript/pull/9137)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.25.2
+
 ## 3.7.3
 
 ### Patch Changes
