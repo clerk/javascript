@@ -33,6 +33,11 @@ type InviteMembersFormProps = {
   onReset?: () => void;
   primaryButtonLabel?: LocalizationKey;
   resetButtonLabel?: LocalizationKey;
+  /**
+   * The standalone invite-members modal is dismissed with the modal's close button rather than a
+   * cancel action, so it hides the reset button and drops the leading margin on the controls row.
+   */
+  hideResetButton?: boolean;
 };
 
 type InviteMembersParams = {
@@ -41,7 +46,7 @@ type InviteMembersParams = {
 };
 
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
-  const { onSuccess, onReset, resetButtonLabel } = props;
+  const { onSuccess, onReset, resetButtonLabel, hideResetButton } = props;
   const clerk = useClerk();
   const { organization, invitations } = useOrganization({
     invitations: {
@@ -300,7 +305,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
         align='center'
         justify='between'
         sx={t => ({
-          marginTop: t.space.$2,
+          marginTop: hideResetButton ? t.space.$none : t.space.$2,
           gap: t.space.$4,
           flexWrap: 'wrap',
           [mqu.sm]: { justifyContent: 'center' },
@@ -317,11 +322,13 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
                 : localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')
             }
           />
-          <Form.ResetButton
-            localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}
-            block={false}
-            onClick={onReset}
-          />
+          {!hideResetButton && (
+            <Form.ResetButton
+              localizationKey={resetButtonLabel || localizationKeys('userProfile.formButtonReset')}
+              block={false}
+              onClick={onReset}
+            />
+          )}
         </FormButtonContainer>
       </Flex>
     </Form.Root>

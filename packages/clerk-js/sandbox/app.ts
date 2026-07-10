@@ -472,6 +472,7 @@ void (async () => {
       mountOpenButton(app, 'Open Sign In', p => Clerk?.openSignIn(p), componentControls.signIn.getProps() ?? {}),
     '/open-sign-up': () =>
       mountOpenButton(app, 'Open Sign Up', p => Clerk?.openSignUp(p), componentControls.signUp.getProps() ?? {}),
+    '/open-invite-members': () => mountOpenButton(app, 'Open Invite Members', p => Clerk?.openInviteMembers(p), {}),
   };
 
   for (const [path, { mount, component, defaultProps }] of Object.entries(mountableRoutes)) {
