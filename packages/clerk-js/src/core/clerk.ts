@@ -209,6 +209,7 @@ const CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE = 'cannot_render_billing_disable
 const CANNOT_RENDER_USER_MISSING_ERROR_CODE = 'cannot_render_user_missing';
 const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizations_disabled';
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
+const CANNOT_RENDER_PERMISSION_MISSING_ERROR_CODE = 'cannot_render_permission_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
@@ -1019,6 +1020,16 @@ export class Clerk implements ClerkInterface {
         throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('InviteMembers'), {
           code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
+      }
+      return;
+    }
+
+    if (!this.session?.checkAuthorization({ permission: 'org:sys_memberships:manage' })) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(
+          warnings.createCannotRenderComponentWhenPermissionIsMissing('InviteMembers', 'org:sys_memberships:manage'),
+          { code: CANNOT_RENDER_PERMISSION_MISSING_ERROR_CODE },
+        );
       }
       return;
     }

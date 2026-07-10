@@ -10,7 +10,9 @@ import { withClerk } from './withClerk';
  * clicked. Wrap your own button, or omit children to render a default one.
  *
  * Requires an active organization, and should be rendered for members who can manage memberships
- * (the `org:sys_memberships:manage` permission). Guard with `<Protect>` or `useAuth()` if unsure.
+ * (the `org:sys_memberships:manage` permission). Guard with `<Show>` or `useAuth()` if unsure.
+ * Clicking it when there is no active organization or the current user lacks that permission is a
+ * no-op in production, and throws a descriptive error in development.
  *
  * @example
  * ```tsx
