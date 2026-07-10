@@ -14,6 +14,8 @@ import pluginYml from 'eslint-plugin-yml';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
+
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
@@ -663,7 +665,11 @@ export default tseslint.config([
       'jsdoc/informative-docs': 'warn',
       'jsdoc/check-tag-names': [
         'warn',
-        { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
+        {
+          // Derived from the Typedoc tooling's custom tags (`.typedoc/custom-tags.mjs`) so the two cannot drift.
+          definedTags: [...CUSTOM_BLOCK_TAGS, ...CUSTOM_MODIFIER_TAGS].map(tag => tag.slice(1)),
+          typed: false,
+        },
       ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
       'jsdoc/require-description': 'off',
