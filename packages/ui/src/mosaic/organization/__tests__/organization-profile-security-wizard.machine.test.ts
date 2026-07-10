@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import { createActor } from '../../machine/createActor';
 import type { OrganizationProfileSecurityWizardContext } from '../organization-profile-security-wizard.machine';
-import { organizationProfileSecurityWizardMachine } from '../organization-profile-security-wizard.machine';
+import {
+  isSecurityWizardStepComplete,
+  organizationProfileSecurityWizardMachine,
+} from '../organization-profile-security-wizard.machine';
 
 type Reach = Partial<
   Pick<
@@ -185,5 +188,106 @@ describe('organizationProfileSecurityWizardMachine — deferred advance (parked 
     // sanity: `actor` above just confirms a direct reachable NEXT path exists
     actor.send({ type: 'NEXT' });
     expect(actor.getSnapshot().value).toBe('configure');
+  });
+
+  it('an explicit PREV abandons a parked advance (legacy goPrev clears pendingNextFrom)', () => {
+    // On configure (reachable) with `test` still closed: NEXT parks.
+    const actor = actorAt('configure', { allDomainsVerified: true, hasConnection: true });
+    actor.send({ type: 'NEXT' });
+    expect(actor.getSnapshot().value).toBe('configure');
+    expect(actor.getSnapshot().context.pendingNext).toBe(true);
+
+    // Back out. The parked advance must be abandoned (navigated(-1) clears pendingNext).
+    actor.send({ type: 'PREV' });
+    expect(actor.getSnapshot().value).toBe('verify-domain');
+    expect(actor.getSnapshot().context.pendingNext).toBe(false);
+
+    // And it must NOT resurrect once `test` later opens — the user chose to step back.
+    actor.setContext({ hasMinimumConfiguration: true });
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('verify-domain');
+  });
+
+  it('keeps a parked advance across a recheck where the guard is still closed, then resolves on a later one', () => {
+    const actor = actorAt('verify-domain', {});
+    actor.send({ type: 'NEXT' });
+    expect(actor.getSnapshot().context.pendingNext).toBe(true);
+
+    // Data has not landed yet: an intermediate recheck must NOT drop the park
+    // (legacy: "keeps a pending advance across an intermediate render where isReachable is still unmet").
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('verify-domain');
+    expect(actor.getSnapshot().context.pendingNext).toBe(true);
+
+    // The awaited revalidate finally lands.
+    actor.setContext({ allDomainsVerified: true });
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('configure');
+    expect(actor.getSnapshot().context.pendingNext).toBe(false);
+  });
+});
+
+describe('organizationProfileSecurityWizardMachine — recheck clamp edge behaviors (1:1 with the legacy render-phase clamp)', () => {
+  it('does not yank the user forward when the current step still holds (a later guard opening is not an auto-advance)', () => {
+    // On configure with domains verified + a connection; the user has NOT pressed Next.
+    const actor = actorAt('configure', { allDomainsVerified: true, hasConnection: true });
+    expect(actor.getSnapshot().value).toBe('configure');
+
+    // `test` becomes reachable (minimum config saved) — but recheck only clamps a
+    // broken step, it never advances a still-valid one (legacy: "does NOT move when an
+    // isReachable goes TRUE while the active step still holds").
+    actor.setContext({ hasMinimumConfiguration: true });
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('configure');
+  });
+
+  it('is a provable one-shot: a second recheck with the same context does not re-seat or re-notify', () => {
+    const actor = actorAt('test', { allDomainsVerified: true, hasConnection: true, hasMinimumConfiguration: true });
+    // The connection backing `test`/`configure` is deleted; `configure` survives on verified domains.
+    actor.setContext({ hasConnection: false, hasMinimumConfiguration: false });
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('configure');
+
+    const settled = actor.getSnapshot();
+    const seen: string[] = [];
+    actor.subscribe(s => seen.push(s.value));
+    actor.recheck();
+    expect(actor.getSnapshot()).toBe(settled); // same ref — no second re-seat
+    expect(seen).toEqual([]); // and no notify
+  });
+});
+
+describe('isSecurityWizardStepComplete — position-independent completion (legacy isComplete predicates)', () => {
+  const ctx = (over: Partial<OrganizationProfileSecurityWizardContext>): OrganizationProfileSecurityWizardContext => ({
+    direction: 0,
+    hasNavigated: false,
+    pendingNext: false,
+    allDomainsVerified: false,
+    hasConnection: false,
+    hasMinimumConfiguration: false,
+    isActive: false,
+    hasSuccessfulTestRun: false,
+    ...over,
+  });
+
+  it('marks each step complete from its own predicate, regardless of the current step', () => {
+    const c = ctx({ allDomainsVerified: true, hasMinimumConfiguration: true });
+    expect(isSecurityWizardStepComplete('verify-domain', c)).toBe(true);
+    expect(isSecurityWizardStepComplete('configure', c)).toBe(true);
+    expect(isSecurityWizardStepComplete('test', c)).toBe(false);
+    expect(isSecurityWizardStepComplete('activate', c)).toBe(false);
+  });
+
+  it('an active connection keeps configure/test/activate ticked (stays complete after a back-nav)', () => {
+    const c = ctx({ allDomainsVerified: true, isActive: true });
+    expect(isSecurityWizardStepComplete('configure', c)).toBe(true);
+    expect(isSecurityWizardStepComplete('test', c)).toBe(true);
+    expect(isSecurityWizardStepComplete('activate', c)).toBe(true);
+  });
+
+  it('a successful test run completes test without an active connection', () => {
+    const c = ctx({ hasSuccessfulTestRun: true });
+    expect(isSecurityWizardStepComplete('test', c)).toBe(true);
+    expect(isSecurityWizardStepComplete('activate', c)).toBe(false);
   });
 });

@@ -3,7 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { createActor } from '../../machine/createActor';
 import { tick } from '../../machines/__tests__/test-utils';
 import type { OrganizationProfileSecurityWizardConfigureContext } from '../organization-profile-security-wizard-configure.machine';
-import { organizationProfileSecurityWizardConfigureMachine } from '../organization-profile-security-wizard-configure.machine';
+import {
+  CONFIGURE_PROVIDER_STEPS,
+  organizationProfileSecurityWizardConfigureMachine,
+  SAML_SUBMIT_STEP_ID,
+} from '../organization-profile-security-wizard-configure.machine';
 
 // Ordered inner SAML steps per provider (matches the controller's PROVIDER_STEPS). Okta submits at
 // its terminal step; Google submits mid-flow (index 1 of 5).
@@ -87,6 +91,28 @@ describe('organizationProfileSecurityWizardConfigureMachine — select provider'
     await tick();
 
     expect(actor.getSnapshot().value).toBe('configuring');
+  });
+
+  it('defers the change advance until the fresh hasConnection lands (non-atomic delete+create swap)', async () => {
+    const { actor, changeProvider } = start({ hasConnection: true, providerSteps: OKTA_STEPS, submitIndex: 3 });
+    actor.send({ type: 'ENTER', forward: true });
+
+    actor.send({ type: 'CHANGE', provider: 'saml_google' });
+    expect(changeProvider).toHaveBeenCalledWith('saml_google');
+
+    // changeProvider deletes the old connection before creating the new one, so
+    // hasConnection is transiently false when it resolves — the advance parks and the
+    // Continue spinner stays on, exactly like the create path's revalidation race.
+    actor.setContext({ hasConnection: false });
+    await tick();
+    expect(actor.getSnapshot().value).toBe('changingProvider');
+    expect(actor.getSnapshot().context.pendingEnter).toBe(true);
+
+    // The revalidate lands with the new connection; recheck completes the parked advance.
+    actor.setContext({ hasConnection: true });
+    actor.recheck();
+    expect(actor.getSnapshot().value).toBe('configuring');
+    expect(actor.getSnapshot().context.pendingEnter).toBe(false);
   });
 
   it('skips straight into the SAML sub-flow for the same provider', () => {
@@ -199,5 +225,80 @@ describe('organizationProfileSecurityWizardConfigureMachine — save + bubble', 
     expect(actor.getSnapshot().value).toBe('configuring');
     expect(actor.getSnapshot().context.stepIndex).toBe(3);
     expect(actor.getSnapshot().context.error).toBe('Invalid metadata URL');
+  });
+});
+
+describe('organizationProfileSecurityWizardConfigureMachine — per-provider save terminal (all 4 providers, 1:1 with legacy STEPS_BY_PROVIDER)', () => {
+  // Transcribed verbatim from the legacy per-provider step arrays; the submit step is always
+  // `identity-provider-metadata` — terminal for Okta/Custom/Microsoft, mid-flow (index 1 of 5) for Google:
+  //   SamlOktaConfigureSteps.tsx:39-44, SamlCustomConfigureSteps.tsx:38-43,
+  //   SamlMicrosoftConfigureSteps.tsx:47-52, SamlGoogleConfigureSteps.tsx:26-32.
+  const PROVIDERS = [
+    { name: 'okta', steps: CONFIGURE_PROVIDER_STEPS.saml_okta, terminal: true },
+    { name: 'custom', steps: CONFIGURE_PROVIDER_STEPS.saml_custom, terminal: true },
+    { name: 'microsoft', steps: CONFIGURE_PROVIDER_STEPS.saml_microsoft, terminal: true },
+    { name: 'google', steps: CONFIGURE_PROVIDER_STEPS.saml_google, terminal: false },
+  ] as const;
+
+  it.each(PROVIDERS)(
+    '$name: saving at its submit step bubbles (terminal) or advances one inner slot (mid-flow) exactly as legacy',
+    async ({ steps, terminal }) => {
+      const submitIndex = steps.indexOf(SAML_SUBMIT_STEP_ID);
+      const { actor, updateConnection } = start({ hasConnection: true, providerSteps: [...steps], submitIndex });
+      actor.send({ type: 'SKIP' });
+
+      // Walk the inner SAML steps up to the submit step.
+      for (let i = 0; i < submitIndex; i++) {
+        actor.send({ type: 'NEXT_INNER' });
+      }
+      expect(actor.getSnapshot().context.stepIndex).toBe(submitIndex);
+
+      actor.send({ type: 'SAVE', payload: { idpMetadataUrl: 'https://idp.example.com/metadata' } });
+      await tick();
+      expect(updateConnection).toHaveBeenCalledTimes(1);
+
+      if (terminal) {
+        // Advancing off the end IS the bubble to the outer wizard's `test` step.
+        expect(actor.getSnapshot().value).toBe('bubblingNext');
+      } else {
+        // Google submits mid-flow: advance to the next inner step; the later terminal
+        // step's plain Continue is the view-forwarded bubble.
+        expect(actor.getSnapshot().value).toBe('configuring');
+        expect(actor.getSnapshot().context.stepIndex).toBe(submitIndex + 1);
+      }
+    },
+  );
+
+  it('the ported CONFIGURE_PROVIDER_STEPS + submit step match the legacy per-provider arrays 1:1', () => {
+    expect(CONFIGURE_PROVIDER_STEPS.saml_okta).toEqual([
+      'create-app',
+      'attribute-mapping',
+      'assign-users',
+      'identity-provider-metadata',
+    ]);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_custom).toEqual([
+      'create-app',
+      'attribute-mapping',
+      'assign-users',
+      'identity-provider-metadata',
+    ]);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_microsoft).toEqual([
+      'create-app',
+      'service-provider',
+      'attribute-mapping',
+      'identity-provider-metadata',
+    ]);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_google).toEqual([
+      'create-app',
+      'identity-provider-metadata',
+      'service-provider',
+      'attribute-mapping',
+      'configure-user-access',
+    ]);
+    // Terminal submit for all but Google (index 1 of 5).
+    expect(CONFIGURE_PROVIDER_STEPS.saml_okta.indexOf(SAML_SUBMIT_STEP_ID)).toBe(3);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_custom.indexOf(SAML_SUBMIT_STEP_ID)).toBe(3);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_microsoft.indexOf(SAML_SUBMIT_STEP_ID)).toBe(3);
+    expect(CONFIGURE_PROVIDER_STEPS.saml_google.indexOf(SAML_SUBMIT_STEP_ID)).toBe(1);
   });
 });
