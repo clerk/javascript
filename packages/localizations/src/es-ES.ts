@@ -1229,6 +1229,9 @@ export const esES: LocalizationResource = {
       title: 'Verificación por TOTP (2FA)',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Añadir cuenta',

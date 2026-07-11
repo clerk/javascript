@@ -1247,6 +1247,9 @@ export const enUS: LocalizationResource = {
       title: 'Verification required',
     },
   },
+  searchInput: {
+    action__clear: 'Clear search',
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',

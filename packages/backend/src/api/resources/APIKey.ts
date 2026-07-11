@@ -23,17 +23,17 @@ export class APIKey {
     readonly revocationReason: string | null,
     /** Whether the API key has expired. */
     readonly expired: boolean,
-    /** The Unix timestamp when the API key expires. `null` if the API key never expires. */
+    /** The Unix timestamp (in milliseconds) when the API key expires. `null` if the API key never expires. */
     readonly expiration: number | null,
     /** The user ID for the user creating the API key. */
     readonly createdBy: string | null,
     /** A description for the API key. */
     readonly description: string | null,
-    /** The Unix timestamp when the API key was last used to authenticate a request. */
+    /** The Unix timestamp (in milliseconds) when the API key was last used to authenticate a request. */
     readonly lastUsedAt: number | null,
-    /** The Unix timestamp when the API key was created. */
+    /** The Unix timestamp (in milliseconds) when the API key was created. */
     readonly createdAt: number,
-    /** The Unix timestamp when the API key was last updated. */
+    /** The Unix timestamp (in milliseconds) when the API key was last updated. */
     readonly updatedAt: number,
     /** The API key secret. */
     readonly secret?: string,

@@ -1217,6 +1217,9 @@ export const koKR: LocalizationResource = {
       title: '인증이 필요해요',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: '계정 추가',

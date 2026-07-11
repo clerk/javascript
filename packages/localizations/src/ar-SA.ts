@@ -1216,6 +1216,9 @@ export const arSA: LocalizationResource = {
       title: undefined,
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'إضافة حساب',

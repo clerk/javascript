@@ -1220,6 +1220,9 @@ export const bgBG: LocalizationResource = {
       title: 'Authenticator App MFA',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',

@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.11.4
+
+### Patch Changes
+
+- Clarify in the `M2MToken`, `APIKey`, and `IdPOAuthAccessToken` JSDoc that the timestamp properties (`expiration`, `lastUsedAt`, `createdAt`, and `updatedAt`) are Unix timestamps in milliseconds (not seconds). ([#9122](https://github.com/clerk/javascript/pull/9122)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 3.11.3
+
+### Patch Changes
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+
 ## 3.11.2
 
 ### Patch Changes

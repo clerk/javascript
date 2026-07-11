@@ -1234,6 +1234,9 @@ export const taIN: LocalizationResource = {
       title: 'சரிபார்ப்பு தேவை',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'கணக்கைச் சேர்',

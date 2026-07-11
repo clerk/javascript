@@ -1212,6 +1212,9 @@ export const zhTW: LocalizationResource = {
       title: '輸入驗證碼',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: '新增帳戶',

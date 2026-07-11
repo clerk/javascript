@@ -1231,6 +1231,9 @@ export const huHU: LocalizationResource = {
       title: 'Ellenőrzés szükséges',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Fiók hozzáadása',

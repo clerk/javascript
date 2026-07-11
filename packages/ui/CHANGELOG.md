@@ -1,5 +1,26 @@
 # @clerk/ui
 
+## 1.25.2
+
+### Patch Changes
+
+- Add a clear button to search inputs for quickly resetting the current query. It appears in the `<APIKeys />` search and the `<OrganizationProfile />` members search. ([#9098](https://github.com/clerk/javascript/pull/9098)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Search inputs now expose a shared `searchInput` appearance element (layered alongside any existing component-specific element), and the clear button is themeable via the new shared `searchInputClearButton` element. The clear button's label can be customized with the new shared `searchInput.action__clear` localization key.
+
+- Fix org invitation and request action descriptions alignment. ([#9118](https://github.com/clerk/javascript/pull/9118)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Polish the `<OrganizationSwitcher />`: ([#9112](https://github.com/clerk/javascript/pull/9112)) by [@maxyinger](https://github.com/maxyinger)
+  - Decode avatar images synchronously so a freshly mounted avatar (e.g. when the popover opens) paints on its first frame instead of briefly flashing the avatar background.
+  - Highlight the trigger while its popover is open.
+  - Align the "Create organization" action's height with the other rows for a consistent list.
+
+- Increase the default height of buttons and inputs by 2px for larger, easier-to-tap touch targets, especially on mobile. ([#9061](https://github.com/clerk/javascript/pull/9061)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/localizations@4.13.2
+  - @clerk/shared@4.25.2
+
 ## 1.25.1
 
 ### Patch Changes
