@@ -485,7 +485,7 @@ describe('useIAPBilling', () => {
       });
     });
 
-    it('preflights against an active paid subscription without opening the payment sheet', async () => {
+    it('preflights against an active paid subscription through another processor without opening the payment sheet', async () => {
       clerk.billing.getSubscription = vi.fn(async () => ({
         subscriptionItems: [
           { id: 'sub_item_stripe', status: 'active', managedBy: 'clerk', plan: { id: 'plan_123', isDefault: false } },
@@ -766,6 +766,185 @@ describe('useIAPBilling', () => {
       } finally {
         process.off('unhandledRejection', onUnhandledRejection);
       }
+    });
+  });
+
+  describe('plan changes (subscription managed by the current platform store)', () => {
+    const heldAppleItem = {
+      id: 'sub_item_apple',
+      status: 'active',
+      managedBy: 'apple',
+      plan: {
+        id: 'plan_basic',
+        isDefault: false,
+        storeProducts: [{ store: 'apple', productId: 'com.acme.basic.monthly' }],
+      },
+    } as any;
+    const heldGoogleItem = {
+      id: 'sub_item_google',
+      status: 'active',
+      managedBy: 'google',
+      plan: {
+        id: 'plan_basic',
+        isDefault: false,
+        storeProducts: [{ store: 'google', productId: 'acme_basic_monthly', purchaseOptionId: 'monthly' }],
+      },
+    } as any;
+    const heldGooglePurchase = {
+      id: 'txn_old',
+      productId: 'acme_basic_monthly',
+      purchaseToken: 'old-play-token',
+      store: 'google',
+      platform: 'android',
+      isAutoRenewing: true,
+    } as any;
+
+    it('proceeds with the purchase on iOS when the active subscription is managed by the App Store', async () => {
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldAppleItem] }));
+      const { result } = await renderIAPBilling();
+
+      expect(result.current.alreadySubscribedVia).toBe('apple');
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      // StoreKit natively replaces and prorates an in-group purchase: a plain purchase request, no
+      // replacement parameters and no available-purchases lookup.
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith({
+        request: {
+          apple: {
+            sku: 'com.acme.pro.monthly',
+            appAccountToken: APPLE_APP_ACCOUNT_TOKEN,
+          },
+        },
+        type: 'subs',
+      });
+      expect(mocks.iap.getAvailablePurchases).not.toHaveBeenCalled();
+      expect(purchaseResult).toEqual({ status: 'success', subscriptionItem });
+    });
+
+    it("still short-circuits on iOS when the subscription is managed by the other platform's store", async () => {
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldGoogleItem] }));
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult).toEqual({ status: 'already_subscribed', alreadySubscribedVia: 'google' });
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
+    it('replaces the active Google Play subscription with the old purchase token and the default prorated-charge mode', async () => {
+      mocks.Platform.OS = 'android';
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldGoogleItem] }));
+      mocks.iap.getAvailablePurchases.mockResolvedValue([heldGooglePurchase]);
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith({
+        request: {
+          google: {
+            skus: ['acme_pro_monthly'],
+            obfuscatedAccountId: GOOGLE_OBFUSCATED_ACCOUNT_ID,
+            subscriptionOffers: [{ sku: 'acme_pro_monthly', offerToken: 'offer_token_1' }],
+            purchaseToken: 'old-play-token',
+            // Google Play Billing's SubscriptionUpdateParams.ReplacementMode.CHARGE_PRORATED_PRICE.
+            replacementMode: 2,
+          },
+        },
+        type: 'subs',
+      });
+      expect(purchaseResult).toEqual({ status: 'success', subscriptionItem });
+    });
+
+    it('honors an explicit androidReplacementMode', async () => {
+      mocks.Platform.OS = 'android';
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldGoogleItem] }));
+      mocks.iap.getAvailablePurchases.mockResolvedValue([heldGooglePurchase]);
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(plan, { androidReplacementMode: 'deferred' });
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith(
+        expect.objectContaining({
+          request: expect.objectContaining({
+            google: expect.objectContaining({
+              purchaseToken: 'old-play-token',
+              // Google Play Billing's SubscriptionUpdateParams.ReplacementMode.DEFERRED.
+              replacementMode: 6,
+            }),
+          }),
+        }),
+      );
+    });
+
+    it('falls back to the only auto-renewing purchase when the held plan does not map the purchased product', async () => {
+      mocks.Platform.OS = 'android';
+      clerk.billing.getSubscription = vi.fn(async () => ({
+        subscriptionItems: [{ ...heldGoogleItem, plan: { id: 'plan_basic', isDefault: false, storeProducts: [] } }],
+      }));
+      mocks.iap.getAvailablePurchases.mockResolvedValue([
+        { ...heldGooglePurchase, productId: 'acme_legacy_monthly' },
+        { id: 'txn_gems', productId: 'acme_gems', purchaseToken: 'gems-token', isAutoRenewing: false },
+      ]);
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await result.current.purchase(plan);
+      });
+
+      expect(mocks.iap.requestPurchase).toHaveBeenCalledWith(
+        expect.objectContaining({
+          request: expect.objectContaining({
+            google: expect.objectContaining({ purchaseToken: 'old-play-token', replacementMode: 2 }),
+          }),
+        }),
+      );
+    });
+
+    it("still short-circuits on Android when the subscription is managed by the other platform's store", async () => {
+      mocks.Platform.OS = 'android';
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldAppleItem] }));
+      const { result } = await renderIAPBilling();
+
+      let purchaseResult: any;
+      await act(async () => {
+        purchaseResult = await result.current.purchase(plan);
+      });
+
+      expect(purchaseResult).toEqual({ status: 'already_subscribed', alreadySubscribedVia: 'apple' });
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
+    });
+
+    it('refuses a Google plan change when the active purchase is not visible to this store account', async () => {
+      // Proceeding without the old purchase token would open a second, parallel subscription instead of
+      // replacing the existing one — a double charge, not a plan change.
+      mocks.Platform.OS = 'android';
+      clerk.billing.getSubscription = vi.fn(async () => ({ subscriptionItems: [heldGoogleItem] }));
+      mocks.iap.getAvailablePurchases.mockResolvedValue([]);
+      const { result } = await renderIAPBilling();
+
+      await act(async () => {
+        await expect(result.current.purchase(plan)).rejects.toMatchObject({
+          name: 'IAPBillingError',
+          code: 'plan_change_purchase_unavailable',
+        });
+      });
+
+      expect(mocks.iap.requestPurchase).not.toHaveBeenCalled();
+      expect(registerStorePurchase).not.toHaveBeenCalled();
     });
   });
 

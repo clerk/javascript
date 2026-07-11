@@ -1,4 +1,10 @@
 export { useIAPBilling } from './billing/useIAPBilling';
 export { IAPBillingError, isIAPBillingError } from './billing/errors';
 export type { IAPBillingErrorCode } from './billing/errors';
-export type { IAPPurchaseResult, IAPRestorePurchasesResult, UseIAPBillingReturn } from './billing/types';
+export type {
+  IAPAndroidReplacementMode,
+  IAPPurchaseOptions,
+  IAPPurchaseResult,
+  IAPRestorePurchasesResult,
+  UseIAPBillingReturn,
+} from './billing/types';

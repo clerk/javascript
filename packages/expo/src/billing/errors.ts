@@ -36,6 +36,12 @@ export type IAPBillingErrorCode =
    */
   | 'purchase_payload_missing'
   /**
+   * A Google Play plan change could not find the active subscription's purchase in this device's store account, so
+   * the purchase cannot be billed as a replacement. This happens when the subscription was bought under a different
+   * Google account — the plan change must be made from there (or via `manageSubscriptions()`).
+   */
+  | 'plan_change_purchase_unavailable'
+  /**
    * A signed-in user is required.
    */
   | 'user_unavailable'

@@ -8,7 +8,13 @@ import { AppState, Linking, Platform } from 'react-native';
 import { IAPBillingError } from './errors';
 import type { ExpoIapModule } from './expoIap';
 import { ensureIapConnection, loadExpoIap } from './expoIap';
-import type { IAPPurchaseOptions, IAPPurchaseResult, IAPRestorePurchasesResult, UseIAPBillingReturn } from './types';
+import type {
+  IAPAndroidReplacementMode,
+  IAPPurchaseOptions,
+  IAPPurchaseResult,
+  IAPRestorePurchasesResult,
+  UseIAPBillingReturn,
+} from './types';
 import {
   deriveAppleAppAccountToken,
   deriveGoogleObfuscatedAccountId,
@@ -67,17 +73,78 @@ function isUserCancelledPurchaseError(error: unknown, depth = 0): boolean {
   return isUserCancelledPurchaseError(cause, depth + 1);
 }
 
+/** The user's active paid (non-default-plan) subscription item, or `undefined` when there is none. */
+function findActivePaidSubscriptionItem(
+  items: BillingSubscriptionItemResource[],
+): BillingSubscriptionItemResource | undefined {
+  return items.find(item => item.status === 'active' && item.plan && !item.plan.isDefault);
+}
+
 /**
  * The processor an active paid subscription is billed through, in the same vocabulary the backend's
  * cross-processor guard reports (`already_subscribed_via`): Clerk-managed items map to `stripe`,
  * store-managed items to their store. `null` when the user holds no active paid subscription.
  */
 function activePaidSubscribedVia(items: BillingSubscriptionItemResource[]): 'stripe' | 'apple' | 'google' | null {
-  const active = items.find(item => item.status === 'active' && item.plan && !item.plan.isDefault);
+  const active = findActivePaidSubscriptionItem(items);
   if (!active) {
     return null;
   }
   return active.managedBy === 'apple' || active.managedBy === 'google' ? active.managedBy : 'stripe';
+}
+
+/**
+ * `IAPAndroidReplacementMode` values as Google Play Billing's `SubscriptionUpdateParams.ReplacementMode` integer
+ * constants — the `replacementMode` field `expo-iap` forwards to the native billing flow.
+ *
+ * The numeric field is used deliberately over expo-iap's newer string-typed
+ * `subscriptionProductReplacementParams`: the item-level params are applied natively via reflection and silently
+ * no-op on Google Play Billing libraries older than 8.1, and when omitted expo-iap stamps `-1` into the legacy
+ * field, so an explicit valid mode must always accompany the old purchase token.
+ */
+const ANDROID_REPLACEMENT_MODE_CODES: Record<IAPAndroidReplacementMode, number> = {
+  'with-time-proration': 1,
+  'charge-prorated-price': 2,
+  'without-proration': 3,
+  'charge-full-price': 5,
+  deferred: 6,
+};
+
+/** Google's recommended upgrade default: the new plan starts now and the prorated price difference is charged. */
+const DEFAULT_ANDROID_REPLACEMENT_MODE: IAPAndroidReplacementMode = 'charge-prorated-price';
+
+/**
+ * Finds the Google Play purchase token backing the user's active store-managed subscription, required to bill a
+ * plan change as a replacement of that subscription rather than a second, parallel one. Prefers the available
+ * purchase whose product is mapped on the currently held plan; falls back to the device's only auto-renewing
+ * purchase. Throws when the purchase is not visible to this device's store account (for example, it was bought
+ * under a different Google account) — proceeding would double-charge instead of replacing.
+ */
+async function findActiveGooglePurchaseToken(
+  iap: ExpoIapModule,
+  activeItem: BillingSubscriptionItemResource,
+): Promise<string> {
+  const availablePurchases = await iap.getAvailablePurchases();
+  const candidates = (availablePurchases ?? []).filter(purchase => !!purchase.purchaseToken);
+
+  const heldProductIds = new Set(
+    (activeItem.plan?.storeProducts ?? [])
+      .filter(storeProduct => storeProduct.store === 'google')
+      .map(storeProduct => storeProduct.productId),
+  );
+  const mapped = candidates.find(
+    purchase => heldProductIds.has(purchase.productId) || purchase.ids?.some(id => heldProductIds.has(id)),
+  );
+  const autoRenewing = candidates.filter(purchase => purchase.isAutoRenewing);
+  const active = mapped ?? (autoRenewing.length === 1 ? autoRenewing[0] : undefined);
+
+  if (!active?.purchaseToken) {
+    throw new IAPBillingError(
+      'plan_change_purchase_unavailable',
+      `The user's active subscription (plan "${activeItem.plan?.id}") was not found among this device's Google Play purchases, so the plan change cannot be billed as a subscription replacement. Change the plan from the store account that purchased it, or open manageSubscriptions().`,
+    );
+  }
+  return active.purchaseToken;
 }
 
 /**
@@ -229,6 +296,11 @@ function resolveAndroidOneTimeOffer(
  * subscriptions server-side; one-time Google Play products are consumed or acknowledged through `expo-iap` only
  * after Clerk accepts the purchase.
  *
+ * When the user's active subscription is already managed by the current platform's store, `purchase()` performs a
+ * plan change of that subscription (StoreKit replaces in-group purchases natively; Google Play supersedes the old
+ * subscription via a replacement purchase). `{ status: 'already_subscribed' }` is only returned for a subscription
+ * billed through a different processor.
+ *
  * @example
  * ```tsx
  * import { useIAPBilling } from '@clerk/expo/experimental';
@@ -237,14 +309,15 @@ function resolveAndroidOneTimeOffer(
  *   const { plans, loading, purchase, manageSubscriptions } = useIAPBilling();
  *
  *   const onSubscribe = async (plan) => {
- *     // Purchases the plan's store product mapped for this platform. Pass
- *     // `{ productId }` to pick between multiple mapped products (for
- *     // example, monthly vs. annual).
+ *     // Purchases the plan's store product mapped for this platform — or, when
+ *     // the user already subscribes through this platform's store, changes their
+ *     // plan in place. Pass `{ productId }` to pick between multiple mapped
+ *     // products (for example, monthly vs. annual).
  *     const result = await purchase(plan);
  *     if (result.status === 'already_subscribed') {
- *       // The user already subscribed via `result.alreadySubscribedVia` (for
- *       // example, on the web). Plan changes go through the store's native
- *       // surface, not a second purchase:
+ *       // The user's subscription is billed through a different processor
+ *       // (`result.alreadySubscribedVia` — for example, Stripe on the web, or
+ *       // the other platform's store), which owns plan changes for it:
  *       await manageSubscriptions();
  *     }
  *   };
@@ -467,14 +540,22 @@ export function useIAPBilling(): UseIAPBillingReturn {
         throw new IAPBillingError('user_unavailable', 'A signed-in user is required to make an in-app purchase.');
       }
 
-      // Preflight against already-loaded state: an active paid subscription through any processor
-      // would be rejected by the backend's cross-processor guard AFTER the store charged the user,
-      // so fail before the payment sheet ever opens. Zero latency (no network); the backend guard
-      // remains the source of truth for races this state can't see.
+      // Preflight against already-loaded state: an active paid subscription through a DIFFERENT processor
+      // (Stripe, or the other platform's store) would be rejected by the backend's cross-processor guard
+      // AFTER the store charged the user, so fail before the payment sheet ever opens. Zero latency (no
+      // network); the backend guard remains the source of truth for races this state can't see.
+      //
+      // A subscription managed by the CURRENT platform's store is not a conflict — buying another mapped
+      // product is a plan change of that subscription. iOS needs nothing extra (StoreKit natively replaces
+      // and prorates an in-group purchase, and the server keeps the same original transaction ID); Android
+      // must name the old purchase token and a replacement mode so Google Play supersedes the old item
+      // instead of double-billing.
       const preflightVia = activePaidSubscribedVia(currentSubscriptionItemsRef.current);
-      if (preflightVia) {
+      if (preflightVia && preflightVia !== store) {
         return { status: 'already_subscribed', alreadySubscribedVia: preflightVia };
       }
+      const planChangeFromItem =
+        preflightVia === store ? findActivePaidSubscriptionItem(currentSubscriptionItemsRef.current) : undefined;
 
       const iap = loadExpoIap();
       await ensureIapConnection(iap);
@@ -574,12 +655,25 @@ export function useIAPBilling(): UseIAPBillingReturn {
                 purchaseOptionId,
                 options?.offerId,
               );
+              // Plan change: bill as a replacement of the active Google Play subscription. The old purchase
+              // token puts Play Billing in subscription-update mode (linkedPurchaseToken supersedes the old
+              // item server-side); the replacement mode decides how the price difference is charged.
+              const replacement = planChangeFromItem
+                ? {
+                    purchaseToken: await findActiveGooglePurchaseToken(iap, planChangeFromItem),
+                    replacementMode:
+                      ANDROID_REPLACEMENT_MODE_CODES[
+                        options?.androidReplacementMode ?? DEFAULT_ANDROID_REPLACEMENT_MODE
+                      ],
+                  }
+                : undefined;
               await iap.requestPurchase({
                 request: {
                   google: {
                     skus: [product.productId],
                     obfuscatedAccountId: googleAccountId,
                     subscriptionOffers: [{ sku: product.productId, offerToken: offer.offerTokenAndroid as string }],
+                    ...replacement,
                   },
                 },
                 type: 'subs',
