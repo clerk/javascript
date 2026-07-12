@@ -100,7 +100,7 @@ import type {
   Web3Provider,
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, handleValueOrFn, noop, timeLimit } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
@@ -191,6 +191,8 @@ const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_se
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
 const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
 const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
+// 7s clears the measured /client edge p99.9 (~2s) with margin, so it only trips on a stuck origin
+const INITIALIZATION_TIMEOUT_MS = 7_000;
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -2844,8 +2846,13 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
-          return Client.getOrCreateInstance()
-            .fetch()
+          // Abort the /client request on timeout so clerkjs loading does not hang
+          const clientFetchController = new AbortController();
+          return timeLimit(
+            Client.getOrCreateInstance().fetch({ abortSignal: clientFetchController.signal }),
+            INITIALIZATION_TIMEOUT_MS,
+            clientFetchController,
+          )
             .then(res => this.updateClient(res))
             .catch(async e => {
               /**
@@ -2858,27 +2865,32 @@ export class Clerk implements ClerkInterface {
 
               ++initializationDegradedCounter;
 
-              const jwtInCookie = this.#authService?.getSessionCookie();
-              const localClient = createClientFromJwt(jwtInCookie);
-
-              this.updateClient(localClient);
-
               /**
                * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
                * We want to avoid having the below `getToken()` retrying at the same time as the poller.
                */
               this.#authService?.stopPollingForToken();
 
-              // Attempt to grab a fresh token
-              await this.session
-                ?.getToken({ skipCache: true })
-                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
-                .catch(() => null)
-                .finally(() => {
-                  this.#authService?.startPollingForToken();
-                });
+              try {
+                const session = this.#defaultSession(createClientFromJwt(this.#authService?.getSessionCookie()));
+                // Prefer minting a fresh token as its claims are fresher than the cookie's
+                session?.clearCache();
+                const jwt = session
+                  ? await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
+                      session.clearCache();
+                      return this.#authService?.getSessionCookie();
+                    })
+                  : this.#authService?.getSessionCookie();
+                this.updateClient(createClientFromJwt(jwt));
+              } finally {
+                this.#authService?.startPollingForToken();
+              }
 
-              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
+              void Client.getOrCreateInstance()
+                .fetch()
+                .then(res => this.updateClient(res))
+                .catch(noop);
+
               return null;
             });
         };

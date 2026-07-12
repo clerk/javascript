@@ -260,8 +260,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
           initialDelay: 700,
           maxDelayBetweenRetries: 5000,
           shouldRetry: (_: unknown, iterations: number) => {
-            // We want to retry only GET requests, as other methods are not idempotent.
-            return overwrittenRequestMethod === 'GET' && iterations < maxTries;
+            // We want to retry only GET requests, as other methods are not idempotent,
+            // and stop as soon as the caller aborted the request.
+            return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
           },
           onBeforeRetry: (iteration: number): void => {
             // Add the retry attempt to the query string params.

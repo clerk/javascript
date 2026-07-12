@@ -72,8 +72,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
-    return this._baseGet({ fetchMaxTries });
+  fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries, abortSignal });
   }
 
   async destroy(): Promise<void> {
