@@ -1,13 +1,12 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Col, descriptors, localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';
@@ -58,34 +57,28 @@ const DeleteOrganizationScreen = () => {
 export const OrganizationGeneralPage = () => {
   return (
     <ProfileCard.Page>
-      <Col
-        elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8 })}
+      <ProfileCard.PagePanel
+        pageId='organizationGeneral'
+        titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
       >
-        <Col
-          elementDescriptor={descriptors.profilePage}
-          elementId={descriptors.profilePage.setId('organizationGeneral')}
-        >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
-              sx={t => ({ marginBottom: t.space.$4 })}
-              textVariant='h2'
-            />
-          </Header.Root>
-          <OrganizationProfileSection />
-          <Protect permission='org:sys_domains:read'>
-            <OrganizationDomainsSection />
-          </Protect>
-          <OrganizationLeaveSection />
-          <OrganizationDeleteSection />
-        </Col>
-      </Col>
+        <OrganizationProfileSection />
+        <Protect permission='org:sys_domains:read'>
+          <OrganizationDomainsSection />
+        </Protect>
+        <OrganizationLeaveSection />
+        <OrganizationDeleteSection />
+      </ProfileCard.PagePanel>
     </ProfileCard.Page>
   );
 };
 
-const OrganizationProfileSection = () => {
+/**
+ * Renders the organization profile section (name, logo) with inline edit when the user has
+ * `org:sys_profile:manage`.
+ *
+ * @returns The profile section, or `null` when no organization is active.
+ */
+export const OrganizationProfileSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -134,7 +127,13 @@ const OrganizationProfileSection = () => {
   );
 };
 
-const OrganizationDomainsSection = () => {
+/**
+ * Renders the verified-domains section.
+ *
+ * @returns The domains section, or `null` when domains are disabled, no organization is active, or
+ * there are no domains and the user cannot add any.
+ */
+export const OrganizationDomainsSection = (): JSX.Element | null => {
   const { organizationSettings } = useEnvironment();
   const { organization, domains } = useOrganization({ domains: { infinite: true } });
   const canManageDomains = useProtect({ permission: 'org:sys_domains:manage' });
@@ -190,7 +189,12 @@ const OrganizationDomainsSection = () => {
   );
 };
 
-const OrganizationLeaveSection = () => {
+/**
+ * Renders the "leave organization" action in the danger section.
+ *
+ * @returns The leave-organization section, or `null` when no organization is active.
+ */
+export const OrganizationLeaveSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -236,7 +240,13 @@ const OrganizationLeaveSection = () => {
   );
 };
 
-const OrganizationDeleteSection = () => {
+/**
+ * Renders the "delete organization" action in the danger section.
+ *
+ * @returns The delete-organization section, or `null` when no organization is active, the user
+ * lacks `org:sys_profile:delete`, or admin delete is disabled.
+ */
+export const OrganizationDeleteSection = (): JSX.Element | null => {
   const { organization } = useOrganization();
   const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
