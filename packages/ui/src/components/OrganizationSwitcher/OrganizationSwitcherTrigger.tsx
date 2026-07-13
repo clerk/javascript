@@ -121,7 +121,7 @@ const PlanBadge = () => {
       elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
       colorScheme={isDefault ? 'primary' : 'secondary'}
       title={name}
-      sx={{ flexShrink: 1, minWidth: 0, maxWidth: '14ch' }}
+      sx={{ minWidth: 0, maxWidth: '14ch' }}
     >
       <Box
         as='span'
