@@ -31,25 +31,39 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
       view.setViewTreeLifecycleOwner(act)
       view.setViewTreeViewModelStoreOwner(act)
       view.setViewTreeSavedStateRegistryOwner(act)
-
-      val recomposerContext = AndroidUiDispatcher.Main
-      val newRecomposer = Recomposer(recomposerContext)
-      recomposer = newRecomposer
-      view.setParentCompositionContext(newRecomposer)
-      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
-      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
-      scope.launch {
-        newRecomposer.runRecomposeAndApplyChanges()
-      }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }
 
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    startRecomposer()
+  }
+
   override fun onDetachedFromWindow() {
+    composeView.disposeComposition()
     recomposer?.cancel()
     recomposerJob?.cancel()
+    recomposer = null
+    recomposerJob = null
     onHostDetachedFromWindow()
     super.onDetachedFromWindow()
+  }
+
+  private fun startRecomposer() {
+    if (activity == null || recomposerJob?.isActive == true) return
+
+    // Navigation can temporarily detach and later reattach the same native host.
+    // Always give a reattached ComposeView a live parent composition context.
+    val recomposerContext = AndroidUiDispatcher.Main
+    val newRecomposer = Recomposer(recomposerContext)
+    recomposer = newRecomposer
+    composeView.setParentCompositionContext(newRecomposer)
+    val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
+    recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
+    scope.launch {
+      newRecomposer.runRecomposeAndApplyChanges()
+    }
   }
 
   fun setupView() {
