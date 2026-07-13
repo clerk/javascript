@@ -1,13 +1,14 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { LoadingBadge } from '@/ui/elements/Badge';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
 import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
-import { Button, descriptors, Icon, localizationKeys, useLocalizations } from '../../customizables';
+import { useEnvironment, useOrganizationSwitcherContext, useSubscription } from '../../contexts';
+import { Badge, Button, descriptors, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -62,6 +63,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             size='xs'
             organization={organization}
+            badge={<PlanBadge />}
             sx={{ maxWidth: '30ch' }}
           />
         )}
@@ -92,6 +94,43 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
+
+const PlanBadge = () => {
+  const { isLoading, subscriptionItems } = useSubscription();
+  const { showPlanName } = useOrganizationSwitcherContext();
+
+  if (!showPlanName) {
+    return null;
+  }
+
+  if (isLoading) {
+    // 5ch is specifically chosen to balance the size of "Free" versus paid plans in Inter
+    return <LoadingBadge sx={{ width: '5ch' }} />;
+  }
+
+  const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active' || si.status === 'past_due');
+  if (!activeSubscriptionItem) {
+    return null;
+  }
+
+  const { slug, name, isDefault } = activeSubscriptionItem.plan;
+
+  return (
+    <Badge
+      elementDescriptor={descriptors.organizationSwitcherTriggerBadge}
+      elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
+      colorScheme={isDefault ? 'primary' : 'secondary'}
+      sx={{ whiteSpace: 'nowrap' }}
+    >
+      <Text
+        as='span'
+        sx={t => ({ fontSize: t.fontSizes.$xs })}
+      >
+        {name}
+      </Text>
+    </Badge>
+  );
+};
 
 const NotificationCountBadgeSwitcherTrigger = () => {
   /**

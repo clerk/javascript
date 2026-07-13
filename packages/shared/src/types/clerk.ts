@@ -2226,6 +2226,12 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
+    /**
+     * Shows the Clerk Billing Plan name for the currently active organization.
+     *
+     * @default false
+     */
+    showPlanName?: boolean;
   };
 
 /** @generateWithEmptyComment */
