@@ -18,13 +18,15 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
   protected val activity: ComponentActivity? = findActivity(context)
 
   private var recomposer: Recomposer? = null
-  private var recomposerJob: kotlinx.coroutines.Job? = null
+  private var recomposerJob: Job? = null
 
   private val composeView = ComposeView(context).also { view ->
     activity?.let { act ->
@@ -37,7 +39,7 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
 
   override fun onAttachedToWindow() {
     super.onAttachedToWindow()
-    startRecomposer()
+    setupView()
   }
 
   override fun onDetachedFromWindow() {
@@ -59,14 +61,14 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
     val newRecomposer = Recomposer(recomposerContext)
     recomposer = newRecomposer
     composeView.setParentCompositionContext(newRecomposer)
-    val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
-    recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
-    scope.launch {
+    val scope = CoroutineScope(recomposerContext + SupervisorJob())
+    recomposerJob = scope.launch {
       newRecomposer.runRecomposeAndApplyChanges()
     }
   }
 
   fun setupView() {
+    startRecomposer()
     composeView.setContent {
       val viewModelStoreOwner = localViewModelStoreOwner()
 
