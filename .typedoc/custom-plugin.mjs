@@ -3,47 +3,8 @@ import { Converter, DeclarationReflection, ReflectionKind, ReflectionType, Rende
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
- * A list of files where we want to remove any headings
- * TODO: Move this logic to the custom-theme logic and don't change it after the fact
- */
-const FILES_WITHOUT_HEADINGS = [
-  'use-organization-return.mdx',
-  'use-organization-params.mdx',
-  'paginated-resources.mdx',
-  'pages-or-infinite-options.mdx',
-  'paginated-hook-config.mdx',
-  'use-organization-list-return.mdx',
-  'use-organization-list-params.mdx',
-  'create-organization-params.mdx',
-  'authenticate-request-options.mdx',
-  'verify-token-options.mdx',
-  'public-organization-data-json.mdx',
-  'organization-membership-public-user-data.mdx',
-  'checkout-signal-value.mdx',
-  'checkout-flow-resource.mdx',
-  'use-checkout-options.mdx',
-  'use-payment-element-return.mdx',
-  'use-payment-methods-return.mdx',
-  'use-payment-attempts-return.mdx',
-  'use-plans-return.mdx',
-  'use-statements-return.mdx',
-  'hook-params.mdx',
-  'use-subscription-params.mdx',
-  'subscription-result.mdx',
-  'needs-reverification-parameters.mdx',
-  'use-reverification-options.mdx',
-  'use-reverification-params.mdx',
-  'payment-element-provider-props.mdx',
-  'payment-element-props.mdx',
-  'use-organization-creation-defaults-return.mdx',
-  'use-organization-creation-defaults-params.mdx',
-  'use-o-auth-consent-params.mdx',
-  'use-o-auth-consent-return.mdx',
-  'create-organization-domain-params.mdx',
-];
-
-/**
- * An array of tuples where the first element is the file name and the second element is the new path.
+ * Docs-relative links to be replaced in the generated MDX files.
+ * Each entry is a tuple where the first element is the file name and the second element is the new path.
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
@@ -143,7 +104,7 @@ const LINK_REPLACEMENTS = [
 
 /**
  * Inside the generated MDX files are links to other generated MDX files. These relative links need to be replaced with absolute links to pages that exist on clerk.com.
- * For example, `[Foobar](../../foo/bar.mdx)` needs to be replaced with `[Foobar](/docs/foo/bar)`.
+ * For example, `[Clerk](/shared/clerk/clerk.mdx)` needs to be replaced with `[Clerk](/docs/reference/objects/clerk)`.
  * It also shouldn't matter how level deep the relative link is.
  *
  * This function returns an array of `{ pattern: string, replace: string }` to pass into the `typedoc-plugin-replace-text` plugin.
@@ -184,219 +145,99 @@ export function applyRelativeLinkReplacements(contents) {
   return out;
 }
 
+/**
+ * Bare-identifier → docs-link data table for {@link getCatchAllReplacements}.
+ * Each entry is `[name, url]` or `[name, url, linkText]` (defaults to `name`).
+ * The regex is derived from `name` via {@link catchAllBareSymbolRegex}.
+ * @type {ReadonlyArray<readonly [string, string] | readonly [string, string, string]>}
+ */
+const CATCH_ALL_TYPE_LINKS = [
+  ['APIKeysNamespace', '/docs/reference/objects/api-keys', 'APIKeys'],
+  ['ClerkAPIResponseError', '/docs/reference/types/clerk-api-response-error'],
+  ['EmailAddressResource', '/docs/reference/types/email-address'],
+  ['EnterpriseAccountResource', '/docs/reference/types/enterprise-account'],
+  ['ExternalAccountResource', '/docs/reference/types/external-account'],
+  ['LastAuthenticationStrategy', '/docs/reference/types/last-authentication-strategy'],
+  ['LoadedClerk', '/docs/reference/objects/clerk', 'Clerk'],
+  ['LocalizationResource', '/docs/guides/customizing-clerk/localization'],
+  ['Machine', '/docs/reference/backend/types/backend-machine'],
+  ['OAuthProvider', '/docs/reference/types/sso#o-auth-provider'],
+  ['OAuthStrategy', '/docs/reference/types/sso#o-auth-strategy'],
+  ['OrganizationInvitationPrivateMetadata', '/docs/reference/types/metadata#organization-invitation-private-metadata'],
+  ['OrganizationInvitationPublicMetadata', '/docs/reference/types/metadata#organization-invitation-public-metadata'],
+  ['OrganizationMembershipPrivateMetadata', '/docs/reference/types/metadata#organization-membership-private-metadata'],
+  ['OrganizationMembershipPublicMetadata', '/docs/reference/types/metadata#organization-membership-public-metadata'],
+  ['OrganizationPrivateMetadata', '/docs/reference/types/metadata#organization-private-metadata'],
+  ['OrganizationPublicMetadata', '/docs/reference/types/metadata#organization-public-metadata'],
+  ['OrganizationResource', '/docs/reference/objects/organization'],
+  ['PasskeyResource', '/docs/reference/types/passkey-resource'],
+  ['PhoneNumberResource', '/docs/reference/types/phone-number'],
+  ['SessionStatusClaim', '/docs/reference/types/session-status'],
+  ['SetActiveParams', '/docs/reference/types/set-active-params'],
+  ['SignedInSessionResource', '/docs/reference/objects/session'],
+  ['SignInErrors', '/docs/reference/types/errors'],
+  ['SignInFirstFactor', '/docs/reference/types/sign-in-first-factor'],
+  ['SignInFutureResource', '/docs/reference/objects/sign-in-future'],
+  ['SignInRedirectOptions', '/docs/reference/types/sign-in-redirect-options'],
+  ['SignInResource', '/docs/reference/objects/sign-in'],
+  ['SignInSecondFactor', '/docs/reference/types/sign-in-second-factor'],
+  ['SignUpErrors', '/docs/reference/types/errors'],
+  ['SignUpFutureResource', '/docs/reference/objects/sign-up-future'],
+  ['SignUpRedirectOptions', '/docs/reference/types/sign-up-redirect-options'],
+  ['SignUpResource', '/docs/reference/objects/sign-up'],
+  ['SignUpUnsafeMetadata', '/docs/reference/types/metadata#sign-up-unsafe-metadata'],
+  ['SignUpVerificationResource', '/docs/reference/types/sign-up-verification-resource'],
+  ['TasksRedirectOptions', '/docs/reference/types/redirect-options'],
+  ['UserPrivateMetadata', '/docs/reference/types/metadata#user-private-metadata'],
+  ['UserPublicMetadata', '/docs/reference/types/metadata#user-public-metadata'],
+  ['UserResource', '/docs/reference/objects/user'],
+  ['UserUnsafeMetadata', '/docs/reference/types/metadata#user-unsafe-metadata'],
+  ['VerificationResource', '/docs/reference/types/verification-resource'],
+  ['Web3WalletResource', '/docs/reference/types/web3-wallet'],
+];
+
+/**
+ * Match a bare identifier not already inside a link (`[…]`), inline code (`` `…` ``), heading anchor (`#…`), or word-character run. Optional wrapping backticks on the match are consumed so the replacement produces a clean `[Name](url)` link.
+ * @param {string} name
+ */
+function catchAllBareSymbolRegex(name) {
+  return new RegExp(`(?<![\\[\\w\`#])\`?${name}\`?(?![\\]\\w\`])`, 'g');
+}
+
 function getCatchAllReplacements() {
+  /** @type {{ pattern: RegExp; replace: string | ((...args: any[]) => string) }[]} */
+  const linkRules = CATCH_ALL_TYPE_LINKS.map(([name, url, linkText]) => ({
+    pattern: catchAllBareSymbolRegex(name),
+    replace: `[${linkText ?? name}](${url})`,
+  }));
   return [
+    ...linkRules,
     {
-      pattern: /(?<![\[\w`#])`?ClerkAPIResponseError`?(?![\]\w`])/g,
-      replace: '[ClerkAPIResponseError](/docs/reference/types/clerk-api-response-error)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?APIKeysNamespace`?(?![\]\w`])/g,
-      replace: '[APIKeys](/docs/reference/objects/api-keys)',
+      // `SessionResource[]` array suffix needs preserving; boundary is `\b` (not the shared
+      // negative-lookbehind used elsewhere) so bare `SessionResource` in prose still matches.
+      pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[SessionResource](/docs/reference/objects/session)$1',
     },
     {
       pattern: /(?<![\[\w`#])`Appearance`\\<`Theme`\\>/g,
       replace: '[Appearance<Theme>](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
+      // In-page anchor for `CreateOrganizationParams` — only inside parentheses (prose lists).
       pattern: /(?<![#])\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
+    // typedoc-plugin-markdown emits `@deprecated` as `**Deprecated**`; add a full stop.
+    { pattern: /\*\*Deprecated\*\*/g, replace: '**Deprecated.**' },
+    // `@default` renders as `**Default** \`value\``; rewrite to `Defaults to \`value\`.`.
+    { pattern: /\*\*Default\*\* `([^`]+)`/g, replace: 'Defaults to `$1`.' },
+    // Single `@example` renders as `**Example** \`value\``; rewrite to `Example: \`value\`.`.
+    { pattern: /\*\*Example\*\* `([^`]+)`/g, replace: 'Example: `$1`.' },
+    // Multiple `@example` render as `**Examples** \`v1\` \`v2\``; rewrite to a comma-joined list.
     {
-      pattern: /(?<![\[\w`#])`?EmailAddressResource`?(?![\]\w`])/g,
-      replace: '[EmailAddressResource](/docs/reference/types/email-address)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?EnterpriseAccountResource`?(?![\]\w`])/g,
-      replace: '[EnterpriseAccountResource](/docs/reference/types/enterprise-account)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?ExternalAccountResource`?(?![\]\w`])/g,
-      replace: '[ExternalAccountResource](/docs/reference/types/external-account)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?LoadedClerk`?(?![\]\w`])/g,
-      replace: '[Clerk](/docs/reference/objects/clerk)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?LocalizationResource`?(?![\]\w`])/g,
-      replace: '[LocalizationResource](/docs/guides/customizing-clerk/localization)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?Machine`?(?![\]\w`])/g,
-      replace: '[Machine](/docs/reference/backend/types/backend-machine)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?PasskeyResource`?(?![\]\w`])/g,
-      replace: '[PasskeyResource](/docs/reference/types/passkey-resource)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?PhoneNumberResource`?(?![\]\w`])/g,
-      replace: '[PhoneNumberResource](/docs/reference/types/phone-number)',
-    },
-    {
-      // SessionResource appears in plain text, with an array next to it, with backticks, etc.
-      // e.g. `SessionResource[]`
-      pattern: /(?<![`#[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
-      replace: '[SessionResource](/docs/reference/objects/session)$1',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SessionStatusClaim`?(?![\]\w`])/g,
-      replace: '[SessionStatusClaim](/docs/reference/types/session-status)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SetActiveParams`?(?![\]\w`])/g,
-      replace: '[SetActiveParams](/docs/reference/types/set-active-params)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignInResource`?(?![\]\w`])/g,
-      replace: '[SignInResource](/docs/reference/objects/sign-in)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?((?:SignIn|SignUp)Errors)`?(?![\]\w`])/g,
-      replace: (/** @type {string} */ _match, /** @type {string} */ type) => `[${type}](/docs/reference/types/errors)`,
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignInFirstFactor`?(?![\]\w`])/g,
-      replace: '[SignInFirstFactor](/docs/reference/types/sign-in-first-factor)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignInFutureResource`?(?![\]\w`])/g,
-      replace: '[SignInFutureResource](/docs/reference/objects/sign-in-future)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignInSecondFactor`?(?![\]\w`])/g,
-      replace: '[SignInSecondFactor](/docs/reference/types/sign-in-second-factor)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignedInSessionResource`?(?![\]\w`])/g,
-      replace: '[SignedInSessionResource](/docs/reference/objects/session)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignInRedirectOptions`?(?![\]\w`])/g,
-      replace: '[SignInRedirectOptions](/docs/reference/types/sign-in-redirect-options)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignUpRedirectOptions`?(?![\]\w`])/g,
-      replace: '[SignUpRedirectOptions](/docs/reference/types/sign-up-redirect-options)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignUpResource`?(?![\]\w`])/g,
-      replace: '[SignUpResource](/docs/reference/objects/sign-up)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignUpVerificationResource`?(?![\]\w`])/g,
-      replace: '[SignUpVerificationResource](/docs/reference/types/sign-up-verification-resource)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignUpUnsafeMetadata`?(?![\]\w`])/g,
-      replace: '[SignUpUnsafeMetadata](/docs/reference/types/metadata#sign-up-unsafe-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?SignUpFutureResource`?(?![\]\w`])/g,
-      replace: '[SignUpFutureResource](/docs/reference/objects/sign-up-future)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?TasksRedirectOptions`?(?![\]\w`])/g,
-      replace: '[TasksRedirectOptions](/docs/reference/types/redirect-options)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OAuthStrategy`?(?![\]\w`])/g,
-      replace: '[OAuthStrategy](/docs/reference/types/sso#o-auth-strategy)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OAuthProvider`?(?![\]\w`])/g,
-      replace: '[OAuthProvider](/docs/reference/types/sso#o-auth-provider)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationResource`?(?![\]\w`])/g,
-      replace: '[OrganizationResource](/docs/reference/objects/organization)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationPrivateMetadata`?(?![\]\w`])/g,
-      replace: '[OrganizationPrivateMetadata](/docs/reference/types/metadata#organization-private-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationPublicMetadata`?(?![\]\w`])/g,
-      replace: '[OrganizationPublicMetadata](/docs/reference/types/metadata#organization-public-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationInvitationPrivateMetadata`?(?![\]\w`])/g,
-      replace:
-        '[OrganizationInvitationPrivateMetadata](/docs/reference/types/metadata#organization-invitation-private-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationInvitationPublicMetadata`?(?![\]\w`])/g,
-      replace:
-        '[OrganizationInvitationPublicMetadata](/docs/reference/types/metadata#organization-invitation-public-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationMembershipPrivateMetadata`?(?![\]\w`])/g,
-      replace:
-        '[OrganizationMembershipPrivateMetadata](/docs/reference/types/metadata#organization-membership-private-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?OrganizationMembershipPublicMetadata`?(?![\]\w`])/g,
-      replace:
-        '[OrganizationMembershipPublicMetadata](/docs/reference/types/metadata#organization-membership-public-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?UserPrivateMetadata`?(?![\]\w`])/g,
-      replace: '[UserPrivateMetadata](/docs/reference/types/metadata#user-private-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?UserPublicMetadata`?(?![\]\w`])/g,
-      replace: '[UserPublicMetadata](/docs/reference/types/metadata#user-public-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?UserUnsafeMetadata`?(?![\]\w`])/g,
-      replace: '[UserUnsafeMetadata](/docs/reference/types/metadata#user-unsafe-metadata)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?UserResource`?(?![\]\w`])/g,
-      replace: '[UserResource](/docs/reference/objects/user)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?LastAuthenticationStrategy`?(?![\]\w`])/g,
-      replace: '[LastAuthenticationStrategy](/docs/reference/types/last-authentication-strategy)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?Web3WalletResource`?(?![\]\w`])/g,
-      replace: '[Web3WalletResource](/docs/reference/types/web3-wallet)',
-    },
-    {
-      pattern: /(?<![\[\w`#])`?VerificationResource`?(?![\]\w`])/g,
-      replace: '[VerificationResource](/docs/reference/types/verification-resource)',
-    },
-    {
-      /**
-       * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
-       */
-      pattern: /\*\*Deprecated\*\*/g,
-      replace: '**Deprecated.**',
-    },
-    {
-      /**
-       * By default, `@default` is output with "**Default** `value`". We want to capture the value and place it inside "Defaults to `value`."
-       */
-      pattern: /\*\*Default\*\* `([^`]+)`/g,
-      replace: 'Defaults to `$1`.',
-    },
-    {
-      /**
-       * By default, `@example` is output with "**Example** `value`". We want to capture the value and place it inside "Example: `value`."
-       */
-      pattern: /\*\*Example\*\* `([^`]+)`/g,
-      replace: 'Example: `$1`.',
-    },
-    {
-      /**
-       * By default, multiple `@example` are output with "**Examples** `value1` `value2`". We want to capture the values and place them inside "Examples: `value1`, `value2`."
-       */
       pattern: /\*\*Examples\*\* ((?:`[^`]+`)(?: `[^`]+`)*)/g,
-      replace: (/** @type {string} */ _match, /** @type {string} */ capturedGroup) => {
-        return `Examples: ${capturedGroup.split(' ').join(', ')}.`;
-      },
+      replace: (/** @type {string} */ _match, /** @type {string} */ capturedGroup) =>
+        `Examples: ${capturedGroup.split(' ').join(', ')}.`,
     },
   ];
 }
@@ -433,19 +274,6 @@ function protectPipeDelimitedInlineCodeSpans(line) {
  */
 function restoreProtectedInlineCodeSpans(text, placeholders) {
   return text.replace(PIPE_CODE_PH, (_, /** @type {string} */ i) => placeholders[Number(i)] ?? '');
-}
-
-/**
- * Remove the Properties section (heading + table) from reference object pages (e.g. `shared/clerk/clerk.mdx`); the table body (no heading) is copied into `shared/<object>/properties.mdx` by `extract-methods.mjs`.
- *
- * @param {string} contents
- */
-export function stripReferenceObjectPropertiesSection(contents) {
-  if (!contents) {
-    return contents;
-  }
-  const stripped = contents.replace(/\r\n/g, '\n').replace(/\n## Properties\n+[\s\S]*$/, '');
-  return stripped.trimEnd() + '\n';
 }
 
 /**
@@ -684,23 +512,9 @@ export function load(app) {
   });
 
   app.renderer.on(MarkdownPageEvent.END, output => {
-    const fileName = output.url.split('/').pop();
-
     if (output.contents) {
       output.contents = applyRelativeLinkReplacements(output.contents);
-    }
-
-    if (output.contents) {
       output.contents = applyCatchAllMdReplacements(output.contents);
-    }
-
-    if (fileName) {
-      if (FILES_WITHOUT_HEADINGS.includes(fileName)) {
-        if (output.contents) {
-          // Remove any headings from the file, irrespective of the level
-          output.contents = output.contents.replace(/^#+\s.+/gm, '');
-        }
-      }
     }
   });
 }

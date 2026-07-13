@@ -6,7 +6,35 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Packages whose pages this script post-processes (Returns + Parameters extracted into sibling
+ * `-return.mdx` / `-params.mdx` files). Pages under these packages get their nominal-type
+ * parameter heading normalized back to the generic `## Parameters` before extraction — see
+ * {@link normalizeNominalParametersHeading}.
+ */
+const EXTRACT_RETURNS_AND_PARAMS_PACKAGES = ['react'];
+
 const LEGACY_HOOK_NAMES = new Set(['use-sign-in-1', 'use-sign-up-1']);
+
+/**
+ * `custom-theme.mjs` uniformly swaps a method's `## Parameters` heading to `` ## `TypeName` ``
+ * when the sole argument is a nominal object type — so every parameters table in the docs uses
+ * one code path. On the pages this script processes, callers still expect the sibling
+ * `-params.mdx` extraction to find a section keyed on the literal `## Parameters` heading, so we
+ * rename the nominal H2 heading back to `## Parameters` in place before extraction.
+ *
+ * Only H2 headings without parentheses are treated as params-type headings: `` ## `TypeName` `` ✔,
+ * `` ## `methodName()` `` ✘ (that's a method name on an aggregator page). Rewrites the first match
+ * only — hook/single-callable pages have at most one such heading per file.
+ *
+ * @param {string} content
+ * @returns {string}
+ */
+function normalizeNominalParametersHeading(content) {
+  return content.replace(/(^|\n)## `([A-Za-z_$][A-Za-z0-9_$]*)`(\s*)(\n|$)/, (_m, before, _name, trailing, after) => {
+    return `${before}## Parameters${trailing}${after}`;
+  });
+}
 
 /**
  * Returns legacy hook output info or null if not a legacy hook.
@@ -203,8 +231,7 @@ function getAllMdxFiles(dir) {
  * Main function to process all files from the react package
  */
 function main() {
-  const packages = ['react'];
-  const dirs = packages.map(folder => path.join(__dirname, 'temp-docs', folder));
+  const dirs = EXTRACT_RETURNS_AND_PARAMS_PACKAGES.map(folder => path.join(__dirname, 'temp-docs', folder));
 
   for (const dir of dirs) {
     if (!fs.existsSync(dir)) {
@@ -219,7 +246,14 @@ function main() {
     let paramsCount = 0;
 
     for (const filePath of mdxFiles) {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const original = fs.readFileSync(filePath, 'utf-8');
+      // Normalize the theme's uniform `` ## `TypeName` `` back to `## Parameters` so both the
+      // sibling extraction below AND downstream consumers reading the page see the generic
+      // heading. Persist the rewrite when it changed anything.
+      const content = normalizeNominalParametersHeading(original);
+      if (content !== original) {
+        fs.writeFileSync(filePath, content, 'utf-8');
+      }
       const legacyTarget = getLegacyHookTarget(filePath);
 
       // Extract Returns sections

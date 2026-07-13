@@ -32,7 +32,7 @@ export interface ClientResource extends ClerkResource {
    */
   signIn: SignInResource;
   /**
-   * Indicates whether this client hasn't been saved (created) yet in the Frontend API.
+   * Whether this client hasn't been saved (created) yet in the Frontend API.
    */
   isNew: () => boolean;
   /**
@@ -60,7 +60,7 @@ export interface ClientResource extends ClerkResource {
    */
   resetSignUp: () => void;
   /**
-   * Indicates whether the client cookie is due to expire in 8 days or less.
+   * Whether the client cookie is due to expire in 8 days or less.
    */
   isEligibleForTouch: () => boolean;
   /**
@@ -78,7 +78,7 @@ export interface ClientResource extends ClerkResource {
    */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null;
   /**
-   * Indicates whether CAPTCHA checks are skipped for this client.
+   * Whether CAPTCHA checks are skipped for this client.
    */
   captchaBypass: boolean;
   /**

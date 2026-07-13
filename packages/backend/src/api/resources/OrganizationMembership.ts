@@ -52,6 +52,7 @@ export class OrganizationMembership {
 
 /**
  * @class
+ * @noHeading
  */
 export class OrganizationMembershipPublicUserData {
   constructor(

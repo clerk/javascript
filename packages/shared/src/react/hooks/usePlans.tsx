@@ -23,5 +23,6 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
 
 /**
  * @interface
+ * @noHeading
  */
 export type UsePlansReturn = ReturnType<typeof usePlans>;

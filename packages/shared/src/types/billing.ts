@@ -1494,6 +1494,7 @@ interface CheckoutFlowMethods {
 
 /**
  * @interface
+ * @noHeading
  */
 export type CheckoutFlowResource = CheckoutPropertiesPerStatus & CheckoutFlowMethods;
 

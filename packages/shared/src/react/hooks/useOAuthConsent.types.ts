@@ -3,40 +3,26 @@ import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
 
 /**
  * @interface
+ * @noHeading
  */
 export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope' | 'redirectUri'> & {
-  /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default true
-   */
+  /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `true`. */
   keepPreviousData?: boolean;
-  /**
-   * If `true`, a request will be triggered when the hook is mounted and the user is signed in.
-   *
-   * @default true
-   */
+  /** Whether a request will be triggered when the hook is mounted and the user is signed in. Defaults to `true`. */
   enabled?: boolean;
 };
 
 /**
  * @interface
+ * @noHeading
  */
 export type UseOAuthConsentReturn = {
-  /**
-   * The OAuth consent screen metadata returned by Clerk, or `undefined` before the first successful fetch.
-   */
+  /** The OAuth consent screen metadata returned by Clerk, or `undefined` before the first successful fetch. */
   data: OAuthConsentInfo | undefined;
-  /**
-   * Any error that occurred during the data fetch, or `null` if no error occurred.
-   */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
-  /**
-   * Whether the initial consent metadata fetch is still in progress.
-   */
+  /** Whether the initial consent metadata fetch is still in progress. */
   isLoading: boolean;
-  /**
-   * Whether any request is still in flight, including background updates.
-   */
+  /** Whether any request is still in flight, including background updates. */
   isFetching: boolean;
 };

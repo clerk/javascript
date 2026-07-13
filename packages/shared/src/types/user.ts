@@ -115,7 +115,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   imageUrl: string;
   /**
-   * Indicates whether the user has uploaded an image or one was copied from OAuth. Returns `false` if Clerk is displaying an avatar for the user.
+   * Whether the user has uploaded an image or one was copied from OAuth. Returns `false` if Clerk is displaying an avatar for the user.
    */
   hasImage: boolean;
   /**
@@ -147,19 +147,19 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   organizationMemberships: OrganizationMembershipResource[];
   /**
-   * Indicates whether the user has a password on their account.
+   * Whether the user has a password on their account.
    */
   passwordEnabled: boolean;
   /**
-   * Indicates whether the user has enabled TOTP.
+   * Whether the user has enabled TOTP.
    */
   totpEnabled: boolean;
   /**
-   * Indicates whether the user has enabled backup codes.
+   * Whether the user has enabled backup codes.
    */
   backupCodeEnabled: boolean;
   /**
-   * Indicates whether the user has enabled two-factor authentication.
+   * Whether the user has enabled two-factor authentication.
    */
   twoFactorEnabled: boolean;
   /**
@@ -181,7 +181,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   legalAcceptedAt: Date | null;
   /**
-   * Indicates whether the user can create organizations.
+   * Whether the user can create organizations.
    */
   createOrganizationEnabled: boolean;
   /**
@@ -189,7 +189,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   createOrganizationsLimit: number | null;
   /**
-   * Indicates whether the user can delete their own account.
+   * Whether the user can delete their own account.
    */
   deleteSelfEnabled: boolean;
   /**

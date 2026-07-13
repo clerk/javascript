@@ -1,52 +1,26 @@
 import type { ClerkAPIResponseError } from '../../error';
 import type { BillingPaymentResource, ForPayerType } from '../../types';
 
-/**
- * @internal
- */
+/** @internal */
 export type UsePaymentAttemptQueryParams = {
-  /**
-   * The payment attempt ID to fetch.
-   */
+  /** The payment attempt ID to fetch. */
   paymentAttemptId: string;
-  /**
-   * Specifies whether to fetch the payment attempt for an organization or a user.
-   *
-   * @default 'user'
-   */
+  /** Specifies whether to fetch the payment attempt for an organization or a user. Defaults to `'user'`. */
   for?: ForPayerType;
-  /**
-   * If true, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default false
-   */
+  /** Whether the previous data will be kept in the cache until new data is fetched. Defaults to `false`. */
   keepPreviousData?: boolean;
-  /**
-   * If `true`, a request will be triggered when the hook is mounted.
-   *
-   * @default true
-   */
+  /** Whether a request will be triggered when the hook is mounted. Defaults to `true`. */
   enabled?: boolean;
 };
 
-/**
- * @internal
- */
+/** @internal */
 export type PaymentAttemptQueryResult = {
-  /**
-   * The payment attempt object, `undefined` before the first fetch, or `null` if no payment attempt exists.
-   */
+  /** The payment attempt object, `undefined` before the first fetch, or `null` if no payment attempt exists. */
   data: BillingPaymentResource | undefined | null;
-  /**
-   * Any error that occurred during the data fetch, or `undefined` if no error occurred.
-   */
+  /** Any error that occurred during the data fetch, or `null` if no error occurred. */
   error: ClerkAPIResponseError | null;
-  /**
-   * Indicates whether the initial data is still being fetched.
-   */
+  /** Whether the initial data is still being fetched. */
   isLoading: boolean;
-  /**
-   * Indicates whether any request is still in flight, including background updates.
-   */
+  /** Whether any request is still in flight, including background updates. */
   isFetching: boolean;
 };

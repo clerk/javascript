@@ -320,9 +320,9 @@ export type UpdateUserParams = {
   legalAcceptedAt?: Date;
   /** The locale of the user in BCP-47 format (e.g. `'en-US'`). */
   locale?: string;
-  /** If `true`, the user can delete themselves with the Frontend API. */
+  /** Whether the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
-  /** If `true`, the user can create Organizations with the Frontend API. */
+  /** Whether the user can create Organizations with the Frontend API. */
   createOrganizationEnabled?: boolean;
   /** The maximum number of Organizations the user can create. `0` means unlimited. */
   createOrganizationsLimit?: number;

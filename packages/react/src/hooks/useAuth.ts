@@ -17,9 +17,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { useAuthBase } from './useAuthBase';
 import { createGetToken, createSignOut } from './utils';
 
-/**
- * @inline
- */
+/** @inline */
 type UseAuthOptions = PendingSessionOptions | undefined | null;
 
 /**
@@ -35,7 +33,7 @@ type UseAuthOptions = PendingSessionOptions | undefined | null;
  * @unionReturnHeadings
  * ["Loading", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @param options - An object containing options for the `useAuth()` hook.
  *
  * @function
  *

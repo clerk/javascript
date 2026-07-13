@@ -34,7 +34,7 @@ export interface SignUpFutureAdditionalParams {
    */
   unsafeMetadata?: SignUpUnsafeMetadata;
   /**
-   * Indicates whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
+   * Whether the user has agreed to the [legal compliance](https://clerk.com/docs/guides/secure/legal-compliance) documents.
    */
   legalAccepted?: boolean;
   /**

@@ -9,13 +9,9 @@ const basePath = '/enterprise_connections';
 
 /** @generateWithEmptyComment */
 export type EnterpriseConnectionListParams = ClerkPaginationRequest<{
-  /**
-   * Filters enterprise connections by Organization ID.
-   */
+  /** Filters enterprise connections by Organization ID. */
   organizationId?: string;
-  /**
-   * Filters enterprise connections by active status. If `true`, only active connections are returned. If `false`, only inactive connections are returned. If omitted, all connections are returned.
-   */
+  /** Filters enterprise connections by active status. If `true`, only active connections are returned. If `false`, only inactive connections are returned. If omitted, all connections are returned. */
   active?: boolean;
 }>;
 

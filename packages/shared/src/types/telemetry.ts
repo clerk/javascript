@@ -2,9 +2,7 @@ import type { InstanceType } from './instance';
 
 type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
 
-/**
- * @internal
- */
+/** @internal */
 export type TelemetryEvent = {
   event: string;
   /**
@@ -34,9 +32,7 @@ export type TelemetryEvent = {
   payload: Record<string, JSONValue>;
 };
 
-/**
- * @internal
- */
+/** @internal */
 export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
   event: TelemetryEvent['event'];
   eventSamplingRate?: number;
@@ -57,24 +53,14 @@ export interface TelemetryLogEntry {
   readonly userId?: string;
 }
 
-/**
- * @inline
- */
+/** @inline */
 export interface TelemetryCollector {
-  /**
-   * Indicates whether telemetry is enabled.
-   */
+  /** Whether telemetry is enabled. */
   isEnabled: boolean;
-  /**
-   * If `true`, telemetry events are only logged to the console and not sent to Clerk.
-   */
+  /** Whether telemetry events are only logged to the console and not sent to Clerk. */
   isDebug: boolean;
-  /**
-   * Records a telemetry event.
-   */
+  /** Records a telemetry event. */
   record(event: TelemetryEventRaw): void;
-  /**
-   * Records a telemetry log entry.
-   */
+  /** Records a telemetry log entry. */
   recordLog(entry: TelemetryLogEntry): void;
 }

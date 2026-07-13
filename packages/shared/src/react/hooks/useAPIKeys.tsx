@@ -6,23 +6,15 @@ import type { PaginatedHookConfig, PaginatedResources } from '../types';
 import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-/**
- * @interface
- */
+/** @interface */
 export type UseAPIKeysParams = PaginatedHookConfig<
   GetAPIKeysParams & {
-    /**
-     * If `true`, a request will be triggered when the hook is mounted.
-     *
-     * @default true
-     */
+    /** Whether a request will be triggered when the hook is mounted. Defaults to `true`. */
     enabled?: boolean;
   }
 >;
 
-/**
- * @interface
- */
+/** @interface */
 export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
   APIKeyResource,
   T extends { infinite: true } ? true : false

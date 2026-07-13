@@ -84,32 +84,22 @@ export type __experimental_CheckoutOptions = {
 };
 
 export type CheckoutErrors = {
-  /**
-   * The raw, unparsed errors from the Clerk API.
-   */
+  /** The raw, unparsed errors from the Clerk API. */
   raw: unknown[] | null;
-  /**
-   * Parsed errors that are not related to any specific field.
-   * Does not include any errors that could be parsed as a field error
-   */
+  /** Parsed errors that are not related to any specific field. Does not include any errors that could be parsed as a field error */
   global: ClerkGlobalHookError[] | null;
 };
 
 /**
  * @interface
+ * @noHeading
  */
 export interface CheckoutSignalValue {
-  /**
-   * Represents the errors that occurred during the last fetch of the parent resource.
-   */
+  /** Represents the errors that occurred during the last fetch of the parent resource. */
   errors: CheckoutErrors;
-  /**
-   * The fetch status of the underlying `Checkout` resource.
-   */
+  /** The fetch status of the underlying `Checkout` resource. */
   fetchStatus: 'idle' | 'fetching';
-  /**
-   * An instance representing the currently active `Checkout`.
-   */
+  /** An instance representing the currently active `Checkout`. */
   checkout: CheckoutFlowResource;
 }
 
@@ -119,21 +109,13 @@ export interface CheckoutSignal {
 
 type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
-/**
- * @inline
- */
+/** @inline */
 export type SDKMetadata = {
-  /**
-   * The npm package name of the SDK.
-   */
+  /** The npm package name of the SDK. */
   name: string;
-  /**
-   * The npm package version of the SDK.
-   */
+  /** The npm package version of the SDK. */
   version: string;
-  /**
-   * Typically this will be the `NODE_ENV` that the SDK is currently running in.
-   */
+  /** Typically this will be the `NODE_ENV` that the SDK is currently running in. */
   environment?: string;
 };
 
@@ -144,7 +126,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 /**
  * Optional configuration for the `addListener()` method.
- * @param skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
+ * @param skipInitialEmit - Whether the callback will not be called immediately after registration. Defaults to `false`.
  * @inline
  */
 export type ListenerOptions = { skipInitialEmit?: boolean };
@@ -188,7 +170,8 @@ export type SetActiveNavigate = (params: {
 
 /**
  * A callback that runs after sign out completes.
- * @inline */
+ * @inline
+ */
 export type SignOutCallback = () => void | Promise<any>;
 
 /**
@@ -205,9 +188,7 @@ export type SignOutOptions = {
   redirectUrl?: string;
 };
 
-/**
- * @inline
- */
+/** @inline */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
 
@@ -242,23 +223,17 @@ export type OnEventListener = <E extends ClerkEvent>(
  */
 export type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
 
-/**
- * @inline
- */
+/** @inline */
 export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
 /**
  * The `Clerk` class serves as the central interface for working with Clerk's authentication and user management functionality in your application. As a top-level class in the Clerk SDK, it provides access to key methods and properties for managing users, sessions, API keys, billing, organizations, and more.
  */
 export interface Clerk {
-  /**
-   * The Clerk SDK version number.
-   */
+  /** The Clerk SDK version number. */
   version: string | undefined;
 
-  /**
-   * The version of `@clerk/ui` that is currently loaded, or `undefined` if the prebuilt UI has not been loaded yet.
-   */
+  /** The version of `@clerk/ui` that is currently loaded, or `undefined` if the prebuilt UI has not been loaded yet. */
   uiVersion: string | undefined;
 
   /**
@@ -268,7 +243,7 @@ export interface Clerk {
   sdkMetadata: SDKMetadata | undefined;
 
   /**
-   * Indicates whether the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
+   * Whether the `Clerk` object is ready for use. Set to `false` when the `status` is `"loading"`. Set to `true` when the `status` is `"ready"` or `"degraded"`.
    */
   loaded: boolean;
 
@@ -283,9 +258,7 @@ export interface Clerk {
    */
   status: ClerkStatus;
 
-  /**
-   * @internal
-   */
+  /** @internal */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   /**
@@ -309,21 +282,19 @@ export interface Clerk {
   /** The current Clerk app's domain. Prefixed with `clerk.` on production if not already prefixed. Returns `""` when ran on the server. */
   domain: string;
 
-  /** Indicates whether the instance is a satellite app. */
+  /** Whether the instance is a satellite app. */
   isSatellite: boolean;
 
-  /** Indicates whether the Clerk instance is running in a production or development environment. */
+  /** Whether the Clerk instance is running in a production or development environment. */
   instanceType: InstanceType | undefined;
 
   /**
-   * Indicates whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   * Whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
    * @inline
    */
   isStandardBrowser: boolean | undefined;
 
-  /**
-   * Indicates whether the current user has a valid signed-in client session.
-   */
+  /** Whether the current user has a valid signed-in client session. */
   isSignedIn: boolean;
 
   /** The `Client` object for the current window. */
@@ -850,7 +821,7 @@ export interface Clerk {
    *
    * @param callback - The function to call when Clerk resources change.
    * @param options - Optional configuration.
-   * @param options.skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
+   * @param options.skipInitialEmit - Whether the callback will not be called immediately after registration. Defaults to `false`.
    * @returns - An `UnsubscribeCallback` function that can be used to remove the listener from the `Clerk` object.
    */
   addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
@@ -861,7 +832,7 @@ export interface Clerk {
    * @param event - The event name to subscribe to.
    * @param handler - The callback function to execute when the event is triggered.
    * @param opt - An object to control the behavior of the event handler. If true, and the event was previously dispatched, handler will be called immediately with the latest payload.
-   * @param opt.notify - If `true` and the event was previously dispatched, the handler will be called immediately with the latest payload.
+   * @param opt.notify - Whether the handler will be called immediately with the latest payload.
    */
   on: OnEventListener;
 
@@ -1291,7 +1262,7 @@ export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
  *
  * @param to - The URL or relative path to navigate to.
  * @param options - Optional configuration.
- * @param options.replace? - If `true`, replace the current history entry instead of pushing a new one.
+ * @param options.replace? - Whether to replace the current history entry instead of pushing a new one.
  * @param options.metadata? - Optional router metadata.
  */
 export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
@@ -1313,7 +1284,7 @@ export type ClerkOptionsNavigation =
        */
       routerReplace?: never;
       /**
-       * If `true`, the router will log debug information to the console.
+       * Whether the router will log debug information to the console.
        */
       routerDebug?: boolean;
     }
@@ -1327,7 +1298,7 @@ export type ClerkOptionsNavigation =
        */
       routerReplace: RouterFn;
       /**
-       * If `true`, the router will log debug information to the console.
+       * Whether the router will log debug information to the console.
        */
       routerDebug?: boolean;
     };
@@ -1384,7 +1355,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     localization?: LocalizationResource;
     /**
-     * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     * Whether Clerk should poll against Clerk's backend every 5 minutes.
      * @default true
      */
     polling?: boolean;
@@ -1393,7 +1364,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
-     * Indicates whether ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
+     * Whether ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
     standardBrowser?: boolean;
     /**
@@ -1421,7 +1392,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     allowedRedirectProtocols?: Array<string>;
     /**
-     * Indicates whether the current application should behave as a satellite app. Unlike `domain`, which must be set in the [`Clerk` constructor](https://clerk.com/docs/reference/objects/clerk), `isSatellite` must be set in [`load()`](https://clerk.com/docs/reference/objects/clerk#load).
+     * Whether the current application should behave as a satellite app. Unlike `domain`, which must be set in the [`Clerk` constructor](https://clerk.com/docs/reference/objects/clerk), `isSatellite` must be set in [`load()`](https://clerk.com/docs/reference/objects/clerk#load).
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
@@ -1531,7 +1502,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
 /** @inline */
 export interface NavigateOptions {
   /**
-   * If `true`, replace the current history entry instead of pushing a new one.
+   * Whether to replace the current history entry instead of pushing a new one.
    */
   replace?: boolean;
   /**
@@ -1765,7 +1736,7 @@ export type SignInProps = RoutingOptions & {
  */
 export interface TransferableOption {
   /**
-   * Indicates whether or not sign-in attempts are transferable to the sign-up flow. Defaults to `true`. When set to `false`, prevents [opaque sign-ups](!opaque-sign-up) when a user attempts to sign in via OAuth with an email that doesn't exist.
+   * Whether or not sign-in attempts are transferable to the sign-up flow. Defaults to `true`. When set to `false`, prevents [opaque sign-ups](!opaque-sign-up) when a user attempts to sign in via OAuth with an email that doesn't exist.
    *
    * @default true
    */
@@ -2385,45 +2356,29 @@ export type ConfigureSSOProps = {
 
 /** @generateWithEmptyComment */
 export type GetAPIKeysParams = ClerkPaginationParams<{
-  /**
-   * The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
-   */
+  /** The user or organization ID to query API keys by. If not provided, defaults to the [Active Organization](!active-organization), then the current user. */
   subject?: string;
-  /**
-   * A search query to filter API keys by name.
-   */
+  /** A search query to filter API keys by name. */
   query?: string;
 }>;
 
 /** @generateWithEmptyComment */
 export type CreateAPIKeyParams = {
-  /**
-   * The name of the API key.
-   */
+  /** The name of the API key. */
   name: string;
-  /**
-   * The user or organization ID to associate the API key with. If not provided, defaults to the [Active Organization](!active-organization), then the current User.
-   */
+  /** The user or organization ID to associate the API key with. If not provided, defaults to the [Active Organization](!active-organization), then the current user. */
   subject?: string;
-  /**
-   * The number of seconds until the API key expires. Set to `null` or omit to create a key that never expires.
-   */
+  /** The number of seconds until the API key expires. Set to `null` or omit to create a key that never expires. */
   secondsUntilExpiration?: number;
-  /**
-   * The description of the API key.
-   */
+  /** The description of the API key. */
   description?: string;
 };
 
 /** @generateWithEmptyComment */
 export type RevokeAPIKeyParams = {
-  /**
-   * The ID of the API key to revoke.
-   */
+  /** The ID of the API key to revoke. */
   apiKeyID: string;
-  /**
-   * The reason for revoking the API key.
-   */
+  /** The reason for revoking the API key. */
   revocationReason?: string;
 };
 
@@ -2741,6 +2696,7 @@ export type CreateBulkOrganizationInvitationParams = {
 
 /**
  * @interface
+ * @noHeading
  */
 export interface CreateOrganizationParams {
   /**

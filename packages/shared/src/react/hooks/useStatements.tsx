@@ -20,5 +20,6 @@ export const useStatements = createBillingPaginatedHook<BillingStatementResource
 
 /**
  * @interface
+ * @noHeading
  */
 export type UseStatementsReturn = ReturnType<typeof useStatements>;

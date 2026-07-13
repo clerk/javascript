@@ -29,6 +29,7 @@ import { TokenType } from './tokenTypes';
 
 /**
  * @interface
+ * @noHeading
  */
 export type VerifyTokenOptions = Simplify<
   Omit<VerifyJwtOptions, 'key'> &
