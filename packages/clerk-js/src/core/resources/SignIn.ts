@@ -54,6 +54,7 @@ import type {
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureSubmitProtectCheckParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
   SignInFutureWeb3Params,
@@ -850,7 +851,7 @@ class SignInFuture implements SignInFutureResource {
    * @param params.proofToken - The proof token produced by the Protect challenge SDK.
    * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
    */
-  async submitProtectCheck(params: { proofToken: string }): Promise<{ error: ClerkError | null }> {
+  async submitProtectCheck(params: SignInFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePatch({
         action: 'protect_check',
