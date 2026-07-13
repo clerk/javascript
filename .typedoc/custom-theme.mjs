@@ -3,7 +3,6 @@ import {
   ArrayType,
   Comment,
   i18n,
-  IntersectionType,
   OptionalType,
   ReferenceType,
   ReflectionKind,
@@ -19,6 +18,17 @@ import { BACKEND_API_CONFIG, REFERENCE_OBJECT_CONFIG, REFERENCE_OBJECTS_LIST } f
 import { toFileSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { unwrapOptional } from './type-utils.mjs';
+
+/**
+ * Prefer structural checks over `instanceof` so we still match when multiple TypeDoc copies are loaded (otherwise `instanceof IntersectionType` is false at render time).
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {t is import('typedoc').IntersectionType}
+ */
+function isIntersectionTypeDoc(t) {
+  const o = /** @type {{ type?: string; types?: import('typedoc').Type[] } | null} */ (t);
+  return Boolean(o && typeof o === 'object' && o.type === 'intersection' && Array.isArray(o.types));
+}
 
 /**
  * Stock `typedoc-plugin-markdown` `arrayType` only wraps `elementType.type === 'union'`.
@@ -264,7 +274,7 @@ function collectPropertyReflectionsFromIntersectionArm(t, visitedReflectionIds, 
     return [];
   }
 
-  if (unwrapped instanceof IntersectionType) {
+  if (isIntersectionTypeDoc(unwrapped)) {
     /** @type {import('typedoc').DeclarationReflection[]} */
     const out = [];
     for (const arm of unwrapped.types) {
@@ -932,7 +942,7 @@ function clerkDeclaration(model, options = { headingLevel: 2, nested: false }) {
       }),
     );
   }
-  if (model.type instanceof IntersectionType) {
+  if (isIntersectionTypeDoc(model.type)) {
     model.type?.types?.forEach(intersectionType => {
       if (
         intersectionType instanceof ReflectionType &&
@@ -1599,10 +1609,6 @@ export function load(app) {
         output.contents = wrapPropertiesSectionWithMarkers(output.contents ?? '');
       }
 
-      // `@noHeading` on the source declaration: strip the leading H1/H2/H3 heading (typically
-      // typedoc-plugin-markdown's `## Properties` group heading) so the emitted `.mdx` starts
-      // straight at the property table. Used by types that clerk-docs embeds via `<Typedoc />`
-      // inside pages that already provide their own heading structure.
       // `@noHeading` on the source declaration: strip the first heading (any level H1-H6) in the
       // emitted page (typically typedoc-plugin-markdown's `## Properties` group heading, sometimes
       // preceded by descriptive prose from the type's summary). Used by types that clerk-docs
@@ -2030,7 +2036,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const customizedModel = model;
         customizedModel.typeParameters = undefined;
 
-        if (!opts.nested && model.type instanceof IntersectionType) {
+        if (!opts.nested && isIntersectionTypeDoc(model.type)) {
           const merged = mergeIntersectionPropertyReflections(model.type, model.project);
           if (merged.length > 0) {
             const output = renderMergedIntersectionDeclaration(this, customizedModel, opts, merged, superPartials);
@@ -2402,7 +2408,7 @@ function getCallSignatureFromType(t, visitedReflectionIds) {
     }
     return undefined;
   }
-  if (t instanceof IntersectionType) {
+  if (isIntersectionTypeDoc(t)) {
     for (const arm of t.types) {
       const sig = getCallSignatureFromType(arm, visitedReflectionIds);
       if (sig) {
@@ -3308,7 +3314,7 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
     }
     return nonNullish.every(u => isCallablePropertyValueType(u, helpers, seenReflectionIds));
   }
-  if (t instanceof IntersectionType) {
+  if (isIntersectionTypeDoc(t)) {
     return t.types.some(u => isCallablePropertyValueType(u, helpers, seenReflectionIds));
   }
   if (t instanceof ReflectionType) {

@@ -99,7 +99,12 @@ function trimBlankBoundariesInPlace(arr) {
  */
 function extractReturnsProseFromReturnsBody(returnsBody) {
   if (!returnsBody) return '';
-  const dashIdx = returnsBody.indexOf(' — ');
+  // The condensed shape puts the `` `Type` — <description> `` separator on the first line, so only
+  // look for ` — ` there. Scanning the whole body would misfire on an em-dash inside an uncondensed
+  // description (which has no separator — the type sits alone on line 1), truncating the prose.
+  const firstLineEnd = returnsBody.indexOf('\n');
+  const firstLine = firstLineEnd === -1 ? returnsBody : returnsBody.slice(0, firstLineEnd);
+  const dashIdx = firstLine.indexOf(' — ');
   let rightSide = '';
   if (dashIdx !== -1) {
     rightSide = returnsBody.slice(dashIdx + 3);
