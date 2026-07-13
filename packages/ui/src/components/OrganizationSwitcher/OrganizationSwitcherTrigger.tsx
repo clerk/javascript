@@ -8,7 +8,7 @@ import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext, useSubscription } from '../../contexts';
-import { Badge, Button, descriptors, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
+import { Badge, Box, Button, descriptors, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -96,14 +96,14 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
 );
 
 const PlanBadge = () => {
-  const { isLoading, subscriptionItems } = useSubscription();
+  const { isLoading, isFetching, subscriptionItems } = useSubscription();
   const { showPlanName } = useOrganizationSwitcherContext();
 
   if (!showPlanName) {
     return null;
   }
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     // 5ch is specifically chosen to balance the size of "Free" versus paid plans in Inter
     return <LoadingBadge sx={{ width: '5ch' }} />;
   }
@@ -120,14 +120,15 @@ const PlanBadge = () => {
       elementDescriptor={descriptors.organizationSwitcherTriggerBadge}
       elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
       colorScheme={isDefault ? 'primary' : 'secondary'}
-      sx={{ whiteSpace: 'nowrap' }}
+      title={name}
+      sx={{ flexShrink: 1, minWidth: 0, maxWidth: '14ch' }}
     >
-      <Text
+      <Box
         as='span'
-        sx={t => ({ fontSize: t.fontSizes.$xs })}
+        sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
       >
         {name}
-      </Text>
+      </Box>
     </Badge>
   );
 };
