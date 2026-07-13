@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.25.2",
+  "version": "1.24.2",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -49,6 +49,11 @@
       "types": "./dist/themes/experimental.d.ts",
       "import": "./dist/themes/experimental.js",
       "default": "./dist/themes/experimental.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental/index.d.ts",
+      "import": "./dist/experimental/index.js",
+      "default": "./dist/experimental/index.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
     "./register": {
