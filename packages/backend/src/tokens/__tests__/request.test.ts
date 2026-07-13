@@ -2058,7 +2058,8 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test('does not trigger handshake when referer is from production accounts portal', async () => {
+    // accounts.example.com is not this instance's derived accounts portal, so it must not be trusted.
+    test('triggers handshake when referer is an unrelated accounts.* domain', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.example.com/sign-in',
@@ -2080,14 +2081,65 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (current format)', async () => {
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (current format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://foo-bar-13.accounts.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (legacy format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+    });
+
+    // A production instance must not trust dev-portal referrers, which are freely obtainable.
+    test('triggers handshake when referer is a dev accounts portal on a production instance (current format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://foo-bar-13.accounts.dev/sign-in',
@@ -2109,14 +2161,14 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (legacy format)', async () => {
+    test('triggers handshake when referer is a dev accounts portal on a production instance (legacy format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
@@ -2138,9 +2190,9 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });
