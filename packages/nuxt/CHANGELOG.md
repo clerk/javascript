@@ -1,5 +1,15 @@
 # @clerk/nuxt
 
+## 1.13.32
+
+### Patch Changes
+
+- Updated dependencies [[`4093b03`](https://github.com/clerk/javascript/commit/4093b03dc1227b253da17582d6ed27f9d189d1b2)]:
+  - @clerk/shared@3.47.8
+  - @clerk/backend@2.33.6
+  - @clerk/types@4.101.26
+  - @clerk/vue@1.17.24
+
 ## 1.13.31
 
 ### Patch Changes
