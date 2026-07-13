@@ -177,8 +177,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputShowPasswordIcon',
   'formFieldInputCopyToClipboardButton',
   'formFieldInputCopyToClipboardIcon',
-  'searchInput',
-  'searchInputClearButton',
 
   'phoneInputBox',
   'formInputGroup',
@@ -465,6 +463,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSectionPrimaryButton',
   'profileSectionButtonGroup',
   'profilePage',
+  'profilePageContent',
 
   'formattedPhoneNumber',
   'formattedPhoneNumberFlag',

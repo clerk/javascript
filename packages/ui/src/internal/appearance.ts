@@ -306,8 +306,6 @@ export type ElementsConfig = {
   formFieldInputShowPasswordIcon: WithOptions;
   formFieldInputCopyToClipboardButton: WithOptions;
   formFieldInputCopyToClipboardIcon: WithOptions;
-  searchInput: WithOptions;
-  searchInputClearButton: WithOptions;
 
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
@@ -599,6 +597,7 @@ export type ElementsConfig = {
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
   profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
+  profilePageContent: WithOptions;
 
   // TODO: review
   formattedPhoneNumber: WithOptions;
