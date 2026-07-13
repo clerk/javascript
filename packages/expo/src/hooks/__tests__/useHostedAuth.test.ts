@@ -1,10 +1,11 @@
+import { createHash } from 'node:crypto';
 import Module from 'node:module';
 
 import type { ClientJSON } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { useHostedAuth } from '../useHostedAuth';
+import { createCodeChallenge, useHostedAuth } from '../useHostedAuth';
 
 const moduleWithLoad = Module as unknown as {
   _load: (request: string, parent?: unknown, isMain?: boolean) => unknown;
@@ -346,7 +347,7 @@ describe('useHostedAuth', () => {
     expect(response.createdSessionId).toBe('sess_reloaded');
   });
 
-  test('rejects a redeemed client response without a created session', async () => {
+  test('rejects a redeemed client response without a created session id but still applies the client', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
@@ -357,11 +358,12 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
 
     await expect(result.current.startHostedAuth()).rejects.toThrow(
-      'Hosted auth completion did not include the created session.',
+      'Hosted auth completion did not include a created session id.',
     );
 
     expect(mockFapiRequest).toHaveBeenNthCalledWith(2, expect.objectContaining({ path: '/client' }));
-    expect(mockClient.fromJSON).not.toHaveBeenCalled();
+    // The client token is already rotated after redemption, so the client JSON must be applied before the throw.
+    expect(mockClient.fromJSON).toHaveBeenCalledWith(expect.objectContaining({ object: 'client' }));
     expect(mockSetActive).not.toHaveBeenCalled();
   });
 
@@ -383,7 +385,7 @@ describe('useHostedAuth', () => {
     expect(mockSetActive).not.toHaveBeenCalled();
   });
 
-  test('rejects a callback session that is absent from the redeemed client', async () => {
+  test('rejects a callback session that is absent from the redeemed client but still applies the client', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
@@ -394,10 +396,57 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
 
     await expect(result.current.startHostedAuth()).rejects.toThrow(
-      'Hosted auth completion did not include the created session.',
+      'Hosted auth created session was not found on the redeemed client.',
     );
-    expect(mockClient.fromJSON).not.toHaveBeenCalled();
+    expect(mockClient.fromJSON).toHaveBeenCalledWith(expect.objectContaining({ object: 'client' }));
     expect(mockSetActive).not.toHaveBeenCalled();
+  });
+
+  test('rejects concurrent invocations while hosted auth is in progress', async () => {
+    mockHostedAuthResponse();
+    let resolveBrowser: (result: { type: string }) => void = () => {};
+    mocks.openAuthSessionAsync.mockReturnValue(
+      new Promise(resolve => {
+        resolveBrowser = resolve;
+      }),
+    );
+
+    const { result } = renderHook(() => useHostedAuth());
+    const firstAttempt = result.current.startHostedAuth();
+
+    await expect(result.current.startHostedAuth()).rejects.toThrow('Hosted auth is already in progress.');
+
+    resolveBrowser({ type: 'dismiss' });
+    await expect(firstAttempt).resolves.toEqual(
+      expect.objectContaining({
+        createdSessionId: null,
+      }),
+    );
+
+    // The rejected concurrent call never created an attempt or opened a browser session.
+    expect(mockFapiRequest).toHaveBeenCalledTimes(1);
+    expect(mocks.openAuthSessionAsync).toHaveBeenCalledTimes(1);
+  });
+
+  test('releases the in-progress guard after a failed attempt', async () => {
+    mockFapiRequest.mockResolvedValueOnce({
+      ok: false,
+      status: 422,
+      statusText: 'Unprocessable Entity',
+      payload: {
+        errors: [],
+      },
+    });
+
+    const { result } = renderHook(() => useHostedAuth());
+    await expect(result.current.startHostedAuth()).rejects.toThrow('Unprocessable Entity');
+
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
+    const response = await result.current.startHostedAuth();
+
+    expect(response.createdSessionId).toBeNull();
+    expect(mocks.openAuthSessionAsync).toHaveBeenCalledTimes(1);
   });
 
   test('surfaces browser session open failures', async () => {
@@ -580,6 +629,17 @@ describe('useHostedAuth', () => {
 
     await expect(result.current.startHostedAuth()).rejects.toThrow('Unauthorized');
     expect(mockHandleUnauthenticated).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('createCodeChallenge', () => {
+  test('derives the S256 code challenge from the RFC 7636 appendix B vector', async () => {
+    const sha256Base64 = (value: string) =>
+      Promise.resolve(createHash('sha256').update(value, 'ascii').digest('base64'));
+
+    await expect(createCodeChallenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', sha256Base64)).resolves.toBe(
+      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+    );
   });
 });
 

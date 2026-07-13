@@ -3,12 +3,15 @@ import type { ClerkAPIErrorJSON, ClientJSON, ClientResource } from '@clerk/share
 
 import { errorThrower } from './errors';
 
-export type FapiHostedAuthMode = 'sign-in' | 'sign-up';
+/**
+ * Controls which Account Portal auth screen opens for hosted auth.
+ */
+export type HostedAuthMode = 'sign-in' | 'sign-up';
 
 export type CreateHostedAuthParams = {
   redirectUrl: string;
   codeChallenge: string;
-  mode?: FapiHostedAuthMode;
+  mode?: HostedAuthMode;
   state: string;
 };
 

@@ -6,13 +6,17 @@ import { Platform } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from '../utils/errors';
-import type { HostedAuthClerkInstance } from '../utils/hostedAuth';
+import type { HostedAuthClerkInstance, HostedAuthMode } from '../utils/hostedAuth';
 import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
 
-/**
- * Controls which Account Portal auth screen opens for hosted auth.
- */
-export type HostedAuthMode = 'sign-in' | 'sign-up';
+export type { HostedAuthMode };
+
+// Hosted auth keeps its `state` and PKCE verifier in memory for the duration of a single
+// `startHostedAuth` call. If Android kills the app process while the Custom Tab is in the
+// foreground, the flow cannot be resumed and must be restarted. This is an accepted
+// limitation, consistent with `useSSO`.
+let hostedAuthInProgress = false;
+let hasWarnedAndroidDefaultRedirect = false;
 
 /**
  * Options for starting hosted auth from a native Expo application.
@@ -24,6 +28,13 @@ export type StartHostedAuthParams = {
    * bundle identifier or Android package name. Expo Go and projects without a
    * configured application identifier fall back to `AuthSession.makeRedirectUri`.
    * Custom values must use a non-HTTP URL scheme.
+   *
+   * On Android, the default `clerk://<package>.callback` URL only reaches the app
+   * when the Clerk Expo config plugin is enabled in `app.json` and the native
+   * project has been rebuilt (for example with `npx expo prebuild`), because the
+   * plugin registers the matching intent filter. Without it, the browser cannot
+   * redirect back to the app and the flow hangs in the Custom Tab. Pass a custom
+   * `redirectUrl` handled by the app to opt out of this requirement.
    */
   redirectUrl?: string;
   /**
@@ -57,13 +68,35 @@ type HostedAuthPKCE = {
 
 /**
  * Returns helpers for authenticating native Expo users through Clerk's hosted Account Portal.
+ *
+ * On Android, the default redirect URL depends on an intent filter that only the Clerk Expo
+ * config plugin registers: the plugin must be enabled in `app.json` and the native project
+ * rebuilt (for example with `npx expo prebuild`), or the browser cannot return to the app
+ * after auth completes. See {@link StartHostedAuthParams.redirectUrl}.
  */
 export function useHostedAuth(): {
   startHostedAuth: (params?: StartHostedAuthParams) => Promise<StartHostedAuthReturnType>;
 } {
   const clerk = useClerk();
 
+  /**
+   * Opens Account Portal in an auth session and activates the session it creates.
+   * Only one hosted auth flow can run at a time; concurrent calls throw.
+   */
   async function startHostedAuth(params: StartHostedAuthParams = {}): Promise<StartHostedAuthReturnType> {
+    if (hostedAuthInProgress) {
+      return errorThrower.throw('Hosted auth is already in progress.');
+    }
+
+    hostedAuthInProgress = true;
+    try {
+      return await runHostedAuth(params);
+    } finally {
+      hostedAuthInProgress = false;
+    }
+  }
+
+  async function runHostedAuth(params: StartHostedAuthParams): Promise<StartHostedAuthReturnType> {
     if (!clerk.loaded) {
       return {
         createdSessionId: null,
@@ -146,14 +179,22 @@ export function useHostedAuth(): {
       hostedAuthClerk,
     );
 
+    // A successful redemption means the server session exists and the rotated client
+    // token has already been persisted locally by the response middleware. Sync the
+    // local client state before validating the created session, so a validation
+    // failure below does not leave the local client stale against the rotated token.
+    applyHostedAuthClientJSON(clerk.client, clientJSON);
+
     const createdSessionId = normalizeSessionId(
       callbackParams.get('created_session_id') || clientJSON.last_active_session_id,
     );
-    if (!createdSessionId || !clientJSON.sessions.some(session => session.id === createdSessionId)) {
-      return errorThrower.throw('Hosted auth completion did not include the created session.');
+    if (!createdSessionId) {
+      return errorThrower.throw('Hosted auth completion did not include a created session id.');
+    }
+    if (!clientJSON.sessions.some(session => session.id === createdSessionId)) {
+      return errorThrower.throw('Hosted auth created session was not found on the redeemed client.');
     }
 
-    applyHostedAuthClientJSON(clerk.client, clientJSON);
     await clerk.setActive({
       session: createdSessionId,
     });
@@ -175,6 +216,7 @@ function getDefaultRedirectUrl(AuthSessionModule: typeof AuthSession): string {
     return `${appIdentifier}://callback`;
   }
   if (appIdentifier && Platform.OS === 'android') {
+    warnAndroidDefaultRedirectOnce();
     return `clerk://${appIdentifier}.callback`;
   }
 
@@ -182,6 +224,18 @@ function getDefaultRedirectUrl(AuthSessionModule: typeof AuthSession): string {
     path: 'hosted-auth-callback',
     isTripleSlashed: true,
   });
+}
+
+function warnAndroidDefaultRedirectOnce(): void {
+  if (__DEV__ && !hasWarnedAndroidDefaultRedirect) {
+    hasWarnedAndroidDefaultRedirect = true;
+    console.warn(
+      '[useHostedAuth] The default Android redirect URL relies on the `clerk://<package>.callback` intent ' +
+        'filter registered by the Clerk Expo config plugin. If the plugin is not enabled in app.json or the ' +
+        'native project has not been rebuilt since (e.g. `npx expo prebuild`), the browser cannot redirect ' +
+        'back to the app and hosted auth will hang. Alternatively, pass a custom `redirectUrl` handled by the app.',
+    );
+  }
 }
 
 function getExpoAppIdentifier(): string | undefined {
@@ -231,8 +285,8 @@ function createState(): string {
 async function createPKCE(): Promise<HostedAuthPKCE> {
   const Crypto = loadExpoCrypto();
   const codeVerifier = bytesToHex(Crypto.getRandomBytes(32));
-  const codeChallenge = base64ToBase64Url(
-    await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, codeVerifier, {
+  const codeChallenge = await createCodeChallenge(codeVerifier, verifier =>
+    Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, verifier, {
       encoding: Crypto.CryptoEncoding.BASE64,
     }),
   );
@@ -241,6 +295,19 @@ async function createPKCE(): Promise<HostedAuthPKCE> {
     codeVerifier,
     codeChallenge,
   };
+}
+
+/**
+ * Derives the S256 PKCE code challenge (RFC 7636) from a code verifier,
+ * given a function that returns the standard-base64 SHA-256 digest of a string.
+ *
+ * @internal Exported for testing.
+ */
+export async function createCodeChallenge(
+  codeVerifier: string,
+  sha256Base64: (value: string) => Promise<string>,
+): Promise<string> {
+  return base64ToBase64Url(await sha256Base64(codeVerifier));
 }
 
 function loadExpoCrypto(): typeof ExpoCrypto {
