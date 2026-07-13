@@ -9,6 +9,7 @@ Clerk's JavaScript SDK and library monorepo.
 - Use `pnpm` only. `npm` and `yarn` are blocked by `preinstall`. Node `>=24.15`, pnpm `>=10.33`.
 - Every PR needs a changeset. `pnpm changeset` for package changes, `pnpm changeset:empty` for tooling/repo-only. Empty changesets are two `---` delimiters with no body. A changeset is a changelog entry for users upgrading the package, not a summary of the work done in the PR. Describe the user-facing change (what changed for someone consuming the library and how it affects them) rather than the implementation details of the diff. If a change has no user-facing impact, use an empty changeset.
 - Commits must be conventional: `type(scope):` (commitlint enforces, on the PR title). `scope` is the package name without `@clerk/`, or `repo` / `release` / `e2e` / `ci` / `*`. `clerk-js` uses scope `js` (`clerk-js` is also accepted). Scope is mandatory; `docs` is a type, not a scope.
+- Keep code comments minimal. Do not add a comment unless it is critical to explain WHY a non-obvious change was made; never restate what the code does. When one is warranted, keep it to a single terse line, not a verbose multi-line block.
 
 ## References
 
