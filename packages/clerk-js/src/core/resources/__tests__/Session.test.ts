@@ -921,6 +921,18 @@ describe('Session', () => {
         }),
       );
     });
+
+    it('rejects invalid verification levels without calling the API', async () => {
+      const mockFetch = vi.fn();
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await expect(session.verifyWithPasskey({ level: 'third_factor' as any })).rejects.toThrow(
+        'not a valid verification level',
+      );
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
   });
 
   describe('touch()', () => {

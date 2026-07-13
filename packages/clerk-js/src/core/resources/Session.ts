@@ -47,7 +47,7 @@ import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
-import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
+import { clerkInvalidStrategy, clerkInvalidVerificationLevel, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
@@ -317,8 +317,21 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
+  /**
+   * Initiates a reverification flow using passkeys.
+   *
+   * By default the passkey verifies the first factor. Pass `{ level: 'second_factor' }` to satisfy
+   * the second factor of an in-progress multi-factor reverification instead. Any other `level`
+   * value is rejected.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns A `SessionVerification` instance with its status and supported factors.
+   */
   verifyWithPasskey = async (params?: SessionVerifyWithPasskeyParams): Promise<SessionVerificationResource> => {
-    const level = params?.level || 'first_factor';
+    const level = params?.level ?? 'first_factor';
+    if (level !== 'first_factor' && level !== 'second_factor') {
+      clerkInvalidVerificationLevel('Session.verifyWithPasskey', level);
+    }
 
     const prepareResponse =
       level === 'second_factor'

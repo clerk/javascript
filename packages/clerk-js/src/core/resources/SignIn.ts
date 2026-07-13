@@ -553,6 +553,22 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * Authenticates the sign-in with a passkey.
+   *
+   * When the sign-in status is `needs_second_factor` (or `needs_client_trust`), the passkey acts as
+   * the second factor: the in-progress sign-in is reused via the discrete prepare/attempt
+   * second-factor flow, and `params.flow` is ignored — `'autofill'` and `'discoverable'` are
+   * identifier-first concepts whose `create()` call would discard the in-progress sign-in.
+   *
+   * Otherwise the passkey verifies the first factor, with `params.flow` selecting how the ceremony
+   * starts: `'autofill'`/`'discoverable'` create a new sign-in and identify the user from the
+   * passkey itself, while the default requires a sign-in created beforehand.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails, and a
+   * validation error when passkey is not among the available factors.
+   * @returns The updated `SignIn` resource.
+   */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
     const { flow } = params || {};
 
@@ -572,11 +588,6 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    // When the sign-in already awaits its second factor, the passkey acts as
-    // the second factor: run the discrete prepare/attempt second-factor flow
-    // against the in-progress sign-in. `flow` is ignored here — autofill and
-    // discoverable are identifier-first concepts, and their `create()` call
-    // would discard the in-progress sign-in.
     const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
     if (isSecondFactor) {
       const passkeySecondFactor = (this.supportedSecondFactors || []).find(f => f.strategy === 'passkey');

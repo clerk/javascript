@@ -258,9 +258,14 @@ describe('SignIn', () => {
       type: 'public-key',
     };
 
+    const originalFetch = BaseResource._fetch;
+    const originalClerk = SignIn.clerk;
+
     afterEach(() => {
       vi.clearAllMocks();
       vi.unstubAllGlobals();
+      BaseResource._fetch = originalFetch;
+      SignIn.clerk = originalClerk;
     });
 
     it('prepares and attempts the second factor when the sign-in needs a second factor', async () => {
@@ -1898,9 +1903,14 @@ describe('SignIn', () => {
     });
 
     describe('mfa.passkey', () => {
+      const originalFetch = BaseResource._fetch;
+      const originalClerk = SignIn.clerk;
+
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+        BaseResource._fetch = originalFetch;
+        SignIn.clerk = originalClerk;
       });
 
       it('prepares and attempts the passkey second factor', async () => {

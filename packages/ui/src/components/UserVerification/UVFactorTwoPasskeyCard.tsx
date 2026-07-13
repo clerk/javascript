@@ -30,12 +30,20 @@ export const UVFactorTwoPasskeyCard = (props: UVFactorTwoPasskeyCardProps) => {
   }, []);
 
   const handlePasskeysAttempt = () => {
+    // A second click while the WebAuthn ceremony is in flight would abort it
+    // and surface a passkey_operation_aborted error.
+    if (card.isLoading) {
+      return;
+    }
+
+    card.setLoading();
     session
       ?.verifyWithPasskey({ level: 'second_factor' })
       .then(response => {
         return handleVerificationResponse(response);
       })
-      .catch(err => handleError(err, [], card.setError));
+      .catch(err => handleError(err, [], card.setError))
+      .finally(() => card.setIdle());
 
     return;
   };
@@ -56,6 +64,7 @@ export const UVFactorTwoPasskeyCard = (props: UVFactorTwoPasskeyCardProps) => {
             <Col gap={3}>
               <Button
                 type='button'
+                isLoading={card.isLoading}
                 onClick={e => {
                   e.preventDefault();
                   handlePasskeysAttempt();
