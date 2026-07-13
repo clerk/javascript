@@ -216,11 +216,11 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   /**
-   * Determines if the referrer URL is from a Clerk domain (accounts portal or FAPI).
-   * This includes both development and production account portal domains, as well as FAPI domains
-   * used for redirect-based authentication flows.
+   * Determines if the referrer URL is from a Clerk domain: the instance's FAPI domain, the accounts
+   * portal derived from its frontend API, or — on non-production instances only — a development
+   * account-portal domain.
    *
-   * @returns {boolean} True if the referrer is from a Clerk accounts portal or FAPI domain, false otherwise
+   * @returns {boolean} True if the referrer is a trusted Clerk domain, false otherwise
    */
   public isKnownClerkReferrer(): boolean {
     if (!this.referrer) {

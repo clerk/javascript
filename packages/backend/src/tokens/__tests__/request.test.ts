@@ -2098,6 +2098,7 @@ describe('tokens.authenticateRequest(options)', () => {
         {
           __session: mockJwt,
           __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
         },
         'https://primary.com/dashboard',
       );
@@ -2110,7 +2111,11 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
     });
 
     test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (legacy format)', async () => {
@@ -2123,6 +2128,7 @@ describe('tokens.authenticateRequest(options)', () => {
         {
           __session: mockJwt,
           __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
         },
         'https://primary.com/dashboard',
       );
@@ -2135,7 +2141,11 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState.reason).not.toBe(AuthErrorReason.PrimaryDomainCrossOriginSync);
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
     });
 
     // A production instance must not trust dev-portal referrers, which are freely obtainable.
