@@ -373,21 +373,68 @@ describe('SignIn', () => {
       );
     });
 
-    it('throws when passkey is not among the supported second factors', async () => {
+    it('falls through to the first-factor flow when the sign-in needs a second factor but does not offer passkey', async () => {
       const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
 
       SignIn.clerk = {
         __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
       } as any;
 
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_456',
+            status: 'needs_first_factor',
+            first_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_456', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      // A stale in-progress sign-in parked at needs_second_factor: e.g. the
+      // backend didn't advertise passkey (instance toggle off, no registered
+      // passkey, or an older-client version gate) while the start page still
+      // offers browser-side passkey discovery.
       const signIn = new SignIn({
         id: 'signin_123',
         status: 'needs_second_factor',
         supported_second_factors: [{ strategy: 'totp' }],
       } as any);
+      await signIn.authenticateWithPasskey({ flow: 'discoverable' });
 
-      await expect(signIn.authenticateWithPasskey()).rejects.toThrow(
-        'Passkey is not available as a second factor for this sign-in',
+      // The in-progress sign-in is discarded: a fresh sign-in is created and
+      // the passkey verifies its first factor, as on clients that predate
+      // passkey second factors.
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins/signin_456/attempt_first_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
       );
     });
   });
