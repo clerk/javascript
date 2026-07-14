@@ -1,13 +1,13 @@
 'use client';
 
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, OAuthProvider, OAuthScope, UserProfileProps } from '@clerk/shared/types';
+import type { OAuthProvider, OAuthScope, UserProfileProps } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
 
 import { UserProfileContext } from '../../contexts/components/UserProfile';
-import { fallbackModuleManager, ProfileProviderShell } from '../ProfileProviderShell';
+import { ProfileProviderShell, resolveComposedClerkRuntime } from '../ProfileProviderShell';
 
 type UserProfileProviderProps = PropsWithChildren<{
   appearance?: Appearance;
@@ -20,8 +20,7 @@ export const UserProfileProvider = (props: UserProfileProviderProps): ReactNode 
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
 
-  const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager = clerk.__internal_moduleManager ?? fallbackModuleManager;
+  const { environment, moduleManager } = resolveComposedClerkRuntime(clerk, isLoaded);
 
   if (!isLoaded || !user || !environment) {
     return null;
