@@ -1,14 +1,14 @@
 'use client';
 
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, OrganizationProfileProps } from '@clerk/shared/types';
+import type { OrganizationProfileProps } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 
 import type { Appearance } from '@/ui/internal/appearance';
 
 import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
 import { SubscriberTypeContext } from '../../contexts/components/SubscriberType';
-import { fallbackModuleManager, ProfileProviderShell } from '../ProfileProviderShell';
+import { ProfileProviderShell, resolveComposedClerkRuntime } from '../ProfileProviderShell';
 
 type OrganizationProfileProviderProps = PropsWithChildren<{
   appearance?: Appearance;
@@ -22,8 +22,7 @@ export const OrganizationProfileProvider = (props: OrganizationProfileProviderPr
   const { isLoaded, user } = useUser();
   const { organization } = useOrganization();
 
-  const environment = (clerk as any).__internal_environment as EnvironmentResource | null | undefined;
-  const moduleManager = clerk.__internal_moduleManager ?? fallbackModuleManager;
+  const { environment, moduleManager } = resolveComposedClerkRuntime(clerk, isLoaded);
 
   if (!isLoaded || !user || !organization || !environment) {
     return null;
