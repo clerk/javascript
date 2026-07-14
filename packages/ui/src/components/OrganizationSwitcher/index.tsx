@@ -42,7 +42,7 @@ const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactE
       <Popover
         nodeId={nodeId}
         context={context}
-        isOpen={isOpen}
+        animateExit
         order={['content']}
         initialFocus={popoverRef}
       >

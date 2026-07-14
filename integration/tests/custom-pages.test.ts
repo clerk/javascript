@@ -405,14 +405,19 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         const notificationsButton = buttons[2];
         const languageButton = buttons[3];
 
+        // Clicking an action closes the popover, which now plays an exit animation and stays
+        // mounted until it finishes — wait for it to fully close before re-opening, otherwise
+        // the re-open races the still-visible exiting popover.
         // Test chat toggle
         await chatButton.click();
+        await u.po.userButton.waitForPopoverClosed();
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
         await expect(chatButton).toHaveText('🌐Chat is ON');
         await expect(languageButton).toHaveText('🌍Language: EN');
 
         await notificationsButton.click();
+        await u.po.userButton.waitForPopoverClosed();
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
         await expect(notificationsButton).toHaveText('🌐Notifications 🔔 ON');
@@ -460,14 +465,19 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         const languageButton = buttons[3];
         const manageAccountButton = buttons[4];
 
+        // Clicking an action closes the popover, which now plays an exit animation and stays
+        // mounted until it finishes — wait for it to fully close before re-opening, otherwise
+        // the re-open races the still-visible exiting popover.
         // Test chat toggle
         await chatButton.click();
+        await u.po.userButton.waitForPopoverClosed();
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
         await expect(chatButton).toHaveText('🌐Chat is ON');
         await expect(languageButton).toHaveText('🌍Language: EN');
 
         await notificationsButton.click();
+        await u.po.userButton.waitForPopoverClosed();
         await u.po.userButton.toggleTrigger();
         await u.po.userButton.waitForPopover();
         await expect(notificationsButton).toHaveText('🌐Notifications 🔔 ON');
@@ -507,6 +517,10 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         const toggleButton = pagesContainer.locator('button', { hasText: 'Toggle menu items' });
         await expect(toggleButton.locator('span')).toHaveText('🔔');
         await toggleButton.click();
+
+        // The action closes the popover with an exit animation that keeps it mounted until it
+        // finishes; wait for the full close so the re-open doesn't race the exiting popover.
+        await u.po.userButton.waitForPopoverClosed();
 
         // Re-open menu to see updated items
         await u.po.userButton.toggleTrigger();

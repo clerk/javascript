@@ -7,7 +7,7 @@ import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import { common } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
@@ -257,6 +257,11 @@ type SelectOptionListProps = PropsOfComponent<typeof Flex> & {
   containerSx?: ThemableCssProp;
   footer?: React.ReactNode;
   onReachEnd?: () => void;
+  /**
+   * Scale the dropdown animates from on open. Defaults to the compact select value; raise it
+   * (e.g. `0.96`) for wider dropdowns like the phone country-code picker.
+   */
+  initialScale?: number;
 };
 
 export const SelectOptionList = (props: SelectOptionListProps) => {
@@ -265,6 +270,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     sx,
     footer,
     onReachEnd,
+    initialScale = 0.92,
     id,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledBy,
@@ -353,7 +359,9 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     <Popover
       nodeId={nodeId}
       context={context}
-      isOpen={isOpen}
+      animateExit
+      exitFast
+      initialScale={initialScale}
       portal={portal || false}
       order={['content']}
     >
@@ -369,8 +377,6 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
             backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
             borderRadius: theme.radii.$lg,
             overflow: 'hidden',
-            animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
-            transformOrigin: 'top center',
             boxShadow: theme.shadows.$menuShadow,
             zIndex: theme.zIndices.$dropdown,
           }),

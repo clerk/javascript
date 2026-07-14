@@ -3,24 +3,13 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
-import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations, common } from '../styledSystem';
+import type { PropsOfComponent } from '../styledSystem';
+import { common } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { Card } from './Card';
 
-const PopoverCardRoot = React.forwardRef<
-  HTMLDivElement,
-  PropsOfComponent<typeof Card.Content> & {
-    shouldEntryAnimate?: boolean;
-  }
->((props, ref) => {
-  const { elementDescriptor, shouldEntryAnimate = true, ...rest } = props;
-
-  const withAnimation: ThemableCssProp = t => ({
-    animation: shouldEntryAnimate
-      ? `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`
-      : undefined,
-  });
+const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
+  const { elementDescriptor, ...rest } = props;
 
   return (
     <Flow.Part part='popover'>
@@ -30,16 +19,13 @@ const PopoverCardRoot = React.forwardRef<
         ref={ref}
         // Popover cards always render as raised — flush is scoped to simple card components
         elevation='raised'
-        sx={[
-          t => ({
-            width: t.sizes.$94,
-            maxWidth: `calc(100vw - ${t.sizes.$8})`,
-            zIndex: t.zIndices.$modal,
-            borderRadius: t.radii.$xl,
-            outline: 'none',
-          }),
-          withAnimation,
-        ]}
+        sx={t => ({
+          width: t.sizes.$94,
+          maxWidth: `calc(100vw - ${t.sizes.$8})`,
+          zIndex: t.zIndices.$modal,
+          borderRadius: t.radii.$xl,
+          outline: 'none',
+        })}
       >
         {props.children}
       </Card.Root>

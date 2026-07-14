@@ -145,6 +145,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           </Text>
         </SelectButton>
         <SelectOptionList
+          initialScale={0.96}
           sx={{ padding: '0 0' }}
           containerSx={theme => ({
             gap: 0,

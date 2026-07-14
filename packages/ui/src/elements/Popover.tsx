@@ -1,14 +1,38 @@
 import { usePortalRoot } from '@clerk/shared/react';
 import type { FloatingContext, ReferenceType } from '@floating-ui/react';
-import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingNode, FloatingPortal, useTransitionStyles } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+
+import { useAppearance } from '../customizables';
+import { transitionDurationValues, transitionTiming } from '../foundations/transitions';
+import { useDirection, usePrefersReducedMotion } from '../hooks';
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
   nodeId?: string;
   isOpen?: boolean;
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
+  /**
+   * When `true`, the popover animates in on mount with an origin-aware scale + fade and stays
+   * mounted through a matching fade-out on close, instead of appearing/unmounting instantly.
+   * Opt-in so other consumers keep their current instant behavior.
+   * @default false
+   */
+  animateExit?: boolean;
+  /**
+   * When `animateExit` is set, exits quickly (`$faster`, matching the entrance) instead of the
+   * default soft exit (`$slower`). The entrance is always `$faster`.
+   * @default false
+   */
+  exitFast?: boolean;
+  /**
+   * The scale the popover animates from on enter (and collapses to on exit) when `animateExit`
+   * is set. Scale is proportional, so compact surfaces travel fewer pixels — lower this
+   * (e.g. `0.92`) to give small popovers like menus a more pronounced motion.
+   * @default 0.96
+   */
+  initialScale?: number;
   /**
    * Determines whether outside elements are inert when modal is enabled. This enables pointer modality without a backdrop.
    * @default false
@@ -30,6 +54,27 @@ type PopoverProps = PropsWithChildren<{
   root?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
 }>;
 
+/**
+ * Maps a resolved Floating UI placement to a `transform-origin` so the popover grows from the
+ * point nearest its trigger. The primary axis anchors to the edge opposite the `side`; when the
+ * placement is aligned to a corner (`-start` / `-end`) the cross axis hugs that corner, otherwise
+ * it stays centered. Horizontal alignment is mirrored under RTL to match Floating UI's
+ * direction-aware resolved position.
+ */
+const getTransformOrigin = (placement: string, direction: 'ltr' | 'rtl'): string => {
+  const [side, alignment] = placement.split('-');
+  if (side === 'top' || side === 'bottom') {
+    const y = side === 'top' ? 'bottom' : 'top';
+    const start = direction === 'rtl' ? 'right' : 'left';
+    const end = direction === 'rtl' ? 'left' : 'right';
+    const x = alignment === 'start' ? start : alignment === 'end' ? end : 'center';
+    return `${x} ${y}`;
+  }
+  const x = side === 'left' ? 'right' : 'left';
+  const y = alignment === 'start' ? 'top' : alignment === 'end' ? 'bottom' : 'center';
+  return `${x} ${y}`;
+};
+
 export const Popover = (props: PopoverProps) => {
   const {
     context,
@@ -39,6 +84,9 @@ export const Popover = (props: PopoverProps) => {
     modal = true,
     nodeId,
     isOpen,
+    animateExit = false,
+    exitFast = false,
+    initialScale = 0.96,
     portal = true,
     root,
     children,
@@ -47,11 +95,45 @@ export const Popover = (props: PopoverProps) => {
   const portalRoot = usePortalRoot();
   const effectiveRoot = root ?? portalRoot?.() ?? undefined;
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const direction = useDirection();
+  const { animations: layoutAnimations } = useAppearance().parsedOptions;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const animate = animateExit && isMotionSafe;
+  const closeDuration = exitFast ? transitionDurationValues.faster : transitionDurationValues.slower;
+
+  // Animate in on mount and out on close with an origin-aware scale + fade. Keeping the element
+  // mounted through the close transition (via `isMounted`) is what makes the exit animation
+  // possible. `transformOrigin` is derived from the resolved placement so the popover grows from
+  // the point nearest its trigger — the aligned corner when present, otherwise the edge center.
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: {
+      open: animate ? transitionDurationValues.faster : 0,
+      close: animate ? closeDuration : 0,
+    },
+    common: ({ placement }) => ({
+      transformOrigin: getTransformOrigin(placement, direction),
+      transitionTimingFunction: transitionTiming.swiftOut,
+    }),
+    initial: { opacity: animate ? 0 : 1, transform: animate ? `scale(${initialScale})` : 'scale(1)' },
+    open: { opacity: 1, transform: 'scale(1)' },
+    close: { opacity: animate ? 0 : 1, transform: animate ? `scale(${initialScale})` : 'scale(1)' },
+  });
+
+  // Non-animating consumers keep the original synchronous `isOpen` unmount.
+  const shouldRender = animateExit ? isMounted : isOpen;
+  const content =
+    animateExit && React.isValidElement<{ style?: React.CSSProperties }>(children)
+      ? React.cloneElement(children, {
+          style: { ...children.props.style, ...transitionStyles },
+        })
+      : children;
+
   if (portal) {
     return (
       <FloatingNode id={nodeId}>
         <FloatingPortal root={effectiveRoot}>
-          {isOpen && (
+          {shouldRender && (
             <FloatingFocusManager
               context={context}
               initialFocus={initialFocus}
@@ -59,7 +141,7 @@ export const Popover = (props: PopoverProps) => {
               order={order}
               modal={modal}
             >
-              <>{children}</>
+              <>{content}</>
             </FloatingFocusManager>
           )}
         </FloatingPortal>
@@ -69,14 +151,15 @@ export const Popover = (props: PopoverProps) => {
 
   return (
     <FloatingNode id={nodeId}>
-      {isOpen && (
+      {shouldRender && (
         <FloatingFocusManager
           context={context}
           initialFocus={initialFocus}
+          outsideElementsInert={outsideElementsInert}
           order={order}
           modal={modal}
         >
-          <>{children}</>
+          <>{content}</>
         </FloatingFocusManager>
       )}
     </FloatingNode>
