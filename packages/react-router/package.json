@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "3.5.9",
+  "version": "3.5.10",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
