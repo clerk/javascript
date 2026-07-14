@@ -18,14 +18,26 @@ describe('EnterpriseConnectionAPI', () => {
     object: 'enterprise_connection',
     id: 'entconn_123',
     name: 'Clerk',
+    provider: 'saml_custom',
+    logo_public_url: 'https://img.example.com/connection-logo.png',
     domains: ['clerk.dev'],
-    organization_id: null,
     created_at: 1672531200000,
     updated_at: 1672531200000,
     active: true,
     sync_user_attributes: false,
-    allow_subdomains: false,
     disable_additional_identifications: false,
+    allow_organization_account_linking: true,
+    authenticatable: true,
+    disable_jit_provisioning: false,
+    custom_attributes: [
+      {
+        name: 'Employee Number',
+        key: 'employee_number',
+        sso_path: 'user.employeeNumber',
+        scim_path: '',
+        multi_valued: false,
+      },
+    ],
     saml_connection: {
       id: 'samlc_1',
       name: 'Acme SAML',
@@ -35,20 +47,29 @@ describe('EnterpriseConnectionAPI', () => {
       idp_certificate_issued_at: 1672531200000,
       idp_certificate_expires_at: 1704067200000,
       idp_metadata_url: 'https://idp.example.com/metadata',
-      idp_metadata: '<xml/>',
       acs_url: 'https://clerk.example.com/v1/saml/acs',
       sp_entity_id: 'https://clerk.example.com',
       sp_metadata_url: 'https://clerk.example.com/v1/saml/metadata',
-      sync_user_attributes: true,
+      active: true,
       allow_subdomains: true,
       allow_idp_initiated: false,
+      force_authn: false,
+      login_hint: {
+        mode: 'custom_attribute',
+        source: 'employee_number',
+      },
     },
     oauth_config: {
       id: 'eaoc_1',
+      provider_key: 'custom_oidc',
       name: 'Acme OIDC',
       client_id: 'client_abc',
       discovery_url: 'https://oauth.example.com/.well-known/openid-configuration',
+      auth_url: 'https://oauth.example.com/authorize',
+      token_url: 'https://oauth.example.com/token',
+      user_info_url: 'https://oauth.example.com/userinfo',
       logo_public_url: 'https://img.example.com/logo.png',
+      requires_pkce: false,
       created_at: 1672531200000,
       updated_at: 1672531200000,
     },
@@ -326,17 +347,43 @@ describe('EnterpriseConnectionAPI', () => {
 
       expect(response.id).toBe('entconn_123');
       expect(response.name).toBe('Clerk');
+      expect(response.provider).toBe('saml_custom');
+      expect(response.logoPublicUrl).toBe('https://img.example.com/connection-logo.png');
       expect(response.domains).toEqual(['clerk.dev']);
       expect(response.active).toBe(true);
+      // organization_id is omitted by the Backend API when unset and normalized to null
       expect(response.organizationId).toBeNull();
+      expect(response.allowOrganizationAccountLinking).toBe(true);
+      expect(response.authenticatable).toBe(true);
+      expect(response.disableJitProvisioning).toBe(false);
+      expect(response.customAttributes).toEqual([
+        {
+          name: 'Employee Number',
+          key: 'employee_number',
+          ssoPath: 'user.employeeNumber',
+          scimPath: '',
+          multiValued: false,
+        },
+      ]);
       expect(response.samlConnection).not.toBeNull();
       expect(response.samlConnection?.id).toBe('samlc_1');
       expect(response.samlConnection?.idpEntityId).toBe('https://idp.example.com');
       expect(response.samlConnection?.idpCertificateIssuedAt).toBe(1672531200000);
       expect(response.samlConnection?.idpCertificateExpiresAt).toBe(1704067200000);
+      expect(response.samlConnection?.active).toBe(true);
+      expect(response.samlConnection?.forceAuthn).toBe(false);
+      expect(response.samlConnection?.loginHint).toEqual({
+        mode: 'custom_attribute',
+        source: 'employee_number',
+      });
       expect(response.oauthConfig).not.toBeNull();
+      expect(response.oauthConfig?.providerKey).toBe('custom_oidc');
       expect(response.oauthConfig?.clientId).toBe('client_abc');
       expect(response.oauthConfig?.discoveryUrl).toBe('https://oauth.example.com/.well-known/openid-configuration');
+      expect(response.oauthConfig?.authUrl).toBe('https://oauth.example.com/authorize');
+      expect(response.oauthConfig?.tokenUrl).toBe('https://oauth.example.com/token');
+      expect(response.oauthConfig?.userInfoUrl).toBe('https://oauth.example.com/userinfo');
+      expect(response.oauthConfig?.requiresPkce).toBe(false);
     });
   });
 

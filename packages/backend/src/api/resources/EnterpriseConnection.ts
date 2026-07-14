@@ -1,8 +1,54 @@
 import type {
+  EnterpriseConnectionCustomAttributeJSON,
   EnterpriseConnectionJSON,
   EnterpriseConnectionOauthConfigJSON,
   EnterpriseConnectionSamlConnectionJSON,
+  EnterpriseConnectionSamlConnectionLoginHintJSON,
 } from './JSON';
+
+/**
+ * The `login_hint` configuration included on a Backend API {@link EnterpriseConnectionSamlConnection} response.
+ */
+export class EnterpriseConnectionSamlConnectionLoginHint {
+  constructor(
+    /** How the SAML connection emits the `login_hint` sent to the IdP: `'email_address'` sends the typed identifier, `'custom_attribute'` sends the value stored at the user `publicMetadata` key named by `source`, and `'off'` omits the `login_hint`. */
+    readonly mode: 'email_address' | 'custom_attribute' | 'off',
+    /** The user `publicMetadata` key the `login_hint` value is read from. Only set when `mode` is `'custom_attribute'`. */
+    readonly source?: string,
+  ) {}
+
+  static fromJSON(data: EnterpriseConnectionSamlConnectionLoginHintJSON): EnterpriseConnectionSamlConnectionLoginHint {
+    return new EnterpriseConnectionSamlConnectionLoginHint(data.mode, data.source);
+  }
+}
+
+/**
+ * A custom attribute mapping included on a Backend API {@link EnterpriseConnection} response.
+ */
+export class EnterpriseConnectionCustomAttribute {
+  constructor(
+    /** The display name of the custom attribute. */
+    readonly name: string,
+    /** The key the custom attribute is stored under. */
+    readonly key: string,
+    /** The SSO (SAML or OIDC) attribute path the value is read from. */
+    readonly ssoPath: string,
+    /** The SCIM attribute path the value is read from. */
+    readonly scimPath: string,
+    /** Whether the custom attribute holds multiple values. */
+    readonly multiValued: boolean,
+  ) {}
+
+  static fromJSON(data: EnterpriseConnectionCustomAttributeJSON): EnterpriseConnectionCustomAttribute {
+    return new EnterpriseConnectionCustomAttribute(
+      data.name,
+      data.key,
+      data.sso_path,
+      data.scim_path,
+      data.multi_valued,
+    );
+  }
+}
 
 /**
  * The Backend `EnterpriseConnectionSamlConnection` object holds information about a SAML enterprise connection for an instance or organization.
@@ -14,31 +60,43 @@ export class EnterpriseConnectionSamlConnection {
     /** The name to use as a label for the connection. */
     readonly name: string,
     /** The Entity ID as provided by the Identity Provider (IdP). */
-    readonly idpEntityId: string,
+    readonly idpEntityId: string | undefined,
     /** The Single-Sign On URL as provided by the Identity Provider (IdP). */
-    readonly idpSsoUrl: string,
+    readonly idpSsoUrl: string | undefined,
     /** The X.509 certificate as provided by the Identity Provider (IdP). */
-    readonly idpCertificate: string,
+    readonly idpCertificate: string | undefined,
     /** The Unix timestamp when the Identity Provider (IdP) certificate was issued. */
-    readonly idpCertificateIssuedAt: number,
+    readonly idpCertificateIssuedAt: number | undefined,
     /** The Unix timestamp when the Identity Provider (IdP) certificate expires. */
-    readonly idpCertificateExpiresAt: number,
+    readonly idpCertificateExpiresAt: number | undefined,
     /** The URL which serves the Identity Provider (IdP) metadata. */
-    readonly idpMetadataUrl: string,
-    /** The XML content of the Identity Provider (IdP) metadata file. */
-    readonly idpMetadata: string,
+    readonly idpMetadataUrl: string | undefined,
+    /**
+     * The XML content of the Identity Provider (IdP) metadata file.
+     * @deprecated The Backend API does not return this field, so it is always `undefined`.
+     */
+    readonly idpMetadata: string | undefined,
     /** The Assertion Consumer Service (ACS) URL of the connection. */
-    readonly acsUrl: string,
+    readonly acsUrl: string | undefined,
     /** The Entity ID as provided by the Service Provider (Clerk). */
-    readonly spEntityId: string,
+    readonly spEntityId: string | undefined,
     /** The metadata URL as provided by the Service Provider (Clerk). */
-    readonly spMetadataUrl: string,
-    /** Whether the connection syncs user attributes between the IdP and Clerk. */
-    readonly syncUserAttributes: boolean,
+    readonly spMetadataUrl: string | undefined,
+    /**
+     * Whether the connection syncs user attributes between the IdP and Clerk.
+     * @deprecated The Backend API does not return this field on the nested SAML connection, so it is always `undefined`. Use the top-level `syncUserAttributes` on {@link EnterpriseConnection} instead.
+     */
+    readonly syncUserAttributes: boolean | undefined,
     /** Whether users with an email address subdomain are allowed to use this connection. */
     readonly allowSubdomains: boolean,
     /** Whether IdP-initiated SSO is allowed. */
     readonly allowIdpInitiated: boolean,
+    /** Whether the SAML connection is active. */
+    readonly active: boolean,
+    /** Whether the SAML connection requires force authentication. */
+    readonly forceAuthn: boolean,
+    /** The `login_hint` configuration of the SAML connection. */
+    readonly loginHint: EnterpriseConnectionSamlConnectionLoginHint | null,
   ) {}
 
   static fromJSON(data: EnterpriseConnectionSamlConnectionJSON): EnterpriseConnectionSamlConnection {
@@ -58,6 +116,9 @@ export class EnterpriseConnectionSamlConnection {
       data.sync_user_attributes,
       data.allow_subdomains,
       data.allow_idp_initiated,
+      data.active,
+      data.force_authn,
+      data.login_hint != null ? EnterpriseConnectionSamlConnectionLoginHint.fromJSON(data.login_hint) : null,
     );
   }
 }
@@ -78,15 +139,15 @@ export class EnterpriseConnectionOauthConfig {
     /**
      * The OAuth client ID.
      */
-    readonly clientId: string,
+    readonly clientId: string | undefined,
     /**
      * The OpenID Connect discovery URL.
      */
-    readonly discoveryUrl: string,
+    readonly discoveryUrl: string | undefined,
     /**
      * The public URL of the OAuth provider logo, if available.
      */
-    readonly logoPublicUrl: string,
+    readonly logoPublicUrl: string | undefined,
     /**
      * The date when the configuration was first created.
      */
@@ -95,6 +156,26 @@ export class EnterpriseConnectionOauthConfig {
      * The date when the configuration was last updated.
      */
     readonly updatedAt: number,
+    /**
+     * The OAuth provider key of the configuration. For example, `'custom_oidc'`.
+     */
+    readonly providerKey: string,
+    /**
+     * The OAuth authorization URL.
+     */
+    readonly authUrl: string | undefined,
+    /**
+     * The OAuth token URL.
+     */
+    readonly tokenUrl: string | undefined,
+    /**
+     * The OAuth user info URL.
+     */
+    readonly userInfoUrl: string | undefined,
+    /**
+     * Whether the OAuth configuration requires PKCE.
+     */
+    readonly requiresPkce: boolean,
   ) {}
 
   static fromJSON(data: EnterpriseConnectionOauthConfigJSON): EnterpriseConnectionOauthConfig {
@@ -106,6 +187,11 @@ export class EnterpriseConnectionOauthConfig {
       data.logo_public_url,
       data.created_at,
       data.updated_at,
+      data.provider_key,
+      data.auth_url,
+      data.token_url,
+      data.user_info_url,
+      data.requires_pkce,
     );
   }
 }
@@ -141,8 +227,9 @@ export class EnterpriseConnection {
     readonly syncUserAttributes: boolean,
     /**
      * Whether users with an email address subdomain are allowed to use this connection or not.
+     * @deprecated The Backend API does not return this field at the top level, so it is always `undefined`. Use `samlConnection.allowSubdomains` instead.
      */
-    readonly allowSubdomains: boolean,
+    readonly allowSubdomains: boolean | undefined,
     /**
      * Whether additional identifications are disabled for this connection.
      */
@@ -163,6 +250,30 @@ export class EnterpriseConnection {
      * OAuth (OIDC) configuration when the enterprise connection uses OAuth.
      */
     readonly oauthConfig: EnterpriseConnectionOauthConfig | null,
+    /**
+     * The identity provider (IdP) of the connection. For example, `'saml_custom'` or `'oidc_custom'`.
+     */
+    readonly provider: string,
+    /**
+     * The public URL of the provider logo, if available.
+     */
+    readonly logoPublicUrl: string | undefined,
+    /**
+     * Whether existing users who are members of the organization can link their account to their enterprise identity.
+     */
+    readonly allowOrganizationAccountLinking: boolean,
+    /**
+     * Whether the connection can be used for sign-in and sign-up.
+     */
+    readonly authenticatable: boolean,
+    /**
+     * Whether Just-in-Time (JIT) provisioning of users is disabled for the connection.
+     */
+    readonly disableJitProvisioning: boolean,
+    /**
+     * The custom attribute mappings of the connection. Only returned when the custom attributes feature is enabled for the instance.
+     */
+    readonly customAttributes: EnterpriseConnectionCustomAttribute[] | undefined,
   ) {}
 
   static fromJSON(data: EnterpriseConnectionJSON): EnterpriseConnection {
@@ -170,7 +281,7 @@ export class EnterpriseConnection {
       data.id,
       data.name,
       data.domains,
-      data.organization_id,
+      data.organization_id ?? null,
       data.active,
       data.sync_user_attributes,
       data.allow_subdomains,
@@ -179,6 +290,12 @@ export class EnterpriseConnection {
       data.updated_at,
       data.saml_connection != null ? EnterpriseConnectionSamlConnection.fromJSON(data.saml_connection) : null,
       data.oauth_config != null ? EnterpriseConnectionOauthConfig.fromJSON(data.oauth_config) : null,
+      data.provider,
+      data.logo_public_url,
+      data.allow_organization_account_linking,
+      data.authenticatable,
+      data.disable_jit_provisioning,
+      data.custom_attributes?.map(attr => EnterpriseConnectionCustomAttribute.fromJSON(attr)),
     );
   }
 }
