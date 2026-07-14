@@ -129,6 +129,59 @@ describe('EnterpriseConnectionAPI', () => {
       expectTypeOf<'saml_bogus'>().not.toExtend<CreateEnterpriseConnectionParams['provider']>();
       expectTypeOf<'saml_okta'>().toExtend<CreateEnterpriseConnectionParams['provider']>();
     });
+
+    it('sends provisioning, custom attribute, and login hint params in snake_case', async () => {
+      server.use(
+        http.post(
+          'https://api.clerk.test/v1/enterprise_connections',
+          validateHeaders(async ({ request }) => {
+            const body = (await request.json()) as Record<string, unknown>;
+
+            expect(body.allow_organization_account_linking).toBe(true);
+            expect(body.authenticatable).toBe(false);
+            expect(body.disable_jit_provisioning).toBe(true);
+            expect(body.custom_attributes).toEqual([
+              {
+                name: 'Employee Number',
+                key: 'employee_number',
+                sso_path: 'user.employeeNumber',
+                multi_valued: false,
+              },
+            ]);
+            expect((body.saml as Record<string, unknown>).login_hint).toEqual({
+              mode: 'custom_attribute',
+              source: 'employee_number',
+            });
+
+            return HttpResponse.json(mockEnterpriseConnectionResponse);
+          }),
+        ),
+      );
+
+      await apiClient.enterpriseConnections.createEnterpriseConnection({
+        name: 'Clerk',
+        domains: ['clerk.dev'],
+        provider: 'saml_custom',
+        allowOrganizationAccountLinking: true,
+        authenticatable: false,
+        disableJitProvisioning: true,
+        customAttributes: [
+          {
+            name: 'Employee Number',
+            key: 'employee_number',
+            ssoPath: 'user.employeeNumber',
+            multiValued: false,
+          },
+        ],
+        saml: {
+          idpEntityId: 'xxx',
+          loginHint: {
+            mode: 'custom_attribute',
+            source: 'employee_number',
+          },
+        },
+      });
+    });
   });
 
   describe('updateEnterpriseConnection', () => {
@@ -155,6 +208,47 @@ describe('EnterpriseConnectionAPI', () => {
           idpEntityId: 'updated_entity',
           idpMetadataUrl: 'https://updated.example.com/metadata',
         },
+      });
+    });
+
+    it('sends provisioning and custom attribute params in snake_case', async () => {
+      server.use(
+        http.patch(
+          'https://api.clerk.test/v1/enterprise_connections/entconn_123',
+          validateHeaders(async ({ request }) => {
+            const body = (await request.json()) as Record<string, unknown>;
+
+            expect(body.sync_user_attributes).toBe(true);
+            expect(body.disable_additional_identifications).toBe(true);
+            expect(body.allow_organization_account_linking).toBe(false);
+            expect(body.authenticatable).toBe(true);
+            expect(body.disable_jit_provisioning).toBe(false);
+            expect(body.custom_attributes).toEqual([
+              {
+                name: 'Department',
+                key: 'department',
+                scim_path: 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department',
+              },
+            ]);
+
+            return HttpResponse.json(mockEnterpriseConnectionResponse);
+          }),
+        ),
+      );
+
+      await apiClient.enterpriseConnections.updateEnterpriseConnection('entconn_123', {
+        syncUserAttributes: true,
+        disableAdditionalIdentifications: true,
+        allowOrganizationAccountLinking: false,
+        authenticatable: true,
+        disableJitProvisioning: false,
+        customAttributes: [
+          {
+            name: 'Department',
+            key: 'department',
+            scimPath: 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department',
+          },
+        ],
       });
     });
   });

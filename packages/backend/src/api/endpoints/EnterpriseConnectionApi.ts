@@ -50,6 +50,28 @@ export interface EnterpriseConnectionSamlAttributeMappingParams {
 }
 
 /** @inline */
+export interface EnterpriseConnectionSamlLoginHintParams {
+  /** How the SAML connection emits the `login_hint` sent to the IdP: `'email_address'` sends the typed identifier, `'custom_attribute'` sends the value stored at the user `publicMetadata` key named by `source`, and `'off'` omits the `login_hint`. */
+  mode: 'email_address' | 'custom_attribute' | 'off';
+  /** The user `publicMetadata` key to read the `login_hint` value from. Required when `mode` is `'custom_attribute'`, and must be omitted otherwise. */
+  source?: string;
+}
+
+/** @inline */
+export interface EnterpriseConnectionCustomAttributeParams {
+  /** The display name of the custom attribute. */
+  name: string;
+  /** The key to store the custom attribute under. */
+  key: string;
+  /** The SSO (SAML or OIDC) attribute path to read the value from. */
+  ssoPath?: string;
+  /** The SCIM attribute path to read the value from. */
+  scimPath?: string;
+  /** Whether the custom attribute holds multiple values. */
+  multiValued?: boolean;
+}
+
+/** @inline */
 export interface EnterpriseConnectionSamlParams {
   /** Whether the SAML connection allows Identity Provider (IdP) initiated flows. */
   allowIdpInitiated?: boolean;
@@ -69,6 +91,8 @@ export interface EnterpriseConnectionSamlParams {
   idpMetadataUrl?: string;
   /** The IdP Single-Sign On URL for the SAML connection. */
   idpSsoUrl?: string;
+  /** Configuration for the `login_hint` the SAML connection sends to the IdP. */
+  loginHint?: EnterpriseConnectionSamlLoginHintParams;
 }
 
 /** @generateWithEmptyComment */
@@ -88,6 +112,14 @@ export type CreateEnterpriseConnectionParams = {
   syncUserAttributes?: boolean;
   /** The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`. */
   provider: OrganizationEnterpriseConnectionProvider;
+  /** Whether existing users who are members of the organization can link their account to their enterprise identity. If `false`, only sign-up flows apply. */
+  allowOrganizationAccountLinking?: boolean;
+  /** The custom attribute mappings for the enterprise connection. */
+  customAttributes?: EnterpriseConnectionCustomAttributeParams[];
+  /** Whether the enterprise connection can be used for sign-in and sign-up. Requires the authenticatable enterprise connections feature to be enabled for the instance. */
+  authenticatable?: boolean;
+  /** Whether Just-in-Time (JIT) provisioning of users is disabled for the enterprise connection. */
+  disableJitProvisioning?: boolean;
   /** Configuration for if the enterprise connection uses OAuth (OIDC). */
   oidc?: EnterpriseConnectionOidcParams;
   /** Configuration for if the enterprise connection uses SAML. */
@@ -106,6 +138,16 @@ export type UpdateEnterpriseConnectionParams = {
   active?: boolean;
   /** Whether the enterprise connection should sync user attributes between the IdP and Clerk. */
   syncUserAttributes?: boolean;
+  /** Whether additional identifications are disabled for the enterprise connection. */
+  disableAdditionalIdentifications?: boolean;
+  /** Whether existing users who are members of the organization can link their account to their enterprise identity. If `false`, only sign-up flows apply. */
+  allowOrganizationAccountLinking?: boolean;
+  /** The custom attribute mappings for the enterprise connection. */
+  customAttributes?: EnterpriseConnectionCustomAttributeParams[];
+  /** Whether the enterprise connection can be used for sign-in and sign-up. Requires the authenticatable enterprise connections feature to be enabled for the instance. */
+  authenticatable?: boolean;
+  /** Whether Just-in-Time (JIT) provisioning of users is disabled for the enterprise connection. */
+  disableJitProvisioning?: boolean;
   /**
    * The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`.
    * @deprecated The Backend API does not support this parameter on update and ignores it. The provider cannot be changed after creation.
