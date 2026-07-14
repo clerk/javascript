@@ -60,6 +60,7 @@ describe('EnterpriseConnectionAPI', () => {
 
             expect(body.name).toBe('Clerk');
             expect(body.domains).toEqual(['clerk.dev']);
+            expect(body.provider).toBe('saml_custom');
             expect(body.saml).toEqual({
               idp_entity_id: 'xxx',
               idp_metadata_url: 'https://oauth.devsuccess.app/metadata',
@@ -74,6 +75,7 @@ describe('EnterpriseConnectionAPI', () => {
       await apiClient.enterpriseConnections.createEnterpriseConnection({
         name: 'Clerk',
         domains: ['clerk.dev'],
+        provider: 'saml_custom',
         saml: {
           idpEntityId: 'xxx',
           idpMetadataUrl: 'https://oauth.devsuccess.app/metadata',
@@ -89,6 +91,7 @@ describe('EnterpriseConnectionAPI', () => {
           validateHeaders(async ({ request }) => {
             const body = (await request.json()) as Record<string, unknown>;
 
+            expect(body.provider).toBe('oidc_custom');
             expect(body.oidc).toEqual({
               discovery_url: 'https://oidc.example.com/.well-known/openid-configuration',
               client_id: 'client_123',
@@ -107,6 +110,7 @@ describe('EnterpriseConnectionAPI', () => {
       await apiClient.enterpriseConnections.createEnterpriseConnection({
         name: 'OIDC Connection',
         domains: ['example.com'],
+        provider: 'oidc_custom',
         oidc: {
           discoveryUrl: 'https://oidc.example.com/.well-known/openid-configuration',
           clientId: 'client_123',
