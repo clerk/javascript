@@ -8,11 +8,11 @@ import { areAllOrganizationDomainsVerified } from '@/components/ConfigureSSO/dom
 import type { TestRunsView } from '@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '@/components/ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import type { ProviderType } from '@/components/ConfigureSSO/types';
-import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '@/utils/errorHandler';
 
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import type { Snapshot } from '../machine/types';
 import { useMachine } from '../machine/useMachine';
+import { getClerkAPIErrorMessage, getFieldError, getGlobalError } from '../utils/errors';
 import type {
   OrganizationProfileSecurityPanelOverviewContext,
   OrganizationProfileSecurityPanelOverviewEvent,
