@@ -23,10 +23,9 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     setNeedsHostedViewUpdate()
   }
 
-  func setLogoMaxHeight(_ logoMaxHeight: Double?) {
-    let newLogoMaxHeight = logoMaxHeight.map { CGFloat($0) }
-    guard newLogoMaxHeight != currentLogoMaxHeight else { return }
-    currentLogoMaxHeight = newLogoMaxHeight
+  func setLogoMaxHeight(_ logoMaxHeight: CGFloat?) {
+    guard logoMaxHeight != currentLogoMaxHeight else { return }
+    currentLogoMaxHeight = logoMaxHeight
     setNeedsHostedViewUpdate()
   }
 
@@ -78,7 +77,7 @@ public class ClerkAuthViewModule: Module {
         view.setDismissible(isDismissible)
       }
 
-      Prop("logoMaxHeight") { (view: ClerkAuthNativeView, logoMaxHeight: Double?) in
+      Prop("logoMaxHeight") { (view: ClerkAuthNativeView, logoMaxHeight: CGFloat?) in
         view.setLogoMaxHeight(logoMaxHeight)
       }
     }
