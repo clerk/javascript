@@ -19,6 +19,8 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
+import { isClerkTestPhoneNumber } from '@/ui/utils/clerkTestPhoneNumber';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -579,14 +581,16 @@ function SignInStartInternal(): JSX.Element {
             label: 'Insert test phone number',
             onInsert: () => identifierField.setValue('+12015550100'),
           },
+          isTestValue: isClerkTestPhoneNumber,
         }
       : identifierAttribute === 'email_address' || identifierAttribute === 'email_address_username'
         ? {
             text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
             action: {
               label: 'Insert test email',
-              onInsert: () => identifierField.setValue('your_email+clerk_test@example.com'),
+              onInsert: () => identifierField.setValue(toClerkTestEmail(identifierField.value)),
             },
+            isTestValue: (value: string) => value.includes('+clerk_test'),
           }
         : undefined;
 

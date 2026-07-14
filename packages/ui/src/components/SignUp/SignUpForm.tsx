@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Form } from '@/ui/elements/Form';
 import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
+import { toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
+import { isClerkTestPhoneNumber } from '@/ui/utils/clerkTestPhoneNumber';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
@@ -90,8 +92,9 @@ export const SignUpForm = (props: SignUpFormProps) => {
                   text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
                   action: {
                     label: 'Insert test email',
-                    onInsert: () => formState.emailAddress.setValue('your_email+clerk_test@example.com'),
+                    onInsert: () => formState.emailAddress.setValue(toClerkTestEmail(formState.emailAddress.value)),
                   },
+                  isTestValue: value => value.includes('+clerk_test'),
                 }}
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
@@ -110,6 +113,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                     label: 'Insert test phone number',
                     onInsert: () => formState.phoneNumber.setValue('+12015550100'),
                   },
+                  isTestValue: isClerkTestPhoneNumber,
                 }}
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}

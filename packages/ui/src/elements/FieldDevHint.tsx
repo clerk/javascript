@@ -37,6 +37,12 @@ type DevHintAction = {
 export type FieldDevHintValue = {
   text: string | LocalizationKey;
   action?: DevHintAction;
+  /**
+   * Returns true when the current field value is already a test credential. When provided, the
+   * hint stays visible (as a warning) while the field holds a non-test value and only hides once
+   * the value is a test credential. When omitted, the hint hides as soon as the field has any value.
+   */
+  isTestValue?: (value: string) => boolean;
 };
 
 type FieldDevHintProps = {
@@ -51,7 +57,14 @@ type FieldDevHintProps = {
 const FieldDevHintBase = (props: FieldDevHintProps) => {
   const { showDevModeNotice } = useDevMode();
   const { value } = useFormField();
-  const { text, action } = props.hint;
+  const { text, action, isTestValue } = props.hint;
+
+  const stringValue = typeof value === 'string' ? value : '';
+  const hasValue = stringValue.length > 0;
+  // Satisfied → hide. No predicate: any value satisfies. With predicate: only a test value does.
+  const satisfied = hasValue && (isTestValue ? isTestValue(stringValue) : true);
+  // A non-test value keeps the warning icon persistently visible, not just on hover/focus.
+  const persist = hasValue && !satisfied;
 
   const [open, setOpen] = React.useState(false);
 
@@ -92,8 +105,7 @@ const FieldDevHintBase = (props: FieldDevHintProps) => {
   const portalRoot = usePortalRoot();
   const effectiveRoot = portalRoot?.() ?? undefined;
 
-  // Only nudge on an empty field; once the developer has typed (or inserted) a value, hide it.
-  if (!showDevModeNotice || value) {
+  if (!showDevModeNotice || satisfied) {
     return null;
   }
 
@@ -120,8 +132,9 @@ const FieldDevHintBase = (props: FieldDevHintProps) => {
           borderRadius: t.radii.$sm,
           color: t.colors.$warning500,
           // Hidden until the field is hovered/focused (revealed by the formField
-          // container in Form.tsx) or the popover is open.
-          opacity: 0,
+          // container in Form.tsx) or the popover is open. When `persist` (a non-test
+          // value is present) it stays visible as a warning.
+          opacity: persist ? 1 : 0,
           transitionProperty: 'opacity',
           transitionDuration: t.transitionDuration.$fast,
           '&[data-open="true"]': { opacity: 1 },
