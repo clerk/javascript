@@ -45,6 +45,7 @@ final class ClerkNativeBridge {
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
+  var logoMaxHeight: CGFloat?
 
   private var clientObservationGeneration = 0
   private var lastObservedClientState: ClientStateSnapshot?
@@ -238,7 +239,8 @@ final class ClerkNativeBridge {
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -344,10 +346,13 @@ final class ClerkNativeBridge {
       return
     }
 
+    let designDictionary = themeDictionary["design"] as? [String: Any]
+
     // Build light theme from top-level "colors" and "design"
     let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap { parseColors(from: $0) }
-    let design = (themeDictionary["design"] as? [String: Any]).flatMap { parseDesign(from: $0) }
-    let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
+    let design = designDictionary.flatMap { parseDesign(from: $0) }
+    let fonts = designDictionary.flatMap { parseFonts(from: $0) }
+    logoMaxHeight = (designDictionary?["logoMaxHeight"] as? NSNumber).map { CGFloat(truncating: $0) }
 
     if lightColors != nil || design != nil || fonts != nil {
       lightTheme = ClerkTheme(colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)
@@ -465,19 +470,26 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private var themedAuthView: some View {
+  @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    return Group {
+    let themedView = Group {
       if let theme {
         view.environment(\.clerkTheme, theme)
       } else {
         view
       }
+    }
+
+    if let logoMaxHeight {
+      themedView.clerkAppIcon(maxHeight: logoMaxHeight)
+    } else {
+      themedView
     }
   }
 

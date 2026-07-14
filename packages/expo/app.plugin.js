@@ -228,7 +228,7 @@ const withClerkAppleSignIn = config => {
  *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
  *               secondaryButtonForeground }  (hex color strings)
  *   - darkColors: same keys as colors (for dark mode)
- *   - design: { fontFamily: string, borderRadius: number }
+ *   - design: { fontFamily: string, borderRadius: number, logoMaxHeight: number }
  *
  * iOS: Embeds the parsed JSON into Info.plist under key "ClerkTheme".
  * Android: Copies the JSON file to android/app/src/main/assets/clerk_theme.json.
@@ -291,6 +291,14 @@ function validateThemeJson(theme) {
     }
     if (theme.design.borderRadius != null && typeof theme.design.borderRadius !== 'number') {
       throw new Error(`Clerk theme: design.borderRadius must be a number`);
+    }
+    if (
+      theme.design.logoMaxHeight != null &&
+      (typeof theme.design.logoMaxHeight !== 'number' ||
+        !Number.isFinite(theme.design.logoMaxHeight) ||
+        theme.design.logoMaxHeight < 0)
+    ) {
+      throw new Error(`Clerk theme: design.logoMaxHeight must be a finite, non-negative number`);
     }
   }
 }

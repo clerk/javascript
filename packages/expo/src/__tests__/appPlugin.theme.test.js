@@ -13,7 +13,7 @@ describe('validateThemeJson', () => {
       validateThemeJson({
         colors: { primary: '#6C47FF', background: '#FFFFFF' },
         darkColors: { primary: '#8B6FFF' },
-        design: { borderRadius: 12, fontFamily: 'Inter' },
+        design: { borderRadius: 12, fontFamily: 'Inter', logoMaxHeight: 64 },
       }),
     ).not.toThrow();
   });
@@ -35,7 +35,7 @@ describe('validateThemeJson', () => {
   });
 
   test('accepts theme with only design', () => {
-    expect(() => validateThemeJson({ design: { borderRadius: 8 } })).not.toThrow();
+    expect(() => validateThemeJson({ design: { logoMaxHeight: 32 } })).not.toThrow();
   });
 
   // --- colors / darkColors shape validation ---
@@ -124,4 +124,13 @@ describe('validateThemeJson', () => {
   test('throws when borderRadius is a string', () => {
     expect(() => validateThemeJson({ design: { borderRadius: '12' } })).toThrow('design.borderRadius must be a number');
   });
+
+  test.each(['64', -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'throws when logoMaxHeight is invalid: %s',
+    logoMaxHeight => {
+      expect(() => validateThemeJson({ design: { logoMaxHeight } })).toThrow(
+        'design.logoMaxHeight must be a finite, non-negative number',
+      );
+    },
+  );
 });
