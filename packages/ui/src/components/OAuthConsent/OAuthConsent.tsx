@@ -13,6 +13,7 @@ import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
+import { getKnownOAuthClient } from './knownClients';
 import {
   ListGroup,
   ListGroupContent,
@@ -89,6 +90,11 @@ function _OAuthConsent() {
   const { t } = useLocalizations();
   const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
+
+  // When the OAuth app has no uploaded logo, fall back to a recognized client's
+  // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
+  // the app-owner-set name, so a look-alike name cannot borrow the branding.
+  const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -197,7 +203,10 @@ function _OAuthConsent() {
               {!oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <LogoGroupIcon />
+                    <LogoGroupIcon
+                      icon={knownClient?.icon}
+                      iconSx={knownClient?.iconSx}
+                    />
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
@@ -208,7 +217,10 @@ function _OAuthConsent() {
               {/* no avatars */}
               {!oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
-                  <LogoGroupIcon />
+                  <LogoGroupIcon
+                    icon={knownClient?.icon}
+                    iconSx={knownClient?.iconSx}
+                  />
                 </LogoGroup>
               )}
               <Header.Title localizationKey={oauthApplicationName} />

@@ -35,7 +35,17 @@ export function LogoGroupItem({ children, sx, ...props }: ComponentProps<typeof 
   );
 }
 
-export function LogoGroupIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
+export function LogoGroupIcon({
+  size = 'md',
+  sx,
+  icon = LockDottedCircle,
+  iconSx = t => ({ color: t.colors.$primary500 }),
+}: {
+  size?: 'sm' | 'md';
+  sx?: ThemableCssProp;
+  icon?: React.ComponentType;
+  iconSx?: ThemableCssProp;
+}) {
   const scale: ThemableCssProp = t => {
     const value = size === 'sm' ? t.space.$6 : t.space.$12;
     return { width: value, height: value };
@@ -63,8 +73,8 @@ export function LogoGroupIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Th
       elementDescriptor={descriptors.logoGroupIcon}
     >
       <Icon
-        icon={LockDottedCircle}
-        sx={t => ({ color: t.colors.$primary500 })}
+        icon={icon}
+        sx={iconSx}
       />
     </Box>
   );

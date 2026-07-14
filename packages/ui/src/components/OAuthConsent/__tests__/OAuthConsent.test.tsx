@@ -542,4 +542,27 @@ describe('OAuthConsent', () => {
       });
     });
   });
+
+  it('renders the branded logo badge for a recognized client with no uploaded logo', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({
+        ...fakeConsentInfo,
+        oauthApplicationName: 'Claude',
+        oauthApplicationLogoUrl: '',
+        redirectDomain: 'claude.ai',
+      }),
+    });
+
+    const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Claude')).toBeVisible();
+      expect(baseElement.querySelector('.cl-logoGroupIcon')).not.toBeNull();
+    });
+  });
 });
