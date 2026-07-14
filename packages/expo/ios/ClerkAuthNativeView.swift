@@ -4,6 +4,9 @@ import UIKit
 public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
+  private var logoView: UIView?
+  private var logoSize: CGSize = .zero
+  private var logoBoundsObservation: NSKeyValueObservation?
   private var didSendDismiss = false
 
   let onAuthEvent = EventDispatcher()
@@ -41,10 +44,66 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     sendDismissIfNeeded()
   }
 
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    guard let logoView else { return }
+    let newSize = logoView.bounds.size
+    guard newSize != logoSize else { return }
+    logoSize = newSize
+    setNeedsHostedViewUpdate()
+  }
+
+#if RCT_NEW_ARCH_ENABLED
+  override public func mountChildComponentView(_ childComponentView: UIView, index: Int) {
+    setLogoView(childComponentView)
+  }
+
+  override public func unmountChildComponentView(_ childComponentView: UIView, index: Int) {
+    removeLogoView(childComponentView)
+  }
+#else
+  override public func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    super.insertReactSubview(subview, at: atIndex)
+    setLogoView(subview)
+  }
+
+  override public func removeReactSubview(_ subview: UIView!) {
+    removeLogoView(subview)
+    super.removeReactSubview(subview)
+  }
+#endif
+
+  private func setLogoView(_ view: UIView) {
+    guard logoView !== view else { return }
+    logoBoundsObservation = nil
+    logoView = view
+    logoSize = view.bounds.size
+    logoBoundsObservation = view.observe(\.bounds, options: [.new]) { [weak self, weak view] _, change in
+      guard let self, let view, let bounds = change.newValue else { return }
+      DispatchQueue.main.async { [weak self, weak view] in
+        guard let self, let view, self.logoView === view, self.logoSize != bounds.size else { return }
+        self.logoSize = bounds.size
+        self.setNeedsHostedViewUpdate()
+      }
+    }
+    setNeedsHostedViewUpdate()
+  }
+
+  private func removeLogoView(_ view: UIView) {
+    guard logoView === view else { return }
+    logoBoundsObservation = nil
+    view.removeFromSuperview()
+    logoView = nil
+    logoSize = .zero
+    setNeedsHostedViewUpdate()
+  }
+
   override func makeHostedController() -> UIViewController? {
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
+      logoView: logoView,
+      logoSize: logoSize,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()

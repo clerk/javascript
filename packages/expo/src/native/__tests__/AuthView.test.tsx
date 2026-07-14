@@ -40,4 +40,13 @@ describe('AuthView', () => {
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  test('passes a custom logo to the native auth view as a single child', () => {
+    const logo = <span>Custom logo</span>;
+
+    render(<AuthView logo={logo} />);
+
+    const props = mocks.NativeClerkAuthView.mock.calls.at(-1)?.[0];
+    expect(props.children.props.children).toBe(logo);
+  });
 });

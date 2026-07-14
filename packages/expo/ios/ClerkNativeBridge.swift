@@ -229,6 +229,8 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoView: UIView?,
+    logoSize: CGSize,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -238,7 +240,9 @@ final class ClerkNativeBridge {
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        logoView: logoView,
+        logoSize: logoSize
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -465,24 +469,74 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoView: UIView?
+  let logoSize: CGSize
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private var themedAuthView: some View {
+  @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    return Group {
+    let themedView = Group {
       if let theme {
         view.environment(\.clerkTheme, theme)
       } else {
         view
       }
     }
+
+    if let logoView {
+      themedView.clerkAppIconView {
+        ClerkReactLogoView(view: logoView)
+          .frame(width: logoSize.width, height: logoSize.height)
+      }
+    } else {
+      themedView
+    }
   }
 
   var body: some View {
     themedAuthView
+  }
+}
+
+private struct ClerkReactLogoView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
+    return ClerkReactLogoContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+    uiView.setContentView(view)
+  }
+}
+
+private final class ClerkReactLogoContainerView: UIView {
+  private var contentView: UIView?
+
+  init(contentView: UIView) {
+    super.init(frame: .zero)
+    setContentView(contentView)
+  }
+
+  required init?(coder: NSCoder) {
+    return nil
+  }
+
+  func setContentView(_ view: UIView) {
+    guard contentView !== view else { return }
+    contentView?.removeFromSuperview()
+    view.removeFromSuperview()
+    contentView = view
+    addSubview(view)
+    setNeedsLayout()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    contentView?.frame = bounds
   }
 }
 
