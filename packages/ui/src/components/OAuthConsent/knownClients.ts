@@ -1,7 +1,8 @@
 import type React from 'react';
 
-import { Claude, OpenAI } from '@/ui/icons';
 import type { ThemableCssProp } from '@/ui/styledSystem';
+
+import { Claude, OpenAI } from './brandIcons';
 
 /**
  * A curated OAuth client we can recognize and brand on the consent screen.
