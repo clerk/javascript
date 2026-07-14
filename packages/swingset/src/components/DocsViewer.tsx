@@ -25,6 +25,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-billing-payments-section': dynamic(
       () => import('../stories/organization-billing-payments-section.mdx'),
     ),
+    'organization-billing-payment-methods-section': dynamic(
+      () => import('../stories/organization-billing-payment-methods-section.mdx'),
+    ),
     'organization-billing-statement-detail': dynamic(
       () => import('../stories/organization-billing-statement-detail.mdx'),
     ),

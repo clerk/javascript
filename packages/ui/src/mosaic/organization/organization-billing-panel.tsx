@@ -1,13 +1,12 @@
 import type { ReactElement } from 'react';
 
-import { Protect } from '@/common';
-import { PaymentMethods } from '@/components/PaymentMethods';
 import { SubscriberTypeContext } from '@/contexts';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { useTabState } from '@/hooks/useTabState';
 
 import { OrganizationBillingAccountCreditsSection } from './organization-billing-account-credits-section';
 import { OrganizationBillingPanelView } from './organization-billing-panel.view';
+import { OrganizationBillingPaymentMethodsSection } from './organization-billing-payment-methods-section';
 import { OrganizationBillingPaymentsSection } from './organization-billing-payments-section';
 import { OrganizationBillingStatementsSection } from './organization-billing-statements-section';
 import { OrganizationBillingSubscriptionsSection } from './organization-billing-subscriptions-section';
@@ -46,10 +45,7 @@ const OrganizationBillingPanelInternal = withCardStateProvider(
         subscriptions={
           <>
             <OrganizationBillingSubscriptionsSection />
-            {/* PaymentMethods stays legacy for now and keeps its own manage-permission gate. */}
-            <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
-              <PaymentMethods />
-            </Protect>
+            <OrganizationBillingPaymentMethodsSection />
             <OrganizationBillingAccountCreditsSection />
           </>
         }
@@ -61,9 +57,9 @@ const OrganizationBillingPanelInternal = withCardStateProvider(
 );
 
 /**
- * The organization billing panel: a Mosaic shell wrapping the migrated Subscriptions, Account
- * Credits, Statements, and Payments sections plus the still-legacy PaymentMethods section, which
- * coexist as slot children. Provides `SubscriberTypeContext='organization'` and the card-state
+ * The organization billing panel: a Mosaic shell wrapping the migrated Subscriptions, Payment
+ * Methods, Account Credits, Statements, and Payments sections, which coexist as slot children.
+ * Provides `SubscriberTypeContext='organization'` and the card-state
  * provider, and syncs the active tab to the URL `?tab=` param. Requires a `MosaicProvider` ancestor.
  * Exposed on the compound namespace as `OrganizationProfile.BillingPanel`.
  */

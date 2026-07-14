@@ -47,6 +47,10 @@ import {
   meta as organizationBillingPaymentDetailMeta,
 } from '../stories/organization-billing-payment-detail.stories';
 import {
+  Default as OrganizationBillingPaymentMethodsSectionDefault,
+  meta as organizationBillingPaymentMethodsSectionMeta,
+} from '../stories/organization-billing-payment-methods-section.stories';
+import {
   Default as OrganizationBillingPaymentsSectionDefault,
   meta as organizationBillingPaymentsSectionMeta,
 } from '../stories/organization-billing-payments-section.stories';
@@ -152,6 +156,10 @@ const organizationBillingPaymentsSectionModule: StoryModule = {
   meta: organizationBillingPaymentsSectionMeta,
   Default: OrganizationBillingPaymentsSectionDefault,
 };
+const organizationBillingPaymentMethodsSectionModule: StoryModule = {
+  meta: organizationBillingPaymentMethodsSectionMeta,
+  Default: OrganizationBillingPaymentMethodsSectionDefault,
+};
 const organizationBillingStatementDetailModule: StoryModule = {
   meta: organizationBillingStatementDetailMeta,
   Default: OrganizationBillingStatementDetailDefault,
@@ -216,6 +224,7 @@ export const registry: StoryModule[] = [
   organizationBillingAccountCreditsSectionModule,
   organizationBillingStatementsSectionModule,
   organizationBillingPaymentsSectionModule,
+  organizationBillingPaymentMethodsSectionModule,
   organizationBillingStatementDetailModule,
   organizationBillingPaymentDetailModule,
   organizationProfileProfileSectionModule,

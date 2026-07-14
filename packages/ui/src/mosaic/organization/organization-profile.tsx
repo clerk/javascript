@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { OrganizationBillingAccountCreditsSection } from './organization-billing-account-credits-section';
 import { OrganizationBillingPanel } from './organization-billing-panel';
 import { OrganizationBillingPaymentDetail } from './organization-billing-payment-detail';
+import { OrganizationBillingPaymentMethodsSection } from './organization-billing-payment-methods-section';
 import { OrganizationBillingPaymentsSection } from './organization-billing-payments-section';
 import { OrganizationBillingStatementDetail } from './organization-billing-statement-detail';
 import { OrganizationBillingStatementsSection } from './organization-billing-statements-section';
@@ -54,6 +55,7 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   BillingAccountCreditsSection: OrganizationBillingAccountCreditsSection,
   BillingStatementsSection: OrganizationBillingStatementsSection,
   BillingPaymentsSection: OrganizationBillingPaymentsSection,
+  BillingPaymentMethodsSection: OrganizationBillingPaymentMethodsSection,
   BillingStatementDetail: OrganizationBillingStatementDetail,
   BillingPaymentDetail: OrganizationBillingPaymentDetail,
 });
