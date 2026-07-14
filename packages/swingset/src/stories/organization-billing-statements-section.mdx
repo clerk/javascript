@@ -1,0 +1,17 @@
+import * as OrganizationBillingStatementsSectionStories from './organization-billing-statements-section.stories';
+
+# Organization Billing Statements Section
+
+The statements list of the organization billing panel — a table of billing statements that navigates to a statement's detail screen on row select. It renders nothing until the first page resolves.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingStatementsSectionStories}
+  composition={[
+    {
+      name: 'OrganizationBillingPanel',
+      href: '/organization/organization-billing-panel',
+      layer: 'Organization',
+    },
+  ]}
+/>

@@ -15,6 +15,20 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-billing-panel': dynamic(() => import('../stories/organization-billing-panel.mdx')),
+    'organization-billing-account-credits-section': dynamic(
+      () => import('../stories/organization-billing-account-credits-section.mdx'),
+    ),
+    'organization-billing-statements-section': dynamic(
+      () => import('../stories/organization-billing-statements-section.mdx'),
+    ),
+    'organization-billing-payments-section': dynamic(
+      () => import('../stories/organization-billing-payments-section.mdx'),
+    ),
+    'organization-billing-statement-detail': dynamic(
+      () => import('../stories/organization-billing-statement-detail.mdx'),
+    ),
+    'organization-billing-payment-detail': dynamic(() => import('../stories/organization-billing-payment-detail.mdx')),
     'organization-profile-profile-section': dynamic(
       () => import('../stories/organization-profile-profile-section.mdx'),
     ),

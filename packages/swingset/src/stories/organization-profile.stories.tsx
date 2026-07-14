@@ -3,6 +3,7 @@ import { OrganizationProfileView } from '@clerk/ui/mosaic/organization/organizat
 
 import type { StoryMeta } from '@/lib/types';
 
+import { Default as OrganizationBillingPanelDemo } from './organization-billing-panel.stories';
 import { Default as OrganizationProfileApiKeysPanelDemo } from './organization-profile-api-keys-panel.stories';
 import { Default as OrganizationProfileGeneralPanelDemo } from './organization-profile-general-panel.stories';
 import { Default as OrganizationProfileMembersPanelDemo } from './organization-profile-members-panel.stories';
@@ -18,6 +19,7 @@ export function Default() {
     <OrganizationProfileView
       general={<OrganizationProfileGeneralPanelDemo />}
       members={<OrganizationProfileMembersPanelDemo />}
+      billing={<OrganizationBillingPanelDemo />}
       apiKeys={<OrganizationProfileApiKeysPanelDemo />}
     />
   );

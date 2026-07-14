@@ -1,0 +1,17 @@
+import * as OrganizationBillingStatementDetailStories from './organization-billing-statement-detail.stories';
+
+# Organization Billing Statement Detail
+
+A single billing statement's detail screen — the header, dated groups of charges with their credit and discount adjustments, and a total. Reached from the statements list; navigates back to it or into the payment attempt behind a charge.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingStatementDetailStories}
+  composition={[
+    {
+      name: 'OrganizationBillingPanel',
+      href: '/organization/organization-billing-panel',
+      layer: 'Organization',
+    },
+  ]}
+/>
