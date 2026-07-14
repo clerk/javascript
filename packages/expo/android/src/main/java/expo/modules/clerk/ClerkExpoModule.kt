@@ -507,14 +507,11 @@ class ClerkExpoModule : Module() {
     }
 
     private fun parseDesign(json: JSONObject): ClerkDesign {
-        var design = ClerkDesign()
-        if (json.has("borderRadius") && !json.isNull("borderRadius")) {
-            design = design.copy(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        } else {
+            ClerkDesign()
         }
-        if (json.has("logoMaxHeight") && !json.isNull("logoMaxHeight")) {
-            design = design.copy(logoMaxHeight = json.getDouble("logoMaxHeight").toFloat().dp)
-        }
-        return design
     }
 
     private fun parseHexColor(hex: String): Color? {

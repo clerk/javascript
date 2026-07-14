@@ -45,7 +45,6 @@ final class ClerkNativeBridge {
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
-  var logoMaxHeight: CGFloat?
 
   private var clientObservationGeneration = 0
   private var lastObservedClientState: ClientStateSnapshot?
@@ -230,6 +229,7 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -346,13 +346,10 @@ final class ClerkNativeBridge {
       return
     }
 
-    let designDictionary = themeDictionary["design"] as? [String: Any]
-
     // Build light theme from top-level "colors" and "design"
     let lightColors = (themeDictionary["colors"] as? [String: String]).flatMap { parseColors(from: $0) }
-    let design = designDictionary.flatMap { parseDesign(from: $0) }
-    let fonts = designDictionary.flatMap { parseFonts(from: $0) }
-    logoMaxHeight = (designDictionary?["logoMaxHeight"] as? NSNumber).map { CGFloat(truncating: $0) }
+    let design = (themeDictionary["design"] as? [String: Any]).flatMap { parseDesign(from: $0) }
+    let fonts = (themeDictionary["design"] as? [String: Any]).flatMap { parseFonts(from: $0) }
 
     if lightColors != nil || design != nil || fonts != nil {
       lightTheme = ClerkTheme(colors: lightColors ?? .default, fonts: fonts ?? .default, design: design ?? .default)

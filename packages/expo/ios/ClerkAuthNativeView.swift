@@ -4,6 +4,7 @@ import UIKit
 public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
+  private var currentLogoMaxHeight: CGFloat?
   private var didSendDismiss = false
 
   let onAuthEvent = EventDispatcher()
@@ -19,6 +20,13 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     let newDismissible = isDismissible ?? true
     guard newDismissible != currentDismissible else { return }
     currentDismissible = newDismissible
+    setNeedsHostedViewUpdate()
+  }
+
+  func setLogoMaxHeight(_ logoMaxHeight: Double?) {
+    let newLogoMaxHeight = logoMaxHeight.map { CGFloat($0) }
+    guard newLogoMaxHeight != currentLogoMaxHeight else { return }
+    currentLogoMaxHeight = newLogoMaxHeight
     setNeedsHostedViewUpdate()
   }
 
@@ -45,6 +53,7 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
+      logoMaxHeight: currentLogoMaxHeight,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()
@@ -67,6 +76,10 @@ public class ClerkAuthViewModule: Module {
 
       Prop("isDismissible") { (view: ClerkAuthNativeView, isDismissible: Bool?) in
         view.setDismissible(isDismissible)
+      }
+
+      Prop("logoMaxHeight") { (view: ClerkAuthNativeView, logoMaxHeight: Double?) in
+        view.setLogoMaxHeight(logoMaxHeight)
       }
     }
   }
