@@ -9,6 +9,7 @@
 // `styleCacheStore` so sibling composed roots don't duplicate style insertions.
 
 import { ClerkRuntimeError } from '@clerk/shared/error';
+import { logger } from '@clerk/shared/logger';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
@@ -19,7 +20,7 @@ import { useMemo } from 'react';
 import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
 import type { Appearance, Elements } from '@/ui/internal/appearance';
-import { getStyleCache, setStyleCache } from '@/ui/internal/styleCacheStore';
+import { getStyleCacheEntry, setStyleCache } from '@/ui/internal/styleCacheStore';
 import { RouteContext } from '@/ui/router/RouteContext';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 import { createEmotionCache } from '@/ui/styledSystem/createEmotionCache';
@@ -46,6 +47,55 @@ export const fallbackModuleManager: ModuleManager = {
     ),
 };
 
+// `__internal_environment` is a getter on the concrete clerk-js Clerk class but
+// is absent from the shared `LoadedClerk` type (composed profiles are newer than
+// that getter on some clerk-js versions in the wild), so it is read through a
+// narrow structural type rather than the typed interface.
+type ClerkWithInternalEnvironment = {
+  __internal_environment?: EnvironmentResource | null;
+};
+
+/**
+ * Resolves the clerk-js runtime state (environment + module manager) that the
+ * composed profile shell needs. Composed UI is bundled into the consumer app but
+ * clerk-js is hotloaded separately, so an app can bundle composed components that
+ * are newer than the loaded clerk-js. `moduleManager` falls back to a loud stub;
+ * `environment` can only be absent, so once clerk has finished loading a missing
+ * runtime is a real version mismatch and gets a one-time warning instead of a
+ * silent blank render.
+ */
+export function resolveComposedClerkRuntime(
+  clerk: LoadedClerk,
+  clerkLoaded: boolean,
+): { environment: EnvironmentResource | null | undefined; moduleManager: ModuleManager } {
+  // SAFETY: __internal_environment is a real getter on the clerk-js Clerk class
+  // but not on the shared LoadedClerk interface. Narrowing to an optional field
+  // (not `any`) keeps the access typed and forces callers to handle `undefined`.
+  const environment = (clerk as LoadedClerk & ClerkWithInternalEnvironment).__internal_environment;
+  const moduleManager = clerk.__internal_moduleManager ?? fallbackModuleManager;
+
+  if (clerkLoaded && (!environment || clerk.__internal_moduleManager === undefined)) {
+    logger.warnOnce(
+      'Clerk: Composed profile components could not read the runtime state (environment/module manager) from the loaded @clerk/clerk-js, so nothing will render. This usually means the loaded clerk-js is older than the composed components bundled in your app. Upgrade @clerk/clerk-js (or your framework SDK) to a version that supports composed profiles.',
+    );
+  }
+
+  return { environment, moduleManager };
+}
+
+// `nonce` lives on IsomorphicClerkOptions, not ClerkOptions, so `__internal_getOption`'s
+// `K extends keyof ClerkOptions` constraint rejects the key even though clerk-js stores
+// and returns it at runtime.
+type ClerkWithNonceOption = { __internal_getOption(key: string): string | undefined };
+
+function readNonceOption(clerk: LoadedClerk): string | undefined {
+  // SAFETY: nonce is a runtime option clerk-js resolves through the same getter,
+  // but its key is absent from the typed ClerkOptions surface. Narrowing to a
+  // string-keyed method (not `any`) keeps the return typed. Called as a method so
+  // the getter keeps its `this` binding to the clerk instance.
+  return (clerk as unknown as ClerkWithNonceOption).__internal_getOption('nonce');
+}
+
 const composedOverrides: Elements = {
   profilePageContent: { padding: 0 },
 };
@@ -67,14 +117,17 @@ type SharedStyleCacheProviderProps = PropsWithChildren<{
 }>;
 
 // One emotion cache per clerk instance, so sibling composed roots share inserts.
+// Reuse the stored cache only when it was built from the same nonce/cssLayerName;
+// a change to either rebuilds it (mirroring the AIO StyleCacheProvider) instead of
+// pinning whatever the first-mounted sibling saw.
 function SharedStyleCacheProvider({ clerk, nonce, cssLayerName, children }: SharedStyleCacheProviderProps): ReactNode {
   const cache = useMemo(() => {
-    const existing = getStyleCache(clerk);
-    if (existing) {
-      return existing;
+    const existing = getStyleCacheEntry(clerk);
+    if (existing && existing.nonce === nonce && existing.cssLayerName === cssLayerName) {
+      return existing.cache;
     }
     const next = createEmotionCache({ nonce, cssLayerName });
-    setStyleCache(clerk, next);
+    setStyleCache(clerk, { cache: next, nonce, cssLayerName });
     return next;
   }, [clerk, nonce, cssLayerName]);
 
@@ -114,8 +167,7 @@ export function ProfileProviderShell({
   return (
     <SharedStyleCacheProvider
       clerk={clerk}
-      // nonce lives on IsomorphicClerkOptions, not ClerkOptions, so the typed K-constraint rejects it
-      nonce={(clerk as any).__internal_getOption('nonce')}
+      nonce={readNonceOption(clerk)}
       cssLayerName={normalizedGlobalAppearance?.cssLayerName}
     >
       {/* parsed appearance for cl-* styled components */}
