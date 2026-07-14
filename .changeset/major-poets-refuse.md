@@ -1,5 +1,5 @@
 ---
-'@clerk/backend': patch
+'@clerk/backend': minor
 ---
 
 Align the `EnterpriseConnection` response resource with what the Backend API actually returns:

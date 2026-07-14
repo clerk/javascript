@@ -785,7 +785,7 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   force_authn: boolean;
-  login_hint?: EnterpriseConnectionSamlConnectionLoginHintJSON | null;
+  login_hint: EnterpriseConnectionSamlConnectionLoginHintJSON;
 }
 
 export interface EnterpriseConnectionOauthConfigJSON {

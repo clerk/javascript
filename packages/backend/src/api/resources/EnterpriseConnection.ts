@@ -96,7 +96,7 @@ export class EnterpriseConnectionSamlConnection {
     /** Whether the SAML connection requires force authentication. */
     readonly forceAuthn: boolean,
     /** The `login_hint` configuration of the SAML connection. */
-    readonly loginHint: EnterpriseConnectionSamlConnectionLoginHint | null,
+    readonly loginHint: EnterpriseConnectionSamlConnectionLoginHint,
   ) {}
 
   static fromJSON(data: EnterpriseConnectionSamlConnectionJSON): EnterpriseConnectionSamlConnection {
@@ -118,7 +118,7 @@ export class EnterpriseConnectionSamlConnection {
       data.allow_idp_initiated,
       data.active,
       data.force_authn,
-      data.login_hint != null ? EnterpriseConnectionSamlConnectionLoginHint.fromJSON(data.login_hint) : null,
+      EnterpriseConnectionSamlConnectionLoginHint.fromJSON(data.login_hint),
     );
   }
 }
