@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { server, validateHeaders } from '../../mock-server';
+import type { CreateEnterpriseConnectionParams } from '../endpoints/EnterpriseConnectionApi';
 import { createBackendApiClient } from '../factory';
 
 describe('EnterpriseConnectionAPI', () => {
@@ -121,6 +122,12 @@ describe('EnterpriseConnectionAPI', () => {
           requiresPkce: true,
         },
       });
+    });
+
+    it('requires provider and rejects unsupported values at the type level', () => {
+      expectTypeOf<{ name: string; domains: string[] }>().not.toExtend<CreateEnterpriseConnectionParams>();
+      expectTypeOf<'saml_bogus'>().not.toExtend<CreateEnterpriseConnectionParams['provider']>();
+      expectTypeOf<'saml_okta'>().toExtend<CreateEnterpriseConnectionParams['provider']>();
     });
   });
 

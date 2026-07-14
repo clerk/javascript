@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
+import type { ClerkPaginationRequest, OrganizationEnterpriseConnectionProvider } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { EnterpriseConnection } from '../resources';
@@ -84,7 +84,7 @@ export type CreateEnterpriseConnectionParams = {
   /** Whether the enterprise connection should sync user attributes between the IdP and Clerk. */
   syncUserAttributes?: boolean;
   /** The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`. */
-  provider: string;
+  provider: OrganizationEnterpriseConnectionProvider;
   /** Configuration for if the enterprise connection uses OAuth (OIDC). */
   oidc?: EnterpriseConnectionOidcParams;
   /** Configuration for if the enterprise connection uses SAML. */
