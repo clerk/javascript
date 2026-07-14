@@ -74,14 +74,17 @@ export interface EnterpriseConnectionSamlParams {
 /** @generateWithEmptyComment */
 export type CreateEnterpriseConnectionParams = {
   /** The name of the enterprise connection. */
-  name?: string;
-  /** The [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) of the enterprise connection. */
-  domains?: string[];
+  name: string;
+  /** The [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) of the enterprise connection. Must contain at least one domain. */
+  domains: string[];
   /** The organization ID of the enterprise connection. */
   organizationId?: string;
   /** Whether the enterprise connection should be active. */
   active?: boolean;
-  /** Whether the enterprise connection should sync user attributes between the IdP and Clerk. */
+  /**
+   * Whether the enterprise connection should sync user attributes between the IdP and Clerk.
+   * @deprecated The Backend API does not support this parameter on create and ignores it. Use `updateEnterpriseConnection()` to set it.
+   */
   syncUserAttributes?: boolean;
   /** The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`. */
   provider: OrganizationEnterpriseConnectionProvider;
@@ -103,7 +106,10 @@ export type UpdateEnterpriseConnectionParams = {
   active?: boolean;
   /** Whether the enterprise connection should sync user attributes between the IdP and Clerk. */
   syncUserAttributes?: boolean;
-  /** The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`. */
+  /**
+   * The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`.
+   * @deprecated The Backend API does not support this parameter on update and ignores it. The provider cannot be changed after creation.
+   */
   provider?: string;
   /** Configuration for if the enterprise connection uses OAuth (OIDC). */
   oidc?: EnterpriseConnectionOidcParams;
