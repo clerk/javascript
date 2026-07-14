@@ -1,12 +1,14 @@
 import {
-  __internal_useCreditBalanceQuery,
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditBalanceQuery,
   __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
+  __internal_usePaymentAttemptQuery,
+  __internal_useStatementQuery,
   useClerk,
   useSession,
 } from '@clerk/shared/react';
@@ -59,6 +61,16 @@ export const usePaymentAttempts = () => {
 export const useStatements = (externalParams?: { mode: 'cache' }) => {
   const params = useBillingHookParams();
   return __experimental_useStatements({ ...params, __experimental_mode: externalParams?.mode });
+};
+
+export const useStatement = (statementId: string | undefined) => {
+  const params = useBillingHookParams();
+  return __internal_useStatementQuery({ ...params, statementId });
+};
+
+export const usePaymentAttempt = (paymentAttemptId: string | undefined) => {
+  const params = useBillingHookParams();
+  return __internal_usePaymentAttemptQuery({ ...params, paymentAttemptId: paymentAttemptId ?? '' });
 };
 
 export const useSubscription = () => {

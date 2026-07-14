@@ -61,12 +61,16 @@ export default defineConfig({
       { find: /^@\/core\//, replacement: `${clerkJsPath}/core/` },
       { find: /^@\/core$/, replacement: `${clerkJsPath}/core` },
       // UI package utils (must come before clerk-js utils)
+      { find: '@/utils/billing', replacement: `${uiPath}/utils/billing` },
+      { find: '@/utils/billingPlanSeats', replacement: `${uiPath}/utils/billingPlanSeats` },
+      { find: '@/utils/billingSubscription', replacement: `${uiPath}/utils/billingSubscription` },
       { find: '@/utils/errorHandler', replacement: `${uiPath}/utils/errorHandler` },
       { find: '@/utils/factorSorting', replacement: `${uiPath}/utils/factorSorting` },
       { find: '@/utils/formatSafeIdentifier', replacement: `${uiPath}/utils/formatSafeIdentifier` },
       { find: '@/utils/intl', replacement: `${uiPath}/utils/intl` },
       { find: '@/utils/normalizeRoutingOptions', replacement: `${uiPath}/utils/normalizeRoutingOptions` },
       { find: '@/utils/phoneUtils', replacement: `${uiPath}/utils/phoneUtils` },
+      { find: '@/utils/truncateTextWithEndVisible', replacement: `${uiPath}/utils/truncateTextWithEndVisible` },
       // Utils from clerk-js (needed by clerk-js core modules)
       { find: '@/utils', replacement: `${clerkJsPath}/utils` },
       // Catch-all for other @/ imports - UI package
