@@ -1,5 +1,19 @@
 # @clerk/ui
 
+## 1.25.3
+
+### Patch Changes
+
+- Fix small actions button border radius to ensure consistency. ([#9146](https://github.com/clerk/javascript/pull/9146)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Reduce the organization avatar's border radius in the `OrganizationSwitcher` trigger so it stays proportional at the smaller trigger size. ([#9148](https://github.com/clerk/javascript/pull/9148)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Set `box-sizing: border-box` on the spinner so its border no longer changes the rendered size and causes a layout shift. ([#9147](https://github.com/clerk/javascript/pull/9147)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+  - @clerk/localizations@4.13.3
+
 ## 1.25.2
 
 ### Patch Changes
