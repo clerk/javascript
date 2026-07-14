@@ -50,12 +50,19 @@ export interface EnterpriseConnectionSamlAttributeMappingParams {
 }
 
 /** @inline */
-export interface EnterpriseConnectionSamlLoginHintParams {
-  /** How the SAML connection emits the `login_hint` sent to the IdP: `'email_address'` sends the typed identifier, `'custom_attribute'` sends the value stored at the user `publicMetadata` key named by `source`, and `'off'` omits the `login_hint`. */
-  mode: 'email_address' | 'custom_attribute' | 'off';
-  /** The user `publicMetadata` key to read the `login_hint` value from. Required when `mode` is `'custom_attribute'`, and must be omitted otherwise. */
-  source?: string;
-}
+export type EnterpriseConnectionSamlLoginHintParams =
+  | {
+      /** Sends the value stored at the user `publicMetadata` key named by `source` as the `login_hint`. */
+      mode: 'custom_attribute';
+      /** The user `publicMetadata` key to read the `login_hint` value from. */
+      source: string;
+    }
+  | {
+      /** How the SAML connection emits the `login_hint` sent to the IdP: `'email_address'` sends the typed identifier and `'off'` omits the `login_hint`. */
+      mode: 'email_address' | 'off';
+      /** Only supported when `mode` is `'custom_attribute'`. */
+      source?: never;
+    };
 
 /** @inline */
 export interface EnterpriseConnectionCustomAttributeParams {

@@ -2,7 +2,10 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { server, validateHeaders } from '../../mock-server';
-import type { CreateEnterpriseConnectionParams } from '../endpoints/EnterpriseConnectionApi';
+import type {
+  CreateEnterpriseConnectionParams,
+  EnterpriseConnectionSamlLoginHintParams,
+} from '../endpoints/EnterpriseConnectionApi';
 import { createBackendApiClient } from '../factory';
 
 describe('EnterpriseConnectionAPI', () => {
@@ -128,6 +131,23 @@ describe('EnterpriseConnectionAPI', () => {
       expectTypeOf<{ name: string; domains: string[] }>().not.toExtend<CreateEnterpriseConnectionParams>();
       expectTypeOf<'saml_bogus'>().not.toExtend<CreateEnterpriseConnectionParams['provider']>();
       expectTypeOf<'saml_okta'>().toExtend<CreateEnterpriseConnectionParams['provider']>();
+    });
+
+    it('requires name and domains at the type level', () => {
+      expectTypeOf<{
+        name: string;
+        domains: string[];
+        provider: 'saml_custom';
+      }>().toExtend<CreateEnterpriseConnectionParams>();
+      expectTypeOf<{ domains: string[]; provider: 'saml_custom' }>().not.toExtend<CreateEnterpriseConnectionParams>();
+      expectTypeOf<{ name: string; provider: 'saml_custom' }>().not.toExtend<CreateEnterpriseConnectionParams>();
+    });
+
+    it('requires a login hint source exactly when mode is custom_attribute at the type level', () => {
+      expectTypeOf<{ mode: 'custom_attribute'; source: string }>().toExtend<EnterpriseConnectionSamlLoginHintParams>();
+      expectTypeOf<{ mode: 'email_address' }>().toExtend<EnterpriseConnectionSamlLoginHintParams>();
+      expectTypeOf<{ mode: 'custom_attribute' }>().not.toExtend<EnterpriseConnectionSamlLoginHintParams>();
+      expectTypeOf<{ mode: 'off'; source: string }>().not.toExtend<EnterpriseConnectionSamlLoginHintParams>();
     });
 
     it('sends provisioning, custom attribute, and login hint params in snake_case', async () => {
