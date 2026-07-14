@@ -86,6 +86,13 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 isRequired={fields.emailAddress?.required}
                 isOptional={!fields.emailAddress?.required}
                 isDisabled={fields.emailAddress?.disabled}
+                devHint={{
+                  text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
+                  action: {
+                    label: 'Insert test email',
+                    onInsert: () => formState.emailAddress.setValue('your_email+clerk_test@example.com'),
+                  },
+                }}
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
               />
@@ -97,6 +104,13 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 {...formState.phoneNumber.props}
                 isRequired={fields.phoneNumber?.required}
                 isOptional={!fields.phoneNumber?.required}
+                devHint={{
+                  text: 'Testing? Use a test phone number so you skip a real SMS. Verify it on the next screen with the code 424242.',
+                  action: {
+                    label: 'Insert test phone number',
+                    onInsert: () => formState.phoneNumber.setValue('+12015550100'),
+                  },
+                }}
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
               />

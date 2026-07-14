@@ -571,6 +571,25 @@ function SignInStartInternal(): JSX.Element {
   // @ts-expect-error `action` is not typed
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
+  const identifierDevHint =
+    identifierAttribute === 'phone_number'
+      ? {
+          text: 'Testing? Use a test phone number so you skip a real SMS. Verify it on the next screen with the code 424242.',
+          action: {
+            label: 'Insert test phone number',
+            onInsert: () => identifierField.setValue('+12015550100'),
+          },
+        }
+      : identifierAttribute === 'email_address' || identifierAttribute === 'email_address_username'
+        ? {
+            text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
+            action: {
+              label: 'Insert test email',
+              onInsert: () => identifierField.setValue('your_email+clerk_test@example.com'),
+            },
+          }
+        : undefined;
+
   const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
   const isIdentifierLastAuthenticationStrategy =
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
@@ -635,6 +654,7 @@ function SignInStartInternal(): JSX.Element {
                         <DynamicField
                           actionLabel={nextIdentifier?.action}
                           onActionClicked={switchToNextIdentifier}
+                          devHint={identifierDevHint}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
