@@ -93,10 +93,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           <CountryCodeListItem
             sx={theme => ({
               '&:hover': {
-                backgroundColor: theme.colors.$neutralAlpha100,
+                backgroundColor: theme.colors.$neutralAlpha50,
               },
               '&[data-focused="true"]': {
-                backgroundColor: theme.colors.$neutralAlpha150,
+                backgroundColor: theme.colors.$neutralAlpha50,
               },
             })}
             isSelected={isSelected}
@@ -145,10 +145,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           </Text>
         </SelectButton>
         <SelectOptionList
-          sx={{ padding: '0 0' }}
+          sx={{ padding: 0 }}
           containerSx={theme => ({
-            gap: 0,
-            padding: `${theme.space.$0x5} 0`,
+            gap: theme.space.$0x5,
+            padding: theme.space.$1,
+            scrollPaddingBlock: theme.space.$1,
           })}
         />
       </Select>
@@ -220,10 +221,17 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       center
       sx={[
         theme => ({
+          position: 'relative',
           width: '100%',
           gap: theme.space.$2,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           color: theme.colors.$colorForeground,
+          borderRadius: theme.radii.$sm,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: `calc(${theme.space.$0x25} * -1) calc(${theme.space.$1} * -1)`,
+          },
         }),
         sx,
       ]}
