@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
 import com.clerk.ui.auth.AuthMode
 import com.clerk.ui.auth.AuthView
 import expo.modules.kotlin.AppContext
@@ -25,6 +28,7 @@ private fun debugLog(tag: String, message: String) {
 
 class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
   var isDismissible: Boolean = true
+  var logoMaxHeight: Float? = null
   var mode: String? = null
 
   private val onAuthEvent by EventDispatcher()
@@ -60,7 +64,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
     AuthView(
       modifier = Modifier.fillMaxSize(),
-      clerkTheme = Clerk.customTheme,
+      clerkTheme = authTheme(),
       mode = authMode(mode),
       isDismissible = isDismissible,
       onDismiss = ::sendDismissEvent,
@@ -68,6 +72,13 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
         sendDismissEvent()
       },
     )
+  }
+
+  private fun authTheme(): ClerkTheme? {
+    val maxHeight = logoMaxHeight ?: return Clerk.customTheme
+    val theme = Clerk.customTheme ?: ClerkTheme()
+    val design = theme.design ?: ClerkDesign()
+    return theme.copy(design = design.copy(logoMaxHeight = maxHeight.dp))
   }
 
   private fun sendEvent(type: String) {
@@ -100,6 +111,10 @@ class ClerkAuthViewModule : Module() {
 
       Prop("isDismissible") { view: ClerkAuthNativeView, isDismissible: Boolean ->
         view.isDismissible = isDismissible
+      }
+
+      Prop("logoMaxHeight") { view: ClerkAuthNativeView, logoMaxHeight: Float? ->
+        view.logoMaxHeight = logoMaxHeight
       }
 
       OnViewDidUpdateProps { view: ClerkAuthNativeView ->

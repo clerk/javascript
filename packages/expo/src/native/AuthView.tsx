@@ -37,7 +37,12 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss }: AuthViewProps): ReactElement {
+export function AuthView({
+  mode = 'signInOrUp',
+  isDismissible = true,
+  logoMaxHeight,
+  onDismiss,
+}: AuthViewProps): ReactElement {
   const handleAuthEvent = useCallback(
     (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -64,6 +69,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss 
       style={{ flex: 1 }}
       mode={mode}
       isDismissible={isDismissible}
+      logoMaxHeight={logoMaxHeight}
       onAuthEvent={handleAuthEvent}
     />
   );
