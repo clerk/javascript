@@ -1,6 +1,6 @@
 // `<`, `>`, `/` (to neutralize `</script>` breakouts) plus the U+2028/U+2029 line
 // terminators, which are valid in JSON strings but break executable script contexts.
-const ESCAPE_REGEX = /[<>\/\u2028\u2029]/g;
+const ESCAPE_REGEX = /[<>/\u2028\u2029]/g;
 
 /**
  * `JSON.stringify` that is safe to embed directly inside an HTML `<script>` element.
