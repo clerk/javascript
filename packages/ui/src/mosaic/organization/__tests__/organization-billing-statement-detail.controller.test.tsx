@@ -163,6 +163,26 @@ describe('useOrganizationBillingStatementDetailController', () => {
     expect(screen.getByTestId('caption')).toHaveTextContent('Subscribed and paid for Pro month plan');
   });
 
+  it('is ready with no sections when the statement has no groups', () => {
+    if (statement) {
+      statement.groups = [];
+    }
+    render(<Harness />);
+    expect(screen.getByTestId('state')).toHaveTextContent('ready');
+    expect(screen.getByTestId('section-date')).toHaveTextContent('');
+    expect(screen.getByTestId('total-value')).toHaveTextContent('$50.00');
+  });
+
+  it('omits the amount from the plan description when the subscription item has none', () => {
+    if (statement) {
+      statement.groups[0].items[0].subscriptionItem.amount = undefined;
+    }
+    render(<Harness />);
+    const desc = screen.getByTestId('plan-desc').textContent ?? '';
+    expect(desc).toContain('Month');
+    expect(desc).not.toContain('$');
+  });
+
   it('navigates back to the statements list', () => {
     render(<Harness />);
     fireEvent.click(screen.getByText('trigger-back'));

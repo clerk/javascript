@@ -117,6 +117,15 @@ describe('useOrganizationBillingSubscriptionsSectionController', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('hidden');
   });
 
+  it('reads and manages billing for a user subscriber without org permissions', () => {
+    subscriberType = 'user';
+    permissions = [];
+    render(<Harness />);
+    expect(screen.getByTestId('state')).toHaveTextContent('ready');
+    // canManageBilling is true for a user subscriber, so the manage action still shows.
+    expect(screen.getByTestId('manage')).toHaveTextContent('Manage');
+  });
+
   it('is loading on first load with no items yet', () => {
     isLoading = true;
     subscriptionItems = [];
@@ -165,6 +174,44 @@ describe('useOrganizationBillingSubscriptionsSectionController', () => {
     expect(screen.getByTestId('rows')).not.toHaveTextContent('Renews');
   });
 
+  it('shows the caption for the default plan when it is upcoming', () => {
+    subscriptionItems = [
+      item({ status: 'upcoming', plan: { name: 'Free', isDefault: true, fee: { amount: 0, currency: 'USD' } } }),
+    ];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Starts');
+  });
+
+  it('captions a past-due subscription', () => {
+    subscriptionItems = [item({ pastDueAt: new Date('2024-05-01') })];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Past due');
+  });
+
+  it('captions an upcoming subscription with its start date', () => {
+    subscriptionItems = [item({ status: 'upcoming' })];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Starts');
+  });
+
+  it('captions a canceled subscription with its end date', () => {
+    subscriptionItems = [item({ canceledAt: new Date('2024-06-01') })];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Canceled • Ends');
+  });
+
+  it('captions a free-trial subscription with its trial-end date', () => {
+    subscriptionItems = [item({ isFreeTrial: true })];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Trial ends');
+  });
+
+  it('shows a badge for a single canceled subscription', () => {
+    subscriptionItems = [item({ canceledAt: new Date('2024-06-01') })];
+    render(<Harness />);
+    expect(screen.getByTestId('rows')).toHaveTextContent('Active');
+  });
+
   it('shows a badge when there is more than one subscription', () => {
     subscriptionItems = [item({ id: 'a', status: 'active' }), item({ id: 'b', status: 'upcoming' })];
     render(<Harness />);
@@ -188,6 +235,15 @@ describe('useOrganizationBillingSubscriptionsSectionController', () => {
 
   it('omits the overview row when nextPayment has no totals', () => {
     subscriptionData = { nextPayment: { date: new Date('2024-06-01') } };
+    render(<Harness />);
+    expect(screen.getByTestId('overview')).toHaveTextContent('');
+  });
+
+  it('omits the overview row when there are no subscription items', () => {
+    subscriptionItems = [];
+    subscriptionData = {
+      nextPayment: { date: new Date('2024-06-01'), totals: { grandTotal: { amount: 5000, currency: 'USD' } } },
+    };
     render(<Harness />);
     expect(screen.getByTestId('overview')).toHaveTextContent('');
   });

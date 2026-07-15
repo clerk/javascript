@@ -161,6 +161,18 @@ describe('useOrganizationBillingPaymentDetailController', () => {
     expect(screen.getByTestId('intent')).toHaveTextContent('danger');
   });
 
+  it('uses the primary intent and the updated date for a pending payment', () => {
+    if (paymentAttempt) {
+      paymentAttempt.status = 'pending';
+      paymentAttempt.paidAt = null;
+      paymentAttempt.failedAt = null;
+    }
+    render(<Harness />);
+    expect(screen.getByTestId('title')).toHaveTextContent('March 16, 2026');
+    expect(screen.getByTestId('status')).toHaveTextContent('Pending');
+    expect(screen.getByTestId('intent')).toHaveTextContent('primary');
+  });
+
   it('omits the seats line when the subscription item has no seats', () => {
     if (paymentAttempt) {
       paymentAttempt.subscriptionItem.seats = undefined;
