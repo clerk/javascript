@@ -16,6 +16,32 @@ extension Notification.Name {
   static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
 }
 
+@Observable
+final class ClerkInlineAuthLogoState {
+  struct Content {
+    let view: UIView
+    let size: CGSize
+  }
+
+  private(set) var content: Content?
+
+  func setView(_ view: UIView) {
+    content = Content(view: view, size: view.bounds.size)
+  }
+
+  func updateSize(for view: UIView) {
+    guard content?.view === view else { return }
+    let currentSize = view.bounds.size
+    guard content?.size != currentSize else { return }
+    content = Content(view: view, size: currentSize)
+  }
+
+  func removeView(_ view: UIView) {
+    guard content?.view === view else { return }
+    content = nil
+  }
+}
+
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 
@@ -229,8 +255,7 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
-    logoView: UIView?,
-    logoSize: CGSize,
+    logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -242,8 +267,7 @@ final class ClerkNativeBridge {
         dismissible: dismissible,
         lightTheme: lightTheme,
         darkTheme: darkTheme,
-        logoView: logoView,
-        logoSize: logoSize,
+        logoState: logoState,
         logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
@@ -471,8 +495,7 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
-  let logoView: UIView?
-  let logoSize: CGSize
+  let logoState: ClerkInlineAuthLogoState
   let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
@@ -489,10 +512,10 @@ struct ClerkInlineAuthWrapperView: View {
       }
     }
 
-    if let logoView {
+    if let logo = logoState.content {
       themedView.clerkAppIconView {
-        ClerkReactLogoView(view: logoView)
-          .frame(width: logoSize.width, height: logoSize.height)
+        ClerkReactLogoView(view: logo.view)
+          .frame(width: logo.size.width, height: logo.size.height)
       }
     } else if let logoMaxHeight {
       themedView.clerkAppIcon(maxHeight: logoMaxHeight)

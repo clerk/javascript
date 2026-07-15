@@ -58,5 +58,9 @@ Pod::Spec.new do |s|
                    "ClerkUserProfileNativeView.swift",
                    "ClerkUserButtonNativeView.swift"
 
+  s.test_spec 'Tests' do |test_spec|
+    test_spec.source_files = 'Tests/**/*.swift'
+  end
+
   install_modules_dependencies(s)
 end
