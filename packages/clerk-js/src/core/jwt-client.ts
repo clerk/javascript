@@ -71,6 +71,10 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
         user: {
           object: 'user',
           id: userId,
+          // Epoch 1, not 0: unixEpochToDate treats 0 as "now", and a "now" timestamp makes
+          // memoizeListenerCallback consider this stub newer than the real user fetched later,
+          // so listeners would keep rendering the stub after the full client arrives.
+          updated_at: 1,
           organization_memberships:
             orgId && orgSlug && orgRole
               ? [
