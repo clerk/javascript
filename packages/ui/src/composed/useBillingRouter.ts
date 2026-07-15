@@ -1,6 +1,8 @@
 // In-memory routing for composed billing — intentionally not URL-backed. The
 // consumer owns the page URL, so we don't touch hash/history. Trade-off:
 // back/forward, refresh, and deep-links don't preserve sub-route or tab state.
+// Composed sections are leaf-only (see stubRouter), so this is a typed in-memory
+// state machine rather than VirtualRouter/BaseRouter <Route> matching.
 import { useMemo, useState } from 'react';
 
 import type { RouteContextValue } from '../router/RouteContext';

@@ -1,15 +1,10 @@
 // eslint-disable-next-line no-restricted-imports
 import type { EmotionCache } from '@emotion/cache';
 
-// Why: composed profile roots (UserProfile + OrganizationProfile) mount as
-// separate React roots in the consumer tree, so N can be live per clerk instance.
-// One `cl-internal` emotion cache per instance is the invariant (two live caches,
-// same key = duplicate style inserts, broken emotion dedup/ordering). AIO gets this
-// free from its single portal tree; composed reconstructs it by keying the cache
-// on the clerk instance here so sibling roots reuse one cache instead of each making
-// their own. The cache is stored with the nonce/cssLayerName it was built from so a
-// later change to either rebuilds it (matching the AIO StyleCacheProvider) instead
-// of pinning whatever the first-mounted root happened to see.
+// Sibling composed roots share one `cl-internal` emotion cache per clerk instance;
+// two live caches under the same key would duplicate style inserts. Keyed with the
+// nonce/cssLayerName it was built from so a change to either rebuilds it (matching
+// the AIO StyleCacheProvider).
 type StyleCacheEntry = {
   cache: EmotionCache;
   nonce: string | undefined;

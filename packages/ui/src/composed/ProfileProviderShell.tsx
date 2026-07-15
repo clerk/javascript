@@ -47,10 +47,6 @@ export const fallbackModuleManager: ModuleManager = {
     ),
 };
 
-// `__internal_environment` is a getter on the concrete clerk-js Clerk class but
-// is absent from the shared `LoadedClerk` type (composed profiles are newer than
-// that getter on some clerk-js versions in the wild), so it is read through a
-// narrow structural type rather than the typed interface.
 type ClerkWithInternalEnvironment = {
   __internal_environment?: EnvironmentResource | null;
 };
@@ -68,9 +64,7 @@ export function resolveComposedClerkRuntime(
   clerk: LoadedClerk,
   clerkLoaded: boolean,
 ): { environment: EnvironmentResource | null | undefined; moduleManager: ModuleManager } {
-  // SAFETY: __internal_environment is a real getter on the clerk-js Clerk class
-  // but not on the shared LoadedClerk interface. Narrowing to an optional field
-  // (not `any`) keeps the access typed and forces callers to handle `undefined`.
+  // SAFETY: __internal_environment is a real clerk-js getter absent from the shared LoadedClerk type; narrowing (not `any`) keeps it typed.
   const environment = (clerk as LoadedClerk & ClerkWithInternalEnvironment).__internal_environment;
   const moduleManager = clerk.__internal_moduleManager ?? fallbackModuleManager;
 
@@ -83,16 +77,10 @@ export function resolveComposedClerkRuntime(
   return { environment, moduleManager };
 }
 
-// `nonce` lives on IsomorphicClerkOptions, not ClerkOptions, so `__internal_getOption`'s
-// `K extends keyof ClerkOptions` constraint rejects the key even though clerk-js stores
-// and returns it at runtime.
 type ClerkWithNonceOption = { __internal_getOption(key: string): string | undefined };
 
 function readNonceOption(clerk: LoadedClerk): string | undefined {
-  // SAFETY: nonce is a runtime option clerk-js resolves through the same getter,
-  // but its key is absent from the typed ClerkOptions surface. Narrowing to a
-  // string-keyed method (not `any`) keeps the return typed. Called as a method so
-  // the getter keeps its `this` binding to the clerk instance.
+  // SAFETY: nonce is a runtime clerk-js option whose key is absent from the typed ClerkOptions; narrowing (not `any`) keeps the return typed. Called as a method to preserve `this`.
   return (clerk as unknown as ClerkWithNonceOption).__internal_getOption('nonce');
 }
 
@@ -150,8 +138,8 @@ export function ProfileProviderShell({
   // state — a consumer URL change wouldn't be a meaningful signal to clear
   // either, so observing it would only cause spurious clears.
   const router = useMemo(() => createComposedRouter(clerk.navigate), [clerk]);
-  // Match the portal path's normalization (Components.tsx:209) so a cssLayerName
-  // nested inside appearance.theme gets hoisted to top-level for @layer wrapping.
+  // Match the portal path's appearance normalization so a cssLayerName nested inside
+  // appearance.theme gets hoisted to top-level for @layer wrapping.
   const normalizedGlobalAppearance = useMemo(
     () => extractCssLayerNameFromAppearance(globalAppearance),
     [globalAppearance],
