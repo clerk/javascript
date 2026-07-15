@@ -48,6 +48,15 @@ export function Default() {
         onConfirm: () => undefined,
         onCancel: () => undefined,
       }}
+      add={{
+        available: true,
+        open: false,
+        submitting: false,
+        error: null,
+        onOpen: () => undefined,
+        onCancel: () => undefined,
+        onSubmit: () => undefined,
+      }}
     />
   );
 }
