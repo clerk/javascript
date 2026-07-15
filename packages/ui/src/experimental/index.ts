@@ -7,7 +7,4 @@
 // file, and re-exporting forwards those references unchanged. A namespace object
 // (`UserProfile.Account`) would expose only the object as a client reference and
 // break property access across the RSC boundary.
-//
-// The export roster is maintained once, in the per-directory `index` files under
-// `../composed`; this module just re-exports it.
 export * from '../composed';

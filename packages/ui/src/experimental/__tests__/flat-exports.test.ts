@@ -11,48 +11,16 @@ import * as experimental from '../index';
  * object does not.
  */
 
-const EXPECTED_EXPORTS = [
-  // Providers
-  'UserProfileProvider',
-  'OrganizationProfileProvider',
-  // UserProfile panels
-  'UserProfileAccountPanel',
-  'UserProfileSecurityPanel',
-  'UserProfileBillingPanel',
-  'UserProfileAPIKeysPanel',
-  // UserProfile account sections
-  'UserProfileProfileSection',
-  'UserProfileUsernameSection',
-  'UserProfileEmailSection',
-  'UserProfilePhoneSection',
-  'UserProfileConnectedAccountsSection',
-  'UserProfileEnterpriseAccountsSection',
-  'UserProfileWeb3Section',
-  // UserProfile security sections
-  'UserProfilePasswordSection',
-  'UserProfilePasskeysSection',
-  'UserProfileMfaSection',
-  'UserProfileActiveDevicesSection',
-  'UserProfileDeleteSection',
-  // OrganizationProfile panels
-  'OrganizationProfileGeneralPanel',
-  'OrganizationProfileMembersPanel',
-  'OrganizationProfileBillingPanel',
-  'OrganizationProfileAPIKeysPanel',
-  'OrganizationProfileSecurityPanel',
-  // OrganizationProfile general sections
-  'OrganizationProfileProfileSection',
-  'OrganizationProfileDomainsSection',
-  'OrganizationProfileLeaveSection',
-  'OrganizationProfileDeleteSection',
-] as const;
-
 describe('@clerk/ui/experimental flat exports', () => {
-  for (const name of EXPECTED_EXPORTS) {
-    it(`exports ${name} as a component`, () => {
-      expect(typeof (experimental as Record<string, unknown>)[name]).toBe('function');
-    });
-  }
+  it('exposes a stable set of flat named exports', () => {
+    expect(Object.keys(experimental).sort()).toMatchSnapshot();
+  });
+
+  it('exports every name as a component', () => {
+    for (const [name, value] of Object.entries(experimental)) {
+      expect(typeof value, name).toBe('function');
+    }
+  });
 
   it('does not export the compound namespace objects', () => {
     expect((experimental as Record<string, unknown>).UserProfile).toBeUndefined();
