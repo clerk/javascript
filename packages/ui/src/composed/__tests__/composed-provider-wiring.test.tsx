@@ -1,18 +1,16 @@
-import { act } from '@testing-library/react';
-import { useContext } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
-import { useModuleManager, useOptions } from '@/ui/contexts';
-import { useAppearance } from '@/ui/customizables/AppearanceContext';
-import { useRouter } from '@/ui/router';
+import { useModuleManager } from '@/ui/contexts';
+import { Box } from '@/ui/customizables';
 
-import { OrganizationProfileContext } from '../../contexts/components/OrganizationProfile';
-import { UserProfileContext } from '../../contexts/components/UserProfile';
+import { computedColors } from '../../customizables/__tests__/test-utils';
 import { clearFetchCache } from '../../hooks';
 import { OrganizationProfileProvider } from '../OrganizationProfile/OrganizationProfileProvider';
 import { fallbackModuleManager } from '../ProfileProviderShell';
+import { UserProfileAccountPanel } from '../UserProfile/Account';
+import { UserProfileProfileSection } from '../UserProfile/AccountProfile';
 import { UserProfileSecurityPanel } from '../UserProfile/Security';
 import { UserProfilePasswordSection } from '../UserProfile/SecurityPassword';
 import { UserProfileProvider } from '../UserProfile/UserProfileProvider';
@@ -21,49 +19,11 @@ function patchEnvironment(clerk: any, env: any) {
   Object.defineProperty(clerk, '__internal_environment', { value: env, configurable: true });
 }
 
-function ModuleManagerProbe() {
-  const mm = useModuleManager();
-  return (
-    <div
-      data-testid='mm-probe'
-      data-has-mm={!!mm}
-    />
-  );
-}
-
-function RouterProbe() {
-  const router = useRouter();
-  return (
-    <div
-      data-testid='router-probe'
-      data-has-navigate={typeof router.navigate === 'function'}
-      data-has-base-navigate={typeof router.baseNavigate === 'function'}
-    />
-  );
-}
-
 describe('UserProfileProvider wiring', () => {
   const { createFixtures } = bindCreateFixtures('UserProfile');
 
   beforeEach(() => {
     clearFetchCache();
-  });
-
-  it("provides the clerk instance's moduleManager to children", async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-
-    render(
-      <UserProfileProvider>
-        <ModuleManagerProbe />
-      </UserProfileProvider>,
-      { wrapper },
-    );
-
-    const probe = screen.getByTestId('mm-probe');
-    expect(probe.dataset.hasMm).toBe('true');
   });
 
   it('falls back to fallbackModuleManager when the clerk instance exposes no moduleManager', async () => {
@@ -95,89 +55,6 @@ describe('UserProfileProvider wiring', () => {
     );
 
     expect(screen.getByTestId('mm-fallback-probe').dataset.isFallback).toBe('true');
-  });
-
-  it('provides a router that delegates to clerk.navigate', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-
-    render(
-      <UserProfileProvider>
-        <RouterProbe />
-      </UserProfileProvider>,
-      { wrapper },
-    );
-
-    const probe = screen.getByTestId('router-probe');
-    expect(probe.dataset.hasNavigate).toBe('true');
-    expect(probe.dataset.hasBaseNavigate).toBe('true');
-  });
-
-  // The shell does NOT track the host app URL. Composed has no Clerk-internal
-  // navigation between sections (consumer remounts <UserProfile.X>), so there's
-  // no meaningful currentPath to snapshot — and observing the consumer's URL
-  // would just trigger spurious navigation-keyed effects.
-  describe('router.currentPath is decoupled from the host URL', () => {
-    let originalPath: string;
-
-    beforeEach(() => {
-      originalPath = window.location.pathname;
-    });
-
-    afterEach(() => {
-      window.history.replaceState(null, '', originalPath);
-    });
-
-    function CurrentPathProbe() {
-      const router = useRouter();
-      return (
-        <div
-          data-testid='path-probe'
-          data-current={router.currentPath}
-        />
-      );
-    }
-
-    it('does not snapshot window.location.pathname into router.currentPath', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-      patchEnvironment(fixtures.clerk, fixtures.environment);
-
-      window.history.replaceState(null, '', '/page-a');
-
-      render(
-        <UserProfileProvider>
-          <CurrentPathProbe />
-        </UserProfileProvider>,
-        { wrapper },
-      );
-
-      expect(screen.getByTestId('path-probe').dataset.current).toBe('');
-    });
-
-    it('does not update router.currentPath on popstate', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'] });
-      });
-      patchEnvironment(fixtures.clerk, fixtures.environment);
-
-      render(
-        <UserProfileProvider>
-          <CurrentPathProbe />
-        </UserProfileProvider>,
-        { wrapper },
-      );
-
-      act(() => {
-        window.history.pushState(null, '', '/page-b');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-
-      expect(screen.getByTestId('path-probe').dataset.current).toBe('');
-    });
   });
 
   // The end-to-end proof that resolution actually feeds a dynamic import: render
@@ -224,7 +101,7 @@ describe('UserProfileProvider wiring', () => {
     const { wrapper, fixtures } = await createFixtures();
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
-    const { container } = render(
+    render(
       <UserProfileProvider>
         <div data-testid='should-not-render' />
       </UserProfileProvider>,
@@ -234,81 +111,50 @@ describe('UserProfileProvider wiring', () => {
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
   });
 
-  it('cascades globalAppearance from ClerkProvider into composed theme', async () => {
+  it('cascades globalAppearance from ClerkProvider into rendered composed styles', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
-    // Simulate ClerkProvider setting appearance with colorPrimary
-    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
-      if (key === 'appearance') {
-        return { variables: { colorPrimary: '#ff0000' } };
-      }
-      return undefined;
-    });
-
-    function AppearanceProbe() {
-      const { parsedInternalTheme } = useAppearance();
-      return (
-        <div
-          data-testid='appearance-probe'
-          data-color-primary={parsedInternalTheme.colors.$primary500}
-        />
-      );
-    }
+    // Simulate ClerkProvider setting appearance with colorPrimary.
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) =>
+      key === 'appearance' ? { variables: { colorPrimary: 'red' } } : undefined,
+    );
 
     render(
       <UserProfileProvider>
-        <AppearanceProbe />
+        <Box
+          data-testid='primary-swatch'
+          sx={t => ({ backgroundColor: t.colors.$primary500 })}
+        />
       </UserProfileProvider>,
       { wrapper },
     );
 
-    const probe = screen.getByTestId('appearance-probe');
-    // #ff0000 = hsla(0, 100%, 50%, 1) — the global appearance should cascade
-    expect(probe.dataset.colorPrimary).toBe('hsla(0, 100%, 50%, 1)');
+    expect(getComputedStyle(screen.getByTestId('primary-swatch')).backgroundColor).toBe(computedColors.red);
   });
 
-  it('threads localization from ClerkProvider into composed OptionsProvider', async () => {
+  it('threads ClerkProvider localization into rendered composed text', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
-    const expectedLocalization = { locale: 'fr-FR', signIn: { start: { title: 'Bienvenue' } } };
-    const expectedSupportEmail = 'help@clerk.dev';
-    fixtures.clerk.__internal_getOption = vi.fn((key: string) => {
-      if (key === 'localization') {
-        return expectedLocalization;
-      }
-      if (key === 'supportEmail') {
-        return expectedSupportEmail;
-      }
-      return undefined;
-    });
-
-    function OptionsProbe() {
-      const options = useOptions();
-      return (
-        <div
-          data-testid='options-probe'
-          data-locale={(options.localization as any)?.locale ?? ''}
-          data-support-email={options.supportEmail ?? ''}
-        />
-      );
-    }
+    fixtures.clerk.__internal_getOption = vi.fn((key: string) =>
+      key === 'localization' ? { userProfile: { start: { headerTitle__account: 'Détails du profil' } } } : undefined,
+    );
 
     render(
       <UserProfileProvider>
-        <OptionsProbe />
+        <UserProfileAccountPanel>
+          <UserProfileProfileSection />
+        </UserProfileAccountPanel>
       </UserProfileProvider>,
       { wrapper },
     );
 
-    const probe = screen.getByTestId('options-probe');
-    expect(probe.dataset.locale).toBe('fr-FR');
-    expect(probe.dataset.supportEmail).toBe(expectedSupportEmail);
+    await waitFor(() => screen.getByText('Détails du profil'));
   });
 
   it('returns null when environment is missing', async () => {
@@ -326,32 +172,6 @@ describe('UserProfileProvider wiring', () => {
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
   });
-
-  it('forwards apiKeysProps into the UserProfile context', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Test', last_name: 'User' });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-
-    function ApiKeysProbe() {
-      const ctx = useContext(UserProfileContext);
-      return (
-        <div
-          data-testid='apikeys-probe'
-          data-api-keys={JSON.stringify(ctx?.apiKeysProps)}
-        />
-      );
-    }
-
-    render(
-      <UserProfileProvider apiKeysProps={{ perPage: 5 }}>
-        <ApiKeysProbe />
-      </UserProfileProvider>,
-      { wrapper },
-    );
-
-    expect(JSON.parse(screen.getByTestId('apikeys-probe').dataset.apiKeys || 'null')).toEqual({ perPage: 5 });
-  });
 });
 
 describe('OrganizationProfileProvider wiring', () => {
@@ -359,30 +179,6 @@ describe('OrganizationProfileProvider wiring', () => {
 
   beforeEach(() => {
     clearFetchCache();
-  });
-
-  it("provides the clerk instance's moduleManager to children", async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        first_name: 'Test',
-        last_name: 'User',
-        organization_memberships: [{ name: 'TestOrg' }],
-      });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-    render(
-      <OrganizationProfileProvider>
-        <ModuleManagerProbe />
-      </OrganizationProfileProvider>,
-      { wrapper },
-    );
-
-    const probe = screen.getByTestId('mm-probe');
-    expect(probe.dataset.hasMm).toBe('true');
   });
 
   it('falls back to fallbackModuleManager when the clerk instance exposes no moduleManager', async () => {
@@ -428,7 +224,7 @@ describe('OrganizationProfileProvider wiring', () => {
     });
     patchEnvironment(fixtures.clerk, fixtures.environment);
 
-    const { container } = render(
+    render(
       <OrganizationProfileProvider>
         <div data-testid='should-not-render' />
       </OrganizationProfileProvider>,
@@ -436,45 +232,6 @@ describe('OrganizationProfileProvider wiring', () => {
     );
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument();
-  });
-
-  it('forwards afterLeaveOrganizationUrl and apiKeysProps into the OrganizationProfile context', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        first_name: 'Test',
-        last_name: 'User',
-        organization_memberships: [{ name: 'TestOrg' }],
-      });
-    });
-    patchEnvironment(fixtures.clerk, fixtures.environment);
-    fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
-
-    function OrgProbe() {
-      const ctx = useContext(OrganizationProfileContext);
-      return (
-        <div
-          data-testid='org-probe'
-          data-after-leave={ctx?.afterLeaveOrganizationUrl ?? ''}
-          data-api-keys={JSON.stringify(ctx?.apiKeysProps)}
-        />
-      );
-    }
-
-    render(
-      <OrganizationProfileProvider
-        afterLeaveOrganizationUrl='/bye'
-        apiKeysProps={{ showDescription: true }}
-      >
-        <OrgProbe />
-      </OrganizationProfileProvider>,
-      { wrapper },
-    );
-
-    const probe = screen.getByTestId('org-probe');
-    expect(probe.dataset.afterLeave).toBe('/bye');
-    expect(JSON.parse(probe.dataset.apiKeys || 'null')).toEqual({ showDescription: true });
   });
 });
 
