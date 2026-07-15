@@ -59,14 +59,25 @@ export async function createHostedAuth(
   params: CreateHostedAuthParams,
   clerk: HostedAuthClerkInstance,
 ): Promise<HostedAuthResource> {
-  const response = await clerk.getFapiClient().request({
-    method: 'POST',
-    path: '/client/hosted_auth',
-    body: params,
-  });
+  const request = () =>
+    clerk.getFapiClient().request({
+      method: 'POST',
+      path: '/client/hosted_auth',
+      body: params,
+    });
+
+  let response = await request();
+  if (
+    !response.ok &&
+    response.status === 401 &&
+    getHostedAuthErrors(response.payload).some(error => error.code === 'signed_out')
+  ) {
+    // The Expo response hook has already persisted the replacement device token.
+    response = await request();
+  }
 
   if (!response.ok) {
-    await throwHostedAuthAPIResponseError(response, clerk);
+    throw buildHostedAuthAPIResponseError(response);
   }
 
   const hostedAuthJSON = getHostedAuthJSON(response.payload);

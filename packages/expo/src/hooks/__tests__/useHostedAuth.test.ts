@@ -615,20 +615,73 @@ describe('useHostedAuth', () => {
     expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
   });
 
-  test('reconciles Clerk state when hosted auth returns an unauthenticated response', async () => {
+  test('retries hosted auth creation once after a signed-out response', async () => {
+    mockFapiRequest.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      payload: {
+        errors: [{ code: 'signed_out', message: 'Signed out', long_message: 'You are signed out' }],
+      },
+    });
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
+
+    const { result } = renderHook(() => useHostedAuth());
+    const response = await result.current.startHostedAuth();
+
+    expect(response.createdSessionId).toBeNull();
+    expect(mockHandleUnauthenticated).not.toHaveBeenCalled();
+    expect(mockFapiRequest).toHaveBeenCalledTimes(2);
+    const expectedCreateRequest = {
+      method: 'POST',
+      path: '/client/hosted_auth',
+      body: {
+        redirectUrl: 'myapp:///hosted-auth-callback',
+        codeChallenge: mockCodeChallenge,
+        mode: undefined,
+        state: 'generated-state-123',
+      },
+    };
+    expect(mockFapiRequest).toHaveBeenNthCalledWith(1, expectedCreateRequest);
+    expect(mockFapiRequest).toHaveBeenNthCalledWith(2, expectedCreateRequest);
+    expect(mocks.openAuthSessionAsync).toHaveBeenCalledTimes(1);
+  });
+
+  test('surfaces a second unauthenticated hosted auth response without retrying again', async () => {
     mockFapiRequest.mockResolvedValue({
       ok: false,
       status: 401,
       statusText: 'Unauthorized',
       payload: {
-        errors: [],
+        errors: [{ code: 'signed_out', message: 'Signed out', long_message: 'You are signed out' }],
       },
     });
 
     const { result } = renderHook(() => useHostedAuth());
 
-    await expect(result.current.startHostedAuth()).rejects.toThrow('Unauthorized');
-    expect(mockHandleUnauthenticated).toHaveBeenCalledTimes(1);
+    await expect(result.current.startHostedAuth()).rejects.toThrow('You are signed out');
+    expect(mockHandleUnauthenticated).not.toHaveBeenCalled();
+    expect(mockFapiRequest).toHaveBeenCalledTimes(2);
+    expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
+  });
+
+  test('does not retry an unrelated unauthorized hosted auth response', async () => {
+    mockFapiRequest.mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      payload: {
+        errors: [{ code: 'authentication_invalid', message: 'Invalid', long_message: 'Authentication is invalid' }],
+      },
+    });
+
+    const { result } = renderHook(() => useHostedAuth());
+
+    await expect(result.current.startHostedAuth()).rejects.toThrow('Authentication is invalid');
+    expect(mockHandleUnauthenticated).not.toHaveBeenCalled();
+    expect(mockFapiRequest).toHaveBeenCalledTimes(1);
+    expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
   });
 });
 
