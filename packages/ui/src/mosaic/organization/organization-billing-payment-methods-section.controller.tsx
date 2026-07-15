@@ -1,4 +1,4 @@
-import { __internal_useOrganizationBase, useSession } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useReverification, useSession } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 
 import { usePaymentMethods, useSubscriberTypeContext } from '@/contexts';
@@ -53,6 +53,10 @@ export function useOrganizationBillingPaymentMethodsSectionController(): Organiz
 
   const findMethod = (paymentMethodId: string) => data.find(method => method.id === paymentMethodId);
 
+  // Removing a payment method can require step-up auth; route it through reverification to match the
+  // legacy RemoveResourceForm. make-default is intentionally not reverified (legacy did not either).
+  const removeMethod = useReverification((method: BillingPaymentMethodResource) => method.remove({ orgId }));
+
   const [makeDefaultSnapshot, sendMakeDefault] = useMachine(organizationBillingPaymentMethodsMakeDefaultMachine, {
     context: {
       makeDefault: async ({ paymentMethodId }) => {
@@ -65,7 +69,11 @@ export function useOrganizationBillingPaymentMethodsSectionController(): Organiz
   const [removeSnapshot, sendRemove] = useMachine(organizationBillingPaymentMethodsRemoveMachine, {
     context: {
       removePaymentMethod: async ({ paymentMethodId }) => {
-        await findMethod(paymentMethodId)?.remove({ orgId });
+        const method = findMethod(paymentMethodId);
+        if (!method) {
+          return;
+        }
+        await removeMethod(method);
         void revalidate();
       },
     },

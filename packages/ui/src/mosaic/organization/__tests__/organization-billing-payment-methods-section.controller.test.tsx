@@ -23,6 +23,7 @@ let revalidate: ReturnType<typeof vi.fn>;
 let isSessionLoaded: boolean;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let subscriberType: 'organization' | 'user';
+let reverificationCalls: number;
 
 vi.mock('@/contexts', () => ({
   usePaymentMethods: () => ({ data: paymentMethods, isLoading, revalidate }),
@@ -38,6 +39,14 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       session: isSessionLoaded ? { id: 'sess_1', checkAuthorization } : undefined,
     }),
     __internal_useOrganizationBase: () => ({ id: 'org_1' }),
+    // Stand-in for the real reverification enhancer: count each wrapped call so tests can assert
+    // a mutation is routed through step-up auth, then delegate to the underlying fetcher.
+    useReverification: (fetcher: (...args: unknown[]) => unknown) => {
+      return (...args: unknown[]) => {
+        reverificationCalls += 1;
+        return fetcher(...args);
+      };
+    },
   };
 });
 
@@ -63,6 +72,7 @@ beforeEach(() => {
   isSessionLoaded = true;
   checkAuthorization = vi.fn().mockReturnValue(true);
   subscriberType = 'organization';
+  reverificationCalls = 0;
 });
 
 afterEach(() => {
@@ -175,6 +185,8 @@ describe('useOrganizationBillingPaymentMethodsSectionController', () => {
 
     expect(screen.getByTestId('pending')).toHaveTextContent('');
     expect(revalidate).toHaveBeenCalledTimes(1);
+    // make-default is not reverified in the legacy flow; keep parity.
+    expect(reverificationCalls).toBe(0);
   });
 
   it('surfaces a make-default error', async () => {
@@ -213,6 +225,30 @@ describe('useOrganizationBillingPaymentMethodsSectionController', () => {
     });
 
     expect(screen.getByTestId('removeOpen')).toHaveTextContent('false');
+    expect(revalidate).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes the remove through reverification (step-up auth), matching the legacy flow', async () => {
+    const gate = deferred<void>();
+    paymentMethods = [makeMethod({ id: 'pm_1' })];
+    paymentMethods[0].remove.mockReturnValue(gate.promise);
+
+    render(<Harness />);
+
+    act(() => {
+      latest.status === 'ready' && latest.onRemove(row('pm_1'));
+    });
+    act(() => {
+      latest.status === 'ready' && latest.remove.onConfirm();
+    });
+
+    expect(reverificationCalls).toBe(1);
+    expect(paymentMethods[0].remove).toHaveBeenCalledWith({ orgId: 'org_1' });
+
+    await act(async () => {
+      gate.resolve();
+    });
+
     expect(revalidate).toHaveBeenCalledTimes(1);
   });
 
