@@ -231,6 +231,7 @@ final class ClerkNativeBridge {
     dismissible: Bool,
     logoView: UIView?,
     logoSize: CGSize,
+    logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -242,7 +243,8 @@ final class ClerkNativeBridge {
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoView: logoView,
-        logoSize: logoSize
+        logoSize: logoSize,
+        logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -471,6 +473,7 @@ struct ClerkInlineAuthWrapperView: View {
   let darkTheme: ClerkTheme?
   let logoView: UIView?
   let logoSize: CGSize
+  let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
 
@@ -491,6 +494,8 @@ struct ClerkInlineAuthWrapperView: View {
         ClerkReactLogoView(view: logoView)
           .frame(width: logoSize.width, height: logoSize.height)
       }
+    } else if let logoMaxHeight {
+      themedView.clerkAppIcon(maxHeight: logoMaxHeight)
     } else {
       themedView
     }
