@@ -5,6 +5,7 @@ import { useCardState, withCardStateProvider } from '@/elements/contexts';
 import { useTabState } from '@/hooks/useTabState';
 
 import { OrganizationBillingAccountCreditsSection } from './organization-billing-account-credits-section';
+import { useOrganizationBillingPanelController } from './organization-billing-panel.controller';
 import { OrganizationBillingPanelView } from './organization-billing-panel.view';
 import { OrganizationBillingPaymentMethodsSection } from './organization-billing-payment-methods-section';
 import { OrganizationBillingPaymentsSection } from './organization-billing-payments-section';
@@ -61,9 +62,15 @@ const OrganizationBillingPanelInternal = withCardStateProvider(
  * Methods, Account Credits, Statements, and Payments sections, which coexist as slot children.
  * Provides `SubscriberTypeContext='organization'` and the card-state
  * provider, and syncs the active tab to the URL `?tab=` param. Requires a `MosaicProvider` ancestor.
- * Exposed on the compound namespace as `OrganizationProfile.BillingPanel`.
+ * Self-gates on the `org:sys_billing:read`/`:manage` permission and whether organization billing is
+ * enabled, rendering nothing when the caller may not view billing. Exposed on the compound namespace
+ * as `OrganizationProfile.BillingPanel`.
  */
-export function OrganizationBillingPanel(): ReactElement {
+export function OrganizationBillingPanel(): ReactElement | null {
+  const controller = useOrganizationBillingPanelController();
+  if (controller.status !== 'ready') {
+    return null;
+  }
   return (
     <SubscriberTypeContext.Provider value='organization'>
       <OrganizationBillingPanelInternal />
