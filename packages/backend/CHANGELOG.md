@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.11.6
+
+### Patch Changes
+
+- Add `CLERK_DISABLE_AUTO_PROXY=true` to opt out of automatic Frontend API proxying on Vercel production deployments. ([#9159](https://github.com/clerk/javascript/pull/9159)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+
 ## 3.11.5
 
 ### Patch Changes
