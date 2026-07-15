@@ -841,16 +841,24 @@ describe('Clerk singleton', () => {
         ...overrides,
       });
 
-      // `load()` awaits native crypto (cookie suffix) before scheduling the timeout, so a single
-      // advance can run before the timer exists; advance the budget repeatedly until load settles.
+      // `load()` awaits native crypto (cookie suffix) before scheduling the timeout, and that work
+      // is real async the fake clock cannot advance. Yield real event-loop turns until a fake timer
+      // actually exists (or load settles) so slow machines can't exhaust the advance budget early.
+      const realSetTimeout = globalThis.setTimeout.bind(globalThis);
+      const yieldRealEventLoop = () => new Promise<void>(resolve => realSetTimeout(resolve, 0));
       const pumpUntilSettled = async (promise: Promise<unknown>) => {
         let settled = false;
         const tracked = promise.then(
           v => ((settled = true), v),
           e => ((settled = true), Promise.reject(e)),
         );
-        for (let i = 0; i < 20 && !settled; i++) {
+        for (let advances = 0; advances < 20 && !settled; ) {
+          if (vi.getTimerCount() === 0) {
+            await yieldRealEventLoop();
+            continue;
+          }
           await vi.advanceTimersByTimeAsync(5000);
+          advances++;
         }
         await tracked;
       };
