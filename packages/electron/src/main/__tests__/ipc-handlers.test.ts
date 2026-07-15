@@ -5,7 +5,9 @@ import { TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
 import { setupTokenCacheIpcHandlers } from '../ipc-handlers';
 
-const ipcEvent = {} as Electron.IpcMainInvokeEvent;
+const mainFrame = {};
+const ipcEvent = { sender: { mainFrame }, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
+const subframeEvent = { sender: { mainFrame }, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
 
 vi.mock('electron', () => ({
   ipcMain: {
@@ -49,6 +51,22 @@ describe('setupTokenCacheIpcHandlers', () => {
     expect(storage.getItem).toHaveBeenCalledWith('token-key');
     expect(storage.setItem).toHaveBeenCalledWith('token-key', 'jwt');
     expect(storage.removeItem).toHaveBeenCalledWith('token-key');
+  });
+
+  it('rejects token operations that do not originate from the main frame', () => {
+    setupTokenCacheIpcHandlers(storage);
+
+    const getTokenHandler = vi.mocked(ipcMain.handle).mock.calls[0][1];
+    const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
+    const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
+
+    expect(() => getTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
+    expect(() => saveTokenHandler(subframeEvent, 'token-key', 'jwt')).toThrow('main frame');
+    expect(() => clearTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
+
+    expect(storage.getItem).not.toHaveBeenCalled();
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(storage.removeItem).not.toHaveBeenCalled();
   });
 
   it('removes registered handlers on cleanup', () => {
