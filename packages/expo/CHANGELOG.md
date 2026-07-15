@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.7.6
+
+### Patch Changes
+
+- Add a `logoMaxHeight` prop to `AuthView`, allowing Expo apps to control the maximum height of the managed logo on Android and iOS. ([#9154](https://github.com/clerk/javascript/pull/9154)) by [@swolfand](https://github.com/swolfand)
+
+  Usage:
+
+  ```tsx
+  <AuthView logoMaxHeight={64} />
+  ```
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+  - @clerk/clerk-js@6.25.4
+  - @clerk/react@6.12.4
+
 ## 3.7.5
 
 ### Patch Changes
