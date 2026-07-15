@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationBillingStatementDetailView } from '@clerk/ui/mosaic/organization/organization-billing-statement-detail.view';
 import type { StatementDetailSection } from '@clerk/ui/mosaic/organization/organization-billing-statement-detail.view';
+import { OrganizationBillingStatementDetailView } from '@clerk/ui/mosaic/organization/organization-billing-statement-detail.view';
 
 import type { StoryMeta } from '@/lib/types';
 

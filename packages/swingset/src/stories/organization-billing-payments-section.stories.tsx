@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationBillingPaymentsSectionView } from '@clerk/ui/mosaic/organization/organization-billing-payments-section.view';
 import type { PaymentAttemptRow } from '@clerk/ui/mosaic/organization/organization-billing-payments-section.view';
+import { OrganizationBillingPaymentsSectionView } from '@clerk/ui/mosaic/organization/organization-billing-payments-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
