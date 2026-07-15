@@ -137,9 +137,14 @@ describe('OrganizationProfile composed sections', () => {
 
   describe('General — section outside page', () => {
     it('useRequirePage throws when rendered outside a page component', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      // The guard only throws for a development SDK; mark the fixture accordingly.
+      Object.defineProperty(fixtures.clerk, 'sdkMetadata', {
+        value: { environment: 'development' },
+        configurable: true,
       });
 
       expect(() => render(<OrganizationProfileProfileSection />, { wrapper })).toThrow(
