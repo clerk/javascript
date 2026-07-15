@@ -250,8 +250,13 @@ describe('UserProfile composed sections', () => {
 
   describe('Account — section outside page', () => {
     it('useRequirePage throws when rendered outside a page component', async () => {
-      const { wrapper } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      // The guard only throws for a development SDK; mark the fixture accordingly.
+      Object.defineProperty(fixtures.clerk, 'sdkMetadata', {
+        value: { environment: 'development' },
+        configurable: true,
       });
 
       expect(() => render(<UserProfileEmailSection />, { wrapper })).toThrow(
