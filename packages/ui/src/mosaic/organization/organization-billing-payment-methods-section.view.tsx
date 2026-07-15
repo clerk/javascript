@@ -26,6 +26,19 @@ export interface PaymentMethodRemoveState {
   onCancel: () => void;
 }
 
+/** The add-payment-method flow state, flattened from the add machine by the controller. */
+export interface PaymentMethodAddState {
+  /** Whether the add entry point is offered at all (false in no-RHC builds). */
+  available: boolean;
+  open: boolean;
+  submitting: boolean;
+  error: string | null;
+  onOpen: () => void;
+  onCancel: () => void;
+  /** The token seam: the gateway's card element hands its tokenized method back here. */
+  onSubmit: (token: { gateway: string; paymentToken: string }) => void;
+}
+
 export interface OrganizationBillingPaymentMethodsSectionViewProps {
   title: string;
   rows: PaymentMethodRow[];
@@ -37,6 +50,7 @@ export interface OrganizationBillingPaymentMethodsSectionViewProps {
   /** Opens the remove confirmation for a row. */
   onRemove: (row: PaymentMethodRow) => void;
   remove: PaymentMethodRemoveState;
+  add: PaymentMethodAddState;
 }
 
 /**
@@ -52,6 +66,7 @@ export function OrganizationBillingPaymentMethodsSectionView({
   onMakeDefault,
   onRemove,
   remove,
+  add,
 }: OrganizationBillingPaymentMethodsSectionViewProps): ReactElement {
   return (
     <section>
@@ -94,6 +109,30 @@ export function OrganizationBillingPaymentMethodsSectionView({
           </li>
         ))}
       </ul>
+      {add.available && !add.open ? (
+        <button
+          type='button'
+          onClick={add.onOpen}
+        >
+          Add payment method
+        </button>
+      ) : null}
+      {add.open ? (
+        <div data-testid='add-payment-method'>
+          {/* Stripe's PaymentElement (remotely hosted) is not migrated into Mosaic; it stays in the
+              legacy user-facing surface. This note stands in for it; `add.onSubmit` is the seam the
+              real element would call with its tokenized method. */}
+          <p>Card details are collected by the payment provider (not shown here).</p>
+          {add.error ? <p role='alert'>{add.error}</p> : null}
+          <button
+            type='button'
+            onClick={add.onCancel}
+            disabled={add.submitting}
+          >
+            Cancel
+          </button>
+        </div>
+      ) : null}
       {remove.open ? (
         <div role='alertdialog'>
           <p>Remove {remove.label}?</p>

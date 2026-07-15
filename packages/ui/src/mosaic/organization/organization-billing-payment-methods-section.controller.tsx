@@ -1,10 +1,15 @@
-import { __internal_useOrganizationBase, useReverification, useSession } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk, useReverification, useSession } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 
 import { usePaymentMethods, useSubscriberTypeContext } from '@/contexts';
 
 import { useMachine } from '../machine/useMachine';
-import type { PaymentMethodRemoveState, PaymentMethodRow } from './organization-billing-payment-methods-section.view';
+import type {
+  PaymentMethodAddState,
+  PaymentMethodRemoveState,
+  PaymentMethodRow,
+} from './organization-billing-payment-methods-section.view';
+import { organizationBillingPaymentMethodsAddMachine } from './organization-billing-payment-methods-section-add.machine';
 import { organizationBillingPaymentMethodsMakeDefaultMachine } from './organization-billing-payment-methods-section-make-default.machine';
 import { organizationBillingPaymentMethodsRemoveMachine } from './organization-billing-payment-methods-section-remove.machine';
 
@@ -20,6 +25,7 @@ type OrganizationBillingPaymentMethodsSectionController =
       onMakeDefault: (id: string) => void;
       onRemove: (row: PaymentMethodRow) => void;
       remove: PaymentMethodRemoveState;
+      add: PaymentMethodAddState;
     };
 
 function capitalize(value: string): string {
@@ -47,9 +53,12 @@ export function useOrganizationBillingPaymentMethodsSectionController(): Organiz
   const { data, isLoading, revalidate } = usePaymentMethods();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const subscriberType = useSubscriberTypeContext();
+  const clerk = useClerk();
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
   const organization = __internal_useOrganizationBase();
   const orgId = subscriberType === 'organization' ? organization?.id : undefined;
+  // addPaymentMethod lives on the payer resource, not the payment method, so resolve it here.
+  const payer = subscriberType === 'organization' ? organization : clerk.user;
 
   const findMethod = (paymentMethodId: string) => data.find(method => method.id === paymentMethodId);
 
@@ -74,6 +83,19 @@ export function useOrganizationBillingPaymentMethodsSectionController(): Organiz
           return;
         }
         await removeMethod(method);
+        void revalidate();
+      },
+    },
+  });
+
+  const [addSnapshot, sendAdd] = useMachine(organizationBillingPaymentMethodsAddMachine, {
+    context: {
+      addPaymentMethod: async ({ gateway, paymentToken }) => {
+        // The token seam only ever produces the stripe gateway today; narrow before the resource call.
+        if (gateway !== 'stripe') {
+          return;
+        }
+        await payer?.addPaymentMethod({ gateway, paymentToken });
         void revalidate();
       },
     },
@@ -116,6 +138,16 @@ export function useOrganizationBillingPaymentMethodsSectionController(): Organiz
       submitting: removeSnapshot.value === 'removing',
       onConfirm: () => sendRemove({ type: 'CONFIRM' }),
       onCancel: () => sendRemove({ type: 'CANCEL' }),
+    },
+    add: {
+      // Adding a method needs Stripe's remotely-hosted card element, so the entry point is gone in no-RHC builds.
+      available: !__BUILD_DISABLE_RHC__,
+      open: addSnapshot.value === 'open' || addSnapshot.value === 'submitting',
+      submitting: addSnapshot.value === 'submitting',
+      error: addSnapshot.context.error,
+      onOpen: () => sendAdd({ type: 'OPEN' }),
+      onCancel: () => sendAdd({ type: 'CANCEL' }),
+      onSubmit: token => sendAdd({ type: 'SUBMIT', gateway: token.gateway, paymentToken: token.paymentToken }),
     },
   };
 }

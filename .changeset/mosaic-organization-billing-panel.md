@@ -6,4 +6,4 @@ Add a Mosaic `OrganizationProfile.BillingPanel` to the organization profile Mosa
 
 The `BillingPanel` self-gates on billing permissions: it renders nothing for members who can neither read nor manage billing (`org:sys_billing:read`/`org:sys_billing:manage`) or when organization billing is disabled, matching the legacy organization billing page.
 
-Note: the Mosaic Payment Methods section currently lists, removes, and re-defaults existing payment methods. Adding a new payment method (the Stripe-backed flow) is not yet available in the Mosaic panel and remains on the legacy billing page.
+The Mosaic Payment Methods section adds, lists, removes, and re-defaults payment methods. Note: the card-entry step of the add flow (the payment provider's remotely-hosted element) is not rendered in the Mosaic panel and remains on the legacy billing page, so the add entry point is hidden in builds without remotely-hosted components.

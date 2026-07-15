@@ -5,17 +5,16 @@ import { OrganizationBillingPaymentMethodsSectionView } from './organization-bil
 
 /**
  * The organization billing payment-methods list: shows saved payment methods and drives the
- * make-default and remove mutations through their machines. Self-gating on the
+ * add, make-default, and remove mutations through their machines. Self-gating on the
  * `org:sys_billing:manage` permission, so it renders nothing for read-only members; requires the
  * surrounding billing contexts (`SubscriberTypeContext`). Exposed on the compound namespace as
  * `OrganizationProfile.BillingPaymentMethodsSection`.
  *
- * NOT YET MIGRATED: the "add payment method" flow. It renders Stripe's `PaymentElement` inside a
- * `PaymentElementProvider` (see the legacy `components/PaymentMethods/AddPaymentMethod.tsx`), which
- * cannot be reduced to a Clerk-free, prop-driven view like the rest of the Mosaic billing surface,
- * and also needs the Stripe appearance-theming bridge. Until that lands, this section only lists,
- * removes, and re-defaults existing methods — matching the legacy RHC-disabled behavior, where the
- * add button is likewise hidden. See roadmap task "Migrate the add-payment-method (Stripe) flow".
+ * The add flow's Clerk-side lifecycle (open, submit, revalidate, error) is fully migrated, but the
+ * gateway's card capture (Stripe's remotely-hosted `PaymentElement`) is deliberately not rendered
+ * here: it cannot be reduced to a Clerk-free, prop-driven view, so it stays in the legacy
+ * user-facing surface. `add.onSubmit` is the seam the real element would call with its tokenized
+ * method. The add entry point is hidden in no-RHC builds, matching the legacy behavior.
  */
 export function OrganizationBillingPaymentMethodsSection(): ReactElement | null {
   const controller = useOrganizationBillingPaymentMethodsSectionController();
@@ -33,6 +32,7 @@ export function OrganizationBillingPaymentMethodsSection(): ReactElement | null 
       onMakeDefault={controller.onMakeDefault}
       onRemove={controller.onRemove}
       remove={controller.remove}
+      add={controller.add}
     />
   );
 }

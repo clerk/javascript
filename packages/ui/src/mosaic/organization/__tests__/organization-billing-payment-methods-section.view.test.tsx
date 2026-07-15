@@ -33,6 +33,15 @@ function baseProps() {
       onConfirm: vi.fn(),
       onCancel: vi.fn(),
     },
+    add: {
+      available: true,
+      open: false,
+      submitting: false,
+      error: null,
+      onOpen: vi.fn(),
+      onCancel: vi.fn(),
+      onSubmit: vi.fn(),
+    },
   };
 }
 
@@ -118,5 +127,38 @@ describe('OrganizationBillingPaymentMethodsSectionView', () => {
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent('card declined');
+  });
+
+  it('offers the add button and fires onOpen', () => {
+    const props = baseProps();
+    render(<OrganizationBillingPaymentMethodsSectionView {...props} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add payment method' }));
+    expect(props.add.onOpen).toHaveBeenCalled();
+  });
+
+  it('hides the add button when the add flow is unavailable', () => {
+    const props = baseProps();
+    render(
+      <OrganizationBillingPaymentMethodsSectionView
+        {...props}
+        add={{ ...props.add, available: false }}
+      />,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Add payment method' })).not.toBeInTheDocument();
+  });
+
+  it('renders the add placeholder and fires cancel when open', () => {
+    const props = baseProps();
+    const withAdd = { ...props, add: { ...props.add, open: true } };
+    render(<OrganizationBillingPaymentMethodsSectionView {...withAdd} />);
+
+    expect(screen.getByTestId('add-payment-method')).toBeInTheDocument();
+    // The add entry point collapses into the open panel.
+    expect(screen.queryByRole('button', { name: 'Add payment method' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(withAdd.add.onCancel).toHaveBeenCalled();
   });
 });

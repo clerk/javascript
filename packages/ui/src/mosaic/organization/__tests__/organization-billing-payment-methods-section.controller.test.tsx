@@ -24,6 +24,8 @@ let isSessionLoaded: boolean;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let subscriberType: 'organization' | 'user';
 let reverificationCalls: number;
+let orgAddPaymentMethod: ReturnType<typeof vi.fn>;
+let userAddPaymentMethod: ReturnType<typeof vi.fn>;
 
 vi.mock('@/contexts', () => ({
   usePaymentMethods: () => ({ data: paymentMethods, isLoading, revalidate }),
@@ -38,7 +40,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       isLoaded: isSessionLoaded,
       session: isSessionLoaded ? { id: 'sess_1', checkAuthorization } : undefined,
     }),
-    __internal_useOrganizationBase: () => ({ id: 'org_1' }),
+    useClerk: () => ({ user: { addPaymentMethod: userAddPaymentMethod } }),
+    __internal_useOrganizationBase: () => ({ id: 'org_1', addPaymentMethod: orgAddPaymentMethod }),
     // Stand-in for the real reverification enhancer: count each wrapped call so tests can assert
     // a mutation is routed through step-up auth, then delegate to the underlying fetcher.
     useReverification: (fetcher: (...args: unknown[]) => unknown) => {
@@ -73,6 +76,8 @@ beforeEach(() => {
   checkAuthorization = vi.fn().mockReturnValue(true);
   subscriberType = 'organization';
   reverificationCalls = 0;
+  orgAddPaymentMethod = vi.fn().mockResolvedValue(undefined);
+  userAddPaymentMethod = vi.fn().mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -100,6 +105,10 @@ function Harness() {
       <output data-testid='removeOpen'>{String(controller.remove.open)}</output>
       <output data-testid='removeLabel'>{controller.remove.label}</output>
       <output data-testid='removeError'>{controller.remove.error ?? ''}</output>
+      <output data-testid='addAvailable'>{String(controller.add.available)}</output>
+      <output data-testid='addOpen'>{String(controller.add.open)}</output>
+      <output data-testid='addSubmitting'>{String(controller.add.submitting)}</output>
+      <output data-testid='addError'>{controller.add.error ?? ''}</output>
     </div>
   );
 }
@@ -276,5 +285,91 @@ describe('useOrganizationBillingPaymentMethodsSectionController', () => {
     });
 
     expect(paymentMethods[0].makeDefault).toHaveBeenCalledWith({ orgId: undefined });
+  });
+
+  it('offers the add entry point and opens it', () => {
+    render(<Harness />);
+
+    // __BUILD_DISABLE_RHC__ is false under test, so the add flow is available.
+    expect(screen.getByTestId('addAvailable')).toHaveTextContent('true');
+    expect(screen.getByTestId('addOpen')).toHaveTextContent('false');
+
+    act(() => {
+      latest.status === 'ready' && latest.add.onOpen();
+    });
+
+    expect(screen.getByTestId('addOpen')).toHaveTextContent('true');
+  });
+
+  it('adds the tokenized method to the organization payer, then revalidates and closes', async () => {
+    const gate = deferred<void>();
+    orgAddPaymentMethod.mockReturnValue(gate.promise);
+
+    render(<Harness />);
+
+    act(() => {
+      latest.status === 'ready' && latest.add.onOpen();
+    });
+    act(() => {
+      latest.status === 'ready' && latest.add.onSubmit({ gateway: 'stripe', paymentToken: 'pm_token_123' });
+    });
+
+    expect(screen.getByTestId('addSubmitting')).toHaveTextContent('true');
+    expect(orgAddPaymentMethod).toHaveBeenCalledWith({ gateway: 'stripe', paymentToken: 'pm_token_123' });
+
+    await act(async () => {
+      gate.resolve();
+    });
+
+    expect(screen.getByTestId('addOpen')).toHaveTextContent('false');
+    expect(revalidate).toHaveBeenCalledTimes(1);
+    // Legacy add is not reverified; keep parity.
+    expect(reverificationCalls).toBe(0);
+  });
+
+  it('adds the tokenized method to the user payer for a user subscriber', () => {
+    subscriberType = 'user';
+
+    render(<Harness />);
+
+    act(() => {
+      latest.status === 'ready' && latest.add.onOpen();
+    });
+    act(() => {
+      latest.status === 'ready' && latest.add.onSubmit({ gateway: 'stripe', paymentToken: 'pm_token_123' });
+    });
+
+    expect(userAddPaymentMethod).toHaveBeenCalledWith({ gateway: 'stripe', paymentToken: 'pm_token_123' });
+    expect(orgAddPaymentMethod).not.toHaveBeenCalled();
+  });
+
+  it('surfaces an add error and stays open', async () => {
+    orgAddPaymentMethod.mockRejectedValue(new Error('card declined'));
+
+    render(<Harness />);
+
+    act(() => {
+      latest.status === 'ready' && latest.add.onOpen();
+    });
+    await act(async () => {
+      latest.status === 'ready' && latest.add.onSubmit({ gateway: 'stripe', paymentToken: 'pm_token_123' });
+    });
+
+    expect(screen.getByTestId('addError')).toHaveTextContent('card declined');
+    expect(screen.getByTestId('addOpen')).toHaveTextContent('true');
+  });
+
+  it('cancels the add flow without adding', () => {
+    render(<Harness />);
+
+    act(() => {
+      latest.status === 'ready' && latest.add.onOpen();
+    });
+    act(() => {
+      latest.status === 'ready' && latest.add.onCancel();
+    });
+
+    expect(screen.getByTestId('addOpen')).toHaveTextContent('false');
+    expect(orgAddPaymentMethod).not.toHaveBeenCalled();
   });
 });
