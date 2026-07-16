@@ -3,7 +3,8 @@ type Milliseconds = number;
 type RetryOptions = Partial<{
   /**
    * The base delay of the exponential backoff: either milliseconds, or a function
-   * deriving them from the error that triggered the retry and the iteration number.
+   * deriving them from the error that triggered the retry and the iteration number,
+   * starting at 1 for the first retry.
    * The exponential factor, max delay, and jitter still apply.
    *
    * @default 125
@@ -143,6 +144,10 @@ export const retry = async <T>(callback: () => T | Promise<T>, options: RetryOpt
     try {
       return await callback();
     } catch (e) {
+      if (signal?.aborted) {
+        throw abortReason(signal);
+      }
+
       iterations++;
       if (!shouldRetry(e, iterations)) {
         throw e;

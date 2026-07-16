@@ -209,6 +209,25 @@ describe('retry', () => {
     expect(attempts).toBe(1);
   });
 
+  test('rejects with the abort reason when the signal aborts while the callback is running', async () => {
+    const controller = new AbortController();
+    const onBeforeRetry = vi.fn();
+    let attempts = 0;
+
+    const result = retry(
+      () => {
+        attempts++;
+        controller.abort(new Error('cancelled'));
+        throw new Error('failed');
+      },
+      { shouldRetry: () => true, signal: controller.signal, onBeforeRetry },
+    );
+
+    await expect(result).rejects.toThrow('cancelled');
+    expect(attempts).toBe(1);
+    expect(onBeforeRetry).not.toHaveBeenCalled();
+  });
+
   test('a functional initialDelay derives the backoff base from the error', async () => {
     let attempts = 0;
     retry(
