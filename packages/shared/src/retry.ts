@@ -2,11 +2,13 @@ type Milliseconds = number;
 
 type RetryOptions = Partial<{
   /**
-   * The initial delay before the first retry.
+   * The base delay of the exponential backoff: either milliseconds, or a function
+   * deriving them from the error that triggered the retry and the iteration number.
+   * The exponential factor, max delay, and jitter still apply.
    *
    * @default 125
    */
-  initialDelay: Milliseconds;
+  initialDelay: Milliseconds | ((error: unknown, iteration: number) => Milliseconds);
   /**
    * The maximum delay between retries.
    * The delay between retries will never exceed this value.
@@ -50,6 +52,12 @@ type RetryOptions = Partial<{
    * This can be used to modify request parameters, add headers, etc.
    */
   onBeforeRetry?: (iteration: number) => void | Promise<void>;
+  /**
+   * An AbortSignal that cancels retrying.
+   * Aborting rejects the returned promise with the signal's abort reason, immediately
+   * interrupting any pending delay. It does not abort a callback that is already executing.
+   */
+  signal: AbortSignal;
 }>;
 
 const defaultOptions = {
@@ -63,27 +71,46 @@ const defaultOptions = {
 
 const RETRY_IMMEDIATELY_DELAY = 100;
 
-const sleep = async (ms: Milliseconds) => new Promise(s => setTimeout(s, ms));
+const abortReason = (signal: AbortSignal): Error => signal.reason ?? new Error('The operation was aborted');
+
+const sleep = async (ms: Milliseconds, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (!signal) {
+      setTimeout(resolve, ms);
+      return;
+    }
+    if (signal.aborted) {
+      reject(abortReason(signal));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(abortReason(signal));
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
 
 const applyJitter = (delay: Milliseconds, jitter: boolean) => {
   return jitter ? delay * (1 + Math.random()) : delay;
 };
 
 const createExponentialDelayAsyncFn = (
-  opts: Required<Pick<RetryOptions, 'initialDelay' | 'maxDelayBetweenRetries' | 'factor' | 'jitter'>>,
+  opts: Required<Pick<RetryOptions, 'maxDelayBetweenRetries' | 'factor' | 'jitter'>> & Pick<RetryOptions, 'signal'>,
 ) => {
   let timesCalled = 0;
 
-  const calculateDelayInMs = () => {
-    const constant = opts.initialDelay;
-    const base = opts.factor;
-    let delay = constant * Math.pow(base, timesCalled);
+  const calculateDelayInMs = (base: Milliseconds) => {
+    let delay = base * Math.pow(opts.factor, timesCalled);
     delay = applyJitter(delay, opts.jitter);
     return Math.min(opts.maxDelayBetweenRetries || delay, delay);
   };
 
-  return async (): Promise<void> => {
-    await sleep(calculateDelayInMs());
+  return async (base: Milliseconds): Promise<void> => {
+    await sleep(calculateDelayInMs(base), opts.signal);
     timesCalled++;
   };
 };
@@ -94,19 +121,25 @@ const createExponentialDelayAsyncFn = (
  */
 export const retry = async <T>(callback: () => T | Promise<T>, options: RetryOptions = {}): Promise<T> => {
   let iterations = 0;
-  const { shouldRetry, initialDelay, maxDelayBetweenRetries, factor, retryImmediately, jitter, onBeforeRetry } = {
-    ...defaultOptions,
-    ...options,
-  };
+  const { shouldRetry, initialDelay, maxDelayBetweenRetries, factor, retryImmediately, jitter, onBeforeRetry, signal } =
+    {
+      ...defaultOptions,
+      ...options,
+    };
 
+  const resolveInitialDelay = typeof initialDelay === 'function' ? initialDelay : () => initialDelay;
   const delay = createExponentialDelayAsyncFn({
-    initialDelay,
     maxDelayBetweenRetries,
     factor,
     jitter,
+    signal,
   });
 
   while (true) {
+    if (signal?.aborted) {
+      throw abortReason(signal);
+    }
+
     try {
       return await callback();
     } catch (e) {
@@ -120,9 +153,9 @@ export const retry = async <T>(callback: () => T | Promise<T>, options: RetryOpt
       }
 
       if (retryImmediately && iterations === 1) {
-        await sleep(applyJitter(RETRY_IMMEDIATELY_DELAY, jitter));
+        await sleep(applyJitter(RETRY_IMMEDIATELY_DELAY, jitter), signal);
       } else {
-        await delay();
+        await delay(resolveInitialDelay(e, iterations));
       }
     }
   }
