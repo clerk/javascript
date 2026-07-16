@@ -26,10 +26,15 @@ const CLERK_MIN_IOS_VERSION = '17.0';
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   const callbackHost = `${packageName}.callback`;
   const intentFilters = mainActivity['intent-filter'] || [];
-  const callbackIsRegistered = intentFilters.some(intentFilter =>
-    intentFilter.data?.some(
-      data => data.$?.['android:scheme'] === 'clerk' && data.$?.['android:host'] === callbackHost,
-    ),
+  const hasAndroidName = (entries, name) => entries?.some(entry => entry.$?.['android:name'] === name);
+  const callbackIsRegistered = intentFilters.some(
+    intentFilter =>
+      hasAndroidName(intentFilter.action, 'android.intent.action.VIEW') &&
+      hasAndroidName(intentFilter.category, 'android.intent.category.DEFAULT') &&
+      hasAndroidName(intentFilter.category, 'android.intent.category.BROWSABLE') &&
+      intentFilter.data?.some(
+        data => data.$?.['android:scheme'] === 'clerk' && data.$?.['android:host'] === callbackHost,
+      ),
   );
 
   if (callbackIsRegistered) {

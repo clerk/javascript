@@ -213,6 +213,7 @@ export function useHostedAuth(): {
 function getDefaultRedirectUrl(AuthSessionModule: typeof AuthSession): string {
   const appIdentifier = getExpoAppIdentifier();
   if (appIdentifier && Platform.OS === 'ios') {
+    // Expo prebuild registers ios.bundleIdentifier as an iOS URL scheme.
     return `${appIdentifier}://callback`;
   }
   if (appIdentifier && Platform.OS === 'android') {
