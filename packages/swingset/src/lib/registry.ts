@@ -172,6 +172,8 @@ const tooltipModule: StoryModule = { meta: tooltipMeta };
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
+  // Account
+  accountButtonModule,
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
@@ -184,7 +186,6 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
-  accountButtonModule,
   buttonModule,
   cardComponentModule,
   inputModule,
