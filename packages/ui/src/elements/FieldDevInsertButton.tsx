@@ -9,10 +9,13 @@ import type { FieldDevHintValue } from './FieldDevHint';
 type FieldDevInsertButtonProps = React.PropsWithChildren<{ hint: FieldDevHintValue }>;
 
 /**
- * Dev-only alternative to the label popover: renders the field's input with a small
- * "insert test credential" button overlaid inside it, right-aligned. The button only
- * appears while the field is focused and empty, and reserves matching padding on the
- * input so text/placeholder never runs beneath it. Renders nothing outside dev mode.
+ * Dev-only affordance: renders the field's input with a small "use test credential"
+ * button overlaid inside it, right-aligned. The button is shown while the input is
+ * focused and its value is not yet a valid test credential (per `hint.isTestValue`),
+ * so it stays available while a developer types a non-test address and hides once the
+ * value is a test credential. When no predicate is given it hides as soon as the field
+ * has any value. It reserves matching padding on the input so text/placeholder never
+ * runs beneath it. Renders nothing outside dev mode.
  */
 export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
   const { showDevModeNotice } = useDevMode();

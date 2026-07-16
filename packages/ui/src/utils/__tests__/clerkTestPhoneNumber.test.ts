@@ -24,5 +24,7 @@ describe('isClerkTestPhoneNumber', () => {
   it('rejects empty or partial input', () => {
     expect(isClerkTestPhoneNumber('')).toBe(false);
     expect(isClerkTestPhoneNumber('+1201')).toBe(false);
+    // Suffix only, missing the area code.
+    expect(isClerkTestPhoneNumber('5550100')).toBe(false);
   });
 });

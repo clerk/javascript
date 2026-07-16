@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Form } from '@/ui/elements/Form';
 import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
-import { toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
+import { isClerkTestEmail, toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
 import { isClerkTestPhoneNumber } from '@/ui/utils/clerkTestPhoneNumber';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
@@ -94,7 +94,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                     label: 'Use test email',
                     onInsert: () => formState.emailAddress.setValue(toClerkTestEmail(formState.emailAddress.value)),
                   },
-                  isTestValue: value => value.includes('+clerk_test'),
+                  isTestValue: isClerkTestEmail,
                 }}
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}

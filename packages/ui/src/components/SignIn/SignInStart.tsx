@@ -19,7 +19,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
-import { toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
+import { isClerkTestEmail, toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
 import { isClerkTestPhoneNumber } from '@/ui/utils/clerkTestPhoneNumber';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
@@ -590,7 +590,7 @@ function SignInStartInternal(): JSX.Element {
               label: 'Use test email',
               onInsert: () => identifierField.setValue(toClerkTestEmail(identifierField.value)),
             },
-            isTestValue: (value: string) => value.includes('+clerk_test'),
+            isTestValue: isClerkTestEmail,
           }
         : undefined;
 

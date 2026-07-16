@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { toClerkTestEmail } from '../clerkTestEmail';
+import { isClerkTestEmail, toClerkTestEmail } from '../clerkTestEmail';
+
+describe('isClerkTestEmail', () => {
+  it('matches the clerk_test subaddress as a complete segment', () => {
+    expect(isClerkTestEmail('alex+clerk_test@work.com')).toBe(true);
+    expect(isClerkTestEmail('alex+newsletter+clerk_test@work.com')).toBe(true);
+    expect(isClerkTestEmail('alex+clerk_test+foo@work.com')).toBe(true);
+  });
+
+  it('does not match a near-substring segment', () => {
+    expect(isClerkTestEmail('alex+clerk_test2@work.com')).toBe(false);
+    expect(isClerkTestEmail('alex+clerk_testing@work.com')).toBe(false);
+    expect(isClerkTestEmail('alex@work.com')).toBe(false);
+  });
+});
 
 describe('toClerkTestEmail', () => {
   it('adds the +clerk_test subaddress to the local part', () => {
