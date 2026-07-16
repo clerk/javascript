@@ -23,6 +23,7 @@ export const APIKeysPage = () => {
       <Col
         gap={4}
         elementDescriptor={descriptors.page}
+        sx={{ isolation: 'isolate' }}
       >
         <Header.Root>
           <Header.Title

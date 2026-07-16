@@ -43,7 +43,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     isLoading,
     enterpriseConnection,

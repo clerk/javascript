@@ -55,6 +55,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
       <Col
         elementDescriptor={descriptors.page}
         gap={2}
+        sx={{ isolation: 'isolate' }}
       >
         <Col
           elementDescriptor={descriptors.profilePage}
