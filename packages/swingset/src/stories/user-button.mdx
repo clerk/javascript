@@ -1,0 +1,115 @@
+import * as UserButtonStories from './user-button.stories';
+
+# UserButton
+
+The account & organization switcher that sits behind the user avatar. The active account sits at the
+top with its organizations (including any **suggested** workspaces you can Join), and **additional
+accounts** are listed below. Hovering the active account reveals **Sign out**; clicking any additional
+account switches to it. **Settings / Members** open the combined profile modal, and the surface also
+exposes **Add organization**, **Add account**, and **Sign out of all accounts**.
+
+It is the styled Mosaic component composed from the headless `@clerk/headless` popover primitive plus
+slot recipes, and inherits the primitive's open/close behavior, focus management, and ARIA wiring. This
+first pass is presentational: the parts render from the props on `UserButtonRoot` (mock data in the
+examples). A `useUserButtonController()` that reads live Clerk resources is a drop-in follow-up.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserButtonStories}
+/>
+
+## Usage
+
+The all-in-one `UserButton` renders the trigger and popup from a single prop-driven call:
+
+```tsx
+import { UserButton } from '@clerk/ui/mosaic/components/user-button.view';
+
+<UserButton
+  status='ready'
+  activeSession={{ sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', email: 'preston@clerk.dev' }}
+  activeOrganizationId='org_clerk_app'
+  hasOrganizations
+  memberships={[
+    { kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan', upgradeable: true },
+    { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud' },
+  ]}
+  suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
+  invitations={[]}
+  additionalSessions={[{ sessionId: 'sess_2', userId: 'user_2', name: 'Preston Booth', email: 'acme@clerk.dev' }]}
+  onSelectOrganization={id => setActive({ organization: id })}
+  onSelectPersonal={() => setActive({ organization: null })}
+  onSwitchSession={sessionId => setActive({ session: sessionId })}
+  onSignOutAll={() => signOut()}
+/>
+```
+
+For layouts that need to drop the popup into their own trigger, compose the parts directly. The data
+and callbacks live on `UserButtonRoot` and are read from context by the leaves, so they take no props:
+
+```tsx
+import {
+  UserButtonRoot,
+  UserButtonTrigger,
+  UserButtonPopup,
+} from '@clerk/ui/mosaic/components/user-button.view';
+
+<UserButtonRoot {...data} {...callbacks}>
+  <UserButtonTrigger />
+  <UserButtonPopup />
+</UserButtonRoot>
+```
+
+The exports are flat (not `UserButton.Trigger`) so each part can declare its own `'use client'`
+boundary without forcing the consumer's file to become a client component.
+
+## States & scenarios
+
+### Personal (no organizations)
+
+When the active account has no organizations, the header collapses to a personal layout —
+**Manage account / Sign out** — and the organization list is omitted. The trigger still shows the
+account avatar and name.
+
+<Story
+  name='Personal'
+  storyModule={UserButtonStories}
+/>
+
+### Personal & workspace
+
+One account has workspaces (organizations); an additional account is a personal account (no orgs).
+Switching to it flips the surface to the personal layout.
+
+<Story
+  name='MultipleSessions'
+  storyModule={UserButtonStories}
+/>
+
+## Parts
+
+| Part                   | Description                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `UserButtonRoot`    | Owns the data + callbacks and forwards popover open state to `Popover.Root`. |
+| `UserButtonTrigger` | The sidebar trigger: active workspace avatar, name, plan badge, selector.    |
+| `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
+
+## Styling
+
+The component is themed with a Mosaic slot recipe (`userButtonRecipe`). Override any slot through
+`appearance.elements` — e.g. `{ 'user-button-popup': { borderRadius: 24 } }`.
+
+| Slot                           | Description                                             |
+| ------------------------------ | ------------------------------------------------------- |
+| `user-button-trigger`       | The trigger button                                      |
+| `user-button-popup`         | The popover surface                                     |
+| `user-button-header`        | Active workspace header                                 |
+| `user-button-action`        | Header action buttons (Settings / Members)              |
+| `user-button-group`         | A divided section (workspace list, additional accounts) |
+| `user-button-item`          | A selectable workspace / account row                    |
+| `user-button-avatar`        | Org (square) / account (circle) avatar                  |
+| `user-button-inline-button` | Row actions (Join / Accept)                             |
+| `user-button-hover-action`  | The hover-revealed Sign out on the active account       |
+| `user-button-footer`        | Sign out of all accounts + branding                     |
