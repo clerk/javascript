@@ -74,10 +74,12 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
             // and would otherwise paint over the button and swallow the click.
             zIndex: 2,
             top: '50%',
-            insetInlineEnd: t.space.$0x75,
+            insetInlineEnd: t.space.$1,
             transform: 'translateY(-50%)',
             backgroundColor: t.colors.$colorBackground,
             whiteSpace: 'nowrap',
+            paddingInline: t.space.$1x5,
+            borderRadius: t.space.$0x75
           })}
         >
           {typeof label === 'string' ? label : undefined}
