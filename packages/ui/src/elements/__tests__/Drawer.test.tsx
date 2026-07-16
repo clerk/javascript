@@ -62,5 +62,11 @@ describe('Drawer', () => {
     // Drawer itself.
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(onOpenChange).not.toHaveBeenCalled();
+
+    // With the Select closed, a second Escape now dismisses the Drawer.
+    // floating-ui invokes onOpenChange(open, event, reason), so assert on the open arg.
+    fireEvent.keyDown(document.body, { key: 'Escape', code: 'Escape' });
+    expect(onOpenChange).toHaveBeenCalled();
+    expect(onOpenChange.mock.lastCall?.[0]).toBe(false);
   });
 });
