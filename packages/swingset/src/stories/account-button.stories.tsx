@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { AccountButton, type AccountButtonProps } from '@clerk/ui/mosaic/account/account-button.view';
+import { type AccountButtonProps, AccountButtonView } from '@clerk/ui/mosaic/account/account-button.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -35,7 +35,7 @@ const preston = { sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', 
 
 export function Default(_args: Record<string, unknown>) {
   return (
-    <AccountButton
+    <AccountButtonView
       {...handlers}
       status='ready'
       activeAccount={preston}
@@ -63,7 +63,7 @@ export function Default(_args: Record<string, unknown>) {
 
 export function Personal(_args: Record<string, unknown>) {
   return (
-    <AccountButton
+    <AccountButtonView
       {...handlers}
       status='ready'
       activeAccount={{
@@ -86,7 +86,7 @@ export function Personal(_args: Record<string, unknown>) {
 
 export function MultipleAccounts(_args: Record<string, unknown>) {
   return (
-    <AccountButton
+    <AccountButtonView
       {...handlers}
       status='ready'
       activeAccount={preston}
