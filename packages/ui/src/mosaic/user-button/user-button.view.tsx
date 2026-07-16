@@ -128,7 +128,7 @@ export const userButtonRecipe = defineSlotRecipe(theme => ({
       background: 'none',
       border: 'none',
       cursor: 'pointer',
-      textAlign: 'left',
+      textAlign: 'start',
       color: theme.color.cardForeground,
       ...theme.text('sm'),
       _hover: { backgroundColor: theme.color.muted },
@@ -233,7 +233,7 @@ export const userButtonRecipe = defineSlotRecipe(theme => ({
       margin: 0,
       font: 'inherit',
       color: 'inherit',
-      textAlign: 'left',
+      textAlign: 'start',
       cursor: 'pointer',
     },
     name: {
@@ -304,7 +304,7 @@ export const userButtonRecipe = defineSlotRecipe(theme => ({
       background: 'none',
       border: 'none',
       cursor: 'pointer',
-      textAlign: 'left',
+      textAlign: 'start',
       ...theme.text('sm'),
       color: theme.color.mutedForeground,
       _hover: { backgroundColor: theme.color.muted },
@@ -335,7 +335,7 @@ export const userButtonRecipe = defineSlotRecipe(theme => ({
       background: 'none',
       border: 'none',
       cursor: 'pointer',
-      textAlign: 'left',
+      textAlign: 'start',
       ...theme.text('sm'),
       color: theme.color.mutedForeground,
       _hover: { backgroundColor: theme.color.muted },
@@ -858,6 +858,7 @@ export function UserButtonTrigger() {
       render={({ ref, ...triggerProps }) => (
         <button
           ref={ref}
+          type='button'
           {...triggerProps}
           {...trigger}
         >
@@ -872,7 +873,7 @@ export function UserButtonTrigger() {
           <Icon
             name='chevron-up-down'
             size='sm'
-            style={{ marginLeft: 'auto', color: theme.color.mutedForeground }}
+            style={{ marginInlineStart: 'auto', color: theme.color.mutedForeground }}
           />
         </button>
       )}
