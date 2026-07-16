@@ -229,6 +229,8 @@ const tooltipModule: StoryModule = { meta: tooltipMeta };
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
+  // User
+  userButtonModule,
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
@@ -254,7 +256,6 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   tabsComponentModule,
   textModule,
-  userButtonModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,

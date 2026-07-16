@@ -8,7 +8,7 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-button.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Components',
+  group: 'User',
   title: 'UserButton',
   source: 'packages/ui/src/mosaic/components/user-button.view.tsx',
 };
