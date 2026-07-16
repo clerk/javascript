@@ -6,8 +6,14 @@ import type { TokenStorage } from '../../shared/types';
 import { setupTokenCacheIpcHandlers } from '../ipc-handlers';
 
 const mainFrame = {};
-const ipcEvent = { sender: { mainFrame }, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
-const subframeEvent = { sender: { mainFrame }, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
+const windowSender = { mainFrame, getType: () => 'window' };
+const ipcEvent = { sender: windowSender, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
+const subframeEvent = { sender: windowSender, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
+// A <webview> is a separate WebContents whose top document satisfies senderFrame === mainFrame.
+const webviewEvent = {
+  sender: { mainFrame, getType: () => 'webview' },
+  senderFrame: mainFrame,
+} as unknown as Electron.IpcMainInvokeEvent;
 
 vi.mock('electron', () => ({
   ipcMain: {
@@ -63,6 +69,22 @@ describe('setupTokenCacheIpcHandlers', () => {
     expect(() => getTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
     expect(() => saveTokenHandler(subframeEvent, 'token-key', 'jwt')).toThrow('main frame');
     expect(() => clearTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
+
+    expect(storage.getItem).not.toHaveBeenCalled();
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(storage.removeItem).not.toHaveBeenCalled();
+  });
+
+  it('rejects token operations from a <webview> whose top frame mimics the main frame', () => {
+    setupTokenCacheIpcHandlers(storage);
+
+    const getTokenHandler = vi.mocked(ipcMain.handle).mock.calls[0][1];
+    const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
+    const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
+
+    expect(() => getTokenHandler(webviewEvent, 'token-key')).toThrow('main frame');
+    expect(() => saveTokenHandler(webviewEvent, 'token-key', 'jwt')).toThrow('main frame');
+    expect(() => clearTokenHandler(webviewEvent, 'token-key')).toThrow('main frame');
 
     expect(storage.getItem).not.toHaveBeenCalled();
     expect(storage.setItem).not.toHaveBeenCalled();
