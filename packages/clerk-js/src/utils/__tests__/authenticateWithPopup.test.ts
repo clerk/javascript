@@ -25,8 +25,8 @@ afterEach(() => {
 
 describe('wrapWithPopupRoutes', () => {
   it.each([
-    [undefined, 'https://clerk.example.com/v1/auth-popup-callback'],
-    ['https://app.example.com/__clerk', 'https://app.example.com/__clerk/v1/auth-popup-callback'],
+    [undefined, 'https://clerk.example.com/v1/popup_auth_callback'],
+    ['https://app.example.com/__clerk', 'https://app.example.com/__clerk/v1/popup_auth_callback'],
   ])('uses the effective FAPI URL when proxyUrl is %s', (proxyUrl, expectedCallbackUrl) => {
     const routes = wrapWithPopupRoutes(createClerk(proxyUrl), {
       redirectCallbackUrl: 'https://app.example.com/sso-callback',

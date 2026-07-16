@@ -2,7 +2,7 @@ import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from
 
 import type { Clerk } from '../core/clerk';
 
-const popupCallbackPath = '/auth-popup-callback';
+const popupCallbackPath = '/popup_auth_callback';
 
 const createPopupState = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');

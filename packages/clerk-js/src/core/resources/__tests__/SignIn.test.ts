@@ -2600,8 +2600,8 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             body: expect.objectContaining({
-              redirectUrl: expect.stringContaining('/auth-popup-callback'),
-              actionCompleteRedirectUrl: expect.stringContaining('/auth-popup-callback'),
+              redirectUrl: expect.stringContaining('/popup_auth_callback'),
+              actionCompleteRedirectUrl: expect.stringContaining('/popup_auth_callback'),
             }),
           }),
         );
