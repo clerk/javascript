@@ -105,6 +105,12 @@ import {
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import {
+  Default as UserButtonDefault,
+  meta as userButtonMeta,
+  MultipleSessions as UserButtonMultipleAccounts,
+  Personal as UserButtonPersonal,
+} from '../stories/user-button.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -176,6 +182,13 @@ const itemModule: StoryModule = {
   Group: ItemGroup,
 };
 
+const userButtonModule: StoryModule = {
+  meta: userButtonMeta,
+  Default: UserButtonDefault,
+  Personal: UserButtonPersonal,
+  MultipleSessions: UserButtonMultipleAccounts,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -241,6 +254,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   tabsComponentModule,
   textModule,
+  userButtonModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
