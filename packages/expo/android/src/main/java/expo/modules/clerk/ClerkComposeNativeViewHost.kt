@@ -19,7 +19,6 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
@@ -35,6 +34,11 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
       view.setViewTreeSavedStateRegistryOwner(act)
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+  }
+
+  init {
+    // Fabric measures before window attach; without a parent composition context, ComposeView.onMeasure throws.
+    startRecomposer()
   }
 
   override fun onAttachedToWindow() {
@@ -55,14 +59,12 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
   private fun startRecomposer() {
     if (activity == null || recomposerJob?.isActive == true) return
 
-    // Navigation can temporarily detach and later reattach the same native host.
-    // Always give a reattached ComposeView a live parent composition context.
+    // Navigation can detach and later reattach the same host, so a reattached ComposeView needs a fresh recomposer.
     val recomposerContext = AndroidUiDispatcher.Main
     val newRecomposer = Recomposer(recomposerContext)
     recomposer = newRecomposer
     composeView.setParentCompositionContext(newRecomposer)
-    val scope = CoroutineScope(recomposerContext + SupervisorJob())
-    recomposerJob = scope.launch {
+    recomposerJob = CoroutineScope(recomposerContext).launch {
       newRecomposer.runRecomposeAndApplyChanges()
     }
   }
