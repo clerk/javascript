@@ -35,10 +35,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
   });
 
   // The component seeds its internal state from `value` only on mount. Sync later
-  // programmatic `value` changes (e.g. inserting a test phone number) into the
-  // internal state; guarded on inequality so it never loops with onChange.
+  // programmatic `value` changes (e.g. inserting a test phone number, or a parent
+  // clearing the field) into the internal state; guarded on inequality so it never
+  // loops with onChange.
   useEffect(() => {
-    if (typeof value === 'string' && value && value !== numberWithCode) {
+    if (typeof value === 'string' && value !== numberWithCode) {
       setNumberAndIso(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -17,6 +17,10 @@ describe('isClerkTestPhoneNumber', () => {
     expect(isClerkTestPhoneNumber('+12015551234')).toBe(false);
   });
 
+  it('rejects non-US numbers that happen to end in 555-01XX', () => {
+    expect(isClerkTestPhoneNumber('+442015550100')).toBe(false);
+  });
+
   it('rejects empty or partial input', () => {
     expect(isClerkTestPhoneNumber('')).toBe(false);
     expect(isClerkTestPhoneNumber('+1201')).toBe(false);
