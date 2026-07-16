@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Box, Button } from '../customizables';
 import { useDevMode } from '../hooks/useDevMode';
 import { useFormField } from '../primitives/hooks/useFormField';
+import { common } from '../styledSystem';
 import type { FieldDevHintValue } from './FieldDevHint';
 
 type FieldDevInsertButtonProps = React.PropsWithChildren<{ hint: FieldDevHintValue }>;
@@ -53,7 +54,8 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
         position: 'relative',
         ...(visible &&
           buttonWidth > 0 && {
-            '& input': { paddingInlineEnd: `calc(${buttonWidth}px + ${t.space.$3})` },
+            // Reserve room for the button (its width) plus its trailing inset and a small gap.
+            '& input': { paddingInlineEnd: `calc(${buttonWidth}px + ${t.space.$2})` },
           }),
       })}
     >
@@ -62,24 +64,22 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
         <Button
           ref={buttonRef}
           variant='outline'
-          size='xs'
           textVariant='buttonSmall'
           localizationKey={typeof label === 'string' ? undefined : label}
           // Prevent the mousedown from blurring the input, so it stays focused through the click.
           onMouseDown={e => e.preventDefault()}
           onClick={() => action?.onInsert()}
           sx={t => ({
-            position: 'absolute',
+            // Reuse the canonical trailing-button geometry (symmetric $1 inset, radius
+            // concentric with the input's), then layer on the text-button chrome.
+            ...common.inputTrailingButton(t),
+            paddingBlock: 0,
+            color: t.colors.$neutralAlpha600,
+            backgroundColor: t.colors.$colorBackground,
+            whiteSpace: 'nowrap',
             // Above the phone input's container, which sets position:relative; z-index:1
             // and would otherwise paint over the button and swallow the click.
             zIndex: 2,
-            top: '50%',
-            insetInlineEnd: t.space.$1,
-            transform: 'translateY(-50%)',
-            backgroundColor: t.colors.$colorBackground,
-            whiteSpace: 'nowrap',
-            paddingInline: t.space.$1x5,
-            borderRadius: t.space.$0x75
           })}
         >
           {typeof label === 'string' ? label : undefined}
