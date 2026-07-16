@@ -47,7 +47,6 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
   }
 
   override fun onDetachedFromWindow() {
-    composeView.disposeComposition()
     recomposer?.cancel()
     recomposerJob?.cancel()
     recomposer = null

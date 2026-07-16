@@ -52,6 +52,8 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   override fun onHostDetachedFromWindow() {
     // Clear our per-view ViewModelStore so any AuthView ViewModels are GC'd.
     viewModelStoreOwner.viewModelStore.clear()
+    // Reset so a detached-then-reattached view can emit dismissed again.
+    dismissalEventSent = false
   }
 
   @Composable
