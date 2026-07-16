@@ -229,6 +229,7 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -238,7 +239,8 @@ final class ClerkNativeBridge {
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -465,19 +467,26 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private var themedAuthView: some View {
+  @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    return Group {
+    let themedView = Group {
       if let theme {
         view.environment(\.clerkTheme, theme)
       } else {
         view
       }
+    }
+
+    if let logoMaxHeight {
+      themedView.clerkAppIcon(maxHeight: logoMaxHeight)
+    } else {
+      themedView
     }
   }
 

@@ -8,6 +8,7 @@ import {
   mockJwks,
   mockJwt,
   mockJwtPayload,
+  mockM2MJwtPayload,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -1277,6 +1278,32 @@ describe('tokens.authenticateRequest(options)', () => {
 
     expect(requestState).toBeSignedIn();
     expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  test('cookieToken: returns signed out when an M2M JWT is presented in the __session cookie (SDK-107)', async () => {
+    // A same-instance M2M JWT carries the instance issuer, so it survives the suffixed-cookie check.
+    const { data: m2mJwt } = await signJwt({ ...mockM2MJwtPayload, iss: mockJwtPayload.iss }, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    });
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: m2mJwt!,
+        },
+      ),
+      mockOptions(),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.TokenTypeMismatch,
+      message: '',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
   // todo(
