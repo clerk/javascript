@@ -81,11 +81,8 @@ function useHostedScreen(
     if (!isFocused.current) {
       return;
     }
-    if (onDismiss) {
-      onDismiss();
-    } else {
-      routerHandle.back();
-    }
+    routerHandle.back();
+    onDismiss?.();
   }, [onDismiss, routerHandle]);
 
   useFocusEffect(
