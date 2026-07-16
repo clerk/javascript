@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -110,7 +110,7 @@ describe('FieldDevInsertButton', () => {
     expect(queryByRole('button', button())).not.toBeInTheDocument();
   });
 
-  it('restores focus to the input after keyboard activation', async () => {
+  it('restores focus to the input when activated via a virtual (keyboard/AT) click', async () => {
     const { wrapper } = await createFixtures();
     const Field = createField('');
 
@@ -118,10 +118,12 @@ describe('FieldDevInsertButton', () => {
     const input = getByLabelText(/email address/i);
 
     await userEvent.click(input);
-    // Move focus to the button and activate it with the keyboard.
-    await userEvent.tab();
-    expect(getByRole('button', button())).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
+    const insertButton = getByRole('button', button());
+    insertButton.focus();
+    expect(insertButton).toHaveFocus();
+
+    // Keyboard/AT activation surfaces as a click with detail 0 (a virtual click).
+    fireEvent.click(insertButton, { detail: 0 });
 
     expect(input).toHaveFocus();
   });

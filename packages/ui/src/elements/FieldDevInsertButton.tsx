@@ -1,3 +1,4 @@
+import { isVirtualClick } from '@floating-ui/react/utils';
 import * as React from 'react';
 
 import { Box, Button } from '../customizables';
@@ -71,13 +72,17 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
           variant='outline'
           textVariant='buttonSmall'
           localizationKey={typeof label === 'string' ? undefined : label}
-          // Prevent the mousedown from blurring the input, so it stays focused through the click.
+          // Prevent the mousedown from blurring the input, so it stays focused through a pointer click.
           onMouseDown={e => e.preventDefault()}
-          onClick={() => {
+          onClick={e => {
             action?.onInsert();
-            // Restore focus to the input before the button unmounts. onMouseDown covers pointer
-            // clicks, but keyboard activation (Enter/Space) would otherwise drop focus out of the field.
-            boxRef.current?.querySelector('input')?.focus();
+            // The button unmounts once a test credential is inserted. Pointer clicks keep focus on the
+            // input via onMouseDown above; only keyboard/AT activation (a virtual click) would drop focus
+            // out of the field, so restore it in that case. `isVirtualClick` also avoids re-opening the
+            // on-screen keyboard on touch. Mirrors InputWithIcon's clear button.
+            if (isVirtualClick(e.nativeEvent)) {
+              boxRef.current?.querySelector('input')?.focus({ preventScroll: true });
+            }
           }}
           sx={t => ({
             // Reuse the canonical trailing-button geometry (symmetric $1 inset, radius
