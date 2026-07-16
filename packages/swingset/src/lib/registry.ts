@@ -1,5 +1,11 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as AccountButtonDefault,
+  meta as accountButtonMeta,
+  MultipleAccounts as AccountButtonMultipleAccounts,
+  Personal as AccountButtonPersonal,
+} from '../stories/account-button.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
@@ -121,6 +127,13 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const accountButtonModule: StoryModule = {
+  meta: accountButtonMeta,
+  Default: AccountButtonDefault,
+  Personal: AccountButtonPersonal,
+  MultipleAccounts: AccountButtonMultipleAccounts,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -171,6 +184,7 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
+  accountButtonModule,
   buttonModule,
   cardComponentModule,
   inputModule,
