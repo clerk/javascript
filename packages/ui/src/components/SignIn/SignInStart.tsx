@@ -578,7 +578,7 @@ function SignInStartInternal(): JSX.Element {
       ? {
           text: 'Testing? Use a test phone number so you skip a real SMS. Verify it on the next screen with the code 424242.',
           action: {
-            label: 'Insert test phone number',
+            label: 'Use test number',
             onInsert: () => identifierField.setValue('+12015550100'),
           },
           isTestValue: isClerkTestPhoneNumber,
@@ -587,7 +587,7 @@ function SignInStartInternal(): JSX.Element {
         ? {
             text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
             action: {
-              label: 'Insert test email',
+              label: 'Use test email',
               onInsert: () => identifierField.setValue(toClerkTestEmail(identifierField.value)),
             },
             isTestValue: (value: string) => value.includes('+clerk_test'),

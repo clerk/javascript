@@ -13,6 +13,7 @@ import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 import type { FieldDevHintValue } from './FieldDevHint';
+import { FieldDevInsertButton } from './FieldDevInsertButton';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -149,10 +150,6 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
         sx={{
           position: 'relative',
           flex: '1 1 auto',
-          // Reveal the dev hint icon only while the field is hovered or focused.
-          ...(devHint && {
-            '&:hover [data-dev-hint-trigger], &:focus-within [data-dev-hint-trigger]': { opacity: 1 },
-          }),
         }}
       >
         <Flex
@@ -160,7 +157,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
           sx={t => ({ gap: t.space.$2 })}
         >
           <Field.LabelRow>
-            <Field.Label devHint={devHint} />
+            <Field.Label />
             <Field.LabelIcon icon={icon} />
             {!actionLabel && isOptional && <Field.AsOptional />}
             {actionLabel && (
@@ -175,7 +172,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
             <Field.Action />
           </Field.LabelRow>
 
-          {children}
+          {devHint ? <FieldDevInsertButton hint={devHint}>{children}</FieldDevInsertButton> : children}
         </Flex>
 
         <Field.Feedback />

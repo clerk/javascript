@@ -91,7 +91,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 devHint={{
                   text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
                   action: {
-                    label: 'Insert test email',
+                    label: 'Use test email',
                     onInsert: () => formState.emailAddress.setValue(toClerkTestEmail(formState.emailAddress.value)),
                   },
                   isTestValue: value => value.includes('+clerk_test'),
@@ -110,7 +110,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 devHint={{
                   text: 'Testing? Use a test phone number so you skip a real SMS. Verify it on the next screen with the code 424242.',
                   action: {
-                    label: 'Insert test phone number',
+                    label: 'Use test number',
                     onInsert: () => formState.phoneNumber.setValue('+12015550100'),
                   },
                   isTestValue: isClerkTestPhoneNumber,

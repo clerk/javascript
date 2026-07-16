@@ -4,7 +4,6 @@ import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
-  Box,
   CheckboxInput,
   descriptors,
   Flex,
@@ -23,8 +22,6 @@ import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils/useFormControl';
 import { OTPCodeControl, OTPResendButton, OTPRoot } from './CodeControl';
 import { useCardState } from './contexts';
-import type { FieldDevHintValue } from './FieldDevHint';
-import { FieldDevHint } from './FieldDevHint';
 import type { FormFeedbackProps } from './FormControl';
 import { FormFeedback } from './FormControl';
 import { InputGroup } from './InputGroup';
@@ -120,16 +117,14 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
   );
 };
 
-const FieldLabel = (
-  props: PropsWithChildren<{ localizationKey?: LocalizationKey | string; devHint?: FieldDevHintValue }>,
-) => {
+const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey | string }>) => {
   const { isRequired, id, label, isDisabled, hasError } = useFormField();
 
   if (!(props.localizationKey || label) && !props.children) {
     return null;
   }
 
-  const labelElement = (
+  return (
     <FormLabel
       localizationKey={props.localizationKey || label}
       elementDescriptor={descriptors.formFieldLabel}
@@ -137,34 +132,10 @@ const FieldLabel = (
       hasError={!!hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      sx={{ display: props.devHint ? 'inline' : 'flex', alignItems: 'center' }}
+      sx={{ display: 'flex', alignItems: 'center' }}
     >
       {props.children}
     </FormLabel>
-  );
-
-  if (!props.devHint) {
-    return labelElement;
-  }
-
-  // The label text and the dev hint are siblings inside an inline-block relative
-  // wrapper (makeLocalizable renders either its key text OR children, never both,
-  // so the hint cannot live inside the label). The label flows inline; the hint's
-  // absolute trigger sits at its static position trailing the text, and
-  // paddingInlineEnd reserves room so long labels wrap cleanly.
-  return (
-    <Box
-      as='span'
-      sx={{
-        position: 'relative',
-        display: 'inline-block',
-        textAlign: 'start',
-        paddingInlineEnd: '1.25em',
-      }}
-    >
-      {labelElement}
-      <FieldDevHint hint={props.devHint} />
-    </Box>
   );
 };
 
