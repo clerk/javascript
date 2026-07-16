@@ -289,7 +289,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const { isOpen, floating, styles, nodeId, context } = popoverCtx;
+  const { isOpen, floating, styles, nodeId, context, getFloatingProps } = popoverCtx;
   const containerRef = React.useRef<HTMLDivElement>(null);
   const effectiveListboxId = id ?? generatedListboxId;
   const effectiveAriaLabelledBy = ariaLabelledBy ?? (ariaLabel ? undefined : triggerId);
@@ -361,7 +361,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
         elementDescriptor={descriptors.selectOptionsContainer}
         elementId={descriptors.selectOptionsContainer.setId(elementId)}
         ref={floating}
-        onKeyDown={onKeyDown}
+        {...getFloatingProps({ onKeyDown })}
         direction='col'
         justify='start'
         sx={[
