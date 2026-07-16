@@ -17,11 +17,6 @@ vi.mock('../../hooks/useDevMode', () => ({
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 const onInsert = vi.fn();
-const hint: FieldDevHintValue = {
-  text: 'Testing tip',
-  action: { label: 'Use test email', onInsert },
-  isTestValue: value => value.includes('+clerk_test'),
-};
 
 const createField = (initialValue: string) =>
   withCardStateProvider(() => {
@@ -30,6 +25,19 @@ const createField = (initialValue: string) =>
       label: 'Email address',
       placeholder: 'Enter your email address',
     });
+
+    const hint: FieldDevHintValue = {
+      text: 'Testing tip',
+      action: {
+        label: 'Use test email',
+        // Mirror the real flow: inserting sets the field to a test credential (which hides the button).
+        onInsert: () => {
+          onInsert();
+          field.setValue('alex+clerk_test@work.com');
+        },
+      },
+      isTestValue: value => value.includes('+clerk_test'),
+    };
 
     // @ts-ignore -- the mock field props satisfy the runtime contract
     return (
@@ -90,14 +98,31 @@ describe('FieldDevInsertButton', () => {
     expect(queryByRole('button', button())).not.toBeInTheDocument();
   });
 
-  it('invokes onInsert when clicked', async () => {
+  it('invokes onInsert when clicked and then hides', async () => {
     const { wrapper } = await createFixtures();
     const Field = createField('');
 
-    const { getByLabelText, getByRole } = render(<Field />, { wrapper });
+    const { getByLabelText, getByRole, queryByRole } = render(<Field />, { wrapper });
     await userEvent.click(getByLabelText(/email address/i));
     await userEvent.click(getByRole('button', button()));
 
     expect(onInsert).toHaveBeenCalledTimes(1);
+    expect(queryByRole('button', button())).not.toBeInTheDocument();
+  });
+
+  it('restores focus to the input after keyboard activation', async () => {
+    const { wrapper } = await createFixtures();
+    const Field = createField('');
+
+    const { getByLabelText, getByRole } = render(<Field />, { wrapper });
+    const input = getByLabelText(/email address/i);
+
+    await userEvent.click(input);
+    // Move focus to the button and activate it with the keyboard.
+    await userEvent.tab();
+    expect(getByRole('button', button())).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+
+    expect(input).toHaveFocus();
   });
 });

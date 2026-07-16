@@ -31,6 +31,7 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
 
   const [isFocused, setIsFocused] = React.useState(false);
   const [buttonWidth, setButtonWidth] = React.useState(0);
+  const boxRef = React.useRef<HTMLDivElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   const visible = !!action && showDevModeNotice && isFocused && !isTestCredential;
@@ -45,6 +46,7 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
 
   return (
     <Box
+      ref={boxRef}
       onFocus={() => setIsFocused(true)}
       // Keep focused while focus moves within the field (e.g. onto the button itself),
       // so the button does not unmount out from under a click.
@@ -71,7 +73,12 @@ export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
           localizationKey={typeof label === 'string' ? undefined : label}
           // Prevent the mousedown from blurring the input, so it stays focused through the click.
           onMouseDown={e => e.preventDefault()}
-          onClick={() => action?.onInsert()}
+          onClick={() => {
+            action?.onInsert();
+            // Restore focus to the input before the button unmounts. onMouseDown covers pointer
+            // clicks, but keyboard activation (Enter/Space) would otherwise drop focus out of the field.
+            boxRef.current?.querySelector('input')?.focus();
+          }}
           sx={t => ({
             // Reuse the canonical trailing-button geometry (symmetric $1 inset, radius
             // concentric with the input's), then layer on the text-button chrome.
