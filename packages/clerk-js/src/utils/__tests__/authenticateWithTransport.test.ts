@@ -34,7 +34,10 @@ describe('_authenticateWithTransport', () => {
     });
 
     expect(authenticateMethod).toHaveBeenCalledWith(
-      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: '/done' }),
+      // The native flow forces both redirect params to the transport callback URL so the browser's
+      // action-complete redirect returns to the transport listener (loopback / custom scheme),
+      // rather than the app's in-app `redirectUrlComplete` ('/done').
+      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: 'myapp://sso-callback' }),
       expect.any(Function),
     );
     expect(transport.open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));

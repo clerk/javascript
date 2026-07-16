@@ -37,9 +37,10 @@ function buildUserAgentFallback(defaultUserAgent: string, productToken: string):
 /**
  * Creates the Clerk bridge for Electron's main process.
  *
- * The bridge owns Clerk's main-process IPC handlers, token persistence, and OAuth deep-link
- * transport. Call this before creating renderer windows, and call the returned `cleanup` method
- * when tearing down the app or test environment.
+ * The bridge owns Clerk's main-process IPC handlers, token persistence, and the OAuth redirect
+ * transport (a custom-scheme deep link by default; opt into a loopback `http://127.0.0.1` server
+ * with `oauth: { redirect: httpRedirectStrategy() }`). Call this before creating renderer windows,
+ * and call the returned `cleanup` method when tearing down the app or test environment.
  */
 export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridge {
   if (!options.storage) {
@@ -75,6 +76,7 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
 
     cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
       renderer: options.renderer,
+      oauth: options.oauth,
     });
   }
 

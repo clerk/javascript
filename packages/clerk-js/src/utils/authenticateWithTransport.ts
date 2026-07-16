@@ -71,7 +71,11 @@ export async function _authenticateWithTransport(opts: {
   const redirectUrl = String(await opts.transport.getRedirectUrl());
 
   let verificationUrl: URL | string | undefined;
-  await opts.authenticateMethod({ ...opts.params, redirectUrl }, url => {
+  // In the native flow the transport's redirect URL is the single place the browser returns to, so
+  // it must back both `redirect_url` and `action_complete_redirect_url`. Otherwise Clerk's final
+  // (action-complete) redirect targets the app's in-app URL — e.g. a custom scheme — instead of the
+  // transport callback, and a loopback listener would never receive it.
+  await opts.authenticateMethod({ ...opts.params, redirectUrl, redirectUrlComplete: redirectUrl }, url => {
     verificationUrl = url;
   });
 
