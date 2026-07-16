@@ -10,8 +10,9 @@ exposes **Add organization**, **Add account**, and **Sign out of all accounts**.
 
 It is the styled Mosaic component composed from the headless `@clerk/headless` popover primitive plus
 slot recipes, and inherits the primitive's open/close behavior, focus management, and ARIA wiring. This
-first pass is presentational: the parts render from the props on `AccountButtonRoot` (mock data in the
-examples). A `useAccountButtonController()` that reads live Clerk resources is a drop-in follow-up.
+`AccountButtonView` is presentational: the parts render from the props on `AccountButtonRoot` (mock data
+in the examples). The connected `AccountButton` wraps it with `useAccountButtonController()`, which reads
+live Clerk resources and needs no props.
 
 ## Example
 
@@ -22,12 +23,13 @@ examples). A `useAccountButtonController()` that reads live Clerk resources is a
 
 ## Usage
 
-The all-in-one `AccountButton` renders the trigger and popup from a single prop-driven call:
+The all-in-one, presentational `AccountButtonView` renders the trigger and popup from a single
+prop-driven call (the connected, Clerk-backed `AccountButton` wraps it and needs no props):
 
 ```tsx
-import { AccountButton } from '@clerk/ui/mosaic/account/account-button.view';
+import { AccountButtonView } from '@clerk/ui/mosaic/account/account-button.view';
 
-<AccountButton
+<AccountButtonView
   status='ready'
   activeAccount={{ sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', email: 'preston@clerk.dev' }}
   activeOrganizationId='org_clerk_app'

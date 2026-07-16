@@ -895,8 +895,11 @@ export function AccountButtonPopup() {
 
 export type AccountButtonProps = Omit<AccountButtonRootProps, 'children'>;
 
-/** All-in-one: renders the trigger + popup from a single prop-driven call. The headline v1 API. */
-export function AccountButton(props: AccountButtonProps) {
+/**
+ * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
+ * connected, Clerk-backed `AccountButton` lives in `account-button.tsx` and wraps this view.
+ */
+export function AccountButtonView(props: AccountButtonProps) {
   return (
     <AccountButtonRoot {...props}>
       <AccountButtonTrigger />
