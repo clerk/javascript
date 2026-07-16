@@ -3,7 +3,7 @@
 import { useFloatingTree, useListItem, useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useMenuContext } from './menu-context';
 
 export interface MenuItemProps extends ComponentProps<'button'> {
@@ -31,20 +31,24 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
     disabled: !!disabled,
   };
 
-  const defaultProps = {
+  const ownProps = {
     'data-cl-slot': 'menu-item',
-    type: 'button' as const,
+    type: 'button',
     ref: combinedRef,
-    role: 'menuitem' as const,
+    role: 'menuitem',
     tabIndex: isActive ? 0 : -1,
-    ...(disabled && { 'aria-disabled': true as const }),
-    ...(getItemProps({
+    ...(disabled && { 'aria-disabled': true }),
+  } satisfies DefaultProps<'button'>;
+
+  const defaultProps = {
+    ...ownProps,
+    ...getItemProps({
       onClick() {
         if (!disabled && closeOnClick) {
           tree?.events.emit('click');
         }
       },
-    }) as React.ComponentPropsWithRef<'button'>),
+    }),
   };
 
   return renderElement({

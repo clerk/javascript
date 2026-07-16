@@ -51,10 +51,15 @@ export const ptPT: LocalizationResource = {
       formButtonPrimary__revoke: 'Revogar chave',
       formHint: 'Tem a certeza de que pretende eliminar esta chave secreta?',
       formTitle: 'Revogar a chave secreta "{{apiKeyName}}"?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Voltar',
   badge__activePlan: 'Ativo',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Cancelado • Termina em {{ date | shortDate('pt-PT') }}",
   badge__currentPlan: 'Plano atual',
   badge__default: 'Padrão',
@@ -75,11 +80,14 @@ export const ptPT: LocalizationResource = {
   badge__userDevice: 'Dispositivo do utilizador',
   badge__you: 'O utilizador',
   billing: {
+    accountCredit: undefined,
     addPaymentMethod__label: 'Adicionar método de pagamento',
     alwaysFree: 'Sempre gratuito',
     annually: 'Anual',
     availableFeatures: 'Funcionalidades disponíveis',
     billedAnnually: 'Faturado anualmente',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: 'Apenas faturação mensal',
     cancelFreeTrial: 'Cancelar período experimental',
     cancelFreeTrialAccessUntil:
@@ -120,20 +128,25 @@ export const ptPT: LocalizationResource = {
       title__subscriptionSuccessful: 'Sucesso!',
       title__trialSuccess: 'Período experimental iniciado com sucesso!',
       totalDueAfterTrial: 'Total devido após o período experimental terminar em {{days}} dias',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Crédito',
     creditRemainder: 'Crédito relativo ao período restante da sua subscrição atual.',
     defaultFreePlanActive: 'Está atualmente no plano Gratuito',
     free: 'Gratuito',
     getStarted: 'Começar',
+    highlightedPlanBadge: 'Popular',
     keepFreeTrial: 'Manter período experimental',
     keepSubscription: 'Manter subscrição',
     manage: 'Gerir',
     manageSubscription: 'Gerir subscrição',
     month: 'Mês',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: 'Mensal',
     pastDue: 'Em atraso',
     pay: 'Pagar {{amount}}',
+    payerCreditRemainder: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
@@ -149,12 +162,32 @@ export const ptPT: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Métodos de pagamento',
-    highlightedPlanBadge: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturação',
       included: 'Incluído',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: undefined,
     reSubscribe: 'Subscrever novamente',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Ver todas as funcionalidades',
     startFreeTrial: 'Iniciar período experimental',
     startFreeTrial__days: 'Iniciar período experimental de {{days}} dias',
@@ -175,18 +208,433 @@ export const ptPT: LocalizationResource = {
       trialStartedOn: 'Período experimental iniciado em',
     },
     subtotal: 'Subtotal',
+    subtotalRenewal: undefined,
     switchPlan: 'Mudar para este plano',
     switchToAnnual: 'Mudar para anual',
-    switchToAnnualWithAnnualPrice: 'Mudar para anual {{currency}}{{price}} / ano',
+    switchToAnnualWithAnnualPrice: 'Mudar para anual {{price}} / ano',
     switchToMonthly: 'Mudar para mensal',
-    switchToMonthlyWithPrice: 'Mudar para mensal {{currency}}{{price}} / mês',
+    switchToMonthlyWithPrice: 'Mudar para mensal {{price}} / mês',
     totalDue: 'Total devido',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Total devido hoje',
     viewFeatures: 'Ver funcionalidades',
     viewPayment: 'Ver pagamento',
     year: 'Ano',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Contacte o administrador da sua organização para ampliar as suas permissões.',
       title: 'Não tem permissão para gerir a autenticação única (SSO)',
@@ -194,39 +642,125 @@ export const ptPT: LocalizationResource = {
     navbar: {
       title: 'Configurar autenticação única (SSO)',
     },
-    selectProviderStep: {
-      title: 'Selecionar fornecedor',
-      subtitle: 'Selecione o fornecedor para o qual vai configurar o SSO.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Fornecedor SAML personalizado',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: 'Não verificado',
+        badge__verified: 'Verificado',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Anfitrião / Nome',
+          instructions:
+            'Adicione este registo TXT ao seu fornecedor de DNS. Verificaremos automaticamente assim que o registo estiver ativo.',
+          typeLabel: 'Tipo',
+          valueLabel: 'Valor',
+        },
+        verifiedAtLabel: "Verificado em {{ date | shortDate('pt-PT') }}",
+        verifyAgainButton: undefined,
       },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Adicionar {{domain}}',
+        messageLabel: 'O seu e-mail utiliza {{domain}}. Pretende adicioná-lo?',
+      },
+      formButtonPrimary__add: 'Adicionar',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
+      formFieldLabel__domain: 'Domínio',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Adicione e verifique a propriedade dos domínios que a sua organização utiliza para iniciar sessão.',
+      title: 'Adicionar domínios de SSO',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Fornecedor SAML personalizado',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Selecione o fornecedor para o qual vai configurar o SSO.',
+      title: 'Selecionar fornecedor',
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
-    verifyEmailDomainStep: {
-      title: 'Verificar endereço de e-mail',
-      subtitle: 'Verifique o endereço de e-mail no qual pretende ativar a ligação empresarial.',
-      addEmailAddress: {
-        formTitle: 'Precisamos do seu e-mail',
-        formSubtitle: 'Para começar, precisaremos do seu endereço de e-mail',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'Endereço de e-mail',
-      },
-      emailCode: {
-        formTitle: 'Verifique o seu endereço de e-mail',
-        formSubtitle: 'Introduza o código de verificação enviado para {{identifier}}',
-        resendButton: 'Não recebeu um código? Reenviar',
-        verified: {
-          title: 'Recebemos o seu e-mail',
-          subtitle: 'Verificou o seu endereço de e-mail com o seguinte e-mail',
-          inputLabel: 'Endereço de e-mail verificado',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'Este domínio ({{domain}}) já possui uma ligação SSO',
-        subtitle: 'Contacte o administrador da aplicação para obter acesso através da ligação existente.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -275,6 +809,7 @@ export const ptPT: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'Insira o identificador da organização (slug)',
   formFieldInputPlaceholder__password: 'Insira a sua palavra-passe',
   formFieldInputPlaceholder__phoneNumber: 'Insira o seu número de telemóvel',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: 'Insira o seu nome de utilizador',
   formFieldInput__emailAddress_format: 'Formato de exemplo: nome@exemplo.com',
   formFieldLabel__apiKey: 'Chave de API',
@@ -305,6 +840,9 @@ export const ptPT: LocalizationResource = {
   formFieldLabel__role: 'Função',
   formFieldLabel__signOutOfOtherSessions: 'Terminar sessão em todos os outros dispositivos',
   formFieldLabel__username: 'Nome de utilizador',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
@@ -314,6 +852,22 @@ export const ptPT: LocalizationResource = {
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
@@ -331,9 +885,19 @@ export const ptPT: LocalizationResource = {
     },
     badge__automaticInvitation: 'Convites automáticos',
     badge__automaticSuggestion: 'Sugestões automáticas',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Sem inscrição automática',
     badge__unverified: 'Não verificado',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Sem histórico de pagamentos',
         notFound: 'Tentativa de pagamento não encontrada',
@@ -368,6 +932,7 @@ export const ptPT: LocalizationResource = {
       statementsSection: {
         empty: 'Sem extratos para apresentar',
         itemCaption__paidForPlan: 'Pago pelo plano {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Crédito proporcional por utilização parcial da subscrição anterior',
         itemCaption__subscribedAndPaidForPlan: 'Subscrição e pagamento do plano {{plan}} {{period}}',
         notFound: 'Extrato não encontrado',
@@ -380,6 +945,11 @@ export const ptPT: LocalizationResource = {
         actionLabel__manageSubscription: 'Gerir',
         actionLabel__newSubscription: 'Subscrever um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Editar',
         tableHeader__plan: 'Plano',
         tableHeader__startDate: 'Data de início',
@@ -401,6 +971,7 @@ export const ptPT: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Os convites não puderam ser enviados. Corrija o seguinte e tente novamente:',
       formButtonPrimary__continue: 'Enviar convites',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Selecionar função',
       subtitle: 'Convidar novos membros para esta organização',
       successMessage: 'Convites enviados com sucesso',
@@ -461,11 +1032,13 @@ export const ptPT: LocalizationResource = {
       description: 'Gira a sua organização.',
       general: 'Geral',
       members: 'Membros',
+      security: undefined,
       title: 'Organização',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: 'Não tem permissões para gerir a faturação.',
+        planMembershipLimitExceeded: undefined,
       },
       title: 'Planos',
     },
@@ -506,9 +1079,36 @@ export const ptPT: LocalizationResource = {
       successMessage: '{{domain}} foi removido.',
       title: 'Eliminar domínio',
     },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: 'Geral',
       headerTitle__members: 'Membros',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: 'Guardar',
         title: 'Perfil da organização',
@@ -630,6 +1230,9 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Introduza o código gerado pela sua aplicação autenticadora para continuar',
       title: 'Verificação necessária',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -774,6 +1377,12 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Insira o código enviado para o seu número de telemóvel',
       title: 'Verifique o seu telemóvel',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Repor Palavra-passe',
       requiredMessage: 'Por motivos de segurança, é necessário redefinir a sua palavra-passe.',
@@ -878,6 +1487,12 @@ export const ptPT: LocalizationResource = {
       resendButton: 'Não recebeu o código? Reenviar',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique o seu telemóvel',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Contactar suporte',
@@ -1025,7 +1640,10 @@ export const ptPT: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Já é membro nesta organização.',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded:
       'O tamanho do ficheiro excede o limite máximo de 10 MB. Por favor, escolha um ficheiro mais pequeno.',
     avatar_file_type_invalid: 'Tipo de ficheiro não suportado. Por favor, carregue uma imagem JPG, PNG, GIF ou WEBP.',
@@ -1071,8 +1689,11 @@ export const ptPT: LocalizationResource = {
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
     form_username_needs_non_number_char: 'O seu nome de utilizador deve conter pelo menos um carácter não numérico.',
     identification_deletion_failed: 'Não pode eliminar o seu último identificador.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "O endereço de e-mail ou número de telemóvel não é permitido para registo. Isto pode dever-se à utilização de '+', '=', '#' ou '.' no endereço de e-mail, ao uso de um domínio associado a um serviço de e-mail temporário ou a uma exclusão explícita.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este domínio organizacional está bloqueado.',
     organization_domain_common: 'Este domínio é demasiado comum para ser utilizado numa organização.',
     organization_domain_exists_for_enterprise_connection: 'Este domínio já existe para uma ligação empresarial.',
@@ -1097,6 +1718,14 @@ export const ptPT: LocalizationResource = {
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Já está conectado.',
     web3_missing_identifier: 'Falta um identificador Web3. Tente novamente.',
     web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',
@@ -1148,6 +1777,9 @@ export const ptPT: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
+    label__userButtonPopover: 'Painel da conta',
   },
   userProfile: {
     apiKeysPage: {
@@ -1170,6 +1802,15 @@ export const ptPT: LocalizationResource = {
       title__codelist: 'Códigos de backup',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Sem histórico de pagamentos',
         notFound: 'Tentativa de pagamento não encontrada',
@@ -1204,6 +1845,7 @@ export const ptPT: LocalizationResource = {
       statementsSection: {
         empty: 'Sem extratos para apresentar',
         itemCaption__paidForPlan: 'Pago pelo plano {{plan}} {{period}}',
+        itemCaption__payerCredit: undefined,
         itemCaption__proratedCredit: 'Crédito proporcional por utilização parcial da subscrição anterior',
         itemCaption__subscribedAndPaidForPlan: 'Subscrição e pagamento do plano {{plan}} {{period}}',
         notFound: 'Extrato não encontrado',
@@ -1216,6 +1858,7 @@ export const ptPT: LocalizationResource = {
         actionLabel__manageSubscription: 'Gerir',
         actionLabel__newSubscription: 'Subscrever um plano',
         actionLabel__switchPlan: 'Mudar de plano',
+        overview: undefined,
         tableHeader__edit: 'Editar',
         tableHeader__plan: 'Plano',
         tableHeader__startDate: 'Data de início',

@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+/// <reference types="cypress" preserve="true" />
 import type { Clerk, SignOutOptions } from '@clerk/shared/types';
 
 import type { ClerkSignInParams } from '../common';

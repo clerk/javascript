@@ -18,6 +18,7 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
+import { JWT_CATEGORY_M2M_TOKEN } from '../machine';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
@@ -31,10 +32,10 @@ async function createSignedOAuthJwt(
   return data!;
 }
 
-async function createSignedM2MJwt(payload = mockM2MJwtPayload) {
+async function createSignedM2MJwt(payload = mockM2MJwtPayload, cat: string | undefined = JWT_CATEGORY_M2M_TOKEN) {
   const { data } = await signJwt(payload, signingJwks, {
     algorithm: 'RS256',
-    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...(cat !== undefined ? { cat } : {}) },
   });
   return data!;
 }
@@ -111,6 +112,22 @@ describe('tokens.verify(token, options)', () => {
 
     expect(errors).toBeDefined();
     expect(errors?.[0].message).toContain('signature');
+  });
+
+  it('rejects a JWT tagged with the M2M category before key resolution (AISEC-91)', async () => {
+    // Non-machine `sub` isolates the category guard from the sub-based machine-JWT check;
+    // no jwks server is mocked, proving the guard fires before any network call.
+    const token = await createSignedM2MJwt({ ...mockM2MJwtPayload, sub: mockJwtPayload.sub });
+
+    const { data, errors } = await verifyToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid');
+    expect(errors?.[0].message).toBe('Invalid session token category.');
   });
 });
 
@@ -639,6 +656,49 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toContain('expired');
+    });
+
+    it('verifies a valid M2M JWT with no cat header (rollout window)', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, undefined);
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeUndefined();
+      expect(result.tokenType).toBe('m2m_token');
+    });
+
+    describe.each([
+      ['session-token', 'cl_B7d4PD111AAA'],
+      ['jwt-template', 'cl_B7d4PD222AAA'],
+      ['unknown', 'cl_some_future_unknown_cat'],
+    ])('rejects M2M JWT masquerading with a non-M2M cat', (label, cat) => {
+      it(`rejects cat=${label} without attempting signature verification`, async () => {
+        // No JWKS handler registered: if the cat check did not short-circuit,
+        // resolveKeyAndVerifyJwt would attempt a JWKS fetch and the failure
+        // message would differ from the category error below.
+        const m2mJwt = await createSignedM2MJwt(mockM2MJwtPayload, cat);
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        });
+
+        expect(result.tokenType).toBe('m2m_token');
+        expect(result.errors).toBeDefined();
+        expect(result.errors?.[0].code).toBe('token-invalid');
+      });
     });
   });
 });

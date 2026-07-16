@@ -181,6 +181,7 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.click(screen.getByText('Banana'));
@@ -241,6 +242,7 @@ describe('Autocomplete', () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
       await user.type(input, 'b');
       await user.keyboard('{Enter}');
@@ -667,10 +669,7 @@ describe('Autocomplete', () => {
                   setPopoverOpen(false);
                 }}
               >
-                <Autocomplete.Input
-                  placeholder='Search...'
-                  autoFocus
-                />
+                <Autocomplete.Input placeholder='Search...' />
                 <Autocomplete.List>
                   {filtered.map(f => (
                     <Autocomplete.Option
@@ -812,10 +811,7 @@ describe('Autocomplete', () => {
                   setPopoverOpen(false);
                 }}
               >
-                <Autocomplete.Input
-                  placeholder='Search...'
-                  autoFocus
-                />
+                <Autocomplete.Input placeholder='Search...' />
                 <Autocomplete.List style={{ maxHeight: 80, overflowY: 'auto' }}>
                   {filtered.map(f => (
                     <Autocomplete.Option
@@ -905,10 +901,7 @@ describe('Autocomplete', () => {
                   setPopoverOpen(false);
                 }}
               >
-                <Autocomplete.Input
-                  placeholder='Search...'
-                  autoFocus
-                />
+                <Autocomplete.Input placeholder='Search...' />
                 <Autocomplete.List>
                   {filtered.map(f => (
                     <Autocomplete.Option
@@ -948,6 +941,7 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Pick a fruit...'));
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
@@ -962,6 +956,7 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Cherry'));
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       expect(document.activeElement).toBe(input);
       expect(input.value).toBe('');
@@ -1218,10 +1213,7 @@ describe('Autocomplete', () => {
             <Popover.Popup>
               <Popover.Title>Fruit picker</Popover.Title>
               <Autocomplete.Root open>
-                <Autocomplete.Input
-                  placeholder='Search...'
-                  autoFocus
-                />
+                <Autocomplete.Input placeholder='Search...' />
                 <Autocomplete.List>
                   {fruits.map(f => (
                     <Autocomplete.Option

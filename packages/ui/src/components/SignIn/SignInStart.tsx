@@ -39,6 +39,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
@@ -56,7 +57,7 @@ const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
 
@@ -103,7 +104,7 @@ function SignInStartInternal(): JSX.Element {
    */
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const isWebSupported = isWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
@@ -158,6 +159,9 @@ function SignInStartInternal(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeChannels.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
@@ -228,6 +232,9 @@ function SignInStartInternal(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
+        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'needs_first_factor': {
             if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
@@ -382,6 +389,10 @@ function SignInStartInternal(): JSX.Element {
     }
     try {
       const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
+
+      if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+        return;
+      }
 
       switch (res.status) {
         case 'needs_identifier':
@@ -597,6 +608,13 @@ function SignInStartInternal(): JSX.Element {
             <Col
               elementDescriptor={descriptors.main}
               gap={6}
+              // @ts-ignore - `inert` is not yet in the installed React types
+              inert={captchaIsInteractive ? '' : undefined}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {hasSocialOrWeb3Buttons && (
@@ -629,24 +647,27 @@ function SignInStartInternal(): JSX.Element {
                       />
                     </Col>
                     <Col center>
-                      <CaptchaElement />
                       <Form.SubmitButton hasArrow />
                     </Col>
                   </Form.Root>
                 ) : null}
               </SocialButtonsReversibleContainerWithDivider>
-              {!standardFormAttributes.length && <CaptchaElement />}
-              {userSettings.attributes.passkey?.enabled &&
-                userSettings.passkeySettings.show_sign_in_button &&
-                isWebSupported && (
-                  <Card.Action elementId={'usePasskey'}>
-                    <Card.ActionLink
-                      localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
-                    />
-                  </Card.Action>
-                )}
             </Col>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
+            {/* Kept outside descriptors.main so the spotlight's `inert` leaves this alternative action reachable. */}
+            {userSettings.attributes.passkey?.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Card.Content>
           <Card.Footer>
             {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
@@ -734,14 +755,26 @@ const InstantPasswordRow = ({
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      aria-hidden={show ? undefined : true}
+      sx={
+        show
+          ? undefined
+          : {
+              position: 'absolute',
+              opacity: 0,
+              height: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              marginTop: '-1rem',
+            }
+      }
     >
       <Form.PasswordInput
         {...field.props}
         actionLabel={show ? localizationKeys('formFieldAction__forgotPassword') : undefined}
         onActionClicked={show ? onForgotPasswordClick : undefined}
-        ref={ref}
         tabIndex={show ? undefined : -1}
+        ref={ref}
       />
     </Form.ControlRow>
   );

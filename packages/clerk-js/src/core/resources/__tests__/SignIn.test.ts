@@ -19,12 +19,14 @@ import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPop
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
-  CaptchaChallenge: vi.fn().mockImplementation(() => ({
-    managedOrInvisible: vi.fn().mockResolvedValue({
-      captchaToken: 'mock_captcha_token',
-      captchaWidgetType: 'invisible',
-    }),
-  })),
+  CaptchaChallenge: vi.fn().mockImplementation(function () {
+    return {
+      managedOrInvisible: vi.fn().mockResolvedValue({
+        captchaToken: 'mock_captcha_token',
+        captchaWidgetType: 'invisible',
+      }),
+    };
+  }),
 }));
 
 describe('SignIn', () => {
@@ -32,6 +34,47 @@ describe('SignIn', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('authenticateWithRedirect with an OAuth transport', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    it('routes through the transport instead of windowNavigate when one is registered', async () => {
+      const open = vi.fn().mockResolvedValue({ callbackUrl: 'myapp://sso-callback' });
+      const handleResourceCallback = vi.fn().mockResolvedValue(undefined);
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_oauthTransport: { getRedirectUrl: () => 'myapp://sso-callback', open },
+        __internal_handleResourceCallback: handleResourceCallback,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        client: null,
+        response: {
+          id: 'signin_123',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://provider.example/auth',
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        __internal_callbackParams: { signInUrl: '/sign-in' },
+      } as any);
+
+      expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
+      expect(handleResourceCallback).toHaveBeenCalledWith(signIn, { signInUrl: '/sign-in' });
+    });
   });
 
   describe('signIn.create', () => {
@@ -2783,6 +2826,182 @@ describe('SignIn', () => {
         expect(mockClient.signIn.status).toBeNull();
         expect(mockClient.signIn.identifier).toBeNull();
       });
+    });
+  });
+
+  describe('protectCheck', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      // Restore the patched _fetch so the mock can't leak into any block added below.
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+    });
+
+    it('deserializes protect_check from JSON', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+          expires_at: 1741564800000,
+          ui_hints: { theme: 'dark' },
+        },
+      });
+
+      expect(signIn.status).toBe('needs_protect_check');
+      expect(signIn.protectCheck?.status).toBe('pending');
+      expect(signIn.protectCheck?.token).toBe('challenge-token-abc');
+      expect(signIn.protectCheck?.sdkUrl).toBe('https://sdk.example.com/challenge.js');
+      expect(signIn.protectCheck?.expiresAt).toBe(1741564800000);
+      expect(signIn.protectCheck?.uiHints).toEqual({ theme: 'dark' });
+    });
+
+    it('sets protectCheck to null when not present in JSON', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_first_factor',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+      } as any);
+
+      expect(signIn.protectCheck).toBeNull();
+    });
+
+    it('handles protect_check with optional fields omitted', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'minimal-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      expect(signIn.protectCheck?.expiresAt).toBeUndefined();
+      expect(signIn.protectCheck?.uiHints).toBeUndefined();
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'minimal-token',
+        sdk_url: 'https://example.com/sdk.js',
+      });
+    });
+
+    it('round-trips protectCheck through snapshot', () => {
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'test-token',
+          sdk_url: 'https://example.com/sdk.js',
+          expires_at: 1700000000000,
+          ui_hints: {},
+        },
+      });
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.protect_check).toEqual({
+        status: 'pending',
+        token: 'test-token',
+        sdk_url: 'https://example.com/sdk.js',
+        expires_at: 1700000000000,
+        ui_hints: {},
+      });
+
+      const signIn2 = new SignIn(snapshot);
+      expect(signIn2.protectCheck?.token).toBe('test-token');
+    });
+
+    it('calls _basePatch with correct params for submitProtectCheck', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          object: 'sign_in',
+          status: 'needs_first_factor',
+          supported_identifiers: [],
+          identifier: 'user@example.com',
+          user_data: {},
+          supported_first_factors: [],
+          supported_second_factors: [],
+          first_factor_verification: null,
+          second_factor_verification: null,
+          created_session_id: null,
+          protect_check: null,
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_protect_check',
+        supported_identifiers: [],
+        identifier: 'user@example.com',
+        user_data: {} as any,
+        supported_first_factors: [],
+        supported_second_factors: [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token',
+          sdk_url: 'https://example.com/sdk.js',
+        },
+      });
+
+      const result = await signIn.submitProtectCheck({ proofToken: 'proof-abc' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          path: '/client/sign_ins/signin_123/protect_check',
+          body: { proof_token: 'proof-abc' },
+        }),
+      );
+      expect(result.status).toBe('needs_first_factor');
+      expect(result.protectCheck).toBeNull();
     });
   });
 });

@@ -52,6 +52,7 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
               identifier={signIn.identifier}
               avatarUrl={signIn.userData.imageUrl}
               onClick={goBack}
+              editButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
             />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>

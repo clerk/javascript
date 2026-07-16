@@ -23,6 +23,7 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
         cardSubtitle={localizationKeys('reverification.phoneCodeMfa.subtitle')}
         inputLabel={localizationKeys('reverification.phoneCodeMfa.formTitle')}
         resendButton={localizationKeys('reverification.phoneCodeMfa.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
         prepare={prepare}
       />
     </Flow.Part>

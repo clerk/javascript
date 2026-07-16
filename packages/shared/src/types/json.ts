@@ -19,7 +19,12 @@ import type { ClerkAPIErrorJSON } from './errors';
 import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
-import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
+import type {
+  OrganizationDomainOwnershipVerificationStatus,
+  OrganizationDomainOwnershipVerificationStrategy,
+  OrganizationDomainVerificationStatus,
+  OrganizationEnrollmentMode,
+} from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
@@ -143,6 +148,21 @@ export interface SignUpJSON extends ClerkResourceJSON {
   legal_accepted_at: number | null;
   locale: string | null;
   verifications: SignUpVerificationsJSON | null;
+  protect_check?: ProtectCheckJSON | null;
+}
+
+export interface ProtectCheckJSON {
+  /**
+   * Always `'pending'` when surfaced to clients. Completed checks are never emitted on the wire.
+   */
+  status: 'pending';
+  token: string;
+  sdk_url: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
+  expires_at?: number;
+  ui_hints?: Record<string, string>;
 }
 
 /**
@@ -394,6 +414,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
   self_serve_sso_enabled?: boolean;
+  exclusive_membership?: boolean;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
@@ -427,6 +448,27 @@ export interface OrganizationDomainVerificationJSON {
   strategy: 'email_code'; // only available value for now
   attempts: number;
   expires_at: number;
+  verified_at?: number | null;
+}
+
+export interface OrganizationDomainOwnershipVerificationJSON {
+  status: OrganizationDomainOwnershipVerificationStatus;
+  strategy: OrganizationDomainOwnershipVerificationStrategy;
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at: number | null;
+  /**
+   * Present only on ownership verification responses immediately after
+   * `prepare_ownership_verification`. The fully qualified DNS name the org admin
+   * must publish the TXT record under.
+   */
+  txt_record_name?: string | null;
+  /**
+   * Present only on ownership verification responses immediately after
+   * `prepare_ownership_verification`. The exact value the org admin must publish
+   * in the TXT record.
+   */
+  txt_record_value?: string | null;
 }
 
 export interface OrganizationDomainJSON extends ClerkResourceJSON {
@@ -435,12 +477,37 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   name: string;
   organization_id: string;
   enrollment_mode: OrganizationEnrollmentMode;
+  /**
+   * @deprecated Use `affiliation_verification` instead.
+   */
   verification: OrganizationDomainVerificationJSON | null;
+  affiliation_verification: OrganizationDomainVerificationJSON | null;
+  ownership_verification: OrganizationDomainOwnershipVerificationJSON | null;
   affiliation_email_address: string | null;
   created_at: number;
   updated_at: number;
   total_pending_invitations: number;
   total_pending_suggestions: number;
+}
+
+/**
+ * A per-domain failure entry returned by the bulk ownership verification
+ * endpoints, carrying the `organization_domain_id` and the API error code that
+ * caused it to be skipped.
+ */
+export interface OrganizationDomainBulkOwnershipVerificationErrorJSON {
+  id: string;
+  code: string;
+}
+
+/**
+ * Partial-success payload returned by the bulk `prepare`/`attempt`
+ * ownership verification endpoints. Each requested domain id lands in either
+ * `data` (with its current ownership state) or `errors`.
+ */
+export interface OrganizationDomainsBulkOwnershipVerificationJSON {
+  data: OrganizationDomainJSON[];
+  errors: OrganizationDomainBulkOwnershipVerificationErrorJSON[];
 }
 
 export interface RoleJSON extends ClerkResourceJSON {
@@ -874,6 +941,26 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
   eligible_for_free_trial: boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceJSON {
+  object: 'commerce_credit_balance';
+  balance: BillingMoneyAmountJSON | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerJSON {
+  object: 'commerce_credit_ledger';
+  id: string;
+  amount: BillingMoneyAmountJSON;
+  source_type: string;
+  source_id: string;
+  created_at: number;
 }
 
 /**

@@ -1,12 +1,15 @@
+import { requireNativeView } from 'expo';
 import type { NativeSyntheticEvent, ViewProps } from 'react-native';
-import { requireNativeComponent } from 'react-native';
+import { Platform } from 'react-native';
 
 type ProfileEvent = Readonly<{ type: string }>;
-type ProfileEventHandler = (event: NativeSyntheticEvent<ProfileEvent>) => void | Promise<void>;
 
 interface NativeProps extends ViewProps {
   isDismissible?: boolean;
-  onProfileEvent?: ProfileEventHandler;
+  onProfileEvent?: (event: NativeSyntheticEvent<ProfileEvent>) => void;
 }
 
-export default requireNativeComponent<NativeProps>('ClerkUserProfileView');
+const NativeClerkUserProfileView =
+  Platform.OS === 'ios' || Platform.OS === 'android' ? requireNativeView<NativeProps>('ClerkUserProfileView') : null;
+
+export default NativeClerkUserProfileView;

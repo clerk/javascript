@@ -7,14 +7,35 @@ vi.mock('node:fs', async importOriginal => {
 });
 
 import {
+  classifyMismatches,
   collapseAttributeMismatches,
   collapseSocialMismatches,
+  compareEnvironments,
   diffObjects,
   fetchEnvironment,
+  isCriticalPath,
+  isIgnored,
   loadKeys,
   main,
   parseFapiDomain,
 } from './validate-staging-instances.mjs';
+
+// ── isIgnored ───────────────────────────────────────────────────────────────
+
+describe('isIgnored', () => {
+  it('compares captcha settings (behavior-changing for headless e2e)', () => {
+    expect(isIgnored('user_settings.sign_up.captcha_enabled')).toBe(false);
+    expect(isIgnored('user_settings.sign_up.captcha_widget_type')).toBe(false);
+  });
+
+  it('still ignores ids, logo_url and hibp settings', () => {
+    expect(isIgnored('user_settings.social.oauth_google.id')).toBe(true);
+    expect(isIgnored('auth_config.id')).toBe(true);
+    expect(isIgnored('user_settings.social.oauth_google.logo_url')).toBe(true);
+    expect(isIgnored('user_settings.sign_in.enforce_hibp_on_sign_in')).toBe(true);
+    expect(isIgnored('user_settings.password_settings.disable_hibp')).toBe(true);
+  });
+});
 
 // ── loadKeys ────────────────────────────────────────────────────────────────
 
@@ -317,6 +338,116 @@ describe('collapseSocialMismatches', () => {
   });
 });
 
+// ── isCriticalPath ──────────────────────────────────────────────────────────
+
+describe('isCriticalPath', () => {
+  it('flags attribute enabled toggles', () => {
+    expect(isCriticalPath('user_settings.attributes.phone_number.enabled')).toBe(true);
+    expect(isCriticalPath('user_settings.attributes.email_address.enabled')).toBe(true);
+  });
+
+  it('flags phone channel changes', () => {
+    expect(isCriticalPath('user_settings.attributes.phone_number.channels')).toBe(true);
+  });
+
+  it('flags factor / verification strategy changes', () => {
+    expect(isCriticalPath('user_settings.attributes.email_address.first_factors')).toBe(true);
+    expect(isCriticalPath('user_settings.attributes.phone_number.second_factors')).toBe(true);
+    expect(isCriticalPath('user_settings.attributes.email_address.verifications')).toBe(true);
+  });
+
+  it('flags social provider enable/disable and wholly added/removed', () => {
+    expect(isCriticalPath('user_settings.social.google')).toBe(true);
+    expect(isCriticalPath('user_settings.social.google.enabled')).toBe(true);
+  });
+
+  it('flags password settings', () => {
+    expect(isCriticalPath('user_settings.password_settings.min_length')).toBe(true);
+  });
+
+  it('flags captcha_enabled but not captcha_widget_type', () => {
+    expect(isCriticalPath('user_settings.sign_up.captcha_enabled')).toBe(true);
+    expect(isCriticalPath('user_settings.sign_up.captcha_widget_type')).toBe(false);
+  });
+
+  it('no critical path is swallowed by the ignore filter before classification', () => {
+    const samples = [
+      'user_settings.attributes.phone_number.enabled',
+      'user_settings.attributes.phone_number.channels',
+      'user_settings.attributes.email_address.first_factors',
+      'user_settings.social.google.enabled',
+      'user_settings.password_settings.min_length',
+      'user_settings.sign_up.captcha_enabled',
+    ];
+    for (const path of samples) {
+      expect(isCriticalPath(path), path).toBe(true);
+      expect(isIgnored(path), path).toBe(false);
+    }
+  });
+
+  it('does not flag cosmetic / non-critical paths', () => {
+    expect(isCriticalPath('auth_config.single_session_mode')).toBe(false);
+    expect(isCriticalPath('organization_settings.enabled')).toBe(false);
+    expect(isCriticalPath('user_settings.social.google.strategy')).toBe(false);
+    expect(isCriticalPath('user_settings.sign_in.second_factor.required')).toBe(false);
+  });
+});
+
+// ── classifyMismatches ──────────────────────────────────────────────────────
+
+describe('classifyMismatches', () => {
+  it('separates blocking (critical) from informational drift', () => {
+    const mismatches = [
+      { path: 'user_settings.attributes.email_address.enabled', prod: true, staging: false },
+      { path: 'auth_config.single_session_mode', prod: true, staging: false },
+    ];
+    const { blocking, informational } = classifyMismatches('myapp', mismatches);
+    expect(blocking.map(m => m.path)).toEqual(['user_settings.attributes.email_address.enabled']);
+    expect(informational.map(m => m.path)).toEqual(['auth_config.single_session_mode']);
+  });
+
+  it('respects accepted drift scoped to a specific instance', () => {
+    const mismatches = [
+      {
+        path: 'user_settings.attributes.phone_number.channels',
+        prod: ['sms', 'whatsapp'],
+        staging: ['sms'],
+        missingOnStaging: ['whatsapp'],
+      },
+    ];
+    const accepted = [
+      { instance: 'with-whatsapp-phone-code', path: 'user_settings.attributes.phone_number.channels', reason: 'x' },
+    ];
+    expect(classifyMismatches('with-whatsapp-phone-code', mismatches, accepted).blocking).toHaveLength(0);
+    // The same drift on a different instance is NOT accepted.
+    expect(classifyMismatches('other-instance', mismatches, accepted).blocking).toHaveLength(1);
+  });
+
+  it('accepts drift matched by a RegExp path with no instance scope', () => {
+    const mismatches = [{ path: 'user_settings.password_settings.min_length', prod: 8, staging: 6 }];
+    const accepted = [{ path: /^user_settings\.password_settings\./, reason: 'x' }];
+    expect(classifyMismatches('any', mismatches, accepted).blocking).toHaveLength(0);
+  });
+
+  it('blocks on captcha_enabled drift but not captcha_widget_type', () => {
+    const mismatches = [
+      { path: 'user_settings.sign_up.captcha_enabled', prod: false, staging: true },
+      { path: 'user_settings.sign_up.captcha_widget_type', prod: 'smart', staging: '' },
+    ];
+    const { blocking, informational } = classifyMismatches('with-legal-consent', mismatches);
+    expect(blocking.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_enabled']);
+    expect(informational.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_widget_type']);
+  });
+
+  it('captcha_enabled drift survives the full compare-filter-classify pipeline', () => {
+    const prodEnv = { user_settings: { sign_up: { captcha_enabled: false } } };
+    const stagingEnv = { user_settings: { sign_up: { captcha_enabled: true } } };
+    const mismatches = compareEnvironments(prodEnv, stagingEnv).filter(m => !isIgnored(m.path));
+    const { blocking } = classifyMismatches('with-legal-consent', mismatches);
+    expect(blocking.map(m => m.path)).toEqual(['user_settings.sign_up.captcha_enabled']);
+  });
+});
+
 // ── fetchEnvironment ────────────────────────────────────────────────────────
 
 describe('fetchEnvironment', () => {
@@ -387,6 +518,7 @@ describe('main', () => {
     // Clean up env vars
     delete process.env.INTEGRATION_INSTANCE_KEYS;
     delete process.env.INTEGRATION_STAGING_INSTANCE_KEYS;
+    delete process.env.STAGING_VALIDATE_STRICT;
   });
 
   afterEach(() => {
@@ -534,5 +666,95 @@ describe('main', () => {
     await main();
     expect(consoleErrors.some(m => m.includes('bad_entry'))).toBe(true);
     expect(consoleLogs.some(m => m.includes('1 key load errors'))).toBe(true);
+  });
+
+  // ── strict gating ──────────────────────────────────────────────────────────
+
+  function mockEnvPair(prodEnv, stagingEnv) {
+    let callCount = 0;
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
+      callCount++;
+      const env = callCount % 2 === 1 ? prodEnv : stagingEnv;
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(env) });
+    });
+  }
+
+  const emptyUserSettings = () => ({ attributes: {}, social: {}, sign_in: {}, sign_up: {}, password_settings: {} });
+
+  function setPair() {
+    process.env.INTEGRATION_INSTANCE_KEYS = JSON.stringify({ myapp: { pk: PROD_PK } });
+    process.env.INTEGRATION_STAGING_INSTANCE_KEYS = JSON.stringify({ 'clerkstage-myapp': { pk: STAGING_PK } });
+  }
+
+  it('exits non-zero in strict mode when a critical config path drifts', async () => {
+    setPair();
+    mockEnvPair(
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { email_address: { enabled: true } } },
+      },
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { email_address: { enabled: false } } },
+      },
+    );
+
+    await expect(main({ strict: true })).rejects.toThrow('process.exit(1)');
+    expect(exitCode).toBe(1);
+    expect(consoleLogs.some(m => m.includes('blocking mismatch'))).toBe(true);
+  });
+
+  it('reports but does not exit non-zero on a critical mismatch when not strict', async () => {
+    setPair();
+    mockEnvPair(
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { email_address: { enabled: true } } },
+      },
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { email_address: { enabled: false } } },
+      },
+    );
+
+    await main({ strict: false });
+    expect(exitCode).toBeUndefined();
+    expect(consoleLogs.some(m => m.includes('Report-only'))).toBe(true);
+  });
+
+  it('does not block on non-critical drift even in strict mode', async () => {
+    setPair();
+    mockEnvPair(
+      { auth_config: { single_session_mode: true }, organization_settings: {}, user_settings: emptyUserSettings() },
+      { auth_config: { single_session_mode: false }, organization_settings: {}, user_settings: emptyUserSettings() },
+    );
+
+    await main({ strict: true });
+    expect(exitCode).toBeUndefined();
+    expect(consoleLogs.some(m => m.includes('1 mismatched'))).toBe(true);
+  });
+
+  it('defaults strict from STAGING_VALIDATE_STRICT=1 and blocks on critical drift', async () => {
+    process.env.STAGING_VALIDATE_STRICT = '1';
+    setPair();
+    mockEnvPair(
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { phone_number: { enabled: true } } },
+      },
+      {
+        auth_config: {},
+        organization_settings: {},
+        user_settings: { ...emptyUserSettings(), attributes: { phone_number: { enabled: false } } },
+      },
+    );
+
+    await expect(main()).rejects.toThrow('process.exit(1)');
+    expect(exitCode).toBe(1);
   });
 });

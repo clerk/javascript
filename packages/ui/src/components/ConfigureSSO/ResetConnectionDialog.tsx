@@ -1,3 +1,4 @@
+import type { LocalizationKey } from '@/customizables';
 import { Col, descriptors, localizationKeys } from '@/customizables';
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -8,17 +9,19 @@ import { Modal } from '@/elements/Modal';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { useConfigureSSO } from './ConfigureSSOContext';
-
 type ResetConnectionDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   confirmationValue: string;
+  onDelete: () => Promise<unknown>;
+  contentRef: React.RefObject<HTMLDivElement>;
+  /** Defaults to the Reset copy; overridden when the dialog is reused for the Remove action. */
+  title?: LocalizationKey;
+  subtitle?: LocalizationKey;
+  confirmButtonLabel?: LocalizationKey;
 };
 
 export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.Element | null => {
-  const { contentRef } = useConfigureSSO();
-
   if (!props.isOpen) {
     return null;
   }
@@ -27,7 +30,7 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
     <Modal
       handleClose={props.onClose}
       canCloseModal={false}
-      portalRoot={contentRef}
+      portalRoot={props.contentRef}
       containerSx={t => ({
         alignItems: 'center',
         position: 'absolute',
@@ -44,9 +47,12 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 };
 
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
-  const { onClose, confirmationValue } = props;
+  const { onClose, onDelete, confirmationValue } = props;
+  const title = props.title ?? localizationKeys('configureSSO.resetConnectionDialog.title');
+  const subtitle = props.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle');
+  const confirmButtonLabel =
+    props.confirmButtonLabel ?? localizationKeys('configureSSO.resetConnectionDialog.resetButton');
   const card = useCardState();
-  const { enterpriseConnection, mutations } = useConfigureSSO();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -60,18 +66,12 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
   const canSubmit = Boolean(confirmationValue && confirmationField.value === confirmationValue);
 
   const onSubmit = async () => {
-    if (!enterpriseConnection || !canSubmit) {
+    if (!canSubmit) {
       return;
     }
 
     try {
-      // Reset is a pure delete — no navigation. Dropping `hasConnection` breaks
-      // the active step's entry guard, so the wizard self-corrects to the
-      // furthest-reachable step. The mutation is already reverification-wrapped.
-      // No `useWizard()` here — that lets this dialog be triggered from ANY
-      // footer (including the nested SAML configure footers) without binding to
-      // a nested wizard.
-      await mutations.deleteConnection(enterpriseConnection.id);
+      await onDelete();
       onClose();
     } catch (err) {
       handleError(err as Error, [confirmationField], card.setError);
@@ -85,8 +85,8 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
     >
       <Card.Content sx={t => ({ textAlign: 'start', padding: t.sizes.$5 })}>
         <FormContainer
-          headerTitle={localizationKeys('configureSSO.resetConnectionDialog.title')}
-          headerSubtitle={localizationKeys('configureSSO.resetConnectionDialog.subtitle')}
+          headerTitle={title}
+          headerSubtitle={subtitle}
           sx={t => ({ gap: t.space.$4 })}
         >
           <Form.Root onSubmit={onSubmit}>
@@ -104,7 +104,7 @@ const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnecti
                   block={false}
                   colorScheme='danger'
                   isDisabled={!canSubmit}
-                  localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
+                  localizationKey={confirmButtonLabel}
                 />
                 <Form.ResetButton
                   elementDescriptor={descriptors.configureSSOResetConnectionDialogCancelButton}

@@ -3,7 +3,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipPositionerProps = ComponentProps<'div'>;
@@ -20,16 +20,17 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const combinedRef = useMergeRefs([refs.setFloating, ref]);
 
     const side = placement.split('-')[0];
-    const floatingProps = getFloatingProps() as React.ComponentPropsWithRef<'div'>;
+    const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'tooltip-positioner',
       'data-cl-side': side,
       ref: combinedRef,
       style: floatingStyles,
-      ...floatingProps,
-    };
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = { ...ownProps, ...floatingProps };
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by floating-ui: it pairs with the trigger's aria-describedby.

@@ -10,10 +10,9 @@ import { ProfileCard } from '@/elements/ProfileCard';
 import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
-import { ConfigureSSOSteps } from './ConfigureSSOSteps';
+import { ConfigureSSOWizard } from './ConfigureSSOWizard';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
@@ -44,41 +43,38 @@ const AuthenticatedContent = withCoreUserGuard(() => {
   );
 });
 
-export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
   const {
     isLoading,
     enterpriseConnection,
     organizationEnterpriseConnection,
     testRuns,
-    mutations,
-    primaryEmailAddress,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
-  // Gate loading one level above the provider so the context never observes a
-  // loading state. The single test-run source is part of this initial fetch
-  // when a connection exists at load, so a cold landing on the test step is
-  // covered by the full skeleton here.
   if (isLoading) {
     return <ConfigureSSOSkeleton />;
   }
 
   return (
     <ConfigureSSOProtect>
-      <ConfigureSSOProvider
+      <ConfigureSSOWizard
         organizationEnterpriseConnection={organizationEnterpriseConnection}
         testRuns={testRuns}
         enterpriseConnection={enterpriseConnection}
         contentRef={contentRef}
-        mutations={mutations}
-        primaryEmailAddress={primaryEmailAddress}
-      >
-        <ConfigureSSOSteps />
-      </ConfigureSSOProvider>
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
+      />
     </ConfigureSSOProtect>
   );
 };
 
-const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+/** Permission gate shared by the wizard's hosts — personal workspaces pass, since there is no membership to check. */
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
   const { session } = useSession();
   const isPersonalWorkspace = !session?.lastActiveOrganizationId;
   const canManageEnterpriseConnections = useProtect(

@@ -180,7 +180,6 @@ const InvitationPreview = withCardStateProvider(
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
           icon={ArrowRight}
           onClick={acceptedOrganization ? () => onOrganizationClick(acceptedOrganization) : undefined}
-          role='menuitem'
         >
           <OrganizationPreview
             elementId='organizationSwitcherListedOrganization'
@@ -205,12 +204,7 @@ const InvitationPreview = withCardStateProvider(
 
 const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { showBorder: boolean }) => {
   const { showBorder, ...restProps } = props;
-  return (
-    <Actions
-      role='menu'
-      {...restProps}
-    />
-  );
+  return <Actions {...restProps} />;
 };
 
 export const SuggestionPreview = withCardStateProvider((props: OrganizationSuggestionResource) => {

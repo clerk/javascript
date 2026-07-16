@@ -1,39 +1,26 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
+import { localizationKeys } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-// The dialog no longer touches the wizard. On confirm it calls the
-// reverification-wrapped `mutations.deleteConnection(id)` directly — a pure
-// delete, no navigation — and the wizard self-corrects to the
-// furthest-reachable step once the active step's guard breaks. That lets the
-// dialog be triggered from ANY footer (including nested SAML configure footers)
-// without binding to a nested wizard.
-const deleteConnection = vi.fn();
-
-const connectionMockState = vi.hoisted(() => ({
-  current: { id: 'idn_connection_1' } as Partial<EnterpriseConnectionResource> | null,
-}));
-
-vi.mock('../ConfigureSSOContext', () => ({
-  useConfigureSSO: () => ({
-    enterpriseConnection: connectionMockState.current,
-    contentRef: { current: null },
-    // The dialog's confirm calls the reverification-wrapped `deleteConnection`
-    // mutation directly. No navigation — the wizard self-corrects.
-    mutations: { deleteConnection },
-  }),
-}));
-
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
+
+const deleteConnection = vi.fn();
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 const renderDialog = (
   wrapper: React.ComponentType<{ children?: React.ReactNode }>,
-  props: { isOpen?: boolean; onClose?: () => void; confirmationValue?: string } = {},
+  props: {
+    isOpen?: boolean;
+    onClose?: () => void;
+    confirmationValue?: string;
+    title?: ReturnType<typeof localizationKeys>;
+    subtitle?: ReturnType<typeof localizationKeys>;
+    confirmButtonLabel?: ReturnType<typeof localizationKeys>;
+  } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
   const utils = render(
@@ -42,6 +29,11 @@ const renderDialog = (
         isOpen={props.isOpen ?? true}
         onClose={onClose}
         confirmationValue={props.confirmationValue ?? 'Acme Inc'}
+        onDelete={() => deleteConnection('idn_connection_1')}
+        contentRef={{ current: null }}
+        title={props.title}
+        subtitle={props.subtitle}
+        confirmButtonLabel={props.confirmButtonLabel}
       />
     </CardStateProvider>,
     { wrapper },
@@ -52,7 +44,6 @@ const renderDialog = (
 const resetMocks = () => {
   deleteConnection.mockReset();
   deleteConnection.mockResolvedValue(undefined);
-  connectionMockState.current = { id: 'idn_connection_1' };
 };
 
 describe('ResetConnectionDialog', () => {
@@ -78,6 +69,25 @@ describe('ResetConnectionDialog', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset connection' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  it('renders override copy when title, subtitle, and confirm label props are supplied', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    renderDialog(wrapper, {
+      confirmationValue: 'Acme Inc',
+      title: localizationKeys('organizationProfile.securityPage.removeDialog.title'),
+      subtitle: localizationKeys('organizationProfile.securityPage.removeDialog.subtitle'),
+      confirmButtonLabel: localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton'),
+    });
+
+    expect(screen.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reset connection' })).not.toBeInTheDocument();
+    // Type-to-confirm is unchanged by the override.
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 

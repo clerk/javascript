@@ -40,6 +40,7 @@ describe('SignInFactorOneCodeForm', () => {
     cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
     inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
     resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+    identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
   };
 
   describe('Cache Key Generation', () => {
@@ -84,6 +85,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...phonePropsWithChannel} />, { wrapper });
@@ -123,6 +125,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
         inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
         resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
@@ -171,6 +174,62 @@ describe('SignInFactorOneCodeForm', () => {
     });
   });
 
+  describe('Protect gate', () => {
+    // The `prepare` (code-send) call site is routed through the same gate as `attempt`. `useFetch`
+    // is mocked here, so we drive its `onSuccess` directly — the choke point under test — and assert
+    // the literal navigation target rather than re-asserting an argument the caller passed back.
+    const getPrepareOnSuccess = () =>
+      vi.mocked(useFetch).mock.calls.at(-1)?.[2]?.onSuccess as ((res: any) => void) | undefined;
+
+    it('routes to the protect-check card when the prepare is gated by Clerk Protect', async () => {
+      const onFactorPrepare = vi.fn();
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+
+      renderWithProviders(
+        <SignInFactorOneCodeForm
+          {...defaultProps}
+          onFactorPrepare={onFactorPrepare}
+        />,
+        { wrapper },
+      );
+
+      const onSuccess = getPrepareOnSuccess();
+      expect(onSuccess).toBeTypeOf('function');
+      onSuccess!({
+        status: 'needs_protect_check',
+        protectCheck: { status: 'pending', token: 'challenge-token', sdkUrl: 'https://protect.example.com/sdk.js' },
+      });
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
+      expect(onFactorPrepare).not.toHaveBeenCalled();
+    });
+
+    it('continues the flow when the prepare is not gated', async () => {
+      const onFactorPrepare = vi.fn();
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+
+      renderWithProviders(
+        <SignInFactorOneCodeForm
+          {...defaultProps}
+          onFactorPrepare={onFactorPrepare}
+        />,
+        { wrapper },
+      );
+
+      const onSuccess = getPrepareOnSuccess();
+      onSuccess!({ status: 'needs_first_factor' });
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../protect-check');
+      expect(onFactorPrepare).toHaveBeenCalled();
+    });
+  });
+
   describe('Component Rendering', () => {
     it('renders phone code verification form', async () => {
       const { wrapper } = await createFixtures(f => {
@@ -201,6 +260,7 @@ describe('SignInFactorOneCodeForm', () => {
         cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
         inputLabel: localizationKeys('signIn.emailCode.formTitle'),
         resendButton: localizationKeys('signIn.emailCode.resendButton'),
+        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__emailAddress'),
       };
 
       const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });

@@ -1,4 +1,4 @@
-import { createCookieHandler } from '@clerk/shared/cookie';
+import { type CookieAttributes, createCookieHandler } from '@clerk/shared/cookie';
 
 /**
  * Determines the eTLD+1 domain, which is where we want the cookies to be set.
@@ -19,7 +19,7 @@ const eTLDCookie = createCookieHandler('__clerk_test_etld');
 export function getCookieDomain(
   hostname = window.location.hostname,
   cookieHandler = eTLDCookie,
-  cookieAttributes?: { sameSite?: string; secure?: boolean },
+  cookieAttributes?: Pick<CookieAttributes, 'sameSite' | 'secure'>,
 ) {
   // only compute it once per session to avoid unnecessary cookie ops
   if (cachedETLDPlusOne) {

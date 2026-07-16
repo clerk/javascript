@@ -108,4 +108,4 @@ Commit Messages
 - Commit messages must be in English
 - Commit messages must be concise and to the point
 - Commit messages must be prefixed with the type of change
-- Commit messages must be prefixed with the scope of the change (package name or `js` for `clekr-js`, repo, release, e2e, \*)
+- Commit messages must be prefixed with the scope of the change (package name without `@clerk/`, or `js` for `clerk-js`, plus `repo`, `release`, `e2e`, `ci`, `\*`)

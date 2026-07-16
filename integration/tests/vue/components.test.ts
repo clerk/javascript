@@ -80,7 +80,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom page/i, /Custom action/i]);
 
     // Click custom action
-    await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
+    await u.page.getByRole('button', { name: /Custom action/i }).click();
     await expect(u.page.getByText('Is action clicked: true')).toBeVisible();
 
     // Trigger the popover again
@@ -88,7 +88,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.waitForPopover();
 
     // Click custom action and check for custom page availbility
-    await u.page.getByRole('menuitem', { name: /Custom page/i }).click();
+    await u.page.getByRole('button', { name: /Custom page/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
     await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
@@ -98,7 +98,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.waitForPopover();
 
     // Click custom link and check navigation
-    await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
+    await u.page.getByRole('button', { name: /Custom link/i }).click();
     await u.page.waitForAppUrl('/profile');
   });
 
@@ -115,7 +115,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.userButton.waitForPopover();
 
     // First item should now be the sign out button
-    await u.page.getByRole('menuitem').first().click();
+    await u.page.getByRole('button').first().click();
     await u.po.expect.toBeSignedOut();
   });
 
@@ -132,7 +132,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     // Open UserProfile modal through UserButton
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
-    await u.page.getByRole('menuitem', { name: /Manage account/i }).click();
+    await u.page.getByRole('button', { name: /Manage account/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
 
     // Verify custom pages and links are visible in the UserProfile

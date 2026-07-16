@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
-import { NativeEventEmitter, Platform } from 'react-native';
 
 import { ClerkExpoModule as ClerkExpo, isNativeSupported } from '../utils/native-module';
+
+const nativeClientChangedEvent = 'clerkNativeClientChanged';
+
+export interface NativeClientSnapshot {
+  changed: {
+    client: boolean;
+    deviceToken: boolean;
+  };
+  deviceToken: string | null;
+  sourceId?: string | null;
+}
 
 /**
  * Local marker for a native client event.
  */
-interface NativeClientEvent {
+export interface NativeClientEvent extends NativeClientSnapshot {
   issuedAt: number;
 }
 
@@ -19,8 +29,27 @@ type RefreshClientEventSubscription = {
 };
 
 type RefreshClientEventEmitter = {
-  addListener: (eventName: 'refreshClient', listener: () => void) => RefreshClientEventSubscription;
+  addListener: (
+    eventName: typeof nativeClientChangedEvent,
+    listener: (snapshot?: NativeClientSnapshot) => void,
+  ) => RefreshClientEventSubscription;
 };
+
+function getNativeClientEventEmitter(): RefreshClientEventEmitter | null {
+  if (ClerkExpo && typeof ClerkExpo.addListener === 'function') {
+    return ClerkExpo as RefreshClientEventEmitter;
+  }
+
+  return null;
+}
+
+function isNativeClientSnapshot(snapshot: NativeClientSnapshot | undefined): snapshot is NativeClientSnapshot {
+  return (
+    typeof snapshot?.changed?.client === 'boolean' &&
+    typeof snapshot.changed.deviceToken === 'boolean' &&
+    (typeof snapshot.deviceToken === 'string' || snapshot.deviceToken === null)
+  );
+}
 
 /**
  * Listens for native client events that should sync JS client state.
@@ -36,13 +65,18 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
     let subscription: { remove: () => void } | null = null;
 
     try {
-      const eventEmitter: RefreshClientEventEmitter =
-        Platform.OS === 'android'
-          ? (ClerkExpo as RefreshClientEventEmitter)
-          : (new NativeEventEmitter(ClerkExpo) as RefreshClientEventEmitter);
+      const eventEmitter = getNativeClientEventEmitter();
 
-      subscription = eventEmitter.addListener('refreshClient', () => {
-        setNativeClientEvent({ issuedAt: Date.now() });
+      if (!eventEmitter) {
+        return;
+      }
+
+      subscription = eventEmitter.addListener(nativeClientChangedEvent, snapshot => {
+        if (!isNativeClientSnapshot(snapshot)) {
+          return;
+        }
+
+        setNativeClientEvent({ issuedAt: Date.now(), ...snapshot });
       });
     } catch (error) {
       if (__DEV__) {

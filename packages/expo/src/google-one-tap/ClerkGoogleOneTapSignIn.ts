@@ -85,7 +85,8 @@ export const ClerkGoogleOneTapSignIn = {
    *
    * @param params - Sign-in parameters
    * @param params.nonce - Cryptographic nonce for replay protection
-   * @param params.filterByAuthorizedAccounts - Only show previously authorized accounts (default: true)
+   * @param params.filterByAuthorizedAccounts - Android only. Filter to previously authorized accounts.
+   * @param params.hint - iOS only. Hint for Google Sign-In.
    *
    * @returns Promise resolving to OneTapResponse
    */

@@ -367,7 +367,7 @@ describe('Collapsible', () => {
   });
 
   describe('Inert Attribute', () => {
-    it('sets inert to empty string when open={false}', async () => {
+    it('sets inert when open={false}', async () => {
       const { wrapper } = await createFixtures();
       const { container, rerender } = render(<Collapsible open>Content</Collapsible>, { wrapper });
 
@@ -375,7 +375,9 @@ describe('Collapsible', () => {
       rerender(<Collapsible open={false}>Content</Collapsible>);
 
       const element = container.querySelector('.cl-collapsible') as HTMLElement;
-      expect(element).toHaveAttribute('inert', '');
+      // Presence check only — `inertProps` emits the value each React major reflects
+      // (string '' on 18, boolean true on 19), both of which serialize to inert="".
+      expect(element).toHaveAttribute('inert');
     });
 
     it('does not set inert when open={true}', async () => {

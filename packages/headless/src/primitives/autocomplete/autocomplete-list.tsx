@@ -3,7 +3,7 @@
 import { FloatingList, useMergeRefs } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export type AutocompleteListProps = ComponentProps<'div'>;
@@ -24,14 +24,15 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const combinedRef = useMergeRefs([refs.setFloating, ref]);
 
-    const floatingProps = getFloatingProps() as React.ComponentPropsWithRef<'div'>;
+    const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'autocomplete-list',
       ref: combinedRef,
-      ...floatingProps,
-    };
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = { ...ownProps, ...floatingProps };
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not

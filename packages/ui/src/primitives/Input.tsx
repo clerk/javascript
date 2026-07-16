@@ -6,11 +6,20 @@ import { common, createVariants, mqu } from '../styledSystem';
 import { sanitizeInputProps, useFormField } from './hooks/useFormField';
 import { useInput } from './hooks/useInput';
 
+/**
+ * Checkmark shape for a checked checkbox, used as a CSS mask rather than a tinted
+ * background-image. Only the shape's alpha matters here; the visible checkmark color
+ * comes from `backgroundColor` on the masked element, which lets it reference the
+ * `colorPrimaryForeground` theme token (a CSS variable / `light-dark()` value would
+ * not resolve if it were baked into the SVG fill).
+ */
+const checkboxCheckmarkMask = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M7.712.233a.889.889 0 0 1 .055 1.256C6.742 2.61 6.249 3.291 5.508 4.615c-.279.5-.589 1.194-.835 1.784a36.761 36.761 0 0 0-.382.95l-.021.057-.006.014-.001.003a.89.89 0 0 1-1.504.27L.218 4.765A.889.889 0 1 1 1.56 3.6l1.591 1.834c.235-.548.524-1.181.806-1.685.807-1.445 1.38-2.239 2.499-3.46A.889.889 0 0 1 7.712.234Z' clip-rule='evenodd'/%3E%3C/svg%3E")`;
+
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
     boxSizing: 'border-box',
     margin: 0,
-    padding: `${theme.space.$1x5} ${theme.space.$3}`,
+    padding: `${theme.space.$1x75} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInput,
     color: theme.colors.$colorInputForeground,
     // outline support for Windows contrast themes
@@ -18,8 +27,34 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     outlineOffset: '2px',
     maxHeight: theme.sizes.$9,
     width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
-    aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
+    ...(props.type === 'checkbox'
+      ? {
+          appearance: 'none',
+          height: theme.sizes.$4,
+          padding: theme.space.$1,
+          '&:checked': {
+            position: 'relative',
+            backgroundColor: theme.colors.$primary500,
+            // Draw the checkmark on a masked overlay so its color tracks the
+            // colorPrimaryForeground token and stays legible in every theme.
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: theme.colors.$colorPrimaryForeground,
+              maskImage: checkboxCheckmarkMask,
+              WebkitMaskImage: checkboxCheckmarkMask,
+              maskPosition: 'center',
+              WebkitMaskPosition: 'center',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              maskSize: `${theme.sizes.$2} ${theme.sizes.$2}`,
+              WebkitMaskSize: `${theme.sizes.$2} ${theme.sizes.$2}`,
+            },
+          },
+        }
+      : {}),
     ...common.textVariants(theme).body,
     ...common.disabled(theme),
     // This is a workaround to prevent zooming on iOS when focusing an input
@@ -40,6 +75,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     variant: {
       default: {
         ...common.borderVariants(theme, props).normal,
+        ...(props.type === 'checkbox' ? { borderRadius: theme.radii.$sm } : {}),
       },
       unstyled: {
         borderWidth: 0,

@@ -20,6 +20,7 @@ export type AvatarUploaderProps = {
   onAvatarChange: (file: File) => Promise<unknown>;
   onAvatarRemove?: (() => void) | null;
   avatarPreviewPlaceholder?: React.ReactElement | null;
+  rounded?: boolean;
 };
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -39,17 +40,21 @@ const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const { t } = useLocalizations();
-  const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
+  const [isDraggingOver, setIsDraggingOver] = React.useState(false);
   const card = useCardState();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const openDialog = () => inputRef.current?.click();
 
-  const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
-
-  const toggle = () => {
-    setShowUpload(!showUpload);
-  };
+  const {
+    onAvatarChange,
+    onAvatarRemove,
+    title,
+    avatarPreview,
+    avatarPreviewPlaceholder,
+    rounded = true,
+    ...rest
+  } = props;
 
   const handleFileDrop = (file: File | null) => {
     if (file === null) {
@@ -60,7 +65,6 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     card.setLoading();
     return onAvatarChange(file)
       .then(() => {
-        toggle();
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -69,6 +73,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const handleRemove = async () => {
     card.setLoading();
     await handleFileDrop(null);
+    card.setIdle();
     return onAvatarRemove?.();
   };
 
@@ -90,6 +95,46 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     await handleFileDrop(f);
   };
 
+  const isFileDrag = (e: React.DragEvent) => e.dataTransfer?.types?.includes('Files') ?? false;
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    if (card.isLoading || !isFileDrag(e)) {
+      return;
+    }
+    e.preventDefault();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    if (card.isLoading || !isFileDrag(e)) {
+      return;
+    }
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    // Only reset when leaving the container entirely, not when moving between children.
+    // SAFETY: e.relatedTarget is typed as EventTarget | null, but in drag events it is always
+    // a DOM Node (or null). Element.contains() requires Node | null; the cast is safe here.
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      return;
+    }
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(e)) {
+      return;
+    }
+    e.preventDefault();
+    setIsDraggingOver(false);
+    if (card.isLoading) {
+      return;
+    }
+    void upload(e.dataTransfer.files?.[0]);
+  };
+
   const hasExistingImage = !!(avatarPreview.props as { imageUrl?: string })?.imageUrl;
   const previewElement = objectUrl
     ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
@@ -108,11 +153,28 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
       />
 
       <Flex
+        {...rest}
         gap={4}
         align='center'
-        {...rest}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
-        {previewElement}
+        <Flex
+          sx={t => ({
+            borderRadius: isDraggingOver && rounded ? t.radii.$circle : t.radii.$md,
+            transitionProperty: t.transitionProperty.$common,
+            transitionDuration: t.transitionDuration.$controls,
+            transitionTimingFunction: t.transitionTiming.$common,
+            ...(isDraggingOver && {
+              outline: `${t.borderWidths.$normal} dashed ${t.colors.$primary500}`,
+              outlineOffset: t.space.$0x5,
+            }),
+          })}
+        >
+          {previewElement}
+        </Flex>
         <Col gap={1}>
           <Flex
             elementDescriptor={descriptors.avatarImageActions}
@@ -127,7 +189,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               onClick={openDialog}
             />
 
-            {!!onAvatarRemove && !showUpload && (
+            {!!onAvatarRemove && (
               <Button
                 elementDescriptor={descriptors.avatarImageActionsRemove}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}

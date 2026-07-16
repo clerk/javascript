@@ -87,6 +87,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
         prepare={prepare}
         attempt={attempt}
         safeIdentifier={signUp.phoneNumber}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
         alternativeMethodsLabel={
           isAlternativePhoneCodeProvider
             ? localizationKeys('footerActionLink__alternativePhoneCodeProvider')

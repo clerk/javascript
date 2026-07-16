@@ -33,6 +33,9 @@ const PAYMENT_ATTEMPTS_KEY = 'billing-payment-attempts';
 // Keys for `useStatements`
 const STATEMENTS_KEY = 'billing-statements';
 
+// Keys for `useCreditBalance`
+const CREDIT_BALANCE_KEY = 'billing-credit-balance';
+
 export const STABLE_KEYS = {
   // Keys for `useOrganizationList`
   USER_MEMBERSHIPS_KEY,
@@ -60,6 +63,9 @@ export const STABLE_KEYS = {
 
   // Keys for `useOAuthConsent`
   OAUTH_CONSENT_INFO_KEY,
+
+  // Keys for `useCreditBalance`
+  CREDIT_BALANCE_KEY,
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];
@@ -76,15 +82,20 @@ const USER_ENTERPRISE_CONNECTIONS_KEY = 'userEnterpriseConnections';
 const ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'enterpriseConnectionTestRuns';
 const ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY = 'organizationEnterpriseConnections';
 const ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY = 'organizationEnterpriseConnectionTestRuns';
+const ORGANIZATION_DOMAINS_KEY = 'organizationDomains';
+
+const CREDIT_HISTORY_KEY = 'billing-credit-history';
 
 export const INTERNAL_STABLE_KEYS = {
   PAYMENT_ATTEMPT_KEY,
   BILLING_PLANS_KEY,
   BILLING_STATEMENTS_KEY,
+  CREDIT_HISTORY_KEY,
   USER_ENTERPRISE_CONNECTIONS_KEY,
   ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
   ORGANIZATION_ENTERPRISE_CONNECTIONS_KEY,
   ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
+  ORGANIZATION_DOMAINS_KEY,
 } as const;
 
 export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];

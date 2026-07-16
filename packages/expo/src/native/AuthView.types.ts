@@ -39,6 +39,13 @@ export interface AuthViewProps {
   isDismissible?: boolean;
 
   /**
+   * Maximum height of the Clerk application logo, in density-independent pixels.
+   *
+   * @default 44
+   */
+  logoMaxHeight?: number;
+
+  /**
    * Called when the native authentication view requests dismissal.
    *
    * This fires when the user dismisses the view, or when the native auth flow

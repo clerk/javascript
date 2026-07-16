@@ -44,13 +44,14 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
         <tr>
           <th>Prop</th>
           <th>Type</th>
+          <th>Default</th>
           <th>Value</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(row => {
-          // Variant props become live controls (seeded with their default); everything
-          // else (sx, extra props) stays a static default cell.
+          // The default is a static cell; the Value column is the live control. Variant
+          // props get a knob there; non-variant rows (sx, extra) have no control.
           const knob = playground?.knobs[row.name];
           return (
             <tr key={row.name}>
@@ -65,6 +66,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
               <td>
                 <code>{row.type}</code>
               </td>
+              <td>{row.default !== undefined ? <code>{row.default}</code> : '—'}</td>
               <td>
                 {knob && playground ? (
                   <KnobControl
@@ -73,8 +75,6 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
                     value={playground.values[row.name]}
                     onChange={v => playground.setValue(row.name, v)}
                   />
-                ) : row.default !== undefined ? (
-                  <code>{row.default}</code>
                 ) : (
                   '—'
                 )}

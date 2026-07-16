@@ -23,7 +23,7 @@ export function TabsRoot(props: TabsProps) {
   const tabsId = useId();
   const tabElementsRef = useRef<Map<string, HTMLElement>>(new Map());
   const tabOrderRef = useRef<string[]>([]);
-  const listRef = useRef<HTMLElement>(null);
+  const [listElement, setListElement] = useState<HTMLElement | null>(null);
   const valueRef = useRef(value);
   valueRef.current = value;
 
@@ -64,10 +64,11 @@ export function TabsRoot(props: TabsProps) {
       tabsId,
       registerTab,
       getTabElement,
-      listRef,
+      listElement,
+      setListElement,
       direction,
     }),
-    [value, setValue, orientation, activationMode, tabsId, registerTab, getTabElement, direction],
+    [value, setValue, orientation, activationMode, tabsId, registerTab, getTabElement, listElement, direction],
   );
 
   return <TabsContext.Provider value={contextValue}>{children}</TabsContext.Provider>;

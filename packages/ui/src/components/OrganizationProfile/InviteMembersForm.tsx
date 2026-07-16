@@ -35,6 +35,11 @@ type InviteMembersFormProps = {
   resetButtonLabel?: LocalizationKey;
 };
 
+type InviteMembersParams = {
+  emailAddresses: string[];
+  role: string;
+};
+
 export const InviteMembersForm = (props: InviteMembersFormProps) => {
   const { onSuccess, onReset, resetButtonLabel } = props;
   const clerk = useClerk();
@@ -101,127 +106,181 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
     const submittedData = new FormData(e.currentTarget);
     const portalRoot = getClosestProfileScrollBoxFromElement(e.currentTarget);
+    const inviteMembersParams: InviteMembersParams = {
+      emailAddresses: emailAddressField.value.split(','),
+      role: submittedData.get('role') as string,
+    };
+
     try {
-      await organization.inviteMembers({
-        emailAddresses: emailAddressField.value.split(','),
-        role: submittedData.get('role') as string,
-      });
-
-      await invitations?.revalidate?.();
-      onSuccess?.();
+      await inviteMembers(inviteMembersParams);
     } catch (err) {
-      if (!isClerkAPIResponseError(err)) {
-        if (err instanceof Error) {
-          handleError(err, [], card.setError);
-          return;
-        }
+      await handleInviteMembersError(err, inviteMembersParams, { portalRoot });
+    }
+  };
 
-        throw err;
+  /**
+   * Attempt to invite members to an organization. Throws errors if unsuccessful.
+   */
+  const inviteMembers = async (params: InviteMembersParams) => {
+    await organization.inviteMembers(params);
+
+    await invitations?.revalidate?.();
+    onSuccess?.();
+  };
+
+  /**
+   * Attempt to invite members after a checkout has been performed. If inviting members throws an error, handle the
+   * error without triggering the checkout flow again.
+   */
+  const inviteMembersAfterCheckout = (params: InviteMembersParams) => {
+    void (async () => {
+      card.setLoading();
+      card.setError(undefined);
+
+      try {
+        await inviteMembers(params);
+      } catch (err) {
+        await handleInviteMembersError(err, params, { openCheckoutOnInsufficientSeats: false });
+      } finally {
+        card.setIdle();
+      }
+    })();
+  };
+
+  /**
+   * Handle errors that are thrown after attempting to invite members to an organization.
+   */
+  const handleInviteMembersError = async (
+    err: unknown,
+    inviteMembersParams: InviteMembersParams,
+    {
+      openCheckoutOnInsufficientSeats = true,
+      portalRoot,
+    }: { openCheckoutOnInsufficientSeats?: boolean; portalRoot?: HTMLElement | null } = {},
+  ) => {
+    if (!isClerkAPIResponseError(err)) {
+      if (err instanceof Error) {
+        handleError(err, [], card.setError);
+        return;
       }
 
-      removeInvalidEmails(err.errors[0]);
+      throw err;
+    }
 
-      switch (err.errors?.[0]?.code) {
-        case 'duplicate_record': {
-          const unlocalizedEmailsList = err.errors[0].meta?.emailAddresses || [];
-          card.setError(
-            t(
-              localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
-                // Create a localized list of email addresses
-                email_addresses: createListFormat(unlocalizedEmailsList, locale),
-              }),
-            ),
+    const apiError = err.errors[0];
+
+    removeInvalidEmails(apiError, inviteMembersParams.emailAddresses);
+
+    switch (apiError?.code) {
+      case 'duplicate_record': {
+        const unlocalizedEmailsList = apiError.meta?.emailAddresses || [];
+        card.setError(
+          t(
+            localizationKeys('organizationProfile.invitePage.detailsTitle__inviteFailed', {
+              // Create a localized list of email addresses
+              email_addresses: createListFormat(unlocalizedEmailsList, locale),
+            }),
+          ),
+        );
+        break;
+      }
+      case 'already_a_member_in_organization': {
+        /**
+         * Extracts email from the error message since it's not provided in the error response
+         */
+        const longMessage = apiError.longMessage ?? '';
+        const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
+
+        handleError(err, [], err =>
+          email
+            ? /**
+               * Fallbacks to original error message in case the email cannot be extracted
+               */
+              card.setError(
+                t(
+                  localizationKeys('unstable__errors.already_a_member_in_organization', {
+                    email,
+                  }),
+                ),
+              )
+            : card.setError(err),
+        );
+
+        break;
+      }
+      case 'insufficient_seats': {
+        // If we get an insufficient_seats error and this function was invoked with openCheckoutOnInsufficientSeats
+        // set to false, we can immediately render an error instead of beginning the checkout flow.
+        if (!openCheckoutOnInsufficientSeats) {
+          handleError(err, [], () =>
+            card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
           );
           break;
         }
-        case 'already_a_member_in_organization': {
-          /**
-           * Extracts email from the error message since it's not provided in the error response
-           */
-          const longMessage = err.errors[0].longMessage ?? '';
-          const email = longMessage.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0];
 
-          handleError(err, [], err =>
-            email
-              ? /**
-                 * Fallbacks to original error message in case the email cannot be extracted
-                 */
-                card.setError(
-                  t(
-                    localizationKeys('unstable__errors.already_a_member_in_organization', {
-                      email,
-                    }),
-                  ),
-                )
-              : card.setError(err),
-          );
+        try {
+          const { data: plans } = await clerk.billing.getPlans({
+            for: 'organization',
+            orgId: organization.id,
+            minSeats: apiError.meta?.seatsQuantity,
+            // TODO(billing): update to multiple calls
+            pageSize: 500,
+          });
 
-          break;
-        }
-        case 'insufficient_seats': {
-          try {
-            const { data: plans } = await clerk.billing.getPlans({
-              for: 'organization',
-              orgId: organization.id,
-              minSeats: err.errors[0].meta?.seatsQuantity,
-              // TODO(billing): update to multiple calls
-              pageSize: 500,
-            });
-
-            if (plans.length === 0) {
-              handleError(err, [], () =>
-                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
-              );
-              break;
-            }
-
-            // we want the "current" subscription item, which can have either "active" or "past_due" status
-            const activeSubscriptionItem = subscriptionItems.find(
-              si => si.status === 'active' || si.status === 'past_due',
-            );
-            if (activeSubscriptionItem) {
-              const currentPlan = activeSubscriptionItem.plan;
-              const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
-                p =>
-                  p.id === currentPlan.id &&
-                  p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
-              );
-              if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
-                handleSelectPlan({
-                  mode: 'modal',
-                  plan: currentPlan,
-                  planPeriod: activeSubscriptionItem.planPeriod,
-                  seatsQuantity: err.errors[0].meta?.seatsQuantity,
-                  priceId: activeSubscriptionItem.priceId,
-                  portalRoot,
-                });
-                break;
-              }
-            }
-
+          if (plans.length === 0) {
             handleError(err, [], () =>
-              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
+              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
             );
-            break;
-          } catch (err: unknown) {
-            if (err instanceof Error) {
-              handleError(err, [], () =>
-                card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
-              );
-            }
             break;
           }
+
+          // we want the "current" subscription item, which can have either "active" or "past_due" status
+          const activeSubscriptionItem = subscriptionItems.find(
+            si => si.status === 'active' || si.status === 'past_due',
+          );
+          if (activeSubscriptionItem) {
+            const currentPlan = activeSubscriptionItem.plan;
+            const currentPlanAndPriceSupportsDesiredSeatQuantity = plans.some(
+              p =>
+                p.id === currentPlan.id &&
+                p.availablePrices?.some(price => price.id === activeSubscriptionItem.priceId),
+            );
+            if (currentPlanAndPriceSupportsDesiredSeatQuantity) {
+              handleSelectPlan({
+                mode: 'modal',
+                plan: currentPlan,
+                planPeriod: activeSubscriptionItem.planPeriod,
+                seatsQuantity: apiError.meta?.seatsQuantity,
+                priceId: activeSubscriptionItem.priceId,
+                portalRoot,
+                // once the checkout process completes, attempt to invite the members a second time
+                onSubscriptionComplete: () => inviteMembersAfterCheckout(inviteMembersParams),
+              });
+              break;
+            }
+          }
+
+          handleError(err, [], () =>
+            card.setError(t(localizationKeys('unstable__errors.insufficient_seats_change_plan'))),
+          );
+          break;
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            handleError(err, [], () =>
+              card.setError(t(localizationKeys('unstable__errors.insufficient_seats_contact_support'))),
+            );
+          }
+          break;
         }
-        default: {
-          handleError(err, [], card.setError);
-        }
+      }
+      default: {
+        handleError(err, [], card.setError);
       }
     }
   };
 
-  const removeInvalidEmails = (err: ClerkAPIError) => {
+  const removeInvalidEmails = (err: ClerkAPIError, emails: string[] = emailAddressField.value.split(',')) => {
     const invalidEmails = new Set([...(err.meta?.emailAddresses ?? []), ...(err.meta?.identifiers ?? [])]);
-    const emails = emailAddressField.value.split(',');
     emailAddressField.setValue(emails.filter(e => !invalidEmails.has(e)).join(','));
   };
 

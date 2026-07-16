@@ -1,9 +1,11 @@
 import {
+  __internal_useCreditBalanceQuery,
   __experimental_usePaymentAttempts,
   __experimental_usePaymentMethods,
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
   useClerk,
   useSession,
@@ -24,13 +26,6 @@ import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-export function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
 
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -93,6 +88,16 @@ export const usePlans = (params?: { mode: 'cache' }) => {
   });
 };
 
+export const useCreditBalance = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditBalanceQuery(params);
+};
+
+export const useCreditHistory = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditHistoryQuery(params);
+};
+
 type HandleSelectPlanProps = {
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
@@ -103,6 +108,7 @@ type HandleSelectPlanProps = {
   portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export const usePlansContext = () => {
@@ -347,6 +353,7 @@ export const usePlansContext = () => {
       portalRoot: providedPortalRoot,
       appearance,
       newSubscriptionRedirectUrl,
+      onSubscriptionComplete,
     }: HandleSelectPlanProps) => {
       const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
@@ -359,6 +366,7 @@ export const usePlansContext = () => {
         priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
+          onSubscriptionComplete?.();
         },
         onClose: () => {
           if (session?.id) {

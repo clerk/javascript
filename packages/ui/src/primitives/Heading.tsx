@@ -6,6 +6,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
     boxSizing: 'border-box',
     color: `${theme.colors.$colorForeground}`,
     margin: 0,
+    textWrap: 'balance',
   },
   variants: {
     textVariant: { ...common.textVariants(theme) },

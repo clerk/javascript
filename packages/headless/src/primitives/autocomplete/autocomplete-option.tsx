@@ -3,7 +3,7 @@
 import { useListItem, useMergeRefs } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export interface AutocompleteOptionProps extends ComponentProps<'div'> {
@@ -43,21 +43,25 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
       disabled: !!disabled,
     };
 
-    const defaultProps = {
+    const ownProps = {
       'data-cl-slot': 'autocomplete-option',
       id,
       ref: combinedRef,
-      role: 'option' as const,
+      role: 'option',
       'aria-selected': isActive,
       'aria-disabled': disabled || undefined,
-      ...(getItemProps({
+    } satisfies DefaultProps<'div'>;
+
+    const defaultProps = {
+      ...ownProps,
+      ...getItemProps({
         onClick() {
           if (!disabled) {
             handleSelect(value, index, displayLabel);
             (refs.domReference.current as HTMLElement | null)?.focus();
           }
         },
-      }) as React.ComponentPropsWithRef<'div'>),
+      }),
     };
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);

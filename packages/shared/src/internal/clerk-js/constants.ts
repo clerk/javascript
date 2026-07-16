@@ -33,6 +33,7 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
   EXTERNAL_ACCOUNT_NOT_FOUND: 'external_account_not_found',
+  EXTERNAL_ACCOUNT_EXISTS: 'external_account_exists',
   SESSION_EXISTS: 'session_exists',
   SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
   SIGN_UP_MODE_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',
@@ -45,6 +46,9 @@ export const ERROR_CODES = {
   CAPTCHA_INVALID: 'captcha_invalid',
   FRAUD_DEVICE_BLOCKED: 'device_blocked',
   FRAUD_ACTION_BLOCKED: 'action_blocked',
+  PROTECT_CHECK_ALREADY_RESOLVED: 'protect_check_already_resolved',
+  PROTECT_CHECK_TIMED_OUT: 'protect_check_timed_out',
+  PROTECT_CHECK_UNSUPPORTED_ENVIRONMENT: 'protect_check_unsupported_environment',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
   USER_BANNED: 'user_banned',
   USER_DEACTIVATED: 'user_deactivated',
@@ -62,7 +66,7 @@ export const SIGN_UP_MODES = {
 } satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2025-11-10';
+export const SUPPORTED_FAPI_VERSION = '2026-05-12';
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
 export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';

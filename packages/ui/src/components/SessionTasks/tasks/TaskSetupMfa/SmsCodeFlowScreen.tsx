@@ -91,6 +91,7 @@ const MFAVerifyPhoneForSessionTasks = withCardStateProvider((props: MFAVerifyPho
         safeIdentifier={resourceRef.current?.phoneNumber || ''}
         inputLabel={localizationKeys('taskSetupMfa.smsCode.verifyPhone.formTitle')}
         resendButton={localizationKeys('taskSetupMfa.smsCode.verifyPhone.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
         badgeText={localizationKeys('taskSetupMfa.badge')}
         onCodeEntryFinishedAction={action}
         onResendCodeClicked={() => void prepare()}
@@ -299,7 +300,6 @@ const SmsCodeScreen = withCardStateProvider((props: SmsCodeScreenProps) => {
         )}
         <Col>
           <Actions
-            role='menu'
             elementDescriptor={descriptors.taskSetupMfaPhoneSelectionItems}
             sx={t => ({
               borderTopWidth: t.borderWidths.$normal,

@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Clerk Expo Native Build Fixture",
+    "slug": "clerk-expo-native-build-fixture",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "clerkexponativebuildfixture",
+    "ios": {
+      "bundleIdentifier": "com.clerk.exponativebuildfixture",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.clerk.exponativebuildfixture"
+    },
+    "plugins": ["expo-secure-store", "@clerk/expo", "expo-web-browser"]
+  }
+}

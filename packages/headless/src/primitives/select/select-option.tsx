@@ -1,10 +1,9 @@
 'use client';
 
 import { useListItem, useMergeRefs } from '@floating-ui/react';
-import type React from 'react';
 import { useEffect } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useSelectContext } from './select-context';
 
 export interface SelectOptionProps extends ComponentProps<'button'> {
@@ -15,7 +14,7 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 
 export function SelectOption(props: SelectOptionProps) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const { activeIndex, selectedValue, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
+  const { activeIndex, selectedValue, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
     useSelectContext();
 
   const displayLabel = label ?? value;
@@ -25,11 +24,18 @@ export function SelectOption(props: SelectOptionProps) {
   const isActive = activeIndex === index;
 
   useEffect(() => {
-    valueToLabelRef.current.set(value, displayLabel);
+    const map = valueToLabelRef.current;
+    map.set(value, displayLabel);
     return () => {
-      valueToLabelRef.current.delete(value);
+      map.delete(value);
     };
   }, [value, displayLabel, valueToLabelRef]);
+
+  useEffect(() => {
+    if (isSelected) {
+      setSelectedIndex(index);
+    }
+  }, [index, isSelected, setSelectedIndex]);
 
   const combinedRef = useMergeRefs([itemRef, isSelected ? selectedItemRef : null]);
 
@@ -39,21 +45,25 @@ export function SelectOption(props: SelectOptionProps) {
     disabled: !!disabled,
   };
 
-  const defaultProps = {
+  const ownProps = {
     'data-cl-slot': 'select-option',
-    type: 'button' as const,
+    type: 'button',
     ref: combinedRef,
-    role: 'option' as const,
+    role: 'option',
     'aria-selected': isSelected,
     'aria-disabled': disabled || undefined,
     tabIndex: isActive ? 0 : -1,
-    ...(getItemProps({
+  } satisfies DefaultProps<'button'>;
+
+  const defaultProps = {
+    ...ownProps,
+    ...getItemProps({
       onClick() {
         if (!disabled) {
           handleSelect(value, index);
         }
       },
-    }) as React.ComponentPropsWithRef<'button'>),
+    }),
   };
 
   return renderElement({

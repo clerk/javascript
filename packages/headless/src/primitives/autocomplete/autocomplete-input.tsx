@@ -33,7 +33,7 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
 
     const defaultProps = {
       'data-cl-slot': 'autocomplete-input',
-      ...(getReferenceProps({
+      ...getReferenceProps({
         ref: combinedRef,
         value: inputValue,
         'aria-autocomplete': 'list' as const,
@@ -50,7 +50,7 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
             }
           }
         },
-      }) as React.ComponentPropsWithRef<'input'>),
+      }),
     };
 
     return renderElement({

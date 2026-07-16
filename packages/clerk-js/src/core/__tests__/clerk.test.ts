@@ -1,4 +1,5 @@
 import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -7,6 +8,7 @@ import type {
   SignUpJSON,
   TokenResource,
 } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
@@ -24,6 +26,9 @@ const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
 
 vi.mock('../resources/Client');
 vi.mock('../resources/Environment');
+
+const { mockCreateClientFromJwt } = vi.hoisted(() => ({ mockCreateClientFromJwt: vi.fn() }));
+vi.mock('../jwt-client', () => ({ createClientFromJwt: mockCreateClientFromJwt }));
 
 vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
@@ -155,6 +160,41 @@ describe('Clerk singleton', () => {
       expect(() => {
         new Clerk('invalidPK');
       }).toThrowError(/The publishableKey passed to Clerk is invalid/);
+    });
+  });
+
+  describe('__internal_oauthTransport', () => {
+    it('defaults to null with no getter access errors', () => {
+      const sut = new Clerk(productionPublishableKey);
+
+      expect(sut.__internal_hasOAuthTransport).toBe(false);
+      expect(sut.__internal_oauthTransport).toBeNull();
+    });
+
+    it('exposes the transport registered via options after load', async () => {
+      const transport = {
+        getRedirectUrl: () => 'myapp://sso-callback',
+        open: async (_url: URL) => ({ callbackUrl: 'myapp://sso-callback' }),
+      };
+      const sut = new Clerk(productionPublishableKey);
+
+      await sut.load({ __internal_oauthTransport: transport });
+
+      expect(sut.__internal_hasOAuthTransport).toBe(true);
+      expect(sut.__internal_oauthTransport).toBe(transport);
+    });
+  });
+
+  describe('__internal_handleResourceCallback', () => {
+    it('handleGoogleOneTapCallback delegates to __internal_handleResourceCallback', async () => {
+      const clerk = new Clerk(productionPublishableKey);
+      await clerk.load();
+      const spy = vi.spyOn(clerk, '__internal_handleResourceCallback').mockResolvedValue(undefined);
+      const signInLike = { identifier: 'x' } as any;
+
+      await clerk.handleGoogleOneTapCallback(signInLike, { signInUrl: '/sign-in' });
+
+      expect(spy).toHaveBeenCalledWith(signInLike, { signInUrl: '/sign-in' }, undefined);
     });
   });
 
@@ -782,6 +822,345 @@ describe('Clerk singleton', () => {
         });
       },
     );
+
+    describe('when the client fetch fails or hangs at load', () => {
+      let startPollSpy: ReturnType<typeof vi.spyOn>;
+      let stopPollSpy: ReturnType<typeof vi.spyOn>;
+      let callLog: string[];
+
+      const sessionClient = (session: any) => ({
+        signedInSessions: [session],
+        lastActiveSessionId: session.id,
+      });
+      const makeSession = (overrides: Record<string, unknown> = {}) => ({
+        id: 'sess_1',
+        status: 'active',
+        user: {},
+        getToken: vi.fn(() => Promise.resolve('fresh-token')),
+        clearCache: vi.fn(),
+        ...overrides,
+      });
+
+      // `load()` awaits native crypto (cookie suffix) before scheduling the timeout, and that work
+      // is real async the fake clock cannot advance. Yield real event-loop turns until a fake timer
+      // actually exists (or load settles) so slow machines can't exhaust the advance budget early.
+      const realSetTimeout = globalThis.setTimeout.bind(globalThis);
+      const yieldRealEventLoop = () => new Promise<void>(resolve => realSetTimeout(resolve, 0));
+      const pumpUntilSettled = async (promise: Promise<unknown>) => {
+        let settled = false;
+        const tracked = promise.then(
+          v => ((settled = true), v),
+          e => ((settled = true), Promise.reject(e)),
+        );
+        for (let advances = 0; advances < 20 && !settled; ) {
+          if (vi.getTimerCount() === 0) {
+            await yieldRealEventLoop();
+            continue;
+          }
+          await vi.advanceTimersByTimeAsync(5000);
+          advances++;
+        }
+        await tracked;
+      };
+
+      beforeEach(async () => {
+        callLog = [];
+        // Import at runtime (not top-level) so this module does not reorder the
+        // static graph and break the auto-mocked Environment/Client resources.
+        const { AuthCookieService } = await import('../auth/AuthCookieService');
+        startPollSpy = vi
+          .spyOn(AuthCookieService.prototype, 'startPollingForToken')
+          .mockImplementation(() => void callLog.push('startPoll'));
+        stopPollSpy = vi
+          .spyOn(AuthCookieService.prototype, 'stopPollingForToken')
+          .mockImplementation(() => void callLog.push('stopPoll'));
+        mockClientFetch.mockClear();
+        mockCreateClientFromJwt.mockReturnValue({ signedInSessions: [], lastActiveSessionId: null });
+      });
+
+      afterEach(() => {
+        startPollSpy.mockRestore();
+        stopPollSpy.mockRestore();
+        mockCreateClientFromJwt.mockReset();
+        vi.useRealTimers();
+      });
+
+      it('fails fast and marks Clerk degraded when the client fetch hangs', async () => {
+        vi.useFakeTimers();
+        // Only the primary fetch hangs; the background retry must resolve so it can't stall the test.
+        mockClientFetch
+          .mockReturnValueOnce(new Promise(() => {}))
+          .mockResolvedValue({ signedInSessions: [], lastActiveSessionId: null });
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(sut.status).toBe('degraded');
+        expect(stopPollSpy).toHaveBeenCalled();
+        expect(startPollSpy).toHaveBeenCalled();
+        expect(mockClientFetch.mock.calls[0]?.[0]?.abortSignal?.aborted).toBe(true);
+      });
+
+      it('builds the degraded identity from the minted token and falls back to the cookie only if the mint fails', async () => {
+        const stubSession = makeSession();
+        const freshSession = { id: 'sess_1', status: 'active', user: { id: 'user_fresh' } };
+        const freshClient = { signedInSessions: [freshSession], lastActiveSessionId: 'sess_1' };
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValueOnce(sessionClient(stubSession)).mockReturnValueOnce(freshClient);
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(mockCreateClientFromJwt).toHaveBeenCalledTimes(2);
+        expect(mockCreateClientFromJwt).toHaveBeenNthCalledWith(2, 'fresh-token');
+        expect(sut.client).toBe(freshClient);
+        expect(sut.session).toBe(freshSession);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('clears the token cache and mints without skipCache when the client fetch fails with a session present', async () => {
+        const getToken = vi.fn(() => {
+          callLog.push('getToken');
+          return Promise.resolve('fresh-token');
+        });
+        const clearCache = vi.fn(() => void callLog.push('clearCache'));
+        const session = makeSession({ getToken, clearCache });
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(getToken).toHaveBeenCalledWith();
+        expect(getToken).not.toHaveBeenCalledWith({ skipCache: true });
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'startPoll']);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('re-clears the token cache before restarting the poller when the recovery mint hangs', async () => {
+        vi.useFakeTimers();
+        const getToken = vi.fn(() => {
+          callLog.push('getToken');
+          return new Promise<string>(() => {});
+        });
+        const clearCache = vi.fn(() => void callLog.push('clearCache'));
+        const session = makeSession({ getToken, clearCache });
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(session));
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'clearCache', 'getToken', 'clearCache', 'startPoll']);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('renders the empty client without minting when there is no session cookie', async () => {
+        mockClientFetch.mockRejectedValue(new Error('client fetch failed'));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        expect(sut.session).toBeNull();
+        expect(callLog).toEqual(['startPoll', 'stopPoll', 'startPoll']);
+        expect(sut.status).toBe('degraded');
+      });
+
+      it('rethrows a 4xx client error without entering the mint path', async () => {
+        const err = Object.assign(new Error('bad request'), { status: 400 });
+        mockClientFetch.mockRejectedValue(err);
+
+        const sut = new Clerk(productionPublishableKey);
+        await expect(sut.load()).rejects.toBe(err);
+
+        expect(mockCreateClientFromJwt).not.toHaveBeenCalled();
+      });
+
+      it('re-fetches /client in the background after a degraded load and applies the late response', async () => {
+        vi.useFakeTimers();
+        const stubSession = makeSession();
+        const realSession = { id: 'sess_1', status: 'active', user: { id: 'user_real' } };
+        const realClient = { id: 'client_real', signedInSessions: [realSession], lastActiveSessionId: 'sess_1' };
+        const refetch = createDeferredPromise();
+        mockClientFetch.mockRejectedValueOnce(new Error('client fetch failed')).mockReturnValueOnce(refetch.promise);
+        mockCreateClientFromJwt.mockReturnValue(sessionClient(stubSession));
+
+        const sut = new Clerk(productionPublishableKey);
+        await pumpUntilSettled(sut.load());
+
+        expect(sut.status).toBe('degraded');
+        expect(mockClientFetch).toHaveBeenCalledTimes(2);
+
+        // The background retry is not bounded by INITIALIZATION_TIMEOUT_MS.
+        await vi.advanceTimersByTimeAsync(60_000);
+        refetch.resolve(realClient);
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(sut.client).toBe(realClient);
+        expect(sut.session).toBe(realSession);
+      });
+    });
+  });
+
+  describe('updateSessionCookie monotonic backstop', () => {
+    const sessionId = 'sess_active';
+    // The cookie guard treats an expired current cookie as no baseline, so test
+    // tokens must carry real, non-expired timestamps rather than tiny literals.
+    const T0 = Math.floor(Date.now() / 1000);
+
+    const createJwtWithOiat = (
+      iat: number,
+      oiat: number | undefined,
+      opts: { sid?: string; org?: string; ttl?: number } = {},
+    ): string => {
+      const { sid = sessionId, org, ttl = 60 } = opts;
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (oiat !== undefined) {
+        header.oiat = oiat;
+      }
+      const payload: Record<string, unknown> = { sid, iat, exp: iat + ttl };
+      if (org) {
+        payload.org_id = org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    };
+
+    const loadClerkWithSession = async () => {
+      const mockSession = {
+        id: sessionId,
+        status: 'active',
+        user: {},
+        getToken: vi.fn(),
+        lastActiveToken: { getRawString: () => mockJwt },
+      };
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      return sut;
+    };
+
+    const emitToken = (raw: string | null) => {
+      eventBus.emit(events.TokenUpdate, {
+        token: raw === null ? null : ({ jwt: {}, getRawString: () => raw } as any),
+      });
+    };
+
+    it('drops a strictly-staler same-context token and keeps the fresher cookie', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(T0, 200, { ttl: 600 });
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      const stale = createJwtWithOiat(T0 - 10, 100);
+      emitToken(stale);
+      expect(document.cookie).not.toContain(stale);
+      expect(document.cookie).toContain(fresh);
+    });
+
+    it('applies a lower-oiat token when the current cookie is expired (no freshness baseline)', async () => {
+      await loadClerkWithSession();
+
+      const expiredFresher = createJwtWithOiat(T0 - 120, 500, { ttl: 60 });
+      emitToken(expiredFresher);
+      expect(document.cookie).toContain(expiredFresher);
+
+      const validStaler = createJwtWithOiat(T0, 100);
+      emitToken(validStaler);
+      expect(document.cookie).toContain(validStaler);
+    });
+
+    it('applies a fresher same-context token', async () => {
+      await loadClerkWithSession();
+
+      const older = createJwtWithOiat(T0, 100);
+      emitToken(older);
+      expect(document.cookie).toContain(older);
+
+      const newer = createJwtWithOiat(T0 + 10, 200);
+      emitToken(newer);
+      expect(document.cookie).toContain(newer);
+    });
+
+    it('applies a token with equal oiat and iat (publish on tie)', async () => {
+      await loadClerkWithSession();
+
+      const first = createJwtWithOiat(T0, 100, { ttl: 60 });
+      emitToken(first);
+      expect(document.cookie).toContain(first);
+
+      const second = createJwtWithOiat(T0, 100, { ttl: 120 });
+      emitToken(second);
+      expect(document.cookie).toContain(second);
+    });
+
+    it('writes a token for a different session (cross-context cookies are not compared)', async () => {
+      await loadClerkWithSession();
+
+      const otherSession = createJwtWithOiat(T0, 200, { sid: 'sess_other' });
+      emitToken(otherSession);
+      expect(document.cookie).toContain(otherSession);
+    });
+
+    it('writes a token for a different organization (cross-context cookies are not compared)', async () => {
+      await loadClerkWithSession();
+
+      const otherOrg = createJwtWithOiat(T0, 200, { org: 'org_other' });
+      emitToken(otherOrg);
+      expect(document.cookie).toContain(otherOrg);
+    });
+
+    it('applies a personal-workspace token (no org) for the active personal workspace', async () => {
+      await loadClerkWithSession();
+
+      const personal = createJwtWithOiat(T0, 200);
+      emitToken(personal);
+      expect(document.cookie).toContain(personal);
+    });
+
+    it('applies an active-context token even when the current cookie is a different session with higher oiat', async () => {
+      const sut = await loadClerkWithSession();
+
+      // Plant a different-session, higher-oiat cookie by temporarily making it the active context.
+      (sut.session as any).id = 'sess_other';
+      const otherContext = createJwtWithOiat(T0 + 20, 999, { sid: 'sess_other' });
+      emitToken(otherContext);
+      expect(document.cookie).toContain(otherContext);
+
+      // Restore the active session; a lower-oiat active-context token must still apply,
+      // because the different-session cookie is not a valid freshness baseline.
+      (sut.session as any).id = sessionId;
+      const active = createJwtWithOiat(T0, 100, { sid: sessionId });
+      emitToken(active);
+      expect(document.cookie).toContain(active);
+    });
+
+    it('applies a token without an oiat header (fail open)', async () => {
+      await loadClerkWithSession();
+
+      const noOiat = createJwtWithOiat(T0, undefined);
+      emitToken(noOiat);
+      expect(document.cookie).toContain(noOiat);
+    });
+
+    it('applies a malformed token (fail open)', async () => {
+      await loadClerkWithSession();
+
+      emitToken('garbage.token');
+      expect(document.cookie).toContain('garbage.token');
+    });
+
+    it('removes the cookie when the token is null', async () => {
+      await loadClerkWithSession();
+
+      const fresh = createJwtWithOiat(T0, 200);
+      emitToken(fresh);
+      expect(document.cookie).toContain(fresh);
+
+      emitToken(null);
+      expect(document.cookie).not.toContain(fresh);
+    });
   });
 
   describe('.signOut()', () => {
@@ -1205,6 +1584,104 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('uses __internal_navigateOnSetActive for completed sign in callbacks', async () => {
+      const sessionId = 'sess_123';
+      const mockSession = { id: sessionId, currentTask: null };
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'complete',
+            created_session_id: sessionId,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+        expect(session).toBe(mockSession);
+        expect(redirectUrl).toBe('http://test.host/after-sign-in');
+        expect(decorateUrl('/decorated')).toBe('/decorated');
+      });
+      const mockSetActive = vi.fn(async ({ navigate }) => navigate({ session: mockSession }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive as any;
+
+      await sut.handleRedirectCallback({
+        signInForceRedirectUrl: '/after-sign-in',
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
+      });
+
+      expect(mockSetActive).toHaveBeenCalledWith({
+        session: sessionId,
+        navigate: expect.any(Function),
+      });
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('uses __internal_navigateOnSetActive for completed sign up callbacks', async () => {
+      const sessionId = 'sess_123';
+      const mockSession = { id: sessionId, currentTask: null };
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'complete',
+            created_session_id: sessionId,
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const internalNavigateOnSetActive = vi.fn(async ({ session, redirectUrl, decorateUrl }) => {
+        expect(session).toBe(mockSession);
+        expect(redirectUrl).toBe('http://test.host/after-sign-up');
+        expect(decorateUrl('/decorated')).toBe('/decorated');
+      });
+      const mockSetActive = vi.fn(async ({ navigate }) => navigate({ session: mockSession }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive as any;
+
+      await sut.handleRedirectCallback({
+        signUpForceRedirectUrl: '/after-sign-up',
+        __internal_navigateOnSetActive: internalNavigateOnSetActive,
+      });
+
+      expect(mockSetActive).toHaveBeenCalledWith({
+        session: sessionId,
+        navigate: expect.any(Function),
+      });
+      expect(internalNavigateOnSetActive).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -1354,7 +1831,7 @@ describe('Clerk singleton', () => {
                 strategy: 'oauth_google',
                 external_verification_redirect_url: null,
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                   long_message: 'This external account already exists.',
                   message: 'already exists',
                 },
@@ -1366,7 +1843,7 @@ describe('Clerk singleton', () => {
               strategy: 'oauth_google',
               external_verification_redirect_url: null,
               error: {
-                code: 'external_account_exists',
+                code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 long_message: 'This external account already exists.',
                 message: 'already exists',
               },
@@ -1952,7 +2429,7 @@ describe('Clerk singleton', () => {
               external_account: {
                 status: 'transferable',
                 error: {
-                  code: 'external_account_exists',
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
                 },
               },
             },
@@ -2121,6 +2598,97 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/reset-password');
+      });
+    });
+
+    it('does not route a sign-up callback into a stale sign-in protect_check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      // An abandoned sign-in keeps serializing its pending protect_check on the client.
+      const staleSignIn = new SignIn({
+        status: 'needs_protect_check',
+        identifier: 'user@example.com',
+        first_factor_verification: null,
+        second_factor_verification: null,
+        user_data: null,
+        created_session_id: null,
+        created_user_id: null,
+        protect_check: { status: 'pending', token: 'stale-token', sdk_url: 'https://example.com/sdk.js' },
+      } as any as SignInJSON);
+      const completeSignUp = new SignUp({ status: 'complete', created_session_id: 'sess_signup' } as any as SignUpJSON);
+      // The intent-driven reload at the top of the handler is a no-op here; keep the state stable.
+      (staleSignIn as any).reload = vi.fn().mockResolvedValue(staleSignIn);
+      (completeSignUp as any).reload = vi.fn().mockResolvedValue(completeSignUp);
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: staleSignIn,
+          signUp: completeSignUp,
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback({ reloadResource: 'signUp' });
+
+      await waitFor(() => {
+        // Completes the sign-up rather than routing into the stale sign-in's challenge.
+        expect(mockSetActive).toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalledWith('/sign-in#/protect-check');
+      });
+    });
+
+    it('routes a sign-in callback to the protect-check gate', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_protect_check',
+            identifier: 'user@example.com',
+            first_factor_verification: null,
+            second_factor_verification: null,
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+            protect_check: { status: 'pending', token: 'fresh-token', sdk_url: 'https://example.com/sdk.js' },
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/protect-check');
       });
     });
   });
@@ -2962,7 +3530,9 @@ describe('Clerk singleton', () => {
 
     it('uses ui.ClerkUI when provided', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -2975,7 +3545,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUICtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({
@@ -2988,7 +3560,9 @@ describe('Clerk singleton', () => {
 
     it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
-      const mockClerkUICtor = vi.fn(() => mockClerkUIInstance);
+      const mockClerkUICtor = vi.fn(function () {
+        return mockClerkUIInstance;
+      });
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({

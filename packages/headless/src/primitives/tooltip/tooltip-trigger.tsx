@@ -3,7 +3,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipTriggerProps = ComponentProps<'button'>;
@@ -21,12 +21,13 @@ export const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTrigger
 
     const state = { open };
 
-    const defaultProps = {
-      type: 'button' as const,
+    const ownProps = {
+      type: 'button',
       'data-cl-slot': 'tooltip-trigger',
       ref: combinedRef,
-      ...(getReferenceProps() as React.ComponentPropsWithRef<'button'>),
-    };
+    } satisfies DefaultProps<'button'>;
+
+    const defaultProps = { ...ownProps, ...getReferenceProps() };
 
     return renderElement({
       defaultTagName: 'button',

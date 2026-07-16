@@ -2,6 +2,7 @@ export { type DialogProps, DialogRoot as Root } from './dialog-root';
 export { type DialogTriggerProps, DialogTrigger as Trigger } from './dialog-trigger';
 export { type DialogPortalProps, DialogPortal as Portal } from './dialog-portal';
 export { type DialogBackdropProps, DialogBackdrop as Backdrop } from './dialog-backdrop';
+export { type DialogViewportProps, DialogViewport as Viewport } from './dialog-viewport';
 export { type DialogPopupProps, DialogPopup as Popup } from './dialog-popup';
 export { type DialogTitleProps, DialogTitle as Title } from './dialog-title';
 export { type DialogDescriptionProps, DialogDescription as Description } from './dialog-description';

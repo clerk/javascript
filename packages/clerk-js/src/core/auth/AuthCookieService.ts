@@ -9,6 +9,7 @@ import {
   isNetworkError,
   isUnauthenticatedError,
 } from '@clerk/shared/error';
+import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
@@ -18,6 +19,8 @@ import { clerkMissingDevBrowser } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import { Environment } from '../resources/Environment';
+import { Token } from '../resources/Token';
+import { normalizeOrgId, pickFreshestJwt, tokenOiat, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
@@ -37,7 +40,7 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  * and auth from the Clerk instance.
  * This service is responsible to:
  *   - refresh the session cookie using a poller
- *   - refresh the session cookie on tab visibility change
+ *   - refresh the session cookie on tab focus and visibility change
  *   - update the related cookies listening to the `token:update` event
  *   - initialize auth related cookies for development instances (eg __client_uat, __clerk_db_jwt)
  *   - cookie setup for production / development instances
@@ -156,7 +159,7 @@ export class AuthCookieService {
   }
 
   private refreshTokenOnFocus() {
-    window.addEventListener('focus', () => {
+    const refreshIfVisible = () => {
       if (document.visibilityState === 'visible') {
         // Certain data-fetching libraries that refetch on focus use setTimeout(cb, 0) to schedule a task on the event loop.
         // This gives us an opportunity to ensure the session cookie is updated with a fresh token before the fetch occurs, but it needs to
@@ -166,7 +169,15 @@ export class AuthCookieService {
         // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
         void this.refreshSessionToken({ updateCookieImmediately: true });
       }
-    });
+    };
+
+    // `focus` covers top-level tabs (and the multi-tab active-organization handoff added in #3786), but it never fires
+    // inside a cross-origin iframe on tab re-activation unless the frame itself is clicked. `visibilitychange` does
+    // propagate into the iframe, so embedded apps (e.g. a preview pane) still get a fresh cookie before they refetch.
+    window.addEventListener('focus', refreshIfVisible);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', refreshIfVisible);
+    }
   }
 
   private async refreshSessionToken({
@@ -189,8 +200,14 @@ export class AuthCookieService {
   }
 
   private updateSessionCookie(token: string | null) {
-    // Only allow background tabs to update if both session and organization match
-    if (!document.hasFocus() && !this.isCurrentContextActive()) {
+    // Only allow background tabs to update if both session and organization match.
+    // A cross-origin iframe never reports focus even while visible, so treat a visible embedded
+    // frame as eligible to write; top-level multi-tab ownership still keys on `document.hasFocus()`.
+    if (!document.hasFocus() && !this.inVisibleCrossOriginIframe() && !this.isCurrentContextActive()) {
+      return;
+    }
+
+    if (token && this.#shouldDropStaleToken(token)) {
       return;
     }
 
@@ -201,6 +218,51 @@ export class AuthCookieService {
     this.setActiveContextInStorage();
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
+  }
+
+  // Returns true only when `raw` is strictly staler than the SAME session+org current cookie.
+  // Fails open (false) for tokens without oiat, decode failures, cross-context tokens, and an
+  // already-expired current cookie: the cookie enforces monotonicity within one session+org
+  // only, never across a session/org switch.
+  #shouldDropStaleToken(raw: string): boolean {
+    const incoming = this.#decodeToken(raw);
+    if (!incoming || tokenOiat(incoming) == null) {
+      return false;
+    }
+
+    const current = this.#decodeToken(this.sessionCookie.get());
+    if (!current || tokenOiat(current) == null) {
+      return false;
+    }
+
+    // An expired cookie is not a freshness baseline: a valid fresh mint must always be
+    // able to replace it, even when a stale edge read gives it a lower oiat.
+    const currentExp = current.jwt?.claims?.exp;
+    if (typeof currentExp !== 'number' || currentExp <= Math.floor(Date.now() / 1000)) {
+      return false;
+    }
+
+    // Only a same session+org cookie is a comparable freshness baseline; write through otherwise.
+    if (
+      tokenSid(current) !== tokenSid(incoming) ||
+      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
+    ) {
+      return false;
+    }
+
+    return pickFreshestJwt(current, incoming) === current;
+  }
+
+  #decodeToken(raw: string | undefined): Token | null {
+    if (!raw) {
+      return null;
+    }
+    try {
+      const token = new Token({ id: '__session', jwt: raw, object: 'token' });
+      return token.jwt ? token : null;
+    } catch {
+      return null;
+    }
   }
 
   public setClientUatCookieForDevelopmentInstances() {
@@ -256,6 +318,10 @@ export class AuthCookieService {
     } else {
       this.activeCookie.remove();
     }
+  }
+
+  private inVisibleCrossOriginIframe() {
+    return inCrossOriginIframe() && document.visibilityState === 'visible';
   }
 
   private isCurrentContextActive() {

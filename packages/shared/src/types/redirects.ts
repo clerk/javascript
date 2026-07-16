@@ -1,3 +1,4 @@
+import type { HandleOAuthCallbackParams } from './clerk';
 import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
 /** @generateWithEmptyComment */
@@ -75,6 +76,15 @@ export type AuthenticateWithRedirectParams = {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+
+  /**
+   * Internal OAuth callback context, consumed only when an OAuth transport completes the
+   * flow in-process. Ignored by the web redirect/popup paths. Shape matches the params
+   * the prebuilt SSO callback route passes to `handleRedirectCallback`.
+   *
+   * @internal
+   */
+  __internal_callbackParams?: HandleOAuthCallbackParams;
 
   /**
    * @experimental

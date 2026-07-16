@@ -51,10 +51,15 @@ export const hrHR: LocalizationResource = {
       formButtonPrimary__revoke: 'Opozovi ključ',
       formHint: 'Jeste li sigurni da želite izbrisati ovaj tajni ključ?',
       formTitle: 'Opozovi tajni ključ "{{apiKeyName}}"?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Natrag',
   badge__activePlan: 'Aktivan',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Otkazan • Završava {{ date | shortDate('hr-HR') }}",
   badge__currentPlan: 'Trenutni plan',
   badge__default: 'Zadano',
@@ -75,13 +80,15 @@ export const hrHR: LocalizationResource = {
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
   billing: {
+    accountCredit: 'Kredit računa',
     addPaymentMethod__label: 'Dodajte način plaćanja',
     alwaysFree: 'Uvijek besplatno',
     annually: 'Godišnje',
     availableFeatures: 'Dostupne značajke',
     billedAnnually: 'Naplaćuje se godišnje',
-    billedMonthlyOnly: 'Naplaćuje se samo mjesečno',
     billedAnnuallyOnly: 'Naplaćuje se samo godišnje',
+    billedMonthly: undefined,
+    billedMonthlyOnly: 'Naplaćuje se samo mjesečno',
     cancelFreeTrial: 'Otkažite probno razdoblje',
     cancelFreeTrialAccessUntil:
       "Vaše probno razdoblje ostat će aktivno do {{ date | longDate('hr-HR') }}. Nakon toga izgubit ćete pristup značajkama probnog razdoblja. Nećete biti naplaćeni.",
@@ -120,15 +127,14 @@ export const hrHR: LocalizationResource = {
       title__subscriptionSuccessful: 'Uspjeh!',
       title__trialSuccess: 'Probno razdoblje uspješno pokrenuto!',
       totalDueAfterTrial: 'Ukupno za platiti nakon isteka probnog razdoblja za {{days}} dana',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Kredit',
-    prorationCredit: 'Proporcionalni kredit',
-    accountCredit: 'Kredit računa',
     creditRemainder: 'Kredit za preostalo razdoblje vaše trenutne pretplate.',
-    payerCreditRemainder: 'Kredit sa stanja računa.',
     defaultFreePlanActive: 'Trenutno ste na besplatnom planu',
     free: 'Besplatno',
     getStarted: 'Započnite',
+    highlightedPlanBadge: 'Popularno',
     keepFreeTrial: 'Zadrži probno razdoblje',
     keepSubscription: 'Zadrži pretplatu',
     manage: 'Upravljaj',
@@ -139,6 +145,7 @@ export const hrHR: LocalizationResource = {
     monthly: 'Mjesečno',
     pastDue: 'Dospjelo',
     pay: 'Plati {{amount}}',
+    payerCreditRemainder: 'Kredit sa stanja računa.',
     paymentMethod: {
       applePayDescription: {
         annual: 'Godišnje plaćanje',
@@ -154,26 +161,32 @@ export const hrHR: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Načini plaćanja',
-    highlightedPlanBadge: 'Popularno',
     pricingTable: {
       billingCycle: 'Obračunsko razdoblje',
       included: 'Uključeno',
       seatCost: {
-        freeUpToSeats: 'Besplatno do {{endsAfterBlock}} mjesta',
-        upToSeats: 'Do {{endsAfterBlock}} mjesta',
-        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} po mjestu',
-        includedSeats: '{{includedSeats}} mjesta uključeno',
         additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} za dodatna)',
-        unlimitedSeats: 'Neograničen broj mjesta',
+        freeUpToSeats: 'Besplatno do {{endsAfterBlock}} mjesta',
+        includedSeats: '{{includedSeats}} mjesta uključeno',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} po mjestu',
         tooltip: {
-          freeForUpToSeats: 'Besplatno za do {{endsAfterBlock}} mjesta.',
           additionalSeatsEach: 'Dodatna mjesta su {{feePerBlockAmount}}/{{period}} svako.',
           firstSeatsIncludedInPlan: 'Prvih {{endsAfterBlock}} mjesta uključeno je u plan.',
+          freeForUpToSeats: 'Besplatno za do {{endsAfterBlock}} mjesta.',
         },
+        unlimitedSeats: 'Neograničen broj mjesta',
+        upToSeats: 'Do {{endsAfterBlock}} mjesta',
       },
     },
+    proratedDiscount: undefined,
+    prorationCredit: 'Proporcionalni kredit',
     reSubscribe: 'Ponovno se pretplatite',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
     seats: 'Mjesta',
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Pogledaj sve značajke',
     startFreeTrial: 'Pokreni probno razdoblje',
     startFreeTrial__days: 'Pokreni {{days}}-dnevno probno razdoblje',
@@ -194,12 +207,14 @@ export const hrHR: LocalizationResource = {
       trialStartedOn: 'Probno razdoblje pokrenuto',
     },
     subtotal: 'Međuzbroj',
+    subtotalRenewal: undefined,
     switchPlan: 'Prebaci na ovaj plan',
     switchToAnnual: 'Prebaci na godišnje',
-    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{currency}}{{price}} / godišnje',
+    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{price}} / godišnje',
     switchToMonthly: 'Prebaci na mjesečno',
-    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{currency}}{{price}} / mjesečno',
+    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{price}} / mjesečno',
     totalDue: 'Ukupno za platiti',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Ukupno za platiti danas',
     viewFeatures: 'Pogledaj značajke',
     viewPayment: 'Pogledaj plaćanje',
@@ -208,6 +223,417 @@ export const hrHR: LocalizationResource = {
     yearPerUnit: 'Godina po {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Obratite se administratoru vaše organizacije kako biste nadogradili svoja dopuštenja.',
       title: 'Nemate dopuštenje za upravljanje jedinstvenom prijavom (SSO)',
@@ -215,39 +641,125 @@ export const hrHR: LocalizationResource = {
     navbar: {
       title: 'Konfiguriraj jedinstvenu prijavu (SSO)',
     },
-    selectProviderStep: {
-      title: 'Odaberite pružatelja',
-      subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
-      saml: {
-        groupLabel: 'SAML',
-        okta: 'Okta Workforce',
-        customSaml: 'Prilagođeni SAML pružatelj',
+    organizationDomainsStep: {
+      domainCard: {
+        badge__expired: undefined,
+        badge__unverified: 'Nepotvrđeno',
+        badge__verified: 'Potvrđeno',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Host / Naziv',
+          instructions:
+            'Dodajte ovaj TXT zapis kod svog DNS pružatelja. Automatski ćemo ga potvrditi čim zapis postane aktivan.',
+          typeLabel: 'Vrsta',
+          valueLabel: 'Vrijednost',
+        },
+        verifiedAtLabel: "Potvrđeno {{ date | shortDate('hr-HR') }}",
+        verifyAgainButton: undefined,
       },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Dodaj {{domain}}',
+        messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
+      },
+      formButtonPrimary__add: 'Dodaj',
+      formFieldInputPlaceholder__domain: 'Dodaj domenu',
+      formFieldLabel__domain: 'Domena',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: 'Dodajte i potvrdite vlasništvo nad domenama koje vaša organizacija koristi za prijavu.',
+      title: 'Dodaj SSO domene',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      saml: {
+        customSaml: 'Prilagođeni SAML pružatelj',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Odaberite pružatelja za kojeg ćete postaviti SSO.',
+      title: 'Odaberite pružatelja',
       warning: 'Nakon odabira pružatelja ne možete ga ponovno mijenjati dok konfiguracija ne završi',
     },
-    verifyEmailDomainStep: {
-      title: 'Potvrdi e-mail adresu',
-      subtitle: 'Potvrdite e-mail adresu na kojoj želite omogućiti poslovnu vezu.',
-      addEmailAddress: {
-        formTitle: 'Treba nam vaš e-mail',
-        formSubtitle: 'Za početak ćemo trebati vašu e-mail adresu',
-        inputPlaceholder: 'name@company.com',
-        inputLabel: 'E-mail adresa',
-      },
-      emailCode: {
-        formTitle: 'Potvrdite svoju e-mail adresu',
-        formSubtitle: 'Unesite verifikacijski kod poslan na {{identifier}}',
-        resendButton: 'Niste primili kod? Pošalji ponovno',
-        verified: {
-          title: 'Primili smo vaš e-mail',
-          subtitle: 'Potvrdili ste svoju e-mail adresu sljedećim e-mailom',
-          inputLabel: 'Potvrđena e-mail adresa',
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
         },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
       },
-      domainTaken: {
-        title: 'Ova domena ({{domain}}) već ima SSO vezu',
-        subtitle: 'Kontaktirajte administratora aplikacije kako biste dobili pristup putem postojeće veze.',
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
       },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -294,8 +806,8 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Naziv organizacije',
   formFieldInputPlaceholder__organizationSlug: 'moja-organizacija',
   formFieldInputPlaceholder__password: 'Unesite svoju lozinku',
-  formFieldInputPlaceholder__signUpPassword: 'Kreirajte lozinku',
   formFieldInputPlaceholder__phoneNumber: 'Unesite svoj telefonski broj',
+  formFieldInputPlaceholder__signUpPassword: 'Kreirajte lozinku',
   formFieldInputPlaceholder__username: 'Unesite svoje korisničko ime',
   formFieldInput__emailAddress_format: 'Primjer formata: ime@primjer.com',
   formFieldLabel__apiKey: 'API ključ',
@@ -326,6 +838,9 @@ export const hrHR: LocalizationResource = {
   formFieldLabel__role: 'Uloga',
   formFieldLabel__signOutOfOtherSessions: 'Odjavi se sa svih ostalih uređaja',
   formFieldLabel__username: 'Korisničko ime',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Odjava',
     title: 'Prijavljeni ste kao {{identifier}}',
@@ -335,6 +850,22 @@ export const hrHR: LocalizationResource = {
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',
   membershipRole__guestMember: 'Gost',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
   organizationList: {
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
@@ -352,9 +883,19 @@ export const hrHR: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski prijedlozi',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Bez automatskog učlanjenja',
     badge__unverified: 'Nepotvrđeno',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nema povijesti plaćanja',
         notFound: 'Pokušaj plaćanja nije pronađen',
@@ -389,8 +930,8 @@ export const hrHR: LocalizationResource = {
       statementsSection: {
         empty: 'Nema izvoda za prikaz',
         itemCaption__paidForPlan: 'Plaćeno za {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Proporcionalni kredit za djelomično korištenje prethodne pretplate',
         itemCaption__payerCredit: 'Kredit sa stanja računa',
+        itemCaption__proratedCredit: 'Proporcionalni kredit za djelomično korištenje prethodne pretplate',
         itemCaption__subscribedAndPaidForPlan: 'Pretplaćeno i plaćeno za {{plan}} {{period}} plan',
         notFound: 'Izvod nije pronađen',
         tableHeader__amount: 'Iznos',
@@ -402,6 +943,11 @@ export const hrHR: LocalizationResource = {
         actionLabel__manageSubscription: 'Upravljaj',
         actionLabel__newSubscription: 'Pretplatite se na plan',
         actionLabel__switchPlan: 'Promijeni plan',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Uredi',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Datum početka',
@@ -424,6 +970,7 @@ export const hrHR: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Pozivnice se nisu mogle poslati. Već postoje pozivnice na čekanju za sljedeće e-mail adrese: {{email_addresses}}.',
       formButtonPrimary__continue: 'Pošalji pozivnice',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Odaberi ulogu',
       subtitle: 'Unesite ili zalijepite jednu ili više e-mail adresa, odvojenih razmakom ili zarezom.',
       successMessage: 'Pozivnice uspješno poslane',
@@ -483,6 +1030,7 @@ export const hrHR: LocalizationResource = {
       description: 'Upravljajte svojom organizacijom.',
       general: 'Općenito',
       members: 'Članovi',
+      security: undefined,
       title: 'Organizacija',
     },
     plansPage: {
@@ -529,6 +1077,32 @@ export const hrHR: LocalizationResource = {
       messageLine2: 'Korisnici se nakon ovoga neće moći automatski pridružiti organizaciji.',
       successMessage: '{{domain}} je uklonjena.',
       title: 'Ukloni domenu',
+    },
+    securityPage: {
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
     },
     start: {
       headerTitle__general: 'Općenito',
@@ -654,6 +1228,9 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite kod generiran vašom aplikacijom za autentifikaciju za nastavak',
       title: 'Potrebna verifikacija',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -800,6 +1377,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Za nastavak, unesite verifikacijski kod poslan na vaš telefon',
       title: 'Provjerite svoj telefon',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Resetiraj lozinku',
       requiredMessage: 'Iz sigurnosnih razloga, potrebno je resetirati vašu lozinku.',
@@ -905,6 +1488,12 @@ export const hrHR: LocalizationResource = {
       resendButton: 'Niste primili kod? Pošalji ponovno',
       subtitle: 'Unesite verifikacijski kod poslan na vaš telefon',
       title: 'Potvrdite svoj telefon',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Prijavi se',
@@ -1053,6 +1642,7 @@ export const hrHR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     api_key_name_already_exists: 'Naziv API ključa već postoji.',
     api_key_usage_exceeded:
@@ -1103,8 +1693,11 @@ export const hrHR: LocalizationResource = {
     form_username_invalid_length: 'Vaše korisničko ime mora imati između {{min_length}} i {{max_length}} znakova.',
     form_username_needs_non_number_char: 'Vaše korisničko ime mora sadržavati najmanje jedan nebrojčani znak.',
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_exists_for_enterprise_connection:
@@ -1131,6 +1724,14 @@ export const hrHR: LocalizationResource = {
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: 'Nije pronađeno proširenje za Web3 novčanik. Molimo instalirajte jedno za nastavak.',
     web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
@@ -1183,6 +1784,9 @@ export const hrHR: LocalizationResource = {
     action__openUserMenu: 'Otvori korisnički izbornik',
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
+    label__accountActions: 'Akcije računa',
+    label__activeSessions: 'Aktivne sesije',
+    label__userButtonPopover: 'Ploča računa',
   },
   userProfile: {
     apiKeysPage: {
@@ -1205,6 +1809,15 @@ export const hrHR: LocalizationResource = {
       title__codelist: 'Rezervni kodovi',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nema povijesti plaćanja',
         notFound: 'Pokušaj plaćanja nije pronađen',
@@ -1239,8 +1852,8 @@ export const hrHR: LocalizationResource = {
       statementsSection: {
         empty: 'Nema izvoda za prikaz',
         itemCaption__paidForPlan: 'Plaćeno za {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Proporcionalni kredit za djelomično korištenje prethodne pretplate',
         itemCaption__payerCredit: 'Kredit sa stanja računa',
+        itemCaption__proratedCredit: 'Proporcionalni kredit za djelomično korištenje prethodne pretplate',
         itemCaption__subscribedAndPaidForPlan: 'Pretplaćeno i plaćeno za {{plan}} {{period}} plan',
         notFound: 'Izvod nije pronađen',
         tableHeader__amount: 'Iznos',
@@ -1252,6 +1865,7 @@ export const hrHR: LocalizationResource = {
         actionLabel__manageSubscription: 'Upravljaj',
         actionLabel__newSubscription: 'Pretplatite se na plan',
         actionLabel__switchPlan: 'Promijeni plan',
+        overview: undefined,
         tableHeader__edit: 'Uredi',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Datum početka',

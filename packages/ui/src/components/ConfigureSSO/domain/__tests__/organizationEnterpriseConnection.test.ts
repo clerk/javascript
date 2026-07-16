@@ -1,12 +1,14 @@
 import type {
   EmailAddressResource,
   EnterpriseConnectionResource,
+  OrganizationDomainResource,
   SamlAccountConnectionResource,
   UserResource,
 } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {
+  areAllOrganizationDomainsVerified,
   connectionBackingEmail,
   isEnterpriseConnectionConfigured,
   organizationEnterpriseConnection,
@@ -122,21 +124,6 @@ describe('organizationEnterpriseConnection', () => {
     });
   });
 
-  describe('isPrimaryEmailVerified', () => {
-    it('undefined email → false', () => {
-      expect(derive({ primaryEmail: undefined }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('null email → false', () => {
-      expect(derive({ primaryEmail: null }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('unverified email → false', () => {
-      expect(derive({ primaryEmail: makeEmail('unverified') }).isPrimaryEmailVerified).toBe(false);
-    });
-    it('verified email → true', () => {
-      expect(derive({ primaryEmail: makeEmail('verified') }).isPrimaryEmailVerified).toBe(true);
-    });
-  });
-
   describe('hasSuccessfulTestRun', () => {
     it('false input → false', () => {
       expect(derive({ hasSuccessfulTestRun: false }).hasSuccessfulTestRun).toBe(false);
@@ -146,10 +133,75 @@ describe('organizationEnterpriseConnection', () => {
     });
   });
 
+  describe('status', () => {
+    it('undefined connection → unconfigured', () => {
+      expect(derive({ connection: undefined }).status).toBe('unconfigured');
+    });
+    it('null connection → unconfigured', () => {
+      expect(derive({ connection: null }).status).toBe('unconfigured');
+    });
+    it('created but unconfigured connection → in_progress', () => {
+      expect(derive({ connection: makeConnection({ samlConnection: null }) }).status).toBe('in_progress');
+    });
+    it('partially configured connection → in_progress', () => {
+      expect(
+        derive({
+          connection: makeConnection({
+            samlConnection: makeSamlConnection({ idpSsoUrl: 'https://idp.example.com/sso' }),
+          }),
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('configured but not yet successfully tested → in_progress', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: false }),
+          hasSuccessfulTestRun: false,
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('successfully tested but not minimally configured → in_progress', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: null, active: false }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('in_progress');
+    });
+    it('configured + successfully tested + not active → inactive', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: false }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('inactive');
+    });
+    it('active connection → active', () => {
+      expect(derive({ connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: true }) }).status).toBe(
+        'active',
+      );
+    });
+    it('active wins over configured + successfully tested', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: fullyConfiguredSaml, active: true }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('active');
+    });
+    it('active wins even for an unconfigured, untested connection', () => {
+      expect(
+        derive({
+          connection: makeConnection({ samlConnection: null, active: true }),
+          hasSuccessfulTestRun: false,
+        }).status,
+      ).toBe('active');
+    });
+  });
+
   it('is pure: identical inputs produce a deep-equal entity', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml, active: true });
-    const primaryEmail = makeEmail('verified');
-    const inputs = { connection, primaryEmail, hasSuccessfulTestRun: true } as const;
+    const inputs = { connection, hasSuccessfulTestRun: true } as const;
 
     expect(organizationEnterpriseConnection(inputs)).toEqual(organizationEnterpriseConnection(inputs));
   });
@@ -166,8 +218,8 @@ describe('organizationEnterpriseConnection', () => {
       hasConnection: true,
       isActive: true,
       hasMinimumConfiguration: true,
-      isPrimaryEmailVerified: true,
       hasSuccessfulTestRun: true,
+      status: 'active',
     });
   });
 });
@@ -198,6 +250,37 @@ describe('isEnterpriseConnectionConfigured', () => {
   it('matches the derived `hasMinimumConfiguration` field', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml });
     expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
+  });
+});
+
+describe('areAllOrganizationDomainsVerified', () => {
+  const makeDomain = (status: 'verified' | 'unverified' | null): OrganizationDomainResource =>
+    ({
+      id: `dmn_${status}`,
+      name: 'acme.com',
+      ownershipVerification: status ? { status } : null,
+    }) as OrganizationDomainResource;
+
+  it('undefined domains → false', () => {
+    expect(areAllOrganizationDomainsVerified(undefined)).toBe(false);
+  });
+  it('null domains → false', () => {
+    expect(areAllOrganizationDomainsVerified(null)).toBe(false);
+  });
+  it('empty list → false', () => {
+    expect(areAllOrganizationDomainsVerified([])).toBe(false);
+  });
+  it('a single verified domain → true', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified')])).toBe(true);
+  });
+  it('every domain verified → true', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('verified')])).toBe(true);
+  });
+  it('any unverified domain → false', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('unverified')])).toBe(false);
+  });
+  it('domain without ownership verification → false', () => {
+    expect(areAllOrganizationDomainsVerified([makeDomain(null)])).toBe(false);
   });
 });
 

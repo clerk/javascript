@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { cva, type VariantProps } from '../cva';
-import { useMosaicTheme } from '../MosaicProvider';
+import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import type { RecipeVariantProps } from '../slot-recipe';
 
-export const inputStyles = cva(theme => ({
+export const inputRecipe = defineSlotRecipe(theme => ({
+  slot: 'input',
   base: {
     display: 'block',
     height: theme.spacing(8),
@@ -29,13 +30,19 @@ export const inputStyles = cva(theme => ({
       fontWeight: 500,
       color: 'inherit',
     },
-    '&:focus-visible': {
+    _focusVisible: {
       borderColor: theme.color.primary,
       boxShadow: `0 0 0 3px ${theme.alpha('primary', 20)}`,
     },
-    '&[aria-invalid="true"]': {
+    _invalid: {
       borderColor: theme.color.primary,
       boxShadow: `0 0 0 3px ${theme.alpha('primary', 15)}`,
+    },
+    _disabled: {
+      pointerEvents: 'none',
+      cursor: 'not-allowed',
+      backgroundColor: theme.alpha('primary', 5),
+      opacity: 0.5,
     },
   },
   variants: {
@@ -43,30 +50,27 @@ export const inputStyles = cva(theme => ({
       sm: { height: theme.spacing(7), paddingInline: theme.spacing(2), ...theme.text('xs') },
       md: { height: theme.spacing(8), paddingInline: theme.spacing(2.5) },
     },
-    disabled: {
-      false: null,
-      true: {
-        pointerEvents: 'none',
-        cursor: 'not-allowed',
-        backgroundColor: theme.alpha('primary', 5),
-        opacity: 0.5,
-      },
-    },
   },
-  defaultVariants: { size: 'md', disabled: false },
+  defaultVariants: { size: 'md' },
 }));
 
-export type InputProps = Omit<React.ComponentPropsWithRef<'input'>, 'size'> & VariantProps<typeof inputStyles>;
+declare module '../registry' {
+  interface MosaicSlotRegistry {
+    input: true;
+  }
+}
+
+export type InputProps = Omit<React.ComponentPropsWithRef<'input'>, 'size'> & RecipeVariantProps<typeof inputRecipe>;
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(props, ref) {
   const { size, disabled, sx, ...rest } = props;
-  const theme = useMosaicTheme();
+  const { root } = useRecipe(inputRecipe, { variants: { size }, state: { disabled: !!disabled }, sx });
   return (
     <input
       ref={ref}
       disabled={disabled || false}
       {...rest}
-      css={inputStyles({ size, disabled, sx })(theme)}
+      {...root}
     />
   );
 });

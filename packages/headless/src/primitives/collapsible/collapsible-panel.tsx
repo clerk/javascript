@@ -3,8 +3,10 @@
 import { useMergeRefs } from '@floating-ui/react';
 import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react';
 
+import { useAnimationsFinished } from '../../hooks/use-animations-finished';
 import { useTransition } from '../../hooks/use-transition';
 import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { resetLayoutStyles } from '../../utils/reset-layout-styles';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsiblePanelProps = ComponentProps<'div'>;
@@ -26,10 +28,12 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
       hasBeenClosed.current = true;
     }
 
-    const { mounted, transitionProps } = useTransition({
+    const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
       ref: panelRef as RefObject<HTMLElement>,
     });
+
+    const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);
 
     useLayoutEffect(() => {
       if (!mounted) {
@@ -41,7 +45,12 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
         return;
       }
 
+      // Reset flex/grid alignment before measuring so non-default alignment
+      // can't shrink the reported scroll dimensions.
+      let restoreLayoutStyles: (() => void) | undefined;
       const measure = () => {
+        restoreLayoutStyles?.();
+        restoreLayoutStyles = resetLayoutStyles(panel);
         setHeight(panel.scrollHeight);
         setWidth(panel.scrollWidth);
       };
@@ -51,8 +60,39 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
       const ro = new ResizeObserver(measure);
       ro.observe(panel, { box: 'border-box' });
 
-      return () => ro.disconnect();
+      return () => {
+        ro.disconnect();
+        restoreLayoutStyles?.();
+      };
     }, [mounted]);
+
+    // Once the open animation settles, drop the measured pixel dimensions so the
+    // panel flows naturally with its content (CSS vars omitted → auto).
+    useLayoutEffect(() => {
+      if (!open || !mounted) {
+        return;
+      }
+      runOnAnimationsFinished(() => {
+        setHeight(undefined);
+        setWidth(undefined);
+      });
+    }, [open, mounted, runOnAnimationsFinished]);
+
+    // Re-pin to measured pixel values when closing starts so the exit
+    // transition animates from concrete dimensions (auto can't interpolate).
+    useLayoutEffect(() => {
+      if (open || transitionStatus !== 'ending') {
+        return;
+      }
+      const panel = panelRef.current;
+      if (!panel) {
+        return;
+      }
+      const restoreLayoutStyles = resetLayoutStyles(panel);
+      setHeight(panel.scrollHeight);
+      setWidth(panel.scrollWidth);
+      return restoreLayoutStyles;
+    }, [open, transitionStatus]);
 
     const state = { open };
 
