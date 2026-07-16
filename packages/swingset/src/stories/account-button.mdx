@@ -25,7 +25,7 @@ examples). A `useAccountButtonController()` that reads live Clerk resources is a
 The all-in-one `AccountButton` renders the trigger and popup from a single prop-driven call:
 
 ```tsx
-import { AccountButton } from '@clerk/ui/mosaic/components/account-button.view';
+import { AccountButton } from '@clerk/ui/mosaic/account/account-button.view';
 
 <AccountButton
   status='ready'
@@ -54,7 +54,7 @@ import {
   AccountButtonRoot,
   AccountButtonTrigger,
   AccountButtonPopup,
-} from '@clerk/ui/mosaic/components/account-button.view';
+} from '@clerk/ui/mosaic/account/account-button.view';
 
 <AccountButtonRoot {...data} {...callbacks}>
   <AccountButtonTrigger />

@@ -4,10 +4,10 @@ import type { PopoverProps } from '@clerk/headless/popover';
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import { Icon } from '../components/icon';
 import type { IconName } from '../icons/registry';
 import { Popover } from '../primitives/popover';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
-import { Icon } from './icon';
 
 // Prototype accent (Clerk brand purple) for the plan badge and the Upgrade link. The neutral
 // Mosaic palette has no accent token yet; swap these for a token once one lands.

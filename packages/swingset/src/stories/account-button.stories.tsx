@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { AccountButton, type AccountButtonProps } from '@clerk/ui/mosaic/components/account-button.view';
+import { AccountButton, type AccountButtonProps } from '@clerk/ui/mosaic/account/account-button.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,7 +10,7 @@ export { default as __source } from './account-button.stories?raw';
 export const meta: StoryMeta = {
   group: 'Account',
   title: 'AccountButton',
-  source: 'packages/ui/src/mosaic/components/account-button.view.tsx',
+  source: 'packages/ui/src/mosaic/account/account-button.view.tsx',
 };
 
 // The view is presentational, so the fixtures drive every state. All callbacks are wired as
