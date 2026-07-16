@@ -652,6 +652,8 @@ export const taIN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'ஹோஸ்ட் / பெயர்',
           instructions:
             'இந்த TXT பதிவை உங்கள் DNS வழங்குநரிடம் சேர்க்கவும். பதிவு செயலில் வந்தவுடன் நாங்கள் தானாகவே சரிபார்ப்போம்.',

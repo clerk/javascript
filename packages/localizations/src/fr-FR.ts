@@ -652,6 +652,8 @@ export const frFR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Hôte / Nom',
           instructions:
             'Ajoutez cet enregistrement TXT à votre fournisseur DNS. Nous le vérifierons automatiquement une fois l’enregistrement actif.',

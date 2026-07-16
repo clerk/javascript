@@ -644,6 +644,8 @@ export const plPL: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Nazwa',
           instructions:
             'Dodaj ten rekord TXT u swojego dostawcy DNS. Zweryfikujemy go automatycznie, gdy rekord stanie się aktywny.',

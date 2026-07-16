@@ -645,6 +645,8 @@ export const bgBG: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Име',
           instructions:
             'Добавете този TXT запис към вашия DNS доставчик. Ще потвърдим автоматично, след като записът стане активен.',

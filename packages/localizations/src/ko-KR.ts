@@ -648,6 +648,8 @@ export const koKR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: '호스트 / 이름',
           instructions: '이 TXT 레코드를 DNS 공급자에 추가하세요. 레코드가 활성화되면 자동으로 확인합니다.',
           typeLabel: '유형',

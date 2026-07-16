@@ -650,6 +650,8 @@ export const ptBR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Nome',
           instructions:
             'Adicione este registro TXT ao seu provedor de DNS. Verificaremos automaticamente assim que o registro estiver ativo.',

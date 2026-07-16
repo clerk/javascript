@@ -651,6 +651,8 @@ export const teIN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'హోస్ట్ / పేరు',
           instructions:
             'ఈ TXT రికార్డ్‌ను మీ DNS ప్రొవైడర్‌కు జోడించండి. రికార్డ్ సక్రియం అయిన వెంటనే మేము స్వయంచాలకంగా ధృవీకరిస్తాము.',

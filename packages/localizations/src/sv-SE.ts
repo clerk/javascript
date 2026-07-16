@@ -644,6 +644,8 @@ export const svSE: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Värd / Namn',
           instructions:
             'Lägg till den här TXT-posten hos din DNS-leverantör. Vi verifierar automatiskt när posten är aktiv.',

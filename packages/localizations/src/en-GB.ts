@@ -644,6 +644,8 @@ export const enGB: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Name',
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
           typeLabel: 'Type',

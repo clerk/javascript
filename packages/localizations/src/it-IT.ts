@@ -650,6 +650,8 @@ export const itIT: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Nome',
           instructions:
             'Aggiungi questo record TXT al tuo provider DNS. Verificheremo automaticamente non appena il record sarà attivo.',

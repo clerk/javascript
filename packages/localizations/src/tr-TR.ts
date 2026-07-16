@@ -644,6 +644,8 @@ export const trTR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Ana bilgisayar / Ad',
           instructions:
             'Bu TXT kaydını DNS sağlayıcınıza ekleyin. Kayıt yayına girer girmez otomatik olarak doğrulayacağız.',

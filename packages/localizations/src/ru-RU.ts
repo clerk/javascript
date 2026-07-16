@@ -644,6 +644,8 @@ export const ruRU: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Имя',
           instructions:
             'Добавьте эту TXT-запись у своего DNS-провайдера. Мы проверим её автоматически, как только запись станет активной.',

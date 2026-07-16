@@ -644,6 +644,8 @@ export const kkKZ: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Атау',
           instructions:
             'Бұл TXT жазбасын DNS провайдеріңізге қосыңыз. Жазба белсенді болған бойда біз оны автоматты түрде растаймыз.',

@@ -650,6 +650,8 @@ export const viVN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Máy chủ / Tên',
           instructions:
             'Thêm bản ghi TXT này vào nhà cung cấp DNS của bạn. Chúng tôi sẽ tự động xác minh khi bản ghi hoạt động.',

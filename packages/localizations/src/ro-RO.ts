@@ -650,6 +650,8 @@ export const roRO: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Gazdă / Nume',
           instructions:
             'Adaugă această înregistrare TXT la furnizorul tău DNS. O vom verifica automat de îndată ce înregistrarea devine activă.',

@@ -651,6 +651,8 @@ export const nbNO: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Vert / Navn',
           instructions:
             'Legg til denne TXT-posten hos DNS-leverandøren din. Vi verifiserer automatisk når posten er aktiv.',

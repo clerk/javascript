@@ -644,6 +644,8 @@ export const daDK: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Vært / Navn',
           instructions: 'Tilføj denne TXT-post hos din DNS-udbyder. Vi bekræfter automatisk, så snart posten er aktiv.',
           typeLabel: 'Type',

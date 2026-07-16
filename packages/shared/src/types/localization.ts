@@ -1433,6 +1433,8 @@ export type __internal_LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {
           instructions: LocalizationValue;
+          pendingHint: LocalizationValue;
+          checkNowButton: LocalizationValue;
           typeLabel: LocalizationValue;
           hostLabel: LocalizationValue;
           valueLabel: LocalizationValue;

@@ -649,6 +649,8 @@ export const faIR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'میزبان / نام',
           instructions:
             'این رکورد TXT را به ارائه‌دهنده DNS خود اضافه کنید. به‌محض فعال شدن رکورد، به‌طور خودکار آن را تأیید می‌کنیم.',

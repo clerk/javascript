@@ -651,6 +651,8 @@ export const caES: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Amfitrió / Nom',
           instructions:
             'Afegeix aquest registre TXT al teu proveïdor de DNS. El verificarem automàticament un cop el registre estigui actiu.',

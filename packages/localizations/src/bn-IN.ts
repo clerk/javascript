@@ -650,6 +650,8 @@ export const bnIN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'হোস্ট / নাম',
           instructions:
             'আপনার DNS প্রদানকারীতে এই TXT রেকর্ডটি যোগ করুন। রেকর্ডটি সক্রিয় হলে আমরা স্বয়ংক্রিয়ভাবে যাচাই করব।',
