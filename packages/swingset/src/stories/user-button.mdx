@@ -25,7 +25,7 @@ examples). A `useUserButtonController()` that reads live Clerk resources is a dr
 The all-in-one `UserButton` renders the trigger and popup from a single prop-driven call:
 
 ```tsx
-import { UserButton } from '@clerk/ui/mosaic/components/user-button.view';
+import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButton
   status='ready'
@@ -54,7 +54,7 @@ import {
   UserButtonRoot,
   UserButtonTrigger,
   UserButtonPopup,
-} from '@clerk/ui/mosaic/components/user-button.view';
+} from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButtonRoot {...data} {...callbacks}>
   <UserButtonTrigger />
