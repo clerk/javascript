@@ -41,7 +41,8 @@ Skills are Claude Code specific. Cursor does not read this directory; it uses `.
 
 ## Skills in this repo
 
-| Skill            | Use it for                                                                                                                              |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `clerk-monorepo` | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
-| `mosaic`         | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
+| Skill            | Use it for                                                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clerk-monorepo` | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.                                                      |
+| `mosaic`         | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification).                                           |
+| `mosaic-stylex`  | Authoring StyleX for Mosaic: `stylex.create`/`props`, `--cl-*` tokens, the stable class + cascade-layer override contract, markers, build, and migrating off Emotion/`useRecipe`. |
