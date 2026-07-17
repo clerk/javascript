@@ -203,5 +203,55 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
       await user.deleteIfExists();
     });
+
+    test('can sign in as a different account from the two-step verification step', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const user = u.services.users.createFakeUser({
+        fictionalEmail: true,
+        withPhoneNumber: true,
+        withPassword: true,
+      });
+      await u.services.users.createBapiUser(user);
+
+      // Enroll SMS as a second factor using the user's existing phone number.
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: user.email, password: user.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.page.goToRelative('/page-protected');
+      await u.page.getByText(/set up two-step verification/i).waitFor({ state: 'visible' });
+      await u.page.getByRole('button', { name: /sms code/i }).click();
+      const formattedPhoneNumber = stringPhoneNumber(user.phoneNumber);
+      await u.page.getByRole('button', { name: formattedPhoneNumber }).click();
+      await u.page.getByText(/save these backup codes/i).waitFor({ state: 'visible', timeout: 10000 });
+      await u.po.signIn.continue();
+      await u.page.waitForAppUrl('/page-protected');
+      await u.po.expect.toBeSignedIn();
+
+      // Sign out and back in so the sign-in flow now requires the second factor.
+      await u.page.signOut();
+      await u.page.context().clearCookies();
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.getIdentifierInput().fill(user.email);
+      await u.po.signIn.setInstantPassword(user.password);
+      await u.po.signIn.continue();
+
+      // We are now on the two-step verification (SMS second factor) step, with no way to
+      // complete it if this is the wrong account.
+      await u.page.getByText(/check your phone/i).waitFor({ state: 'visible' });
+
+      // The "Sign in as a different account" action abandons the attempt and returns to the start.
+      const differentAccount = u.page.getByRole('link', { name: /sign in as a different account/i });
+      await expect(differentAccount).toBeVisible();
+      await differentAccount.click();
+
+      // Back on the sign-in start, where a different account can be used.
+      await expect(u.po.signIn.getIdentifierInput()).toBeVisible();
+
+      await user.deleteIfExists();
+    });
   },
 );
