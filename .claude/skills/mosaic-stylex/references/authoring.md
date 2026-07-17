@@ -192,6 +192,59 @@ const styles = stylex.create({
 });
 ```
 
+## CSS reset (box-sizing, margin/padding, borders)
+
+Mosaic is an **embedded widget**, not a whole-app framework, so it must **not**
+ship a global reset (`*`, `html`, `body`, `h1`, `button`, …) the way astryx's
+`reset.css` does — that would restyle the host app's entire DOM. Two scoped moves
+replace it:
+
+**1. Per-component base reset in StyleX (primary).** StyleX styles only the
+element it's on, and Mosaic components are self-contained, so put the reset in each
+component's `base`. Factor the repeated bits into one shared `reset` object and
+compose it:
+
+```tsx
+const reset = stylex.create({
+  box: { boxSizing: 'border-box', margin: 0, padding: 0 },
+});
+
+const styles = stylex.create({
+  base: { display: 'inline-flex', borderRadius: radius['--cl-radius-md'] /* … */ },
+});
+
+stylex.props(reset.box, styles.base /* variants */); // reset first, so real styles win
+```
+
+This is what the POC's `button.tsx` already does implicitly — it sets
+`borderWidth`/`borderStyle`/`borderColor` explicitly rather than leaning on a
+global reset.
+
+**2. A _scoped_ reset stylesheet for the genuinely universal bits.** `box-sizing`
+and the border reset are things you don't want to hand-repeat on every element.
+StyleX can't express a `*`/descendant selector, so ship this as **plain hand-written
+CSS**, scoped to the Mosaic subtree and zero-specificity via `:where()`:
+
+```css
+@layer cl-reset {
+  :where([data-cl-scope] *, [data-cl-scope] *::before, [data-cl-scope] *::after) {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid; /* now a component adds a border with just border-width + border-color */
+  }
+}
+```
+
+The Mosaic root carries `data-cl-scope` (the same root that sets `color-scheme` +
+`container-type`). `:where()` keeps specificity 0 so component `base` styles and
+consumer overrides always win; the `@layer` keeps it below everything else.
+
+Two notes carried from astryx: the **border reset** (`border-width: 0; border-style: solid`)
+is a real ergonomic win — borders become `borderWidth` + `borderColor` only. And
+for layout-critical components, **also** assert `boxSizing: 'border-box'` in the
+StyleX `base` (belt-and-suspenders) so they're correct even if a consumer strips
+the reset sheet. Never reach for a global `*`/`body` reset.
+
 ## Accepting style overrides from a parent
 
 Type a passthrough prop as `StyleXStyles` and place it **last** so it overrides:
