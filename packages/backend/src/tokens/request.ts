@@ -631,6 +631,17 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
+    // Machine JWTs pass verifyToken() but must not be accepted as session tokens (mirrors header path).
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (isMachineJwt(authenticateContext.sessionTokenInCookie!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenIATBeforeClientUAT, '');
     }

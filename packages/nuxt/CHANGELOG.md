@@ -1,5 +1,14 @@
 # @clerk/nuxt
 
+## 2.6.19
+
+### Patch Changes
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716), [`e657d99`](https://github.com/clerk/javascript/commit/e657d994d938194cfa02da329707bf012873c01b)]:
+  - @clerk/shared@4.25.5
+  - @clerk/backend@3.11.7
+  - @clerk/vue@2.4.17
+
 ## 2.6.18
 
 ### Patch Changes
