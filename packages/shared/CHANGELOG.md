@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.25.5
+
+### Patch Changes
+
+- Escape `<`, `>`, and `/` when serializing the Clerk auth state into SSR `<script>` tags, preventing a `</script>` sequence inside user-controllable session claims from breaking out of the script element (stored XSS). The embedded JSON still parses to identical values on the client. ([#9166](https://github.com/clerk/javascript/pull/9166)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 4.25.4
 
 ### Patch Changes
