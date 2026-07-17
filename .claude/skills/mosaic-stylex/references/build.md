@@ -120,7 +120,7 @@ this split is inherent (StyleX can't emit a `*`/`:where()` reset):
 - **Ship a `.css.d.ts` stub** (`export {};`) next to each CSS export so TypeScript
   allows `import '@clerk/ui/mosaic.css'` without a "cannot find module" error — the
   babel/rolldown JS build ignores `.css` files, so the stub provides the type.
-- **`sideEffects` must include `**/\*.css`\*\* so bundlers never drop the import.
+- `sideEffects` **must list the `.css` glob** so bundlers never drop the import.
 - **Layers come from each file wrapping its own `@layer`** plus import order:
   reset (`@layer cl-reset`) → component (`@layer` from `useCSSLayers`) → consumer.
 
