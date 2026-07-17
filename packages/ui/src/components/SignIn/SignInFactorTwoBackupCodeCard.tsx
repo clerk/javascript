@@ -15,6 +15,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
@@ -45,6 +46,9 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     return signIn
       .attemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
       .then(res => {
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'complete':
             if (isResettingPassword(res) && res.createdSessionId) {

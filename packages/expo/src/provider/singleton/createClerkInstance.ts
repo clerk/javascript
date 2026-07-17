@@ -44,6 +44,9 @@ type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> &
   publishableKey: string;
 };
 
+const RESOURCE_RETRY_MAX_DELAY_MS = 30_000;
+const RESOURCE_RETRY_MAX_EXPONENT = 4;
+
 function hasOwnOption<Key extends keyof BuildClerkOptions>(
   options: BuildClerkOptions | undefined,
   key: Key,
@@ -53,6 +56,7 @@ function hasOwnOption<Key extends keyof BuildClerkOptions>(
 
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
+let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
 
@@ -110,6 +114,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
     if (!__internal_clerk || hasConfigChanged) {
       assertValidProxyUrl(proxyUrl);
 
+      __internal_cancelResourceRetries?.();
+      __internal_cancelResourceRetries = undefined;
+
       if (hasConfigChanged) {
         void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
@@ -118,7 +125,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       const saveToken = (key: string, token: string) => __internal_tokenCache.saveToken(key, token);
 
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
-      __internal_clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
+      const clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
+      __internal_clerk = clerk;
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
@@ -162,17 +170,64 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         const isClerkNetworkError = (err: unknown): boolean => isClerkRuntimeError(err) && err.code === 'network_error';
 
         if (createResourceCache) {
-          const retryInitilizeResourcesFromFAPI = async () => {
-            try {
-              await __internal_clerk?.__internal_reloadInitialResources();
-            } catch (err: unknown) {
-              // Retry after 3 seconds if the error is a network error or a 5xx error
-              if (isClerkNetworkError(err) || !is4xxError(err)) {
-                // Retry after 2 seconds if the error is a network error
-                // Retry after 10 seconds if the error is a 5xx FAPI error
-                const timeout = isClerkNetworkError(err) ? 2000 : 10000;
-                setTimeout(() => void retryInitilizeResourcesFromFAPI(), timeout);
+          let resourceRetryTimer: ReturnType<typeof setTimeout> | undefined;
+          let resourceRetryCancelled = false;
+          let resourceRetryInFlight = false;
+          let resourceRetryFailureCount = 0;
+          let initialResourcesLoaded = false;
+
+          __internal_cancelResourceRetries = () => {
+            resourceRetryCancelled = true;
+            if (resourceRetryTimer !== undefined) {
+              clearTimeout(resourceRetryTimer);
+              resourceRetryTimer = undefined;
+            }
+          };
+
+          const scheduleResourceRetry = (timeout: number) => {
+            if (
+              resourceRetryCancelled ||
+              initialResourcesLoaded ||
+              resourceRetryTimer !== undefined ||
+              resourceRetryInFlight
+            ) {
+              return;
+            }
+
+            resourceRetryTimer = setTimeout(() => {
+              resourceRetryTimer = undefined;
+              if (resourceRetryCancelled || initialResourcesLoaded) {
+                return;
               }
+              void retryInitializeResourcesFromFAPI();
+            }, timeout);
+          };
+
+          const retryInitializeResourcesFromFAPI = async () => {
+            if (resourceRetryCancelled || initialResourcesLoaded || resourceRetryInFlight) {
+              return;
+            }
+
+            resourceRetryInFlight = true;
+            let nextRetryTimeout: number | undefined;
+            try {
+              await clerk.__internal_reloadInitialResources();
+              initialResourcesLoaded = true;
+            } catch (err: unknown) {
+              if (isClerkNetworkError(err) || !is4xxError(err)) {
+                const initialRetryTimeout = isClerkNetworkError(err) ? 2000 : 10000;
+                nextRetryTimeout = Math.min(
+                  initialRetryTimeout * 2 ** resourceRetryFailureCount,
+                  RESOURCE_RETRY_MAX_DELAY_MS,
+                );
+                resourceRetryFailureCount = Math.min(resourceRetryFailureCount + 1, RESOURCE_RETRY_MAX_EXPONENT);
+              }
+            } finally {
+              resourceRetryInFlight = false;
+            }
+
+            if (nextRetryTimeout !== undefined) {
+              scheduleResourceRetry(nextRetryTimeout);
             }
           };
 
@@ -210,7 +265,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             if (!environment || !client) {
               environment = DUMMY_CLERK_ENVIRONMENT_RESOURCE;
               client = DUMMY_CLERK_CLIENT_RESOURCE;
-              setTimeout(() => void retryInitilizeResourcesFromFAPI(), 3000);
+              scheduleResourceRetry(3000);
             }
             return { client, environment };
           };

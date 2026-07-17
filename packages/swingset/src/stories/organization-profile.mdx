@@ -8,7 +8,16 @@ The full Organization Profile AIO — lays out the organization panels under a t
   name='Default'
   storyModule={OrganizationProfileStories}
   composition={[
-    { name: 'OrganizationProfileGeneral', href: '/panels/organization-profile-general', layer: 'Panels' },
+    {
+      name: 'OrganizationProfileGeneralPanel',
+      href: '/organization/organization-profile-general-panel',
+      layer: 'Organization',
+    },
+    {
+      name: 'OrganizationProfileApiKeysPanel',
+      href: '/organization/organization-profile-api-keys-panel',
+      layer: 'Organization',
+    },
     { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
   ]}
 />

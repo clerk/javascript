@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
@@ -412,6 +416,12 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       noAvailableWallets: LocalizationValue;
     };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -593,6 +603,12 @@ export type __internal_LocalizationResource = {
     web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
     };
   };
   reverification: {
@@ -2021,11 +2037,20 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  action_blocked: LocalizationValue;
   avatar_file_type_invalid: LocalizationValue;
   avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
+  protect_check_aborted: LocalizationValue;
+  protect_check_already_resolved: LocalizationValue;
+  protect_check_execution_failed: LocalizationValue;
+  protect_check_invalid_script: LocalizationValue;
+  protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_script_load_failed: LocalizationValue;
+  protect_check_timed_out: LocalizationValue;
+  protect_check_unsupported_environment: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;

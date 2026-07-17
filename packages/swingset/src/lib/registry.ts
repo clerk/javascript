@@ -8,13 +8,10 @@ import {
   meta as cardComponentMeta,
 } from '../stories/card.component.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
-import {
-  Default as DeleteOrganizationDefault,
-  meta as deleteOrganizationMeta,
-} from '../stories/delete-organization.stories';
 import { Default as DestructiveDefault, meta as destructiveMeta } from '../stories/destructive.stories';
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
+import { meta as drawerMeta } from '../stories/drawer.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Default as HeadingDefault,
@@ -36,19 +33,39 @@ import {
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
-import {
-  Default as LeaveOrganizationDefault,
-  meta as leaveOrganizationMeta,
-} from '../stories/leave-organization.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
 import {
-  Default as OrganizationProfileGeneralDefault,
-  meta as organizationProfileGeneralMeta,
-} from '../stories/organization-profile-general.stories';
+  Default as OrganizationProfileApiKeysPanelDefault,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
+  Default as OrganizationProfileDeleteSectionDefault,
+  meta as organizationProfileDeleteSectionMeta,
+} from '../stories/organization-profile-delete-section.stories';
+import {
+  Default as OrganizationProfileDomainsSectionDefault,
+  meta as organizationProfileDomainsSectionMeta,
+} from '../stories/organization-profile-domains-section.stories';
+import {
+  Default as OrganizationProfileGeneralPanelDefault,
+  meta as organizationProfileGeneralPanelMeta,
+} from '../stories/organization-profile-general-panel.stories';
+import {
+  Default as OrganizationProfileLeaveSectionDefault,
+  meta as organizationProfileLeaveSectionMeta,
+} from '../stories/organization-profile-leave-section.stories';
+import {
+  Default as OrganizationProfileMembersPanelDefault,
+  meta as organizationProfileMembersPanelMeta,
+} from '../stories/organization-profile-members-panel.stories';
+import {
+  Default as OrganizationProfileProfileSectionDefault,
+  meta as organizationProfileProfileSectionMeta,
+} from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
@@ -66,12 +83,34 @@ import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
-const leaveOrganizationModule: StoryModule = { meta: leaveOrganizationMeta, Default: LeaveOrganizationDefault };
-const deleteOrganizationModule: StoryModule = { meta: deleteOrganizationMeta, Default: DeleteOrganizationDefault };
+const organizationProfileLeaveSectionModule: StoryModule = {
+  meta: organizationProfileLeaveSectionMeta,
+  Default: OrganizationProfileLeaveSectionDefault,
+};
+const organizationProfileDeleteSectionModule: StoryModule = {
+  meta: organizationProfileDeleteSectionMeta,
+  Default: OrganizationProfileDeleteSectionDefault,
+};
+const organizationProfileProfileSectionModule: StoryModule = {
+  meta: organizationProfileProfileSectionMeta,
+  Default: OrganizationProfileProfileSectionDefault,
+};
+const organizationProfileDomainsSectionModule: StoryModule = {
+  meta: organizationProfileDomainsSectionMeta,
+  Default: OrganizationProfileDomainsSectionDefault,
+};
 const organizationProfileModule: StoryModule = { meta: organizationProfileMeta, Default: OrganizationProfileDefault };
-const organizationProfileGeneralModule: StoryModule = {
-  meta: organizationProfileGeneralMeta,
-  Default: OrganizationProfileGeneralDefault,
+const organizationProfileGeneralPanelModule: StoryModule = {
+  meta: organizationProfileGeneralPanelMeta,
+  Default: OrganizationProfileGeneralPanelDefault,
+};
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+};
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Default: OrganizationProfileMembersPanelDefault,
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
@@ -108,6 +147,7 @@ const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
+const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
@@ -119,13 +159,15 @@ const tooltipModule: StoryModule = { meta: tooltipMeta };
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
-  // AIO
+  // Organization
   organizationProfileModule,
-  // Panels
-  organizationProfileGeneralModule,
-  // Sections
-  leaveOrganizationModule,
-  deleteOrganizationModule,
+  organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
+  organizationProfileProfileSectionModule,
+  organizationProfileDomainsSectionModule,
+  organizationProfileLeaveSectionModule,
+  organizationProfileDeleteSectionModule,
   // Blocks
   destructiveModule,
   // Components
@@ -142,6 +184,7 @@ export const registry: StoryModule[] = [
   autocompleteModule,
   collapsibleModule,
   dialogModule,
+  drawerModule,
   fileUploadModule,
   menuModule,
   otpModule,

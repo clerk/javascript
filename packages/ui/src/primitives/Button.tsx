@@ -40,7 +40,7 @@ const { applyVariants, filterProps } = createVariants(
             padding: `${theme.space.$1} ${theme.space.$3}`,
           },
           sm: {
-            padding: `${theme.space.$1x5} ${theme.space.$3}`,
+            padding: `${theme.space.$1x75} ${theme.space.$3}`,
           },
           md: {
             padding: `${theme.space.$2x5} ${theme.space.$5}`,

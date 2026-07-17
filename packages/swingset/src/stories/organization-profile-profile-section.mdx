@@ -1,0 +1,15 @@
+import * as OrganizationProfileProfileSectionStories from './organization-profile-profile-section.stories';
+
+# Organization Profile Profile Section
+
+A section that owns the open/editing/saving state for an organization's name and slug, wiring a `Dialog` around the edit form. Edits live as machine-owned drafts that fall through to the committed organization values, so the form seeds itself and closes on a successful save without a syncing effect.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileProfileSectionStories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+  ]}
+/>

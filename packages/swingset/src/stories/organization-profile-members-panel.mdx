@@ -1,0 +1,17 @@
+import * as OrganizationProfileMembersPanelStories from './organization-profile-members-panel.stories';
+
+# Organization Profile Members Panel
+
+The Members tab panel of the Organization Profile — lists an organization's active members and owns the search and remove flows. It gates on `org:sys_memberships:read` to view and `org:sys_memberships:manage` to remove a member.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileMembersPanelStories}
+  composition={[
+    {
+      name: 'OrganizationProfile',
+      href: '/organization/organization-profile',
+      layer: 'Organization',
+    },
+  ]}
+/>

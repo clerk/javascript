@@ -1,5 +1,4 @@
 /** @jsxImportSource @emotion/react */
-import type { MosaicIconRenderer } from '@clerk/ui/mosaic/appearance';
 import type { IconProps } from '@clerk/ui/mosaic/components/icon';
 import { Icon, iconRecipe } from '@clerk/ui/mosaic/components/icon';
 import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
@@ -75,26 +74,30 @@ export function Names() {
   );
 }
 
-// Mosaic's styling (sizing/color) applies to the override just like the built-in glyph, so the
-// replacement only needs its viewBox + paths — spread `props` to receive the sizing className and
-// `data-cl-slot`. Defined at module scope (not inline in the story) to keep a stable component type.
-const CircleGlyph: MosaicIconRenderer = props => (
-  <svg
-    {...props}
-    viewBox='0 0 20 20'
-    fill='currentColor'
-  >
-    <circle
-      cx={10}
-      cy={10}
-      r={6}
-    />
-  </svg>
-);
-
 export function Override() {
   return (
-    <MosaicProvider appearance={{ icons: { 'chevron-right': CircleGlyph } }}>
+    <MosaicProvider
+      appearance={{
+        // Overrides are elements now, not render functions: Mosaic injects its sizing className and
+        // `data-cl-slot` into the element via cloneElement, so the replacement only needs its viewBox
+        // + paths. Passing an element (vs a function) also lets overrides be supplied from a Server
+        // Component, since elements serialize across the RSC boundary.
+        icons: {
+          'chevron-right': (
+            <svg
+              viewBox='0 0 20 20'
+              fill='currentColor'
+            >
+              <circle
+                cx={10}
+                cy={10}
+                r={6}
+              />
+            </svg>
+          ),
+        },
+      }}
+    >
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <Icon name='chevron-right' />
         <Icon name='chevron-left' />
