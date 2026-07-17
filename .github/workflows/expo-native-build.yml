@@ -31,7 +31,7 @@ env:
 jobs:
   native-build:
     if: ${{ github.head_ref != 'changeset-release/main' }}
-    name: Expo ${{ matrix.expo-sdk }} / ${{ matrix.platform }}
+    name: Expo ${{ matrix.expo-sdk }} Build / ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
