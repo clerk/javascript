@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  LIVE demo — renders the actual built Button component (../../dist-mosaic-x/index.js).
+  Build first: `pnpm build:mosaic-x`, then serve the package dir over HTTP:
+    cd packages/ui && python3 -m http.server 4321
+  and open http://localhost:4321/src/mosaic-x/demo-live.html
+  (react / react-dom / @stylexjs/stylex are loaded from esm.sh via the import map,
+  so this page needs network access.)
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>mosaic-x — live component demo</title>
+
+  <!-- Consumer owns the layer: import our sheet into `components`, override from `overrides`. -->
+  <style>
+    @layer components, overrides;
+    @import url('../../dist-mosaic-x/mosaic.css') layer(components);
+
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem;
+    }
+
+    h2 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Flip this on with the checkbox to see consumer overrides win by layer order.
+         Custom properties inherit, so setting --cl-primary on body reaches every
+         button; the rules live in `overrides` so they beat the `components` layer. */
+    @layer overrides {
+      body.overrides-on {
+        --cl-primary: rebeccapurple;
+      }
+
+      body.overrides-on .cl-button {
+        border-radius: 9999px;
+      }
+    }
+  </style>
+
+  <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.3.1",
+          "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+          "@stylexjs/stylex": "https://esm.sh/@stylexjs/stylex@0.19.0"
+        }
+      }
+    </script>
+</head>
+
+<body>
+  <label style="display: block; margin-bottom: 1rem">
+    <input id="toggle" type="checkbox" /> apply consumer overrides (purple + pill)
+  </label>
+  <div id="root"></div>
+
+  <script type="module">
+    import React from 'react';
+    import {createRoot} from 'react-dom/client';
+    import {Button} from '../../dist-mosaic-x/index.js';
+
+    const h = React.createElement;
+    const Row = (label, kids) => h('div', null, h('h2', null, label), h('div', {className: 'row'}, kids));
+
+    function App() {
+      return h(
+        React.Fragment,
+        null,
+        Row('filled', [
+          h(Button, {key: 1, intent: 'primary'}, 'Primary'),
+          h(Button, {key: 2, intent: 'destructive'}, 'Destructive'),
+        ]),
+        Row('outline', [h(Button, {key: 1, variant: 'outline'}, 'Outline')]),
+        Row('sizes', [
+          h(Button, {key: 1, size: 'sm'}, 'Small'),
+          h(Button, {key: 2, size: 'md'}, 'Medium'),
+        ]),
+        Row('state', [h(Button, {key: 1, disabled: true}, 'Disabled')]),
+      );
+    }
+
+    createRoot(document.getElementById('root')).render(h(App));
+
+    document.getElementById('toggle').addEventListener('change', e => {
+      document.body.classList.toggle('overrides-on', e.target.checked);
+    });
+  </script>
+</body>
+
+</html>

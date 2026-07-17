@@ -1,0 +1,64 @@
+<!doctype html>
+<!--
+  POC demo. Build first: `pnpm build:mosaic-x`, then open this file in a browser.
+  Shows the intended consumer model: the consumer imports our stylesheet INTO A
+  LAYER THEY CONTROL, then puts their own overrides in a later layer (or
+  unlayered). Their rules win by cascade-layer order — no StyleX/JS on the
+  consumer side, and layer precedence is the consumer's concern, not ours.
+  The button markup below is copied verbatim from the server-rendered POC output.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>mosaic-x StyleX POC</title>
+  <style>
+    /* ---- CONSUMER CSS (plain, no StyleX) ---- */
+
+    /* Consumer declares layer order and imports our sheet into `components`. */
+    @layer components, overrides;
+    @import url('../../dist-mosaic-x/mosaic.css') layer(components);
+
+    /* Consumer overrides live in a later layer → always win over `components`. */
+    @layer overrides {
+
+      /* 1. Override a design token globally. */
+      :root {
+        --cl-primary: rebeccapurple;
+      }
+
+      /* 2. Target the stable class directly. */
+      .cl-button {
+        border-radius: 9999px;
+      }
+
+      /* 3. Variant-scoped override via the data-* attribute the component emits. */
+      .cl-button[data-variant='outline'] {
+        border-color: rebeccapurple;
+        color: rebeccapurple;
+      }
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <button type="button"
+    class="cl-button x3nfvp2 x6s0dn4 xl56j7k x19rnl8h xzmjytj xmkeg23 x1y0btm7 x9r1u3d xk50ysn xjb2p0i x1ypdohk x1qsmvhx xx6bhzk x1a2a7pz xy8msr7 x1hl8ikr x1hew001 x1kdqmna x13bm0ie xlgzno x1495f9z x16lbfrg xkpwil5 xp7d87r"
+    data-intent="primary" data-variant="filled" data-size="md">
+    Primary (purple + pill)
+  </button>
+  <button type="button"
+    class="cl-button x3nfvp2 x6s0dn4 xl56j7k x19rnl8h xzmjytj xmkeg23 x1y0btm7 xk50ysn xjb2p0i x1ypdohk x1qsmvhx xx6bhzk x1a2a7pz xy8msr7 x1hl8ikr xjbqb8w x1slpqh1 x1hzhwjc x1495f9z x16lbfrg xkpwil5 xp7d87r"
+    data-intent="primary" data-variant="outline" data-size="md">
+    Outline (purple border)
+  </button>
+</body>
+
+</html>

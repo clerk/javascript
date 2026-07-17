@@ -1,0 +1,2 @@
+# StyleX migration POC build output (regenerate with `pnpm build:mosaic-x`)
+dist-mosaic-x
