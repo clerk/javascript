@@ -103,6 +103,40 @@ Source distribution (shipping `.stylex.ts` and requiring every consumer to run t
 StyleX plugin) is **not viable** — consumers are arbitrary Next/Vite/etc. apps we
 don't control.
 
+### Two CSS files, produced two different ways
+
+astryx ships the reset and the compiled component CSS as **separate files**, and
+this split is inherent (StyleX can't emit a `*`/`:where()` reset):
+
+| File              | How it's produced                                                                       | Exported as                     |
+| ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- |
+| reset (plain CSS) | Hand-authored, **shipped verbatim from `src/`** — not compiled                          | `./reset.css` → `src/reset.css` |
+| component CSS     | Compiled: babel/rollup runs the StyleX plugin over all source, wraps output in `@layer` | `./mosaic.css` → `dist/…`       |
+
+- astryx's compiled sheet comes from a custom post-build script (`build-css.mjs`:
+  glob sources → `@babel/core` + `@stylexjs/babel-plugin` → concat rules → wrap in
+  `@layer astryx-base` → write `dist/astryx.css`). The Clerk POC does the equivalent
+  with `@stylexjs/rollup-plugin` inside tsdown emitting `mosaic.css`.
+- **Ship a `.css.d.ts` stub** (`export {};`) next to each CSS export so TypeScript
+  allows `import '@clerk/ui/mosaic.css'` without a "cannot find module" error — the
+  babel/rolldown JS build ignores `.css` files, so the stub provides the type.
+- **`sideEffects` must include `**/\*.css`\*\* so bundlers never drop the import.
+- **Layers come from each file wrapping its own `@layer`** plus import order:
+  reset (`@layer cl-reset`) → component (`@layer` from `useCSSLayers`) → consumer.
+
+### Bundling the reset for Clerk
+
+The reset is a **hand-authored, scoped, static CSS file** (`:where([data-cl-scope] *)`,
+see `authoring.md` → CSS reset) shipped verbatim — same mechanism as astryx, but
+scoped instead of global. Two delivery choices astryx doesn't need:
+
+1. **Separate file** the consumer imports (`import '@clerk/ui/mosaic-reset.css'`) —
+   cleanest for npm consumers, keeps the layer explicit.
+2. **Prepend the `@layer cl-reset {…}` block into `mosaic.css`** at build so there's
+   a single sheet — simpler for the **clerk-js runtime-injection** path (one blob to
+   inject, no second load). Prepending keeps it in the lowest layer regardless of
+   source order.
+
 ### Open build questions (from the migration spike)
 
 - **clerk-js load path.** clerk-js is a runtime-injected rspack UMD bundle, not an
