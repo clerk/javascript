@@ -249,6 +249,54 @@ const noPhysicalCssProperties = {
   },
 };
 
+// Mosaic components expose a stable, consumer-facing class (e.g. `.cl-button`)
+// as the first argument to the `cx()` styling helper. Consumers target that
+// class in their own CSS, so it is a public contract: it must be an explicit
+// string literal in `cl-<name>` kebab-case, never derived from a variable or
+// identifier that could be renamed/minified out from under consumers.
+const mosaicStableClass = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Require cx() to receive a stable cl-* class literal as its first argument',
+      recommended: false,
+    },
+    messages: {
+      missing: 'cx() must receive a stable class literal (e.g. cx("cl-button", ...)) as its first argument.',
+      notLiteral:
+        'The first argument to cx() must be a string literal (e.g. "cl-button"), not {{ got }}. Consumers target this class in their CSS, so it must stay stable and greppable rather than derived from a variable.',
+      badFormat: 'Stable class "{{ value }}" must be cl-<name> in lowercase kebab-case (e.g. "cl-button").',
+    },
+    schema: [],
+  },
+  create(context) {
+    const STABLE_CLASS = /^cl-[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+    return {
+      CallExpression(node) {
+        if (node.callee.type !== 'Identifier' || node.callee.name !== 'cx') {
+          return;
+        }
+        const first = node.arguments[0];
+        if (!first) {
+          context.report({ node, messageId: 'missing' });
+          return;
+        }
+        if (first.type !== 'Literal' || typeof first.value !== 'string') {
+          context.report({
+            node: first,
+            messageId: 'notLiteral',
+            data: { got: first.type === 'SpreadElement' ? 'a spread' : 'a non-literal expression' },
+          });
+          return;
+        }
+        if (!STABLE_CLASS.test(first.value)) {
+          context.report({ node: first, messageId: 'badFormat', data: { value: first.value } });
+        }
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -325,6 +373,7 @@ export default tseslint.config([
           'no-global-object': noGlobalObject,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'mosaic-stable-class': mosaicStableClass,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -559,6 +608,13 @@ export default tseslint.config([
             "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
         },
       ],
+    },
+  },
+  {
+    name: 'packages/ui/mosaic-x',
+    files: ['packages/ui/src/mosaic-x/**/*.{ts,tsx}'],
+    rules: {
+      'custom-rules/mosaic-stable-class': 'error',
     },
   },
   {

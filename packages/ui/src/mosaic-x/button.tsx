@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { cx } from './props';
 import { colors, radius, space } from './tokens.stylex';
 
 // Helper to keep spacing math readable. `space['--cl-spacing']` compiles to
@@ -68,12 +69,6 @@ export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
   fullWidth?: boolean;
 }
 
-// Stable, hand-authored class every consumer can target: `.cl-button { … }`.
-// StyleX never attaches rules to this class; it exists purely as a targeting
-// hook. Consumer rules on it are unlayered and therefore beat StyleX's
-// `@layer`-wrapped atomic classes (see mosaic-stylex-migration.md).
-const STABLE_CLASS = 'cl-button';
-
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     intent = 'primary',
@@ -87,27 +82,28 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   },
   ref,
 ) {
-  const atomic = stylex.props(
-    styles.base,
-    variant === 'filled' && intent === 'primary' && styles.filledPrimary,
-    variant === 'filled' && intent === 'destructive' && styles.filledDestructive,
-    variant === 'outline' && styles.outlinePrimary,
-    size === 'sm' ? styles.sizeSm : styles.sizeMd,
-    fullWidth && styles.fullWidth,
-    disabled && styles.disabled,
-  );
-
   return (
     <button
       ref={ref}
       type='button'
       disabled={disabled}
-      // Order: stable class → consumer className → StyleX atomic classes.
-      className={[STABLE_CLASS, className, atomic.className].filter(Boolean).join(' ')}
-      style={atomic.style}
       data-intent={intent}
       data-variant={variant}
       data-size={size}
+      {...cx(
+        // Stable, consumer-facing targeting class: `.cl-button { … }`. Keep this a
+        // literal (enforced by the custom-rules/mosaic-stable-class lint rule) — it
+        // is a public styling contract, not an internal identifier.
+        'cl-button',
+        className,
+        styles.base,
+        variant === 'filled' && intent === 'primary' && styles.filledPrimary,
+        variant === 'filled' && intent === 'destructive' && styles.filledDestructive,
+        variant === 'outline' && styles.outlinePrimary,
+        size === 'sm' ? styles.sizeSm : styles.sizeMd,
+        fullWidth && styles.fullWidth,
+        disabled && styles.disabled,
+      )}
       {...rest}
     >
       {children}
