@@ -1,5 +1,6 @@
 import type { Clerk } from '@clerk/clerk-js';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { ClerkRuntimeError } from '@clerk/shared/error';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { TokenCache } from '../../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
@@ -7,6 +8,7 @@ import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
 const mocks = vi.hoisted(() => {
   return {
     constructorSpy: vi.fn(),
+    requestInitialResources: vi.fn<() => Promise<void>>(),
   };
 });
 
@@ -31,9 +33,16 @@ class MockClerk {
   }
 
   addListener = vi.fn();
+  __internal_reloadInitialResources = () => mocks.requestInitialResources();
+  __internal_getCachedResources?: () => Promise<{ client: unknown; environment: unknown }>;
   __internal_onBeforeRequest = vi.fn();
   __internal_onAfterResponse = vi.fn();
 }
+
+const createUnavailableResourceCache = () => ({
+  get: () => Promise.resolve(null),
+  set: () => Promise.resolve(),
+});
 
 const loadCreateClerkInstance = async () => {
   const mod = await import('../createClerkInstance');
@@ -44,6 +53,7 @@ describe('createClerkInstance', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    mocks.requestInitialResources.mockResolvedValue(undefined);
   });
 
   test('passes proxyUrl to the native Clerk constructor', async () => {
@@ -383,5 +393,109 @@ describe('createClerkInstance', () => {
 
     expect(initialTokenCache.saveToken).not.toHaveBeenCalled();
     expect(latestTokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'fresh-token');
+  });
+
+  describe('initial resource recovery', () => {
+    const setupUnavailableResources = async () => {
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        __experimental_resourceCache: createUnavailableResourceCache,
+      }) as unknown as MockClerk;
+
+      return { clerk, getClerkInstance };
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    test('keeps one FAPI recovery attempt active across repeated cache misses', async () => {
+      mocks.requestInitialResources.mockImplementation(() => new Promise(() => {}));
+
+      const { clerk } = await setupUnavailableResources();
+
+      const cachedResources = await Promise.all([
+        clerk.__internal_getCachedResources?.(),
+        clerk.__internal_getCachedResources?.(),
+      ]);
+
+      expect(cachedResources).toEqual([
+        { client: expect.any(Object), environment: expect.any(Object) },
+        { client: expect.any(Object), environment: expect.any(Object) },
+      ]);
+
+      await vi.advanceTimersByTimeAsync(3_000);
+
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not retry a failed recovery after the instance is replaced', async () => {
+      mocks.requestInitialResources.mockRejectedValue(
+        new ClerkRuntimeError('FAPI unavailable', { code: 'network_error' }),
+      );
+
+      const { clerk, getClerkInstance } = await setupUnavailableResources();
+
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+
+      getClerkInstance({ publishableKey: 'pk_test_second' });
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not start another FAPI recovery while one is still pending', async () => {
+      mocks.requestInitialResources.mockImplementation(() => new Promise(() => {}));
+
+      const { clerk } = await setupUnavailableResources();
+
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(3_000);
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(3_000);
+
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+    });
+
+    test('backs off failed FAPI recovery attempts without waiting more than 30 seconds', async () => {
+      mocks.requestInitialResources.mockRejectedValue(
+        new ClerkRuntimeError('FAPI unavailable', { code: 'network_error' }),
+      );
+
+      const { clerk } = await setupUnavailableResources();
+
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+
+      const retryDelays = [2_000, 4_000, 8_000, 16_000, 30_000, 30_000];
+      for (const [index, retryDelay] of retryDelays.entries()) {
+        await vi.advanceTimersByTimeAsync(retryDelay);
+        expect(mocks.requestInitialResources).toHaveBeenCalledTimes(index + 2);
+      }
+    });
+
+    test('stops recovering after the initial resources load', async () => {
+      mocks.requestInitialResources.mockResolvedValue(undefined);
+
+      const { clerk } = await setupUnavailableResources();
+
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+
+      await clerk.__internal_getCachedResources?.();
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
+    });
   });
 });

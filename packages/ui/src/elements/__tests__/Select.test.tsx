@@ -95,6 +95,122 @@ describe('Select', () => {
     expect(listbox).not.toHaveAttribute('aria-labelledby');
   });
 
+  it('opens the listbox when ArrowDown is pressed on the focused trigger', async () => {
+    const user = userEvent.setup();
+    renderSelect(
+      <Select
+        options={options}
+        value={null}
+        onChange={vi.fn()}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Select an option' });
+    button.focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(await screen.findByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('opens the listbox when ArrowUp is pressed on the focused trigger', async () => {
+    const user = userEvent.setup();
+    renderSelect(
+      <Select
+        options={options}
+        value={null}
+        onChange={vi.fn()}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Select an option' });
+    button.focus();
+    await user.keyboard('{ArrowUp}');
+
+    expect(await screen.findByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('navigates and selects an option with the keyboard', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderSelect(
+      <Select
+        options={options}
+        value={null}
+        onChange={onChange}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Select an option' });
+    button.focus();
+    await user.keyboard('{ArrowDown}');
+    await screen.findByRole('listbox');
+    // Opening highlights the first option; ArrowDown advances to the second.
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(onChange).toHaveBeenCalledWith(options[1]);
+  });
+
+  it('exposes the active option through aria-activedescendant on the listbox (select mode)', async () => {
+    const user = userEvent.setup();
+    renderSelect(
+      <Select
+        options={options}
+        value={null}
+        onChange={vi.fn()}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Select an option' });
+    expect(button).toHaveAttribute('aria-haspopup', 'listbox');
+
+    button.focus();
+    await user.keyboard('{ArrowDown}');
+
+    const listbox = await screen.findByRole('listbox');
+    const activeId = listbox.getAttribute('aria-activedescendant');
+    expect(activeId).toBeTruthy();
+
+    const activeOption = activeId ? document.getElementById(activeId) : null;
+    expect(activeOption).toHaveAttribute('role', 'option');
+    // The searchbox combobox role only applies to the searchable variant.
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  });
+
+  it('marks the search input as a combobox controlling the listbox (combobox mode)', async () => {
+    const user = userEvent.setup();
+    renderSelect(
+      <Select
+        options={options}
+        value={null}
+        onChange={vi.fn()}
+        searchPlaceholder='Search'
+        comparator={(term, option) => (option.label ?? '').toLowerCase().includes(term.toLowerCase())}
+      >
+        <SelectButton />
+        <SelectOptionList />
+      </Select>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Select an option' }));
+
+    const listbox = await screen.findByRole('listbox');
+    const combobox = screen.getByRole('combobox');
+
+    expect(combobox).toHaveAttribute('aria-controls', listbox.id);
+    expect(combobox).toHaveAttribute('aria-autocomplete', 'list');
+    expect(combobox).toHaveAttribute('aria-expanded', 'true');
+    // In combobox mode the active descendant lives on the input, not the listbox.
+    expect(listbox).not.toHaveAttribute('aria-activedescendant');
+
+    combobox.focus();
+    await user.keyboard('{ArrowDown}');
+
+    const activeId = combobox.getAttribute('aria-activedescendant');
+    expect(activeId).toBeTruthy();
+    const activeOption = activeId ? document.getElementById(activeId) : null;
+    expect(activeOption).toHaveAttribute('role', 'option');
+  });
+
   it('preserves an explicit listbox aria-labelledby', async () => {
     const user = userEvent.setup();
     renderSelect(
