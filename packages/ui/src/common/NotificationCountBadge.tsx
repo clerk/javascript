@@ -1,6 +1,7 @@
 import { formatToCompactNumber } from '@/utils/intl';
 
-import { Box, Flex, localizationKeys, NotificationBadge, useLocalizations } from '../customizables';
+import { Flex, localizationKeys, NotificationBadge, useLocalizations } from '../customizables';
+import { Skeleton } from '../elements/Skeleton';
 import { usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
@@ -39,17 +40,11 @@ export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
       ]}
     >
       {isLoading ? (
-        <Box
-          as='span'
-          aria-hidden
+        <Skeleton
           sx={t => ({
             height: t.space.$4,
             width: t.space.$5,
             borderRadius: t.radii.$lg,
-            backgroundColor: t.colors.$neutralAlpha100,
-            animation: prefersReducedMotion
-              ? 'none'
-              : `${animations.loadingPulse} 2s ${t.transitionTiming.$slowBezier} infinite`,
           })}
         />
       ) : (

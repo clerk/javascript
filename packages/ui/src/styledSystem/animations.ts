@@ -38,8 +38,9 @@ const fadeOut = keyframes`
   100% { opacity: 0; }
 `;
 
-const loadingPulse = keyframes`
-  50% { opacity: 0.5; }
+const loadingShimmer = keyframes`
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 `;
 
 const inAnimation = keyframes`
@@ -147,5 +148,5 @@ export const animations = {
   inDelayAnimation,
   outAnimation,
   notificationAnimation,
-  loadingPulse,
+  loadingShimmer,
 };

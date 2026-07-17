@@ -510,6 +510,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'notificationBadge',
   'buttonArrowIcon',
   'spinner',
+  'skeleton',
 
   'apiKeys',
   'apiKeysHeader',
