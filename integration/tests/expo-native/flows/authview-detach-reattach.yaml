@@ -1,0 +1,36 @@
+# Dismiss the native AuthView mid-flow and reopen it: the native view must
+# survive detach/reattach and still complete a sign-in afterwards. Dismissal
+# is the platform-native gesture: Android's system back button (doubling as
+# the back-dismisses-AuthView regression), iOS's sheet Close control
+# (clerk-ios exposes the stable clerk.dismissButton identifier).
+appId: com.clerk.exponativebuildfixture
+name: AuthView survives detach and reattach
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- extendedWaitUntil:
+    visible: 'Welcome! Sign in to continue\.?'
+    timeout: 25000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          id: 'clerk.dismissButton'
+- extendedWaitUntil:
+    visible:
+      id: 'open-auth-view-button'
+    timeout: 15000
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml
