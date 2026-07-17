@@ -244,6 +244,18 @@ describe('AccountButton (connected)', () => {
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
   });
 
+  it('accepting a suggestion accepts it, revalidates, and closes', async () => {
+    renderAccountButton();
+    const user = await open();
+    const suggestion = userSuggestions.data[0];
+
+    await user.click(screen.getByRole('button', { name: 'Join' }));
+
+    await waitFor(() => expect(suggestion.accept).toHaveBeenCalledTimes(1));
+    expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
   it('navigating to manage the organization navigates and leaves the popover open', async () => {
     renderAccountButton();
     const user = await open();
@@ -251,6 +263,27 @@ describe('AccountButton (connected)', () => {
     await user.click(screen.getByRole('button', { name: 'Settings' }));
 
     expect(navigate).toHaveBeenCalledWith('/org-profile');
+    expect(popup()).toBeInTheDocument();
+  });
+
+  it('navigating to manage the account (personal mode) navigates and leaves the popover open', async () => {
+    organization = null;
+    renderAccountButton();
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: 'Manage account' }));
+
+    expect(navigate).toHaveBeenCalledWith('/user-profile');
+    expect(popup()).toBeInTheDocument();
+  });
+
+  it('creating an organization navigates and leaves the popover open', async () => {
+    renderAccountButton();
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: 'Add organization' }));
+
+    expect(navigate).toHaveBeenCalledWith('/create-org');
     expect(popup()).toBeInTheDocument();
   });
 });
