@@ -5,13 +5,13 @@ import type {
   BillingTotals,
 } from '@clerk/shared/types';
 
-import { BillingPlan } from './CommercePlan';
 import {
   billingMoneyAmountFromJSON,
   billingPerUnitTotalsFromJSON,
   billingSubscriptionItemSeatsFromJSON,
   billingTotalsFromJSON,
 } from '../../util/billing';
+import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
