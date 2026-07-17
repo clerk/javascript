@@ -152,21 +152,32 @@ jobs:
         working-directory: ${{ env.FIXTURE_DIR }}
         run: pnpm build:ios
 
+      - name: Cache Maestro
+        if: steps.keys.outputs.pk != ''
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
+
       - name: Install Maestro
         if: steps.keys.outputs.pk != ''
         # pipefail + binary check so a curl flake doesn't leave a missing
         # binary that only surfaces later as exit-code-127.
         run: |
           set -o pipefail
-          installed=0
-          for i in 1 2 3; do
-            if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-              if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
-            fi
-            echo "Maestro install attempt $i failed (or binary missing); retrying"
-            sleep 5
-          done
-          [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
+          if [ -x "$HOME/.maestro/bin/maestro" ]; then
+            echo "Using cached Maestro"
+          else
+            installed=0
+            for i in 1 2 3; do
+              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
+                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+              fi
+              echo "Maestro install attempt $i failed (or binary missing); retrying"
+              sleep 5
+            done
+            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
+          fi
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
           "$HOME/.maestro/bin/maestro" --version
 
