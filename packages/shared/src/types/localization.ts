@@ -551,6 +551,12 @@ export type __internal_LocalizationResource = {
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
+    /**
+     * Footer action on the second-factor step that abandons the current sign-in
+     * attempt and returns the user to the sign-in start so they can sign in with
+     * a different account.
+     */
+    differentAccountAction: LocalizationValue;
     newDeviceVerificationNotice: LocalizationValue;
     phoneCodeMfa: {
       title: LocalizationValue;

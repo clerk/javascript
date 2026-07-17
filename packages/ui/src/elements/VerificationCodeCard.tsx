@@ -32,6 +32,7 @@ export type VerificationCodeCardProps = {
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
   onIdentityPreviewEditClicked?: React.MouseEventHandler;
   onBackLinkClicked?: React.MouseEventHandler;
+  onDifferentAccountClicked?: React.MouseEventHandler;
 };
 
 export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCardProps>) => {
@@ -41,7 +42,16 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         <VerificationCodeContent {...props} />
       </Card.Content>
 
-      <Card.Footer />
+      <Card.Footer>
+        {props.onDifferentAccountClicked && (
+          <Card.Action elementId='signIn'>
+            <Card.ActionLink
+              localizationKey={localizationKeys('signIn.differentAccountAction')}
+              onClick={props.onDifferentAccountClicked}
+            />
+          </Card.Action>
+        )}
+      </Card.Footer>
     </Card.Root>
   );
 };
