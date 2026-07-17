@@ -3,6 +3,22 @@
 '@clerk/expo-google-signin': minor
 ---
 
-Move native Google Sign-In out of `@clerk/expo` and into `@clerk/expo-google-signin`.
+Native Google Sign-In has moved out of `@clerk/expo` into a new optional package, `@clerk/expo-google-signin`. Apps that don't use `useSignInWithGoogle` no longer pull in the native Google Sign-In dependencies during prebuild.
 
-Apps using native Google Sign-In should install `@clerk/expo-google-signin`, add it to the Expo config plugin list alongside `@clerk/expo`, and rebuild their native app. The `@clerk/expo/google` import path continues to re-export `useSignInWithGoogle`, but now requires `@clerk/expo-google-signin` to be installed.
+If you use native Google Sign-In, install the new package:
+
+```sh
+npx expo install @clerk/expo-google-signin
+```
+
+add its config plugin alongside `@clerk/expo` in your app config:
+
+```json
+{
+  "expo": {
+    "plugins": ["@clerk/expo", "@clerk/expo-google-signin"]
+  }
+}
+```
+
+then rebuild your native app. The `@clerk/expo/google` import path still re-exports `useSignInWithGoogle`, but it now requires `@clerk/expo-google-signin` to be installed.
