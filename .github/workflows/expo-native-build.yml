@@ -152,9 +152,7 @@ jobs:
         working-directory: ${{ env.FIXTURE_DIR }}
         run: pnpm build:ios
 
-      # Hand the built app to the e2e job. Only the run-e2e entries with a real
-      # key baked in produce a usable app; tar the iOS .app so its bundle
-      # structure survives the artifact round-trip.
+      # tar the .app so its bundle structure survives the artifact round-trip.
       - name: Package iOS app for e2e
         if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -201,8 +199,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # Only Node is needed here (to run the key resolver); the e2e job builds
-      # nothing, so it skips the monorepo install entirely.
+      # Only Node (for the key resolver) is needed; the e2e job builds nothing.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.15.0
@@ -233,6 +230,14 @@ jobs:
         with:
           name: expo-fixture-${{ matrix.platform }}
           path: ${{ runner.temp }}/fixture-app
+
+      # Maestro is a JVM app and needs a JDK on the Linux runner (macOS ships one).
+      - name: Set up JDK 17
+        if: matrix.platform == 'android' && steps.keys.outputs.pk != ''
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Cache Maestro
         if: steps.keys.outputs.pk != ''
