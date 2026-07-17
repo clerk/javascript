@@ -2231,7 +2231,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      *
      * @default false
      */
-    showPlanName?: boolean;
+    renderPlanBadge?: boolean | (() => Promise<{ label: string; slug: string; colorScheme?: 'primary' | 'secondary' }>);
   };
 
 /** @generateWithEmptyComment */

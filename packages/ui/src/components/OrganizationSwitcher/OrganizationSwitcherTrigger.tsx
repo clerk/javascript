@@ -1,5 +1,5 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 import { LoadingBadge } from '@/ui/elements/Badge';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
@@ -96,13 +96,33 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
   }),
 );
 
-const PlanBadge = () => {
-  const { isLoading, isFetching, subscriptionItems } = useSubscription();
-  const { showPlanName } = useOrganizationSwitcherContext();
+const SwitcherPlanBadge = ({
+  label,
+  slug,
+  colorScheme = 'secondary',
+}: {
+  label: string;
+  slug: string;
+  colorScheme?: 'primary' | 'secondary';
+}) => (
+  <Badge
+    elementDescriptor={descriptors.organizationSwitcherTriggerBadge}
+    elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
+    colorScheme={colorScheme}
+    title={label}
+    sx={{ minWidth: 0, maxWidth: '14ch' }}
+  >
+    <Box
+      as='span'
+      sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+    >
+      {label}
+    </Box>
+  </Badge>
+);
 
-  if (!showPlanName) {
-    return null;
-  }
+const ClerkBillingPlanBadge = () => {
+  const { isLoading, isFetching, subscriptionItems } = useSubscription();
 
   if (isLoading || isFetching) {
     // 5ch is specifically chosen to balance the size of "Free" versus paid plans in Inter
@@ -117,21 +137,64 @@ const PlanBadge = () => {
   const { slug, name, isDefault } = activeSubscriptionItem.plan;
 
   return (
-    <Badge
-      elementDescriptor={descriptors.organizationSwitcherTriggerBadge}
-      elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
+    <SwitcherPlanBadge
+      label={name}
+      slug={slug}
       colorScheme={isDefault ? 'primary' : 'secondary'}
-      title={name}
-      sx={{ minWidth: 0, maxWidth: '14ch' }}
-    >
-      <Box
-        as='span'
-        sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-      >
-        {name}
-      </Box>
-    </Badge>
+    />
   );
+};
+
+const CustomRenderPlanBadge = ({
+  renderPlanBadge,
+}: {
+  renderPlanBadge: () => Promise<{ label: string; slug: string; colorScheme?: 'primary' | 'secondary' }>;
+}) => {
+  const [state, setState] = useState<{
+    isLoading: boolean;
+    data: { label: string; slug: string; colorScheme?: 'primary' | 'secondary' } | null;
+  }>({ isLoading: true, data: null });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await renderPlanBadge();
+        setState({ isLoading: false, data });
+      } catch {
+        setState({ isLoading: false, data: null });
+      }
+    })();
+  }, [renderPlanBadge]);
+
+  if (state.isLoading) {
+    return <LoadingBadge sx={{ width: '5ch' }} />;
+  }
+
+  if (state.data) {
+    const { label, slug, colorScheme } = state.data;
+    return (
+      <SwitcherPlanBadge
+        label={label}
+        slug={slug}
+        colorScheme={colorScheme}
+      />
+    );
+  }
+
+  return null;
+};
+
+const PlanBadge = () => {
+  const { renderPlanBadge } = useOrganizationSwitcherContext();
+  if (!renderPlanBadge) {
+    return null;
+  }
+
+  if (typeof renderPlanBadge === 'boolean') {
+    return <ClerkBillingPlanBadge />;
+  }
+
+  return <CustomRenderPlanBadge renderPlanBadge={renderPlanBadge} />;
 };
 
 const NotificationCountBadgeSwitcherTrigger = () => {

@@ -103,7 +103,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
 
-      props.setProps({ showPlanName: true });
+      props.setProps({ renderPlanBadge: true });
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_1',
@@ -142,7 +142,7 @@ describe('OrganizationSwitcher', () => {
         });
       });
 
-      props.setProps({ showPlanName: true });
+      props.setProps({ renderPlanBadge: true });
       fixtures.environment.commerceSettings.billing.organization.enabled = false;
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_1',
