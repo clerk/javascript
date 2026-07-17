@@ -1,6 +1,17 @@
-import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/shared/types';
+import type {
+  BillingMoneyAmount,
+  BillingPerUnitTotal,
+  BillingSubscriptionItemSeats,
+  BillingTotals,
+} from '@clerk/shared/types';
 
 import { BillingPlan } from './CommercePlan';
+import {
+  billingMoneyAmountFromJSON,
+  billingPerUnitTotalsFromJSON,
+  billingSubscriptionItemSeatsFromJSON,
+  billingTotalsFromJSON,
+} from '../../util/billing';
 import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
@@ -12,6 +23,8 @@ export class BillingSubscriptionItem {
   constructor(
     /** The unique identifier for the Subscription Item. */
     readonly id: string,
+    /** The ID of the instance this Subscription Item belongs to. */
+    readonly instanceId: string,
     /** The status of the Subscription Item. */
     readonly status: BillingSubscriptionItemJSON['status'],
     /** The period of the Plan associated with this Subscription Item. */
@@ -22,9 +35,13 @@ export class BillingSubscriptionItem {
     readonly nextPayment:
       | {
           /** The amount of the next payment. */
-          amount: number;
+          amount: BillingMoneyAmount;
           /** The Unix timestamp (milliseconds) of when the next payment is scheduled. */
           date: number;
+          /** The per-unit cost breakdown for the next payment. */
+          perUnitTotals?: BillingPerUnitTotal[];
+          /** The full cost breakdown for the next payment. */
+          totals?: BillingTotals;
         }
       | null
       | undefined,
@@ -34,6 +51,8 @@ export class BillingSubscriptionItem {
     readonly plan: BillingPlan | null,
     /** The ID of the Plan associated with this Subscription Item. */
     readonly planId: string | null,
+    /** The ID of the price associated with this Subscription Item. */
+    readonly priceId: string | null,
     /** The Unix timestamp (milliseconds) of when the Subscription Item was created. */
     readonly createdAt: number,
     /** The Unix timestamp (milliseconds) of when the Subscription Item was last updated. */
@@ -49,36 +68,36 @@ export class BillingSubscriptionItem {
     /** The ID of the payer for this Subscription Item. */
     readonly payerId: string | undefined,
     /** Whether this Subscription Item is currently in a free trial period. */
-    readonly isFreeTrial?: boolean,
+    readonly isFreeTrial: boolean,
     /** The lifetime amount paid for this Subscription Item. */
     readonly lifetimePaid?: BillingMoneyAmount,
+    /** Seat entitlement details for organization subscription items with seat-based billing. */
+    readonly seats?: BillingSubscriptionItemSeats,
   ) {}
 
   static fromJSON(data: BillingSubscriptionItemJSON): BillingSubscriptionItem {
-    function formatAmountJSON(
-      amount: BillingMoneyAmountJSON | null | undefined,
-    ): BillingMoneyAmount | null | undefined {
-      if (!amount) {
-        return amount;
-      }
-
-      return {
-        amount: amount.amount,
-        amountFormatted: amount.amount_formatted,
-        currency: amount.currency,
-        currencySymbol: amount.currency_symbol,
-      };
-    }
+    const nextPayment = data.next_payment
+      ? {
+          amount: billingMoneyAmountFromJSON(data.next_payment.amount),
+          date: data.next_payment.date,
+          perUnitTotals: data.next_payment.per_unit_totals
+            ? billingPerUnitTotalsFromJSON(data.next_payment.per_unit_totals)
+            : undefined,
+          totals: data.next_payment.totals ? billingTotalsFromJSON(data.next_payment.totals) : undefined,
+        }
+      : data.next_payment;
 
     return new BillingSubscriptionItem(
       data.id,
+      data.instance_id,
       data.status,
       data.plan_period,
       data.period_start,
-      data.next_payment,
-      formatAmountJSON(data.amount) ?? undefined,
+      nextPayment,
+      data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined,
       data.plan ? BillingPlan.fromJSON(data.plan) : null,
       data.plan_id ?? null,
+      data.price_id ?? null,
       data.created_at,
       data.updated_at,
       data.period_end,
@@ -87,7 +106,8 @@ export class BillingSubscriptionItem {
       data.ended_at,
       data.payer_id,
       data.is_free_trial,
-      formatAmountJSON(data.lifetime_paid) ?? undefined,
+      data.lifetime_paid ? billingMoneyAmountFromJSON(data.lifetime_paid) : undefined,
+      data.seats ? billingSubscriptionItemSeatsFromJSON(data.seats) : undefined,
     );
   }
 }

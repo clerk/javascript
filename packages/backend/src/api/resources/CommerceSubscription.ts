@@ -1,5 +1,6 @@
-import type { BillingMoneyAmount } from '@clerk/shared/types';
+import type { BillingMoneyAmount, BillingPerUnitTotal, BillingTotals } from '@clerk/shared/types';
 
+import { billingMoneyAmountFromJSON, billingPerUnitTotalsFromJSON, billingTotalsFromJSON } from '../../util/billing';
 import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
 import type { BillingSubscriptionJSON } from './JSON';
 
@@ -12,6 +13,8 @@ export class BillingSubscription {
   constructor(
     /** The unique identifier for the Subscription. */
     readonly id: string,
+    /** The ID of the instance this Subscription belongs to. */
+    readonly instanceId: string,
     /** The current status of the Subscription. */
     readonly status: BillingSubscriptionJSON['status'],
     /** The ID of the payer for this Subscription. */
@@ -32,6 +35,10 @@ export class BillingSubscription {
       date: number;
       /** The amount of the next payment. */
       amount: BillingMoneyAmount;
+      /** The per-unit cost breakdown for the next payment. */
+      perUnitTotals?: BillingPerUnitTotal[];
+      /** The full cost breakdown for the next payment. */
+      totals?: BillingTotals;
     } | null,
     /** Whether the payer is eligible for a free trial. */
     readonly eligibleForFreeTrial: boolean,
@@ -41,17 +48,17 @@ export class BillingSubscription {
     const nextPayment = data.next_payment
       ? {
           date: data.next_payment.date,
-          amount: {
-            amount: data.next_payment.amount.amount,
-            amountFormatted: data.next_payment.amount.amount_formatted,
-            currency: data.next_payment.amount.currency,
-            currencySymbol: data.next_payment.amount.currency_symbol,
-          },
+          amount: billingMoneyAmountFromJSON(data.next_payment.amount),
+          perUnitTotals: data.next_payment.per_unit_totals
+            ? billingPerUnitTotalsFromJSON(data.next_payment.per_unit_totals)
+            : undefined,
+          totals: data.next_payment.totals ? billingTotalsFromJSON(data.next_payment.totals) : undefined,
         }
       : null;
 
     return new BillingSubscription(
       data.id,
+      data.instance_id,
       data.status,
       data.payer_id,
       data.created_at,
