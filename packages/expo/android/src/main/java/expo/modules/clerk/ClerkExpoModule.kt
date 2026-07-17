@@ -215,13 +215,15 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
                     // before initializing so the SDK boots with the correct client.
-                    if (!bearerToken.isNullOrEmpty()) {
+                    if (normalizedBearerToken != null) {
                         context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
                             .edit()
-                            .putString("DEVICE_TOKEN", bearerToken)
+                            .putString("DEVICE_TOKEN", normalizedBearerToken)
                             .apply()
                     }
 
@@ -248,7 +250,7 @@ class ClerkExpoModule : Module() {
                         }
                         // If a bearer token was provided, wait for native client state to hydrate
                         // before resolving the configure call.
-                        if (!bearerToken.isNullOrEmpty()) {
+                        if (normalizedBearerToken != null) {
                             withTimeout(5_000L) {
                                 Clerk.clientFlow.first { it != null }
                             }
@@ -270,6 +272,7 @@ class ClerkExpoModule : Module() {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
                         configuredPublishableKey = pubKey
+                        lastObservedClientState = clientStateSnapshot()
                         promise.resolve(null)
                     }
                     return@launch
@@ -303,10 +306,13 @@ class ClerkExpoModule : Module() {
                         return@launch
                     }
 
-                    if (!bearerToken.isNullOrEmpty()) {
-                        val result = Clerk.updateDeviceToken(bearerToken)
-                        if (result is ClerkResult.Failure) {
-                            debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                    if (normalizedBearerToken != null) {
+                        val clientState = clientStateSnapshot()
+                        if (clientState.deviceToken != normalizedBearerToken || clientState.client == null) {
+                            val result = Clerk.updateDeviceToken(normalizedBearerToken)
+                            if (result is ClerkResult.Failure) {
+                                debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                            }
                         }
 
                         try {
@@ -319,6 +325,7 @@ class ClerkExpoModule : Module() {
                     }
 
                     configuredPublishableKey = pubKey
+                    lastObservedClientState = clientStateSnapshot()
                     promise.resolve(null)
                     return@launch
                 }
@@ -326,10 +333,20 @@ class ClerkExpoModule : Module() {
                 // Already initialized — use the public SDK API to update
                 // the device token and trigger a client/environment refresh.
                 startClientStateObserver()
-                if (!bearerToken.isNullOrEmpty()) {
-                    val result = Clerk.updateDeviceToken(bearerToken)
+                if (normalizedBearerToken != null) {
+                    val clientState = clientStateSnapshot()
+                    val result = if (
+                        clientState.deviceToken != normalizedBearerToken ||
+                        clientState.client == null
+                    ) {
+                        Clerk.updateDeviceToken(normalizedBearerToken)
+                    } else {
+                        // A remounted JS runtime can have the same token while native
+                        // client state is stale, so preserve one refresh in that case.
+                        Clerk.refreshClient()
+                    }
                     if (result is ClerkResult.Failure) {
-                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                        debugLog(TAG, "configure - client refresh failed: ${result.error}")
                     }
 
                     // Wait for client state to hydrate with the new token (up to 5s).
@@ -342,6 +359,7 @@ class ClerkExpoModule : Module() {
                     }
                 }
 
+                lastObservedClientState = clientStateSnapshot()
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
@@ -382,6 +400,7 @@ class ClerkExpoModule : Module() {
             try {
                 jsOriginatedClientSyncDepth += 1
                 val previousClientState = clientStateSnapshot()
+                var refreshedClientWhileUpdatingToken = false
 
                 if (didChangeDeviceToken && !deviceToken.isNullOrBlank()) {
                     val currentDeviceToken = try {
@@ -401,6 +420,7 @@ class ClerkExpoModule : Module() {
                                 return@launch
                             }
                             is ClerkResult.Success -> {
+                                refreshedClientWhileUpdatingToken = true
                                 try {
                                     withTimeout(5_000L) {
                                         Clerk.clientFlow.first { it != null }
@@ -413,7 +433,7 @@ class ClerkExpoModule : Module() {
                     }
                 }
 
-                if (didChangeClient || didChangeDeviceToken) {
+                if (!refreshedClientWhileUpdatingToken && (didChangeClient || didChangeDeviceToken)) {
                     when (val result = Clerk.refreshClient()) {
                         is ClerkResult.Failure -> {
                             promise.reject(

@@ -1,0 +1,13 @@
+# Maestro workspace config: https://docs.maestro.dev/reference/workspace-configuration
+# Top-level files under flows/ are cross-platform tests; flows/subflows/ holds
+# runFlow-only pieces that discovery never runs standalone. Selectors use
+# English text/labels: clerk-android ships no testTag/resource-ids, and both
+# native SDKs localize all strings, so devices must run the en locale.
+appId: com.clerk.exponativebuildfixture
+flows:
+  - 'flows/*.yaml'
+platform:
+  ios:
+    disableAnimations: true
+  android:
+    disableAnimations: true
