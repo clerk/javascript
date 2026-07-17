@@ -103,10 +103,11 @@ Source distribution (shipping `.stylex.ts` and requiring every consumer to run t
 StyleX plugin) is **not viable** — consumers are arbitrary Next/Vite/etc. apps we
 don't control.
 
-### Two CSS files, produced two different ways
+### How the CSS is produced (astryx reference)
 
-astryx ships the reset and the compiled component CSS as **separate files**, and
-this split is inherent (StyleX can't emit a `*`/`:where()` reset):
+astryx ships the reset and the compiled component CSS as **separate files** — the
+split is inherent (StyleX can't emit a `*`/`:where()` reset). Clerk collapses these
+into one sheet (next section); the production mechanism is the same either way:
 
 | File              | How it's produced                                                                       | Exported as                     |
 | ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- |
@@ -124,18 +125,19 @@ this split is inherent (StyleX can't emit a `*`/`:where()` reset):
 - **Layers come from each file wrapping its own `@layer`** plus import order:
   reset (`@layer cl-reset`) → component (`@layer` from `useCSSLayers`) → consumer.
 
-### Bundling the reset for Clerk
+### Bundling the reset for Clerk (one sheet only)
 
-The reset is a **hand-authored, scoped, static CSS file** (`:where([data-cl-scope] *)`,
-see `authoring.md` → CSS reset) shipped verbatim — same mechanism as astryx, but
-scoped instead of global. Two delivery choices astryx doesn't need:
+Unlike astryx (which ships `reset.css` and `astryx.css` separately), **Clerk ships
+exactly one CSS file** — `mosaic.css`. So the reset is **prepended into that single
+sheet** at build, not shipped as its own import:
 
-1. **Separate file** the consumer imports (`import '@clerk/ui/mosaic-reset.css'`) —
-   cleanest for npm consumers, keeps the layer explicit.
-2. **Prepend the `@layer cl-reset {…}` block into `mosaic.css`** at build so there's
-   a single sheet — simpler for the **clerk-js runtime-injection** path (one blob to
-   inject, no second load). Prepending keeps it in the lowest layer regardless of
-   source order.
+- The reset stays hand-authored, scoped, static CSS (`:where([data-cl-scope] *)`,
+  see `authoring.md` → CSS reset) — StyleX can't emit it.
+- A build step prepends the `@layer cl-reset {…}` block ahead of the StyleX output
+  in `mosaic.css`. Because it's declared first (and lives in the lowest layer), it
+  sits under every component rule regardless of source order.
+- One sheet is what the **clerk-js runtime-injection** path needs — a single blob
+  to inject, no second load — and it's simplest for npm consumers too (one import).
 
 ### Open build questions (from the migration spike)
 
