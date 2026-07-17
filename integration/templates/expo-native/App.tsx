@@ -11,7 +11,7 @@ if (!publishableKey) {
 }
 
 function NativeBuildFixture() {
-  const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
@@ -25,9 +25,17 @@ function NativeBuildFixture() {
       <Text testID='auth-state'>{isLoaded ? `signed ${isSignedIn ? 'in' : 'out'}` : 'loading'}</Text>
       {user?.id && <Text testID='user-id'>{user.id}</Text>}
       <Button
+        testID='open-auth-view-button'
         title='Open native AuthView'
         onPress={() => setIsAuthOpen(true)}
       />
+      {isSignedIn && (
+        <Button
+          testID='sign-out-button'
+          title='Sign out'
+          onPress={() => void signOut()}
+        />
+      )}
 
       <Modal
         animationType='slide'
