@@ -1,4 +1,4 @@
-name: 'Expo native build (@clerk/expo)'
+name: 'Expo native (@clerk/expo)'
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: expo-native-build-${{ github.head_ref || github.ref }}
+  group: expo-native-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -32,9 +32,9 @@ env:
 jobs:
   native-build:
     if: ${{ github.head_ref != 'changeset-release/main' }}
-    name: Expo ${{ matrix.expo-sdk }} / ${{ matrix.platform }}
+    name: Expo ${{ matrix.expo-sdk }} Build / ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -153,6 +153,93 @@ jobs:
         working-directory: ${{ env.FIXTURE_DIR }}
         run: pnpm build:ios
 
+      # tar the .app so its bundle structure survives the artifact round-trip.
+      - name: Package iOS app for e2e
+        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
+        working-directory: ${{ env.FIXTURE_DIR }}
+        run: |
+          tar -C ios/build/Build/Products/Release-iphonesimulator \
+            -cf "$RUNNER_TEMP/ClerkExpoNativeBuildFixture.app.tar" \
+            ClerkExpoNativeBuildFixture.app
+
+      - name: Upload iOS fixture app
+        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: expo-fixture-ios
+          path: ${{ runner.temp }}/ClerkExpoNativeBuildFixture.app.tar
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Upload Android fixture app
+        if: matrix.platform == 'android' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: expo-fixture-android
+          path: ${{ env.FIXTURE_DIR }}/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 1
+          if-no-files-found: error
+
+  e2e:
+    name: E2E / ${{ matrix.platform }}
+    needs: native-build
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ios
+            runner: blacksmith-6vcpu-macos-26
+          - platform: android
+            runner: blacksmith-8vcpu-ubuntu-2204
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      # Only Node (for the key resolver) is needed; the e2e job builds nothing.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+
+      - name: Check e2e secret availability
+        id: gate
+        env:
+          KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+        run: |
+          if [ -n "$KEYS" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::INTEGRATION_STAGING_INSTANCE_KEYS unavailable (fork PR?); skipping e2e."
+          fi
+
+      - name: Resolve Clerk instance keys
+        id: keys
+        if: steps.gate.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
+        run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$E2E_INSTANCE_NAME"
+
+      - name: Download fixture app
+        if: steps.keys.outputs.pk != ''
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: expo-fixture-${{ matrix.platform }}
+          path: ${{ runner.temp }}/fixture-app
+
+      # Maestro is a JVM app and needs a JDK on the Linux runner (macOS ships one).
+      - name: Set up JDK 17
+        if: matrix.platform == 'android' && steps.keys.outputs.pk != ''
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Cache Maestro
         if: steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -189,8 +276,8 @@ jobs:
         with:
           model: 'iPhone 17 Pro'
 
-      # Provisioned as late as possible (after the expensive native build and
-      # simulator boot) so live credentials exist for the shortest window.
+      # Provisioned as late as possible so live credentials exist for the
+      # shortest window.
       - name: Provision test user via BAPI
         id: user
         if: steps.keys.outputs.pk != ''
@@ -224,7 +311,6 @@ jobs:
         # Burn-in: e2e cannot fail the check yet. Flip to hard-fail in a
         # follow-up once the suite has proven quiet.
         continue-on-error: true
-        working-directory: ${{ env.FIXTURE_DIR }}
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
@@ -239,7 +325,8 @@ jobs:
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
-          xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
+          tar -C "$RUNNER_TEMP/fixture-app" -xf "$RUNNER_TEMP/fixture-app/ClerkExpoNativeBuildFixture.app.tar"
+          xcrun simctl install "$SIM_UDID" "$RUNNER_TEMP/fixture-app/ClerkExpoNativeBuildFixture.app"
           # Stream the app's console output into the debug artifact so a hang has
           # actionable evidence (keychain/network errors) instead of just screenshots.
           mkdir -p "$RUNNER_TEMP/maestro-debug"
@@ -301,7 +388,7 @@ jobs:
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
-            adb install -r integration/templates/expo-native/android/app/build/outputs/apk/release/app-release.apk &&
+            adb install -r "$RUNNER_TEMP/fixture-app/app-release.apk" &&
             cd integration/tests/expo-native &&
             MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh adb shell am force-stop com.clerk.exponativebuildfixture
 
@@ -334,7 +421,7 @@ jobs:
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: maestro-${{ matrix.platform }}-sdk${{ matrix.expo-sdk }}
+          name: maestro-${{ matrix.platform }}
           path: ${{ runner.temp }}/maestro-debug
           retention-days: 7
 
@@ -346,7 +433,7 @@ jobs:
         run: |
           outcome="$IOS_OUTCOME"
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
-          echo "## Maestro e2e (${{ matrix.platform }}, SDK ${{ matrix.expo-sdk }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::warning::Maestro e2e failed (burn-in mode: not failing the job). See the maestro-${{ matrix.platform }}-sdk${{ matrix.expo-sdk }} artifact."
+            echo "::warning::Maestro e2e failed (burn-in mode: not failing the job). See the maestro-${{ matrix.platform }} artifact."
           fi
