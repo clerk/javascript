@@ -1308,6 +1308,10 @@ export const idID: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab yang baru dibuka untuk melanjutkan',
         titleNewTab: 'Masuk di tab lain',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',

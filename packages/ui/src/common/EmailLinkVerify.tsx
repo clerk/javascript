@@ -1,5 +1,6 @@
 import { EmailLinkErrorCodeStatus, isEmailLinkError } from '@clerk/shared/error';
 import { completeSignUpFlow } from '@clerk/shared/internal/clerk-js/completeSignUpFlow';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -31,6 +32,15 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
       // Avoid loading flickering
       await sleep(750);
       await handleEmailLinkVerification({ redirectUrlComplete, redirectUrl }, navigate);
+
+      // `transferable` = the email was verified but no user exists (`signUpIfMissing`).
+      // The originating tab's poll performs the sign-up transfer, so this tab has no
+      // session and nothing to complete - it only points the user back there.
+      if (getClerkQueryParam('__clerk_status') === 'transferable') {
+        setVerificationStatus('transferable');
+        return;
+      }
+
       setVerificationStatus('verified_switch_tab');
       await sleep(750);
       await completeSignUpFlow({

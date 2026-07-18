@@ -510,6 +510,14 @@ export type __internal_LocalizationResource = {
         titleNewTab: LocalizationValue;
         subtitleNewTab: LocalizationValue;
       };
+      /**
+       * Shown in the link-click tab when the verified email has no matching user
+       * and the original tab transfers the flow to sign-up (`signUpIfMissing`).
+       */
+      verifiedTransferable: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
       loading: {
         title: LocalizationValue;
         subtitle: LocalizationValue;

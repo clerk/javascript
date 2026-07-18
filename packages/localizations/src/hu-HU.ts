@@ -1317,6 +1317,10 @@ export const huHU: LocalizationResource = {
         subtitleNewTab: 'Menj át az újonan megnyitott lapra a folytatáshoz',
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',

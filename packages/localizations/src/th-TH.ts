@@ -1305,6 +1305,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บที่เปิดใหม่เพื่อดำเนินการต่อ',
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',

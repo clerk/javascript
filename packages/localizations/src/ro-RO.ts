@@ -1317,6 +1317,10 @@ export const roRO: LocalizationResource = {
         subtitleNewTab: 'Revino în noua filă deschisă pentru a continua',
         titleNewTab: 'Autentificat în altă filă',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',

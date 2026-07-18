@@ -15,6 +15,7 @@ import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
@@ -27,9 +28,8 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const card = useCardState();
   const signIn = useCoreSignIn();
   const signInContext = useSignInContext();
-  const { signInUrl } = signInContext;
+  const { signInUrl, afterSignInUrl, afterSignUpUrl, signUpIfMissingEnabled, navigateOnSetActive } = signInContext;
   const { navigate } = useRouter();
-  const { afterSignInUrl } = useSignInContext();
   const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
@@ -64,6 +64,14 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     const ver = si.firstFactorVerification;
     if (ver.status === 'expired') {
       card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
+    } else if (signUpIfMissingEnabled && ver.status === 'transferable') {
+      return handleSignUpIfMissingTransfer({
+        clerk,
+        navigate,
+        afterSignUpUrl,
+        navigateOnSetActive,
+        unsafeMetadata: signInContext.unsafeMetadata,
+      });
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {

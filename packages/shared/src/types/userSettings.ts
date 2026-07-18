@@ -82,6 +82,12 @@ export type UsernameSettingsData = {
   max_length: number;
 };
 
+export type AttackProtectionData = {
+  enumeration_protection: {
+    enabled: boolean;
+  };
+};
+
 export type PasskeySettingsData = {
   allow_autofill: boolean;
   show_sign_in_button: boolean;
@@ -122,6 +128,11 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   password_settings: PasswordSettingsData;
   passkey_settings: PasskeySettingsData;
   username_settings: UsernameSettingsData;
+  /**
+   * Optional because older environment payloads (and existing mocks) predate the field.
+   * `UserSettings.fromJSON` falls back to enumeration protection disabled.
+   */
+  attack_protection?: AttackProtectionData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -136,6 +147,7 @@ export interface UserSettingsResource extends ClerkResource {
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;
   usernameSettings: UsernameSettingsData;
+  attackProtection: AttackProtectionData;
   passkeySettings: PasskeySettingsData;
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];

@@ -1313,6 +1313,10 @@ export const bnIN: LocalizationResource = {
         subtitleNewTab: 'চালিয়ে যেতে নতুন খোলা ট্যাবে ফিরে যান',
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',

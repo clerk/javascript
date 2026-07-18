@@ -1296,6 +1296,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回新開啟的分頁以繼續',
         titleNewTab: '已在其他分頁登入',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '使用發送到您電子郵件的驗證連結',

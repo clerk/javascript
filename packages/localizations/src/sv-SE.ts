@@ -1306,6 +1306,10 @@ export const svSE: LocalizationResource = {
         subtitleNewTab: 'Återgå till den nyligen öppnade fliken för att fortsätta',
         titleNewTab: 'Loggade in på annan flik',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Använd verifieringslänken som skickades till din e-post',

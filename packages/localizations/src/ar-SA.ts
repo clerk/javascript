@@ -1301,6 +1301,10 @@ export const arSA: LocalizationResource = {
         subtitleNewTab: 'ارجع إلى علامة التبويب المفتوحة حديثًا للمتابعة',
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',

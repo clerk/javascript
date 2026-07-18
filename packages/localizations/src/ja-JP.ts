@@ -1314,6 +1314,10 @@ export const jaJP: LocalizationResource = {
         subtitleNewTab: '新しく開いたタブに戻って続行してください',
         titleNewTab: '他のタブでサインイン済み',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'メールに送信された確認リンクを使用してください',

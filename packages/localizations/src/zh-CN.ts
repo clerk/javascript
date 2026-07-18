@@ -1293,6 +1293,10 @@ export const zhCN: LocalizationResource = {
         subtitleNewTab: '返回新打开的标签页继续',
         titleNewTab: '在其他标签页上登录',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '使用发送到您电子邮件的验证链接',

@@ -1313,6 +1313,10 @@ export const hiIN: LocalizationResource = {
         subtitleNewTab: 'जारी रखने के लिए नए खोले गए टैब पर वापस जाएं',
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',

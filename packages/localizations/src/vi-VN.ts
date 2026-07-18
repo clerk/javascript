@@ -1313,6 +1313,10 @@ export const viVN: LocalizationResource = {
         subtitleNewTab: 'Quay lại tab mới được mở để tiếp tục',
         titleNewTab: 'Đăng nhập trên tab khác',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',

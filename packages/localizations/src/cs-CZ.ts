@@ -1312,6 +1312,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na nově otevřenou kartu pro pokračování',
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',

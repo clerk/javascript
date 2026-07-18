@@ -1305,6 +1305,10 @@ export const bgBG: LocalizationResource = {
         subtitleNewTab: 'Върнете се в новоотворения таб, за да продължите',
         titleNewTab: 'Влезнали сте в друг таб',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',

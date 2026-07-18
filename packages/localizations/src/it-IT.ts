@@ -1313,6 +1313,10 @@ export const itIT: LocalizationResource = {
         subtitleNewTab: 'Ritorna sulla nuova scheda aperta per continuare',
         titleNewTab: "Accedi da un'altra scheda",
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Usa il link di verifica inviato alla tua email',

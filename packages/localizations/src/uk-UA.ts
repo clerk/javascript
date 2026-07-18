@@ -1303,6 +1303,10 @@ export const ukUA: LocalizationResource = {
         subtitleNewTab: 'Поверніться до щойно відкритої вкладки, щоб продовжити',
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',

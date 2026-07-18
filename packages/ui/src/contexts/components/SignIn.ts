@@ -1,4 +1,4 @@
-import { SIGN_IN_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
+import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
@@ -30,6 +30,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  signUpIfMissingEnabled: boolean;
   navigateOnSetActive: (opts: {
     session: SessionResource;
     redirectUrl: string;
@@ -127,6 +128,15 @@ export const useSignInContext = (): SignInContextType => {
     );
   }
 
+  // Static preconditions of the sign-up-if-missing flow, shared by SignInStart (which requests
+  // `signUpIfMissing` on sign-in create) and the factor-one cards (which handle the resulting
+  // `transferable` verification status). Per-attempt conditions (identifier type, password use)
+  // stay at the call sites.
+  const signUpIfMissingEnabled =
+    isCombinedFlow &&
+    userSettings.attackProtection.enumeration_protection.enabled &&
+    signUpMode === SIGN_UP_MODES.PUBLIC;
+
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
   // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
   // resolves to the embedded `…/create/protect-check` route there and the standalone sign-up route
@@ -197,6 +207,7 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    signUpIfMissingEnabled,
     navigateOnSetActive,
     taskUrl,
   };

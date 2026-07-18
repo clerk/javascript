@@ -1310,6 +1310,10 @@ export const esCR: LocalizationResource = {
         subtitleNewTab: 'Regresa a la pestaña recién abierta para continuar',
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',

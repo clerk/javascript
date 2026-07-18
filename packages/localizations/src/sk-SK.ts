@@ -1306,6 +1306,10 @@ export const skSK: LocalizationResource = {
         subtitleNewTab: 'Vráťte sa do novootvoreného okna pre pokračovanie',
         titleNewTab: 'Prihlásené v inom okne',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
