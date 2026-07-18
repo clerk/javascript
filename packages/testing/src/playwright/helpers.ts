@@ -2,8 +2,9 @@ import { createClerkClient } from '@clerk/backend';
 import type { Clerk, SignOutOptions } from '@clerk/shared/types';
 import type { Page } from '@playwright/test';
 
-import type { ClerkSignInParams, SetupClerkTestingTokenOptions } from '../common';
+import type { ClerkSignInParams } from '../common';
 import { signInHelper } from '../common';
+import type { PlaywrightSetupClerkTestingTokenOptions } from './setupClerkTestingToken';
 import { setupClerkTestingToken } from './setupClerkTestingToken';
 
 declare global {
@@ -19,7 +20,7 @@ type PlaywrightClerkLoadedParams = {
 type PlaywrightClerkSignInParamsWithEmail = {
   page: Page;
   emailAddress: string;
-  setupClerkTestingTokenOptions?: SetupClerkTestingTokenOptions;
+  setupClerkTestingTokenOptions?: PlaywrightSetupClerkTestingTokenOptions;
 };
 
 type ClerkHelperParams = {
@@ -104,7 +105,7 @@ const loaded = async ({ page }: PlaywrightClerkLoadedParams) => {
 type PlaywrightClerkSignInParams = {
   page: Page;
   signInParams: ClerkSignInParams;
-  setupClerkTestingTokenOptions?: SetupClerkTestingTokenOptions;
+  setupClerkTestingTokenOptions?: PlaywrightSetupClerkTestingTokenOptions;
 };
 
 const signIn = async (opts: PlaywrightClerkSignInParams | PlaywrightClerkSignInParamsWithEmail) => {
