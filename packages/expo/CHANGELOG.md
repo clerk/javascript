@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.7.8
+
+### Patch Changes
+
+- Reduce redundant native and JavaScript client refreshes during Expo startup. ([#9140](https://github.com/clerk/javascript/pull/9140)) by [@mikepitre](https://github.com/mikepitre)
+
 ## 3.7.7
 
 ### Patch Changes

@@ -1,0 +1,13 @@
+# Native AuthView email+password sign-in, asserting the native->JS session
+# sync, then JS-side sign-out asserting the reverse direction.
+appId: com.clerk.exponativebuildfixture
+name: Native AuthView sign-in syncs to JS
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml
