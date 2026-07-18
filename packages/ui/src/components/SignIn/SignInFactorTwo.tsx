@@ -11,6 +11,7 @@ import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeM
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
+import { SignInFactorTwoPasskeyCard } from './SignInFactorTwoPasskeyCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
@@ -83,6 +84,8 @@ function SignInFactorTwoInternal(): JSX.Element {
       );
     case 'backup_code':
       return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    case 'passkey':
+      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     case 'email_code':
       return (
         <SignInFactorTwoEmailCodeCard

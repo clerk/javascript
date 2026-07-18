@@ -1208,6 +1208,11 @@ export const roRO: LocalizationResource = {
         'Folosirea cheii de acces confirmă identitatea ta. Dispozitivul îți poate cere amprenta, fața sau codul de ecran.',
       title: 'Folosește cheia de acces',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Folosește altă metodă',
       subtitle: 'Introdu parola curentă pentru a continua',
@@ -1352,6 +1357,10 @@ export const roRO: LocalizationResource = {
       subtitle:
         'Folosirea cheii de acces confirmă că ești tu. Dispozitivul îți poate cere amprenta, fața sau blocarea ecranului.',
       title: 'Folosește cheia de acces',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Folosește altă metodă',

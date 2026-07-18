@@ -102,6 +102,8 @@ export function getButtonLabel(factor: SessionVerificationSecondFactor): Localiz
       return localizationKeys('reverification.alternativeMethods.blockButton__totp');
     case 'backup_code':
       return localizationKeys('reverification.alternativeMethods.blockButton__backupCode');
+    case 'passkey':
+      return localizationKeys('reverification.alternativeMethods.blockButton__passkey');
     default:
       throw new Error(`Invalid verification strategy: "${(factor as any).strategy}"`);
   }

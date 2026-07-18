@@ -1208,6 +1208,11 @@ export const huHU: LocalizationResource = {
         'A passkey használata megerősíti a személyazonosságodat. Az eszközöd kérheti az ujjlenyomatodat, arcodat vagy a képernyőzáradat.',
       title: 'Passkey használata',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Másik módszer használata',
       subtitle: 'Add meg a jelenlegi jelszavadat a folytatáshoz',
@@ -1352,6 +1357,10 @@ export const huHU: LocalizationResource = {
       subtitle:
         'A Passkey-d használata megerősíti, hogy te vagy az. Az eszközöd kérheti az ujjlenyomatod, arcod vagy a képernyőzárad.',
       title: 'Használd a passkeydet',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Másik mód használata',

@@ -3,7 +3,7 @@ import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { mockWebAuthn, render, screen, waitFor } from '@/test/utils';
 
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
@@ -404,6 +404,61 @@ describe('SignInFactorTwo', () => {
         });
       });
     });
+
+    describe('Passkey', () => {
+      it('is never the starting factor when another second factor is available', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.startSignInFactorTwo({
+            supportPhoneCode: false,
+            supportTotp: true,
+            supportPasskey: true,
+          });
+        });
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        render(<SignInFactorTwo />, { wrapper });
+
+        expect(screen.getAllByTestId('otp-input-segment').length).toBe(6);
+        expect(screen.queryByText('Use your passkey')).not.toBeInTheDocument();
+      });
+
+      mockWebAuthn(() => {
+        it('renders the passkey card when passkey is the only second factor', async () => {
+          const { wrapper } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.startSignInFactorTwo({
+              supportPhoneCode: false,
+              supportPasskey: true,
+            });
+          });
+          render(<SignInFactorTwo />, { wrapper });
+
+          await screen.findByText('Use your passkey');
+          await screen.findByText(
+            "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+          );
+        });
+
+        it('calls authenticateWithPasskey when clicking continue', async () => {
+          const { wrapper, fixtures } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.startSignInFactorTwo({
+              supportPhoneCode: false,
+              supportPasskey: true,
+            });
+          });
+          fixtures.signIn.authenticateWithPasskey.mockResolvedValue({ status: 'complete' } as SignInResource);
+          const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+
+          await userEvent.click(screen.getByText('Continue'));
+
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalled();
+        });
+      });
+    });
   });
 
   describe('Use another method', () => {
@@ -461,6 +516,44 @@ describe('SignInFactorTwo', () => {
       expect(await screen.findByText(/Send SMS code to \+/i)).toBeInTheDocument();
       expect(await screen.findByText(/Use a backup code/i)).toBeInTheDocument();
       expect(await screen.findByText(/Authenticator/i)).toBeInTheDocument();
+    });
+
+    it('skips the passkey method when webauthn is not supported', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.startSignInFactorTwo({
+          supportPhoneCode: true,
+          supportTotp: true,
+          supportPasskey: true,
+        });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      expect(await screen.findByText(/Send SMS code to \+/i)).toBeInTheDocument();
+      expect(screen.queryByText('Sign in with your passkey')).not.toBeInTheDocument();
+    });
+
+    mockWebAuthn(() => {
+      it('lists the passkey method and shows the passkey card when clicking it', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.startSignInFactorTwo({
+            supportPhoneCode: true,
+            supportTotp: true,
+            supportPasskey: true,
+          });
+        });
+
+        fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(await screen.findByText('Sign in with your passkey'));
+        expect(await screen.findByText('Use your passkey')).toBeInTheDocument();
+      });
     });
 
     it('shows the SMS code input when clicking the Phone code method', async () => {

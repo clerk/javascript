@@ -804,6 +804,137 @@ describe('Session', () => {
     });
   });
 
+  describe('verifyWithPasskey()', () => {
+    const mockPublicKeyCredential = {
+      id: 'credential_123',
+      rawId: new ArrayBuffer(32),
+      response: {
+        authenticatorData: new ArrayBuffer(37),
+        clientDataJSON: new ArrayBuffer(121),
+        signature: new ArrayBuffer(64),
+        userHandle: null,
+      },
+      type: 'public-key',
+    };
+
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    let originalFetch: typeof BaseResource._fetch;
+
+    beforeEach(() => {
+      originalFetch = BaseResource._fetch;
+      BaseResource.clerk = clerkMock({
+        __internal_isWebAuthnSupported: vi.fn().mockReturnValue(true),
+        __internal_getPublicCredentials: vi.fn().mockResolvedValue({
+          publicKeyCredential: mockPublicKeyCredential,
+          error: null,
+        }),
+      } as any);
+    });
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      BaseResource.clerk = null as any;
+    });
+
+    it('runs the first-factor verification flow by default', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            first_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey();
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('runs the second-factor verification flow when level is second_factor', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            second_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey({ level: 'second_factor' });
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('rejects invalid verification levels without calling the API', async () => {
+      const mockFetch = vi.fn();
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await expect(session.verifyWithPasskey({ level: 'third_factor' as any })).rejects.toThrow(
+        'not a valid verification level',
+      );
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
   describe('touch()', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
 

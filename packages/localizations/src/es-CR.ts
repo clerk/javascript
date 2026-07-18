@@ -1201,6 +1201,11 @@ export const esCR: LocalizationResource = {
         'Utilizar tu llave de acceso confirma que eres tú. Tu dispositivo puede solicitar tu huella dactilar, rostro o pantalla de bloqueo.',
       title: 'Utiliza tu llave de acceso',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utiliza otro método',
       subtitle: 'Ingresa tu contraseña actual para continuar',
@@ -1345,6 +1350,10 @@ export const esCR: LocalizationResource = {
       subtitle:
         'Usando tu llave de acceso confirmas que eres tú. Tu dispositivo puede pedirte la huella dactilar, el rostro o el bloqueo de pantalla.',
       title: 'Usa tu llave de acceso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utiliza otro método',

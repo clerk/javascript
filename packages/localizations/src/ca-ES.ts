@@ -1205,6 +1205,11 @@ export const caES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Has oblidat la contrasenya? Recupera-la aquí.',
       subtitle: 'Utilitza la teva contrasenya per verificar la teva identitat.',
@@ -1347,6 +1352,10 @@ export const caES: LocalizationResource = {
     passkey: {
       subtitle: "Utilitza la teva clau d'accés per continuar amb l'autenticació.",
       title: "Clau d'accés",
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utilitza un altre mètode',

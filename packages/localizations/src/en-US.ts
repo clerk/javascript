@@ -1224,6 +1224,12 @@ export const enUS: LocalizationResource = {
         'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
       title: 'Use your passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: 'Use your passkey',
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Verification required',
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter your current password to continue',
@@ -1365,6 +1371,10 @@ export const enUS: LocalizationResource = {
       title: 'Cannot sign in',
     },
     passkey: {
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+      title: 'Use your passkey',
+    },
+    passkeyMfa: {
       subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
       title: 'Use your passkey',
     },

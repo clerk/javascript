@@ -1197,6 +1197,11 @@ export const thTH: LocalizationResource = {
       subtitle: 'การใช้พาสคีย์ของคุณยืนยันตัวตนของคุณ อุปกรณ์ของคุณอาจขอลายนิ้วมือ ใบหน้า หรือการล็อคหน้าจอ',
       title: 'ใช้พาสคีย์ของคุณ',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'ใช้วิธีอื่น',
       subtitle: 'ใส่รหัสผ่านปัจจุบันของคุณเพื่อดำเนินการต่อ',
@@ -1339,6 +1344,10 @@ export const thTH: LocalizationResource = {
     passkey: {
       subtitle: 'การใช้พาสคีย์ของคุณยืนยันว่าเป็นคุณ อุปกรณ์ของคุณอาจขอลายนิ้วมือ ใบหน้า หรือการล็อคหน้าจอ',
       title: 'ใช้พาสคีย์ของคุณ',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',

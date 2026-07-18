@@ -1208,6 +1208,11 @@ export const ptPT: LocalizationResource = {
         'A utilização da sua chave de acesso confirma a sua identidade. O dispositivo pode pedir a sua impressão digital, rosto ou bloqueio de ecrã.',
       title: 'Utilizar a sua chave de acesso',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utilizar outro método',
       subtitle: 'Introduza a sua palavra-passe atual para continuar',
@@ -1350,6 +1355,10 @@ export const ptPT: LocalizationResource = {
     passkey: {
       subtitle: 'Utilize a sua chave de acesso para autenticação.',
       title: 'Autenticação com Chave de Acesso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utilize outro método',
