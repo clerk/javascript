@@ -68,6 +68,12 @@ export function renderWarning(message) {
   console.log(chalk.yellow(`⚠️ ${message}`));
 }
 
+export function renderDebug(message) {
+  if (process.env.DEBUG) {
+    console.debug(chalk.dim(message));
+  }
+}
+
 export function renderNewline() {
   console.log('');
 }
