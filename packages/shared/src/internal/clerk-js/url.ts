@@ -424,7 +424,11 @@ export function requiresUserInput(redirectUrl: string): boolean {
 }
 
 export const isAllowedRedirect =
-  (allowedRedirectOrigins: Array<string | RegExp> | undefined, currentOrigin: string) => (_url: URL | string) => {
+  (
+    allowedRedirectOrigins: Array<string | RegExp> | undefined,
+    currentOrigin: string,
+  ): ((_url: URL | string) => boolean) =>
+  (_url: URL | string): boolean => {
     let url = _url;
     if (typeof url === 'string') {
       url = relativeToAbsoluteUrl(url, currentOrigin);
@@ -436,12 +440,22 @@ export const isAllowedRedirect =
 
     const isSameOrigin = currentOrigin === url.origin;
 
+    // When the redirect URL includes a non-default port (common in local dev, e.g. :5173),
+    // url.origin includes the port (https://app.example.net:5173) while glob entries like
+    // https://*.example.net have none. For wildcard/glob entries only, also test the
+    // port-stripped origin so satellite apps on custom ports are not rejected.
+    // Exact string entries (no wildcard) remain port-sensitive to preserve the security boundary.
+    const portlessOrigin = url.port !== '' ? `${url.protocol}//${url.hostname}` : null;
+
     const isAllowed =
       !isProblematicUrl(url) &&
       (isSameOrigin ||
-        allowedRedirectOrigins
-          .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-          .some(origin => origin.test(trimTrailingSlash(url.origin))));
+        allowedRedirectOrigins.some(origin => {
+          const pattern = typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin;
+          if (pattern.test(trimTrailingSlash(url.origin))) return true;
+          const isGlobEntry = typeof origin === 'string' && origin.includes('*');
+          return isGlobEntry && portlessOrigin !== null && pattern.test(portlessOrigin);
+        }));
 
     if (!isAllowed) {
       logger.warnOnce(
