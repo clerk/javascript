@@ -30,7 +30,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 concurrency:
   # Key on the clerk_go commit being validated rather than the (effectively always "main")

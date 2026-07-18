@@ -8,7 +8,12 @@ name: Labeler (apply)
 # trigger while preserving fork-PR labeling (SDK-80).
 
 on:
-  workflow_run:
+  # Privileged trigger, intentionally: this is the trusted half of the labeler
+  # handshake and never runs PR-controlled code. The apply job validates the
+  # artifact PR number against the trigger run's head_sha and head repository
+  # before using it (see the Resolve-and-verify step below and SDK-80). zizmor's
+  # dangerous-triggers audit can't see that guard, so suppress it here.
+  workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: [Labeler]
     types:
       - completed
