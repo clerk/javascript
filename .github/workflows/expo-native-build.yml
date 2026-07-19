@@ -68,7 +68,7 @@ jobs:
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 24.15.0
+          node-version: 24.18.0
           cache: pnpm
 
       - name: Install monorepo dependencies
@@ -202,7 +202,7 @@ jobs:
       # Only Node (for the key resolver) is needed; the e2e job builds nothing.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 24.15.0
+          node-version: 24.18.0
 
       - name: Check e2e secret availability
         id: gate
@@ -359,7 +359,7 @@ jobs:
 
       - name: Create AVD snapshot
         if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
           target: google_apis
@@ -373,7 +373,7 @@ jobs:
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
         continue-on-error: true
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}

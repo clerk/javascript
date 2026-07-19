@@ -238,7 +238,7 @@ jobs:
       - name: Send commit log to Slack
         id: slack
         if: steps.changesets.outputs.published == 'true'
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
@@ -247,7 +247,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: |
             {
@@ -347,7 +347,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: |
             {
@@ -500,7 +500,7 @@ jobs:
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: heart
@@ -536,7 +536,7 @@ jobs:
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
