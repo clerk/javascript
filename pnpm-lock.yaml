@@ -1080,7 +1080,7 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(webpack@5.102.1(esbuild@0.27.7))
       '@mdx-js/react':
-        specifier: ^3.1.0
+        specifier: ^3.1.1
         version: 3.1.1(@types/react@18.3.28)(react@18.3.1)
       '@next/mdx':
         specifier: ^15.0.0
