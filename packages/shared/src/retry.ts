@@ -136,9 +136,11 @@ export const retry = async <T>(callback: () => T | Promise<T>, options: RetryOpt
     signal,
   });
 
-      if (signal?.aborted) {
-        throw abortReason(signal);
-      }
+  while (true) {
+    if (signal?.aborted) {
+      throw abortReason(signal);
+    }
+
     try {
       const result = await callback();
       if (signal?.aborted) {
