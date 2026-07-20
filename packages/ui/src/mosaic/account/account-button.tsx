@@ -68,7 +68,6 @@ export function AccountButton(props: AccountButtonProps = {}) {
   return (
     <AccountButtonView
       {...data}
-      status={status}
       open={open}
       onOpenChange={setOpen}
       pendingKey={displayPendingKey}

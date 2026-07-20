@@ -49,6 +49,40 @@ function useBusy(key?: string): BusyState {
   return resolveBusy(pendingKey, key);
 }
 
+type BusySlot = 'inlineButton' | 'hoverAction' | 'action' | 'signOutAll';
+
+/**
+ * A button whose action can be in flight: swaps `leading` for a spinner while `busyKey` is the pending
+ * action, and disables itself whenever any action is pending. `children` persist across the swap.
+ */
+function BusyButton({
+  slot,
+  busyKey,
+  onClick,
+  leading,
+  children,
+}: {
+  slot: BusySlot;
+  busyKey?: string;
+  onClick: () => void;
+  leading?: ReactNode;
+  children?: ReactNode;
+}) {
+  const recipe = useRecipe(accountButtonRecipe);
+  const { loading, disabled } = useBusy(busyKey);
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      disabled={loading || disabled}
+      {...recipe[slot]}
+    >
+      {loading ? <Spinner /> : leading}
+      {children}
+    </button>
+  );
+}
+
 function activeMembership(data: AccountButtonData): AccountButtonMembership | undefined {
   if (data.activeOrganizationId === null) {
     return undefined;
@@ -175,36 +209,6 @@ function PendingApprovalLabel() {
   return <span {...suggestedBadge}>Pending approval</span>;
 }
 
-function InlineButton({ label, onClick, busyKey }: { label: string; onClick: () => void; busyKey?: string }) {
-  const { inlineButton } = useRecipe(accountButtonRecipe);
-  const { loading, disabled } = useBusy(busyKey);
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      disabled={loading || disabled}
-      {...inlineButton}
-    >
-      {loading ? <Spinner /> : label}
-    </button>
-  );
-}
-
-function HoverAction({ onClick, busyKey }: { onClick: () => void; busyKey?: string }) {
-  const { hoverAction } = useRecipe(accountButtonRecipe);
-  const { loading, disabled } = useBusy(busyKey);
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      disabled={loading || disabled}
-      {...hoverAction}
-    >
-      {loading ? <Spinner /> : 'Sign out'}
-    </button>
-  );
-}
-
 function AddRow({ label, onClick }: { label: string; onClick: () => void }) {
   const { add, addIcon } = useRecipe(accountButtonRecipe);
   const { disabled } = useBusy();
@@ -238,7 +242,7 @@ interface HeaderAction {
 
 function Header() {
   const data = useAccountButtonContext();
-  const { header, headerName, headerActions, action, secondary, upgrade } = useRecipe(accountButtonRecipe);
+  const { header, headerName, headerActions, secondary, upgrade } = useRecipe(accountButtonRecipe);
   const org = activeMembership(data);
   const isOrg = org !== undefined;
   const label = isOrg ? org.name : data.activeAccount.name;
@@ -304,29 +308,23 @@ function Header() {
           {...headerActions}
           style={{ gridTemplateColumns: `repeat(${actions.length}, 1fr)` }}
         >
-          {actions.map(a => {
-            const { loading, disabled } = resolveBusy(data.pendingKey, a.busyKey);
-            return (
-              <button
-                key={a.label}
-                type='button'
-                onClick={a.onClick}
-                disabled={loading || disabled}
-                {...action}
-              >
-                {loading ? (
-                  <Spinner />
-                ) : (
-                  <Icon
-                    name={a.icon}
-                    size='sm'
-                    sx={t => ({ color: t.color.cardForeground })}
-                  />
-                )}
-                {a.label}
-              </button>
-            );
-          })}
+          {actions.map(a => (
+            <BusyButton
+              key={a.label}
+              slot='action'
+              onClick={a.onClick}
+              busyKey={a.busyKey}
+              leading={
+                <Icon
+                  name={a.icon}
+                  size='sm'
+                  sx={t => ({ color: t.color.cardForeground })}
+                />
+              }
+            >
+              {a.label}
+            </BusyButton>
+          ))}
         </div>
       ) : null}
     </div>
@@ -353,7 +351,9 @@ function WorkspaceList() {
         busyKey={accountBusyKeys.selectPersonal()}
         hoverAction={
           signOutSession ? (
-            <HoverAction
+            <BusyButton
+              slot='hoverAction'
+              leading='Sign out'
               onClick={() => signOutSession(data.activeAccount.sessionId)}
               busyKey={accountBusyKeys.signOutSession(data.activeAccount.sessionId)}
             />
@@ -389,8 +389,9 @@ function WorkspaceList() {
             badge={<SuggestedBadge />}
             trailing={
               acceptSuggestion ? (
-                <InlineButton
-                  label='Join'
+                <BusyButton
+                  slot='inlineButton'
+                  leading='Join'
                   onClick={() => acceptSuggestion(s.id)}
                   busyKey={accountBusyKeys.acceptSuggestion(s.id)}
                 />
@@ -407,8 +408,9 @@ function WorkspaceList() {
           imageUrl={i.imageUrl}
           trailing={
             acceptInvitation ? (
-              <InlineButton
-                label='Accept'
+              <BusyButton
+                slot='inlineButton'
+                leading='Accept'
                 onClick={() => acceptInvitation(i.id)}
                 busyKey={accountBusyKeys.acceptInvitation(i.id)}
               />
@@ -461,28 +463,24 @@ function AccountsSection() {
 
 function Footer() {
   const data = useAccountButtonContext();
-  const { footer, signOutAll, branding } = useRecipe(accountButtonRecipe);
-  const { loading, disabled } = resolveBusy(data.pendingKey, accountBusyKeys.signOutAll());
+  const { footer, branding } = useRecipe(accountButtonRecipe);
   return (
     <div {...footer}>
       {data.onSignOutAll ? (
-        <button
-          type='button'
+        <BusyButton
+          slot='signOutAll'
           onClick={data.onSignOutAll}
-          disabled={loading || disabled}
-          {...signOutAll}
-        >
-          {loading ? (
-            <Spinner />
-          ) : (
+          busyKey={accountBusyKeys.signOutAll()}
+          leading={
             <Icon
               name='sign-out'
               size='sm'
               sx={t => ({ color: t.color.mutedForeground })}
             />
-          )}
+          }
+        >
           <span>Sign out of all accounts</span>
-        </button>
+        </BusyButton>
       ) : null}
       <div {...branding}>Secured by Clerk</div>
     </div>
@@ -602,13 +600,13 @@ export function AccountButtonPopup() {
   );
 }
 
-export type AccountButtonProps = Omit<AccountButtonRootProps, 'children'>;
+export type AccountButtonViewProps = Omit<AccountButtonRootProps, 'children'>;
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `AccountButton` lives in `account-button.tsx` and wraps this view.
  */
-export function AccountButtonView(props: AccountButtonProps) {
+export function AccountButtonView(props: AccountButtonViewProps) {
   return (
     <AccountButtonRoot {...props}>
       <AccountButtonTrigger />

@@ -39,7 +39,6 @@ export interface AccountButtonInvitation {
 }
 
 export interface AccountButtonData {
-  status: 'loading' | 'ready';
   activeAccount: AccountButtonAccount;
   /** `null` => the personal workspace is active. */
   activeOrganizationId: string | null;
