@@ -186,6 +186,31 @@ function assertClerkIsLoaded(c: ClerkType | undefined): asserts c is ClerkType {
   }
 }
 
+/**
+ * Sandbox-only demo aid: force an interactive Cloudflare Turnstile challenge so the inline captcha
+ * "spotlight" can be exercised without changing instance settings. Enable with `?captcha=interactive`.
+ *
+ * Overrides the loaded environment (never `src/`) to use Cloudflare's documented test sitekey
+ * `3x00000000000000000000FF` (which always escalates to interactive), render it inline, and disable
+ * the OAuth bypass so the "Continue with …" path also hits the challenge. Remove the query param to
+ * get the normal (mostly invisible) behavior back.
+ */
+function applyCaptchaSandboxOverrides() {
+  if (new URL(window.location.href).searchParams.get('captcha') !== 'interactive') {
+    return;
+  }
+  const env = (Clerk as unknown as { __internal_environment?: any })?.__internal_environment;
+  if (!env) {
+    console.warn('[sandbox] captcha=interactive: environment not loaded, skipping override');
+    return;
+  }
+  env.displayConfig.captchaPublicKey = '3x00000000000000000000FF'; // forces an interactive challenge
+  env.displayConfig.captchaWidgetType = 'smart'; // render inline into #clerk-captcha
+  env.displayConfig.captchaOauthBypass = []; // also exercise the OAuth ("Continue with …") path
+  env.userSettings.signUp.captcha_enabled = true; // ensure the widget actually runs
+  console.info('[sandbox] Forcing interactive captcha (test sitekey 3x…FF).');
+}
+
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
@@ -507,6 +532,7 @@ void (async () => {
       },
       localization: l[initialLocale as keyof typeof l],
     });
+    applyCaptchaSandboxOverrides();
     renderCurrentRoute();
     const { pane } = await initControls();
 

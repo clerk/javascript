@@ -1,41 +1,41 @@
 import { describe, expect, it } from 'vitest';
 
-import { guardHolds, initialState, reduce, type WizardConfig, type WizardState } from '../reducer';
+import { isStepReachable, initialState, reduce, type WizardConfig, type WizardState } from '../reducer';
 import type { WizardStepDescriptor } from '../types';
 
 const cfg = (descriptors: WizardStepDescriptor[]): WizardConfig => ({ descriptors });
 
 /**
- * A representative monotonic guard set over 4 steps:
- *   a — entry (no guard, always enterable)
- *   b — guard: g1
- *   c — guard: g2
- *   d — guard: g3
+ * A representative monotonic reachability set over 4 steps:
+ *   a — entry (no isReachable, always enterable)
+ *   b — isReachable: g1
+ *   c — isReachable: g2
+ *   d — isReachable: g3
  * Toggling g1..g3 from all-false to all-true walks the furthest-reachable
  * boundary one step at a time. Monotonic by construction (g3 ⇒ g2 ⇒ g1).
  */
 const monotonic = (g1: boolean, g2: boolean, g3: boolean): WizardStepDescriptor[] => [
   { id: 'a' },
-  { id: 'b', guard: () => g1 },
-  { id: 'c', guard: () => g2 },
-  { id: 'd', guard: () => g3 },
+  { id: 'b', isReachable: () => g1 },
+  { id: 'c', isReachable: () => g2 },
+  { id: 'd', isReachable: () => g3 },
 ];
 
 const at = (current: string): WizardState => ({ current, direction: 0, hasNavigated: false });
 
-describe('guardHolds', () => {
-  it('resolves TRUE when no guard (entry step default flip)', () => {
-    expect(guardHolds({ id: 'a' })).toBe(true);
+describe('isStepReachable', () => {
+  it('resolves TRUE when no isReachable (entry step default)', () => {
+    expect(isStepReachable({ id: 'a' })).toBe(true);
   });
 
   it('delegates to the inline predicate', () => {
-    expect(guardHolds({ id: 'b', guard: () => true })).toBe(true);
-    expect(guardHolds({ id: 'b', guard: () => false })).toBe(false);
+    expect(isStepReachable({ id: 'b', isReachable: () => true })).toBe(true);
+    expect(isStepReachable({ id: 'b', isReachable: () => false })).toBe(false);
   });
 });
 
 describe('initialState — furthest contiguously-reachable step', () => {
-  it('all guards false but entry → step 0', () => {
+  it('all isReachable false but entry → step 0', () => {
     expect(initialState(cfg(monotonic(false, false, false))).current).toBe('a');
   });
 
@@ -51,7 +51,7 @@ describe('initialState — furthest contiguously-reachable step', () => {
     expect(initialState(cfg(monotonic(true, true, true))).current).toBe('d');
   });
 
-  it('stops at the first gate (does not jump a closed guard)', () => {
+  it('stops at the first gate (does not jump a closed isReachable)', () => {
     // b open, c closed, d open: contiguous run stops at b.
     expect(initialState(cfg(monotonic(true, false, true))).current).toBe('b');
   });
@@ -80,9 +80,9 @@ describe('reduce — referential identity on every no-op path', () => {
     expect(reduce(s, { type: 'NEXT' }, cfg(monotonic(true, true, true)))).toBe(s);
   });
 
-  it('NEXT blocked by next guard → same ref', () => {
+  it('NEXT blocked by next isReachable → same ref', () => {
     const s = at('a');
-    // b's guard is false → cannot advance.
+    // b's isReachable is false → cannot advance.
     expect(reduce(s, { type: 'NEXT' }, cfg(monotonic(false, false, false)))).toBe(s);
   });
 
@@ -96,12 +96,12 @@ describe('reduce — referential identity on every no-op path', () => {
     expect(reduce(s, { type: 'PREV' }, cfg(monotonic(true, true, true)))).toBe(s);
   });
 
-  it('PREV blocked by predecessor guard → same ref', () => {
-    // Non-monotonic on purpose: at c, b's guard is false.
+  it('PREV blocked by predecessor isReachable → same ref', () => {
+    // Non-monotonic on purpose: at c, b's isReachable is false.
     const steps: WizardStepDescriptor[] = [
       { id: 'a' },
-      { id: 'b', guard: () => false },
-      { id: 'c', guard: () => true },
+      { id: 'b', isReachable: () => false },
+      { id: 'c', isReachable: () => true },
     ];
     const s = at('c');
     expect(reduce(s, { type: 'PREV' }, cfg(steps))).toBe(s);
@@ -117,9 +117,9 @@ describe('reduce — referential identity on every no-op path', () => {
     expect(reduce(s, { type: 'GOTO', step: 'a' }, cfg(monotonic(true, true, true)))).toBe(s);
   });
 
-  it('GOTO blocked by target guard → same ref', () => {
+  it('GOTO blocked by target isReachable → same ref', () => {
     const s = at('a');
-    // d's guard is false → cannot jump.
+    // d's isReachable is false → cannot jump.
     expect(reduce(s, { type: 'GOTO', step: 'd' }, cfg(monotonic(true, true, false)))).toBe(s);
   });
 
@@ -130,8 +130,8 @@ describe('reduce — referential identity on every no-op path', () => {
   });
 });
 
-describe('reduce — NEXT sequential + guard-gated', () => {
-  it('advances exactly one slot when the next guard holds', () => {
+describe('reduce — NEXT sequential + isReachable-gated', () => {
+  it('advances exactly one slot when the next isReachable holds', () => {
     const next = reduce(at('a'), { type: 'NEXT' }, cfg(monotonic(true, false, false)));
     expect(next.current).toBe('b');
     expect(next.direction).toBe(1);
@@ -144,14 +144,14 @@ describe('reduce — NEXT sequential + guard-gated', () => {
     expect(next.current).toBe('b');
   });
 
-  it('a hard stop mid-flow does not skip ahead to a later open guard', () => {
+  it('a hard stop mid-flow does not skip ahead to a later open isReachable', () => {
     // b open, c closed, d open. From b, NEXT targets c (closed) → no-op.
     const s = at('b');
     expect(reduce(s, { type: 'NEXT' }, cfg(monotonic(true, false, true)))).toBe(s);
   });
 });
 
-describe('reduce — PREV positional + guard-gated', () => {
+describe('reduce — PREV positional + isReachable-gated', () => {
   it('walks exactly one declaration slot back', () => {
     const prev = reduce(at('c'), { type: 'PREV' }, cfg(monotonic(true, true, true)));
     expect(prev.current).toBe('b');
@@ -165,7 +165,7 @@ describe('reduce — PREV positional + guard-gated', () => {
   });
 });
 
-describe('reduce — GOTO guard-gated', () => {
+describe('reduce — GOTO isReachable-gated', () => {
   it('jumps to a reachable target', () => {
     const goto = reduce(at('a'), { type: 'GOTO', step: 'c' }, cfg(monotonic(true, true, true)));
     expect(goto.current).toBe('c');

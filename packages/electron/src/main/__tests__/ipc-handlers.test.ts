@@ -1,0 +1,103 @@
+import { ipcMain } from 'electron';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
+import type { TokenStorage } from '../../shared/types';
+import { setupTokenCacheIpcHandlers } from '../ipc-handlers';
+
+const mainFrame = {};
+const windowSender = { mainFrame, getType: () => 'window' };
+const ipcEvent = { sender: windowSender, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
+const subframeEvent = { sender: windowSender, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
+// A <webview> is a separate WebContents whose top document satisfies senderFrame === mainFrame.
+const webviewEvent = {
+  sender: { mainFrame, getType: () => 'webview' },
+  senderFrame: mainFrame,
+} as unknown as Electron.IpcMainInvokeEvent;
+
+vi.mock('electron', () => ({
+  ipcMain: {
+    handle: vi.fn(),
+    removeHandler: vi.fn(),
+  },
+}));
+
+describe('setupTokenCacheIpcHandlers', () => {
+  const storage: TokenStorage = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('registers token cache IPC handlers', () => {
+    setupTokenCacheIpcHandlers(storage);
+
+    expect(ipcMain.handle).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken, expect.any(Function));
+    expect(ipcMain.handle).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken, expect.any(Function));
+    expect(ipcMain.handle).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken, expect.any(Function));
+  });
+
+  it('delegates token operations to the storage adapter', async () => {
+    vi.mocked(storage.getItem).mockResolvedValue('jwt');
+
+    setupTokenCacheIpcHandlers(storage);
+
+    const getTokenHandler = vi.mocked(ipcMain.handle).mock.calls[0][1];
+    const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
+    const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
+
+    await expect(getTokenHandler(ipcEvent, 'token-key')).resolves.toBe('jwt');
+    await saveTokenHandler(ipcEvent, 'token-key', 'jwt');
+    await clearTokenHandler(ipcEvent, 'token-key');
+
+    expect(storage.getItem).toHaveBeenCalledWith('token-key');
+    expect(storage.setItem).toHaveBeenCalledWith('token-key', 'jwt');
+    expect(storage.removeItem).toHaveBeenCalledWith('token-key');
+  });
+
+  it('rejects token operations that do not originate from the main frame', () => {
+    setupTokenCacheIpcHandlers(storage);
+
+    const getTokenHandler = vi.mocked(ipcMain.handle).mock.calls[0][1];
+    const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
+    const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
+
+    expect(() => getTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
+    expect(() => saveTokenHandler(subframeEvent, 'token-key', 'jwt')).toThrow('main frame');
+    expect(() => clearTokenHandler(subframeEvent, 'token-key')).toThrow('main frame');
+
+    expect(storage.getItem).not.toHaveBeenCalled();
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(storage.removeItem).not.toHaveBeenCalled();
+  });
+
+  it('rejects token operations from a <webview> whose top frame mimics the main frame', () => {
+    setupTokenCacheIpcHandlers(storage);
+
+    const getTokenHandler = vi.mocked(ipcMain.handle).mock.calls[0][1];
+    const saveTokenHandler = vi.mocked(ipcMain.handle).mock.calls[1][1];
+    const clearTokenHandler = vi.mocked(ipcMain.handle).mock.calls[2][1];
+
+    expect(() => getTokenHandler(webviewEvent, 'token-key')).toThrow('main frame');
+    expect(() => saveTokenHandler(webviewEvent, 'token-key', 'jwt')).toThrow('main frame');
+    expect(() => clearTokenHandler(webviewEvent, 'token-key')).toThrow('main frame');
+
+    expect(storage.getItem).not.toHaveBeenCalled();
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(storage.removeItem).not.toHaveBeenCalled();
+  });
+
+  it('removes registered handlers on cleanup', () => {
+    const cleanup = setupTokenCacheIpcHandlers(storage);
+
+    cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken);
+  });
+});

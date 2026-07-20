@@ -20,9 +20,9 @@ import type {
 import { useCallback, useMemo, useRef } from 'react';
 
 import {
-  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
@@ -46,6 +46,11 @@ export interface EnterpriseConnectionMutations {
    * never thread them through.
    */
   createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
+  /**
+   * Swaps the active organization's connection to a different provider. This removes the existing
+   * connection and creates a fresh one.
+   */
+  changeProvider: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   updateConnection: (
     id: string,
     params: UpdateOrganizationEnterpriseConnectionParams,
@@ -104,6 +109,11 @@ export interface TestRunsView {
   setPage: (page: number) => void;
   /** Pass `{ armPolling: true }` after the user kicks off a run. */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
+  /**
+   * Revalidates the success probe and resolves with the fresh answer, so the
+   * Test step's Continue gate can pick up a run completed elsewhere on demand.
+   */
+  revalidateHasSuccessfulTestRun: () => Promise<boolean>;
 }
 
 /**
@@ -168,6 +178,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     page: testRunPage,
     setPage: setTestRunPage,
     refresh: refreshTestRuns,
+    revalidateHasSuccessfulTestRun,
   } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive);
 
   const { user } = useUser();
@@ -222,6 +233,24 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       });
     };
 
+    const changeProvider: EnterpriseConnectionMutations['changeProvider'] = async provider => {
+      // FAPI can't switch an existing connection's provider in place, so for the MVP
+      // we delete the old connection and create a new one. This is intentionally
+      // non-atomic: if the create fails, the org is briefly left without a connection
+      // until the user retries. Recovery is by design — the next render revalidates
+      // the now-deleted connection away, so a retry is just a plain create.
+      if (enterpriseConnection) {
+        await deleteEnterpriseConnection(enterpriseConnection.id);
+      }
+
+      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
+
+      return createEnterpriseConnection({
+        provider,
+        domains,
+      });
+    };
+
     const updateConnection: EnterpriseConnectionMutations['updateConnection'] = (id, params) =>
       updateEnterpriseConnection(id, params);
 
@@ -244,15 +273,16 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
     return {
       createConnection,
+      changeProvider,
       updateConnection,
       setConnectionActive,
       deleteConnection,
       createTestRun,
     };
   }, [
-    user,
     organization,
     organizationDomains,
+    enterpriseConnection,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
@@ -268,6 +298,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       page: testRunPage,
       setPage: setTestRunPage,
       refresh: refreshTestRuns,
+      revalidateHasSuccessfulTestRun,
     }),
     [
       testRunRows,
@@ -278,6 +309,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       testRunPage,
       setTestRunPage,
       refreshTestRuns,
+      revalidateHasSuccessfulTestRun,
     ],
   );
 

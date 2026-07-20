@@ -350,6 +350,137 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 });
 ```
 
+## Flow and data architecture
+
+Mosaic flow UI follows a **machine → controller → view** split. This keeps Clerk resource logic out of visual components and makes most behavior testable without a running Clerk app.
+
+```text
+machine
+  Pure flow rules: states, events, guards, async invokes, errors.
+  No React hooks. No Clerk hooks. No Clerk resource objects.
+
+controller
+  Clerk/data adapter: reads Clerk hooks/resources, injects async effects, derives actor-driven view props.
+  This is the only layer in the flow that may import Clerk hooks or call Clerk resource methods.
+
+view
+  Rendering only: receives a snapshot plus explicit props, renders UI, sends events.
+  No Clerk imports. No data-fetching hooks. No mutation calls.
+```
+
+### File shape
+
+Flow slices should be split by role:
+
+```text
+delete-organization.machine.ts        // pure state machine
+delete-organization.controller.tsx     // Clerk/mock adapter + actor wiring
+delete-organization.view.tsx           // view-only rendering
+delete-organization.tsx                // thin composition wrapper
+```
+
+The exported component composes the controller and view:
+
+```tsx
+export function DeleteOrganization() {
+  const controller = useDeleteOrganizationController();
+  // Render nothing until the controller is ready (mirrors the legacy sections,
+  // which gate their own visibility and show no skeleton).
+  if (controller.status !== 'ready') {
+    return null;
+  }
+
+  return (
+    <DeleteOrganizationView
+      snapshot={controller.snapshot}
+      send={controller.send}
+      canSubmit={controller.canSubmit}
+    />
+  );
+}
+```
+
+### Machines
+
+Machines own the flow rules. For destructive confirmation flows, the confirmation input value and the guard live in the machine, not the view block:
+
+```ts
+export type DeleteOrgEvent =
+  | { type: 'OPEN' }
+  | { type: 'TYPE_CONFIRMATION'; value: string }
+  | { type: 'CONFIRM' }
+  | { type: 'CANCEL' };
+
+CONFIRM: {
+  target: 'deleting',
+  guard: context => context.confirmationValue === context.organizationName,
+}
+```
+
+Async effects are injected through context and invoked by the machine:
+
+```ts
+deleting: {
+  invoke: fromPromise(ctx => ctx.destroyOrganization(), {
+    onDone: 'deleted',
+    onError: {
+      target: 'confirming',
+      actions: assign((_, event) => ({ error: String(event.error) })),
+    },
+  }),
+}
+```
+
+Machine tests should use `createActor()` directly. They should not render React and should not require Clerk fixtures.
+
+### Controllers
+
+Controllers are the adapter from Clerk resources into machine context and view props. They may call hooks like `useOrganization()` and inject live resource methods:
+
+```tsx
+export function useDeleteOrganizationController() {
+  const { isLoaded, organization } = useOrganization();
+  const [snapshot, send, actor] = useMachine(deleteOrgMachine, {
+    context: {
+      organizationName: organization?.name ?? '',
+      destroyOrganization: () => organization?.destroy() ?? Promise.resolve(),
+    },
+  });
+
+  if (!isLoaded || !organization) {
+    return { status: 'loading' as const };
+  }
+
+  return {
+    status: 'ready' as const,
+    snapshot,
+    send,
+    canSubmit: actor.can({ type: 'CONFIRM' }),
+  };
+}
+```
+
+Controllers should pass plain data and plain functions into machines. Do not pass Clerk resource objects through to views.
+
+### Views
+
+Views render snapshots and emit events. They receive any derived booleans from the controller, including `actor.can(...)` results, so they do not duplicate machine guards:
+
+```tsx
+<Destructive
+  open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
+  resourceName={snapshot.context.organizationName}
+  confirmationValue={snapshot.context.confirmationValue}
+  onConfirmationValueChange={value => send({ type: 'TYPE_CONFIRMATION', value })}
+  onDelete={() => send({ type: 'CONFIRM' })}
+  canSubmit={canSubmit}
+  isDeleting={snapshot.value === 'deleting'}
+  error={snapshot.context.error}
+/>
+```
+
+View tests should render the view directly with a fake snapshot and fake `send`. They should not use Clerk providers or Clerk fixtures.
+
 ## Coexistence with existing system
 
 ### Provider tree
@@ -396,6 +527,13 @@ To migrate a component from the old system to Mosaic:
 6. Update token references — e.g. `theme.colors.$primary500` → `theme.color.primary`.
 7. Ensure the component is inside a `MosaicProvider` in the tree.
 
+The steps above cover the **styling** migration (recipes + tokens). For **flow**
+components — where the legacy component also fuses data-fetching and flow logic —
+splitting that logic into the machine/controller/view layers and verifying no
+implicit behavior is dropped is its own end-to-end workflow. See the `mosaic`
+Claude Code skill (`.claude/skills/mosaic/`), in particular its
+`references/migration.md`.
+
 ## Files
 
 | File                                              | Purpose                                                                     |
@@ -408,6 +546,10 @@ To migrate a component from the old system to Mosaic:
 | `src/mosaic/useSlot.ts`                           | `useSlot` + `slot()` sugar for non-recipe parts                             |
 | `src/mosaic/resolveSlot.ts`                       | Pure per-slot appearance-layer resolver (`resolveSlotCss`)                  |
 | `src/mosaic/conditions.ts`                        | Condition vocabulary (`_hover`, …) + `expandConditions`                     |
+| `src/mosaic/machine/`                             | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
+| `src/mosaic/<feature>/*-machine.ts`               | Pure flow rules for a Mosaic feature (e.g. `organization/`)                 |
+| `src/mosaic/<feature>/*-controller.tsx`           | Clerk/mock data adapters and actor wiring for a Mosaic feature              |
+| `src/mosaic/<feature>/*-view.tsx`                 | Clerk-free view modules that render snapshots and send events               |
 | `src/mosaic/__tests__/slot-recipe.test.ts`        | Recipe resolution, attrs, conditions, `useSlot`/`slot` specs                |
 | `src/mosaic/__tests__/resolveSlot.test.ts`        | Appearance-layer resolution specs                                           |
 | `src/mosaic/__tests__/MosaicProvider.test.tsx`    | Appearance/scope parsing + theme-from-variables specs                       |

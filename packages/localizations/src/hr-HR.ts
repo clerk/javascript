@@ -210,9 +210,9 @@ export const hrHR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Prebaci na ovaj plan',
     switchToAnnual: 'Prebaci na godišnje',
-    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{currency}}{{price}} / godišnje',
+    switchToAnnualWithAnnualPrice: 'Prebaci na godišnje {{price}} / godišnje',
     switchToMonthly: 'Prebaci na mjesečno',
-    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{currency}}{{price}} / mjesečno',
+    switchToMonthlyWithPrice: 'Prebaci na mjesečno {{price}} / mjesečno',
     totalDue: 'Ukupno za platiti',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Ukupno za platiti danas',
@@ -223,7 +223,26 @@ export const hrHR: LocalizationResource = {
     yearPerUnit: 'Godina po {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -234,26 +253,25 @@ export const hrHR: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -263,7 +281,6 @@ export const hrHR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -304,7 +321,6 @@ export const hrHR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -352,7 +368,6 @@ export const hrHR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -389,7 +404,6 @@ export const hrHR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -419,6 +433,8 @@ export const hrHR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -438,21 +454,17 @@ export const hrHR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -500,7 +512,6 @@ export const hrHR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -532,7 +543,6 @@ export const hrHR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -573,7 +583,6 @@ export const hrHR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -620,38 +629,9 @@ export const hrHR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -663,8 +643,11 @@ export const hrHR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Nepotvrđeno',
         badge__verified: 'Potvrđeno',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -675,14 +658,15 @@ export const hrHR: LocalizationResource = {
           valueLabel: 'Vrijednost',
         },
         verifiedAtLabel: "Potvrđeno {{ date | shortDate('hr-HR') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Dodaj {{domain}}',
         messageLabel: 'Vaša e-pošta koristi {{domain}}. Želite li ga dodati?',
       },
       formButtonPrimary__add: 'Dodaj',
-      formFieldInputPlaceholder__domain: 'Ovdje upišite svoju domenu i kliknite dodaj za početak',
-      formFieldLabel__domain: 'Domene',
+      formFieldInputPlaceholder__domain: 'Dodaj domenu',
+      formFieldLabel__domain: 'Domena',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -903,6 +887,15 @@ export const hrHR: LocalizationResource = {
     badge__manualInvitation: 'Bez automatskog učlanjenja',
     badge__unverified: 'Nepotvrđeno',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nema povijesti plaćanja',
         notFound: 'Pokušaj plaćanja nije pronađen',
@@ -1097,19 +1090,17 @@ export const hrHR: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1237,6 +1228,9 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite kod generiran vašom aplikacijom za autentifikaciju za nastavak',
       title: 'Potrebna verifikacija',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1383,6 +1377,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Za nastavak, unesite verifikacijski kod poslan na vaš telefon',
       title: 'Provjerite svoj telefon',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Resetiraj lozinku',
       requiredMessage: 'Iz sigurnosnih razloga, potrebno je resetirati vašu lozinku.',
@@ -1488,6 +1488,12 @@ export const hrHR: LocalizationResource = {
       resendButton: 'Niste primili kod? Pošalji ponovno',
       subtitle: 'Unesite verifikacijski kod poslan na vaš telefon',
       title: 'Potvrdite svoj telefon',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Prijavi se',
@@ -1636,6 +1642,7 @@ export const hrHR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     api_key_name_already_exists: 'Naziv API ključa već postoji.',
     api_key_usage_exceeded:
@@ -1690,6 +1697,7 @@ export const hrHR: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_exists_for_enterprise_connection:
@@ -1716,6 +1724,14 @@ export const hrHR: LocalizationResource = {
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: 'Nije pronađeno proširenje za Web3 novčanik. Molimo instalirajte jedno za nastavak.',
     web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
@@ -1768,6 +1784,9 @@ export const hrHR: LocalizationResource = {
     action__openUserMenu: 'Otvori korisnički izbornik',
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
+    label__accountActions: 'Akcije računa',
+    label__activeSessions: 'Aktivne sesije',
+    label__userButtonPopover: 'Ploča računa',
   },
   userProfile: {
     apiKeysPage: {
@@ -1790,6 +1809,15 @@ export const hrHR: LocalizationResource = {
       title__codelist: 'Rezervni kodovi',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nema povijesti plaćanja',
         notFound: 'Pokušaj plaćanja nije pronađen',

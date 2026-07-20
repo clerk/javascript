@@ -94,34 +94,42 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             boxShadow: hoverBoxShadow,
           },
         };
+  const borderColor = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha150
+      : t.colors.$warningAlpha300
+    : t.colors.$dangerAlpha500;
+
+  const boxShadow = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha100
+      : t.colors.$warningAlpha50
+    : t.colors.$borderAlpha150;
+
+  const defaultBoxShadow = t.shadows.$input.replace('{{color}}', boxShadow);
+
+  const focusStyleValues = {
+    borderColor: hoverBorderColor,
+    WebkitTapHighlightColor: 'transparent',
+    boxShadow: [
+      hoverBoxShadow,
+      t.shadows.$focusRing.replace(
+        '{{color}}',
+        !props?.hasError ? t.colors.$borderAlpha150 : (t.colors.$dangerAlpha200 as string),
+      ),
+    ].toString(),
+  };
   const focusStyles =
     props?.focusRing === false
       ? {}
       : {
-          '&:focus': {
-            borderColor: hoverBorderColor,
-            WebkitTapHighlightColor: 'transparent',
-            boxShadow: [
-              hoverBoxShadow,
-              t.shadows.$focusRing.replace(
-                '{{color}}',
-                !props?.hasError ? t.colors.$borderAlpha150 : (t.colors.$dangerAlpha200 as string),
-              ),
-            ].toString(),
+          '&:focus': focusStyleValues,
+          '&:focus:not(:focus-visible)': {
+            borderColor,
+            boxShadow: defaultBoxShadow,
           },
+          '&:focus-visible': focusStyleValues,
         };
-
-  const borderColor = !props?.hasError
-    ? !props?.hasWarning
-      ? t.colors.$borderAlpha150 // Default border color
-      : t.colors.$warningAlpha300 // Warning border color
-    : t.colors.$dangerAlpha500; // Error border color
-
-  const boxShadow = !props?.hasError
-    ? !props?.hasWarning
-      ? t.colors.$borderAlpha100 // Default box shadow color
-      : t.colors.$warningAlpha50 // Warning box shadow color
-    : t.colors.$borderAlpha150; // Error box shadow color
 
   return {
     normal: {
@@ -129,7 +137,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
       borderWidth: t.borderWidths.$normal,
       borderStyle: t.borderStyles.$solid,
       borderColor,
-      boxShadow: t.shadows.$input.replace('{{color}}', boxShadow),
+      boxShadow: defaultBoxShadow,
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
@@ -161,6 +169,12 @@ const focusRing = (t: InternalTheme) => {
     '&:focus': {
       ...focusRingStyles(t),
     },
+    '&:focus:not(:focus-visible)': {
+      boxShadow: 'none',
+    },
+    '&:focus-visible': {
+      ...focusRingStyles(t),
+    },
   } as const;
 };
 
@@ -173,6 +187,26 @@ const disabled = (t: InternalTheme) => {
     },
   } as const;
 };
+
+// Shared chrome for a button anchored to the trailing edge of an input (e.g. password reveal,
+// search clear). The clerk theme tightens the geometry in `baseTheme.ts`; the simple theme uses
+// these values as-is. Callers layer on their own icon/visibility styles.
+const inputTrailingButton = (t: InternalTheme) =>
+  ({
+    position: 'absolute',
+    insetInlineEnd: t.space.$1,
+    insetBlock: t.space.$1,
+    borderRadius: `calc(${t.radii.$md} - ${t.space.$1})`,
+    color: t.colors.$neutralAlpha400,
+    paddingInline: t.space.$2,
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: `calc(${t.space.$1} * -1)`,
+      display: 'block',
+      borderRadius: t.radii.$md,
+    },
+  }) as const;
 
 const centeredFlex = (display: 'flex' | 'inline-flex' = 'flex') => ({
   display: display,
@@ -250,6 +284,7 @@ export const common = {
   focusRing,
   disabled,
   borderColor,
+  inputTrailingButton,
   centeredFlex,
   maxHeightScroller,
   mutedBackground,

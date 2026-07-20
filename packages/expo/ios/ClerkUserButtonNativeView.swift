@@ -1,22 +1,16 @@
-import React
+import ExpoModulesCore
 import UIKit
 
 public class ClerkUserButtonNativeView: ClerkNativeViewHost {
   override func makeHostedController() -> UIViewController? {
-    guard let bridge = clerkNativeBridge else { return nil }
-
-    return bridge.makeUserButtonViewController()
+    return ClerkNativeBridge.shared.makeUserButtonViewController()
   }
 }
 
-@objc(ClerkUserButtonViewManager)
-class ClerkUserButtonViewManager: RCTViewManager {
+public class ClerkUserButtonViewModule: Module {
+  public func definition() -> ModuleDefinition {
+    Name("ClerkUserButtonView")
 
-  override static func requiresMainQueueSetup() -> Bool {
-    return true
-  }
-
-  override func view() -> UIView! {
-    return ClerkUserButtonNativeView()
+    View(ClerkUserButtonNativeView.self) {}
   }
 }

@@ -209,9 +209,9 @@ export const roRO: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Schimbă pe acest plan',
     switchToAnnual: 'Treci la anual',
-    switchToAnnualWithAnnualPrice: 'Treci la anual {{currency}}{{price}} / an',
+    switchToAnnualWithAnnualPrice: 'Treci la anual {{price}} / an',
     switchToMonthly: 'Treci la lunar',
-    switchToMonthlyWithPrice: 'Treci la lunar {{currency}}{{price}} / lună',
+    switchToMonthlyWithPrice: 'Treci la lunar {{price}} / lună',
     totalDue: 'Total de plată',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total de plată astăzi',
@@ -222,7 +222,26 @@ export const roRO: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -233,26 +252,25 @@ export const roRO: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -262,7 +280,6 @@ export const roRO: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -303,7 +320,6 @@ export const roRO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -351,7 +367,6 @@ export const roRO: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -388,7 +403,6 @@ export const roRO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -418,6 +432,8 @@ export const roRO: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -437,21 +453,17 @@ export const roRO: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -499,7 +511,6 @@ export const roRO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -531,7 +542,6 @@ export const roRO: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -572,7 +582,6 @@ export const roRO: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -619,38 +628,9 @@ export const roRO: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -662,8 +642,11 @@ export const roRO: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Neverificat',
         badge__verified: 'Verificat',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -674,14 +657,15 @@ export const roRO: LocalizationResource = {
           valueLabel: 'Valoare',
         },
         verifiedAtLabel: "Verificat pe {{ date | shortDate('ro-RO') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Adaugă {{domain}}',
         messageLabel: 'E-mailul tău folosește {{domain}}. Vrei să-l adaugi?',
       },
       formButtonPrimary__add: 'Adaugă',
-      formFieldInputPlaceholder__domain: 'Scrie aici domeniul tău și fă clic pe adaugă pentru a începe',
-      formFieldLabel__domain: 'Domenii',
+      formFieldInputPlaceholder__domain: 'Adaugă domeniu',
+      formFieldLabel__domain: 'Domeniu',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -904,6 +888,15 @@ export const roRO: LocalizationResource = {
     badge__manualInvitation: 'Fără înscriere automată',
     badge__unverified: 'Neverificat',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nu există istoric de plăți',
         notFound: 'Plata nu a fost găsită',
@@ -1098,19 +1091,17 @@ export const roRO: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1239,6 +1230,9 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu codul generat de aplicația ta de autentificare pentru a continua',
       title: 'Verificare în doi pași',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1385,6 +1379,12 @@ export const roRO: LocalizationResource = {
       subtitle: 'Pentru a continua, introdu codul de verificare trimis pe telefon',
       title: 'Verifică-ți telefonul',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Resetează parola',
       requiredMessage: 'Din motive de securitate, este necesar să îți resetezi parola.',
@@ -1490,6 +1490,12 @@ export const roRO: LocalizationResource = {
       resendButton: 'Nu ai primit un cod? Retrimite',
       subtitle: 'Introdu codul de verificare trimis pe telefon',
       title: 'Verifică-ți telefonul',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Autentifică-te',
@@ -1630,6 +1636,7 @@ export const roRO: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1681,6 +1688,7 @@ export const roRO: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1705,6 +1713,14 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola ta trebuie să conțină',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
     web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
@@ -1757,6 +1773,9 @@ export const roRO: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
+    label__accountActions: 'Acțiuni cont',
+    label__activeSessions: 'Sesiuni active',
+    label__userButtonPopover: 'Panoul contului',
   },
   userProfile: {
     apiKeysPage: {
@@ -1779,6 +1798,15 @@ export const roRO: LocalizationResource = {
       title__codelist: 'Coduri de rezervă',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nu există istoric de plăți',
         notFound: 'Încercarea de plată nu a fost găsită',

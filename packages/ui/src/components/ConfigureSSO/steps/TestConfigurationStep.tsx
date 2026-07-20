@@ -58,6 +58,7 @@ export const TestConfigurationStep = (): JSX.Element => {
     page: currentPage,
     setPage: setCurrentPage,
     refresh: refreshTestRuns,
+    revalidateHasSuccessfulTestRun,
   } = testRuns;
 
   const isRefreshingTestRuns = areTestRunsFetching && !areTestRunsLoading;
@@ -94,6 +95,7 @@ export const TestConfigurationStep = (): JSX.Element => {
             <Col gap={3}>
               <Text
                 as='p'
+                colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.testConfigurationStep.subtitle')}
               />
 
@@ -181,7 +183,10 @@ export const TestConfigurationStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Reset />
           <Step.Footer.Previous onClick={() => goPrev()} />
-          <ContinueTestSsoStepButton hasSuccessfulTestRun={c.hasSuccessfulTestRun} />
+          <ContinueTestSsoStepButton
+            hasSuccessfulTestRun={c.hasSuccessfulTestRun}
+            revalidateHasSuccessfulTestRun={revalidateHasSuccessfulTestRun}
+          />
         </Step.Footer>
       </Step>
     </Flow.Part>
@@ -190,27 +195,60 @@ export const TestConfigurationStep = (): JSX.Element => {
 
 type ContinueTestSsoStepButtonProps = {
   hasSuccessfulTestRun: boolean;
+  revalidateHasSuccessfulTestRun: () => Promise<boolean>;
 };
 
-const ContinueTestSsoStepButton = ({ hasSuccessfulTestRun }: ContinueTestSsoStepButtonProps): JSX.Element => {
+const ContinueTestSsoStepButton = ({
+  hasSuccessfulTestRun,
+  revalidateHasSuccessfulTestRun,
+}: ContinueTestSsoStepButtonProps): JSX.Element => {
   const { t } = useLocalizations();
   const card = useCardState();
   const { goNext } = useWizard();
+  const [isValidating, setIsValidating] = useState(false);
+  const isLoading = useSpinDelay(isValidating);
+
+  const advance = (): void => {
+    card.setError(undefined);
+    goNext();
+  };
 
   // The button stays enabled so a user without a successful run still gets the
   // inline validation message (matching legacy), rather than a silently
-  // disabled Continue. On success we advance; otherwise we surface the error
-  // and stay put.
-  const handleContinue = (): void => {
+  // disabled Continue.
+  //
+  // The local success probe can be stale — e.g. the run that succeeded happened
+  // in a different browser tab. So before blocking, revalidate the probe and
+  // gate on the genuinely FRESH answer (the resolved value, not the
+  // closed-over `hasSuccessfulTestRun` prop, which is the pre-revalidate render
+  // value). This picks up a success from elsewhere without a manual "Refresh
+  // logs"; we still surface the error when there is genuinely no successful run.
+  const handleContinue = async (): Promise<void> => {
     if (hasSuccessfulTestRun) {
-      card.setError(undefined);
-      goNext();
+      advance();
       return;
     }
-    card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
+
+    setIsValidating(true);
+    try {
+      if (await revalidateHasSuccessfulTestRun()) {
+        advance();
+        return;
+      }
+      card.setError(t(localizationKeys('configureSSO.testConfigurationStep.error__noSuccessfulTestRun')));
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+    } finally {
+      setIsValidating(false);
+    }
   };
 
-  return <Step.Footer.Continue onClick={handleContinue} />;
+  return (
+    <Step.Footer.Continue
+      onClick={handleContinue}
+      isLoading={isLoading}
+    />
+  );
 };
 
 type TestResultsTableProps = {

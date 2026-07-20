@@ -19,6 +19,7 @@ import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
 import { handleError } from '@/utils/errorHandler';
 
+import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
@@ -54,30 +55,44 @@ const PROVIDER_GROUPS: ReadonlyArray<{
   },
 ];
 
+const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
+  PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
+
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
-    enterpriseConnectionMutations: { createConnection },
+    enterpriseConnectionMutations: { createConnection, changeProvider },
+    contentRef,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
+  const { t } = useLocalizations();
 
   const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
   const card = useCardState();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isChangeDialogOpen, setIsChangeDialogOpen] = React.useState(false);
+  const [changeFromProvider, setChangeFromProvider] = React.useState<ProviderType | null>(null);
 
   const handleSelect = (next: ProviderType) => {
     setSelected(next);
   };
+
+  const isChangingProvider = c.hasConnection && selected !== null && selected !== c.provider;
 
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    if (c.hasConnection) {
-      // TODO ORGS-1607 - Support changing the provider
+    if (c.hasConnection && selected === c.provider) {
       void goNext();
+      return;
+    }
+
+    if (isChangingProvider) {
+      setChangeFromProvider(c.provider ?? null);
+      setIsChangeDialogOpen(true);
       return;
     }
 
@@ -92,6 +107,28 @@ export const SelectProviderStep = (): JSX.Element => {
       setIsSubmitting(false);
     }
   };
+
+  const handleConfirmChangeProvider = async (): Promise<void> => {
+    if (!selected) {
+      return;
+    }
+
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await changeProvider(selected);
+      void goNext();
+    } catch (err) {
+      handleError(err as Error, [], card.setError);
+      setIsChangeDialogOpen(false);
+      setChangeFromProvider(null);
+      setIsSubmitting(false);
+    }
+  };
+
+  const currentProviderLabel = changeFromProvider ? providerLabel(changeFromProvider) : undefined;
+  const nextProviderLabel = selected ? providerLabel(selected) : undefined;
 
   return (
     <Flow.Part part='selectProvider'>
@@ -122,6 +159,8 @@ export const SelectProviderStep = (): JSX.Element => {
                 />
 
                 <Grid
+                  role='radiogroup'
+                  aria-label={t(group.label)}
                   elementDescriptor={descriptors.configureSSOProviderGrid}
                   gap={3}
                   sx={{
@@ -146,11 +185,6 @@ export const SelectProviderStep = (): JSX.Element => {
               </Col>
             ))}
 
-            <Alert
-              variant='warning'
-              title={localizationKeys('configureSSO.selectProviderStep.warning')}
-            />
-
             {card.error && (
               <Alert
                 variant='danger'
@@ -164,15 +198,32 @@ export const SelectProviderStep = (): JSX.Element => {
         <Step.Footer>
           <Step.Footer.Previous
             onClick={() => goPrev()}
-            isDisabled={isFirstStep}
+            isDisabled={isFirstStep || isSubmitting}
           />
 
           <Step.Footer.Continue
             onClick={handleContinue}
-            isLoading={isSubmitting}
+            isLoading={isSubmitting && !isChangeDialogOpen}
             isDisabled={!selected || isSubmitting}
           />
         </Step.Footer>
+
+        {currentProviderLabel && nextProviderLabel ? (
+          <ChangeProviderDialog
+            isOpen={isChangeDialogOpen}
+            onClose={() => {
+              setIsChangeDialogOpen(false);
+              setChangeFromProvider(null);
+            }}
+            onConfirm={() => {
+              void handleConfirmChangeProvider();
+            }}
+            isSubmitting={isSubmitting}
+            nextProviderLabel={nextProviderLabel}
+            currentProviderLabel={currentProviderLabel}
+            contentRef={contentRef}
+          />
+        ) : null}
       </Step>
     </Flow.Part>
   );
@@ -228,15 +279,10 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         checked={checked}
         onChange={onChange}
         focusRing={false}
-        sx={theme => ({
-          position: 'absolute',
-          top: theme.space.$1x5,
-          insetInlineStart: theme.space.$1x5,
-          margin: 0,
-          width: 'fit-content',
-          boxShadow: 'none',
-          '&:hover': { boxShadow: 'none' },
-        })}
+        // The visible dot is intentionally dropped per design; the radio stays in
+        // the a11y tree (sr-only, not display:none) so it keeps native radiogroup
+        // keyboard semantics and names itself from the wrapping label.
+        sx={common.visuallyHidden()}
       />
 
       <Span

@@ -2,10 +2,14 @@ import { usePortalRoot, useSafeLayoutEffect } from '@clerk/shared/react/index';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
+  FloatingNode,
   FloatingPortal,
+  FloatingTree,
   useClick,
   useDismiss,
   useFloating,
+  useFloatingNodeId,
+  useFloatingParentNodeId,
   useInteractions,
   useMergeRefs,
   useRole,
@@ -78,7 +82,22 @@ interface RootProps {
   dismissProps?: UseDismissProps;
 }
 
-function Root({
+function Root(props: RootProps) {
+  // The Drawer must be the root of a FloatingTree so that nested floating
+  // elements (e.g. a Select) register as its children. Without this, pressing
+  // Escape to close a nested popover also dismisses the Drawer.
+  const parentNodeId = useFloatingParentNodeId();
+  if (parentNodeId == null) {
+    return (
+      <FloatingTree>
+        <RootContent {...props} />
+      </FloatingTree>
+    );
+  }
+  return <RootContent {...props} />;
+}
+
+function RootContent({
   children,
   open,
   onOpenChange,
@@ -90,10 +109,12 @@ function Root({
   const direction = useDirection();
   const portalRoot = usePortalRoot();
   const effectivePortalRoot = portalProps?.root ?? portalRoot?.() ?? undefined;
+  const nodeId = useFloatingNodeId();
 
   const { refs, context } = useFloating({
     open,
     onOpenChange,
+    nodeId,
     transform: false,
     strategy,
     placement: direction === 'ltr' ? 'right' : 'left',
@@ -107,25 +128,27 @@ function Root({
   ]);
 
   return (
-    <DrawerContext.Provider
-      value={{
-        isOpen: open,
-        setIsOpen: onOpenChange,
-        strategy,
-        portalProps: { ...portalProps, root: effectivePortalRoot },
-        refs,
-        context,
-        getFloatingProps,
-        direction,
-      }}
-    >
-      <FloatingPortal
-        {...portalProps}
-        root={effectivePortalRoot}
+    <FloatingNode id={nodeId}>
+      <DrawerContext.Provider
+        value={{
+          isOpen: open,
+          setIsOpen: onOpenChange,
+          strategy,
+          portalProps: { ...portalProps, root: effectivePortalRoot },
+          refs,
+          context,
+          getFloatingProps,
+          direction,
+        }}
       >
-        {children}
-      </FloatingPortal>
-    </DrawerContext.Provider>
+        <FloatingPortal
+          {...portalProps}
+          root={effectivePortalRoot}
+        >
+          {children}
+        </FloatingPortal>
+      </DrawerContext.Provider>
+    </FloatingNode>
   );
 }
 

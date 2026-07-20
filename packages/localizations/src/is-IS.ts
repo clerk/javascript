@@ -209,9 +209,9 @@ export const isIS: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Skipta yfir í þessa áskrift',
     switchToAnnual: 'Skipta yfir í árlega',
-    switchToAnnualWithAnnualPrice: 'Skipta yfir í árlega {{currency}}{{price}} / ár',
+    switchToAnnualWithAnnualPrice: 'Skipta yfir í árlega {{price}} / ár',
     switchToMonthly: 'Skipta yfir í mánaðarlega',
-    switchToMonthlyWithPrice: 'Skipta yfir í mánaðarlega {{currency}}{{price}} / mánuð',
+    switchToMonthlyWithPrice: 'Skipta yfir í mánaðarlega {{price}} / mánuð',
     totalDue: 'Samtals til greiðslu',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Samtals til greiðslu í dag',
@@ -222,7 +222,26 @@ export const isIS: LocalizationResource = {
     yearPerUnit: 'Ár á {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -233,26 +252,25 @@ export const isIS: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -262,7 +280,6 @@ export const isIS: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -303,7 +320,6 @@ export const isIS: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -351,7 +367,6 @@ export const isIS: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -388,7 +403,6 @@ export const isIS: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -418,6 +432,8 @@ export const isIS: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -437,21 +453,17 @@ export const isIS: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -499,7 +511,6 @@ export const isIS: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -531,7 +542,6 @@ export const isIS: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -572,7 +582,6 @@ export const isIS: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -619,38 +628,9 @@ export const isIS: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -662,8 +642,11 @@ export const isIS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Óstaðfest',
         badge__verified: 'Staðfest',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -674,13 +657,14 @@ export const isIS: LocalizationResource = {
           valueLabel: 'Gildi',
         },
         verifiedAtLabel: "Staðfest {{ date | shortDate('is-IS') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Bæta við {{domain}}',
         messageLabel: 'Tölvupósturinn þinn notar {{domain}}. Viltu bæta því við?',
       },
       formButtonPrimary__add: 'Bæta við',
-      formFieldInputPlaceholder__domain: 'Skrifaðu lénið þitt hér og smelltu á bæta við til að byrja',
+      formFieldInputPlaceholder__domain: 'Bæta við léni',
       formFieldLabel__domain: 'Lén',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -903,6 +887,15 @@ export const isIS: LocalizationResource = {
     badge__manualInvitation: 'Engin sjálfvirk skráning',
     badge__unverified: 'Óstaðfest',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Engin greiðslusaga',
         notFound: 'Greiðslutilraun fannst ekki',
@@ -1097,19 +1090,17 @@ export const isIS: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1238,6 +1229,9 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn kóðann sem auðkennisforritið þitt bjó til til að halda áfram',
       title: 'Staðfesting nauðsynleg',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1384,6 +1378,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'Til að halda áfram, vinsamlegast sláðu inn staðfestingarkóðann sem sendur var á símann þinn',
       title: 'Athugaðu símann þinn',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Endurstilla lykilorð',
       requiredMessage: 'Af öryggisástæðum er nauðsynlegt að endurstilla lykilorðið þitt.',
@@ -1489,6 +1489,12 @@ export const isIS: LocalizationResource = {
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       title: 'Staðfesta símanúmer',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Skrá inn',
@@ -1637,6 +1643,7 @@ export const isIS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} er þegar meðlimur í samtökunum.',
     api_key_name_already_exists: 'API-lyklanafn er þegar til.',
     api_key_usage_exceeded:
@@ -1689,6 +1696,7 @@ export const isIS: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Netfang eða símanúmer þitt er ekki leyft til að skrá sig. Þetta gæti verið vegna þess að þú ert að nota '+', '=', '#' eða '.' í netfangi þínu, að nota domen sem tengist tímabundnum tölvupóstur, eða að þú ert búinn til að nota það. Ef þú reynir að skrá sig og færð villu, vinsamlegast hafið samband við stuðning.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1713,6 +1721,14 @@ export const isIS: LocalizationResource = {
       sentencePrefix: 'Lykilorðið þitt verður að innihalda',
     },
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: 'Ekki fannst Web3 veskisviðbót. Vinsamlegast settu upp eina til að halda áfram.',
     web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',
@@ -1765,6 +1781,9 @@ export const isIS: LocalizationResource = {
     action__openUserMenu: 'Opna notendavalmynd',
     action__signOut: 'Skrá út',
     action__signOutAll: 'Skrá út af öllum reikningum',
+    label__accountActions: 'Reikningsaðgerðir',
+    label__activeSessions: 'Virkar lotur',
+    label__userButtonPopover: 'Reikningsspjald',
   },
   userProfile: {
     apiKeysPage: {
@@ -1787,6 +1806,15 @@ export const isIS: LocalizationResource = {
       title__codelist: 'Öryggiskóðar',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Engin greiðslusaga',
         notFound: 'Greiðslutilraun fannst ekki',

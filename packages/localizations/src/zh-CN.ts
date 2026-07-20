@@ -216,7 +216,26 @@ export const zhCN: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const zhCN: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const zhCN: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const zhCN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const zhCN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const zhCN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const zhCN: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const zhCN: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const zhCN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const zhCN: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const zhCN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const zhCN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const zhCN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: '未验证',
         badge__verified: '已验证',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -667,13 +650,14 @@ export const zhCN: LocalizationResource = {
           valueLabel: '值',
         },
         verifiedAtLabel: "验证于 {{ date | shortDate('zh-CN') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '添加 {{domain}}',
         messageLabel: '您的邮箱使用了 {{domain}}。是否要添加它？',
       },
       formButtonPrimary__add: '添加',
-      formFieldInputPlaceholder__domain: '在此输入您的域名，然后点击添加即可开始',
+      formFieldInputPlaceholder__domain: '添加域名',
       formFieldLabel__domain: '域名',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -894,6 +878,15 @@ export const zhCN: LocalizationResource = {
     badge__manualInvitation: '无自动注册',
     badge__unverified: '未验证',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1081,19 +1074,17 @@ export const zhCN: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1217,6 +1208,9 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1359,6 +1353,12 @@ export const zhCN: LocalizationResource = {
       subtitle: '请继续输入发送到您手机的验证码。',
       title: '检查手机短信',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: '重置密码',
       requiredMessage: '出于安全原因，需要重置您的密码。',
@@ -1462,6 +1462,12 @@ export const zhCN: LocalizationResource = {
       resendButton: '重新发送验证码',
       subtitle: '继续使用 {{applicationName}}',
       title: '验证您的电话',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: undefined,
@@ -1601,6 +1607,7 @@ export const zhCN: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: undefined,
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1644,6 +1651,7 @@ export const zhCN: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "您使用的电子邮件地址或电话号码不允许注册。这可能是因为您在电子邮件地址中使用了 '+', '=', '#' 或 '.'，使用了与临时电子邮件服务关联的域名，或者有明确的排除。如果您认为这是错误，请联系支持。",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1666,6 +1674,14 @@ export const zhCN: LocalizationResource = {
       sentencePrefix: '您的密码必须包含',
     },
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: '您已登录。',
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: '您已拒绝签名请求。请重试以继续。',
@@ -1717,6 +1733,9 @@ export const zhCN: LocalizationResource = {
     action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
+    label__accountActions: '账户操作',
+    label__activeSessions: '活跃会话',
+    label__userButtonPopover: '账户面板',
   },
   userProfile: {
     apiKeysPage: {
@@ -1737,6 +1756,15 @@ export const zhCN: LocalizationResource = {
       title__codelist: '备份代码',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

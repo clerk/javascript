@@ -152,14 +152,6 @@ const SamlOktaCreateAppStep = (): JSX.Element => {
                   'configureSSO.configureStep.samlOkta.createAppStep.createAppInstructions.step4',
                 )}
               />
-              <Text
-                elementDescriptor={descriptors.configureSSOInstructionsListItem}
-                as='li'
-                colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.samlOkta.createAppStep.createAppInstructions.step5',
-                )}
-              />
             </Col>
           </Col>
 
@@ -425,14 +417,6 @@ const SamlOktaAssignUsersStep = (): JSX.Element => {
 
       <Step.Body>
         <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlOkta.assignUsersStep.assignUsersInstructions.title',
-            )}
-          />
           <Text
             as='p'
             colorScheme='secondary'
@@ -672,14 +656,6 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
           fill
           gap={5}
         >
-          <Heading
-            elementDescriptor={descriptors.configureSSOInstructionsHeading}
-            as='h3'
-            textVariant='subtitle'
-            localizationKey={localizationKeys(
-              'configureSSO.configureStep.samlOkta.identityProviderMetadataStep.modes.title',
-            )}
-          />
           <IdentityProviderConfigurationModes
             modes={OKTA_IDP_MODES}
             value={mode}

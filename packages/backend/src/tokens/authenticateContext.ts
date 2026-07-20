@@ -216,11 +216,11 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   /**
-   * Determines if the referrer URL is from a Clerk domain (accounts portal or FAPI).
-   * This includes both development and production account portal domains, as well as FAPI domains
-   * used for redirect-based authentication flows.
+   * Determines if the referrer URL is from a Clerk domain: the instance's FAPI domain, the accounts
+   * portal derived from its frontend API, or — on non-production instances only — a development
+   * account-portal domain.
    *
-   * @returns {boolean} True if the referrer is from a Clerk accounts portal or FAPI domain, false otherwise
+   * @returns {boolean} True if the referrer is a trusted Clerk domain, false otherwise
    */
   public isKnownClerkReferrer(): boolean {
     if (!this.referrer) {
@@ -239,23 +239,22 @@ class AuthenticateContext implements AuthenticateContext {
         }
       }
 
-      // Check for development account portal patterns
-      if (isLegacyDevAccountPortalOrigin(referrerHost) || isCurrentDevAccountPortalOrigin(referrerHost)) {
+      // Dev account-portal domains are freely obtainable, so only trust them on non-production instances.
+      if (
+        this.instanceType !== 'production' &&
+        (isLegacyDevAccountPortalOrigin(referrerHost) || isCurrentDevAccountPortalOrigin(referrerHost))
+      ) {
         return true;
       }
 
-      // Check for production account portal by comparing with expected accounts URL
+      // Only trust the accounts portal derived from this instance's frontend API — never a
+      // generic `accounts.*` prefix, which any attacker-controlled domain could match.
       const expectedAccountsUrl = buildAccountsBaseUrl(this.frontendApi);
       if (expectedAccountsUrl) {
         const expectedAccountsOrigin = new URL(expectedAccountsUrl).origin;
         if (referrerOrigin.origin === expectedAccountsOrigin) {
           return true;
         }
-      }
-
-      // Check for generic production accounts patterns (accounts.*)
-      if (referrerHost.startsWith('accounts.')) {
-        return true;
       }
 
       return false;

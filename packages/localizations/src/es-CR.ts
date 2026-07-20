@@ -216,7 +216,26 @@ export const esCR: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const esCR: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const esCR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const esCR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const esCR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const esCR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const esCR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const esCR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const esCR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const esCR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const esCR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const esCR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const esCR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Sin verificar',
         badge__verified: 'Verificado',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -668,14 +651,15 @@ export const esCR: LocalizationResource = {
           valueLabel: 'Valor',
         },
         verifiedAtLabel: "Verificado el {{ date | shortDate('es-CR') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Agregar {{domain}}',
         messageLabel: 'Tu correo electrónico usa {{domain}}. ¿Quieres agregarlo?',
       },
       formButtonPrimary__add: 'Agregar',
-      formFieldInputPlaceholder__domain: 'Escribe aquí tu dominio y haz clic en Agregar para empezar',
-      formFieldLabel__domain: 'Dominios',
+      formFieldInputPlaceholder__domain: 'Agregar dominio',
+      formFieldLabel__domain: 'Dominio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -898,6 +882,15 @@ export const esCR: LocalizationResource = {
     badge__manualInvitation: 'Sin inscripciones automáticas',
     badge__unverified: 'No verificado',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1092,19 +1085,17 @@ export const esCR: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1232,6 +1223,9 @@ export const esCR: LocalizationResource = {
       subtitle: 'Ingresa el código generado por la aplicación de autenticación para continuar',
       title: 'Verificación requerida',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1378,6 +1372,12 @@ export const esCR: LocalizationResource = {
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Revisa tu teléfono',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Restablecer contraseña',
       requiredMessage: 'Por razones de seguridad, es necesario restablecer su contraseña.',
@@ -1483,6 +1483,12 @@ export const esCR: LocalizationResource = {
       resendButton: 'Reenviar código',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Verifica tu teléfono',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Iniciar sesión',
@@ -1623,6 +1629,7 @@ export const esCR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1673,6 +1680,7 @@ export const esCR: LocalizationResource = {
     insufficient_seats_change_plan: undefined,
     insufficient_seats_contact_support: undefined,
     not_allowed_access: 'No tienes permiso para acceder a esta página.',
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este correo electrónico del dominio está bloqueado, intenta con otro.',
     organization_domain_common: 'Este correo electrónico del dominio es muy común, intenta con otro.',
     organization_domain_exists_for_enterprise_connection: 'Este dominio ya esta en uso para tú organización',
@@ -1697,6 +1705,14 @@ export const esCR: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de telefónico ya está en uso.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'No se puede encontrar la extension de la billetera Web3. Instala una para continuar',
     web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',
@@ -1749,6 +1765,9 @@ export const esCR: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
+    label__accountActions: 'Acciones de cuenta',
+    label__activeSessions: 'Sesiones activas',
+    label__userButtonPopover: 'Panel de cuenta',
   },
   userProfile: {
     apiKeysPage: {
@@ -1771,6 +1790,15 @@ export const esCR: LocalizationResource = {
       title__codelist: 'Códigos de respaldo',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

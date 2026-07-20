@@ -280,6 +280,21 @@ describe('Menu', () => {
       expect(queryByRole('menu')).not.toBeInTheDocument();
     });
 
+    it('does not trap focus — Tab exits the menu', async () => {
+      const { wrapper } = await createFixtures();
+      const { getByRole, userEvent } = render(<Harness items={[{ label: 'First' }, { label: 'Second' }]} />, {
+        wrapper,
+      });
+
+      getByRole('button', { name: 'Open menu' }).focus();
+      await userEvent.keyboard('{ArrowDown}');
+      await waitFor(() => expect(getByRole('menuitem', { name: 'First' })).toHaveFocus());
+
+      const menu = getByRole('menu');
+      await userEvent.tab();
+      expect(menu.contains(document.activeElement)).toBe(false);
+    });
+
     it('closes the menu on Escape and returns focus to the trigger', async () => {
       const { wrapper } = await createFixtures();
       const { getByRole, userEvent, queryByRole } = render(<Harness items={[{ label: 'First' }]} />, { wrapper });

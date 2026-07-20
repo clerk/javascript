@@ -595,7 +595,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       await u.po.checkout.clickPayOrSubscribe();
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
-      await expect(u.po.page.getByText('- $9.99')).toBeVisible();
+      await expect(u.po.page.getByText('-$9.99')).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });
@@ -673,8 +673,6 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      // TODO: Re-enable once flaky statements endpoint is fixed
-      test.skip(true, 'Skipped due to flaky statements endpoint');
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();

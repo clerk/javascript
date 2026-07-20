@@ -28,6 +28,7 @@ export const OrganizationProfileAvatarUploader = (
       />
       <AvatarUploader
         {...rest}
+        rounded={false}
         title={localizationKeys('userProfile.profilePage.imageFormTitle')}
         avatarPreview={
           <OrganizationAvatar

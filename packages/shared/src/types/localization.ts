@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
@@ -205,8 +209,8 @@ export type __internal_LocalizationResource = {
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
-    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
-    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
+    switchToMonthlyWithPrice: LocalizationValue<'price'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price'>;
     billedAnnually: LocalizationValue;
     billedMonthly: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
@@ -412,6 +416,12 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       noAvailableWallets: LocalizationValue;
     };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -593,6 +603,12 @@ export type __internal_LocalizationResource = {
     web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
     };
   };
   reverification: {
@@ -938,6 +954,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -1011,6 +1036,9 @@ export type __internal_LocalizationResource = {
     action__addAccount: LocalizationValue;
     action__openUserMenu: LocalizationValue;
     action__closeUserMenu: LocalizationValue;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
@@ -1148,18 +1176,16 @@ export type __internal_LocalizationResource = {
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         descriptionLine1: LocalizationValue;
-        descriptionLine2: LocalizationValue<'role'>;
-        descriptionLine2__noRole: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
-        providerLabel: LocalizationValue;
         domainLabel: LocalizationValue;
-        signOnUrlLabel: LocalizationValue;
-        issuerLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
         menuAction__remove: LocalizationValue;
+        tooltip: LocalizationValue<'role'>;
+        tooltip__noRole: LocalizationValue;
+        tooltipLabel: LocalizationValue;
       };
     };
     membersPage: {
@@ -1210,6 +1236,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -1370,6 +1405,12 @@ export type __internal_LocalizationResource = {
       };
       warning: LocalizationValue;
     };
+    changeProviderDialog: {
+      title: LocalizationValue<'provider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      cancelButton: LocalizationValue;
+      confirmButton: LocalizationValue;
+    };
     organizationDomainsStep: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1383,7 +1424,11 @@ export type __internal_LocalizationResource = {
       domainCard: {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
+        badge__expired: LocalizationValue;
         verifiedAtLabel: LocalizationValue<'date'>;
+        expiredAtLabel: LocalizationValue<'date'>;
+        expiredLabel: LocalizationValue;
+        verifyAgainButton: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {
@@ -1472,6 +1517,10 @@ export type __internal_LocalizationResource = {
           optional: LocalizationValue;
         };
       };
+      activeConnectionWarning: {
+        title: LocalizationValue;
+        dismiss: LocalizationValue;
+      };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
         createAppStep: {
@@ -1482,7 +1531,6 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
           serviceProviderInstructions: {
             title: LocalizationValue;
@@ -1523,7 +1571,6 @@ export type __internal_LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
           assignUsersInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
@@ -1535,7 +1582,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1570,7 +1616,6 @@ export type __internal_LocalizationResource = {
         createAppStep: {
           headerSubtitle: LocalizationValue;
           createAppInstructions: {
-            title: LocalizationValue;
             paragraph: LocalizationValue;
           };
           serviceProviderFields: {
@@ -1588,25 +1633,23 @@ export type __internal_LocalizationResource = {
           attributeMappingTable: {
             title: LocalizationValue;
             columns: {
-              userProfile: LocalizationValue;
               attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
             };
             rows: {
-              email: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              firstName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
-              lastName: { userProfile: LocalizationValue; attributeName: LocalizationValue };
+              email: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              firstName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              lastName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
             };
           };
         };
         assignUsersStep: {
           headerSubtitle: LocalizationValue;
-          title: LocalizationValue;
           paragraph: LocalizationValue;
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1646,13 +1689,11 @@ export type __internal_LocalizationResource = {
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
-            step5: LocalizationValue;
           };
         };
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataFile: LocalizationValue;
             manual: LocalizationValue;
@@ -1749,13 +1790,11 @@ export type __internal_LocalizationResource = {
           };
           assignUsersInstructions: {
             title: LocalizationValue;
-            paragraph1: LocalizationValue;
             step1: LocalizationValue;
             step2: LocalizationValue;
             step3: LocalizationValue;
             step4: LocalizationValue;
             step5: LocalizationValue;
-            step6: LocalizationValue;
           };
         };
         serviceProviderStep: {
@@ -1779,7 +1818,6 @@ export type __internal_LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: LocalizationValue;
           modes: {
-            title: LocalizationValue;
             ariaLabel: LocalizationValue;
             metadataUrl: LocalizationValue;
             manual: LocalizationValue;
@@ -1811,16 +1849,16 @@ export type __internal_LocalizationResource = {
         attributeMappingStep: {
           headerSubtitle: LocalizationValue;
           title: LocalizationValue;
-          paragraph: LocalizationValue;
           step1: LocalizationValue;
           step2: LocalizationValue;
-          step3: LocalizationValue;
           attributeMappingTable: {
             columns: {
               attribute: LocalizationValue;
               claimName: LocalizationValue;
               value: LocalizationValue;
             };
+            copyClaimName: LocalizationValue;
+            copyClaimNameCopied: LocalizationValue;
             rows: {
               email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
               firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
@@ -1999,11 +2037,20 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  action_blocked: LocalizationValue;
   avatar_file_type_invalid: LocalizationValue;
   avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
+  protect_check_aborted: LocalizationValue;
+  protect_check_already_resolved: LocalizationValue;
+  protect_check_execution_failed: LocalizationValue;
+  protect_check_invalid_script: LocalizationValue;
+  protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_script_load_failed: LocalizationValue;
+  protect_check_timed_out: LocalizationValue;
+  protect_check_unsupported_environment: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
@@ -2037,6 +2084,7 @@ type UnstableErrors = WithParamName<{
   form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
+  oauth_access_denied: LocalizationValue;
   form_identifier_exists: LocalizationValue;
   form_identifier_exists__email_address: LocalizationValue;
   form_identifier_exists__username: LocalizationValue;

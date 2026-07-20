@@ -84,9 +84,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
     await u.page.getByTestId('protected').waitFor();
     await u.page.getByRole('link', { name: 'Home' }).click();
-    await u.page.getByRole('button', { name: 'Open user menu' }).click();
+    await u.page.getByRole('button', { name: /Open user menu/i }).click();
 
-    await u.page.getByRole('menuitem', { name: 'Sign out' }).click();
+    await u.page.getByRole('button', { name: 'Sign out' }).click();
     await u.po.expect.toBeSignedOut();
     await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
     await u.page.waitForURL(url => url.href.includes('/sign-in?redirect_url'));

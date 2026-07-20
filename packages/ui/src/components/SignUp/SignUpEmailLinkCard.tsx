@@ -56,6 +56,7 @@ export const SignUpEmailLinkCard = () => {
         continuePath: '../continue',
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
+        protectCheckPath: '../protect-check',
         handleComplete: () =>
           setActive({
             session: su.createdSessionId,

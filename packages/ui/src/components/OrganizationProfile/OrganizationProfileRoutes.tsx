@@ -37,6 +37,12 @@ const OrganizationPaymentAttemptPage = lazy(() =>
   })),
 );
 
+const CreditHistoryPage = lazy(() =>
+  import(/* webpackChunkName: "credit-history-page"*/ '../AccountCredits').then(module => ({
+    default: module.CreditHistoryPage,
+  })),
+);
+
 const OrganizationSecurityPage = lazy(() =>
   import(/* webpackChunkName: "op-security-page"*/ './OrganizationSecurityPage').then(module => ({
     default: module.OrganizationSecurityPage,
@@ -133,6 +139,11 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
                     <OrganizationPaymentAttemptPage />
                   </Suspense>
                 </Route>
+                <Route path='credit-history'>
+                  <Suspense fallback={''}>
+                    <CreditHistoryPage />
+                  </Suspense>
+                </Route>
               </Switch>
             </Route>
           </Protect>
@@ -155,15 +166,17 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
           </Protect>
         )}
         {shouldShowSelfServeSSO ? (
-          <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationSecurityPage contentRef={contentRef} />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+          <Protect condition={has => has({ permission: 'org:sys_entconns:manage' })}>
+            <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationSecurityPage contentRef={contentRef} />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         ) : null}
       </Route>
     </Switch>

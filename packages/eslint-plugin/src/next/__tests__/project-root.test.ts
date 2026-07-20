@@ -59,6 +59,12 @@ describe('resolveProjectRoot', () => {
     expect(resolveProjectRoot(file, { rootDir: explicit, cwd: '/elsewhere' })).toBe(explicit.replaceAll('\\', '/'));
   });
 
+  it('resolves relative rootDir against cwd', () => {
+    expect(resolveProjectRoot('/repo/apps/web/src/app/page.tsx', { rootDir: 'apps/web', cwd: '/repo' })).toBe(
+      '/repo/apps/web',
+    );
+  });
+
   it('uses nearest eslint.config.* when rootDir is omitted', async () => {
     await writeFile(path.join(projectRoot, 'eslint.config.js'), 'export default [];\n');
     const file = path.join(projectRoot, 'app', 'page.tsx');
@@ -103,6 +109,19 @@ describe('path classification with project root', () => {
       classifyFolder(folder!, {
         protected: ['app/**'],
         public: ['app/sign-in/**'],
+      }),
+    ).toBe('public');
+  });
+
+  it('classifies folders relative to a cwd-resolved rootDir', () => {
+    const file = '/repo/apps/web/src/app/sign-in/page.tsx';
+    const folder = getRelativeFolder(file, resolveProjectRoot(file, { rootDir: 'apps/web', cwd: '/repo' }));
+
+    expect(folder).toBe('src/app/sign-in');
+    expect(
+      classifyFolder(folder!, {
+        protected: ['**'],
+        public: ['src/app/sign-in/**'],
       }),
     ).toBe('public');
   });

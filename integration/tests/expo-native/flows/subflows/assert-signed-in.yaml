@@ -1,0 +1,9 @@
+# Subflow: assert the JS layer observed the native sign-in (bridge sync).
+# extendedWaitUntil retries until timeout; assertVisible does not.
+appId: com.clerk.exponativebuildfixture
+---
+- extendedWaitUntil:
+    visible: 'signed in'
+    timeout: 30000
+- assertVisible:
+    id: 'user-id'

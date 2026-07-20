@@ -1,5 +1,139 @@
 # @clerk/astro
 
+## 3.4.19
+
+### Patch Changes
+
+- Fix Astro initialization when bundled `ui` or `prefetchUI: false` is passed to the integration. ([#8628](https://github.com/clerk/javascript/pull/8628)) by [@jescalan](https://github.com/jescalan)
+
+- Escape `<`, `>`, and `/` when serializing the Clerk auth state into SSR `<script>` tags, preventing a `</script>` sequence inside user-controllable session claims from breaking out of the script element (stored XSS). The embedded JSON still parses to identical values on the client. ([#9166](https://github.com/clerk/javascript/pull/9166)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716), [`e657d99`](https://github.com/clerk/javascript/commit/e657d994d938194cfa02da329707bf012873c01b)]:
+  - @clerk/shared@4.25.5
+  - @clerk/backend@3.11.7
+
+## 3.4.18
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/backend@3.11.6
+  - @clerk/shared@4.25.4
+
+## 3.4.17
+
+### Patch Changes
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+  - @clerk/backend@3.11.5
+
+## 3.4.16
+
+### Patch Changes
+
+- Updated dependencies [[`1a19409`](https://github.com/clerk/javascript/commit/1a1940975b51749dbf066344a8be305cc45ea928)]:
+  - @clerk/backend@3.11.4
+
+## 3.4.15
+
+### Patch Changes
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+  - @clerk/backend@3.11.3
+
+## 3.4.14
+
+### Patch Changes
+
+- Updated dependencies [[`08ba540`](https://github.com/clerk/javascript/commit/08ba5401c45c5c6e60d320c66493b6b58b446403), [`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/backend@3.11.2
+  - @clerk/shared@4.25.1
+
+## 3.4.13
+
+### Patch Changes
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1), [`80afb69`](https://github.com/clerk/javascript/commit/80afb69ecf2d1a3525e46a919952a47ff1fe924b)]:
+  - @clerk/shared@4.25.0
+  - @clerk/backend@3.11.1
+
+## 3.4.12
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/backend@3.11.0
+  - @clerk/shared@4.24.0
+
+## 3.4.11
+
+### Patch Changes
+
+- Updated dependencies [[`f42aad9`](https://github.com/clerk/javascript/commit/f42aad99389fa219588a3f450cdaa8fb6b55acda)]:
+  - @clerk/backend@3.10.0
+
+## 3.4.10
+
+### Patch Changes
+
+- Updated dependencies [[`2914c2c`](https://github.com/clerk/javascript/commit/2914c2c5dd8e2ce46be37a6645642f4cb32e7909), [`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`07e1b06`](https://github.com/clerk/javascript/commit/07e1b067dc0c6b52ccc23d0a5f0988c4b731959a), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915), [`6a9bb60`](https://github.com/clerk/javascript/commit/6a9bb609050ed498c66db9087ed96350f91ed5df)]:
+  - @clerk/backend@3.9.0
+  - @clerk/shared@4.23.0
+
+## 3.4.9
+
+### Patch Changes
+
+- Updated dependencies [[`a8c727c`](https://github.com/clerk/javascript/commit/a8c727c6ad44121204c1fcc95ee356199643a8a9), [`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/backend@3.8.5
+  - @clerk/shared@4.22.1
+
+## 3.4.8
+
+### Patch Changes
+
+- Fix custom user button menu item rendering for Astro's stricter compiler. ([#8980](https://github.com/clerk/javascript/pull/8980)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Deprecate `createRouteMatcher()` in favor of resource-based auth checks. ([#8981](https://github.com/clerk/javascript/pull/8981)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Instead of protecting routes only from middleware, move auth checks into each protected Astro page, API route, or server-side handler:
+
+  ```ts
+  import type { APIRoute } from 'astro';
+
+  export const GET: APIRoute = ({ locals }) => {
+    const { userId } = locals.auth();
+
+    if (!userId) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    return Response.json({ userId });
+  };
+  ```
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+  - @clerk/backend@3.8.4
+
+## 3.4.7
+
+### Patch Changes
+
+- Updated dependencies [[`c38d853`](https://github.com/clerk/javascript/commit/c38d8534b916936acbe4131fac58c8743e684eab), [`7e3174a`](https://github.com/clerk/javascript/commit/7e3174a4f861ad89667c3d0c63b6f2d0c001bcb6), [`97039bb`](https://github.com/clerk/javascript/commit/97039bb871a33ccc2c9e46f011e4cbbc1459fb1e), [`f43071d`](https://github.com/clerk/javascript/commit/f43071d8d98194c22e34d1d72ed8d0cf0b6b0f0e), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0039618`](https://github.com/clerk/javascript/commit/003961810786af49daba5a3e82e34378d52b885c), [`a536a0d`](https://github.com/clerk/javascript/commit/a536a0d5b31a5fcba31813ed34f9494a4ec4851b)]:
+  - @clerk/shared@4.21.0
+  - @clerk/backend@3.8.3
+
+## 3.4.6
+
+### Patch Changes
+
+- Updated dependencies [[`01789b4`](https://github.com/clerk/javascript/commit/01789b4e8d3a280940b7ebcb223a33c6ecfd209a)]:
+  - @clerk/shared@4.20.0
+  - @clerk/backend@3.8.2
+
 ## 3.4.5
 
 ### Patch Changes

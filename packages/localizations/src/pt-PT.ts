@@ -211,9 +211,9 @@ export const ptPT: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Mudar para este plano',
     switchToAnnual: 'Mudar para anual',
-    switchToAnnualWithAnnualPrice: 'Mudar para anual {{currency}}{{price}} / ano',
+    switchToAnnualWithAnnualPrice: 'Mudar para anual {{price}} / ano',
     switchToMonthly: 'Mudar para mensal',
-    switchToMonthlyWithPrice: 'Mudar para mensal {{currency}}{{price}} / mês',
+    switchToMonthlyWithPrice: 'Mudar para mensal {{price}} / mês',
     totalDue: 'Total devido',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Total devido hoje',
@@ -224,7 +224,26 @@ export const ptPT: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -235,26 +254,25 @@ export const ptPT: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -264,7 +282,6 @@ export const ptPT: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -305,7 +322,6 @@ export const ptPT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -353,7 +369,6 @@ export const ptPT: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -390,7 +405,6 @@ export const ptPT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -420,6 +434,8 @@ export const ptPT: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -439,21 +455,17 @@ export const ptPT: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -501,7 +513,6 @@ export const ptPT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -533,7 +544,6 @@ export const ptPT: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -574,7 +584,6 @@ export const ptPT: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -621,38 +630,9 @@ export const ptPT: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -664,8 +644,11 @@ export const ptPT: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Não verificado',
         badge__verified: 'Verificado',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -676,14 +659,15 @@ export const ptPT: LocalizationResource = {
           valueLabel: 'Valor',
         },
         verifiedAtLabel: "Verificado em {{ date | shortDate('pt-PT') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Adicionar {{domain}}',
         messageLabel: 'O seu e-mail utiliza {{domain}}. Pretende adicioná-lo?',
       },
       formButtonPrimary__add: 'Adicionar',
-      formFieldInputPlaceholder__domain: 'Escreva aqui o seu domínio e clique em adicionar para começar',
-      formFieldLabel__domain: 'Domínios',
+      formFieldInputPlaceholder__domain: 'Adicionar domínio',
+      formFieldLabel__domain: 'Domínio',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -905,6 +889,15 @@ export const ptPT: LocalizationResource = {
     badge__manualInvitation: 'Sem inscrição automática',
     badge__unverified: 'Não verificado',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Sem histórico de pagamentos',
         notFound: 'Tentativa de pagamento não encontrada',
@@ -1098,19 +1091,17 @@ export const ptPT: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1239,6 +1230,9 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Introduza o código gerado pela sua aplicação autenticadora para continuar',
       title: 'Verificação necessária',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1383,6 +1377,12 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Insira o código enviado para o seu número de telemóvel',
       title: 'Verifique o seu telemóvel',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Repor Palavra-passe',
       requiredMessage: 'Por motivos de segurança, é necessário redefinir a sua palavra-passe.',
@@ -1487,6 +1487,12 @@ export const ptPT: LocalizationResource = {
       resendButton: 'Não recebeu o código? Reenviar',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique o seu telemóvel',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Contactar suporte',
@@ -1634,6 +1640,7 @@ export const ptPT: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Já é membro nesta organização.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1686,6 +1693,7 @@ export const ptPT: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "O endereço de e-mail ou número de telemóvel não é permitido para registo. Isto pode dever-se à utilização de '+', '=', '#' ou '.' no endereço de e-mail, ao uso de um domínio associado a um serviço de e-mail temporário ou a uma exclusão explícita.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Este domínio organizacional está bloqueado.',
     organization_domain_common: 'Este domínio é demasiado comum para ser utilizado numa organização.',
     organization_domain_exists_for_enterprise_connection: 'Este domínio já existe para uma ligação empresarial.',
@@ -1710,6 +1718,14 @@ export const ptPT: LocalizationResource = {
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Já está conectado.',
     web3_missing_identifier: 'Falta um identificador Web3. Tente novamente.',
     web3_signature_request_rejected: 'Rejeitou o pedido de assinatura. Tente novamente para continuar.',
@@ -1761,6 +1777,9 @@ export const ptPT: LocalizationResource = {
     action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
+    label__accountActions: 'Ações da conta',
+    label__activeSessions: 'Sessões ativas',
+    label__userButtonPopover: 'Painel da conta',
   },
   userProfile: {
     apiKeysPage: {
@@ -1783,6 +1802,15 @@ export const ptPT: LocalizationResource = {
       title__codelist: 'Códigos de backup',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Sem histórico de pagamentos',
         notFound: 'Tentativa de pagamento não encontrada',

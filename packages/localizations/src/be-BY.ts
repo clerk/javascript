@@ -216,7 +216,26 @@ export const beBY: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const beBY: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const beBY: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const beBY: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const beBY: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const beBY: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const beBY: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const beBY: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const beBY: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const beBY: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const beBY: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const beBY: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const beBY: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Не пацверджана',
         badge__verified: 'Пацверджана',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -668,14 +651,15 @@ export const beBY: LocalizationResource = {
           valueLabel: 'Значэнне',
         },
         verifiedAtLabel: "Пацверджана {{ date | shortDate('be-BY') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Дадаць {{domain}}',
         messageLabel: 'Ваша электронная пошта выкарыстоўвае {{domain}}. Хочаце дадаць яго?',
       },
       formButtonPrimary__add: 'Дадаць',
-      formFieldInputPlaceholder__domain: 'Увядзіце свой дамен тут і націсніце «Дадаць», каб пачаць',
-      formFieldLabel__domain: 'Дамены',
+      formFieldInputPlaceholder__domain: 'Дадаць дамен',
+      formFieldLabel__domain: 'Дамен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -898,6 +882,15 @@ export const beBY: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1089,19 +1082,17 @@ export const beBY: LocalizationResource = {
         badge__inactive: undefined,
         badge__unconfigured: undefined,
         descriptionLine1: undefined,
-        descriptionLine2: undefined,
-        descriptionLine2__noRole: undefined,
         domainLabel: undefined,
-        issuerLabel: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
-        providerLabel: undefined,
-        signOnUrlLabel: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1231,6 +1222,9 @@ export const beBY: LocalizationResource = {
       subtitle: 'Вы можаце выкарыстоўваць прыкладанне для атрымання аднаразовага кода.',
       title: 'Код TOTP',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1376,6 +1370,12 @@ export const beBY: LocalizationResource = {
       subtitle: 'Каб працягнуць, увядзіце код, адправлены на ваш тэлефон.',
       title: 'Праверце ваш тэлефон',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Скідаць пароль',
       requiredMessage: 'Па меркаванню бяспекі неабходна скідаць ваш пароль.',
@@ -1480,6 +1480,12 @@ export const beBY: LocalizationResource = {
       resendButton: 'Пераадправіць код',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Верыфікуйце Ваш нумар тэлефона',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Звяжыцеся з падтрымкай',
@@ -1620,6 +1626,7 @@ export const beBY: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1670,6 +1677,7 @@ export const beBY: LocalizationResource = {
     insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: 'Дамен арганізацыі заблакаван.',
     organization_domain_common: 'Дамен арганізацыі звычайны і не можа быць выкарыстаны.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1692,6 +1700,14 @@ export const beBY: LocalizationResource = {
       sentencePrefix: 'Ваш пароль павінен утрымліваць',
     },
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Вы ўжо ўвайшлі.',
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Вы адхілілі запыт на подпіс. Калі ласка, паспрабуйце яшчэ раз, каб працягнуць.',
@@ -1745,6 +1761,9 @@ export const beBY: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
+    label__accountActions: 'Дзеянні з уліковым запісам',
+    label__activeSessions: 'Актыўныя сесіі',
+    label__userButtonPopover: 'Панэль уліковага запісу',
   },
   userProfile: {
     apiKeysPage: {
@@ -1767,6 +1786,15 @@ export const beBY: LocalizationResource = {
       title__codelist: 'Рэзервовы коды',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

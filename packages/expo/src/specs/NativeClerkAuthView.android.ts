@@ -1,13 +1,13 @@
 import { requireNativeView } from 'expo';
-import type { ViewProps } from 'react-native';
+import type { NativeSyntheticEvent, ViewProps } from 'react-native';
 
 type AuthEvent = Readonly<{ type: string }>;
-type NativeEvent<T> = Readonly<{ nativeEvent: T }>;
 
 interface NativeProps extends ViewProps {
   mode?: string;
   isDismissible?: boolean;
-  onAuthEvent?: (event: NativeEvent<AuthEvent>) => void;
+  logoMaxHeight?: number;
+  onAuthEvent?: (event: NativeSyntheticEvent<AuthEvent>) => void;
 }
 
 export default requireNativeView<NativeProps>('ClerkAuthView');

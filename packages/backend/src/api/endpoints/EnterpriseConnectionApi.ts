@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
+import type { ClerkPaginationRequest, OrganizationEnterpriseConnectionProvider } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { EnterpriseConnection } from '../resources';
@@ -7,62 +7,171 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/enterprise_connections';
 
-type EnterpriseConnectionListParams = ClerkPaginationRequest<{
+/** @generateWithEmptyComment */
+export type EnterpriseConnectionListParams = ClerkPaginationRequest<{
+  /**
+   * Filters enterprise connections by Organization ID.
+   */
   organizationId?: string;
+  /**
+   * Filters enterprise connections by active status. If `true`, only active connections are returned. If `false`, only inactive connections are returned. If omitted, all connections are returned.
+   */
   active?: boolean;
 }>;
 
+/** @inline */
 export interface EnterpriseConnectionOidcParams {
+  /** The OAuth (OIDC) authorization URL. */
   authUrl?: string;
+  /** The OAuth (OIDC) client ID. */
   clientId?: string;
+  /** The OAuth (OIDC) client secret. */
   clientSecret?: string;
+  /** The OAuth (OIDC) discovery URL. */
   discoveryUrl?: string;
+  /** Whether the OAuth (OIDC) requires PKCE. Must be `true` for public clients with no client secret. */
   requiresPkce?: boolean;
+  /** The OAuth (OIDC) token URL. */
   tokenUrl?: string;
+  /** The OAuth (OIDC) user info URL. */
   userInfoUrl?: string;
 }
 
+/** @inline */
 export interface EnterpriseConnectionSamlAttributeMappingParams {
+  /** The attribute mapping for the user ID. */
   userId?: string | null;
+  /** The attribute mapping for the email address. */
   emailAddress?: string | null;
+  /** The attribute mapping for the first name. */
   firstName?: string | null;
+  /** The attribute mapping for the last name. */
   lastName?: string | null;
 }
 
-export interface EnterpriseConnectionSamlParams {
-  allowIdpInitiated?: boolean;
-  allowSubdomains?: boolean;
-  attributeMapping?: EnterpriseConnectionSamlAttributeMappingParams;
-  forceAuthn?: boolean;
-  idpCertificate?: string;
-  idpEntityId?: string;
-  idpMetadata?: string;
-  idpMetadataUrl?: string;
-  idpSsoUrl?: string;
+/** @inline */
+export type EnterpriseConnectionSamlLoginHintParams =
+  | {
+      /** Sends the value stored at the user `publicMetadata` key named by `source` as the `login_hint`. */
+      mode: 'custom_attribute';
+      /** The user `publicMetadata` key to read the `login_hint` value from. */
+      source: string;
+    }
+  | {
+      /** How the SAML connection emits the `login_hint` sent to the IdP: `'email_address'` sends the typed identifier and `'off'` omits the `login_hint`. */
+      mode: 'email_address' | 'off';
+      /** Only supported when `mode` is `'custom_attribute'`. */
+      source?: never;
+    };
+
+/** @inline */
+export interface EnterpriseConnectionCustomAttributeParams {
+  /** The display name of the custom attribute. */
+  name: string;
+  /** The key to store the custom attribute under. */
+  key: string;
+  /** The SSO (SAML or OIDC) attribute path to read the value from. */
+  ssoPath?: string;
+  /** The SCIM attribute path to read the value from. */
+  scimPath?: string;
+  /** Whether the custom attribute holds multiple values. */
+  multiValued?: boolean;
 }
 
-type CreateEnterpriseConnectionParams = {
-  name?: string;
-  domains?: string[];
+/** @inline */
+export interface EnterpriseConnectionSamlParams {
+  /** Whether the SAML connection allows Identity Provider (IdP) initiated flows. */
+  allowIdpInitiated?: boolean;
+  /** Whether the SAML connection allows users with an email address subdomain to use it. */
+  allowSubdomains?: boolean;
+  /** The attribute mapping for the SAML connection. */
+  attributeMapping?: EnterpriseConnectionSamlAttributeMappingParams;
+  /** Whether the SAML connection requires force authentication. */
+  forceAuthn?: boolean;
+  /** The IdP certificate (PEM) for the SAML connection. */
+  idpCertificate?: string;
+  /** The IdP Entity ID for the SAML connection. */
+  idpEntityId?: string;
+  /** The raw IdP metadata XML for the SAML connection. */
+  idpMetadata?: string;
+  /** The IdP metadata URL for the SAML connection. */
+  idpMetadataUrl?: string;
+  /** The IdP Single-Sign On URL for the SAML connection. */
+  idpSsoUrl?: string;
+  /** Configuration for the `login_hint` the SAML connection sends to the IdP. */
+  loginHint?: EnterpriseConnectionSamlLoginHintParams;
+}
+
+/** @generateWithEmptyComment */
+export type CreateEnterpriseConnectionParams = {
+  /** The name of the enterprise connection. */
+  name: string;
+  /** The [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) of the enterprise connection. Must contain at least one domain. */
+  domains: string[];
+  /** The organization ID of the enterprise connection. */
   organizationId?: string;
+  /** Whether the enterprise connection should be active. */
   active?: boolean;
+  /**
+   * Whether the enterprise connection should sync user attributes between the IdP and Clerk.
+   * @deprecated The Backend API does not support this parameter on create and ignores it. Use `updateEnterpriseConnection()` to set it.
+   */
   syncUserAttributes?: boolean;
+  /** The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`. */
+  provider: OrganizationEnterpriseConnectionProvider;
+  /** Whether existing users who are members of the organization can link their account to their enterprise identity. If `false`, only sign-up flows apply. */
+  allowOrganizationAccountLinking?: boolean;
+  /** The custom attribute mappings for the enterprise connection. */
+  customAttributes?: EnterpriseConnectionCustomAttributeParams[];
+  /** Whether the enterprise connection can be used for sign-in and sign-up. Requires the authenticatable enterprise connections feature to be enabled for the instance. */
+  authenticatable?: boolean;
+  /** Whether Just-in-Time (JIT) provisioning of users is disabled for the enterprise connection. */
+  disableJitProvisioning?: boolean;
+  /** Configuration for if the enterprise connection uses OAuth (OIDC). */
   oidc?: EnterpriseConnectionOidcParams;
+  /** Configuration for if the enterprise connection uses SAML. */
   saml?: EnterpriseConnectionSamlParams;
 };
 
-type UpdateEnterpriseConnectionParams = {
+/** @inline */
+export type UpdateEnterpriseConnectionParams = {
+  /** The name of the enterprise connection. */
   name?: string;
+  /** The [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) of the enterprise connection. */
   domains?: string[];
+  /** The organization ID of the enterprise connection. */
   organizationId?: string;
+  /** Whether the enterprise connection should be active. */
   active?: boolean;
+  /** Whether the enterprise connection should sync user attributes between the IdP and Clerk. */
   syncUserAttributes?: boolean;
+  /** Whether additional identifications are disabled for the enterprise connection. */
+  disableAdditionalIdentifications?: boolean;
+  /** Whether existing users who are members of the organization can link their account to their enterprise identity. If `false`, only sign-up flows apply. */
+  allowOrganizationAccountLinking?: boolean;
+  /** The custom attribute mappings for the enterprise connection. */
+  customAttributes?: EnterpriseConnectionCustomAttributeParams[];
+  /** Whether the enterprise connection can be used for sign-in and sign-up. Requires the authenticatable enterprise connections feature to be enabled for the instance. */
+  authenticatable?: boolean;
+  /** Whether Just-in-Time (JIT) provisioning of users is disabled for the enterprise connection. */
+  disableJitProvisioning?: boolean;
+  /**
+   * The identity provider (IdP) of the enterprise connection. For example, `'saml_custom'` or `'oidc_custom'`.
+   * @deprecated The Backend API does not support this parameter on update and ignores it. The provider cannot be changed after creation.
+   */
   provider?: string;
+  /** Configuration for if the enterprise connection uses OAuth (OIDC). */
   oidc?: EnterpriseConnectionOidcParams;
+  /** Configuration for if the enterprise connection uses SAML. */
   saml?: EnterpriseConnectionSamlParams;
 };
 
+/** @generateWithEmptyComment */
 export class EnterpriseConnectionAPI extends AbstractAPI {
+  /**
+   * Creates a new enterprise connection.
+   * @returns The created [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) object.
+   */
   public async createEnterpriseConnection(params: CreateEnterpriseConnectionParams) {
     return this.request<EnterpriseConnection>({
       method: 'POST',
@@ -74,6 +183,12 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Updates the given enterprise connection.
+   * @param enterpriseConnectionId - The ID of the enterprise connection to update.
+   * @param params - The parameters to update the enterprise connection.
+   * @returns The updated [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) object.
+   */
   public async updateEnterpriseConnection(enterpriseConnectionId: string, params: UpdateEnterpriseConnectionParams) {
     this.requireId(enterpriseConnectionId);
     return this.request<EnterpriseConnection>({
@@ -86,6 +201,10 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Gets the list of enterprise connections for the instance. By default, the list is returned in descending order by creation date (newest first).
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) objects and a `totalCount` property containing the total number of enterprise connections for the instance.
+   */
   public async getEnterpriseConnectionList(params: EnterpriseConnectionListParams = {}) {
     return this.request<PaginatedResourceResponse<EnterpriseConnection[]>>({
       method: 'GET',
@@ -94,6 +213,11 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Gets the given enterprise connection.
+   * @param enterpriseConnectionId - The ID of the enterprise connection to get.
+   * @returns The [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) object.
+   */
   public async getEnterpriseConnection(enterpriseConnectionId: string) {
     this.requireId(enterpriseConnectionId);
     return this.request<EnterpriseConnection>({
@@ -102,6 +226,11 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Deletes the given enterprise connection.
+   * @param enterpriseConnectionId - The ID of the enterprise connection to delete.
+   * @returns The deleted [`EnterpriseConnection`](https://clerk.com/docs/reference/backend/types/backend-enterprise-connection) object.
+   */
   public async deleteEnterpriseConnection(enterpriseConnectionId: string) {
     this.requireId(enterpriseConnectionId);
     return this.request<EnterpriseConnection>({
