@@ -21,13 +21,14 @@ import { handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
+import { isOidcProvider } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
-import type { ProviderType } from '../types';
+import type { EnterpriseConnectionProviderType, ProviderType } from '../types';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 const PROVIDER_GROUPS: ReadonlyArray<{
-  id: 'saml';
+  id: 'saml' | 'oidc';
   label: LocalizationKey;
   options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
 }> = [
@@ -53,21 +54,49 @@ const PROVIDER_GROUPS: ReadonlyArray<{
       },
     ],
   },
+  {
+    id: 'oidc',
+    label: localizationKeys('configureSSO.selectProviderStep.oidc.groupLabel'),
+    options: [
+      {
+        id: 'oidc_custom',
+        label: localizationKeys('configureSSO.selectProviderStep.oidc.oidcProvider'),
+        iconId: 'oidc',
+      },
+    ],
+  },
 ];
 
 const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
+
+/**
+ * The picker works in input aliases; an existing connection reports back its real
+ * provider (OIDC as an open `oidc_<slug>` family), so collapse it onto the card
+ * that represents it — every OIDC family maps to the single `oidc_custom` card.
+ */
+const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
+  isOidcProvider(provider) ? 'oidc_custom' : provider;
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
     enterpriseConnectionMutations: { createConnection, changeProvider },
     contentRef,
+    isOIDCFlowEnabled,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { t } = useLocalizations();
 
-  const [selected, setSelected] = React.useState<ProviderType | null>(c.provider ?? null);
+  // OIDC is gated behind the experimental self-serve flag; SAML always shows.
+  const providerGroups = React.useMemo(
+    () => PROVIDER_GROUPS.filter(group => group.id !== 'oidc' || isOIDCFlowEnabled),
+    [isOIDCFlowEnabled],
+  );
+
+  const currentCard = c.provider ? toProviderCard(c.provider) : null;
+
+  const [selected, setSelected] = React.useState<ProviderType | null>(currentCard);
   const card = useCardState();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -78,20 +107,20 @@ export const SelectProviderStep = (): JSX.Element => {
     setSelected(next);
   };
 
-  const isChangingProvider = c.hasConnection && selected !== null && selected !== c.provider;
+  const isChangingProvider = c.hasConnection && selected !== null && selected !== currentCard;
 
   const handleContinue = async (): Promise<void> => {
     if (!selected) {
       return;
     }
 
-    if (c.hasConnection && selected === c.provider) {
+    if (c.hasConnection && selected === currentCard) {
       void goNext();
       return;
     }
 
     if (isChangingProvider) {
-      setChangeFromProvider(c.provider ?? null);
+      setChangeFromProvider(currentCard);
       setIsChangeDialogOpen(true);
       return;
     }
@@ -143,7 +172,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            {PROVIDER_GROUPS.map(group => (
+            {providerGroups.map(group => (
               <Col
                 key={group.id}
                 elementDescriptor={descriptors.configureSSOProviderGroup}
