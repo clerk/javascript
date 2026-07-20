@@ -416,7 +416,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   });
 
   // ----- redirect
-  test('redirects to sign-in when unauthenticated (middleware)', async ({ page, context }) => {
+  test('redirects to sign-in when unauthenticated (user page)', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.getByRole('link', { name: 'User', exact: true }).click();

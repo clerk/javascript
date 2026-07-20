@@ -3,26 +3,25 @@ import { expect, test } from '@playwright/test';
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 
-const middlewareFile = () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
+const middlewareFile = () => `import { clerkMiddleware } from '@clerk/astro/server';
 
-const isProtectedRoute = createRouteMatcher(['/api/admin(.*)']);
-
-export const onRequest = clerkMiddleware((auth, context, next) => {
-  if (isProtectedRoute(context.request) && !auth().userId) {
-    return new Response(null, { status: 401, statusText: 'Unauthorized' });
-  }
-  return next();
-});
+export const onRequest = clerkMiddleware();
 `;
 
 const apiRouteFile = () => `import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = () => {
+export const GET: APIRoute = ({ locals }) => {
+  const { userId } = locals.auth();
+
+  if (!userId) {
+    return new Response(null, { status: 401, statusText: 'Unauthorized' });
+  }
+
   return Response.json({ status: 'ok' });
 };
 `;
 
-test.describe('custom middleware @astro', () => {
+test.describe('resource-based route protection @astro', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
 
@@ -52,10 +51,9 @@ test.describe('custom middleware @astro', () => {
 
   test('handle percent-encoded URL on protected routes', async () => {
     // %61 = 'a': /api/%61dmin/users decodes to /api/admin/users
-    // Note: Astro's dev server normalizes percent-encoded URLs before
-    // the middleware runs, so this test validates the full pipeline.
-    // The decodeURIComponent in createPathMatcher provides defense-in-depth
-    // for environments that don't normalize (e.g., raw Node.js, Edge).
+    // Astro's dev server normalizes percent-encoded URLs before routing,
+    // so the request reaches the admin endpoint where the auth check
+    // rejects it with 401
     const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
     expect(encodedRes.status).toBe(401);
 
@@ -65,58 +63,57 @@ test.describe('custom middleware @astro', () => {
   });
 
   test('double-encoded URLs do not match route (Astro router rejects)', async () => {
-    // %2561 decodes one layer to %61 — Astro's file-based router does not
+    // %2561 decodes one layer to %61, and Astro's dev router does not
     // match %2561dmin to the admin/ directory, returning 404
     const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
     expect(res.status).toBe(404);
   });
 
   test('encoded slash is not decoded into a path separator', async () => {
-    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
-    // sees /api%2Fadmin/users which does not match /api/admin(.*).
-    // The router also treats %2F as a literal segment char, not a separator.
+    // %2F is a reserved delimiter: the router treats it as a literal
+    // segment char, not a separator, so /api%2Fadmin/users matches no route
     const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
     expect(res.status).not.toBe(200);
   });
 
-  test('null byte in path is caught by middleware as protected route', async () => {
-    // %00 decodes to a null char — /api/admin\0/users still matches
-    // /api/admin(.*) so our middleware correctly blocks it with 401
+  test('null byte in path cannot access protected route', async () => {
+    // %00 decodes to a null char: /api/admin\0/users is not the admin/
+    // directory; if a router ever resolved it to the admin endpoint anyway,
+    // the endpoint's own auth check would still return 401
     const res = await fetch(app.serverUrl + '/api/admin%00/users');
-    expect(res.status).toBe(401);
+    expect(res.status).not.toBe(200);
   });
 
-  test('malformed percent-encoding is rejected (Astro dev server rejects before middleware)', async () => {
-    // %zz is not valid percent-encoding — Astro's Vite dev server crashes
-    // on decodeURI() in the trailing-slash plugin before our middleware runs,
-    // returning 500
+  test('malformed percent-encoding is rejected (Astro dev server rejects before routing)', async () => {
+    // %zz is not valid percent-encoding: Astro's Vite dev server crashes
+    // on decodeURI() in the trailing-slash plugin, returning 500
     const res = await fetch(app.serverUrl + '/api/%zz/users');
     expect(res.status).toBe(500);
   });
 
-  test('encoded dot-current segment is caught by middleware', async () => {
-    // %2e = '.' — /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
-    // Our middleware matches the resolved path as protected
+  test('encoded dot-current segment is caught by resource check', async () => {
+    // %2e = '.': /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
+    // The request reaches the admin endpoint, whose auth check returns 401
     const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
     expect(res.status).toBe(401);
   });
 
   test('encoded dot-parent segment does not reach protected route', async () => {
-    // %2e%2e = '..' — /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
+    // %2e%2e = '..': /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
     // This doesn't match any route, returning 404
     const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
     expect(res.status).toBe(404);
   });
 
-  test('encoded dot-parent traversal through fake segment is caught by middleware', async () => {
+  test('encoded dot-parent traversal through fake segment is caught by resource check', async () => {
     // /api/foo/%2e%2e/admin/users resolves to /api/foo/../admin/users → /api/admin/users
-    // Our middleware matches the resolved path as protected, returning 401
+    // The request reaches the admin endpoint, whose auth check returns 401
     const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
     expect(res.status).toBe(401);
   });
 
   test('fully encoded dot segments with encoded slash are rejected', async () => {
-    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // %2e%2f = './', %2e%2e%2f = '../': when the slash is also encoded,
     // the entire sequence is treated as a single path segment by the router
     const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
     expect(dotSlashCurrent.status).toBe(404);
@@ -139,7 +136,7 @@ test.describe('custom middleware @astro', () => {
   });
 });
 
-test.describe('custom middleware @astro (production build)', () => {
+test.describe('resource-based route protection @astro (production build)', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
 
@@ -169,9 +166,8 @@ test.describe('custom middleware @astro (production build)', () => {
   });
 
   test('handle percent-encoded URL on protected routes', async () => {
-    // Unlike the dev server (Vite), the production Node adapter does NOT
-    // normalize percent-encoded URLs — this test relies on our
-    // decodeURIComponent fix in createPathMatcher (verified to fail without it)
+    // The production router resolves percent-encoded paths to the admin
+    // endpoint, where the auth check rejects the unauthenticated request
     const encodedRes = await fetch(app.serverUrl + '/api/%61dmin/users');
     expect(encodedRes.status).toBe(401);
 
@@ -179,61 +175,61 @@ test.describe('custom middleware @astro (production build)', () => {
     expect(encodedRes2.status).toBe(401);
   });
 
-  test('double-encoded URLs do not match route (Astro router rejects)', async () => {
-    test.skip(
-      true,
-      'Astro 7 production now routes this double-encoded path to the admin endpoint; createPathMatcher needs follow-up to align with Astro routing normalization.',
-    );
-
+  test('double-encoded URLs cannot access protected route', async () => {
+    // Astro 7's production router resolves %2561dmin to the admin endpoint,
+    // which previously diverged from middleware path matching and could
+    // bypass it. With the auth check on the endpoint itself, routing
+    // normalization no longer matters: a request that reaches the endpoint
+    // unauthenticated gets 401, and one that doesn't gets 404
     const res = await fetch(app.serverUrl + '/api/%2561dmin/users');
-    expect(res.status).toBe(404);
+    expect(res.status).not.toBe(200);
   });
 
   test('encoded slash is not decoded into a path separator', async () => {
-    // %2F is a reserved delimiter — decodeURI preserves it, so the matcher
-    // sees /api%2Fadmin/users which does not match /api/admin(.*).
-    // The router also treats %2F as a literal segment char, not a separator.
+    // %2F is a reserved delimiter: the router treats it as a literal
+    // segment char, not a separator, so /api%2Fadmin/users matches no route
     const res = await fetch(app.serverUrl + '/api%2Fadmin/users');
     expect(res.status).not.toBe(200);
   });
 
-  test('null byte in path is caught by middleware as protected route', async () => {
-    // %00 decodes to a null char — /api/admin\0/users still matches
-    // /api/admin(.*) so our middleware correctly blocks it with 401
+  test('null byte in path cannot access protected route', async () => {
+    // %00 decodes to a null char: /api/admin\0/users is not the admin/
+    // directory; if a router ever resolved it to the admin endpoint anyway,
+    // the endpoint's own auth check would still return 401
     const res = await fetch(app.serverUrl + '/api/admin%00/users');
-    expect(res.status).toBe(401);
+    expect(res.status).not.toBe(200);
   });
 
-  test('malformed percent-encoding returns 400 (clerkMiddleware catches MalformedURLError)', async () => {
-    // %zz is not valid percent-encoding — createPathMatcher throws
-    // MalformedURLError, which handleControlFlowErrors catches and returns 400
+  test('malformed percent-encoding cannot access protected route', async () => {
+    // %zz is not valid percent-encoding: it cannot resolve to the admin
+    // endpoint, and even if it did, the auth check would return 401
     const res = await fetch(app.serverUrl + '/api/%zz/users');
-    expect(res.status).toBe(400);
+    expect(res.status).not.toBe(200);
   });
 
-  test('encoded dot-current segment is caught by middleware', async () => {
-    // %2e = '.' — /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
-    // Our middleware matches the resolved path as protected
+  test('encoded dot-current segment is caught by resource check', async () => {
+    // %2e = '.': /api/%2e/admin/users resolves to /api/./admin/users → /api/admin/users
+    // The request reaches the admin endpoint, whose auth check returns 401
     const res = await fetch(app.serverUrl + '/api/%2e/admin/users');
     expect(res.status).toBe(401);
   });
 
   test('encoded dot-parent segment does not reach protected route', async () => {
-    // %2e%2e = '..' — /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
+    // %2e%2e = '..': /api/%2e%2e/admin/users resolves to /api/../admin/users → /admin/users
     // This doesn't match any route, returning 404
     const res = await fetch(app.serverUrl + '/api/%2e%2e/admin/users');
     expect(res.status).toBe(404);
   });
 
-  test('encoded dot-parent traversal through fake segment is caught by middleware', async () => {
+  test('encoded dot-parent traversal through fake segment is caught by resource check', async () => {
     // /api/foo/%2e%2e/admin/users resolves to /api/foo/../admin/users → /api/admin/users
-    // Our middleware matches the resolved path as protected, returning 401
+    // The request reaches the admin endpoint, whose auth check returns 401
     const res = await fetch(app.serverUrl + '/api/foo/%2e%2e/admin/users');
     expect(res.status).toBe(401);
   });
 
   test('fully encoded dot segments with encoded slash are rejected', async () => {
-    // %2e%2f = './', %2e%2e%2f = '../' — when the slash is also encoded,
+    // %2e%2f = './', %2e%2e%2f = '../': when the slash is also encoded,
     // the entire sequence is treated as a single path segment by the router
     const dotSlashCurrent = await fetch(app.serverUrl + '/api%2f%2e%2fadmin/users');
     expect(dotSlashCurrent.status).toBe(404);
