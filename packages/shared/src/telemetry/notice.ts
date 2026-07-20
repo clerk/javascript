@@ -7,7 +7,7 @@
  * frequently observed by non-developers (QA, screenshots, demos), and adding another
  * console warning is a common source of customer complaints.
  *
- * Known gap: pure browser-only setups with no server-side Clerk runtime (e.g., a Vite
+ * Known gap: pure browser-only setups with no server-side Clerk runtime (e.g. a Vite
  * SPA using `@clerk/clerk-react` or `@clerk/clerk-js` directly, without any Node/Edge
  * backend that imports `@clerk/shared`) will never hit this code path and therefore
  * see no in-band disclosure. This is an accepted trade-off: the original postinstall
@@ -82,7 +82,7 @@ function printNotice(): void {
 export type MaybeShowTelemetryNoticeOptions = {
   /**
    * Skip the notice entirely. Used when the caller has already determined that no
-   * telemetry will be sent (e.g., opt-out, non-development instance), in which case
+   * telemetry will be sent (e.g. opt-out, non-development instance), in which case
    * there is nothing to disclose.
    */
   skip?: boolean;

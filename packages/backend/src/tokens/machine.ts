@@ -86,7 +86,7 @@ export function isMachineJwt(token: string): boolean {
  *
  * @remarks
  * In the future, this will support custom prefixes that can be prepended to the base prefixes
- * (e.g., "org_a_m2m_", "org_a_oauth_access_", "org_a_api_key_")
+ * (e.g. "org_a_m2m_", "org_a_oauth_access_", "org_a_api_key_")
  *
  * @param token - The token string to check
  * @returns true if the token starts with a recognized machine token prefix
@@ -110,7 +110,7 @@ export function isMachineToken(token: string): boolean {
  *
  * @remarks
  * In the future, this will support custom prefixes that can be prepended to the base prefixes
- * (e.g., "org_a_m2m_", "org_a_oauth_access_", "org_a_api_key_")
+ * (e.g. "org_a_m2m_", "org_a_oauth_access_", "org_a_api_key_")
  *
  * @param token - The token string to check
  * @returns The specific MachineTokenType

@@ -1062,7 +1062,7 @@ export interface Clerk {
   ) => Promise<unknown>;
 
   /**
-   * Whether an OAuth transport (e.g., for Electron) has been registered.
+   * Whether an OAuth transport (e.g. for Electron) has been registered.
    *
    * @internal
    */
@@ -1337,7 +1337,7 @@ type ClerkUnsafeOptions = {
   /**
    * Disables the `Clerk has been loaded with development keys` console warning that is logged when Clerk is
    * initialized with development keys. The warning is emitted by `clerk-js` to the browser console; in dev servers
-   * that mirror browser logs to the terminal (e.g., Next.js with `experimental.browserDebugInfoInTerminal`), setting
+   * that mirror browser logs to the terminal (e.g. Next.js with `experimental.browserDebugInfoInTerminal`), setting
    * this option also stops it from showing up there.
    *
    * Each framework integration also exposes an env-var shortcut so you don't need to thread the option through
@@ -1513,7 +1513,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
 
     /**
      * Provide a transport for OAuth/SSO flows in environments where a same-document
-     * redirect or popup cannot be used (e.g., Electron, Tauri). When set, Clerk uses the
+     * redirect or popup cannot be used (e.g. Electron, Tauri). When set, Clerk uses the
      * transport's `getRedirectUrl` as the FAPI `redirectUrl` and calls `open` instead of
      * navigating the document. Intended for native desktop SDK wrappers.
      *

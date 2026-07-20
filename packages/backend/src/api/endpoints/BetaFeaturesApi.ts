@@ -5,7 +5,7 @@ const basePath = '/beta_features';
 
 type ChangeDomainParams = {
   /**
-   * The new home URL of the production instance e.g., https://www.example.com
+   * The new home URL of the production instance e.g. https://www.example.com
    */
   homeUrl?: string;
   /**
@@ -25,7 +25,7 @@ export class BetaFeaturesAPI extends AbstractAPI {
    * updating your Social Connection's redirect URLs and setting the new keys in your code.
    *
    * @remarks
-   * WARNING: Changing your domain will invalidate all current user sessions (i.e., users will be logged out).
+   * WARNING: Changing your domain will invalidate all current user sessions (i.e. users will be logged out).
    *          Also, while your application is being deployed, a small downtime is expected to occur.
    */
   public async changeDomain(params: ChangeDomainParams) {
