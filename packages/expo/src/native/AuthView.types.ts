@@ -1,3 +1,5 @@
+import type { HostedNavigationProps } from './HostedNavigation.types';
+
 /**
  * Authentication mode that determines which flows are available to the user.
  *
@@ -14,7 +16,7 @@ export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
  */
-export interface AuthViewProps {
+export interface AuthViewProps extends HostedNavigationProps {
   /**
    * Authentication mode that determines which flows are available.
    *
