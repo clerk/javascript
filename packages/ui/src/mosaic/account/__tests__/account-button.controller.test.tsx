@@ -29,6 +29,7 @@ let userInvitations: { data: unknown[]; count: number; revalidate: ReturnType<ty
 let userSuggestions: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
 let signedInSessions: FakeSession[];
 let singleSessionMode: boolean;
+let controllerOptions: AccountButtonControllerOptions | undefined;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -51,6 +52,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
       buildSignInUrl: () => '/sign-in',
+      buildAfterSignOutUrl: () => '/after-signout',
+      buildAfterMultiSessionSingleSignOutUrl: () => '/after-single-signout',
       client: { signedInSessions },
       __internal_environment: {
         authConfig: { singleSessionMode },
@@ -124,6 +127,7 @@ beforeEach(() => {
   signOut = vi.fn().mockResolvedValue(undefined);
   navigate = vi.fn().mockResolvedValue(undefined);
   singleSessionMode = false;
+  controllerOptions = undefined;
 });
 
 afterEach(() => {
@@ -131,7 +135,7 @@ afterEach(() => {
 });
 
 function Harness() {
-  const c = useAccountButtonController();
+  const c = useAccountButtonController(controllerOptions);
   if (c.status !== 'ready') {
     return <output data-testid='status'>{c.status}</output>;
   }
@@ -327,16 +331,42 @@ describe('useAccountButtonController', () => {
     expect(rows[1].membershipRequestCount).toBeUndefined();
   });
 
-  it('selects an organization via setActive with a redirect, and personal via a null organization', () => {
+  it('selects an organization and personal via setActive, with no redirect when no select url is configured', () => {
     render(<Harness />);
 
     fireEvent.click(screen.getByText('select-org'));
-    expect(setActive).toHaveBeenCalledWith(
-      expect.objectContaining({ organization: 'org_9', redirectUrl: '/after-create' }),
-    );
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
 
     fireEvent.click(screen.getByText('select-personal'));
-    expect(setActive).toHaveBeenCalledWith(expect.objectContaining({ organization: null }));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
+  });
+
+  it('resolves a function-form afterSelect url from the selected organization and the user', () => {
+    controllerOptions = {
+      afterSelectOrganizationUrl: org => `/o/${org.id}`,
+      afterSelectPersonalUrl: u => `/me/${u.id}`,
+    };
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('select-org'));
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/org_9' });
+
+    fireEvent.click(screen.getByText('select-personal'));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/me/user_1' });
+  });
+
+  it('resolves a token-string afterSelect url against the selected organization and the user', () => {
+    controllerOptions = {
+      afterSelectOrganizationUrl: '/o/:id',
+      afterSelectPersonalUrl: '/me/:id',
+    };
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('select-org'));
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/org_9' });
+
+    fireEvent.click(screen.getByText('select-personal'));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/me/user_1' });
   });
 
   it('switches and signs out sessions via setActive and signOut', () => {
@@ -346,10 +376,18 @@ describe('useAccountButtonController', () => {
     expect(setActive).toHaveBeenCalledWith(expect.objectContaining({ session: 'sess_2' }));
 
     fireEvent.click(screen.getByText('sign-out-one'));
-    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_2' });
+    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_2', redirectUrl: '/after-single-signout' });
 
     fireEvent.click(screen.getByText('sign-out-all'));
-    expect(signOut).toHaveBeenCalledWith();
+    expect(signOut).toHaveBeenCalledWith({ redirectUrl: '/after-signout' });
+  });
+
+  it('signs out the only session with the after-sign-out url, not the multi-session url', () => {
+    signedInSessions = [{ id: 'sess_1', user: user as FakeUser }];
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('sign-out-one'));
+    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_2', redirectUrl: '/after-signout' });
   });
 
   it('navigates for manage and create actions using clerk build URLs', () => {

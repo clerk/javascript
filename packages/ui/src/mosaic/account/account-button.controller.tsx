@@ -1,7 +1,8 @@
 import { useClerk, useOrganization, useOrganizationList, useSession, useUser } from '@clerk/shared/react';
-import type { UserResource } from '@clerk/shared/types';
+import type { OrganizationResource, UserResource } from '@clerk/shared/types';
 
 import { organizationListParams } from '../../components/OrganizationSwitcher/utils';
+import { populateParamFromObject } from '../../contexts/utils';
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type {
@@ -19,6 +20,28 @@ export type AccountButtonController =
   | (AccountButtonData & AccountButtonCallbacks & { status: 'ready' });
 
 const MANAGE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
+
+// Mirrors the `<OrganizationSwitcher>` `afterSelect*Url` props: a full URL/path, a `:token` path
+// template resolved against the entity, or a builder function.
+type AfterSelectUrl<T> = ((entity: T) => string) | string;
+
+export interface AccountButtonControllerOptions {
+  afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
+  afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
+}
+
+function resolveAfterSelectUrl<T extends OrganizationResource | UserResource>(
+  config: AfterSelectUrl<T> | undefined,
+  entity: T,
+): string | undefined {
+  if (typeof config === 'function') {
+    return config(entity);
+  }
+  if (config) {
+    return populateParamFromObject({ urlWithParam: config, entity });
+  }
+  return undefined;
+}
 
 function accountName(user: UserResource): string {
   const full = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
@@ -41,7 +64,7 @@ function toAccount(sessionId: string, user: UserResource): AccountButtonAccount 
   };
 }
 
-export function useAccountButtonController(): AccountButtonController {
+export function useAccountButtonController(options?: AccountButtonControllerOptions): AccountButtonController {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
 
@@ -118,15 +141,31 @@ export function useAccountButtonController(): AccountButtonController {
     suggestions,
     invitations,
     additionalAccounts,
-    onSelectOrganization: organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: displayConfig?.afterCreateOrganizationUrl }),
-    onSelectPersonal: () => clerk.setActive({ organization: null }),
+    onSelectOrganization: organizationId => {
+      const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
+      return clerk.setActive({
+        organization: organizationId,
+        redirectUrl: selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined,
+      });
+    },
+    onSelectPersonal: () =>
+      clerk.setActive({
+        organization: null,
+        redirectUrl: resolveAfterSelectUrl(options?.afterSelectPersonalUrl, user),
+      }),
     onSwitchAccount: sessionId =>
       clerk.setActive({ session: sessionId, redirectUrl: displayConfig?.afterSwitchSessionUrl }),
-    onSignOutSession: sessionId => clerk.signOut({ sessionId }),
+    onSignOutSession: sessionId =>
+      clerk.signOut({
+        sessionId,
+        // Other users' sessions remain signed in, so route to the single-session-out URL; otherwise
+        // this is a full sign out.
+        redirectUrl:
+          additionalAccounts.length > 0 ? clerk.buildAfterMultiSessionSingleSignOutUrl() : clerk.buildAfterSignOutUrl(),
+      }),
     // Single-session apps cannot hold a second session, so adding an account and signing out of
     // "all accounts" are meaningless there; the per-session sign out on the active row remains.
-    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut(),
+    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
     onManageAccount: () => router.navigate(clerk.buildUserProfileUrl()),
     onManageOrganization: () => router.navigate(clerk.buildOrganizationProfileUrl()),
     onManageMembers: () => router.navigate(clerk.buildOrganizationProfileUrl()),

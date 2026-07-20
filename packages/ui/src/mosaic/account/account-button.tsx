@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 
-import { useAccountButtonController } from './account-button.controller';
+import { type AccountButtonControllerOptions, useAccountButtonController } from './account-button.controller';
 import { AccountButtonView } from './account-button.view';
+
+export type AccountButtonProps = AccountButtonControllerOptions;
 
 /**
  * The connected AccountButton: reads live Clerk data through `useAccountButtonController` and renders
@@ -11,8 +13,8 @@ import { AccountButtonView } from './account-button.view';
  * one-shot action (select/switch/sign out/accept). Actions that open another surface
  * (manage/create navigations) leave the popover as-is.
  */
-export function AccountButton() {
-  const controller = useAccountButtonController();
+export function AccountButton(props: AccountButtonProps = {}) {
+  const controller = useAccountButtonController(props);
   const [open, setOpen] = useState(false);
 
   if (controller.status !== 'ready') {

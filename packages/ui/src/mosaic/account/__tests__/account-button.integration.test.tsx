@@ -59,6 +59,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
       buildSignInUrl: () => '/sign-in',
+      buildAfterSignOutUrl: () => '/after-signout',
+      buildAfterMultiSessionSingleSignOutUrl: () => '/after-single-signout',
       client: { signedInSessions },
       __internal_environment: {
         authConfig: { singleSessionMode },
@@ -181,16 +183,27 @@ describe('AccountButton (connected)', () => {
     expect(screen.getByRole('button', { name: /Other/ })).toBeInTheDocument();
   });
 
-  it('selecting an organization calls setActive and closes the popover', async () => {
+  it('selecting an organization calls setActive without a redirect by default and closes the popover', async () => {
     renderAccountButton();
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: /Other/ }));
 
-    expect(setActive).toHaveBeenCalledWith(
-      expect.objectContaining({ organization: 'org_9', redirectUrl: '/after-create' }),
-    );
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
+  it('selecting an organization redirects to the configured afterSelectOrganizationUrl', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <AccountButton afterSelectOrganizationUrl={org => `/o/${org.id}`} />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button'));
+    await user.click(screen.getByRole('button', { name: /Other/ }));
+
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/org_9' });
   });
 
   it('selecting the personal workspace calls setActive with a null organization and closes', async () => {
@@ -221,17 +234,17 @@ describe('AccountButton (connected)', () => {
     // state jsdom can't apply, so dispatch the click directly rather than through userEvent.
     fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
 
-    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_1' });
+    expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_1', redirectUrl: '/after-single-signout' });
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
   });
 
-  it('signing out of all accounts calls signOut with no session and closes', async () => {
+  it('signing out of all accounts calls signOut with the after-sign-out url and closes', async () => {
     renderAccountButton();
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: 'Sign out of all accounts' }));
 
-    expect(signOut).toHaveBeenCalledWith();
+    expect(signOut).toHaveBeenCalledWith({ redirectUrl: '/after-signout' });
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
   });
 
@@ -257,6 +270,19 @@ describe('AccountButton (connected)', () => {
     await waitFor(() => expect(suggestion.accept).toHaveBeenCalledTimes(1));
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
+  it('renders an accepted suggestion as non-actionable, without a Join button', async () => {
+    userSuggestions = {
+      data: [acceptable('sug_1', 'org_2', 'Beta', 'accepted')],
+      count: 1,
+      revalidate: vi.fn().mockResolvedValue(undefined),
+    };
+    renderAccountButton();
+    await open();
+
+    expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
+    expect(screen.getByText('Pending approval')).toBeInTheDocument();
   });
 
   it('in single-session mode hides add-account and sign-out-of-all', async () => {

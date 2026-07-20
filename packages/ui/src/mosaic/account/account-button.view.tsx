@@ -540,6 +540,11 @@ function SuggestedBadge() {
   return <span {...suggestedBadge}>Suggested</span>;
 }
 
+function PendingApprovalLabel() {
+  const { suggestedBadge } = useRecipe(accountButtonRecipe);
+  return <span {...suggestedBadge}>Pending approval</span>;
+}
+
 function InlineButton({ label, onClick }: { label: string; onClick: () => void }) {
   const { inlineButton } = useRecipe(accountButtonRecipe);
   return (
@@ -708,23 +713,33 @@ function WorkspaceList() {
           active={m.organizationId === data.activeOrganizationId}
         />
       ))}
-      {data.suggestions.map(s => (
-        <Row
-          key={s.id}
-          shape='square'
-          name={s.name}
-          imageUrl={s.imageUrl}
-          badge={<SuggestedBadge />}
-          trailing={
-            acceptSuggestion ? (
-              <InlineButton
-                label='Join'
-                onClick={() => acceptSuggestion(s.id)}
-              />
-            ) : undefined
-          }
-        />
-      ))}
+      {data.suggestions.map(s =>
+        s.status === 'accepted' ? (
+          <Row
+            key={s.id}
+            shape='square'
+            name={s.name}
+            imageUrl={s.imageUrl}
+            trailing={<PendingApprovalLabel />}
+          />
+        ) : (
+          <Row
+            key={s.id}
+            shape='square'
+            name={s.name}
+            imageUrl={s.imageUrl}
+            badge={<SuggestedBadge />}
+            trailing={
+              acceptSuggestion ? (
+                <InlineButton
+                  label='Join'
+                  onClick={() => acceptSuggestion(s.id)}
+                />
+              ) : undefined
+            }
+          />
+        ),
+      )}
       {data.invitations.map(i => (
         <Row
           key={i.id}
