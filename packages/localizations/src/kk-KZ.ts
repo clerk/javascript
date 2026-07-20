@@ -62,6 +62,7 @@ export const kkKZ: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Ағымдағы жоспар',
   badge__default: 'Әдепкі бойынша',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('kk-KZ') }} күні аяқталады",
   badge__expired: 'Мерзімі біткен',
   badge__freeTrial: undefined,

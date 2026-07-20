@@ -21,6 +21,7 @@ type FakeMemberParams = {
   firstName?: string;
   lastName?: string;
   imageUrl?: string;
+  deprovisioned?: boolean;
   createdAt?: Date;
 };
 
@@ -30,6 +31,7 @@ export const createFakeMember = (params: FakeMemberParams): OrganizationMembersh
     update: vi.fn() as any,
     organization: { id: params.orgId } as any as OrganizationResource,
     id: params.id,
+    deprovisioned: params.deprovisioned,
     role: params?.role || 'admin',
     roleName: params?.roleName || 'Admin',
     createdAt: params?.createdAt || new Date(),

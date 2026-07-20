@@ -63,6 +63,7 @@ export const nbNO: LocalizationResource = {
   badge__canceledEndsAt: "Kansellert • Slutter {{ date | shortDate('nb-NO') }}",
   badge__currentPlan: 'Nåværende plan',
   badge__default: 'Standard',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Slutter {{ date | shortDate('nb-NO') }}",
   badge__expired: 'Utløpt',
   badge__freeTrial: 'Gratis prøveperiode',

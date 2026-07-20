@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__deprovisioned: 'Deprovisioned',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__freeTrial: 'Free trial',

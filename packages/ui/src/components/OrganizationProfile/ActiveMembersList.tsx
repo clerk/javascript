@@ -7,9 +7,9 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { Protect } from '../../common/Gate';
-import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
+import { Badge, Box, descriptors, localizationKeys, Td, Text, Tr } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
+import { DataTable, RoleSelect } from './MemberListTable';
 
 type ActiveMembersListProps = {
   memberships: ReturnType<typeof useOrganization>['memberships'];
@@ -85,10 +85,18 @@ const MemberRow = (props: {
   const { user } = useUser();
 
   const isCurrentUser = user?.id === membership.publicUserData?.userId;
+  const isDeprovisioned = membership.deprovisioned;
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
-    <RowContainer>
+    <Tr
+      aria-disabled={isDeprovisioned}
+      sx={t =>
+        isDeprovisioned
+          ? { opacity: t.opacity.$disabled, ':hover': { backgroundColor: 'transparent' } }
+          : { ':hover': { backgroundColor: t.colors.$neutralAlpha50 } }
+      }
+    >
       <Td>
         <UserPreview
           sx={{ maxWidth: '30ch' }}
@@ -98,6 +106,11 @@ const MemberRow = (props: {
           badge={
             isCurrentUser ? (
               <Badge localizationKey={localizationKeys('badge__you')} />
+            ) : isDeprovisioned ? (
+              <Badge
+                colorScheme='secondary'
+                localizationKey={localizationKeys('badge__deprovisioned')}
+              />
             ) : membership.publicUserData?.banned ? (
               <Badge
                 colorScheme='danger'
@@ -126,7 +139,7 @@ const MemberRow = (props: {
           }
         >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration}
+            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration || isDeprovisioned}
             value={membership.role}
             fallbackLabel={membership.roleName}
             onChange={onRoleChange}
@@ -142,13 +155,13 @@ const MemberRow = (props: {
                 label: localizationKeys('organizationProfile.membersPage.activeMembersTab.menuAction__remove'),
                 isDestructive: true,
                 onClick: onRemove,
-                isDisabled: isCurrentUser,
+                isDisabled: isCurrentUser || isDeprovisioned,
               },
             ]}
             elementId={'member'}
           />
         </Protect>
       </Td>
-    </RowContainer>
+    </Tr>
   );
 };

@@ -63,6 +63,7 @@ export const ptPT: LocalizationResource = {
   badge__canceledEndsAt: "Cancelado • Termina em {{ date | shortDate('pt-PT') }}",
   badge__currentPlan: 'Plano atual',
   badge__default: 'Padrão',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina em {{ date | shortDate('pt-PT') }}",
   badge__expired: 'Expirado',
   badge__freeTrial: 'Período experimental',

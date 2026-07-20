@@ -62,6 +62,7 @@ export const esMX: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Plan actual',
   badge__default: 'Por defecto',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina {{ date | shortDate('en-US') }}",
   badge__expired: 'Caducado',
   badge__freeTrial: undefined,

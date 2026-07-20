@@ -63,6 +63,7 @@ export const roRO: LocalizationResource = {
   badge__canceledEndsAt: "Anulat • Se încheie {{ date | shortDate('ro-RO') }}",
   badge__currentPlan: 'Plan curent',
   badge__default: 'Implicit',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Se încheie {{ date | shortDate('ro-RO') }}",
   badge__expired: 'Expirat',
   badge__freeTrial: 'Probă gratuită',
