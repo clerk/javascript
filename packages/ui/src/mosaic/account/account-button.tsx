@@ -31,7 +31,10 @@ export function AccountButton(props: AccountButtonProps = {}) {
 
   // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view,
   // close on success, and always clear busy so a rejection can't leave the UI hanging.
-  const runAction = <Args extends unknown[]>(keyFor: (...args: Args) => string, fn?: (...args: Args) => void) =>
+  const runAction = <Args extends unknown[]>(
+    keyFor: (...args: Args) => string,
+    fn?: (...args: Args) => void | Promise<unknown>,
+  ) =>
     fn
       ? (...args: Args) => {
           if (pendingKey) {
@@ -44,7 +47,17 @@ export function AccountButton(props: AccountButtonProps = {}) {
         }
       : undefined;
 
-  const { status, ...data } = controller;
+  const {
+    status,
+    onSelectOrganization,
+    onSelectPersonal,
+    onSwitchAccount,
+    onSignOutSession,
+    onSignOutAll,
+    onAcceptSuggestion,
+    onAcceptInvitation,
+    ...data
+  } = controller;
 
   return (
     <AccountButtonView
@@ -53,13 +66,13 @@ export function AccountButton(props: AccountButtonProps = {}) {
       open={open}
       onOpenChange={setOpen}
       pendingKey={pendingKey}
-      onSelectOrganization={runAction(accountBusyKeys.selectOrganization, data.onSelectOrganization)}
-      onSelectPersonal={runAction(accountBusyKeys.selectPersonal, data.onSelectPersonal)}
-      onSwitchAccount={runAction(accountBusyKeys.switchAccount, data.onSwitchAccount)}
-      onSignOutSession={runAction(accountBusyKeys.signOutSession, data.onSignOutSession)}
-      onSignOutAll={runAction(accountBusyKeys.signOutAll, data.onSignOutAll)}
-      onAcceptSuggestion={runAction(accountBusyKeys.acceptSuggestion, data.onAcceptSuggestion)}
-      onAcceptInvitation={runAction(accountBusyKeys.acceptInvitation, data.onAcceptInvitation)}
+      onSelectOrganization={runAction(accountBusyKeys.selectOrganization, onSelectOrganization)}
+      onSelectPersonal={runAction(accountBusyKeys.selectPersonal, onSelectPersonal)}
+      onSwitchAccount={runAction(accountBusyKeys.switchAccount, onSwitchAccount)}
+      onSignOutSession={runAction(accountBusyKeys.signOutSession, onSignOutSession)}
+      onSignOutAll={runAction(accountBusyKeys.signOutAll, onSignOutAll)}
+      onAcceptSuggestion={runAction(accountBusyKeys.acceptSuggestion, onAcceptSuggestion)}
+      onAcceptInvitation={runAction(accountBusyKeys.acceptInvitation, onAcceptInvitation)}
     />
   );
 }

@@ -14,10 +14,24 @@ import type {
   AccountButtonSuggestion,
 } from './account-button.view';
 
+// The container awaits these one-shot actions to drive busy state, so the controller exposes their
+// promise; navigation callbacks stay fire-and-forget (`() => void`) and reach the view's DOM handlers.
+interface AccountButtonAsyncCallbacks {
+  onSelectOrganization?: (organizationId: string) => void | Promise<unknown>;
+  onSelectPersonal?: () => void | Promise<unknown>;
+  onSwitchAccount?: (sessionId: string) => void | Promise<unknown>;
+  onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
+  onSignOutAll?: () => void | Promise<unknown>;
+  onAcceptSuggestion?: (suggestionId: string) => void | Promise<unknown>;
+  onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
+}
+
 export type AccountButtonController =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (AccountButtonData & AccountButtonCallbacks & { status: 'ready' });
+  | (AccountButtonData &
+      Omit<AccountButtonCallbacks, keyof AccountButtonAsyncCallbacks> &
+      AccountButtonAsyncCallbacks & { status: 'ready' });
 
 const MANAGE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
 
@@ -166,11 +180,11 @@ export function useAccountButtonController(options?: AccountButtonControllerOpti
     // Single-session apps cannot hold a second session, so adding an account and signing out of
     // "all accounts" are meaningless there; the per-session sign out on the active row remains.
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
-    onManageAccount: () => router.navigate(clerk.buildUserProfileUrl()),
-    onManageOrganization: () => router.navigate(clerk.buildOrganizationProfileUrl()),
-    onManageMembers: () => router.navigate(clerk.buildOrganizationProfileUrl()),
-    onCreateOrganization: () => router.navigate(clerk.buildCreateOrganizationUrl()),
-    onAddAccount: singleSessionMode ? undefined : () => router.navigate(clerk.buildSignInUrl()),
+    onManageAccount: () => void router.navigate(clerk.buildUserProfileUrl()),
+    onManageOrganization: () => void router.navigate(clerk.buildOrganizationProfileUrl()),
+    onManageMembers: () => void router.navigate(clerk.buildOrganizationProfileUrl()),
+    onCreateOrganization: () => void router.navigate(clerk.buildCreateOrganizationUrl()),
+    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
