@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
+import { useSpinDelay } from '../hooks/useSpinDelay';
 import { type AccountButtonControllerOptions, useAccountButtonController } from './account-button.controller';
 import { accountBusyKeys, AccountButtonTriggerSkeleton, AccountButtonView } from './account-button.view';
 
@@ -18,6 +19,15 @@ export function AccountButton(props: AccountButtonProps = {}) {
   const controller = useAccountButtonController(props);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
+
+  // Hold the spinner off for quick actions and steady it once shown. The container still guards
+  // re-entry on the immediate `pendingKey`; only the view's feedback is delayed.
+  const spinnerVisible = useSpinDelay(pendingKey !== null);
+  const lastPendingKey = useRef<string | null>(null);
+  if (pendingKey !== null) {
+    lastPendingKey.current = pendingKey;
+  }
+  const displayPendingKey = spinnerVisible ? lastPendingKey.current : null;
 
   if (controller.status === 'loading') {
     return <AccountButtonTriggerSkeleton />;
@@ -65,7 +75,7 @@ export function AccountButton(props: AccountButtonProps = {}) {
       status={status}
       open={open}
       onOpenChange={setOpen}
-      pendingKey={pendingKey}
+      pendingKey={displayPendingKey}
       onSelectOrganization={runAction(accountBusyKeys.selectOrganization, onSelectOrganization)}
       onSelectPersonal={runAction(accountBusyKeys.selectPersonal, onSelectPersonal)}
       onSwitchAccount={runAction(accountBusyKeys.switchAccount, onSwitchAccount)}

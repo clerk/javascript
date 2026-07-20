@@ -360,7 +360,8 @@ describe('AccountButton (connected)', () => {
 
     await user.click(screen.getByRole('button', { name: /Other/ }));
 
-    expect(spinner()).toBeInTheDocument();
+    // The spinner is spin-delayed, so it surfaces only after the delay window elapses.
+    await waitFor(() => expect(spinner()).toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeDisabled();
     expect(popup()).toBeInTheDocument();
 
@@ -376,8 +377,8 @@ describe('AccountButton (connected)', () => {
 
     await user.click(screen.getByRole('button', { name: 'Join' }));
 
+    await waitFor(() => expect(spinner()).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
-    expect(spinner()).toBeInTheDocument();
 
     deferred.resolve();
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
@@ -390,7 +391,7 @@ describe('AccountButton (connected)', () => {
     const user = await open();
 
     await user.click(screen.getByRole('button', { name: /Other/ }));
-    expect(spinner()).toBeInTheDocument();
+    await waitFor(() => expect(spinner()).toBeInTheDocument());
 
     deferred.reject(new Error('setActive failed'));
 
