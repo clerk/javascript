@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 export interface SpinDelayOptions {
-  /** Wait this long before showing the spinner, so quick actions never flash one. */
+  /** Wait this long before showing the value, so quick actions never flash a spinner. */
   delay?: number;
-  /** Once shown, keep the spinner up at least this long, so it never flickers off. */
+  /** Once shown, keep the value up at least this long, so the spinner never flickers off. */
   minDuration?: number;
 }
 
@@ -11,37 +11,48 @@ const DEFAULT_DELAY = 500;
 const DEFAULT_MIN_DURATION = 200;
 
 /**
- * Gates a boolean loading flag so the spinner only appears for actions slow enough to warrant it, and
- * never flickers. Inspired by https://github.com/smeijer/spin-delay, reworked around a single visible
- * flag: a `delay`-timer arms the spinner and a symmetric `minDuration`-timer holds it, each cancelled
- * by effect cleanup when `loading` flips before it fires.
+ * Spin-delays a nullable value: returns `null` until `value` has stayed non-null longer than `delay`
+ * (so quick actions never flash a spinner), then holds the last non-null value for at least
+ * `minDuration` after it clears (so the spinner never flickers off). A value-carrying rework of
+ * https://github.com/smeijer/spin-delay: each timer lives in a `const` and is cancelled by effect
+ * cleanup when `value` flips before it fires.
  */
-export function useSpinDelay(loading: boolean, options: SpinDelayOptions = {}): boolean {
+export function useSpinDelay<T>(value: T | null, options: SpinDelayOptions = {}): T | null {
   const delay = options.delay ?? DEFAULT_DELAY;
   const minDuration = options.minDuration ?? DEFAULT_MIN_DURATION;
 
-  const [visible, setVisible] = useState(false);
+  const [shown, setShown] = useState<T | null>(null);
   const shownAt = useRef(0);
 
   useEffect(() => {
-    if (loading && !visible) {
+    // Nothing showing yet: arm a timer so the value only surfaces if it outlasts `delay`.
+    if (shown === null) {
+      if (value === null) {
+        return;
+      }
       const timer = setTimeout(() => {
         shownAt.current = Date.now();
-        setVisible(true);
+        setShown(value);
       }, delay);
       return () => clearTimeout(timer);
     }
 
-    if (!loading && visible) {
+    // Showing, and the value cleared: hold it for the rest of `minDuration`.
+    if (value === null) {
       const remaining = minDuration - (Date.now() - shownAt.current);
       if (remaining <= 0) {
-        setVisible(false);
+        setShown(null);
         return;
       }
-      const timer = setTimeout(() => setVisible(false), remaining);
+      const timer = setTimeout(() => setShown(null), remaining);
       return () => clearTimeout(timer);
     }
-  }, [loading, visible, delay, minDuration]);
 
-  return visible;
+    // Showing, and the value swapped to another non-null: surface it right away.
+    if (value !== shown) {
+      setShown(value);
+    }
+  }, [value, shown, delay, minDuration]);
+
+  return shown;
 }

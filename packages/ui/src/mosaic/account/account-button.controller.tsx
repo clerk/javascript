@@ -12,7 +12,7 @@ import type {
   AccountButtonInvitation,
   AccountButtonMembership,
   AccountButtonSuggestion,
-} from './account-button.view';
+} from './account-button.types';
 
 // The container awaits these one-shot actions to drive busy state, so the controller exposes their
 // promise; navigation callbacks stay fire-and-forget (`() => void`) and reach the view's DOM handlers.
