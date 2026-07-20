@@ -5,413 +5,21 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Icon } from '../components/icon';
+import { Skeleton } from '../components/skeleton';
+import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
 import { Popover } from '../primitives/popover';
-import { defineSlotRecipe, useRecipe } from '../slot-recipe';
+import { useRecipe } from '../slot-recipe';
+import { accountButtonRecipe } from './account-button.recipe';
+import {
+  accountBusyKeys,
+  type AccountButtonBusyState,
+  type AccountButtonCallbacks,
+  type AccountButtonData,
+  type AccountButtonMembership,
+} from './account-button.types';
 
-// Prototype accent (Clerk brand purple) for the plan badge and the Upgrade link. The neutral
-// Mosaic palette has no accent token yet; swap these for a token once one lands.
-const ACCENT = '#6c47ff';
-const ACCENT_SOFT = 'color-mix(in oklab, #6c47ff 14%, transparent)';
-
-// ─── Data contract ──────────────────────────────────────────────────────────
-// Session-backed, discriminated resource rows. Intended to be 1:1 with a future
-// `useAccountButtonController()` output so the controller is a drop-in follow-up.
-
-export interface AccountButtonAccount {
-  sessionId: string;
-  userId: string;
-  name: string;
-  email: string;
-  imageUrl?: string;
-}
-
-export interface AccountButtonMembership {
-  kind: 'membership';
-  organizationId: string;
-  name: string;
-  imageUrl?: string;
-  membersCount?: number;
-  planLabel?: string;
-  upgradeable?: boolean;
-  membershipRequestCount?: number;
-}
-
-export interface AccountButtonSuggestion {
-  kind: 'suggestion';
-  id: string;
-  organizationId: string;
-  name: string;
-  imageUrl?: string;
-  status: 'pending' | 'accepted';
-}
-
-export interface AccountButtonInvitation {
-  kind: 'invitation';
-  id: string;
-  organizationId: string;
-  organizationName: string;
-  imageUrl?: string;
-}
-
-export interface AccountButtonData {
-  status: 'loading' | 'ready';
-  activeAccount: AccountButtonAccount;
-  /** `null` => the personal workspace is active. */
-  activeOrganizationId: string | null;
-  /** Explicit; do not derive from `memberships.length`. */
-  hasOrganizations: boolean;
-  memberships: AccountButtonMembership[];
-  suggestions: AccountButtonSuggestion[];
-  invitations: AccountButtonInvitation[];
-  additionalAccounts: AccountButtonAccount[];
-}
-
-/** All optional. An unhandled action hides (or de-activates) the affordance it drives. */
-export interface AccountButtonCallbacks {
-  onSelectOrganization?: (organizationId: string) => void;
-  onSelectPersonal?: () => void;
-  onAcceptSuggestion?: (suggestionId: string) => void;
-  onAcceptInvitation?: (invitationId: string) => void;
-  onSwitchAccount?: (sessionId: string) => void;
-  onSignOutSession?: (sessionId: string) => void;
-  onSignOutAll?: () => void;
-  onManageOrganization?: () => void;
-  onManageMembers?: () => void;
-  onManageAccount?: () => void;
-  onCreateOrganization?: () => void;
-  onAddAccount?: () => void;
-  onUpgrade?: () => void;
-}
-
-type AccountButtonContextValue = AccountButtonData & AccountButtonCallbacks;
-
-// ─── Recipe ───────────────────────────────────────────────────────────────────
-
-export const accountButtonRecipe = defineSlotRecipe(theme => ({
-  slots: {
-    trigger: { slot: 'account-button-trigger' },
-    triggerName: { slot: 'account-button-trigger-name' },
-    triggerBadge: { slot: 'account-button-trigger-badge' },
-    popup: { slot: 'account-button-popup' },
-    header: { slot: 'account-button-header' },
-    headerName: { slot: 'account-button-header-name' },
-    headerActions: { slot: 'account-button-header-actions' },
-    action: { slot: 'account-button-action' },
-    group: { slot: 'account-button-group' },
-    groupLabel: { slot: 'account-button-group-label' },
-    item: { slot: 'account-button-item' },
-    select: { slot: 'account-button-select' },
-    name: { slot: 'account-button-name' },
-    secondary: { slot: 'account-button-secondary' },
-    upgrade: { slot: 'account-button-upgrade' },
-    suggestedBadge: { slot: 'account-button-suggested-badge' },
-    inlineButton: { slot: 'account-button-inline-button' },
-    hoverAction: { slot: 'account-button-hover-action' },
-    add: { slot: 'account-button-add' },
-    addIcon: { slot: 'account-button-add-icon' },
-    footer: { slot: 'account-button-footer' },
-    signOutAll: { slot: 'account-button-sign-out-all' },
-    branding: { slot: 'account-button-branding' },
-    avatar: { slot: 'account-button-avatar' },
-  },
-  base: {
-    trigger: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(2),
-      width: '100%',
-      minWidth: 0,
-      padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`,
-      borderRadius: theme.rounded.md,
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      textAlign: 'start',
-      color: theme.color.cardForeground,
-      ...theme.text('sm'),
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    triggerName: {
-      fontWeight: theme.font.medium,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    triggerBadge: {
-      flexShrink: 0,
-      ...theme.text('xs'),
-      fontWeight: theme.font.medium,
-      padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
-      borderRadius: theme.rounded.full,
-      backgroundColor: ACCENT_SOFT,
-      color: ACCENT,
-      whiteSpace: 'nowrap',
-    },
-    popup: {
-      width: '20rem',
-      maxWidth: 'calc(100vw - 2rem)',
-      backgroundColor: theme.color.card,
-      color: theme.color.cardForeground,
-      border: `1px solid ${theme.color.border}`,
-      borderRadius: theme.rounded.lg,
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12)',
-      overflow: 'hidden',
-      ...theme.text('sm'),
-    },
-    header: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: theme.spacing(3),
-      padding: theme.spacing(4),
-    },
-    headerName: {
-      ...theme.text('sm'),
-      fontWeight: theme.font.semibold,
-      color: theme.color.cardForeground,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    headerActions: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: theme.spacing(2),
-    },
-    action: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: theme.spacing(2),
-      padding: theme.spacing(2),
-      borderRadius: theme.rounded.md,
-      border: `1px solid ${theme.color.border}`,
-      background: theme.color.card,
-      color: theme.color.cardForeground,
-      ...theme.text('sm'),
-      fontWeight: theme.font.medium,
-      cursor: 'pointer',
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    group: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: theme.spacing(0.5),
-      padding: theme.spacing(1.5),
-      borderTop: `1px solid ${theme.color.border}`,
-    },
-    groupLabel: {
-      padding: `${theme.spacing(1.5)} ${theme.spacing(2)} ${theme.spacing(1)}`,
-      ...theme.text('xs'),
-      fontWeight: theme.font.medium,
-      color: theme.color.mutedForeground,
-    },
-    item: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(2),
-      padding: theme.spacing(2),
-      borderRadius: theme.rounded.md,
-      position: 'relative',
-      _hover: { backgroundColor: theme.color.muted },
-      // Hover-reveal sign out: hidden but focusable (kept in tab order); revealed on row hover
-      // or keyboard focus-within — never a bare `opacity: 0` that would strand the focused button.
-      '& [data-cl-slot="account-button-hover-action"]': { opacity: 0, pointerEvents: 'none' },
-      '&:hover [data-cl-slot="account-button-hover-action"], &:focus-within [data-cl-slot="account-button-hover-action"]':
-        { opacity: 1, pointerEvents: 'auto' },
-    },
-    select: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(3),
-      flex: 1,
-      minWidth: 0,
-      background: 'none',
-      border: 'none',
-      padding: 0,
-      margin: 0,
-      font: 'inherit',
-      color: 'inherit',
-      textAlign: 'start',
-      cursor: 'pointer',
-    },
-    name: {
-      ...theme.text('sm'),
-      fontWeight: theme.font.medium,
-      color: theme.color.cardForeground,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    secondary: {
-      ...theme.text('xs'),
-      color: theme.color.mutedForeground,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    },
-    upgrade: {
-      background: 'none',
-      border: 'none',
-      padding: 0,
-      font: 'inherit',
-      cursor: 'pointer',
-      color: ACCENT,
-      fontWeight: theme.font.medium,
-    },
-    suggestedBadge: {
-      flexShrink: 0,
-      ...theme.text('xs'),
-      color: theme.color.mutedForeground,
-      padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
-      borderRadius: theme.rounded.sm,
-      backgroundColor: theme.color.muted,
-      whiteSpace: 'nowrap',
-    },
-    inlineButton: {
-      flexShrink: 0,
-      ...theme.text('xs'),
-      fontWeight: theme.font.medium,
-      padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
-      borderRadius: theme.rounded.md,
-      border: `1px solid ${theme.color.border}`,
-      background: theme.color.card,
-      color: theme.color.cardForeground,
-      cursor: 'pointer',
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    hoverAction: {
-      flexShrink: 0,
-      ...theme.text('xs'),
-      fontWeight: theme.font.medium,
-      padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
-      borderRadius: theme.rounded.md,
-      border: `1px solid ${theme.color.border}`,
-      background: theme.color.card,
-      color: theme.color.cardForeground,
-      cursor: 'pointer',
-      transition: 'opacity 120ms ease',
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    add: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(3),
-      width: '100%',
-      padding: theme.spacing(2),
-      borderRadius: theme.rounded.md,
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      textAlign: 'start',
-      ...theme.text('sm'),
-      color: theme.color.mutedForeground,
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    addIcon: {
-      display: 'grid',
-      placeItems: 'center',
-      flexShrink: 0,
-      width: theme.spacing(9),
-      height: theme.spacing(9),
-      borderRadius: theme.rounded.full,
-      backgroundColor: theme.color.muted,
-      color: theme.color.mutedForeground,
-    },
-    footer: {
-      display: 'flex',
-      flexDirection: 'column',
-      borderTop: `1px solid ${theme.color.border}`,
-      padding: theme.spacing(1.5),
-    },
-    signOutAll: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(3),
-      width: '100%',
-      padding: theme.spacing(2),
-      borderRadius: theme.rounded.md,
-      background: 'none',
-      border: 'none',
-      cursor: 'pointer',
-      textAlign: 'start',
-      ...theme.text('sm'),
-      color: theme.color.mutedForeground,
-      _hover: { backgroundColor: theme.color.muted },
-    },
-    branding: {
-      marginTop: theme.spacing(1),
-      padding: theme.spacing(2),
-      borderTop: `1px solid ${theme.color.border}`,
-      textAlign: 'center',
-      ...theme.text('xs'),
-      color: theme.color.mutedForeground,
-    },
-    avatar: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexShrink: 0,
-      overflow: 'hidden',
-      fontWeight: theme.font.medium,
-      textTransform: 'uppercase',
-      lineHeight: 1,
-      '& > img': { width: '100%', height: '100%', objectFit: 'cover' },
-    },
-  },
-  variants: {
-    shape: {
-      square: {
-        avatar: {
-          borderRadius: theme.rounded.md,
-          backgroundColor: theme.color.primary,
-          color: theme.color.primaryForeground,
-        },
-      },
-      circle: {
-        avatar: {
-          borderRadius: theme.rounded.full,
-          backgroundColor: theme.color.muted,
-          color: theme.color.mutedForeground,
-        },
-      },
-    },
-    size: {
-      sm: { avatar: { width: theme.spacing(5), height: theme.spacing(5), ...theme.text('xs') } },
-      md: { avatar: { width: theme.spacing(9), height: theme.spacing(9), ...theme.text('sm') } },
-    },
-  },
-  defaultVariants: { shape: 'circle', size: 'md' },
-}));
-
-declare module '../registry' {
-  interface MosaicSlotRegistry {
-    'account-button-trigger': true;
-    'account-button-trigger-name': true;
-    'account-button-trigger-badge': true;
-    'account-button-popup': true;
-    'account-button-header': true;
-    'account-button-header-name': true;
-    'account-button-header-actions': true;
-    'account-button-action': true;
-    'account-button-group': true;
-    'account-button-group-label': true;
-    'account-button-item': true;
-    'account-button-select': true;
-    'account-button-name': true;
-    'account-button-secondary': true;
-    'account-button-upgrade': true;
-    'account-button-suggested-badge': true;
-    'account-button-inline-button': true;
-    'account-button-hover-action': true;
-    'account-button-add': true;
-    'account-button-add-icon': true;
-    'account-button-footer': true;
-    'account-button-sign-out-all': true;
-    'account-button-branding': true;
-    'account-button-avatar': true;
-  }
-}
+type AccountButtonContextValue = AccountButtonData & AccountButtonCallbacks & AccountButtonBusyState;
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -423,6 +31,56 @@ function useAccountButtonContext(): AccountButtonContextValue {
     throw new Error('AccountButton compound components must be used within <AccountButtonRoot>');
   }
   return ctx;
+}
+
+interface BusyState {
+  loading: boolean;
+  disabled: boolean;
+}
+
+/** A key-less affordance (navigation) is disabled whenever anything is pending, never `loading`. */
+function resolveBusy(pendingKey: string | null | undefined, key?: string): BusyState {
+  const busy = pendingKey !== null && pendingKey !== undefined;
+  return { loading: key !== undefined && pendingKey === key, disabled: busy && pendingKey !== key };
+}
+
+function useBusy(key?: string): BusyState {
+  const { pendingKey } = useAccountButtonContext();
+  return resolveBusy(pendingKey, key);
+}
+
+type BusySlot = 'inlineButton' | 'hoverAction' | 'action' | 'signOutAll';
+
+/**
+ * A button whose action can be in flight: swaps `leading` for a spinner while `busyKey` is the pending
+ * action, and disables itself whenever any action is pending. `children` persist across the swap.
+ */
+function BusyButton({
+  slot,
+  busyKey,
+  onClick,
+  leading,
+  children,
+}: {
+  slot: BusySlot;
+  busyKey?: string;
+  onClick: () => void;
+  leading?: ReactNode;
+  children?: ReactNode;
+}) {
+  const recipe = useRecipe(accountButtonRecipe);
+  const { loading, disabled } = useBusy(busyKey);
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      disabled={loading || disabled}
+      {...recipe[slot]}
+    >
+      {loading ? <Spinner /> : leading}
+      {children}
+    </button>
+  );
 }
 
 function activeMembership(data: AccountButtonData): AccountButtonMembership | undefined {
@@ -483,10 +141,13 @@ interface RowProps {
   badge?: ReactNode;
   trailing?: ReactNode;
   hoverAction?: ReactNode;
+  /** Key for this row's own select action; drives its spinner/disabled state. */
+  busyKey?: string;
 }
 
-function Row({ name, secondary, shape, imageUrl, onSelect, active, badge, trailing, hoverAction }: RowProps) {
+function Row({ name, secondary, shape, imageUrl, onSelect, active, badge, trailing, hoverAction, busyKey }: RowProps) {
   const { item, select, name: nameSlot, secondary: secondarySlot } = useRecipe(accountButtonRecipe);
+  const { loading, disabled } = useBusy(busyKey);
   const inner = (
     <>
       <Avatar
@@ -510,6 +171,7 @@ function Row({ name, secondary, shape, imageUrl, onSelect, active, badge, traili
         <button
           type='button'
           onClick={onSelect}
+          disabled={loading || disabled}
           {...select}
         >
           {inner}
@@ -522,7 +184,9 @@ function Row({ name, secondary, shape, imageUrl, onSelect, active, badge, traili
           {inner}
         </div>
       )}
-      {active ? (
+      {loading ? (
+        <Spinner />
+      ) : active ? (
         <Icon
           name='check'
           size='sm'
@@ -540,38 +204,19 @@ function SuggestedBadge() {
   return <span {...suggestedBadge}>Suggested</span>;
 }
 
-function InlineButton({ label, onClick }: { label: string; onClick: () => void }) {
-  const { inlineButton } = useRecipe(accountButtonRecipe);
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      {...inlineButton}
-    >
-      {label}
-    </button>
-  );
-}
-
-function HoverAction({ onClick }: { onClick: () => void }) {
-  const { hoverAction } = useRecipe(accountButtonRecipe);
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      {...hoverAction}
-    >
-      Sign out
-    </button>
-  );
+function PendingApprovalLabel() {
+  const { suggestedBadge } = useRecipe(accountButtonRecipe);
+  return <span {...suggestedBadge}>Pending approval</span>;
 }
 
 function AddRow({ label, onClick }: { label: string; onClick: () => void }) {
   const { add, addIcon } = useRecipe(accountButtonRecipe);
+  const { disabled } = useBusy();
   return (
     <button
       type='button'
       onClick={onClick}
+      disabled={disabled}
       {...add}
     >
       <span {...addIcon}>
@@ -592,11 +237,12 @@ interface HeaderAction {
   icon: IconName;
   label: string;
   onClick: () => void;
+  busyKey?: string;
 }
 
 function Header() {
   const data = useAccountButtonContext();
-  const { header, headerName, headerActions, action, secondary, upgrade } = useRecipe(accountButtonRecipe);
+  const { header, headerName, headerActions, secondary, upgrade } = useRecipe(accountButtonRecipe);
   const org = activeMembership(data);
   const isOrg = org !== undefined;
   const label = isOrg ? org.name : data.activeAccount.name;
@@ -616,7 +262,12 @@ function Header() {
     }
     const signOut = data.onSignOutSession;
     if (signOut) {
-      actions.push({ icon: 'sign-out', label: 'Sign out', onClick: () => signOut(data.activeAccount.sessionId) });
+      actions.push({
+        icon: 'sign-out',
+        label: 'Sign out',
+        onClick: () => signOut(data.activeAccount.sessionId),
+        busyKey: accountBusyKeys.signOutSession(data.activeAccount.sessionId),
+      });
     }
   }
 
@@ -642,6 +293,7 @@ function Header() {
                 <button
                   type='button'
                   onClick={data.onUpgrade}
+                  disabled={resolveBusy(data.pendingKey).disabled}
                   {...upgrade}
                 >
                   Upgrade
@@ -657,19 +309,21 @@ function Header() {
           style={{ gridTemplateColumns: `repeat(${actions.length}, 1fr)` }}
         >
           {actions.map(a => (
-            <button
+            <BusyButton
               key={a.label}
-              type='button'
+              slot='action'
               onClick={a.onClick}
-              {...action}
+              busyKey={a.busyKey}
+              leading={
+                <Icon
+                  name={a.icon}
+                  size='sm'
+                  sx={t => ({ color: t.color.cardForeground })}
+                />
+              }
             >
-              <Icon
-                name={a.icon}
-                size='sm'
-                sx={t => ({ color: t.color.cardForeground })}
-              />
               {a.label}
-            </button>
+            </BusyButton>
           ))}
         </div>
       ) : null}
@@ -679,7 +333,7 @@ function Header() {
 
 function WorkspaceList() {
   const data = useAccountButtonContext();
-  const { group } = useRecipe(accountButtonRecipe);
+  const { group, scroll, loadMore } = useRecipe(accountButtonRecipe);
   const selectOrg = data.onSelectOrganization;
   const acceptSuggestion = data.onAcceptSuggestion;
   const acceptInvitation = data.onAcceptInvitation;
@@ -687,60 +341,95 @@ function WorkspaceList() {
 
   return (
     <div {...group}>
-      <Row
-        shape='circle'
-        name={data.activeAccount.name}
-        secondary={data.activeAccount.email}
-        imageUrl={data.activeAccount.imageUrl}
-        onSelect={data.onSelectPersonal}
-        active={data.activeOrganizationId === null}
-        hoverAction={
-          signOutSession ? <HoverAction onClick={() => signOutSession(data.activeAccount.sessionId)} /> : undefined
-        }
-      />
-      {data.memberships.map(m => (
+      <div {...scroll}>
         <Row
-          key={m.organizationId}
-          shape='square'
-          name={m.name}
-          imageUrl={m.imageUrl}
-          onSelect={selectOrg ? () => selectOrg(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganizationId}
-        />
-      ))}
-      {data.suggestions.map(s => (
-        <Row
-          key={s.id}
-          shape='square'
-          name={s.name}
-          imageUrl={s.imageUrl}
-          badge={<SuggestedBadge />}
-          trailing={
-            acceptSuggestion ? (
-              <InlineButton
-                label='Join'
-                onClick={() => acceptSuggestion(s.id)}
+          shape='circle'
+          name={data.activeAccount.name}
+          secondary={data.activeAccount.email}
+          imageUrl={data.activeAccount.imageUrl}
+          onSelect={data.onSelectPersonal}
+          active={data.activeOrganizationId === null}
+          busyKey={accountBusyKeys.selectPersonal()}
+          hoverAction={
+            signOutSession ? (
+              <BusyButton
+                slot='hoverAction'
+                leading='Sign out'
+                onClick={() => signOutSession(data.activeAccount.sessionId)}
+                busyKey={accountBusyKeys.signOutSession(data.activeAccount.sessionId)}
               />
             ) : undefined
           }
         />
-      ))}
-      {data.invitations.map(i => (
-        <Row
-          key={i.id}
-          shape='square'
-          name={i.organizationName}
-          imageUrl={i.imageUrl}
-          trailing={
-            acceptInvitation ? (
-              <InlineButton
-                label='Accept'
-                onClick={() => acceptInvitation(i.id)}
-              />
-            ) : undefined
-          }
-        />
-      ))}
+        {data.memberships.map(m => (
+          <Row
+            key={m.organizationId}
+            shape='square'
+            name={m.name}
+            imageUrl={m.imageUrl}
+            onSelect={selectOrg ? () => selectOrg(m.organizationId) : undefined}
+            active={m.organizationId === data.activeOrganizationId}
+            busyKey={accountBusyKeys.selectOrganization(m.organizationId)}
+          />
+        ))}
+        {data.suggestions.map(s =>
+          s.status === 'accepted' ? (
+            <Row
+              key={s.id}
+              shape='square'
+              name={s.name}
+              imageUrl={s.imageUrl}
+              trailing={<PendingApprovalLabel />}
+            />
+          ) : (
+            <Row
+              key={s.id}
+              shape='square'
+              name={s.name}
+              imageUrl={s.imageUrl}
+              badge={<SuggestedBadge />}
+              trailing={
+                acceptSuggestion ? (
+                  <BusyButton
+                    slot='inlineButton'
+                    leading='Join'
+                    onClick={() => acceptSuggestion(s.id)}
+                    busyKey={accountBusyKeys.acceptSuggestion(s.id)}
+                  />
+                ) : undefined
+              }
+            />
+          ),
+        )}
+        {data.invitations.map(i => (
+          <Row
+            key={i.id}
+            shape='square'
+            name={i.organizationName}
+            imageUrl={i.imageUrl}
+            trailing={
+              acceptInvitation ? (
+                <BusyButton
+                  slot='inlineButton'
+                  leading='Accept'
+                  onClick={() => acceptInvitation(i.id)}
+                  busyKey={accountBusyKeys.acceptInvitation(i.id)}
+                />
+              ) : undefined
+            }
+          />
+        ))}
+        <div
+          ref={data.loadMoreRef}
+          aria-hidden
+        >
+          {data.hasMoreRows || data.isFetchingRows ? (
+            <div {...loadMore}>
+              <Spinner />
+            </div>
+          ) : null}
+        </div>
+      </div>
       {data.onCreateOrganization ? (
         <AddRow
           label='Add organization'
@@ -771,6 +460,7 @@ function AccountsSection() {
           secondary={a.email}
           imageUrl={a.imageUrl}
           onSelect={switchAccount ? () => switchAccount(a.sessionId) : undefined}
+          busyKey={accountBusyKeys.switchAccount(a.sessionId)}
         />
       ))}
       {data.onAddAccount ? (
@@ -785,22 +475,24 @@ function AccountsSection() {
 
 function Footer() {
   const data = useAccountButtonContext();
-  const { footer, signOutAll, branding } = useRecipe(accountButtonRecipe);
+  const { footer, branding } = useRecipe(accountButtonRecipe);
   return (
     <div {...footer}>
       {data.onSignOutAll ? (
-        <button
-          type='button'
+        <BusyButton
+          slot='signOutAll'
           onClick={data.onSignOutAll}
-          {...signOutAll}
+          busyKey={accountBusyKeys.signOutAll()}
+          leading={
+            <Icon
+              name='sign-out'
+              size='sm'
+              sx={t => ({ color: t.color.mutedForeground })}
+            />
+          }
         >
-          <Icon
-            name='sign-out'
-            size='sm'
-            sx={t => ({ color: t.color.mutedForeground })}
-          />
           <span>Sign out of all accounts</span>
-        </button>
+        </BusyButton>
       ) : null}
       <div {...branding}>Secured by Clerk</div>
     </div>
@@ -809,7 +501,7 @@ function Footer() {
 
 // ─── Public parts ───────────────────────────────────────────────────────────
 
-export interface AccountButtonRootProps extends AccountButtonData, AccountButtonCallbacks {
+export interface AccountButtonRootProps extends AccountButtonData, AccountButtonCallbacks, AccountButtonBusyState {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -875,6 +567,31 @@ export function AccountButtonTrigger() {
   );
 }
 
+/**
+ * Placeholder shown in the trigger's slot while the controller loads, so the sidebar reserves the
+ * trigger's space and nothing shifts when the real avatar/name land. Non-interactive.
+ */
+export function AccountButtonTriggerSkeleton() {
+  const { trigger } = useRecipe(accountButtonRecipe);
+  return (
+    <div
+      {...trigger}
+      data-cl-loading=''
+      css={{ ...trigger.css, cursor: 'default' }}
+    >
+      <Skeleton
+        width='1.25rem'
+        height='1.25rem'
+        sx={t => ({ borderRadius: t.rounded.full, flexShrink: 0 })}
+      />
+      <Skeleton
+        width='7rem'
+        height='0.875rem'
+      />
+    </div>
+  );
+}
+
 /** The popover surface: header, workspace list, additional accounts, and footer. */
 export function AccountButtonPopup() {
   const data = useAccountButtonContext();
@@ -884,7 +601,9 @@ export function AccountButtonPopup() {
       <Popover.Positioner css={{ zIndex: 50 }}>
         <Popover.Popup {...popup}>
           <Header />
-          {data.hasOrganizations ? <WorkspaceList /> : null}
+          {data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0 ? (
+            <WorkspaceList />
+          ) : null}
           <AccountsSection />
           <Footer />
         </Popover.Popup>
@@ -893,13 +612,13 @@ export function AccountButtonPopup() {
   );
 }
 
-export type AccountButtonProps = Omit<AccountButtonRootProps, 'children'>;
+export type AccountButtonViewProps = Omit<AccountButtonRootProps, 'children'>;
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `AccountButton` lives in `account-button.tsx` and wraps this view.
  */
-export function AccountButtonView(props: AccountButtonProps) {
+export function AccountButtonView(props: AccountButtonViewProps) {
   return (
     <AccountButtonRoot {...props}>
       <AccountButtonTrigger />

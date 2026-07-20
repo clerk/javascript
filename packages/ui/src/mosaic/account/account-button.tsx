@@ -2,42 +2,82 @@
 
 import { useState } from 'react';
 
-import { useAccountButtonController } from './account-button.controller';
-import { AccountButtonView } from './account-button.view';
+import { useSpinDelay } from '../hooks/useSpinDelay';
+import { type AccountButtonControllerOptions, useAccountButtonController } from './account-button.controller';
+import { accountBusyKeys } from './account-button.types';
+import { AccountButtonTriggerSkeleton, AccountButtonView } from './account-button.view';
+
+export type AccountButtonProps = AccountButtonControllerOptions;
 
 /**
  * The connected AccountButton: reads live Clerk data through `useAccountButtonController` and renders
- * the presentational `AccountButtonView`. Owns the popover open state and closes it after a successful
- * one-shot action (select/switch/sign out/accept). Actions that open another surface
- * (manage/create navigations) leave the popover as-is.
+ * the presentational `AccountButtonView`. Owns the popover open state and the single in-flight action:
+ * it marks the clicked affordance busy (spinner + disables the rest), closes the popover only when the
+ * action resolves, and clears busy state (leaving the popover open) if it rejects. Actions that open
+ * another surface (manage/create navigations) leave the popover as-is.
  */
-export function AccountButton() {
-  const controller = useAccountButtonController();
+export function AccountButton(props: AccountButtonProps = {}) {
+  const controller = useAccountButtonController(props);
   const [open, setOpen] = useState(false);
+  const [pendingKey, setPendingKey] = useState<string | null>(null);
+
+  // Hold the spinner off for quick actions and steady it once shown. The container still guards
+  // re-entry on the immediate `pendingKey`; only the view's feedback is delayed.
+  const displayPendingKey = useSpinDelay(pendingKey);
+
+  if (controller.status === 'loading') {
+    return <AccountButtonTriggerSkeleton />;
+  }
 
   if (controller.status !== 'ready') {
     return null;
   }
 
   const close = () => setOpen(false);
-  const closeOnSuccess = <Args extends unknown[]>(fn?: (...args: Args) => void) =>
-    fn ? (...args: Args) => void Promise.resolve(fn(...args)).finally(close) : undefined;
 
-  const { status, ...data } = controller;
+  // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view,
+  // close on success, and always clear busy so a rejection can't leave the UI hanging.
+  const runAction = <Args extends unknown[]>(
+    keyFor: (...args: Args) => string,
+    fn?: (...args: Args) => void | Promise<unknown>,
+  ) =>
+    fn
+      ? (...args: Args) => {
+          if (pendingKey) {
+            return;
+          }
+          setPendingKey(keyFor(...args));
+          void Promise.resolve(fn(...args))
+            .then(close, () => {})
+            .finally(() => setPendingKey(null));
+        }
+      : undefined;
+
+  const {
+    status,
+    onSelectOrganization,
+    onSelectPersonal,
+    onSwitchAccount,
+    onSignOutSession,
+    onSignOutAll,
+    onAcceptSuggestion,
+    onAcceptInvitation,
+    ...data
+  } = controller;
 
   return (
     <AccountButtonView
       {...data}
-      status={status}
       open={open}
       onOpenChange={setOpen}
-      onSelectOrganization={closeOnSuccess(data.onSelectOrganization)}
-      onSelectPersonal={closeOnSuccess(data.onSelectPersonal)}
-      onSwitchAccount={closeOnSuccess(data.onSwitchAccount)}
-      onSignOutSession={closeOnSuccess(data.onSignOutSession)}
-      onSignOutAll={closeOnSuccess(data.onSignOutAll)}
-      onAcceptSuggestion={closeOnSuccess(data.onAcceptSuggestion)}
-      onAcceptInvitation={closeOnSuccess(data.onAcceptInvitation)}
+      pendingKey={displayPendingKey}
+      onSelectOrganization={runAction(accountBusyKeys.selectOrganization, onSelectOrganization)}
+      onSelectPersonal={runAction(accountBusyKeys.selectPersonal, onSelectPersonal)}
+      onSwitchAccount={runAction(accountBusyKeys.switchAccount, onSwitchAccount)}
+      onSignOutSession={runAction(accountBusyKeys.signOutSession, onSignOutSession)}
+      onSignOutAll={runAction(accountBusyKeys.signOutAll, onSignOutAll)}
+      onAcceptSuggestion={runAction(accountBusyKeys.acceptSuggestion, onAcceptSuggestion)}
+      onAcceptInvitation={runAction(accountBusyKeys.acceptInvitation, onAcceptInvitation)}
     />
   );
 }
