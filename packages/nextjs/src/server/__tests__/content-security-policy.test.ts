@@ -78,14 +78,25 @@ describe('CSP Header Utils', () => {
       expect(cspHeader[1]).toContain(`'nonce-${nonceHeader[1]}'`);
     });
 
-    it('should allow Clerk abuse and fraud protection origins', () => {
-      const result = createContentSecurityPolicyHeaders(testHost, {});
-      const directives = result.headers[0][1].split('; ');
+    it('should allow Clerk abuse and fraud protection origins in default and strict modes', () => {
+      for (const strict of [false, true]) {
+        const result = createContentSecurityPolicyHeaders(testHost, { strict });
+        const directives = result.headers[0][1].split('; ');
 
-      for (const directiveName of ['script-src', 'connect-src', 'frame-src']) {
-        const directive = directives.find(d => d.startsWith(directiveName));
-        expect(directive).toContain('https://*.protect.clerk.com');
-        expect(directive).toContain('https://*.client.protect.clerk.com');
+        for (const directiveName of ['script-src', 'connect-src', 'frame-src']) {
+          const directive = directives.find(d => d.startsWith(directiveName));
+          expect(directive).toContain('https://*.protect.clerk.com');
+          expect(directive).toContain('https://*.client.protect.clerk.com');
+        }
+
+        if (strict) {
+          const scriptSrcValues = directives
+            .find(d => d.startsWith('script-src'))
+            ?.replace('script-src ', '')
+            .split(' ');
+          expect(scriptSrcValues).not.toContain('https:');
+          expect(scriptSrcValues).not.toContain('http:');
+        }
       }
     });
 
