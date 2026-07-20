@@ -504,7 +504,7 @@ export type GetTokenOptions = {
    */
   skipCache?: boolean;
   /**
-   * The name of the JWT template from the [Clerk Dashboard](https://dashboard.clerk.com/~/jwt-templates) to generate a new token from. E.g. 'firebase', 'grafbase', or your custom template's name.
+   * The name of the JWT template from the [Clerk Dashboard](https://dashboard.clerk.com/~/jwt-templates) to generate a new token from. E.g., 'firebase', 'grafbase', or your custom template's name.
    */
   template?: string;
 };

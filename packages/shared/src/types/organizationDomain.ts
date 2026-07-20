@@ -81,7 +81,7 @@ export interface OrganizationDomainOwnershipVerification {
    */
   strategy: OrganizationDomainOwnershipVerificationStrategy;
   /**
-   * The number of verification attempts that have been made for the current ownership verification, or `null` when ownership was not established through a per-attempt flow (for example, the `legacy` strategy).
+   * The number of verification attempts that have been made for the current ownership verification, or `null` when ownership was not established through a per-attempt flow (e.g., the `legacy` strategy).
    */
   attempts: number | null;
   /**
