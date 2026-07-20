@@ -86,6 +86,19 @@ function membership(orgId: string, name: string, membersCount: number) {
   return { organization: { id: orgId, name, imageUrl: '', membersCount } };
 }
 
+/** A promise whose settling is controlled by the test, to hold an async action in flight. */
+function createDeferred() {
+  let resolve: () => void = () => {};
+  let reject: (reason?: unknown) => void = () => {};
+  const promise = new Promise<void>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+const spinner = () => popup()?.querySelector('[data-cl-spinner]') ?? null;
+
 beforeEach(() => {
   isUserLoaded = true;
   isSessionLoaded = true;
@@ -159,10 +172,13 @@ async function open() {
 }
 
 describe('AccountButton (connected)', () => {
-  it('renders nothing while the controller is loading', () => {
+  it('renders a non-interactive skeleton trigger while the controller is loading', () => {
     isUserLoaded = false;
     renderAccountButton();
-    expect(trigger()).toBeNull();
+    const t = trigger();
+    expect(t).toBeInTheDocument();
+    expect(t).toHaveAttribute('data-cl-loading');
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('renders nothing when there is no active user', () => {
@@ -334,5 +350,52 @@ describe('AccountButton (connected)', () => {
 
     expect(navigate).toHaveBeenCalledWith('/create-org');
     expect(popup()).toBeInTheDocument();
+  });
+
+  it('shows a spinner on the clicked action and disables other actions while it is in flight', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderAccountButton();
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: /Other/ }));
+
+    expect(spinner()).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeDisabled();
+    expect(popup()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
+  it('replaces the label with a spinner in the clicked inline button while accepting a suggestion', async () => {
+    const deferred = createDeferred();
+    userSuggestions.data[0].accept.mockReturnValueOnce(deferred.promise);
+    renderAccountButton();
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: 'Join' }));
+
+    expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
+    expect(spinner()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
+  it('keeps the popover open and clears busy state when an action rejects', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderAccountButton();
+    const user = await open();
+
+    await user.click(screen.getByRole('button', { name: /Other/ }));
+    expect(spinner()).toBeInTheDocument();
+
+    deferred.reject(new Error('setActive failed'));
+
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
   });
 });
