@@ -1,15 +1,14 @@
 import { useClerk } from '@clerk/react';
-import { buildErrorThrower, isClerkAPIResponseError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
 
-import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from './google-one-tap';
+import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
+import { errorThrower } from '../utils/errors';
 import type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
 } from './useSignInWithGoogle.types';
-
-const errorThrower = buildErrorThrower({ packageName: PACKAGE_NAME });
 
 export type GoogleClientIds = {
   webClientId: string;

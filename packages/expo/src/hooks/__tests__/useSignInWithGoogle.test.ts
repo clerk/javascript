@@ -29,7 +29,7 @@ vi.mock('@clerk/shared/error', async importOriginal => {
   };
 });
 
-vi.mock('../google-one-tap', async importOriginal => {
+vi.mock('../../google-one-tap', async importOriginal => {
   const actual = await importOriginal();
   return {
     ...actual,
@@ -46,7 +46,17 @@ vi.mock('react-native', () => {
   };
 });
 
-vi.mock('../specs/NativeClerkGoogleSignIn', () => {
+vi.mock('../../specs/NativeClerkModule', () => {
+  return {
+    default: {
+      configure: vi.fn(),
+      getClientToken: vi.fn(),
+      syncClientStateFromJs: vi.fn(),
+    },
+  };
+});
+
+vi.mock('../../specs/NativeClerkGoogleSignIn', () => {
   return {
     default: {
       configure: vi.fn(),

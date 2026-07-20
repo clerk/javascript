@@ -1,7 +1,6 @@
-import { buildErrorThrower } from '@clerk/shared/error';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
-const errorThrower = buildErrorThrower({ packageName: PACKAGE_NAME });
+import { errorThrower } from '../utils/errors';
 
 type SignUpUnsafeMetadata = Record<string, unknown>;
 
@@ -21,6 +20,9 @@ export type StartGoogleAuthenticationFlowReturnType = {
  *
  * Native Google Authentication is only available on iOS and Android.
  * For web platforms, use the OAuth-based Google Sign-In flow instead via useSSO.
+ *
+ * On iOS and Android, native Google Sign-In requires the `@clerk/expo-google-signin`
+ * package to be installed and its Expo config plugin added.
  *
  * @example
  * ```tsx

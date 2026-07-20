@@ -14,7 +14,8 @@ function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
   if (!NativeClerkGoogleSignIn) {
     throw new Error(
       'ClerkGoogleSignIn native module is not available. ' +
-        'Ensure the @clerk/expo-google-signin plugin is added to your app.json and you have run a development build.',
+        'Install @clerk/expo-google-signin (npx expo install @clerk/expo-google-signin), ' +
+        'add "@clerk/expo-google-signin" to the plugins array in your app config, then rebuild your native app.',
     );
   }
   return NativeClerkGoogleSignIn;

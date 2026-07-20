@@ -78,7 +78,6 @@ jobs:
       - name: Build and pack Clerk packages
         run: |
           pnpm --filter @clerk/expo... build
-          pnpm --filter @clerk/expo-google-signin build
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"

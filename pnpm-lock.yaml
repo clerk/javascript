@@ -504,7 +504,7 @@ importers:
         version: 11.14.0(@types/react@18.3.28)(react@18.3.1)
       '@rsdoctor/rspack-plugin':
         specifier: ^1.5.9
-        version: 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)
+        version: 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
         specifier: catalog:rspack
         version: 2.0.6(@rspack/core@2.0.6(@swc/helpers@0.5.21))(@rspack/dev-server@2.0.3(@rspack/core@2.0.6(@swc/helpers@0.5.21)))
@@ -692,41 +692,13 @@ importers:
         version: 0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10)
 
   packages/expo-google-signin:
-    dependencies:
-      '@clerk/react':
-        specifier: workspace:^
-        version: link:../react
-      '@clerk/shared':
-        specifier: workspace:^
-        version: link:../shared
-      tslib:
-        specifier: catalog:repo
-        version: 2.8.1
     devDependencies:
       '@expo/config-plugins':
         specifier: ^54.0.4
         version: 54.0.4
-      '@types/react':
-        specifier: catalog:react
-        version: 18.3.28
       expo:
         specifier: ~54.0.34
         version: 54.0.35(@babel/core@7.29.7)(bufferutil@4.1.0)(graphql@16.14.1)(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.3)(utf-8-validate@5.0.10)
-      expo-constants:
-        specifier: ^18.0.13
-        version: 18.0.13(expo@54.0.35(@babel/core@7.29.7)(bufferutil@4.1.0)(graphql@16.14.1)(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.3)(utf-8-validate@5.0.10))(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))
-      expo-crypto:
-        specifier: ^15.0.9
-        version: 15.0.9(expo@54.0.35(@babel/core@7.29.7)(bufferutil@4.1.0)(graphql@16.14.1)(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.3)(utf-8-validate@5.0.10))
-      react:
-        specifier: 18.3.1
-        version: 18.3.1
-      react-native:
-        specifier: ^0.86.0
-        version: 0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10)
-      tsup:
-        specifier: catalog:repo
-        version: 8.5.1(@microsoft/api-extractor@7.58.7(@types/node@25.6.0))(jiti@2.7.0)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0)
 
   packages/expo-passkeys:
     dependencies:
@@ -1118,13 +1090,13 @@ importers:
     devDependencies:
       '@mdx-js/loader':
         specifier: ^3.1.1
-        version: 3.1.1(webpack@5.102.1)
+        version: 3.1.1(webpack@5.102.1(esbuild@0.27.7))
       '@mdx-js/react':
         specifier: ^3.1.0
         version: 3.1.1(@types/react@18.3.28)(react@18.3.1)
       '@next/mdx':
         specifier: ^15.0.0
-        version: 15.5.19(@mdx-js/loader@3.1.1(webpack@5.102.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))
+        version: 15.5.19(@mdx-js/loader@3.1.1(webpack@5.102.1(esbuild@0.27.7)))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.3.0
@@ -1176,7 +1148,7 @@ importers:
         version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start':
         specifier: 1.157.16
-        version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)
+        version: 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))
       esbuild-plugin-file-path-extensions:
         specifier: ^2.1.4
         version: 2.1.4
@@ -1265,7 +1237,7 @@ importers:
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rsdoctor/rspack-plugin':
         specifier: ^1.5.9
-        version: 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)
+        version: 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/cli':
         specifier: catalog:rspack
         version: 2.0.6(@rspack/core@2.0.6(@swc/helpers@0.5.21))(@rspack/dev-server@2.0.3(@rspack/core@2.0.6(@swc/helpers@0.5.21)))
@@ -3054,7 +3026,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.28':
     resolution: {integrity: sha512-lvt72KNitGuixYD2l3SZmRKVu2G4zJpmg5V7WfUBNpmUU5oODBw/6qmiJ6kSLAlfDozscUk+BBGknBBzxUrwrA==}
@@ -19131,12 +19103,12 @@ snapshots:
       - encoding
       - supports-color
 
-  '@mdx-js/loader@3.1.1(webpack@5.102.1)':
+  '@mdx-js/loader@3.1.1(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@mdx-js/mdx': 3.1.1
       source-map: 0.7.6
     optionalDependencies:
-      webpack: 5.102.1
+      webpack: 5.102.1(esbuild@0.27.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -19547,11 +19519,11 @@ snapshots:
 
   '@next/env@15.5.19': {}
 
-  '@next/mdx@15.5.19(@mdx-js/loader@3.1.1(webpack@5.102.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))':
+  '@next/mdx@15.5.19(@mdx-js/loader@3.1.1(webpack@5.102.1(esbuild@0.27.7)))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))':
     dependencies:
       source-map: 0.7.6
     optionalDependencies:
-      '@mdx-js/loader': 3.1.1(webpack@5.102.1)
+      '@mdx-js/loader': 3.1.1(webpack@5.102.1(esbuild@0.27.7))
       '@mdx-js/react': 3.1.1(@types/react@18.3.28)(react@18.3.1)
 
   '@next/swc-darwin-arm64@15.5.19':
@@ -20971,13 +20943,13 @@ snapshots:
 
   '@rsdoctor/client@1.5.9': {}
 
-  '@rsdoctor/core@1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)':
+  '@rsdoctor/core@1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@rsbuild/plugin-check-syntax': 1.6.1
-      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/sdk': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)
-      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
+      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/sdk': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
       '@rspack/resolver': 0.2.8(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       browserslist-load-config: 1.0.1
       es-toolkit: 1.47.0
@@ -20995,10 +20967,10 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/graph@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)':
+  '@rsdoctor/graph@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
-      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
+      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
       es-toolkit: 1.47.0
       path-browserify: 1.0.1
       source-map: 0.7.6
@@ -21006,13 +20978,13 @@ snapshots:
       - '@rspack/core'
       - webpack
 
-  '@rsdoctor/rspack-plugin@1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)':
+  '@rsdoctor/rspack-plugin@1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
-      '@rsdoctor/core': 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)
-      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/sdk': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)
-      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
+      '@rsdoctor/core': 1.5.9(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/sdk': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
     optionalDependencies:
       '@rspack/core': 2.0.6(@swc/helpers@0.5.21)
     transitivePeerDependencies:
@@ -21024,12 +20996,12 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/sdk@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1)':
+  '@rsdoctor/sdk@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(bufferutil@4.1.0)(utf-8-validate@5.0.10)(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@rsdoctor/client': 1.5.9
-      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
-      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
+      '@rsdoctor/graph': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
+      '@rsdoctor/utils': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
       launch-editor: 2.13.2
       safer-buffer: 2.1.2
       socket.io: 4.8.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -21041,7 +21013,7 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/types@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)':
+  '@rsdoctor/types@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@types/connect': 3.4.38
       '@types/estree': 1.0.5
@@ -21049,12 +21021,12 @@ snapshots:
       source-map: 0.7.6
     optionalDependencies:
       '@rspack/core': 2.0.6(@swc/helpers@0.5.21)
-      webpack: 5.102.1
+      webpack: 5.102.1(esbuild@0.27.7)
 
-  '@rsdoctor/utils@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)':
+  '@rsdoctor/utils@1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/code-frame': 7.26.2
-      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1)
+      '@rsdoctor/types': 1.5.9(@rspack/core@2.0.6(@swc/helpers@0.5.21))(webpack@5.102.1(esbuild@0.27.7))
       '@types/estree': 1.0.5
       acorn: 8.16.0
       acorn-import-attributes: 1.9.5(acorn@8.16.0)
@@ -21996,14 +21968,14 @@ snapshots:
     transitivePeerDependencies:
       - crossws
 
-  '@tanstack/react-start@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)':
+  '@tanstack/react-start@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@tanstack/react-router': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start-client': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start-server': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.157.16
-      '@tanstack/start-plugin-core': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)
+      '@tanstack/start-plugin-core': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))
       '@tanstack/start-server-core': 1.157.16
       pathe: 2.0.3
       react: 18.3.1
@@ -22046,7 +22018,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)':
+  '@tanstack/router-plugin@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.29.7)
@@ -22065,7 +22037,7 @@ snapshots:
     optionalDependencies:
       '@tanstack/react-router': 1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vite: 7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0)
-      webpack: 5.102.1
+      webpack: 5.102.1(esbuild@0.27.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -22092,7 +22064,7 @@ snapshots:
 
   '@tanstack/start-fn-stubs@1.154.7': {}
 
-  '@tanstack/start-plugin-core@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)':
+  '@tanstack/start-plugin-core@1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.29.7
@@ -22100,7 +22072,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.40
       '@tanstack/router-core': 1.157.16
       '@tanstack/router-generator': 1.157.16
-      '@tanstack/router-plugin': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1)
+      '@tanstack/router-plugin': 1.157.16(@tanstack/react-router@1.157.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(vite@7.3.5(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.20.6)(yaml@2.9.0))(webpack@5.102.1(esbuild@0.27.7))
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.157.16
       '@tanstack/start-server-core': 1.157.16
@@ -32616,13 +32588,15 @@ snapshots:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
 
-  terser-webpack-plugin@5.4.0(webpack@5.102.1):
+  terser-webpack-plugin@5.4.0(esbuild@0.27.7)(webpack@5.102.1(esbuild@0.27.7)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.1
-      webpack: 5.102.1
+      webpack: 5.102.1(esbuild@0.27.7)
+    optionalDependencies:
+      esbuild: 0.27.7
     optional: true
 
   terser@5.46.1:
@@ -32818,35 +32792,6 @@ snapshots:
       '@microsoft/api-extractor': 7.58.7(@types/node@22.19.17)
       postcss: 8.5.15
       typescript: 6.0.3
-    transitivePeerDependencies:
-      - jiti
-      - supports-color
-      - tsx
-      - yaml
-
-  tsup@8.5.1(@microsoft/api-extractor@7.58.7(@types/node@25.6.0))(jiti@2.7.0)(postcss@8.5.15)(tsx@4.20.6)(typescript@5.9.3)(yaml@2.9.0):
-    dependencies:
-      bundle-require: 5.1.0(esbuild@0.27.7)
-      cac: 6.7.14
-      chokidar: 5.0.0
-      consola: 3.4.2
-      debug: 4.4.3(supports-color@8.1.1)
-      esbuild: 0.27.7
-      fix-dts-default-cjs-exports: 1.0.1
-      joycon: 3.1.1
-      picocolors: 1.1.1
-      postcss-load-config: 6.0.1(jiti@2.7.0)(postcss@8.5.15)(tsx@4.20.6)(yaml@2.9.0)
-      resolve-from: 5.0.0
-      rollup: 4.61.0
-      source-map: 0.7.6
-      sucrase: 3.35.1
-      tinyexec: 0.3.2
-      tinyglobby: 0.2.17
-      tree-kill: 1.2.2
-    optionalDependencies:
-      '@microsoft/api-extractor': 7.58.7(@types/node@25.6.0)
-      postcss: 8.5.15
-      typescript: 5.9.3
     transitivePeerDependencies:
       - jiti
       - supports-color
@@ -33790,7 +33735,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.102.1:
+  webpack@5.102.1(esbuild@0.27.7):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.9
@@ -33814,7 +33759,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.4.0(webpack@5.102.1)
+      terser-webpack-plugin: 5.4.0(esbuild@0.27.7)(webpack@5.102.1(esbuild@0.27.7))
       watchpack: 2.5.1
       webpack-sources: 3.3.4
     transitivePeerDependencies:

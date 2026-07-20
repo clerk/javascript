@@ -5,7 +5,6 @@
     "packages/chrome-extension",
     "packages/clerk-js",
     "packages/expo",
-    "packages/expo-google-signin",
     "packages/expo-passkeys",
     "packages/express",
     "packages/fastify",

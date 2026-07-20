@@ -5,24 +5,26 @@ export type {
 } from './useSignInWithGoogle.types';
 
 /**
- * Hook for native Google Authentication on iOS using Clerk's built-in Google Sign-In module.
+ * Hook for native Google Authentication on Android using Clerk's built-in Google One Tap module.
  *
  * This hook provides a simplified way to authenticate users with their Google account
- * using the native iOS Google Sign-In UI. The authentication flow automatically
- * handles the ID token exchange with Clerk's backend and manages the transfer flow
- * between sign-in and sign-up.
+ * using the native Android Google Sign-In UI with Credential Manager. The authentication
+ * flow automatically handles the ID token exchange with Clerk's backend and manages
+ * the transfer flow between sign-in and sign-up.
  *
  * Features:
- * - Native Google Sign-In UI
+ * - Native Google One Tap UI
  * - Built-in nonce support for replay attack protection
- * - No additional dependencies required
+ *
+ * Requires the `@clerk/expo-google-signin` package to be installed and its Expo
+ * config plugin added, which provide the native module.
  *
  * @example
  * ```tsx
- * import { useSignInWithGoogle } from '@clerk/expo-google-signin';
+ * import { useSignInWithGoogle } from '@clerk/expo/google';
  * import { Button } from 'react-native';
  *
- * function GoogleSigninButton() {
+ * function GoogleSignInButton() {
  *   const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
  *
  *   const onPress = async () => {
@@ -41,8 +43,8 @@ export type {
  * }
  * ```
  *
- * @platform iOS - This is the iOS-specific implementation using Google Sign-In SDK
+ * @platform Android - This is the Android-specific implementation using Credential Manager
  *
  * @returns An object containing the `startGoogleAuthenticationFlow` function
  */
-export const useSignInWithGoogle = createUseSignInWithGoogle({ requiresIosClientId: true });
+export const useSignInWithGoogle = createUseSignInWithGoogle({ requiresIosClientId: false });
