@@ -884,7 +884,9 @@ export function AccountButtonPopup() {
       <Popover.Positioner css={{ zIndex: 50 }}>
         <Popover.Popup {...popup}>
           <Header />
-          {data.hasOrganizations ? <WorkspaceList /> : null}
+          {data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0 ? (
+            <WorkspaceList />
+          ) : null}
           <AccountsSection />
           <Footer />
         </Popover.Popup>

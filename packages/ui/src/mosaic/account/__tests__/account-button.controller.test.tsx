@@ -28,6 +28,7 @@ let userMemberships: { data: unknown[]; count: number; revalidate: ReturnType<ty
 let userInvitations: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
 let userSuggestions: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
 let signedInSessions: FakeSession[];
+let singleSessionMode: boolean;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -52,6 +53,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       buildSignInUrl: () => '/sign-in',
       client: { signedInSessions },
       __internal_environment: {
+        authConfig: { singleSessionMode },
         displayConfig: {
           afterCreateOrganizationUrl: '/after-create',
           afterSwitchSessionUrl: '/after-switch',
@@ -121,6 +123,7 @@ beforeEach(() => {
   setActive = vi.fn().mockResolvedValue(undefined);
   signOut = vi.fn().mockResolvedValue(undefined);
   navigate = vi.fn().mockResolvedValue(undefined);
+  singleSessionMode = false;
 });
 
 afterEach(() => {
@@ -142,6 +145,8 @@ function Harness() {
       <output data-testid='active-org'>{String(c.activeOrganizationId)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
       <output data-testid='additional'>{c.additionalAccounts.map(a => a.userId).join(',')}</output>
+      <output data-testid='can-add-account'>{String(Boolean(c.onAddAccount))}</output>
+      <output data-testid='can-sign-out-all'>{String(Boolean(c.onSignOutAll))}</output>
       <output data-testid='memberships'>{JSON.stringify(c.memberships)}</output>
       <output data-testid='suggestions'>{JSON.stringify(c.suggestions)}</output>
       <output data-testid='invitations'>{JSON.stringify(c.invitations)}</output>
@@ -361,6 +366,19 @@ describe('useAccountButtonController', () => {
 
     fireEvent.click(screen.getByText('create-org'));
     expect(navigate).toHaveBeenCalledWith('/create-org');
+  });
+
+  it('offers add-account and sign-out-all in multi-session mode', () => {
+    render(<Harness />);
+    expect(screen.getByTestId('can-add-account')).toHaveTextContent('true');
+    expect(screen.getByTestId('can-sign-out-all')).toHaveTextContent('true');
+  });
+
+  it('omits add-account and sign-out-all in single-session mode', () => {
+    singleSessionMode = true;
+    render(<Harness />);
+    expect(screen.getByTestId('can-add-account')).toHaveTextContent('false');
+    expect(screen.getByTestId('can-sign-out-all')).toHaveTextContent('false');
   });
 
   it('accepts invitations and suggestions, then revalidates the collection', async () => {

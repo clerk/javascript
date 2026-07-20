@@ -37,6 +37,7 @@ let userMemberships: { data: ReturnType<typeof membership>[]; count: number; rev
 let userInvitations: { data: ReturnType<typeof acceptable>[]; count: number; revalidate: ReturnType<typeof vi.fn> };
 let userSuggestions: { data: ReturnType<typeof acceptable>[]; count: number; revalidate: ReturnType<typeof vi.fn> };
 let signedInSessions: FakeSession[];
+let singleSessionMode: boolean;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -60,6 +61,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       buildSignInUrl: () => '/sign-in',
       client: { signedInSessions },
       __internal_environment: {
+        authConfig: { singleSessionMode },
         displayConfig: {
           afterCreateOrganizationUrl: '/after-create',
           afterSwitchSessionUrl: '/after-switch',
@@ -129,6 +131,7 @@ beforeEach(() => {
   setActive = vi.fn().mockResolvedValue(undefined);
   signOut = vi.fn().mockResolvedValue(undefined);
   navigate = vi.fn().mockResolvedValue(undefined);
+  singleSessionMode = false;
 });
 
 afterEach(() => {
@@ -254,6 +257,26 @@ describe('AccountButton (connected)', () => {
     await waitFor(() => expect(suggestion.accept).toHaveBeenCalledTimes(1));
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(popup()).not.toBeInTheDocument());
+  });
+
+  it('in single-session mode hides add-account and sign-out-of-all', async () => {
+    singleSessionMode = true;
+    signedInSessions = [{ id: 'sess_1', user: user as FakeUser }];
+    renderAccountButton();
+    await open();
+
+    expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sign out of all accounts' })).toBeNull();
+  });
+
+  it('shows pending invitations and suggestions even with no organization memberships', async () => {
+    userMemberships = { data: [], count: 0, revalidate: vi.fn().mockResolvedValue(undefined) };
+    organization = null;
+    renderAccountButton();
+    await open();
+
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument();
   });
 
   it('navigating to manage the organization navigates and leaves the popover open', async () => {

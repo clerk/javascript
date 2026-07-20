@@ -57,7 +57,9 @@ export function useAccountButtonController(): AccountButtonController {
 
   const clerk = useClerk();
   const router = useMosaicRouter();
-  const displayConfig = useMosaicEnvironment()?.displayConfig;
+  const environment = useMosaicEnvironment();
+  const displayConfig = environment?.displayConfig;
+  const singleSessionMode = environment?.authConfig?.singleSessionMode ?? false;
 
   if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded) {
     return { status: 'loading' };
@@ -122,12 +124,14 @@ export function useAccountButtonController(): AccountButtonController {
     onSwitchAccount: sessionId =>
       clerk.setActive({ session: sessionId, redirectUrl: displayConfig?.afterSwitchSessionUrl }),
     onSignOutSession: sessionId => clerk.signOut({ sessionId }),
-    onSignOutAll: () => clerk.signOut(),
+    // Single-session apps cannot hold a second session, so adding an account and signing out of
+    // "all accounts" are meaningless there; the per-session sign out on the active row remains.
+    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut(),
     onManageAccount: () => router.navigate(clerk.buildUserProfileUrl()),
     onManageOrganization: () => router.navigate(clerk.buildOrganizationProfileUrl()),
     onManageMembers: () => router.navigate(clerk.buildOrganizationProfileUrl()),
     onCreateOrganization: () => router.navigate(clerk.buildCreateOrganizationUrl()),
-    onAddAccount: () => router.navigate(clerk.buildSignInUrl()),
+    onAddAccount: singleSessionMode ? undefined : () => router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
