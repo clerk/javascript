@@ -19,6 +19,7 @@ import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
   API_KEY_PREFIX,
   isJwtFormat,
+  JWT_CATEGORY_M2M_TOKEN,
   M2M_SUBJECT_PREFIX,
   M2M_TOKEN_PREFIX,
   OAUTH_ACCESS_TOKEN_TYPES,
@@ -118,6 +119,20 @@ export async function verifyToken(
 
   const { header } = decodedResult;
   const { kid } = header;
+
+  // Reject machine JWTs (e.g. M2M) tagged with a non-session category but signed by the same
+  // instance key, regardless of transport. Reciprocal of the machine verifier's `cat` check.
+  if (header.cat === JWT_CATEGORY_M2M_TOKEN) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          action: TokenVerificationErrorAction.EnsureClerkJWT,
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: 'Invalid session token category.',
+        }),
+      ],
+    };
+  }
 
   try {
     let key: JsonWebKey;

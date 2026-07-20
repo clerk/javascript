@@ -17,11 +17,6 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
     activity?.let { Clerk.attachActivity(it) }
   }
 
-  override fun onAttachedToWindow() {
-    super.onAttachedToWindow()
-    setupView()
-  }
-
   @Composable
   override fun Content() {
     Box(

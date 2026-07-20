@@ -113,6 +113,22 @@ describe('tokens.verify(token, options)', () => {
     expect(errors).toBeDefined();
     expect(errors?.[0].message).toContain('signature');
   });
+
+  it('rejects a JWT tagged with the M2M category before key resolution (AISEC-91)', async () => {
+    // Non-machine `sub` isolates the category guard from the sub-based machine-JWT check;
+    // no jwks server is mocked, proving the guard fires before any network call.
+    const token = await createSignedM2MJwt({ ...mockM2MJwtPayload, sub: mockJwtPayload.sub });
+
+    const { data, errors } = await verifyToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid');
+    expect(errors?.[0].message).toBe('Invalid session token category.');
+  });
 });
 
 describe('tokens.verifyMachineAuthToken(token, options)', () => {
