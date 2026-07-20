@@ -1,8 +1,8 @@
-import { useClerk, useOrganization, useOrganizationList, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationResource, UserResource } from '@clerk/shared/types';
 
-import { organizationListParams } from '../../components/OrganizationSwitcher/utils';
 import { populateParamFromObject } from '../../contexts/utils';
+import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type {
@@ -90,7 +90,7 @@ export function useAccountButtonController(options?: AccountButtonControllerOpti
     organization,
     membershipRequests,
   } = useOrganization({ membershipRequests: canManageMembers ? true : undefined });
-  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
+  const { userMemberships, userInvitations, userSuggestions, ref: loadMoreRef } = useOrganizationListInView();
 
   const clerk = useClerk();
   const router = useMosaicRouter();
@@ -155,6 +155,9 @@ export function useAccountButtonController(options?: AccountButtonControllerOpti
     suggestions,
     invitations,
     additionalAccounts,
+    loadMoreRef,
+    hasMoreRows: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
+    isFetchingRows: Boolean(userMemberships.isFetching || userInvitations.isFetching || userSuggestions.isFetching),
     onSelectOrganization: organizationId => {
       const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
       return clerk.setActive({

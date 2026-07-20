@@ -16,6 +16,8 @@ export const accountButtonRecipe = defineSlotRecipe(theme => ({
     headerActions: { slot: 'account-button-header-actions' },
     action: { slot: 'account-button-action' },
     group: { slot: 'account-button-group' },
+    scroll: { slot: 'account-button-scroll' },
+    loadMore: { slot: 'account-button-load-more' },
     groupLabel: { slot: 'account-button-group-label' },
     item: { slot: 'account-button-item' },
     select: { slot: 'account-button-select' },
@@ -116,6 +118,19 @@ export const accountButtonRecipe = defineSlotRecipe(theme => ({
       gap: theme.spacing(0.5),
       padding: theme.spacing(1.5),
       borderTop: `1px solid ${theme.color.border}`,
+    },
+    scroll: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: theme.spacing(0.5),
+      maxHeight: '18rem',
+      overflowY: 'auto',
+    },
+    loadMore: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing(2),
     },
     groupLabel: {
       padding: `${theme.spacing(1.5)} ${theme.spacing(2)} ${theme.spacing(1)}`,
@@ -312,6 +327,8 @@ declare module '../registry' {
     'account-button-header-actions': true;
     'account-button-action': true;
     'account-button-group': true;
+    'account-button-scroll': true;
+    'account-button-load-more': true;
     'account-button-group-label': true;
     'account-button-item': true;
     'account-button-select': true;

@@ -24,9 +24,16 @@ let user: FakeUser | null;
 let session: { id: string; checkAuthorization: ReturnType<typeof vi.fn> } | null;
 let organization: { id: string } | null;
 let membershipRequests: { count: number };
-let userMemberships: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
-let userInvitations: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
-let userSuggestions: { data: unknown[]; count: number; revalidate: ReturnType<typeof vi.fn> };
+type FakePaginated = {
+  data: unknown[];
+  count: number;
+  revalidate: ReturnType<typeof vi.fn>;
+  hasNextPage?: boolean;
+  isFetching?: boolean;
+};
+let userMemberships: FakePaginated;
+let userInvitations: FakePaginated;
+let userSuggestions: FakePaginated;
 let signedInSessions: FakeSession[];
 let singleSessionMode: boolean;
 let controllerOptions: AccountButtonControllerOptions | undefined;
@@ -154,6 +161,9 @@ function Harness() {
       <output data-testid='memberships'>{JSON.stringify(c.memberships)}</output>
       <output data-testid='suggestions'>{JSON.stringify(c.suggestions)}</output>
       <output data-testid='invitations'>{JSON.stringify(c.invitations)}</output>
+      <output data-testid='has-more-rows'>{String(c.hasMoreRows)}</output>
+      <output data-testid='is-fetching-rows'>{String(c.isFetchingRows)}</output>
+      <output data-testid='has-load-more-ref'>{String(typeof c.loadMoreRef === 'function')}</output>
       <button
         type='button'
         onClick={() => void c.onSelectOrganization?.('org_9')}
@@ -329,6 +339,19 @@ describe('useAccountButtonController', () => {
     rows = memberships();
     expect(rows[0].membershipRequestCount).toBeUndefined();
     expect(rows[1].membershipRequestCount).toBeUndefined();
+  });
+
+  it('exposes a load-more ref and derives paging flags from the org lists', () => {
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('has-load-more-ref')).toHaveTextContent('true');
+    expect(screen.getByTestId('has-more-rows')).toHaveTextContent('false');
+    expect(screen.getByTestId('is-fetching-rows')).toHaveTextContent('false');
+
+    userInvitations.hasNextPage = true;
+    userSuggestions.isFetching = true;
+    rerender(<Harness />);
+    expect(screen.getByTestId('has-more-rows')).toHaveTextContent('true');
+    expect(screen.getByTestId('is-fetching-rows')).toHaveTextContent('true');
   });
 
   it('selects an organization and personal via setActive, with no redirect when no select url is configured', () => {

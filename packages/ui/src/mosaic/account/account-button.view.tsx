@@ -333,7 +333,7 @@ function Header() {
 
 function WorkspaceList() {
   const data = useAccountButtonContext();
-  const { group } = useRecipe(accountButtonRecipe);
+  const { group, scroll, loadMore } = useRecipe(accountButtonRecipe);
   const selectOrg = data.onSelectOrganization;
   const acceptSuggestion = data.onAcceptSuggestion;
   const acceptInvitation = data.onAcceptInvitation;
@@ -341,83 +341,95 @@ function WorkspaceList() {
 
   return (
     <div {...group}>
-      <Row
-        shape='circle'
-        name={data.activeAccount.name}
-        secondary={data.activeAccount.email}
-        imageUrl={data.activeAccount.imageUrl}
-        onSelect={data.onSelectPersonal}
-        active={data.activeOrganizationId === null}
-        busyKey={accountBusyKeys.selectPersonal()}
-        hoverAction={
-          signOutSession ? (
-            <BusyButton
-              slot='hoverAction'
-              leading='Sign out'
-              onClick={() => signOutSession(data.activeAccount.sessionId)}
-              busyKey={accountBusyKeys.signOutSession(data.activeAccount.sessionId)}
-            />
-          ) : undefined
-        }
-      />
-      {data.memberships.map(m => (
+      <div {...scroll}>
         <Row
-          key={m.organizationId}
-          shape='square'
-          name={m.name}
-          imageUrl={m.imageUrl}
-          onSelect={selectOrg ? () => selectOrg(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganizationId}
-          busyKey={accountBusyKeys.selectOrganization(m.organizationId)}
-        />
-      ))}
-      {data.suggestions.map(s =>
-        s.status === 'accepted' ? (
-          <Row
-            key={s.id}
-            shape='square'
-            name={s.name}
-            imageUrl={s.imageUrl}
-            trailing={<PendingApprovalLabel />}
-          />
-        ) : (
-          <Row
-            key={s.id}
-            shape='square'
-            name={s.name}
-            imageUrl={s.imageUrl}
-            badge={<SuggestedBadge />}
-            trailing={
-              acceptSuggestion ? (
-                <BusyButton
-                  slot='inlineButton'
-                  leading='Join'
-                  onClick={() => acceptSuggestion(s.id)}
-                  busyKey={accountBusyKeys.acceptSuggestion(s.id)}
-                />
-              ) : undefined
-            }
-          />
-        ),
-      )}
-      {data.invitations.map(i => (
-        <Row
-          key={i.id}
-          shape='square'
-          name={i.organizationName}
-          imageUrl={i.imageUrl}
-          trailing={
-            acceptInvitation ? (
+          shape='circle'
+          name={data.activeAccount.name}
+          secondary={data.activeAccount.email}
+          imageUrl={data.activeAccount.imageUrl}
+          onSelect={data.onSelectPersonal}
+          active={data.activeOrganizationId === null}
+          busyKey={accountBusyKeys.selectPersonal()}
+          hoverAction={
+            signOutSession ? (
               <BusyButton
-                slot='inlineButton'
-                leading='Accept'
-                onClick={() => acceptInvitation(i.id)}
-                busyKey={accountBusyKeys.acceptInvitation(i.id)}
+                slot='hoverAction'
+                leading='Sign out'
+                onClick={() => signOutSession(data.activeAccount.sessionId)}
+                busyKey={accountBusyKeys.signOutSession(data.activeAccount.sessionId)}
               />
             ) : undefined
           }
         />
-      ))}
+        {data.memberships.map(m => (
+          <Row
+            key={m.organizationId}
+            shape='square'
+            name={m.name}
+            imageUrl={m.imageUrl}
+            onSelect={selectOrg ? () => selectOrg(m.organizationId) : undefined}
+            active={m.organizationId === data.activeOrganizationId}
+            busyKey={accountBusyKeys.selectOrganization(m.organizationId)}
+          />
+        ))}
+        {data.suggestions.map(s =>
+          s.status === 'accepted' ? (
+            <Row
+              key={s.id}
+              shape='square'
+              name={s.name}
+              imageUrl={s.imageUrl}
+              trailing={<PendingApprovalLabel />}
+            />
+          ) : (
+            <Row
+              key={s.id}
+              shape='square'
+              name={s.name}
+              imageUrl={s.imageUrl}
+              badge={<SuggestedBadge />}
+              trailing={
+                acceptSuggestion ? (
+                  <BusyButton
+                    slot='inlineButton'
+                    leading='Join'
+                    onClick={() => acceptSuggestion(s.id)}
+                    busyKey={accountBusyKeys.acceptSuggestion(s.id)}
+                  />
+                ) : undefined
+              }
+            />
+          ),
+        )}
+        {data.invitations.map(i => (
+          <Row
+            key={i.id}
+            shape='square'
+            name={i.organizationName}
+            imageUrl={i.imageUrl}
+            trailing={
+              acceptInvitation ? (
+                <BusyButton
+                  slot='inlineButton'
+                  leading='Accept'
+                  onClick={() => acceptInvitation(i.id)}
+                  busyKey={accountBusyKeys.acceptInvitation(i.id)}
+                />
+              ) : undefined
+            }
+          />
+        ))}
+        <div
+          ref={data.loadMoreRef}
+          aria-hidden
+        >
+          {data.hasMoreRows || data.isFetchingRows ? (
+            <div {...loadMore}>
+              <Spinner />
+            </div>
+          ) : null}
+        </div>
+      </div>
       {data.onCreateOrganization ? (
         <AddRow
           label='Add organization'

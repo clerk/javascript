@@ -48,6 +48,12 @@ export interface AccountButtonData {
   suggestions: AccountButtonSuggestion[];
   invitations: AccountButtonInvitation[];
   additionalAccounts: AccountButtonAccount[];
+  /** Attach to the workspace-list sentinel; scrolling it into view pages in more rows. */
+  loadMoreRef?: (element: HTMLElement | null) => void;
+  /** More membership/invitation/suggestion pages remain to fetch. */
+  hasMoreRows?: boolean;
+  /** A page of workspace rows is currently being fetched. */
+  isFetchingRows?: boolean;
 }
 
 /** All optional. An unhandled action hides (or de-activates) the affordance it drives. */

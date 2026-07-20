@@ -33,9 +33,16 @@ let user: FakeUser | null;
 let session: { id: string; checkAuthorization: ReturnType<typeof vi.fn> } | null;
 let organization: { id: string } | null;
 let membershipRequests: { count: number };
-let userMemberships: { data: ReturnType<typeof membership>[]; count: number; revalidate: ReturnType<typeof vi.fn> };
-let userInvitations: { data: ReturnType<typeof acceptable>[]; count: number; revalidate: ReturnType<typeof vi.fn> };
-let userSuggestions: { data: ReturnType<typeof acceptable>[]; count: number; revalidate: ReturnType<typeof vi.fn> };
+type FakePaginated<T> = {
+  data: T[];
+  count: number;
+  revalidate: ReturnType<typeof vi.fn>;
+  hasNextPage?: boolean;
+  isFetching?: boolean;
+};
+let userMemberships: FakePaginated<ReturnType<typeof membership>>;
+let userInvitations: FakePaginated<ReturnType<typeof acceptable>>;
+let userSuggestions: FakePaginated<ReturnType<typeof acceptable>>;
 let signedInSessions: FakeSession[];
 let singleSessionMode: boolean;
 
@@ -398,5 +405,23 @@ describe('AccountButton (connected)', () => {
     await waitFor(() => expect(spinner()).toBeNull());
     expect(popup()).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
+  });
+
+  const loadMore = () => popup()?.querySelector('[data-cl-slot="account-button-load-more"]') ?? null;
+
+  it('shows the load-more spinner while more workspace pages remain', async () => {
+    userMemberships.hasNextPage = true;
+    renderAccountButton();
+    await open();
+
+    expect(loadMore()).toBeInTheDocument();
+    expect(loadMore()?.querySelector('[data-cl-spinner]')).toBeInTheDocument();
+  });
+
+  it('renders no load-more spinner when the workspace lists are fully loaded', async () => {
+    renderAccountButton();
+    await open();
+
+    expect(loadMore()).toBeNull();
   });
 });
