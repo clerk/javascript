@@ -362,7 +362,7 @@ type RunHandlerWithRequestStateArgs = {
  * Drives the post-authentication pipeline: handler invocation, CSP, redirects, header propagation,
  * and response decoration. Accepts a pre-computed `requestState` so callers can supply either a
  * real authentication result from `authenticateRequest()` or a synthetic signed-out state
- * (e.g. during keyless bootstrap when no publishable key is available yet).
+ * (e.g., during keyless bootstrap when no publishable key is available yet).
  */
 async function runHandlerWithRequestState({
   clerkRequest,

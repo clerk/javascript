@@ -129,7 +129,7 @@ export class HandshakeService {
 
   /**
    * Builds the redirect headers for a handshake request
-   * @param reason - The reason for the handshake (e.g. 'session-token-expired')
+   * @param reason - The reason for the handshake (e.g., 'session-token-expired')
    * @returns Headers object containing the Location header for redirect
    * @throws Error if clerkUrl is missing in authenticateContext
    */

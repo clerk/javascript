@@ -236,7 +236,7 @@ async function verifyAPIKey(
  * Verifies any type of machine token by detecting its type from the prefix or JWT claims.
  * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
- * @param token - The token to verify (e.g. starts with "mt_", "oat_", "ak_", or a JWT)
+ * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {

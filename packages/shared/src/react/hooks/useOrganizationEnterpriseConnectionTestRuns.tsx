@@ -93,7 +93,7 @@ export type RevalidateTestRunsOptions = {
    * Invalidate only this query's exact `queryKey` instead of the broad
    * org+connection `invalidationKey`. The default broad invalidation
    * prefix-matches every test-runs query for the connection, so a sibling query
-   * (e.g. a success probe sharing the org+connection key with the visible list)
+   * (e.g., a success probe sharing the org+connection key with the visible list)
    * refetches too. Pass `true` to refetch ONLY this query and leave the siblings
    * — and their loading indicators — untouched.
    *

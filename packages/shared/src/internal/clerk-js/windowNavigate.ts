@@ -14,7 +14,7 @@ export const ALLOWED_PROTOCOLS = [
 export type WindowNavigateOptions = {
   /**
    * Protocol allowlist applied to the resolved URL. Defaults to `ALLOWED_PROTOCOLS`. Pass an
-   * extended list (e.g. `Clerk`'s `#allowedRedirectProtocols`) to honor the customer-supplied
+   * extended list (e.g., `Clerk`'s `#allowedRedirectProtocols`) to honor the customer-supplied
    * `allowedRedirectProtocols` option.
    */
   allowedProtocols?: ReadonlyArray<string>;
@@ -46,7 +46,7 @@ function stripUrlParserIgnoredChars(to: string): string {
 /**
  * Helper utility to navigate via window.location.href. Also dispatches a clerk:beforeunload custom event.
  *
- * Navigations whose protocol is not in the allowlist (e.g. `javascript:`, `data:`) are aborted.
+ * Navigations whose protocol is not in the allowlist (e.g., `javascript:`, `data:`) are aborted.
  * Scheme-relative inputs (`//host`, `\\host`) are also rejected: they adopt the base URL's scheme,
  * which is always in the allowlist, so they would otherwise pass the protocol check while
  * redirecting cross-origin.

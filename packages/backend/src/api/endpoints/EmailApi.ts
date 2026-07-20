@@ -18,7 +18,7 @@ type Mailbox = {
   name?: string;
 
   /**
-   * The `addr-spec` of the mailbox, i.e. the email address itself.
+   * The `addr-spec` of the mailbox, i.e., the email address itself.
    */
   address: string;
 };
@@ -34,7 +34,7 @@ type Mailbox = {
 type EmailRecipient =
   | {
       /**
-       * The `addr-spec` of the recipient mailbox, i.e. the email address itself.
+       * The `addr-spec` of the recipient mailbox, i.e., the email address itself.
        */
       address: string;
       /**

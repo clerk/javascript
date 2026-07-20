@@ -50,12 +50,12 @@ const unauthenticated403ErrorCodes = new Set(['user_banned', 'user_deactivated']
 
 /**
  * Checks if the provided error indicates the user's session is no longer valid
- * and should trigger the unauthenticated flow (e.g. sign-out / redirect to sign-in).
+ * and should trigger the unauthenticated flow (e.g., sign-out / redirect to sign-in).
  *
  * Only matches explicit authentication failure status codes:
  * - 401: session is invalid or expired
- * - 422: invalid session state (e.g. missing_expired_token)
- * - 403: terminal user state (e.g. user_banned, user_deactivated)
+ * - 422: invalid session state (e.g., missing_expired_token)
+ * - 403: terminal user state (e.g., user_banned, user_deactivated)
  *
  * 404 is intentionally excluded despite being returned for "session not found",
  * because it's also returned for unrelated resources (org not found, JWT template

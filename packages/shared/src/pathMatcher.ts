@@ -3,7 +3,7 @@ import type { Autocomplete } from './types';
 
 /**
  * @deprecated Prefer {@link WithPathSegmentWildcard}; `(.*)` also matches sibling routes
- * (e.g. `/dashboard(.*)` matches `/dashboardxyz`).
+ * (e.g., `/dashboard(.*)` matches `/dashboardxyz`).
  */
 export type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 
@@ -14,7 +14,7 @@ type StripTrailingSlash<T extends string> = T extends '/'
     : T;
 
 /**
- * Suggests the `:path*` subtree form (e.g. `/dashboard/:path*`), which matches on
+ * Suggests the `:path*` subtree form (e.g., `/dashboard/:path*`), which matches on
  * path-segment boundaries. `/` is special-cased to `/:path*` to avoid a malformed `//:path*`.
  *
  * @deprecated Will be removed in the next major version together with {@link createPathMatcher}.
@@ -59,7 +59,7 @@ const precomputePathRegex = (patterns: Array<string | RegExp>) => {
  * 1. Decodes percent-encoded unreserved characters using decodeURI (not
  *    decodeURIComponent) so path-reserved delimiters like %2F, %3F, %23
  *    are preserved — matching how framework routers interpret paths.
- * 2. Collapses consecutive slashes (e.g. //api/admin → /api/admin) to
+ * 2. Collapses consecutive slashes (e.g., //api/admin → /api/admin) to
  *    prevent bypass via extra slashes.
  *
  * @throws {MalformedURLError} if the path contains invalid percent-encoding

@@ -282,7 +282,7 @@ export interface SessionResource extends ClerkResource {
   /**
    * Gets the current user's [session token](https://clerk.com/docs/guides/sessions/session-tokens) or a [custom JWT template](https://clerk.com/docs/guides/sessions/jwt-templates).
    *
-   * This method uses a cache so a network request will only be made if the token in memory has expired. The TTL for a Clerk token is one minute. It retries on transient failures (e.g. network errors); when the browser is offline and retries are exhausted, it throws `ClerkOfflineError`.
+   * This method uses a cache so a network request will only be made if the token in memory has expired. The TTL for a Clerk token is one minute. It retries on transient failures (e.g., network errors); when the browser is offline and retries are exhausted, it throws `ClerkOfflineError`.
    *
    * Tokens can only be generated if the user is signed in.
    */
@@ -500,7 +500,7 @@ export type GetTokenOptions = {
    */
   organizationId?: string;
   /**
-   * Whether to skip the cache lookup and force a call to the server instead, even within the TTL. Useful if the token claims are time-sensitive or depend on data that can be updated (e.g. user fields). Defaults to `false`.
+   * Whether to skip the cache lookup and force a call to the server instead, even within the TTL. Useful if the token claims are time-sensitive or depend on data that can be updated (e.g., user fields). Defaults to `false`.
    */
   skipCache?: boolean;
   /**

@@ -1,5 +1,5 @@
 /**
- * Domains of third-party embedding platforms (e.g. online IDEs, preview environments)
+ * Domains of third-party embedding platforms (e.g., online IDEs, preview environments)
  * that require special handling for cookies and OAuth flows.
  *
  * These domains need:

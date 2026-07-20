@@ -6,7 +6,7 @@ export interface ExecuteProtectCheckOptions {
    * Host-provided visibility handshake, forwarded to the script verbatim as
    * `setWidgetVisible` in the init payload. The script calls it right before revealing UI in
    * the container (and with `false` once its widget is done); the returned promise resolves
-   * only after the host has applied the change to the DOM (e.g. removed its own loading
+   * only after the host has applied the change to the DOM (e.g., removed its own loading
    * spinner), so the script can sequence its reveal without a frame of overlap. A script that
    * knows its widget is imminent may call it immediately to avoid a spinner flash. Scripts
    * must treat the field as optional — older hosts don't provide it.

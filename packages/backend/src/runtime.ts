@@ -1,5 +1,5 @@
 /**
- * This file exports APIs that vary across runtimes (i.e. Node & Browser - V8 isolates)
+ * This file exports APIs that vary across runtimes (i.e., Node & Browser - V8 isolates)
  * as a singleton object.
  *
  * Runtime polyfills are written in VanillaJS for now to avoid TS complication. Moreover,

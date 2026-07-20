@@ -4,11 +4,11 @@ const EVENT_FLOW_STEP_MOUNTED = 'FLOW_STEP_MOUNTED';
 const EVENT_SAMPLING_RATE = 1;
 
 type EventFlowStepMounted = {
-  /** The flow the step belongs to, e.g. `configureSSO` (mirrors `Flow.Root`'s `flow`). */
+  /** The flow the step belongs to, e.g., `configureSSO` (mirrors `Flow.Root`'s `flow`). */
   flow: string;
-  /** The step/part that mounted, e.g. `verify-domain` */
+  /** The step/part that mounted, e.g., `verify-domain` */
   step: string;
-  /** Free-form, flow-specific metadata supplied by the caller (e.g. `timestamp`, `connectionStatus`). */
+  /** Free-form, flow-specific metadata supplied by the caller (e.g., `timestamp`, `connectionStatus`). */
   metadata: TelemetryEventRaw['payload'];
 } & TelemetryEventRaw['payload'];
 

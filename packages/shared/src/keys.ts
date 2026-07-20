@@ -45,12 +45,12 @@ export function buildPublishableKey(frontendApi: string): string {
 
 /**
  * Derives a publishable key from the current hostname. Intended for multi-domain
- * setups (e.g. custom domains on top of a default domain) where the correct key
+ * setups (e.g., custom domains on top of a default domain) where the correct key
  * must be resolved per request.
  *
  * Pass the configured publishable key as `fallbackKey` so that development
  * instances (pk_test_) are returned as-is instead of being incorrectly derived
- * from the host (e.g. localhost).
+ * from the host (e.g., localhost).
  *
  * @example
  * // React (use window.location.hostname, not window.location.host, to avoid including the port)

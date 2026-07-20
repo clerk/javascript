@@ -245,7 +245,7 @@ export type CreateUserParams = {
   firstName?: string;
   /** The last name to assign to the user. */
   lastName?: string;
-  /** The locale of the user in BCP-47 format (e.g. `'en-US'`, `'fr-FR'`). */
+  /** The locale of the user in BCP-47 format (e.g., `'en-US'`, `'fr-FR'`). */
   locale?: string;
   /** When set to `true`, all password checks are skipped. It is recommended to use this method only when migrating plaintext passwords to Clerk. Upon migration the user base should be prompted to pick stronger password. */
   skipPasswordChecks?: boolean;
@@ -253,7 +253,7 @@ export type CreateUserParams = {
   skipPasswordRequirement?: boolean;
   /** When set to `true`, all legal checks are skipped. It is not recommended to skip legal checks unless you are migrating a user to Clerk. */
   skipLegalChecks?: boolean;
-  /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g. `'2012-10-20T07:15:20.902Z'`). */
+  /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g., `'2012-10-20T07:15:20.902Z'`). */
   legalAcceptedAt?: Date;
   /**
    * If TOTP is enabled on the instance, you can provide the secret to enable it on the newly created user without the need to reset it. Currently, the supported options are:
@@ -266,7 +266,7 @@ export type CreateUserParams = {
   totpSecret?: string;
   /** If backup codes are enabled on the instance, you can provide them to enable it on the newly created user without the need to reset them. You must provide the backup codes in plain format or the corresponding bcrypt digest. */
   backupCodes?: string[];
-  /** A custom timestamp denoting when the user signed up to the application, specified in RFC3339 format (e.g. `'2012-10-20T07:15:20.902Z'`). */
+  /** A custom timestamp denoting when the user signed up to the application, specified in RFC3339 format (e.g., `'2012-10-20T07:15:20.902Z'`). */
   createdAt?: Date;
   /** When set to `true`, the user is created already banned and cannot sign in. */
   banned?: boolean;
@@ -312,13 +312,13 @@ export type UpdateUserParams = {
   backupCodes?: string[];
   /** The ID of the user as used in your external systems or your previous authentication solution. Must be unique across your entire instance. */
   externalId?: string;
-  /** A custom timestamp denoting when the user signed up to the application, specified in RFC3339 format (e.g. `'2012-10-20T07:15:20.902Z'`). */
+  /** A custom timestamp denoting when the user signed up to the application, specified in RFC3339 format (e.g., `'2012-10-20T07:15:20.902Z'`). */
   createdAt?: Date;
   /** When set to `true`, all legal checks are skipped. It is not recommended to skip legal checks unless you are migrating a user to Clerk. */
   skipLegalChecks?: boolean;
-  /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g. `'2012-10-20T07:15:20.902Z'`). */
+  /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g., `'2012-10-20T07:15:20.902Z'`). */
   legalAcceptedAt?: Date;
-  /** The locale of the user in BCP-47 format (e.g. `'en-US'`). */
+  /** The locale of the user in BCP-47 format (e.g., `'en-US'`). */
   locale?: string;
   /** If `true`, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
@@ -620,7 +620,7 @@ export class UserAPI extends AbstractAPI {
   /**
    * Gets the corresponding [OAuth access token](!oauth-access-token) for a user that has previously authenticated with the given OAuth provider.
    * @param userId - The ID of the user to get the OAuth access tokens for.
-   * @param provider - The OAuth provider to get the access tokens for. If using a custom OAuth provider, prefix the provider name with `custom_` (e.g. `oauth_custom_google`).
+   * @param provider - The OAuth provider to get the access tokens for. If using a custom OAuth provider, prefix the provider name with `custom_` (e.g., `oauth_custom_google`).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`OauthAccessToken`](https://clerk.com/docs/reference/backend/types/backend-oauth-access-token) objects, and a `totalCount` property that indicates the total number of OAuth access tokens for the specified user and provider.
    */
   public async getUserOauthAccessToken(
@@ -652,7 +652,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Disable all of a user's MFA methods (e.g. [OTP](!otp) sent via SMS, TOTP on their authenticator app) at once.
+   * Disable all of a user's MFA methods (e.g., [OTP](!otp) sent via SMS, TOTP on their authenticator app) at once.
    * @param userId - The ID of the user to disable MFA for.
    */
   public async disableUserMFA(userId: string) {
@@ -705,7 +705,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** Verify that the provided TOTP or backup code is valid for the user. Verifying a backup code will result it in being consumed (i.e. it will become invalid). Useful for custom auth flows and re-verification. */
+  /** Verify that the provided TOTP or backup code is valid for the user. Verifying a backup code will result it in being consumed (i.e., it will become invalid). Useful for custom auth flows and re-verification. */
   public async verifyTOTP(params: VerifyTOTPParams) {
     const { userId, code } = params;
     this.requireId(userId);

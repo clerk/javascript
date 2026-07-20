@@ -34,7 +34,7 @@ export type TelemetryCollectorOptions = {
    */
   clerkVersion?: string;
   /**
-   * The SDK being used, e.g. `@clerk/nextjs` or `@clerk/remix`.
+   * The SDK being used, e.g., `@clerk/nextjs` or `@clerk/remix`.
    */
   sdk?: string;
   /**

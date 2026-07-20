@@ -283,7 +283,7 @@ type BootstrapSignedOutParams = {
  * Returns a synthetic `UnauthenticatedState` without requiring a publishable key or an
  * `AuthenticateContext`. Intended for framework integrations that need to run
  * authorization logic for a request that arrived before real Clerk keys are available
- * (e.g. the Next.js keyless bootstrap window). The returned state has
+ * (e.g., the Next.js keyless bootstrap window). The returned state has
  * `status: 'signed-out'` and `toAuth()` returns a standard signed-out session auth object.
  *
  * `signInUrl` / `signUpUrl` are carried through so that `redirectToSignIn` /
