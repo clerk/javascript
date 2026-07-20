@@ -1,6 +1,6 @@
 ---
 '@clerk/expo': major
-'@clerk/expo-google-signin': minor
+'@clerk/expo-google-signin': major
 ---
 
 Native Google Sign-In has moved out of `@clerk/expo` into a new optional package, `@clerk/expo-google-signin`. Apps that don't use `useSignInWithGoogle` no longer pull in the native Google Sign-In dependencies during prebuild.
