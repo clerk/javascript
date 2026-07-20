@@ -43,6 +43,7 @@ describe('StorageCache', () => {
   describe('get', () => {
     afterEach(() => {
       vi.restoreAllMocks();
+      vi.mocked(browser.storage.local.get).mockClear();
     });
 
     test('value missing', async () => {

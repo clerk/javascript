@@ -19,6 +19,7 @@ export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   skipUpdateClient?: boolean;
   fetchMaxTries?: number;
+  abortSignal?: AbortSignal;
 };
 
 export type BaseMutateParams = {
@@ -207,6 +208,7 @@ export abstract class BaseResource {
         method: 'GET',
         path: this.path(),
         rotatingTokenNonce: opts.rotatingTokenNonce,
+        signal: opts.abortSignal,
       },
       opts,
     );

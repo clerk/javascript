@@ -12,57 +12,31 @@ export class OrganizationInvitation {
   }
 
   constructor(
-    /**
-     * The unique identifier for the `OrganizationInvitation`.
-     */
+    /** The unique identifier for the `OrganizationInvitation`. */
     readonly id: string,
-    /**
-     * The email address of the user who is invited to the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization).
-     */
+    /** The email address of the user who is invited to the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization). */
     readonly emailAddress: string,
-    /**
-     * The Role of the invited user.
-     */
+    /** The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) of the invited user. */
     readonly role: OrganizationMembershipRole,
-    /**
-     * The name of the Role of the invited user.
-     */
+    /** The name of the [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) of the invited user. */
     readonly roleName: string,
-    /**
-     * The ID of the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization) that the user is invited to.
-     */
+    /** The ID of the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization) that the user is invited to. */
     readonly organizationId: string,
-    /**
-     * The date when the invitation was first created.
-     */
+    /** The Unix timestamp when the invitation was first created. */
     readonly createdAt: number,
-    /**
-     * The date when the invitation was last updated.
-     */
+    /** The Unix timestamp when the invitation was last updated. */
     readonly updatedAt: number,
-    /**
-     * The date when the invitation expires.
-     */
+    /** The Unix timestamp when the invitation expires. */
     readonly expiresAt: number,
-    /**
-     * The URL that the user can use to accept the invitation.
-     */
+    /** The URL that the user can use to accept the invitation. */
     readonly url: string | null,
-    /**
-     * The status of the invitation.
-     */
+    /** The status of the invitation. */
     readonly status?: OrganizationInvitationStatus,
-    /**
-     * Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API.
-     */
+    /** Metadata that can be read from the Frontend API and [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} and can be set only from the Backend API. */
     readonly publicMetadata: OrganizationInvitationPublicMetadata = {},
-    /**
-     * Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}.
-     */
+    /** Metadata that can be read and set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}. */
     readonly privateMetadata: OrganizationInvitationPrivateMetadata = {},
-    /**
-     * Public data about the Organization that the user is invited to.
-     */
+    /** Public data about the Organization that the user is invited to. */
     readonly publicOrganizationData?: PublicOrganizationDataJSON | null,
   ) {}
 

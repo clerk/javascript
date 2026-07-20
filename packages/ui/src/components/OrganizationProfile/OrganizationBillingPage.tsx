@@ -12,6 +12,7 @@ import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
+import { AccountCredits } from '../AccountCredits';
 
 const orgTabMap = {
   0: 'subscriptions',
@@ -74,6 +75,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                 <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
                   <PaymentMethods />
                 </Protect>
+                <AccountCredits />
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <StatementsList />

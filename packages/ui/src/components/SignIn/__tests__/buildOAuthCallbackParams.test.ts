@@ -15,6 +15,7 @@ describe('buildSignInOAuthCallbackParams', () => {
       afterSignInUrl: '/after-in',
       afterSignUpUrl: '/after-up',
       signUpContinueUrl: '/continue',
+      signUpProtectCheckUrl: '/sign-up-protect-check',
       transferable: true,
       unsafeMetadata: { a: 1 },
     } as any;
@@ -29,6 +30,8 @@ describe('buildSignInOAuthCallbackParams', () => {
       firstFactorUrl: '../factor-one',
       secondFactorUrl: '../factor-two',
       resetPasswordUrl: '../reset-password',
+      signInProtectCheckUrl: '../protect-check',
+      signUpProtectCheckUrl: '/sign-up-protect-check',
       unsafeMetadata: { a: 1 },
     });
   });
@@ -47,6 +50,7 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
       afterSignInUrl: '/after-in',
       afterSignUpUrl: '/after-up',
       signUpContinueUrl: '/continue',
+      signUpProtectCheckUrl: '/sign-up-protect-check',
       transferable: true,
       unsafeMetadata: { a: 1 },
     } as any;
@@ -61,6 +65,9 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
       firstFactorUrl: 'factor-one',
       secondFactorUrl: 'factor-two',
       resetPasswordUrl: 'reset-password',
+      // Relative to the SignIn start route; the sign-up gate URL stays absolute (combined-aware).
+      signInProtectCheckUrl: 'protect-check',
+      signUpProtectCheckUrl: '/sign-up-protect-check',
       unsafeMetadata: { a: 1 },
     });
   });
@@ -86,6 +93,7 @@ describe('buildSignUpOAuthCallbackParams', () => {
       continueSignUpUrl: '../continue',
       verifyEmailAddressUrl: '../verify-email-address',
       verifyPhoneNumberUrl: '../verify-phone-number',
+      signUpProtectCheckUrl: '../protect-check',
       unsafeMetadata: { b: 2 },
     });
   });
@@ -116,6 +124,7 @@ describe('buildSignUpOAuthTransportCallbackParams', () => {
       continueSignUpUrl: 'continue',
       verifyEmailAddressUrl: 'verify-email-address',
       verifyPhoneNumberUrl: 'verify-phone-number',
+      signUpProtectCheckUrl: 'protect-check',
       unsafeMetadata: { b: 2 },
     });
   });

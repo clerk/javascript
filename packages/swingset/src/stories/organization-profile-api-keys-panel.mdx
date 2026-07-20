@@ -1,0 +1,17 @@
+import * as OrganizationProfileApiKeysPanelStories from './organization-profile-api-keys-panel.stories';
+
+# Organization Profile API Keys Panel
+
+The API keys tab panel of the Organization Profile — lists an organization's API keys and owns the create and revoke flows. It gates on `org:sys_api_keys:read` to view and `org:sys_api_keys:manage` to create or revoke.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileApiKeysPanelStories}
+  composition={[
+    {
+      name: 'OrganizationProfile',
+      href: '/organization/organization-profile',
+      layer: 'Organization',
+    },
+  ]}
+/>

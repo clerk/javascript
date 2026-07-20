@@ -207,9 +207,9 @@ export const koKR: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: '이 플랜으로 전환',
     switchToAnnual: '연간 결제로 변경',
-    switchToAnnualWithAnnualPrice: '연간 {{currency}}{{price}} / 년으로 변경',
+    switchToAnnualWithAnnualPrice: '연간 {{price}} / 년으로 변경',
     switchToMonthly: '월간 결제로 변경',
-    switchToMonthlyWithPrice: '월간 {{currency}}{{price}} / 월로 변경',
+    switchToMonthlyWithPrice: '월간 {{price}} / 월로 변경',
     totalDue: '총 결제 금액',
     totalDuePerPeriod: undefined,
     totalDueToday: '오늘 결제 금액',
@@ -220,7 +220,26 @@ export const koKR: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -231,26 +250,25 @@ export const koKR: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -260,7 +278,6 @@ export const koKR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -301,7 +318,6 @@ export const koKR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -349,7 +365,6 @@ export const koKR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -386,7 +401,6 @@ export const koKR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -416,6 +430,8 @@ export const koKR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -435,21 +451,17 @@ export const koKR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -497,7 +509,6 @@ export const koKR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -529,7 +540,6 @@ export const koKR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -570,7 +580,6 @@ export const koKR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -617,38 +626,9 @@ export const koKR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -660,8 +640,11 @@ export const koKR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: '미확인',
         badge__verified: '확인됨',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -671,13 +654,14 @@ export const koKR: LocalizationResource = {
           valueLabel: '값',
         },
         verifiedAtLabel: "{{ date | shortDate('ko-KR') }}에 확인됨",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} 추가',
         messageLabel: '이메일이 {{domain}}을(를) 사용합니다. 추가하시겠습니까?',
       },
       formButtonPrimary__add: '추가',
-      formFieldInputPlaceholder__domain: '여기에 도메인을 입력하고 추가를 클릭하여 시작하세요',
+      formFieldInputPlaceholder__domain: '도메인 추가',
       formFieldLabel__domain: '도메인',
       removeDomainDialog: {
         cancelButton: undefined,
@@ -899,6 +883,15 @@ export const koKR: LocalizationResource = {
     badge__manualInvitation: '자동 등록 없음',
     badge__unverified: '미인증',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '결제 내역이 없어요',
         notFound: '결제 시도를 찾을 수 없어요',
@@ -1096,6 +1089,9 @@ export const koKR: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1220,6 +1216,9 @@ export const koKR: LocalizationResource = {
       subtitle: '인증 앱에서 생성된 코드를 입력해 주세요',
       title: '인증이 필요해요',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1362,6 +1361,12 @@ export const koKR: LocalizationResource = {
       subtitle: '계속하려면 휴대폰으로 전송된 인증 코드를 입력하세요',
       title: '휴대폰 확인',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: '비밀번호 재설정',
       requiredMessage: '보안을 위해 비밀번호를 재설정해야 해요.',
@@ -1466,6 +1471,12 @@ export const koKR: LocalizationResource = {
       resendButton: '코드 재전송',
       subtitle: '휴대폰으로 전송된 인증 코드를 입력하세요',
       title: '휴대폰 번호 인증',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: '로그인',
@@ -1605,6 +1616,7 @@ export const koKR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}}은(는) 이미 이 조직의 멤버예요.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1678,6 +1690,14 @@ export const koKR: LocalizationResource = {
       sentencePrefix: '비밀번호에는 다음이 꼭 포함돼야 해요',
     },
     phone_number_exists: '이 전화번호는 이미 사용 중이에요. 다른 번호를 시도해 주세요.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: '이미 로그인 중이에요.',
     web3_missing_identifier: 'Web3 지갑 확장 프로그램을 찾을 수 없어요. 계속하려면 설치해 주세요.',
     web3_signature_request_rejected: '서명 요청을 거부했어요. 계속하려면 다시 시도해 주세요.',
@@ -1729,9 +1749,9 @@ export const koKR: LocalizationResource = {
     action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
-    label__userButtonPopover: '계정 패널',
     label__accountActions: '계정 작업',
     label__activeSessions: '활성 세션',
+    label__userButtonPopover: '계정 패널',
   },
   userProfile: {
     apiKeysPage: {
@@ -1752,6 +1772,15 @@ export const koKR: LocalizationResource = {
       title__codelist: '백업 코드',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '결제 내역이 없어요',
         notFound: '결제 시도를 찾을 수 없어요',

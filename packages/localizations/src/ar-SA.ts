@@ -216,7 +216,26 @@ export const arSA: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const arSA: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const arSA: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const arSA: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const arSA: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const arSA: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const arSA: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const arSA: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const arSA: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const arSA: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const arSA: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const arSA: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const arSA: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'لم يتم التحقق',
         badge__verified: 'تم التحقق',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -667,14 +650,15 @@ export const arSA: LocalizationResource = {
           valueLabel: 'القيمة',
         },
         verifiedAtLabel: "تم التحقق في {{ date | shortDate('en-US') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'إضافة {{domain}}',
         messageLabel: 'بريدك الإلكتروني يستخدم {{domain}}. هل تريد إضافته؟',
       },
       formButtonPrimary__add: 'إضافة',
-      formFieldInputPlaceholder__domain: 'اكتب نطاقك هنا وانقر على إضافة للبدء',
-      formFieldLabel__domain: 'النطاقات',
+      formFieldInputPlaceholder__domain: 'إضافة نطاق',
+      formFieldLabel__domain: 'النطاق',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -896,6 +880,15 @@ export const arSA: LocalizationResource = {
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
     badge__unverified: 'لم يتم التحقق منها',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1094,6 +1087,9 @@ export const arSA: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1219,6 +1215,9 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1363,6 +1362,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة، يرجى إدخال رمز التحقق المرسل إلى هاتفك',
       title: 'تحقق من هاتفك',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'أعادة تعيين كلمة المرور',
       requiredMessage:
@@ -1467,6 +1472,12 @@ export const arSA: LocalizationResource = {
       resendButton: 'لم يصلك الرمز؟ حاول مرة أخرى',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تحقق من هاتفك',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: undefined,
@@ -1606,6 +1617,7 @@ export const arSA: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: undefined,
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1677,6 +1689,14 @@ export const arSA: LocalizationResource = {
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'لقد رفضت طلب التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
@@ -1728,9 +1748,9 @@ export const arSA: LocalizationResource = {
     action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
-    label__userButtonPopover: 'لوحة الحساب',
     label__accountActions: 'إجراءات الحساب',
     label__activeSessions: 'الجلسات النشطة',
+    label__userButtonPopover: 'لوحة الحساب',
   },
   userProfile: {
     apiKeysPage: {
@@ -1753,6 +1773,15 @@ export const arSA: LocalizationResource = {
       title__codelist: 'رموز النسخ الأحتياطي',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

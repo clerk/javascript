@@ -198,9 +198,9 @@ export const enUS: LocalizationResource = {
     subtotalRenewal: 'Subtotal per period',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{price}} / year',
     switchToMonthly: 'Switch to monthly',
-    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToMonthlyWithPrice: 'Switch to monthly {{price}} / month',
     totalDue: 'Total due',
     totalDuePerPeriod: 'Total per period',
     totalDueToday: 'Total due today',
@@ -229,9 +229,9 @@ export const enUS: LocalizationResource = {
     },
     configureStep: {
       activeConnectionWarning: {
+        dismiss: 'Dismiss',
         title:
           'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
-        dismiss: 'Dismiss',
       },
       attributeMappingTable: {
         badges: {
@@ -279,7 +279,7 @@ export const enUS: LocalizationResource = {
               label: 'Assertion consumer service (ACS) URL',
             },
             spEntityId: {
-              label: 'Service provider entity ID',
+              label: 'Entity ID',
             },
           },
         },
@@ -557,15 +557,15 @@ export const enUS: LocalizationResource = {
             },
             rows: {
               email: {
-                expression: 'user.mail',
+                expression: 'user.profile.email',
                 name: 'mail',
               },
               firstName: {
-                expression: 'user.firstName',
+                expression: 'user.profile.firstName',
                 name: 'firstName',
               },
               lastName: {
-                expression: 'user.lastName',
+                expression: 'user.profile.lastName',
                 name: 'lastName',
               },
             },
@@ -578,7 +578,7 @@ export const enUS: LocalizationResource = {
         },
         createAppStep: {
           completeSamlIntegrationInstructions: {
-            step1: 'From the options menu, select <bold>This is an internal app that we have created.</bold>',
+            step1: 'From the <bold>Feedback</bold>, select <bold>This is an internal app that we have created.</bold>',
             step2: 'Click <bold>Finish</bold> to complete the integration.',
             title: 'Complete the SAML integration',
           },
@@ -608,7 +608,7 @@ export const enUS: LocalizationResource = {
         identityProviderMetadataStep: {
           headerSubtitle: 'Add your Okta application metadata',
           manual: {
-            description: 'In your Okta SAML application, go to the Sign On tab and retrieve these values.',
+            description: 'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve these values.',
             issuer: {
               label: 'Issuer',
               placeholder: 'Paste URL here...',
@@ -627,7 +627,7 @@ export const enUS: LocalizationResource = {
           },
           metadataUrl: {
             description:
-              'In your Okta SAML application, go to the Sign On tab and retrieve the metadata URL. Paste it below.',
+              'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
             label: 'Metadata URL',
             placeholder: 'Paste URL here...',
           },
@@ -649,8 +649,12 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        expiredAtLabel:
+          "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
+        expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
@@ -660,6 +664,7 @@ export const enUS: LocalizationResource = {
           valueLabel: 'Value',
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        verifyAgainButton: 'Verify again',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',
@@ -667,7 +672,7 @@ export const enUS: LocalizationResource = {
       },
       formButtonPrimary__add: 'Add',
       formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
-      formFieldLabel__domain: 'Domains',
+      formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
         removeButton: 'Remove domain',
@@ -898,6 +903,15 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -1103,8 +1117,8 @@ export const enUS: LocalizationResource = {
         title: 'SSO',
         tooltip:
           'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
-        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
         tooltipLabel: 'More information',
+        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
       },
       title: 'Security',
     },
@@ -1232,6 +1246,9 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the code generated by your authenticator app to continue',
       title: 'Verification required',
     },
+  },
+  searchInput: {
+    action__clear: 'Clear search',
   },
   signIn: {
     accountSwitcher: {
@@ -1377,6 +1394,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'To continue, please enter the verification code sent to your phone',
       title: 'Check your phone',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
       requiredMessage: 'For security reasons, it is required to reset your password.',
@@ -1482,6 +1505,12 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
     restrictedAccess: {
       actionLink: 'Sign in',
@@ -1628,6 +1657,7 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     api_key_name_already_exists: 'API Key name already exists.',
     api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
@@ -1702,6 +1732,16 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: "Verification didn't complete. Please try again.",
+    protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
+    protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_script_load_failed:
+      "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
+    protect_check_timed_out: "Verification didn't complete in time. Please try again.",
+    protect_check_unsupported_environment:
+      "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
@@ -1754,9 +1794,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
-    label__userButtonPopover: 'Account panel',
     label__accountActions: 'Account actions',
     label__activeSessions: 'Active sessions',
+    label__userButtonPopover: 'Account panel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1779,6 +1819,15 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',

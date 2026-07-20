@@ -142,7 +142,9 @@ const createPusher = username => {
 async function createPackageToPathMap() {
   const map = new Map();
   const packagesRoot = new URL('../packages/', import.meta.url);
-  const packages = await glob(['*/package.json', '*/*/package.json'], { cwd: fileURLToPath(packagesRoot) });
+  const packages = await glob(['*/package.json', '*/*/package.json', 'electron-passkeys/npm/*/package.json'], {
+    cwd: fileURLToPath(packagesRoot),
+  });
   await Promise.all(
     packages.map(async pkg => {
       const packageJsonPath = fileURLToPath(new URL(pkg, packagesRoot));
@@ -162,7 +164,7 @@ const createPackageData = (releasedPackages, packageToPathMap) => {
   return releasedPackages.map(({ name, version }) => {
     const relativePath = packageToPathMap.get(name);
     if (!relativePath) {
-      throw new Error(`Not found: "${relativePath}"!`);
+      throw new Error(`Package path not found for published package "${name}"`);
     }
     const changelogUrl = new URL(`${relativePath}/CHANGELOG.md#${version.replace(/\./g, '')}`, baseUrl).toString();
     return { name, version, changelogUrl };

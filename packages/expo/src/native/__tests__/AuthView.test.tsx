@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { AuthView } from '../AuthView';
 
@@ -30,6 +30,16 @@ vi.mock('react-native', () => {
 });
 
 describe('AuthView', () => {
+  beforeEach(() => {
+    mocks.NativeClerkAuthView.mockClear();
+  });
+
+  test('passes logoMaxHeight to the native auth view', () => {
+    render(<AuthView logoMaxHeight={64} />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ logoMaxHeight: 64 });
+  });
+
   test('calls onDismiss when the native auth view emits dismissed', () => {
     const onDismiss = vi.fn();
 

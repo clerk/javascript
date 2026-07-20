@@ -1,5 +1,132 @@
 # Change Log
 
+## 6.25.5
+
+### Patch Changes
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+
+## 6.25.4
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+
+## 6.25.3
+
+### Patch Changes
+
+- Fail fast when the Clerk Frontend API (FAPI) is slow or unreachable during load. The client request and the load-recovery token mint are now bounded by a timeout, and the timed-out client request is aborted instead of being left in flight. A cold `Clerk.load()` renders identity from a freshly minted session token (falling back to the session cookie if the mint fails) in seconds instead of hanging while retries run. After a degraded load, the client is re-fetched in the background without a time limit, so a slow-but-healthy origin recovers full client data (user profile, other sessions) without a reload. Also fixes hooks like `useUser()` keeping the cookie-derived stub user after full user data arrives. Adds a `timeLimit` utility to `@clerk/shared/utils` that optionally aborts an `AbortController` on timeout. ([#9065](https://github.com/clerk/javascript/pull/9065)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+
+## 6.25.2
+
+### Patch Changes
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+
+## 6.25.1
+
+### Patch Changes
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+
+## 6.25.0
+
+### Minor Changes
+
+- Add support for Clerk Protect mid-flow SDK challenges (`protect_check`) on both sign-up and sign-in. ([#8329](https://github.com/clerk/javascript/pull/8329)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  When the Protect antifraud service issues a challenge, responses now carry a `protectCheck` field
+  with `{ status, token, sdkUrl, expiresAt?, uiHints? }`. Clients resolve the gate by loading the
+  SDK at `sdkUrl`, executing the challenge, and submitting the resulting proof token via
+  `signUp.submitProtectCheck({ proofToken })` or `signIn.submitProtectCheck({ proofToken })`. The
+  response may carry a chained challenge, which the SDK resolves iteratively.
+
+  Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union. **Upgrading this
+  package is type-only and does not change runtime behavior**: the server returns the new status
+  (and the `protectCheck` field) only for instances where Protect mid-flow challenges have been
+  explicitly enabled — the feature is off by default and is not enabled for existing instances by
+  upgrading. The server additionally only emits the new status value to SDK versions that
+  understand it, so older clients never receive an unknown status.
+
+  If an exhaustive `switch` on `signIn.status` flags the new value after upgrading, handle it by
+  running the challenge described by `protectCheck` and submitting the proof via
+  `submitProtectCheck()`. Clients should treat the `protectCheck` field as the authoritative gate
+  signal and fall back to the status value for defense in depth.
+
+  The pre-built `<SignIn />` and `<SignUp />` components handle the gate automatically by routing
+  to a new `protect-check` route that runs the challenge SDK and resumes the flow on completion.
+
+### Patch Changes
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+
+## 6.24.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Prevent a staler session token from overwriting a fresher one on the same tab. Freshness is ranked by the JWT `oiat` header, then `iat`; tokens without `oiat` always pass through. ([#9030](https://github.com/clerk/javascript/pull/9030)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+
+## 6.23.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix native OAuth transport handling for combined sign-in-or-up flows so transfer callbacks can continue instead of surfacing a generic OAuth callback failure. ([#9037](https://github.com/clerk/javascript/pull/9037)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Refactor the internal token cache so entry keys are derived through a dedicated `KeyResolver` module. This is an internal change with no effect on caching behavior or the public API. ([#9032](https://github.com/clerk/javascript/pull/9032)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
+## 6.22.1
+
+### Patch Changes
+
+- Fix missing redirect URL protocol validation for Clerk UI browser navigations, including the multi-session add-account flow. ([#8961](https://github.com/clerk/javascript/pull/8961)) by [@jacekradko](https://github.com/jacekradko)
+
+  Internal browser navigations now consistently honor configured redirect protocols and fail closed across mixed ClerkJS/UI bundle versions.
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+
+## 6.22.0
+
+### Minor Changes
+
+- Handle expired organization domains on self-serve SSO flow, allowing to trigger a new verification ([#9000](https://github.com/clerk/javascript/pull/9000)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Prevent a cross-tab broadcast failure from evicting a freshly cached session token. Previously, if broadcasting a token update to other tabs threw (for example when the `BroadcastChannel` was racing a close), the token that was just cached got dropped and the next `getToken()` made an unnecessary network request. The broadcast is now isolated so a failure no longer discards a valid cached token. ([#8969](https://github.com/clerk/javascript/pull/8969)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8)]:
+  - @clerk/shared@4.22.0
+
+## 6.21.1
+
+### Patch Changes
+
+- Refresh the session cookie when a tab becomes visible again, not only on window `focus`. Apps embedded in a cross-origin iframe (for example a preview pane) never receive a `focus` event when their parent tab is re-activated, which could leave the session token stale and cause requests to fail with a 401 until the page was manually refreshed. clerk-js now also refreshes on `visibilitychange` (which does reach iframes) and allows a visible embedded frame to write the refreshed cookie. ([#8923](https://github.com/clerk/javascript/pull/8923)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 6.21.0
 
 ### Minor Changes

@@ -216,7 +216,26 @@ export const kkKZ: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -227,26 +246,25 @@ export const kkKZ: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +274,6 @@ export const kkKZ: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +314,6 @@ export const kkKZ: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +361,6 @@ export const kkKZ: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +397,6 @@ export const kkKZ: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +426,8 @@ export const kkKZ: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +447,17 @@ export const kkKZ: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +505,6 @@ export const kkKZ: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +536,6 @@ export const kkKZ: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +576,6 @@ export const kkKZ: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,38 +622,9 @@ export const kkKZ: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -656,8 +636,11 @@ export const kkKZ: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Расталмаған',
         badge__verified: 'Расталған',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -668,14 +651,15 @@ export const kkKZ: LocalizationResource = {
           valueLabel: 'Мән',
         },
         verifiedAtLabel: "{{ date | shortDate('kk-KZ') }} күні расталды",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} қосу',
         messageLabel: 'Электрондық поштаңыз {{domain}} пайдаланады. Оны қосқыңыз келе ме?',
       },
       formButtonPrimary__add: 'Қосу',
-      formFieldInputPlaceholder__domain: 'Доменіңізді осы жерге енгізіп, бастау үшін «Қосу» түймесін басыңыз',
-      formFieldLabel__domain: 'Домендер',
+      formFieldInputPlaceholder__domain: 'Домен қосу',
+      formFieldLabel__domain: 'Домен',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -896,6 +880,15 @@ export const kkKZ: LocalizationResource = {
     badge__manualInvitation: 'Автоқосылу жоқ',
     badge__unverified: 'Расталмаған',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1091,6 +1084,9 @@ export const kkKZ: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1215,6 +1211,9 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Аутентификатор қолданбасындағы кодты енгізіңіз',
       title: 'Растау қажет',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1359,6 +1358,12 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Жалғастыру үшін телефонға жіберілген кодты енгізіңіз',
       title: 'Телефонды тексеріңіз',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Құпия сөзді өзгерту',
       requiredMessage: 'Қауіпсіздік себептерімен құпия сөзді өзгерту қажет.',
@@ -1463,6 +1468,12 @@ export const kkKZ: LocalizationResource = {
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
       subtitle: 'Телефон нөміріңізді растаңыз',
       title: 'Телефон нөмірін растау',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Кіру',
@@ -1602,6 +1613,7 @@ export const kkKZ: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1671,6 +1683,14 @@ export const kkKZ: LocalizationResource = {
       sentencePrefix: 'Құпия сөзде болуы керек:',
     },
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
     web3_signature_request_rejected: 'Сіз қолтаңба сұрауын қабылдамадыңыз. Жалғастыру үшін қайтадан көріңіз.',
@@ -1723,9 +1743,9 @@ export const kkKZ: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
-    label__userButtonPopover: 'Есептік жазба тақтасы',
     label__accountActions: 'Есептік жазба әрекеттері',
     label__activeSessions: 'Белсенді сессиялар',
+    label__userButtonPopover: 'Есептік жазба тақтасы',
   },
   userProfile: {
     apiKeysPage: {
@@ -1745,6 +1765,15 @@ export const kkKZ: LocalizationResource = {
       title__codelist: 'Сақтық кодтары',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

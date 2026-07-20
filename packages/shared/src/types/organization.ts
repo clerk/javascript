@@ -27,18 +27,14 @@ import type { GetEnterpriseConnectionsParams } from './user';
 
 declare global {
   /**
-   * If you want to provide custom types for the organization.publicMetadata object,
-   * simply redeclare this rule in the global namespace.
-   * Every Organization object will use the provided type.
+   * If you want to provide custom types for the `organization.publicMetadata` object, simply redeclare this rule in the global namespace. Every `Organization` object will use the provided type.
    */
   interface OrganizationPublicMetadata {
     [k: string]: unknown;
   }
 
   /**
-   * If you want to provide custom types for the organization.privateMetadata object,
-   * simply redeclare this rule in the global namespace.
-   * Every Organization object will use the provided type.
+   * If you want to provide custom types for the `organization.privateMetadata` object, simply redeclare this rule in the global namespace. Every `Organization` object will use the provided type.
    */
   interface OrganizationPrivateMetadata {
     [k: string]: unknown;
@@ -189,18 +185,13 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     params?: Pick<CreateOrganizationDomainParams, 'enrollmentMode'>,
   ) => Promise<OrganizationDomainResource>;
   /**
-   * Issues a fresh TXT challenge for each of the given domains in a single
-   * request. Each resolved domain's `ownershipVerification` carries the
-   * `txtRecordName` and `txtRecordValue` the org admin must publish. A single
-   * bad domain does not fail the batch; it lands in `errors`.
+   * Starts the verification process of multiple [Verified Domains](https://clerk.com/docs/guides/organizations/add-members/verified-domains) at once by issuing a fresh TXT challenge for each of the given domains in a single request. Each resolved domain's `ownershipVerification` property carries the `txtRecordName` and `txtRecordValue` the Organization [admin](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) must publish. A single bad domain does not fail the batch; it lands in the returned [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object's `errors` array.
    * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
    * @param domainIds - The unique identifiers of the domains to prepare.
    */
   prepareOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;
   /**
-   * Resolves the published TXT record for each of the given domains in a single
-   * request to complete ownership verification. A single bad domain does not
-   * fail the batch; it lands in `errors`.
+   * Completes the verification process started by [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification), by resolving the published TXT record for each of the given domains in a single request. A single bad domain does not fail the batch; it lands in the returned [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object's `errors` array.
    * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
    * @param domainIds - The unique identifiers of the domains to attempt.
    */

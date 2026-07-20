@@ -1,4 +1,5 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   AuthenticateWithRedirectParams,
   HandleOAuthCallbackParams,
@@ -21,8 +22,12 @@ type ClerkWithResourceCallback = {
 
 const NATIVE_OAUTH_FAILED_STATUS = 'failed';
 const NATIVE_OAUTH_ERROR_FALLBACK_CODE = 'oauth_callback_failed';
+const NATIVE_OAUTH_TRANSFER_SIGNAL_CODES = new Set<string>([
+  ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND,
+  ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
+]);
 const NATIVE_OAUTH_ERROR_MESSAGES: Record<string, string> = {
-  oauth_access_denied: 'You did not grant access to your account.',
+  [ERROR_CODES.OAUTH_ACCESS_DENIED]: 'You did not grant access to your account.',
 };
 
 function getNativeOAuthCallbackFailure(callbackUrl: string): { code: string; message: string } | null {
@@ -34,6 +39,10 @@ function getNativeOAuthCallbackFailure(callbackUrl: string): { code: string; mes
   }
 
   const unsafeCode = searchParams.get('__clerk_error_code') || NATIVE_OAUTH_ERROR_FALLBACK_CODE;
+  if (NATIVE_OAUTH_TRANSFER_SIGNAL_CODES.has(unsafeCode)) {
+    return null;
+  }
+
   const code = NATIVE_OAUTH_ERROR_MESSAGES[unsafeCode] ? unsafeCode : NATIVE_OAUTH_ERROR_FALLBACK_CODE;
 
   return {

@@ -26,7 +26,7 @@ const ruleTester = new RuleTester({
   },
 });
 
-const config = { protected: ['app/**'] };
+const config = { protected: ['**'], rootDir: projectRoot };
 
 ruleTester.run('require-auth-protection (suggestions)', rule, {
   valid: [],
@@ -44,7 +44,7 @@ ruleTester.run('require-auth-protection (suggestions)', rule, {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export default async function Page() {
   await auth.protect();
   return <div>Hello</div>;
@@ -65,7 +65,7 @@ export default async function Page() {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export default async () => {
   await auth.protect();
   return null;
@@ -86,7 +86,7 @@ export default async () => {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export const GET = async () => {
   await auth.protect();
   return { ok: true };
@@ -107,7 +107,7 @@ export const GET = async () => {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export default async () => {
   await auth.protect();
   return <div>Hello</div>;
@@ -132,7 +132,7 @@ export default Page;`,
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 async function Page() {
   await auth.protect();
   return <div>Hello</div>;
@@ -159,7 +159,7 @@ export const POST = () => new Response('ok');`,
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export async function GET() {
   await auth.protect();
   return new Response('ok');
@@ -174,7 +174,7 @@ export const POST = () => new Response('ok');`,
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export async function GET() {
   return new Response('ok');
 }
@@ -204,7 +204,7 @@ export async function loadData() {
             {
               messageId: 'addAuthProtect',
               output: `'use server';
-import { auth } from '@clerk/nextjs/server';
+import { auth } from "@clerk/nextjs/server";
 
 export async function loadData() {
   await auth.protect();
@@ -229,7 +229,7 @@ export async function loadData() {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export async function action() {
   'use server';
   await auth.protect();
@@ -254,7 +254,7 @@ export async function action() {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 const action = async function () {
   'use server';
   await auth.protect();
@@ -282,7 +282,7 @@ const action = async function () {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 export function getAction() {
   const create = async () => {
     'use server';
@@ -349,6 +349,59 @@ export default async function Page() {
       ],
     },
     {
+      name: 'double-quoted clerk import without auth: merges the specifier without changing quote style',
+      code: `import { currentUser } from "@clerk/nextjs/server";
+
+export default function Page() {
+  return null;
+}`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { currentUser, auth } from "@clerk/nextjs/server";
+
+export default async function Page() {
+  await auth.protect();
+  return null;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'double-quoted import in file: new auth import matches file quote style',
+      code: `import { redirect } from "next/navigation";
+
+export default function Page() {
+  return null;
+}`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+export default async function Page() {
+  await auth.protect();
+  return null;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'namespace import before named import: merges auth into named import',
       code: `import * as clerk from '@clerk/nextjs/server';
 import { currentUser } from '@clerk/nextjs/server';
@@ -378,7 +431,7 @@ export default async function Page() {
     },
     {
       name: 'existing await auth() destructure: merges .protect() into the call',
-      code: `import { auth } from '@clerk/nextjs/server';
+      code: `import { auth } from "@clerk/nextjs/server";
 
 export default async function Page() {
   const { userId } = await auth();
@@ -392,7 +445,7 @@ export default async function Page() {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 
 export default async function Page() {
   const { userId } = await auth.protect();
@@ -405,7 +458,7 @@ export default async function Page() {
     },
     {
       name: 'existing bare await auth(): merges .protect() into the call',
-      code: `import { auth } from '@clerk/nextjs/server';
+      code: `import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   await auth();
@@ -419,7 +472,7 @@ export async function GET() {
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   await auth.protect();
@@ -432,7 +485,7 @@ export async function GET() {
     },
     {
       name: 'concise arrow awaiting auth(): merges .protect() into the call',
-      code: `import { auth } from '@clerk/nextjs/server';
+      code: `import { auth } from "@clerk/nextjs/server";
 
 export const POST = async () => await auth();`,
       filename: abs('app/api/widgets/route.ts'),
@@ -443,7 +496,7 @@ export const POST = async () => await auth();`,
           suggestions: [
             {
               messageId: 'addAuthProtect',
-              output: `import { auth } from '@clerk/nextjs/server';
+              output: `import { auth } from "@clerk/nextjs/server";
 
 export const POST = async () => await auth.protect();`,
             },
@@ -472,6 +525,96 @@ export default async function Page() {
 export default async function Page() {
   const { userId } = await clerkAuth.protect();
   return <div>{userId}</div>;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'page: sync default export with explicit return type — wraps in Promise',
+      code: `export default function Page(): JSX.Element {
+  return <div>Hello</div>;
+}`,
+      filename: abs('app/dashboard/page.tsx'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from "@clerk/nextjs/server";
+export default async function Page(): Promise<JSX.Element> {
+  await auth.protect();
+  return <div>Hello</div>;
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: sync arrow with explicit return type — wraps in Promise',
+      code: `export const GET = (): Response => new Response('ok');`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from "@clerk/nextjs/server";
+export const GET = async (): Promise<Response> => {
+  await auth.protect();
+  return new Response('ok');
+};`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: sync function with Promise return type — does not double-wrap',
+      code: `export function GET(): Promise<Response> {
+  return Promise.resolve(new Response('ok'));
+}`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from "@clerk/nextjs/server";
+export async function GET(): Promise<Response> {
+  await auth.protect();
+  return Promise.resolve(new Response('ok'));
+}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'route: type-predicate return type — adds async but does not wrap return type',
+      code: `export function GET(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}`,
+      filename: abs('app/api/widgets/route.ts'),
+      options: [config],
+      errors: [
+        {
+          messageId: 'missingProtect',
+          suggestions: [
+            {
+              messageId: 'addAuthProtect',
+              output: `import { auth } from "@clerk/nextjs/server";
+export async function GET(value: unknown): value is boolean {
+  await auth.protect();
+  return typeof value === 'boolean';
 }`,
             },
           ],

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
+import com.clerk.api.ClerkConfigurationOptions
 import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
@@ -25,6 +26,9 @@ import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
+private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
+private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
+private const val HOST_SDK = "expo"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -107,6 +111,18 @@ class ClerkExpoModule : Module() {
 
     private val reactContext: Context?
         get() = appContext.reactContext
+
+    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+        val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
+        val customHeaders = buildMap {
+            put(HOST_SDK_HEADER, HOST_SDK)
+            if (hostSdkVersion.isNotEmpty()) {
+                put(HOST_SDK_VERSION_HEADER, hostSdkVersion)
+            }
+        }
+
+        return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
+    }
 
     private fun startClientStateObserver() {
         if (clientStateObserverJob != null) {
@@ -199,17 +215,19 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
                     // before initializing so the SDK boots with the correct client.
-                    if (!bearerToken.isNullOrEmpty()) {
+                    if (normalizedBearerToken != null) {
                         context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
                             .edit()
-                            .putString("DEVICE_TOKEN", bearerToken)
+                            .putString("DEVICE_TOKEN", normalizedBearerToken)
                             .apply()
                     }
 
-                    Clerk.initialize(context, pubKey)
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
                     startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
@@ -232,7 +250,7 @@ class ClerkExpoModule : Module() {
                         }
                         // If a bearer token was provided, wait for native client state to hydrate
                         // before resolving the configure call.
-                        if (!bearerToken.isNullOrEmpty()) {
+                        if (normalizedBearerToken != null) {
                             withTimeout(5_000L) {
                                 Clerk.clientFlow.first { it != null }
                             }
@@ -254,6 +272,7 @@ class ClerkExpoModule : Module() {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
                         configuredPublishableKey = pubKey
+                        lastObservedClientState = clientStateSnapshot()
                         promise.resolve(null)
                     }
                     return@launch
@@ -261,7 +280,7 @@ class ClerkExpoModule : Module() {
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
                 if (activePublishableKey != null && activePublishableKey != pubKey) {
-                    Clerk.switchConfiguration(context, pubKey)
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     loadThemeFromAssets(context)
@@ -287,10 +306,13 @@ class ClerkExpoModule : Module() {
                         return@launch
                     }
 
-                    if (!bearerToken.isNullOrEmpty()) {
-                        val result = Clerk.updateDeviceToken(bearerToken)
-                        if (result is ClerkResult.Failure) {
-                            debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                    if (normalizedBearerToken != null) {
+                        val clientState = clientStateSnapshot()
+                        if (clientState.deviceToken != normalizedBearerToken || clientState.client == null) {
+                            val result = Clerk.updateDeviceToken(normalizedBearerToken)
+                            if (result is ClerkResult.Failure) {
+                                debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                            }
                         }
 
                         try {
@@ -303,6 +325,7 @@ class ClerkExpoModule : Module() {
                     }
 
                     configuredPublishableKey = pubKey
+                    lastObservedClientState = clientStateSnapshot()
                     promise.resolve(null)
                     return@launch
                 }
@@ -310,10 +333,20 @@ class ClerkExpoModule : Module() {
                 // Already initialized — use the public SDK API to update
                 // the device token and trigger a client/environment refresh.
                 startClientStateObserver()
-                if (!bearerToken.isNullOrEmpty()) {
-                    val result = Clerk.updateDeviceToken(bearerToken)
+                if (normalizedBearerToken != null) {
+                    val clientState = clientStateSnapshot()
+                    val result = if (
+                        clientState.deviceToken != normalizedBearerToken ||
+                        clientState.client == null
+                    ) {
+                        Clerk.updateDeviceToken(normalizedBearerToken)
+                    } else {
+                        // A remounted JS runtime can have the same token while native
+                        // client state is stale, so preserve one refresh in that case.
+                        Clerk.refreshClient()
+                    }
                     if (result is ClerkResult.Failure) {
-                        debugLog(TAG, "configure - updateDeviceToken failed: ${result.error}")
+                        debugLog(TAG, "configure - client refresh failed: ${result.error}")
                     }
 
                     // Wait for client state to hydrate with the new token (up to 5s).
@@ -326,6 +359,7 @@ class ClerkExpoModule : Module() {
                     }
                 }
 
+                lastObservedClientState = clientStateSnapshot()
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
@@ -366,6 +400,7 @@ class ClerkExpoModule : Module() {
             try {
                 jsOriginatedClientSyncDepth += 1
                 val previousClientState = clientStateSnapshot()
+                var refreshedClientWhileUpdatingToken = false
 
                 if (didChangeDeviceToken && !deviceToken.isNullOrBlank()) {
                     val currentDeviceToken = try {
@@ -385,6 +420,7 @@ class ClerkExpoModule : Module() {
                                 return@launch
                             }
                             is ClerkResult.Success -> {
+                                refreshedClientWhileUpdatingToken = true
                                 try {
                                     withTimeout(5_000L) {
                                         Clerk.clientFlow.first { it != null }
@@ -397,7 +433,7 @@ class ClerkExpoModule : Module() {
                     }
                 }
 
-                if (didChangeClient || didChangeDeviceToken) {
+                if (!refreshedClientWhileUpdatingToken && (didChangeClient || didChangeDeviceToken)) {
                     when (val result = Clerk.refreshClient()) {
                         is ClerkResult.Failure -> {
                             promise.reject(
@@ -484,7 +520,9 @@ class ClerkExpoModule : Module() {
             border = json.optStringColor("border"),
             ring = json.optStringColor("ring"),
             muted = json.optStringColor("muted"),
-            shadow = json.optStringColor("shadow")
+            shadow = json.optStringColor("shadow"),
+            secondaryButtonBackground = json.optStringColor("secondaryButtonBackground"),
+            secondaryButtonForeground = json.optStringColor("secondaryButtonForeground")
         )
     }
 

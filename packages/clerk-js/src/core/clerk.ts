@@ -140,7 +140,7 @@ import type {
 } from '@clerk/shared/types';
 import type { ClerkUI } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, handleValueOrFn, noop, timeLimit } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
@@ -215,6 +215,7 @@ const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_o
 const CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE = 'cannot_render_self_serve_sso_disabled';
 const CANNOT_RENDER_CONFIGURE_SSO_EMAIL_ADDRESS_DISABLED_ERROR_CODE =
   'cannot_render_configure_sso_email_address_disabled';
+const INITIALIZATION_TIMEOUT_MS = 7_000;
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -1916,7 +1917,7 @@ export class Clerk implements ClerkInterface {
 
       if (customNavigate) {
         debugLogger.info(`Clerk is navigating to: ${to}`);
-        return await customNavigate(to, { windowNavigate });
+        return await customNavigate(to, { windowNavigate: this.__internal_windowNavigate });
       }
 
       // No window.location and no custom router - can't navigate
@@ -1955,13 +1956,13 @@ export class Clerk implements ClerkInterface {
 
     // Custom protocol URLs have an origin value of 'null'. In many cases, this indicates deep-linking and we want to ensure the customNavigate function is used if available.
     if ((toURL.origin !== 'null' && toURL.origin !== window.location.origin) || !customNavigate) {
-      windowNavigate(toURL);
+      this.__internal_windowNavigate(toURL);
       return;
     }
 
     const metadata = {
       ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
-      windowNavigate,
+      windowNavigate: this.__internal_windowNavigate,
     };
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
@@ -2379,6 +2380,7 @@ export class Clerk implements ClerkInterface {
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
       sessionId: signUp.createdSessionId,
+      protectCheck: signUp.protectCheck,
     };
 
     const si = {
@@ -2387,6 +2389,7 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
+      protectCheck: signIn.protectCheck,
     };
 
     const makeNavigate = (to: string) => () => navigate(to);
@@ -2410,6 +2413,11 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      params.signInProtectCheckUrl ||
+        buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const redirectUrls = new RedirectUrls(this.#options, params);
 
     const navigateToContinueSignUp = makeNavigate(
@@ -2423,7 +2431,19 @@ export class Clerk implements ClerkInterface {
         ),
     );
 
+    const navigateToSignUpProtectCheck = makeNavigate(
+      params.signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
+      // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
+      // check must run BEFORE the generic missing-fields short-circuit below — otherwise the
+      // OAuth/SAML callback would land on /continue instead of the challenge.
+      if (signUp.protectCheck || missingFields.includes('protect_check')) {
+        return navigateToSignUpProtectCheck();
+      }
+
       if (missingFields.length) {
         return navigateToContinueSignUp();
       }
@@ -2442,6 +2462,9 @@ export class Clerk implements ClerkInterface {
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
           buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+        protectCheckPath:
+          params.signUpProtectCheckUrl ||
+          buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
         navigate,
       });
     };
@@ -2492,11 +2515,36 @@ export class Clerk implements ClerkInterface {
       });
     }
 
+    // OAuth/SAML callbacks can resolve into a protect_check gate that surfaces on the next
+    // /v1/client read, so check for it here before continuing with the transfer logic below.
+    // Honor either the explicit `protectCheck` field or the `needs_protect_check` status override.
+    //
+    // Scope to the callback's intent: an abandoned sign-in keeps serializing its pending
+    // `protect_check` on the client for up to a day (and a later sign-up doesn't clear it in
+    // multi-session mode), so an unscoped check would route a *sign-up* callback into the stale
+    // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
+    // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
+    // response for the gate.
+    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
+      return navigateToSignInProtectCheck();
+    }
+
+    // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
+    // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
+    // shouldn't hijack a sign-in callback.
+    if (params.reloadResource !== 'signIn' && su.protectCheck) {
+      return navigateToSignUpProtectCheck();
+    }
+
     const userExistsButNeedsToSignIn =
-      su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
+      su.externalAccountStatus === 'transferable' &&
+      su.externalAccountErrorCode === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS;
 
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
+      if (res.protectCheck || res.status === 'needs_protect_check') {
+        return navigateToSignInProtectCheck();
+      }
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -2755,6 +2803,8 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    protectCheckUrl,
+    signUpProtectCheckUrl,
     walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
@@ -2797,6 +2847,15 @@ export class Clerk implements ClerkInterface {
       secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
+    const navigateToSignInProtectCheck = makeNavigate(
+      protectCheckUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
+    const navigateToSignUpProtectCheck = makeNavigate(
+      signUpProtectCheckUrl ||
+        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
+    );
+
     const navigateToContinueSignUp = makeNavigate(
       signUpContinueUrl ||
         buildURL(
@@ -2809,6 +2868,7 @@ export class Clerk implements ClerkInterface {
     );
 
     let signInOrSignUp: SignInResource | SignUpResource;
+    let viaSignUp = false;
     try {
       signInOrSignUp = await this.client.signIn.authenticateWithWeb3({
         identifier,
@@ -2818,6 +2878,7 @@ export class Clerk implements ClerkInterface {
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
+        viaSignUp = true;
         signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
           identifier,
           generateSignature,
@@ -2830,7 +2891,10 @@ export class Clerk implements ClerkInterface {
         if (
           signUpContinueUrl &&
           signInOrSignUp.status === 'missing_requirements' &&
-          signInOrSignUp.verifications.web3Wallet.status === 'verified'
+          signInOrSignUp.verifications.web3Wallet.status === 'verified' &&
+          // A protect_check gate also surfaces as missing_requirements; don't skip past it into
+          // the continue step. The gate is handled by the sign-up protect-check route instead.
+          !signInOrSignUp.protectCheck
         ) {
           await navigateToContinueSignUp();
         }
@@ -2850,6 +2914,15 @@ export class Clerk implements ClerkInterface {
         navigate: this.navigate,
       });
     };
+
+    // A Clerk Protect challenge can gate the inline web3 attempt (no redirect happens, so the
+    // centralized _handleRedirectCallback check never runs). Route to the challenge before the
+    // status switch below, otherwise the user is stranded on the wallet step. The sign-up fallback
+    // gates as `missing_requirements` + `protectCheck`, so it has no status branch below either.
+    if (signInOrSignUp.protectCheck || signInOrSignUp.status === 'needs_protect_check') {
+      await (viaSignUp ? navigateToSignUpProtectCheck : navigateToSignInProtectCheck)();
+      return;
+    }
 
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':
@@ -3173,8 +3246,13 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
-          return Client.getOrCreateInstance()
-            .fetch()
+          // Abort the /client request on timeout so clerkjs loading does not hang
+          const clientFetchController = new AbortController();
+          return timeLimit(
+            Client.getOrCreateInstance().fetch({ abortSignal: clientFetchController.signal }),
+            INITIALIZATION_TIMEOUT_MS,
+            clientFetchController,
+          )
             .then(res => this.updateClient(res))
             .catch(async e => {
               /**
@@ -3187,27 +3265,32 @@ export class Clerk implements ClerkInterface {
 
               ++initializationDegradedCounter;
 
-              const jwtInCookie = this.#authService?.getSessionCookie();
-              const localClient = createClientFromJwt(jwtInCookie);
-
-              this.updateClient(localClient);
-
               /**
                * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
                * We want to avoid having the below `getToken()` retrying at the same time as the poller.
                */
               this.#authService?.stopPollingForToken();
 
-              // Attempt to grab a fresh token
-              await this.session
-                ?.getToken({ skipCache: true })
-                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
-                .catch(() => null)
-                .finally(() => {
-                  this.#authService?.startPollingForToken();
-                });
+              try {
+                const session = this.#defaultSession(createClientFromJwt(this.#authService?.getSessionCookie()));
+                // Prefer minting a fresh token as its claims are fresher than the cookie's
+                session?.clearCache();
+                const jwt = session
+                  ? await timeLimit(session.getToken(), INITIALIZATION_TIMEOUT_MS).catch(() => {
+                      session.clearCache();
+                      return this.#authService?.getSessionCookie();
+                    })
+                  : this.#authService?.getSessionCookie();
+                this.updateClient(createClientFromJwt(jwt));
+              } finally {
+                this.#authService?.startPollingForToken();
+              }
 
-              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
+              void Client.getOrCreateInstance()
+                .fetch()
+                .then(res => this.updateClient(res))
+                .catch(noop);
+
               return null;
             });
         };
@@ -3577,6 +3660,21 @@ export class Clerk implements ClerkInterface {
 
     return allowedProtocols;
   }
+
+  /**
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (the static `ALLOWED_PROTOCOLS` ∪ the customer extension),
+   * so internal callers honor customer protocols automatically.
+   *
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension when a call site
+   * must reject any protocol the customer added. There is no current internal consumer of the
+   * opt-out; it exists for future security-critical paths.
+   */
+  public __internal_windowNavigate = (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }): void => {
+    const allowedProtocols = opts?.useStaticAllowlistOnly ? ALLOWED_PROTOCOLS : this.#allowedRedirectProtocols;
+    windowNavigate(to, { allowedProtocols });
+  };
 
   #isLoaded(): this is LoadedClerk {
     return this.client !== undefined;

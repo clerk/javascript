@@ -1,0 +1,18 @@
+import * as OrganizationProfileDomainsSectionStories from './organization-profile-domains-section.stories';
+
+# Organization Profile Domains Section
+
+Manages an organization's domains — lists them, adds and verifies new ones, edits a verified
+domain's enrollment mode, and removes them. It owns each flow's state (three machines) and wires
+the list, the add/verify wizard, the enrollment editor, and the remove confirmation together.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileDomainsSectionStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+  ]}
+/>

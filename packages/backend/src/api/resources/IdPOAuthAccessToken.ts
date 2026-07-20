@@ -19,8 +19,11 @@ export class IdPOAuthAccessToken {
     readonly revoked: boolean,
     readonly revocationReason: string | null,
     readonly expired: boolean,
+    /** The Unix timestamp (in milliseconds) when the access token expires. */
     readonly expiration: number | null,
+    /** The Unix timestamp (in milliseconds) when the access token was created. */
     readonly createdAt: number,
+    /** The Unix timestamp (in milliseconds) when the access token was last updated. */
     readonly updatedAt: number,
   ) {}
 

@@ -1,23 +1,21 @@
-import React
+import ExpoModulesCore
 import UIKit
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
   private var didSendDismiss = false
 
-  @objc var onProfileEvent: RCTBubblingEventBlock?
+  let onProfileEvent = EventDispatcher()
 
-  @objc var isDismissible: NSNumber? {
-    didSet {
-      let newDismissible = isDismissible?.boolValue ?? true
-      guard newDismissible != currentDismissible else { return }
-      currentDismissible = newDismissible
-      setNeedsHostedViewUpdate()
-    }
+  func setDismissible(_ isDismissible: Bool?) {
+    let newDismissible = isDismissible ?? true
+    guard newDismissible != currentDismissible else { return }
+    currentDismissible = newDismissible
+    setNeedsHostedViewUpdate()
   }
 
   private func sendProfileEvent(type: ClerkNativeViewEvent) {
-    onProfileEvent?(["type": type.rawValue])
+    onProfileEvent(["type": type.rawValue])
   }
 
   private func sendDismissIfNeeded() {
@@ -47,14 +45,16 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 }
 
-@objc(ClerkUserProfileViewManager)
-class ClerkUserProfileViewManager: RCTViewManager {
+public class ClerkUserProfileViewModule: Module {
+  public func definition() -> ModuleDefinition {
+    Name("ClerkUserProfileView")
 
-  override static func requiresMainQueueSetup() -> Bool {
-    return true
-  }
+    View(ClerkUserProfileNativeView.self) {
+      Events("onProfileEvent")
 
-  override func view() -> UIView! {
-    return ClerkUserProfileNativeView()
+      Prop("isDismissible") { (view: ClerkUserProfileNativeView, isDismissible: Bool?) in
+        view.setDismissible(isDismissible)
+      }
+    }
   }
 }

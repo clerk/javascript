@@ -2,7 +2,6 @@ import { SIGN_IN_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/cons
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
@@ -13,6 +12,7 @@ import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
+import { clerkWindowNavigate } from '../../utils/windowNavigate';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
@@ -21,6 +21,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   signUpUrl: string;
   signInUrl: string;
   signUpContinueUrl: string;
+  signUpProtectCheckUrl: string;
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
@@ -127,6 +128,10 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+  // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
+  // resolves to the embedded `…/create/protect-check` route there and the standalone sign-up route
+  // otherwise — keeping a Protect-gated sign-up inside whichever component is mounted.
+  const signUpProtectCheckUrl = buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true });
 
   const navigateOnSetActive = async ({
     session,
@@ -145,7 +150,7 @@ export const useSignInContext = (): SignInContextType => {
       // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
       // The touch endpoint URL will be an absolute URL starting with http:// or https://
       if (decoratedUrl !== redirectUrl && /^https?:\/\//.test(decoratedUrl)) {
-        windowNavigate(decoratedUrl);
+        clerkWindowNavigate(clerk, decoratedUrl);
         return;
       }
 
@@ -187,6 +192,7 @@ export const useSignInContext = (): SignInContextType => {
     ssoCallbackUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
+    signUpProtectCheckUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,

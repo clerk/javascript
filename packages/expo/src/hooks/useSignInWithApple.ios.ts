@@ -24,7 +24,7 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  * @example
  * ```tsx
- * import { useSignInWithApple } from '@clerk/clerk-expo';
+ * import { useSignInWithApple } from '@clerk/expo';
  * import { Button } from 'react-native';
  *
  * function AppleSignInButton() {

@@ -13,7 +13,6 @@ const FAKE_IDP_CERTIFICATE =
 /**
  * Helper to create and activate a SAML enterprise connection.
  * The Clerk API requires creating the connection first (inactive), then activating via update.
- * The `provider` field is required by the API but missing from the SDK types, so we cast.
  */
 async function createActiveEnterpriseConnection(
   clerk: ReturnType<typeof createTestUtils>['services']['clerk'],
@@ -28,7 +27,7 @@ async function createActiveEnterpriseConnection(
       idpSsoUrl: opts.idpSsoUrl,
       idpCertificate: FAKE_IDP_CERTIFICATE,
     },
-  } as Parameters<typeof clerk.enterpriseConnections.createEnterpriseConnection>[0]);
+  });
 
   return clerk.enterpriseConnections.updateEnterpriseConnection(conn.id, { active: true });
 }

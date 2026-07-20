@@ -5,17 +5,20 @@ import type { MosaicElements } from './registry';
 import type { MosaicVariables } from './variables';
 
 /**
- * The props handed to an icon override: the resolved `className` (Mosaic's sizing/color, applied to
- * the override exactly as to the built-in glyph, so icons stay visually consistent), `data-cl-slot`
- * for targeting, and any forwarded `svg` props. Spread them onto your element.
+ * A replacement glyph for a named icon, authored as a React element (`<MyIcon />` or a raw
+ * `<svg>…</svg>`). Mosaic injects its sizing/color `className`, `data-cl-slot`, and any svg props
+ * forwarded from the `<Icon>` call site into this element via `cloneElement`, so the override is
+ * styled and targetable exactly like the built-in glyph. Author the element to accept those props
+ * (a component should spread them onto its root svg; a raw svg receives them directly).
+ *
+ * An element rather than a render function so overrides serialize across the RSC server→client
+ * boundary: `appearance.icons` can then be supplied from a Server Component. An inline function
+ * cannot cross that boundary; an element (or a `'use client'` component reference) can.
  */
-export type MosaicIconRenderProps = React.ComponentPropsWithoutRef<'svg'> & { 'data-cl-slot'?: string };
-
-/** Replaces a named icon's glyph. Spread the received props onto your element so Mosaic styling applies. */
-export type MosaicIconRenderer = (props: MosaicIconRenderProps) => React.ReactElement;
+export type MosaicIconOverride = React.ReactElement;
 
 /** `appearance.icons`: per-name glyph overrides, applied globally. */
-export type MosaicIconOverrides = Partial<Record<IconName, MosaicIconRenderer>>;
+export type MosaicIconOverrides = Partial<Record<IconName, MosaicIconOverride>>;
 
 /**
  * The flow-scope keys an `appearance` may carry. Overrides nested under one of these keys (inside

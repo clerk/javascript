@@ -1,5 +1,5 @@
 import { descriptors, Flex } from '@/customizables';
-import { common } from '@/styledSystem';
+import { common, mqu } from '@/styledSystem';
 
 type ProfileCardHeaderProps = React.PropsWithChildren;
 
@@ -9,13 +9,19 @@ export const ProfileCardHeader = (props: ProfileCardHeaderProps): JSX.Element =>
     elementDescriptor={descriptors.configureSSOHeader}
     {...props}
     sx={theme => ({
-      gap: theme.space.$2,
+      // Min gap between the back button and the stepper (the auto-margin collapses when the stepper wraps at tight widths).
+      gap: theme.space.$4,
       width: '100%',
       minHeight: theme.sizes.$13,
       padding: theme.space.$5,
       borderBottomWidth: theme.borderWidths.$normal,
       borderBottomStyle: theme.borderStyles.$solid,
       borderBottomColor: theme.colors.$borderAlpha100,
+      [mqu.md]: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: theme.space.$4,
+      },
     })}
   />
 );
