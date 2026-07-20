@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { type AccountButtonProps, AccountButtonView } from '@clerk/ui/mosaic/account/account-button.view';
+import { AccountButtonView, type AccountButtonViewProps } from '@clerk/ui/mosaic/account/account-button.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -29,7 +29,7 @@ const handlers = {
   onCreateOrganization: () => {},
   onAddAccount: () => {},
   onUpgrade: () => {},
-} satisfies Partial<AccountButtonProps>;
+} satisfies Partial<AccountButtonViewProps>;
 
 const preston = { sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', email: 'preston@clerk.dev' };
 
@@ -37,7 +37,6 @@ export function Default(_args: Record<string, unknown>) {
   return (
     <AccountButtonView
       {...handlers}
-      status='ready'
       activeAccount={preston}
       activeOrganizationId='org_clerk_app'
       hasOrganizations
@@ -65,7 +64,6 @@ export function Personal(_args: Record<string, unknown>) {
   return (
     <AccountButtonView
       {...handlers}
-      status='ready'
       activeAccount={{
         sessionId: 'sess_cam',
         userId: 'user_cam',
@@ -88,7 +86,6 @@ export function MultipleAccounts(_args: Record<string, unknown>) {
   return (
     <AccountButtonView
       {...handlers}
-      status='ready'
       activeAccount={preston}
       activeOrganizationId='org_clerk_app'
       hasOrganizations
