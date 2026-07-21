@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.25.6
+
+### Patch Changes
+
+- Standardize JSDoc punctuation to always follow `e.g.` and `i.e.` with a comma (`e.g.,` / `i.e.,`), matching the docs style guide. Comment-only change; no runtime behavior is affected. This keeps the generated Typedoc reference output consistent. ([#9201](https://github.com/clerk/javascript/pull/9201)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
 ## 4.25.5
 
 ### Patch Changes
