@@ -1,5 +1,25 @@
 # @clerk/astro
 
+## 3.4.19
+
+### Patch Changes
+
+- Fix Astro initialization when bundled `ui` or `prefetchUI: false` is passed to the integration. ([#8628](https://github.com/clerk/javascript/pull/8628)) by [@jescalan](https://github.com/jescalan)
+
+- Escape `<`, `>`, and `/` when serializing the Clerk auth state into SSR `<script>` tags, preventing a `</script>` sequence inside user-controllable session claims from breaking out of the script element (stored XSS). The embedded JSON still parses to identical values on the client. ([#9166](https://github.com/clerk/javascript/pull/9166)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716), [`e657d99`](https://github.com/clerk/javascript/commit/e657d994d938194cfa02da329707bf012873c01b)]:
+  - @clerk/shared@4.25.5
+  - @clerk/backend@3.11.7
+
+## 3.4.18
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/backend@3.11.6
+  - @clerk/shared@4.25.4
+
 ## 3.4.17
 
 ### Patch Changes

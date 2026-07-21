@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.11.7
+
+### Patch Changes
+
+- Reject machine tokens (M2M and OAuth JWTs) presented in the `__session` cookie. Previously such a token could pass session verification and produce a signed-in state with the machine identity as `userId`, defeating `if (userId)` authorization checks. The cookie path now mirrors the existing header-path guard and returns a signed-out state for these tokens. ([#9168](https://github.com/clerk/javascript/pull/9168)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+
+## 3.11.6
+
+### Patch Changes
+
+- Add `CLERK_DISABLE_AUTO_PROXY=true` to opt out of automatic Frontend API proxying on Vercel production deployments. ([#9159](https://github.com/clerk/javascript/pull/9159)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+
 ## 3.11.5
 
 ### Patch Changes

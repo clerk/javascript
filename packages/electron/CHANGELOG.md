@@ -1,5 +1,29 @@
 # @clerk/electron
 
+## 0.0.16
+
+### Patch Changes
+
+- Validate that token-cache and OAuth-transport IPC requests originate from a top-level window's main frame. This prevents untrusted content in subframes or `<webview>`s that share the Clerk preload from reading the persisted client JWT or driving the OAuth transport. ([#9167](https://github.com/clerk/javascript/pull/9167)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/react@6.12.5
+  - @clerk/clerk-js@6.25.5
+
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+  - @clerk/clerk-js@6.25.4
+  - @clerk/react@6.12.4
+
 ## 0.0.13
 
 ### Patch Changes

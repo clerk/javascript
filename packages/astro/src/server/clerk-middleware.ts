@@ -15,6 +15,7 @@ import {
   signedOutAuthObject,
   TokenType,
 } from '@clerk/backend/internal';
+import { htmlSafeJson } from '@clerk/shared/htmlSafeJson';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
@@ -382,10 +383,10 @@ function decorateRequest(locals: APIContext['locals'], res: Response): Response 
     const encoder = new TextEncoder();
     const closingHeadTag = encoder.encode('</head>');
     const clerkAstroData = encoder.encode(
-      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
+      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${htmlSafeJson(locals.auth())}</script>\n`,
     );
     const clerkSafeEnvVariables = encoder.encode(
-      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
+      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${htmlSafeJson(getClientSafeEnv(locals))}</script>\n`,
     );
     const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 

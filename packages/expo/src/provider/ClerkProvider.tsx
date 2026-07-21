@@ -90,13 +90,15 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     : null;
 
   const suppressJsClientChangedRef = useRef(0);
-  const isMountedRef = useNativeClientBootstrap({
+  const { isMountedRef, isNativeClientReady } = useNativeClientBootstrap({
     publishableKey: pk,
+    nativeRefreshFromJsControllerRef,
     suppressTokenCacheNotificationsRef,
     tokenCache: syncableTokenCache,
     clerkInstance,
   });
   useNativeClientEventSync({
+    enabled: isNativeClientReady,
     clerkInstance,
     isMountedRef,
     nativeRefreshFromJsControllerRef,
@@ -134,6 +136,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     >
       {isNative() && (
         <NativeClientSync
+          enabled={isNativeClientReady}
           clerkInstance={clerkInstance}
           nativeRefreshFromJsControllerRef={nativeRefreshFromJsControllerRef}
           suppressJsClientChangedRef={suppressJsClientChangedRef}
