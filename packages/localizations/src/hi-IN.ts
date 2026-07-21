@@ -650,6 +650,8 @@ export const hiIN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'होस्ट / नाम',
           instructions:
             'इस TXT रिकॉर्ड को अपने DNS प्रदाता में जोड़ें। रिकॉर्ड सक्रिय होते ही हम स्वतः सत्यापित कर देंगे।',

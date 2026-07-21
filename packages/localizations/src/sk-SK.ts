@@ -644,6 +644,8 @@ export const skSK: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Hostiteľ / Názov',
           instructions:
             'Pridajte tento záznam TXT u svojho poskytovateľa DNS. Hneď ako bude záznam aktívny, automaticky ho overíme.',

@@ -651,6 +651,8 @@ export const huHU: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Gazda / Név',
           instructions:
             'Adja hozzá ezt a TXT-rekordot a DNS-szolgáltatójához. Automatikusan igazoljuk, amint a rekord aktívvá válik.',

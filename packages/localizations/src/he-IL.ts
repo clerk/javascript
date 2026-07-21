@@ -644,6 +644,8 @@ export const heIL: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'מארח / שם',
           instructions: 'הוסף רשומת TXT זו אצל ספק ה-DNS שלך. נאמת אותה אוטומטית ברגע שהרשומה תהיה פעילה.',
           typeLabel: 'סוג',

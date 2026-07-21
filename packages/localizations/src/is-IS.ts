@@ -650,6 +650,8 @@ export const isIS: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Hýsill / Nafn',
           instructions:
             'Bættu þessari TXT-færslu við DNS-þjónustuna þína. Við staðfestum sjálfkrafa um leið og færslan verður virk.',

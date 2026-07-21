@@ -651,6 +651,8 @@ export const hrHR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Naziv',
           instructions:
             'Dodajte ovaj TXT zapis kod svog DNS pružatelja. Automatski ćemo ga potvrditi čim zapis postane aktivan.',

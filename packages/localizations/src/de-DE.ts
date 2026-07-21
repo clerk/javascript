@@ -650,6 +650,8 @@ export const deDE: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Name',
           instructions:
             'Fügen Sie diesen TXT-Eintrag bei Ihrem DNS-Anbieter hinzu. Wir verifizieren ihn automatisch, sobald der Eintrag aktiv ist.',

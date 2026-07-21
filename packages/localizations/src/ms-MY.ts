@@ -652,6 +652,8 @@ export const msMY: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Hos / Nama',
           instructions:
             'Tambahkan rekod TXT ini kepada penyedia DNS anda. Kami akan mengesahkan secara automatik sebaik sahaja rekod aktif.',

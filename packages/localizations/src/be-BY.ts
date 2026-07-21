@@ -644,6 +644,8 @@ export const beBY: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Імя',
           instructions:
             'Дадайце гэты TXT-запіс да вашага DNS-правайдара. Мы аўтаматычна выканаем праверку, як толькі запіс стане актыўным.',

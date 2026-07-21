@@ -650,6 +650,8 @@ export const fiFI: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Isäntä / Nimi',
           instructions:
             'Lisää tämä TXT-tietue DNS-palveluntarjoajallesi. Vahvistamme sen automaattisesti, kun tietue on aktiivinen.',

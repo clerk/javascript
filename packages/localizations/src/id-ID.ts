@@ -644,6 +644,8 @@ export const idID: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Nama',
           instructions:
             'Tambahkan data TXT ini ke penyedia DNS Anda. Kami akan memverifikasi secara otomatis setelah data aktif.',

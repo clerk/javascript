@@ -644,6 +644,8 @@ export const zhCN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: '主机 / 名称',
           instructions: '将此 TXT 记录添加到您的 DNS 提供商。记录生效后，我们将自动进行验证。',
           typeLabel: '类型',

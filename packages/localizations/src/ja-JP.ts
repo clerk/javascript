@@ -651,6 +651,8 @@ export const jaJP: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'ホスト / 名前',
           instructions:
             'この TXT レコードを DNS プロバイダーに追加してください。レコードが有効になると自動的に確認します。',

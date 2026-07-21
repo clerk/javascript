@@ -158,6 +158,31 @@ describe('ConfigureSSO', () => {
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
+    it('lets an admin check an unverified domain again without reloading the page', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      fixtures.clerk.organization?.attemptOwnershipVerification.mockResolvedValue({ data: [unverifiedDomain] } as any);
+      mockOrganizationDomains(fixtures, [unverifiedDomain]);
+
+      const { findByText, getByRole, userEvent } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText(/verification usually completes within 1-5 minutes/i);
+      await userEvent.click(getByRole('button', { name: 'Check now' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.attemptOwnershipVerification).toHaveBeenCalledWith(['dmn_unverified']);
+      });
+    });
+
     it('short-circuits to the activate step for an active connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });

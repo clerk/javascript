@@ -658,8 +658,10 @@ export const enUS: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
+          checkNowButton: 'Check now',
           hostLabel: 'Host / Name',
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
+          pendingHint: 'Verification usually completes within 1-5 minutes, depending on your DNS provider.',
           typeLabel: 'Type',
           valueLabel: 'Value',
         },

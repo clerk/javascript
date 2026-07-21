@@ -648,6 +648,8 @@ export const csCZ: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Hostitel / Název',
           instructions:
             'Přidejte tento záznam TXT u svého poskytovatele DNS. Jakmile bude záznam aktivní, automaticky jej ověříme.',

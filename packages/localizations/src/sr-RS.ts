@@ -644,6 +644,8 @@ export const srRS: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Naziv',
           instructions:
             'Dodajte ovaj TXT zapis kod svog DNS provajdera. Automatski ćemo ga potvrditi čim zapis postane aktivan.',

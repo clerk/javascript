@@ -644,6 +644,8 @@ export const ukUA: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Імʼя',
           instructions:
             'Додайте цей TXT-запис до свого DNS-провайдера. Ми перевіримо його автоматично, щойно запис стане активним.',

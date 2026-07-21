@@ -644,6 +644,8 @@ export const nlBE: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Host / Naam',
           instructions:
             'Voeg dit TXT-record toe aan je DNS-provider. We verifiëren het automatisch zodra het record actief is.',

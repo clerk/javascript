@@ -647,6 +647,8 @@ export const zhTW: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: '主機 / 名稱',
           instructions: '請將此 TXT 記錄新增至您的 DNS 供應商。記錄生效後，我們將自動進行驗證。',
           typeLabel: '類型',

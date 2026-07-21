@@ -644,6 +644,8 @@ export const arSA: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'المضيف / الاسم',
           instructions: 'أضِف سجل TXT هذا إلى مزوّد DNS الخاص بك. سنتحقق تلقائيًا بمجرد أن يصبح السجل نشطًا.',
           typeLabel: 'النوع',

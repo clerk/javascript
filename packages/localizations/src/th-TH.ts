@@ -648,6 +648,8 @@ export const thTH: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'โฮสต์ / ชื่อ',
           instructions: 'เพิ่มระเบียน TXT นี้ไปยังผู้ให้บริการ DNS ของคุณ เราจะยืนยันโดยอัตโนมัติเมื่อระเบียนทำงาน',
           typeLabel: 'ประเภท',

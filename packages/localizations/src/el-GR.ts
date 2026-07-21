@@ -644,6 +644,8 @@ export const elGR: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Κεντρικός υπολογιστής / Όνομα',
           instructions:
             'Προσθέστε αυτήν την εγγραφή TXT στον πάροχο DNS σας. Θα την επαληθεύσουμε αυτόματα μόλις η εγγραφή ενεργοποιηθεί.',

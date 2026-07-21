@@ -644,6 +644,8 @@ export const mnMN: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Хост / Нэр',
           instructions:
             'Энэ TXT бичлэгийг өөрийн DNS үйлчилгээ үзүүлэгчид нэмнэ үү. Бичлэг идэвхжсэний дараа бид автоматаар баталгаажуулна.',

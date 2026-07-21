@@ -652,6 +652,8 @@ export const ptPT: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
+          checkNowButton: undefined,
+          pendingHint: undefined,
           hostLabel: 'Anfitrião / Nome',
           instructions:
             'Adicione este registo TXT ao seu fornecedor de DNS. Verificaremos automaticamente assim que o registo estiver ativo.',
