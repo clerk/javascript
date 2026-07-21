@@ -1,6 +1,6 @@
 import { constants } from '@clerk/backend/internal';
 
-const clerkProtectionOrigins = ['https://*.protect.clerk.com', 'https://*.client.protect.clerk.com'];
+const clerkProtectionOrigin = 'https://*.clerk.com';
 
 /**
  * Valid CSP directives according to the CSP Level 3 specification
@@ -105,7 +105,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://maps.googleapis.com',
       'https://img.clerk.com',
       'https://images.clerkstage.dev',
-      ...clerkProtectionOrigins,
+      clerkProtectionOrigin,
     ],
     'default-src': ['self'],
     'form-action': ['self'],
@@ -115,7 +115,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://*.js.stripe.com',
       'https://js.stripe.com',
       'https://hooks.stripe.com',
-      ...clerkProtectionOrigins,
+      clerkProtectionOrigin,
     ],
     'img-src': ['self', 'https://img.clerk.com'],
     'script-src': [
@@ -127,7 +127,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://*.js.stripe.com',
       'https://js.stripe.com',
       'https://maps.googleapis.com',
-      ...clerkProtectionOrigins,
+      clerkProtectionOrigin,
     ],
     'style-src': ['self', 'unsafe-inline'],
     'worker-src': ['self', 'blob:'],
