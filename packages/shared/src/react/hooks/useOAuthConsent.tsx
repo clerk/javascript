@@ -12,7 +12,7 @@ const HOOK_NAME = 'useOAuthConsent';
 /**
  * The `useOAuthConsent()` hook loads OAuth application consent metadata for the **signed-in** user
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
- * (for example, redirect to sign-in on your custom consent route).
+ * (e.g., redirect to sign-in on your custom consent route).
  *
  * @example
  * ```tsx

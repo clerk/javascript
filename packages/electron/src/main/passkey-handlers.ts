@@ -12,6 +12,7 @@ import type {
   SerializedPublicKeyCredentialRequestOptions,
   SetupPasskeysMainReturn,
 } from '../shared/types';
+import { isMainFrameEvent } from './validate-sender';
 
 /**
  * Optional native module. Ceremony failures resolve as JSON envelopes so error
@@ -77,7 +78,7 @@ async function invokeNative<T>(
 
   // Subframes and webviews can host third-party content that must not be able
   // to run credential ceremonies for the app's RP ID.
-  if (!event.senderFrame || event.senderFrame !== event.sender.mainFrame) {
+  if (!isMainFrameEvent(event)) {
     return {
       ok: false,
       error: { code: 'unknown', message: "The passkey request did not originate from a window's main frame." },

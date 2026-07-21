@@ -1,0 +1,36 @@
+# Native UserButton -> account sheet -> native sign-out, asserting the JS
+# layer observes it (the reverse bridge direction from sign-in.yaml).
+# clerk-android exposes no test identifiers (no testTag / resource-ids), so
+# shared selectors are English text / accessibility labels.
+#
+# Ends with a second sign-in in the SAME app process (no restart, no
+# clearState): a past regression had the second native sign-in complete
+# natively while the JS SDK never observed it. Every other flow cold-launches
+# with clearState, so this is the only place that path is exercised.
+appId: com.clerk.exponativebuildfixture
+name: UserButton native sign-out, then same-process re-sign-in
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+# iOS labels the trigger "Open account"; Android "Open user profile".
+- tapOn:
+    text: 'Open (account|user profile)'
+- extendedWaitUntil:
+    visible: 'Manage account'
+    timeout: 15000
+- assertVisible: 'Sign out'
+- tapOn:
+    text: 'Sign out'
+- runFlow: subflows/assert-signed-out.yaml
+# Second sign-in without restarting the app: the remounted AuthView must
+# work and the JS layer must observe the new session.
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml

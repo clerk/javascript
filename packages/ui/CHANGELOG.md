@@ -1,5 +1,27 @@
 # @clerk/ui
 
+## 1.25.6
+
+### Patch Changes
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+  - @clerk/localizations@4.13.6
+
+## 1.25.5
+
+### Patch Changes
+
+- Fix pressing `Escape` while a `Select` is open inside a `Drawer` (for example the payment method picker in Checkout) dismissing the entire Drawer. `Escape` now closes only the open `Select` and leaves the Drawer open. The `Select` now wires up its floating interaction props so it handles `Escape` itself, and the `Drawer` roots a floating tree so nested floating elements are recognized as its children. ([#9176](https://github.com/clerk/javascript/pull/9176)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve `Select` keyboard and screen reader support by routing navigation through floating-ui's interaction hooks. Pressing `ArrowUp`/`ArrowDown` on a focused, closed `Select` now opens the listbox, and the active option is announced via `aria-activedescendant`. The searchable variant (for example the `PhoneInput` country picker) now exposes a proper combobox: its input is marked `role="combobox"` with `aria-controls`, `aria-autocomplete="list"`, and `aria-activedescendant`, while the plain variant keeps its listbox semantics. ([#9179](https://github.com/clerk/javascript/pull/9179)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/localizations@4.13.5
+
 ## 1.25.4
 
 ### Patch Changes

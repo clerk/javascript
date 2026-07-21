@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.7.6",
+  "version": "4.0.0",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -117,26 +117,28 @@
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "base-64": "^1.0.0",
-    "react-native-url-polyfill": "2.0.0",
+    "react-native-url-polyfill": "4.0.0",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
+    "@clerk/expo-google-signin": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
     "esbuild": "^0.28.1",
-    "expo-apple-authentication": "^7.2.4",
-    "expo-auth-session": "^5.5.2",
+    "expo-apple-authentication": "^8.0.8",
+    "expo-auth-session": "^7.0.11",
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
-    "expo-local-authentication": "^13.8.0",
-    "expo-secure-store": "^12.8.1",
-    "expo-web-browser": "^12.8.2",
+    "expo-local-authentication": "^17.0.8",
+    "expo-secure-store": "^15.0.8",
+    "expo-web-browser": "^15.0.11",
     "react-native": "^0.86.0"
   },
   "peerDependencies": {
+    "@clerk/expo-google-signin": ">=0.1.0",
     "@clerk/expo-passkeys": ">=0.0.6",
-    "expo": ">=53 <58",
+    "expo": ">=54 <58",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
@@ -149,6 +151,9 @@
     "react-native": ">=0.75"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-google-signin": {
+      "optional": true
+    },
     "@clerk/expo-passkeys": {
       "optional": true
     },

@@ -34,6 +34,11 @@ vi.mock('@clerk/electron-passkeys', () => ({
   },
 }));
 
+const mainFrame = {};
+const windowSender = { mainFrame, getType: () => 'window' };
+const mainFrameEvent = { sender: windowSender, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
+const subframeEvent = { sender: windowSender, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
+
 describe('createClerkBridge', () => {
   const missingStorage = {} as Parameters<typeof createClerkBridge>[0];
   const storage: TokenStorage = {
@@ -264,7 +269,52 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
     })?.[1];
 
-    expect(getRedirectUrlHandler?.({} as Electron.IpcMainInvokeEvent)).toBe('my-app://renderer/');
+    expect(getRedirectUrlHandler?.(mainFrameEvent)).toBe('my-app://renderer/');
+  });
+
+  it('rejects OAuth transport requests that do not originate from the main frame', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    expect(() => findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(subframeEvent)).toThrow('main frame');
+    await expect(
+      findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(subframeEvent, 'https://accounts.example.com/oauth'),
+    ).rejects.toThrow('main frame');
+    expect(shell.openExternal).not.toHaveBeenCalled();
+  });
+
+  it('rejects OAuth transport requests from a <webview> whose top frame mimics the main frame', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    const webviewEvent = {
+      sender: { mainFrame, getType: () => 'webview' },
+      senderFrame: mainFrame,
+    } as unknown as Electron.IpcMainInvokeEvent;
+
+    expect(() => findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(webviewEvent)).toThrow('main frame');
+    await expect(
+      findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(webviewEvent, 'https://accounts.example.com/oauth'),
+    ).rejects.toThrow('main frame');
+    expect(shell.openExternal).not.toHaveBeenCalled();
   });
 
   it('opens OAuth URLs externally and resolves with the matching deep-link callback URL', async () => {
@@ -280,7 +330,7 @@ describe('createClerkBridge', () => {
     const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
-    const openPromise = openHandler?.({} as Electron.IpcMainInvokeEvent, 'https://accounts.example.com/oauth');
+    const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
     const openUrlListener = vi.mocked(app.on).mock.calls.find(([event]) => event === 'open-url')?.[1] as (
       event: Electron.Event,
       url: string,
