@@ -10,13 +10,17 @@ import type { EnterpriseConnectionProviderType } from '../../../types';
 // The dispatch reads `organizationEnterpriseConnection.provider`. The nested
 // sub-flows also read `enterpriseConnection` (via `Step.Footer.Reset`), which is
 // left undefined so that footer self-hides in this isolated render.
-const contextState = vi.hoisted(() => ({ provider: undefined as string | undefined }));
+const contextState = vi.hoisted(() => ({
+  provider: undefined as string | undefined,
+  enterpriseConnection: undefined as { id: string; oauthConfig: { discoveryUrl?: string } | null } | undefined,
+}));
+const updateConnection = vi.hoisted(() => vi.fn());
 
 vi.mock('../../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
-    enterpriseConnection: undefined,
+    enterpriseConnection: contextState.enterpriseConnection,
     contentRef: { current: null },
-    enterpriseConnectionMutations: {},
+    enterpriseConnectionMutations: { updateConnection },
     organizationEnterpriseConnection: {
       provider: contextState.provider,
       hasConnection: true,
@@ -70,6 +74,7 @@ describe('ConfigureProviderStep', () => {
 
   it('renders the OIDC configure steps for a derived provider key without throwing', async () => {
     contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = undefined;
     const { wrapper } = await createFixtures();
 
     const { userEvent } = renderStep(wrapper);
@@ -97,6 +102,58 @@ describe('ConfigureProviderStep', () => {
     await userEvent.click(manualMode);
 
     expect(screen.getAllByRole('textbox')).toHaveLength(3);
+  });
+
+  it('saves the discovery endpoint before advancing to credentials', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenCalledWith('ent_123', {
+        oidc: { discoveryUrl: 'https://idp.example/.well-known/openid-configuration' },
+      });
+    });
+  });
+
+  it('saves manual endpoints before advancing to credentials', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    const [, manualMode] = await screen.findAllByRole('radio');
+    await userEvent.click(manualMode);
+
+    const [authUrl, tokenUrl, userInfoUrl] = screen.getAllByRole('textbox');
+    await userEvent.type(authUrl, 'https://idp.example/authorize');
+    await userEvent.type(tokenUrl, 'https://idp.example/token');
+    await userEvent.type(userInfoUrl, 'https://idp.example/userinfo');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenCalledWith('ent_123', {
+        oidc: {
+          authUrl: 'https://idp.example/authorize',
+          tokenUrl: 'https://idp.example/token',
+          userInfoUrl: 'https://idp.example/userinfo',
+        },
+      });
+    });
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

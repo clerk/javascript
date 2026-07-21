@@ -16,9 +16,11 @@ import {
   Tr,
 } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
+import { useCardState } from '@/elements/contexts';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
+import { handleError } from '@/utils/errorHandler';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
@@ -38,14 +40,6 @@ const OIDC_STEPS: WizardStepConfig[] = [
 ];
 
 export const OidcCustomConfigureSteps = (): JSX.Element => {
-  const { enterpriseConnection } = useConfigureSSO();
-  const [endpoints, setEndpoints] = React.useState<OidcEndpointConfiguration>(() => ({
-    discoveryUrl: enterpriseConnection?.oauthConfig?.discoveryUrl ?? '',
-    authUrl: '',
-    tokenUrl: '',
-    userInfoUrl: '',
-  }));
-
   return (
     // Linear, guard-less sub-flow: mount on the first step, mirroring the SAML custom inner wizard.
     <Wizard
@@ -61,10 +55,7 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
       </Wizard.Match>
 
       <Wizard.Match id='endpoints'>
-        <OidcEndpointsStep
-          endpoints={endpoints}
-          onEndpointsChange={setEndpoints}
-        />
+        <OidcEndpointsStep />
       </Wizard.Match>
 
       <Wizard.Match id='credentials'>
@@ -254,45 +245,38 @@ const OidcClaimsTable = (): JSX.Element => (
   </Table>
 );
 
-type OidcEndpointConfiguration = {
-  discoveryUrl: string;
-  authUrl: string;
-  tokenUrl: string;
-  userInfoUrl: string;
-};
-
-type OidcEndpointsStepProps = {
-  endpoints: OidcEndpointConfiguration;
-  onEndpointsChange: React.Dispatch<React.SetStateAction<OidcEndpointConfiguration>>;
-};
-
 const OIDC_ENDPOINT_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
 
-const OidcEndpointsStep = ({ endpoints, onEndpointsChange }: OidcEndpointsStepProps): JSX.Element => {
+const OidcEndpointsStep = (): JSX.Element => {
+  const card = useCardState();
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-  const [mode, setMode] = React.useState<IdpConfigurationMode>(
-    endpoints.authUrl || endpoints.tokenUrl || endpoints.userInfoUrl ? 'manual' : 'discoveryUrl',
-  );
+  const {
+    enterpriseConnection,
+    enterpriseConnectionMutations: { updateConnection },
+  } = useConfigureSSO();
+  const oauthConfig = enterpriseConnection?.oauthConfig;
+  const [mode, setMode] = React.useState<IdpConfigurationMode>('discoveryUrl');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const discoveryUrlField = useFormControl('discoveryUrl', endpoints.discoveryUrl, {
+  const discoveryUrlField = useFormControl('discoveryUrl', oauthConfig?.discoveryUrl ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.discoveryUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.discoveryUrl.placeholder'),
     isRequired: true,
   });
-  const authUrlField = useFormControl('authUrl', endpoints.authUrl, {
+  const authUrlField = useFormControl('authUrl', '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.authUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.authUrl.placeholder'),
     isRequired: true,
   });
-  const tokenUrlField = useFormControl('tokenUrl', endpoints.tokenUrl, {
+  const tokenUrlField = useFormControl('tokenUrl', '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.tokenUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.tokenUrl.placeholder'),
     isRequired: true,
   });
-  const userInfoUrlField = useFormControl('userInfoUrl', endpoints.userInfoUrl, {
+  const userInfoUrlField = useFormControl('userInfoUrl', '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.placeholder'),
@@ -306,18 +290,38 @@ const OidcEndpointsStep = ({ endpoints, onEndpointsChange }: OidcEndpointsStepPr
         tokenUrlField.value.trim().length > 0 &&
         userInfoUrlField.value.trim().length > 0;
 
-  const handleContinue = (): void => {
-    if (!isValid) {
+  const canSubmit = isValid && !isSubmitting;
+
+  const handleContinue = async (): Promise<void> => {
+    if (!enterpriseConnection || !canSubmit) {
       return;
     }
 
-    onEndpointsChange({
-      discoveryUrl: discoveryUrlField.value.trim(),
-      authUrl: authUrlField.value.trim(),
-      tokenUrl: tokenUrlField.value.trim(),
-      userInfoUrl: userInfoUrlField.value.trim(),
-    });
-    void goNext();
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await updateConnection(
+        enterpriseConnection.id,
+        mode === 'discoveryUrl'
+          ? { oidc: { discoveryUrl: discoveryUrlField.value.trim() } }
+          : {
+              oidc: {
+                authUrl: authUrlField.value.trim(),
+                tokenUrl: tokenUrlField.value.trim(),
+                userInfoUrl: userInfoUrlField.value.trim(),
+              },
+            },
+      );
+      void goNext();
+    } catch (err) {
+      handleError(
+        err as Error,
+        mode === 'discoveryUrl' ? [discoveryUrlField] : [authUrlField, tokenUrlField, userInfoUrlField],
+        card.setError,
+      );
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -387,11 +391,12 @@ const OidcEndpointsStep = ({ endpoints, onEndpointsChange }: OidcEndpointsStepPr
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled={isFirstStep || isSubmitting}
         />
         <Step.Footer.Continue
           onClick={handleContinue}
-          isDisabled={!isValid || isLastStep}
+          isLoading={isSubmitting}
+          isDisabled={!canSubmit || isLastStep}
         />
       </Step.Footer>
     </>
