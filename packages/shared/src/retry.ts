@@ -56,7 +56,9 @@ type RetryOptions = Partial<{
   /**
    * An AbortSignal that cancels retrying.
    * Aborting rejects the returned promise with the signal's abort reason, immediately
-   * interrupting any pending delay. It does not abort a callback that is already executing.
+   * interrupting any pending delay. It does not interrupt a callback or onBeforeRetry
+   * hook that is already running, but once it settles the abort reason takes
+   * precedence over its result or error.
    */
   signal: AbortSignal;
 }>;
@@ -158,7 +160,11 @@ export const retry = async <T>(callback: () => T | Promise<T>, options: RetryOpt
       }
 
       if (onBeforeRetry) {
-        await onBeforeRetry(iterations);
+        try {
+          await onBeforeRetry(iterations);
+        } catch (hookError) {
+          throw signal?.aborted ? abortReason(signal) : hookError;
+        }
       }
 
       if (retryImmediately && iterations === 1) {

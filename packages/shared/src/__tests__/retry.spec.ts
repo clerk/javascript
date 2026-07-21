@@ -228,6 +228,29 @@ describe('retry', () => {
     expect(onBeforeRetry).not.toHaveBeenCalled();
   });
 
+  test('the abort reason wins over an onBeforeRetry rejection', async () => {
+    const controller = new AbortController();
+    let attempts = 0;
+
+    const result = retry(
+      () => {
+        attempts++;
+        throw new Error('failed');
+      },
+      {
+        shouldRetry: () => true,
+        signal: controller.signal,
+        onBeforeRetry: () => {
+          controller.abort(new Error('cancelled'));
+          throw new Error('hook failed');
+        },
+      },
+    );
+
+    await expect(result).rejects.toThrow('cancelled');
+    expect(attempts).toBe(1);
+  });
+
   test('a functional initialDelay derives the backoff base from the error', async () => {
     let attempts = 0;
     retry(
