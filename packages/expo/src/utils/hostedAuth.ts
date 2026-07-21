@@ -80,7 +80,7 @@ export async function createHostedAuth(
     throw buildHostedAuthAPIResponseError(response);
   }
 
-  const hostedAuthJSON = getResponseJSON<HostedAuthJSON>(response.payload, 'hosted_auth');
+  const hostedAuthJSON = getResponseJSON(response.payload, 'hosted_auth');
   if (!hostedAuthJSON?.url) {
     return errorThrower.throw('Hosted auth creation returned an invalid response.');
   }
@@ -108,7 +108,7 @@ export async function redeemHostedAuth(
     await throwHostedAuthAPIResponseError(response, clerk);
   }
 
-  const clientJSON = getResponseJSON<ClientJSON>(response.payload, 'client');
+  const clientJSON = getResponseJSON(response.payload, 'client');
   if (!clientJSON) {
     return errorThrower.throw('Hosted auth completion returned an invalid response.');
   }
@@ -116,16 +116,11 @@ export async function redeemHostedAuth(
   return clientJSON;
 }
 
-function getResponseJSON<T extends { object: string }>(
-  payload: HostedAuthResponse['payload'],
-  object: T['object'],
-): T | null {
+function getResponseJSON(payload: HostedAuthResponse['payload'], object: 'hosted_auth'): HostedAuthJSON | null;
+function getResponseJSON(payload: HostedAuthResponse['payload'], object: 'client'): ClientJSON | null;
+function getResponseJSON(payload: HostedAuthResponse['payload'], object: string): HostedAuthJSON | ClientJSON | null {
   const response = payload?.response;
-  if (!!response && typeof response === 'object' && (response as { object?: unknown }).object === object) {
-    return response as T;
-  }
-
-  return null;
+  return !!response && typeof response === 'object' && response.object === object ? response : null;
 }
 
 export function applyHostedAuthClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
