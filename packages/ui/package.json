@@ -77,7 +77,7 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze",
     "build:esm": "tsdown",
     "build:mosaic": "tsdown --config tsdown.mosaic.config.mts",
