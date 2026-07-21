@@ -249,7 +249,7 @@ export interface BillingPlanResource extends ClerkResource {
    */
   features: FeatureResource[];
   /**
-   * Per-unit pricing tiers for this Plan (for example, seats).
+   * Per-unit pricing tiers for this Plan (e.g., seats).
    */
   unitPrices?: BillingPlanUnitPrice[];
   /**
@@ -308,7 +308,7 @@ export interface BillingPlanUnitPriceTier {
 }
 
 /**
- * The `BillingPlanUnitPrice` type represents unit pricing for a specific unit type (for example, seats) on a plan.
+ * The `BillingPlanUnitPrice` type represents unit pricing for a specific unit type (e.g., seats) on a plan.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -556,7 +556,7 @@ export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
  * The `BillingPaymentTotals` type represents the per-payment cost breakdown, including any base fee
- * and per-unit (for example, seats) subtotals.
+ * and per-unit (e.g., seats) subtotals.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -578,7 +578,7 @@ export interface BillingPaymentTotals {
    */
   baseFee?: BillingMoneyAmount | null;
   /**
-   * Per-unit cost breakdown for this payment (for example, seats).
+   * Per-unit cost breakdown for this payment (e.g., seats).
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
@@ -630,7 +630,7 @@ export interface BillingPaymentResource extends ClerkResource {
    */
   status: BillingPaymentStatus;
   /**
-   * Per-payment breakdown with optional base fee and per-unit (for example, seats) subtotals.
+   * Per-payment breakdown with optional base fee and per-unit (e.g., seats) subtotals.
    * Absent on older responses.
    */
   totals?: BillingPaymentTotals | null;
@@ -748,7 +748,7 @@ export interface BillingSubscriptionNextPayment {
    */
   date: Date;
   /**
-   * Per-unit cost breakdown for the next payment (for example, seats).
+   * Per-unit cost breakdown for the next payment (e.g., seats).
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
@@ -772,7 +772,7 @@ export interface BillingSubscriptionItemNextPayment {
    */
   date: Date;
   /**
-   * Per-unit cost breakdown for the next payment (for example, seats).
+   * Per-unit cost breakdown for the next payment (e.g., seats).
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
@@ -1122,7 +1122,7 @@ export interface BillingTotals {
    */
   totalDueNow?: BillingMoneyAmount;
   /**
-   * Per-unit total breakdown (for example, seats)
+   * Per-unit total breakdown (e.g., seats)
    */
   perUnitTotals?: BillingPerUnitTotal[];
   /**
@@ -1160,7 +1160,7 @@ export interface BillingCheckoutTotals {
    */
   taxTotal: BillingMoneyAmount;
   /**
-   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (e.g., seats being added).
    * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
    */
   perUnitTotals?: BillingPerUnitTotal[];
