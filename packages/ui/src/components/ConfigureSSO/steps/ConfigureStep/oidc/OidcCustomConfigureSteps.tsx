@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
 
 import {
   Badge,
@@ -20,9 +20,15 @@ import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
+import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { ActiveConnectionAlert } from '../saml/shared/ActiveConnectionAlert';
+import {
+  IdentityProviderConfigurationModes,
+  type IdpConfigurationMode,
+} from '../saml/shared/IdentityProviderConfigurationModes';
 
 const OIDC_STEPS: WizardStepConfig[] = [
   { id: 'redirect-uri' },
@@ -32,6 +38,14 @@ const OIDC_STEPS: WizardStepConfig[] = [
 ];
 
 export const OidcCustomConfigureSteps = (): JSX.Element => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const [endpoints, setEndpoints] = React.useState<OidcEndpointConfiguration>(() => ({
+    discoveryUrl: enterpriseConnection?.oauthConfig?.discoveryUrl ?? '',
+    authUrl: '',
+    tokenUrl: '',
+    userInfoUrl: '',
+  }));
+
   return (
     // Linear, guard-less sub-flow: mount on the first step, mirroring the SAML custom inner wizard.
     <Wizard
@@ -47,7 +61,10 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
       </Wizard.Match>
 
       <Wizard.Match id='endpoints'>
-        <OidcEndpointsStep />
+        <OidcEndpointsStep
+          endpoints={endpoints}
+          onEndpointsChange={setEndpoints}
+        />
       </Wizard.Match>
 
       <Wizard.Match id='credentials'>
@@ -237,8 +254,71 @@ const OidcClaimsTable = (): JSX.Element => (
   </Table>
 );
 
-const OidcEndpointsStep = (): JSX.Element => {
+type OidcEndpointConfiguration = {
+  discoveryUrl: string;
+  authUrl: string;
+  tokenUrl: string;
+  userInfoUrl: string;
+};
+
+type OidcEndpointsStepProps = {
+  endpoints: OidcEndpointConfiguration;
+  onEndpointsChange: React.Dispatch<React.SetStateAction<OidcEndpointConfiguration>>;
+};
+
+const OIDC_ENDPOINT_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+
+const OidcEndpointsStep = ({ endpoints, onEndpointsChange }: OidcEndpointsStepProps): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const [mode, setMode] = React.useState<IdpConfigurationMode>(
+    endpoints.authUrl || endpoints.tokenUrl || endpoints.userInfoUrl ? 'manual' : 'discoveryUrl',
+  );
+
+  const discoveryUrlField = useFormControl('discoveryUrl', endpoints.discoveryUrl, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.discoveryUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.discoveryUrl.placeholder'),
+    isRequired: true,
+  });
+  const authUrlField = useFormControl('authUrl', endpoints.authUrl, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.authUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.authUrl.placeholder'),
+    isRequired: true,
+  });
+  const tokenUrlField = useFormControl('tokenUrl', endpoints.tokenUrl, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.tokenUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.tokenUrl.placeholder'),
+    isRequired: true,
+  });
+  const userInfoUrlField = useFormControl('userInfoUrl', endpoints.userInfoUrl, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.placeholder'),
+    isRequired: true,
+  });
+
+  const isValid =
+    mode === 'discoveryUrl'
+      ? discoveryUrlField.value.trim().length > 0
+      : authUrlField.value.trim().length > 0 &&
+        tokenUrlField.value.trim().length > 0 &&
+        userInfoUrlField.value.trim().length > 0;
+
+  const handleContinue = (): void => {
+    if (!isValid) {
+      return;
+    }
+
+    onEndpointsChange({
+      discoveryUrl: discoveryUrlField.value.trim(),
+      authUrl: authUrlField.value.trim(),
+      tokenUrl: tokenUrlField.value.trim(),
+      userInfoUrl: userInfoUrlField.value.trim(),
+    });
+    void goNext();
+  };
 
   return (
     <>
@@ -249,7 +329,59 @@ const OidcEndpointsStep = (): JSX.Element => {
         <InnerStepCounter />
       </Step.Header>
 
-      <Step.Body />
+      <Step.Body>
+        <Step.Section
+          fill
+          gap={5}
+        >
+          <IdentityProviderConfigurationModes
+            modes={OIDC_ENDPOINT_MODES}
+            value={mode}
+            onChange={setMode}
+            labels={{
+              ariaLabel: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.ariaLabel'),
+              discoveryUrl: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.discoveryUrl'),
+              manual: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.manual'),
+            }}
+          />
+
+          {mode === 'discoveryUrl' ? (
+            <>
+              <Text
+                as='p'
+                colorScheme='secondary'
+                localizationKey={localizationKeys(
+                  'configureSSO.configureStep.oidcCustom.endpointsStep.discoveryUrl.description',
+                )}
+              />
+              <Form.ControlRow elementId={discoveryUrlField.id}>
+                <Form.PlainInput {...discoveryUrlField.props} />
+              </Form.ControlRow>
+            </>
+          ) : (
+            <>
+              <Text
+                as='p'
+                colorScheme='secondary'
+                localizationKey={localizationKeys(
+                  'configureSSO.configureStep.oidcCustom.endpointsStep.manual.description',
+                )}
+              />
+              <Form.ControlRow elementId={authUrlField.id}>
+                <Form.PlainInput {...authUrlField.props} />
+              </Form.ControlRow>
+              <Form.ControlRow elementId={tokenUrlField.id}>
+                <Form.PlainInput {...tokenUrlField.props} />
+              </Form.ControlRow>
+              <Form.ControlRow elementId={userInfoUrlField.id}>
+                <Form.PlainInput {...userInfoUrlField.props} />
+              </Form.ControlRow>
+            </>
+          )}
+
+          <ActiveConnectionAlert />
+        </Step.Section>
+      </Step.Body>
 
       <Step.Footer>
         <Step.Footer.Reset />
@@ -258,8 +390,8 @@ const OidcEndpointsStep = (): JSX.Element => {
           isDisabled={isFirstStep}
         />
         <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
+          onClick={handleContinue}
+          isDisabled={!isValid || isLastStep}
         />
       </Step.Footer>
     </>

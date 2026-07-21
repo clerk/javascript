@@ -86,6 +86,17 @@ describe('ConfigureProviderStep', () => {
     expect(await screen.findByRole('table')).toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(5);
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    const [discoveryMode, manualMode] = await screen.findAllByRole('radio');
+    expect(discoveryMode).toBeChecked();
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.click(manualMode);
+
+    expect(screen.getAllByRole('textbox')).toHaveLength(3);
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

@@ -1564,6 +1564,31 @@ export type __internal_LocalizationResource = {
         };
         endpointsStep: {
           headerSubtitle: LocalizationValue;
+          discoveryUrl: {
+            description: LocalizationValue;
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          manual: {
+            authUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            description: LocalizationValue;
+            tokenUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            userInfoUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+          };
+          modes: {
+            ariaLabel: LocalizationValue;
+            discoveryUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
         };
         credentialsStep: {
           headerSubtitle: LocalizationValue;

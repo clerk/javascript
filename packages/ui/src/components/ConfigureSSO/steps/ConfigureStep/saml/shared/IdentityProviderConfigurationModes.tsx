@@ -8,9 +8,10 @@ import { SegmentedControl } from '@/elements/SegmentedControl';
  *
  * metadataUrl: Fetch IdP configuration via metadata URL
  * metadataFile: Upload IdP configuration via metadata file
+ * discoveryUrl: Fetch IdP configuration via OIDC discovery URL
  * manual: Configure manually each field, such as sign on URL, issuer, and signing certificate
  */
-export type IdpConfigurationMode = 'metadataUrl' | 'metadataFile' | 'manual';
+export type IdpConfigurationMode = 'metadataUrl' | 'metadataFile' | 'discoveryUrl' | 'manual';
 
 type ModeLocalizationKeys = Partial<Record<IdpConfigurationMode, LocalizationKey>>;
 

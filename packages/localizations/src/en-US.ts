@@ -273,6 +273,32 @@ export const enUS: LocalizationResource = {
         },
         endpointsStep: {
           headerSubtitle: 'Add your identity provider’s endpoints',
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
         },
         mainHeaderTitle: 'Configure your identity provider',
         redirectUriStep: {
