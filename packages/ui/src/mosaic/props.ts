@@ -1,7 +1,7 @@
 import type React from 'react';
 
 // The public styling contract, emitted onto a component's root element:
-//   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-accent: … }`)
+//   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)
 //   2. `.cl-<slot>` class — from `themeProps` (`.cl-button { … }`)
 //   3. `data-<axis>` attrs — from `themeProps` (`.cl-button[data-variant='outline']`)
 //

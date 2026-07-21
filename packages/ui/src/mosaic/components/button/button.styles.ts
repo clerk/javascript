@@ -11,7 +11,7 @@ export const styles = stylex.create({
     gap: spacingVars['--cl-spacing-2'],
     outline: {
       default: 'none',
-      ':focus-visible': `2px solid color-mix(in oklab, ${colorVars['--cl-color-accent']} 50%, transparent)`,
+      ':focus-visible': `2px solid color-mix(in oklab, ${colorVars['--cl-color-primary']} 50%, transparent)`,
     },
     alignItems: 'center',
     boxSizing: 'border-box',
@@ -28,37 +28,37 @@ export const styles = stylex.create({
   // intent × variant
   filledPrimary: {
     backgroundColor: {
-      default: colorVars['--cl-color-accent'],
-      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-accent']}, ${colorVars['--cl-color-on-accent']} 12%)`,
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-accent']}, ${colorVars['--cl-color-on-accent']} 24%)`,
+      default: colorVars['--cl-color-primary'],
+      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`,
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 24%)`,
     },
-    color: colorVars['--cl-color-on-accent'],
+    color: colorVars['--cl-color-primary-foreground'],
   },
   filledDestructive: {
     backgroundColor: {
-      default: colorVars['--cl-color-error'],
-      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-error']}, ${colorVars['--cl-color-on-error']} 12%)`,
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-error']}, ${colorVars['--cl-color-on-error']} 24%)`,
+      default: colorVars['--cl-color-destructive'],
+      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 12%)`,
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 24%)`,
     },
-    color: colorVars['--cl-color-on-error'],
+    color: colorVars['--cl-color-destructive-foreground'],
   },
   outlinePrimary: {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-accent'],
+    color: colorVars['--cl-color-primary'],
   },
   outlineDestructive: {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-error'],
+    color: colorVars['--cl-color-destructive'],
   },
   ghostPrimary: {
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-accent'],
+    color: colorVars['--cl-color-primary'],
   },
   ghostDestructive: {
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-error'],
+    color: colorVars['--cl-color-destructive'],
   },
 
   // size — height-driven; padding sets only the inline axis

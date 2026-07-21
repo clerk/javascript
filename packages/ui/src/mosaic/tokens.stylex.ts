@@ -7,17 +7,16 @@ import * as stylex from '@stylexjs/stylex';
 // these become real, stable custom properties a consumer can override in plain
 // CSS without touching StyleX:
 //
-//   :root { --cl-color-accent: rebeccapurple; }
+//   :root { --cl-color-primary: rebeccapurple; }
 //
-// StyleX still emits `:root { --cl-color-accent: … }` as the default. Following
+// StyleX still emits `:root { --cl-color-primary: … }` as the default. Following
 // astryx's structure: each group is a plain `*Defaults` object wrapped by
 // `defineVars`. The `*VarName` unions are derived from the exported `*Vars` in
 // `styles/index.ts` — the `@stylexjs/enforce-extension` rule requires a
 // `.stylex.ts` file to export nothing but its `defineVars` results. Color tokens
 // carry light and dark in one `light-dark(...)` value, so dark mode lives in the token
 // layer and resolves against the `color-scheme` in scope, with no
-// `@media (prefers-color-scheme)` duplication. Names are semantic (`accent`,
-// `on-accent`, `error`) rather than role-specific. The `--cl-` prefix namespaces
+// `@media (prefers-color-scheme)` duplication. The `--cl-` prefix namespaces
 // the vars so they never collide with a host app's own custom properties.
 
 // =============================================================================
@@ -25,14 +24,14 @@ import * as stylex from '@stylexjs/stylex';
 // =============================================================================
 
 const colorDefaults = {
-  '--cl-color-accent': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
-  '--cl-color-on-accent': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
-  '--cl-color-error': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
-  '--cl-color-on-error': 'oklch(0.985 0 0)',
-  '--cl-color-neutral': 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
-  '--cl-color-background-surface': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
-  '--cl-color-text-primary': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
-  '--cl-color-text-secondary': 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
+  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
+  '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  '--cl-color-destructive': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
+  '--cl-color-destructive-foreground': 'oklch(0.985 0 0)',
+  '--cl-color-muted': 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
+  '--cl-color-muted-foreground': 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
+  '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
+  '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
   '--cl-color-border': 'light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%))',
 } as const;
 
