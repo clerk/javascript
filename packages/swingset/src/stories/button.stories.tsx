@@ -13,7 +13,7 @@ export { default as __source } from './button.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
-  source: 'packages/ui/src/mosaic/components/button.tsx',
+  source: 'packages/ui/src/mosaic/components/button/button.tsx',
   styles: {
     _variants: {
       intent: { primary: {}, destructive: {} },

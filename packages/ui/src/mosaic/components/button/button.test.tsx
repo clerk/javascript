@@ -18,6 +18,7 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('data-variant', 'filled');
     expect(button).toHaveAttribute('data-size', 'md');
     expect(button).toHaveAttribute('data-shape', 'default');
+    expect(button).toHaveAttribute('type', 'button');
   });
 
   it('wires variant props and consumer className/style through to the element', () => {
