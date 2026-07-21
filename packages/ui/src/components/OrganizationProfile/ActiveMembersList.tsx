@@ -85,7 +85,7 @@ const MemberRow = (props: {
   const { user } = useUser();
 
   const isCurrentUser = user?.id === membership.publicUserData?.userId;
-  const isDeprovisioned = membership.deprovisioned;
+  const isDeprovisioned = membership.publicUserData?.deprovisioned;
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (

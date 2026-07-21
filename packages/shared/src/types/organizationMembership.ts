@@ -46,10 +46,6 @@ export interface OrganizationMembershipResource extends ClerkResource {
    */
   id: string;
   /**
-   * Indicates whether the member has been deprovisioned by their identity provider.
-   */
-  deprovisioned?: boolean;
-  /**
    * The [`Organization`](https://clerk.com/docs/reference/objects/organization) object the membership belongs to.
    */
   organization: OrganizationResource;

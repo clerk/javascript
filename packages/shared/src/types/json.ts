@@ -342,6 +342,7 @@ export interface PublicUserDataJSON {
   user_id?: string;
   username?: string;
   banned?: boolean;
+  deprovisioned?: boolean;
 }
 
 export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
@@ -420,7 +421,6 @@ export interface OrganizationJSON extends ClerkResourceJSON {
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: 'organization_membership';
   id: string;
-  deprovisioned?: boolean;
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;

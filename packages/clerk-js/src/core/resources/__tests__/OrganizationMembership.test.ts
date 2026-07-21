@@ -7,7 +7,6 @@ describe('OrganizationMembership', () => {
     const organizationMembership = new OrganizationMembership({
       object: 'organization_membership',
       id: 'test_id',
-      deprovisioned: true,
       created_at: 12345,
       updated_at: 5678,
       role: 'admin',
@@ -45,7 +44,6 @@ describe('OrganizationMembership', () => {
 
     expect(organizationMembership).toMatchObject({
       id: 'test_id',
-      deprovisioned: true,
       role: 'admin',
       roleName: undefined,
       createdAt: expect.any(Date),

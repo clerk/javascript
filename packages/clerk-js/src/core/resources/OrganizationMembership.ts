@@ -16,7 +16,6 @@ import { BaseResource, Organization, PublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
-  deprovisioned?: boolean;
   publicMetadata: OrganizationMembershipPublicMetadata = {};
   publicUserData?: PublicUserData;
   organization!: Organization;
@@ -72,7 +71,6 @@ export class OrganizationMembership extends BaseResource implements Organization
     }
 
     this.id = data.id;
-    this.deprovisioned = data.deprovisioned ?? undefined;
     this.organization = new Organization(data.organization);
     this.publicMetadata = data.public_metadata || {};
     if (data.public_user_data) {
@@ -90,7 +88,6 @@ export class OrganizationMembership extends BaseResource implements Organization
     return {
       object: 'organization_membership',
       id: this.id,
-      deprovisioned: this.deprovisioned,
       organization: this.organization.__internal_toSnapshot(),
       public_metadata: this.publicMetadata,
       public_user_data: this.publicUserData?.__internal_toSnapshot(),
