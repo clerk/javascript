@@ -32,10 +32,10 @@
   },
   "devDependencies": {
     "@expo/config-plugins": "^54.0.4",
-    "expo": "~54.0.34"
+    "expo": "~54.0.36"
   },
   "peerDependencies": {
-    "expo": ">=53 <58"
+    "expo": ">=54 <58"
   },
   "publishConfig": {
     "access": "public"
