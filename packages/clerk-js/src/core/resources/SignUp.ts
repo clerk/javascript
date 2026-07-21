@@ -1074,6 +1074,7 @@ class SignUpFuture implements SignUpFutureResource {
         redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
         actionCompleteRedirectUrl: redirectUrlComplete,
       };
+      let popupState = '';
       if (popup) {
         const wrappedRoutes = wrapWithPopupRoutes(SignUp.clerk, {
           redirectCallbackUrl: routes.redirectUrl,
@@ -1081,6 +1082,7 @@ class SignUpFuture implements SignUpFutureResource {
         });
         routes.redirectUrl = wrappedRoutes.redirectCallbackUrl;
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
+        popupState = wrappedRoutes.state;
       }
 
       const authenticateFn = () => {
@@ -1119,7 +1121,11 @@ class SignUpFuture implements SignUpFutureResource {
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
         if (popup) {
-          await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
+          await _futureAuthenticateWithPopup(SignUp.clerk, {
+            popup,
+            externalVerificationRedirectURL,
+            state: popupState,
+          });
           // Pick up the modified SignUp resource
           await this.#resource.reload();
         } else {
