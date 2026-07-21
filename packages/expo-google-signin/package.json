@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-google-signin",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Native Google Sign-In module to be used with Clerk for Expo",
   "keywords": [
     "react-native",
