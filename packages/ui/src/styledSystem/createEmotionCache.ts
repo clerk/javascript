@@ -1,7 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache, { type EmotionCache } from '@emotion/cache';
-// eslint-disable-next-line no-restricted-imports
-import type { SerializedStyles } from '@emotion/react';
 
 type CreateEmotionCacheOptions = {
   /** The nonce value for CSP (Content Security Policy). */
@@ -28,7 +26,7 @@ export function createEmotionCache({ nonce, cssLayerName }: CreateEmotionCacheOp
   if (cssLayerName) {
     const prevInsert = cache.insert.bind(cache);
 
-    cache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
+    cache.insert = (selector, serialized, sheet, shouldCache) => {
       if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
         const wrapped = { ...serialized, styles: `@layer ${cssLayerName} {${serialized.styles}}` };
         return prevInsert(selector, wrapped, sheet, shouldCache);

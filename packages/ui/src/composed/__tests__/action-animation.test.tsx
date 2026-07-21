@@ -13,15 +13,13 @@ import { UserProfileProfileSection } from '../UserProfile/AccountProfile';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-function findAddAnimationCall(calls: any[]) {
+function findAddAnimationCall(calls: Parameters<Element['animate']>[]) {
   return calls.find(call => {
     const keyframes = call[0];
     if (!Array.isArray(keyframes)) {
       return false;
     }
-    return keyframes.some(
-      (kf: any) => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'),
-    );
+    return keyframes.some(kf => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'));
   });
 }
 

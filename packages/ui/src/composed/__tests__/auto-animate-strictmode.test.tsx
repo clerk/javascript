@@ -25,22 +25,20 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
  * the animated element after the cycle.
  */
 
-function classifyAnimateCalls(calls: any[]) {
-  const adds: any[] = [];
-  const remains: any[] = [];
+type AnimateCall = Parameters<Element['animate']>;
+
+function classifyAnimateCalls(calls: AnimateCall[]) {
+  const adds: AnimateCall[] = [];
+  const remains: AnimateCall[] = [];
   for (const call of calls) {
     const keyframes = call[0];
     if (!Array.isArray(keyframes)) {
       continue;
     }
-    if (
-      keyframes.some(
-        (kf: any) => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'),
-      )
-    ) {
+    if (keyframes.some(kf => kf.opacity === 0 && typeof kf.transform === 'string' && kf.transform.includes('scale'))) {
       adds.push(call);
     }
-    if (keyframes.some((kf: any) => typeof kf.transform === 'string' && kf.transform.includes('translate'))) {
+    if (keyframes.some(kf => typeof kf.transform === 'string' && kf.transform.includes('translate'))) {
       remains.push(call);
     }
   }
@@ -62,9 +60,11 @@ describe('Animated under React StrictMode', () => {
   let animateSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    animateSpy = vi
-      .spyOn(Element.prototype, 'animate')
-      .mockImplementation(() => ({ addEventListener: vi.fn(), cancel: vi.fn(), finished: Promise.resolve() }) as any);
+    animateSpy = vi.spyOn(Element.prototype, 'animate').mockImplementation(
+      () =>
+        // SAFETY: The test only reads addEventListener/cancel/finished off the returned Animation; the rest of the interface is never touched, so a partial stub is sufficient.
+        ({ addEventListener: vi.fn(), cancel: vi.fn(), finished: Promise.resolve() }) as unknown as Animation,
+    );
   });
 
   afterEach(() => {

@@ -125,8 +125,11 @@ test.describe('composed UserProfile exports @generic', () => {
   });
 
   test.afterAll(async () => {
-    await fakeUser.deleteIfExists();
-    await app.teardown();
+    try {
+      await fakeUser.deleteIfExists();
+    } finally {
+      await app.teardown();
+    }
   });
 
   // Sign in as `user` and open the composed profile page. The composed provider renders null until
@@ -229,17 +232,23 @@ test.describe('composed UserProfile exports @generic', () => {
       phoneNumber: undefined,
     });
 
-    const u = await signInAndVisitComposedUserProfile(page, context, delFakeUser);
+    try {
+      const u = await signInAndVisitComposedUserProfile(page, context, delFakeUser);
 
-    // The delete section is rendered directly in the composed security panel (no tab to switch).
-    await u.page.getByRole('button', { name: /delete account/i }).click();
-    await u.page.locator('input[name=deleteConfirmation]').fill('Delete account');
-    await u.page.getByRole('button', { name: /delete account/i }).click();
+      // The delete section is rendered directly in the composed security panel (no tab to switch).
+      await u.page.getByRole('button', { name: /delete account/i }).click();
+      await u.page.locator('input[name=deleteConfirmation]').fill('Delete account');
+      await u.page.getByRole('button', { name: /delete account/i }).click();
 
-    await u.po.expect.toBeSignedOut();
+      await u.po.expect.toBeSignedOut();
 
-    const sessionCookieList = (await u.page.context().cookies()).filter(cookie => cookie.name.startsWith('__session'));
-    expect(sessionCookieList).toHaveLength(0);
+      const sessionCookieList = (await u.page.context().cookies()).filter(cookie =>
+        cookie.name.startsWith('__session'),
+      );
+      expect(sessionCookieList).toHaveLength(0);
+    } finally {
+      await delFakeUser.deleteIfExists();
+    }
   });
 });
 
@@ -355,10 +364,13 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   });
 
   test.afterAll(async () => {
-    // The delete test removes its own organization; ignore if this one is already gone.
-    await fakeOrganization.delete().catch(() => {});
-    await fakeUser.deleteIfExists();
-    await app.teardown();
+    try {
+      // The delete test removes its own organization; ignore if this one is already gone.
+      await fakeOrganization.delete().catch(() => {});
+      await fakeUser.deleteIfExists();
+    } finally {
+      await app.teardown();
+    }
   });
 
   // Sign in as `user` and open the composed organization profile page, waiting for the active org's
