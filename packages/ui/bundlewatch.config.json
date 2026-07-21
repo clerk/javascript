@@ -5,7 +5,7 @@
     { "path": "./dist/ui.shared.browser.js", "maxSize": "40KB" },
     { "path": "./dist/framework*.js", "maxSize": "44KB" },
     { "path": "./dist/vendors*.js", "maxSize": "73KB" },
-    { "path": "./dist/ui-common*.js", "maxSize": "130KB" },
+    { "path": "./dist/ui-common*.js", "maxSize": "132KB" },
     { "path": "./dist/signin*.js", "maxSize": "17KB" },
     { "path": "./dist/signup*.js", "maxSize": "13KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "16KB" },

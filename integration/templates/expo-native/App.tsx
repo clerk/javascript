@@ -1,4 +1,5 @@
 import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
+import { useSignInWithGoogle } from '@clerk/expo/google';
 import { AuthView, UserButton } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
@@ -11,9 +12,11 @@ if (!publishableKey) {
 }
 
 function NativeBuildFixture() {
-  const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
+  const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [googleResult, setGoogleResult] = useState<string | null>(null);
 
   return (
     <View style={styles.container}>
@@ -25,9 +28,30 @@ function NativeBuildFixture() {
       <Text testID='auth-state'>{isLoaded ? `signed ${isSignedIn ? 'in' : 'out'}` : 'loading'}</Text>
       {user?.id && <Text testID='user-id'>{user.id}</Text>}
       <Button
+        testID='open-auth-view-button'
         title='Open native AuthView'
         onPress={() => setIsAuthOpen(true)}
       />
+      {!isSignedIn && (
+        <Button
+          testID='google-sign-in-button'
+          title='Sign in with Google'
+          onPress={() => {
+            void startGoogleAuthenticationFlow().catch((error: unknown) => {
+              const message = error instanceof Error ? error.message : String(error);
+              setGoogleResult(message.replace(/\s+/g, ' '));
+            });
+          }}
+        />
+      )}
+      {googleResult && <Text testID='google-result'>{googleResult}</Text>}
+      {isSignedIn && (
+        <Button
+          testID='sign-out-button'
+          title='Sign out'
+          onPress={() => void signOut()}
+        />
+      )}
 
       <Modal
         animationType='slide'

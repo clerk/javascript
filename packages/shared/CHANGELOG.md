@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.25.6
+
+### Patch Changes
+
+- Standardize JSDoc punctuation to always follow `e.g.` and `i.e.` with a comma (`e.g.,` / `i.e.,`), matching the docs style guide. Comment-only change; no runtime behavior is affected. This keeps the generated Typedoc reference output consistent. ([#9201](https://github.com/clerk/javascript/pull/9201)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.25.5
+
+### Patch Changes
+
+- Escape `<`, `>`, and `/` when serializing the Clerk auth state into SSR `<script>` tags, preventing a `</script>` sequence inside user-controllable session claims from breaking out of the script element (stored XSS). The embedded JSON still parses to identical values on the client. ([#9166](https://github.com/clerk/javascript/pull/9166)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 4.25.4
+
+### Patch Changes
+
+- Add `CLERK_DISABLE_AUTO_PROXY=true` to opt out of automatic Frontend API proxying on Vercel production deployments. ([#9159](https://github.com/clerk/javascript/pull/9159)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.25.3
 
 ### Patch Changes
