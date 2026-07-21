@@ -1,4 +1,4 @@
-import { requireNativeModule } from 'expo';
+import { requireOptionalNativeModule } from 'expo';
 
 interface Spec {
   // Exposed by Expo Modules EventEmitter for internal native client change events.
@@ -14,4 +14,5 @@ interface Spec {
   ): Promise<void>;
 }
 
-export default requireNativeModule<Spec>('ClerkExpo');
+// Optional so it resolves to null in Expo Go instead of throwing at import time.
+export default requireOptionalNativeModule<Spec>('ClerkExpo');

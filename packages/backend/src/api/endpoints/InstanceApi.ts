@@ -22,7 +22,7 @@ export type UpdateParams = {
   developmentOrigin?: string | null | undefined;
   /** For browser-like stacks such as browser extensions, Electron, or Capacitor.js, the instance allowed origins need to be updated with the request origin value. For Chrome extensions popup, background, or service worker pages the origin is `chrome-extension://extension_uiid`. For Electron apps the default origin is `http://localhost:3000`. For Capacitor.js, the origin is `capacitor://localhost`. */
   allowedOrigins?: Array<string> | undefined;
-  /** Whether the instance should use URL-based session syncing in development mode (i.e. without third-party cookies). */
+  /** Whether the instance should use URL-based session syncing in development mode (i.e., without third-party cookies). */
   urlBasedSessionSyncing?: boolean | null | undefined;
   /** Overrides the sign-in strategy that is preferred when a password is required. The value is only consulted when a password is required, and is dormant otherwise. Pass an empty string to clear the override. Passing `null` or `undefined` leaves the current value unchanged. */
   preferredSignInStrategyWhenPasswordRequired?: 'password' | 'otp' | '' | null | undefined;
