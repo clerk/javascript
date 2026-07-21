@@ -1535,7 +1535,32 @@ export type __internal_LocalizationResource = {
           };
         };
         claimsStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
+            };
+            rows: {
+              subject: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              email: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              firstName: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              lastName: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+            };
+          };
           headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
         };
         endpointsStep: {
           headerSubtitle: LocalizationValue;

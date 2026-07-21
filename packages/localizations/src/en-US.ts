@@ -241,7 +241,32 @@ export const enUS: LocalizationResource = {
       },
       oidcCustom: {
         claimsStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: 'Attribute Name',
+              userAttribute: 'User Attribute',
+            },
+            rows: {
+              subject: {
+                attributeName: 'External user ID',
+                userAttribute: 'sub',
+              },
+              email: {
+                attributeName: 'Primary email',
+                userAttribute: 'email',
+              },
+              firstName: {
+                attributeName: 'First name',
+                userAttribute: 'given_name',
+              },
+              lastName: {
+                attributeName: 'Last name',
+                userAttribute: 'family_name',
+              },
+            },
+          },
           headerSubtitle: 'Set the claims your identity provider includes in the ID token',
+          paragraph: 'Your user ID token must include the following claims:',
         },
         credentialsStep: {
           headerSubtitle: 'Add your application credentials',

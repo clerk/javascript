@@ -72,7 +72,7 @@ describe('ConfigureProviderStep', () => {
     contextState.provider = 'oidc_clerk_dev';
     const { wrapper } = await createFixtures();
 
-    renderStep(wrapper);
+    const { userEvent } = renderStep(wrapper);
 
     // The OIDC sub-flow mounts on its first step. Before the fix this threw
     // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
@@ -80,6 +80,12 @@ describe('ConfigureProviderStep', () => {
     const redirectUri = screen.getByRole('textbox') as HTMLInputElement;
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri.value).toMatch(/^https:\/\/.+\/v1\/oauth_callback$/);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(5);
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

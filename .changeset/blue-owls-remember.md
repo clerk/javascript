@@ -4,4 +4,4 @@
 '@clerk/ui': patch
 ---
 
-Display a copyable authorized redirect URI in the first step of the experimental OIDC self-serve SSO setup flow.
+Add the first two setup steps to the experimental OIDC self-serve SSO configuration flow, including a copyable authorized redirect URI and required ID-token claims.

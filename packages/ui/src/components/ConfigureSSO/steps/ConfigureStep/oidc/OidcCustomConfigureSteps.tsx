@@ -1,7 +1,20 @@
 import { useClerk } from '@clerk/shared/react';
 import { type JSX } from 'react';
 
-import { Col, localizationKeys, Text } from '@/customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
@@ -113,7 +126,17 @@ const OidcClaimsStep = (): JSX.Element => {
         <InnerStepCounter />
       </Step.Header>
 
-      <Step.Body />
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$3 })}>
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.claimsStep.paragraph')}
+          />
+
+          <OidcClaimsTable />
+        </Step.Section>
+      </Step.Body>
 
       <Step.Footer>
         <Step.Footer.Reset />
@@ -129,6 +152,90 @@ const OidcClaimsStep = (): JSX.Element => {
     </>
   );
 };
+
+type OidcClaimRow = {
+  id: 'subject' | 'email' | 'firstName' | 'lastName';
+  isRequired: boolean;
+};
+
+const OIDC_CLAIM_ROWS: ReadonlyArray<OidcClaimRow> = [
+  { id: 'subject', isRequired: true },
+  { id: 'email', isRequired: true },
+  { id: 'firstName', isRequired: false },
+  { id: 'lastName', isRequired: false },
+];
+
+const OidcClaimsTable = (): JSX.Element => (
+  <Table
+    elementDescriptor={descriptors.configureSSOAttributeMappingTable}
+    sx={theme => ({
+      'tr > th:first-of-type': { paddingInlineStart: theme.space.$4 },
+    })}
+  >
+    <Thead>
+      <Tr>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.oidcCustom.claimsStep.attributeMappingTable.columns.attributeName',
+            )}
+          />
+        </Th>
+        <Th>
+          <Text
+            sx={theme => ({ fontSize: theme.fontSizes.$xs })}
+            localizationKey={localizationKeys(
+              'configureSSO.configureStep.oidcCustom.claimsStep.attributeMappingTable.columns.userAttribute',
+            )}
+          />
+        </Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      {OIDC_CLAIM_ROWS.map(row => (
+        <Tr key={row.id}>
+          <Td>
+            <Flex
+              as='span'
+              align='center'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              <Text
+                as='span'
+                colorScheme='secondary'
+                sx={{ fontFamily: 'monospace' }}
+                localizationKey={localizationKeys(
+                  `configureSSO.configureStep.oidcCustom.claimsStep.attributeMappingTable.rows.${row.id}.userAttribute`,
+                )}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOAttributeMappingBadge}
+                elementId={descriptors.configureSSOAttributeMappingBadge.setId(
+                  row.isRequired ? 'required' : 'optional',
+                )}
+                colorScheme={row.isRequired ? 'warning' : 'primary'}
+                localizationKey={localizationKeys(
+                  row.isRequired
+                    ? 'configureSSO.configureStep.attributeMappingTable.badges.required'
+                    : 'configureSSO.configureStep.attributeMappingTable.badges.optional',
+                )}
+              />
+            </Flex>
+          </Td>
+          <Td>
+            <Text
+              as='span'
+              localizationKey={localizationKeys(
+                `configureSSO.configureStep.oidcCustom.claimsStep.attributeMappingTable.rows.${row.id}.attributeName`,
+              )}
+            />
+          </Td>
+        </Tr>
+      ))}
+    </Tbody>
+  </Table>
+);
 
 const OidcEndpointsStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
