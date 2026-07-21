@@ -7,6 +7,7 @@ import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
 import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
+import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
@@ -542,7 +543,19 @@ export default tseslint.config([
     name: 'packages/ui/mosaic',
     files: ['packages/ui/src/mosaic/**/*'],
     ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    plugins: {
+      '@stylexjs': pluginStylex,
+    },
     rules: {
+      '@stylexjs/enforce-extension': 'error',
+      '@stylexjs/no-legacy-contextual-styles': 'error',
+      '@stylexjs/no-lookahead-selectors': 'error',
+      '@stylexjs/no-nonstandard-styles': 'error',
+      '@stylexjs/no-conflicting-props': 'error',
+      '@stylexjs/no-unused': 'error',
+      '@stylexjs/sort-keys': 'error',
+      '@stylexjs/valid-shorthands': 'error',
+      '@stylexjs/valid-styles': 'error',
       'no-restricted-syntax': [
         'error',
         {
