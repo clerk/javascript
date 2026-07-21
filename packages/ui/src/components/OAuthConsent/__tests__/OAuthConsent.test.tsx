@@ -562,7 +562,11 @@ describe('OAuthConsent', () => {
 
     await waitFor(() => {
       expect(getByText('Claude')).toBeVisible();
-      expect(baseElement.querySelector('.cl-logoGroupIcon')).not.toBeNull();
+      const icon = baseElement.querySelector('.cl-logoGroupIcon');
+      expect(icon).not.toBeNull();
+      // The brand mark conveys which app is requesting access, so it needs an accessible name.
+      expect(icon).toHaveAttribute('role', 'img');
+      expect(icon).toHaveAttribute('aria-label', 'Claude');
     });
   });
 });

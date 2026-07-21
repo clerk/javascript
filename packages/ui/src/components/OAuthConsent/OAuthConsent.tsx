@@ -22,7 +22,7 @@ import {
   ListGroupItem,
   ListGroupItemLabel,
 } from './ListGroup';
-import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
+import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
@@ -165,16 +165,20 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
@@ -182,20 +186,24 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
                   <Box sx={{ position: 'relative' }}>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
-                    <LogoGroupIcon
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
+                    <LogoGroupItemContainer
                       size='sm'
                       sx={t => ({
                         position: 'absolute',
-                        bottom: `calc(${t.space.$3} * -1)`,
-                        insetInlineEnd: `calc(${t.space.$3} * -1)`,
+                        bottom: `calc(${t.space.$2x5} * -1)`,
+                        insetInlineEnd: `calc(${t.space.$2x5} * -1)`,
                       })}
-                    />
+                    >
+                      <LogoGroupIcon />
+                    </LogoGroupItemContainer>
                   </Box>
                 </LogoGroup>
               )}
@@ -203,24 +211,32 @@ function _OAuthConsent() {
               {!oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <LogoGroupIcon
-                      icon={knownClient?.icon}
-                      iconSx={knownClient?.iconSx}
-                    />
+                    <LogoGroupItemContainer>
+                      <LogoGroupIcon
+                        icon={knownClient?.icon}
+                        iconSx={knownClient?.iconSx}
+                        label={knownClient?.name}
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
               {/* no avatars */}
               {!oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
-                  <LogoGroupIcon
-                    icon={knownClient?.icon}
-                    iconSx={knownClient?.iconSx}
-                  />
+                  <LogoGroupItemContainer>
+                    <LogoGroupIcon
+                      icon={knownClient?.icon}
+                      iconSx={knownClient?.iconSx}
+                      label={knownClient?.name}
+                    />
+                  </LogoGroupItemContainer>
                 </LogoGroup>
               )}
               <Header.Title localizationKey={oauthApplicationName} />

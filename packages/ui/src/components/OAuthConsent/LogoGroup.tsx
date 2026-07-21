@@ -35,20 +35,21 @@ export function LogoGroupItem({ children, sx, ...props }: ComponentProps<typeof 
   );
 }
 
-export function LogoGroupIcon({
+export function LogoGroupItemContainer({
   size = 'md',
   sx,
-  icon = LockDottedCircle,
-  iconSx = t => ({ color: t.colors.$primary500 }),
+  children,
 }: {
   size?: 'sm' | 'md';
   sx?: ThemableCssProp;
-  icon?: React.ComponentType;
-  iconSx?: ThemableCssProp;
+  children: React.ReactNode;
 }) {
   const scale: ThemableCssProp = t => {
-    const value = size === 'sm' ? t.space.$6 : t.space.$12;
-    return { width: value, height: value };
+    const container = size === 'sm' ? t.space.$6 : t.space.$12;
+    const inner = size === 'sm' ? t.space.$3 : t.space.$5;
+    // `&&` doubles the container's specificity so it wins over a bare child
+    // (Icon / ApplicationLogo) that sizes itself with a single class.
+    return { width: container, height: container, '&& > *': { width: inner, height: inner } };
   };
 
   return (
@@ -70,13 +71,35 @@ export function LogoGroupIcon({
         scale,
         sx,
       ]}
-      elementDescriptor={descriptors.logoGroupIcon}
+      elementDescriptor={descriptors.logoGroupItemContainer}
     >
-      <Icon
-        icon={icon}
-        sx={iconSx}
-      />
+      {children}
     </Box>
+  );
+}
+
+export function LogoGroupIcon({
+  icon = LockDottedCircle,
+  iconSx = t => ({ color: t.colors.$primary500 }),
+  label,
+}: {
+  icon?: React.ComponentType;
+  iconSx?: ThemableCssProp;
+  /**
+   * Accessible name for a meaningful mark (e.g. a recognized client's brand).
+   * Omit for the decorative fallback, which is then hidden from assistive tech.
+   */
+  label?: string;
+}) {
+  return (
+    <Icon
+      icon={icon}
+      sx={iconSx}
+      elementDescriptor={descriptors.logoGroupIcon}
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+    />
   );
 }
 
