@@ -2,6 +2,12 @@
 import { UserProfile } from '@clerk/astro/components';
 import Layout from '../layouts/Layout.astro';
 import StreamUser from '../components/StreamUser.astro';
+
+const { userId, redirectToSignIn } = Astro.locals.auth();
+
+if (!userId) {
+  return redirectToSignIn();
+}
 ---
 
 <Layout title='Welcome to Astro.'>
