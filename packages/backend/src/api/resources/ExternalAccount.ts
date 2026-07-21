@@ -2,7 +2,7 @@ import type { ExternalAccountJSON } from './JSON';
 import { Verification } from './Verification';
 
 /**
- * The Backend `ExternalAccount` object is a model around an identification obtained by an external provider (e.g. a social provider such as Google).
+ * The Backend `ExternalAccount` object is a model around an identification obtained by an external provider (e.g., a social provider such as Google).
  *
  * External account must be verified, so that you can make sure they can be assigned to their rightful owners. The `ExternalAccount` object holds all necessary state around the verification process.
  */
