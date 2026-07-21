@@ -163,7 +163,7 @@ export type OrganizationSyncTargetMatchers = {
 };
 
 /**
- * Represents an Organization or a Personal Account - e.g., an
+ * Represents an Organization or a Personal Account - i.e., an
  * entity that can be activated by the handshake API.
  */
 export type OrganizationSyncTarget =

@@ -1,7 +1,5 @@
 ---
 '@clerk/backend': patch
-'@clerk/nextjs': patch
-'@clerk/react': patch
 '@clerk/shared': patch
 ---
 
