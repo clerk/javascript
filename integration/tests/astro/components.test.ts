@@ -432,6 +432,13 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     );
   });
 
+  test('redirects to sign-in when unauthenticated (discover page)', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/discover');
+    await u.page.waitForURL(`${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/discover`)}`);
+    await u.po.signIn.waitForMounted();
+  });
+
   // ---- protect
   test('only admin', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
