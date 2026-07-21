@@ -10,6 +10,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       boxSizing: 'border-box',
       margin: 0,
       fontSize: 'inherit',
+      textWrap: 'pretty',
       ...common.disabled(theme),
     },
     variants: {

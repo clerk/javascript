@@ -206,6 +206,11 @@ export const MenuItem = (props: MenuItemProps) => {
           borderRadius: theme.radii.$sm,
           padding: `${theme.space.$1} ${theme.space.$3}`,
           whiteSpace: 'nowrap',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: `calc(${theme.space.$0x25} * -1) calc(${theme.space.$1} * -1)`,
+          },
         }),
         sx,
       ]}
