@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.7.8
+
+### Patch Changes
+
+- Reduce redundant native and JavaScript client refreshes during Expo startup. ([#9140](https://github.com/clerk/javascript/pull/9140)) by [@mikepitre](https://github.com/mikepitre)
+
+## 3.7.7
+
+### Patch Changes
+
+- Fix Android native UI components crashing before window attachment or becoming unresponsive after navigation detaches and reattaches their views. ([#9178](https://github.com/clerk/javascript/pull/9178)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Prevent Expo apps from accumulating duplicate initialization requests while the Clerk API is unavailable or the app reloads. ([#9173](https://github.com/clerk/javascript/pull/9173)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/react@6.12.5
+  - @clerk/clerk-js@6.25.5
+
 ## 3.7.6
 
 ### Patch Changes
