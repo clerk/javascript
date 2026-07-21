@@ -10,5 +10,6 @@ interface Spec {
   signOut(): Promise<void>;
 }
 
-// Optional so getNativeModule() can surface its actionable error instead.
+// Optional so getNativeModule() surfaces its actionable error rather than
+// throwing at import time.
 export default requireOptionalNativeModule<Spec>('ClerkGoogleSignIn');
