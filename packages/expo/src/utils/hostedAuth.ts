@@ -80,7 +80,7 @@ export async function createHostedAuth(
     throw buildHostedAuthAPIResponseError(response);
   }
 
-  const hostedAuthJSON = getHostedAuthJSON(response.payload);
+  const hostedAuthJSON = getResponseJSON<HostedAuthJSON>(response.payload, 'hosted_auth');
   if (!hostedAuthJSON?.url) {
     return errorThrower.throw('Hosted auth creation returned an invalid response.');
   }
@@ -108,7 +108,7 @@ export async function redeemHostedAuth(
     await throwHostedAuthAPIResponseError(response, clerk);
   }
 
-  const clientJSON = getClientJSON(response.payload);
+  const clientJSON = getResponseJSON<ClientJSON>(response.payload, 'client');
   if (!clientJSON) {
     return errorThrower.throw('Hosted auth completion returned an invalid response.');
   }
@@ -116,40 +116,16 @@ export async function redeemHostedAuth(
   return clientJSON;
 }
 
-function getHostedAuthJSON(payload: HostedAuthResponse['payload']): HostedAuthJSON | null {
-  if (!payload) {
-    return null;
-  }
-
-  if (isHostedAuthJSON(payload.response)) {
-    return payload.response;
-  }
-
-  return null;
-}
-
-function isHostedAuthJSON(payload: unknown): payload is HostedAuthJSON {
-  return hasObjectType(payload, 'hosted_auth');
-}
-
-function getClientJSON(payload: HostedAuthResponse['payload']): ClientJSON | null {
-  if (!payload) {
-    return null;
-  }
-
-  if (isClientJSON(payload.response)) {
-    return payload.response;
+function getResponseJSON<T extends { object: string }>(
+  payload: HostedAuthResponse['payload'],
+  object: T['object'],
+): T | null {
+  const response = payload?.response;
+  if (!!response && typeof response === 'object' && (response as { object?: unknown }).object === object) {
+    return response as T;
   }
 
   return null;
-}
-
-function isClientJSON(payload: unknown): payload is ClientJSON {
-  return hasObjectType(payload, 'client');
-}
-
-function hasObjectType(payload: unknown, object: string): boolean {
-  return !!payload && typeof payload === 'object' && (payload as { object?: unknown }).object === object;
 }
 
 export function applyHostedAuthClientJSON(client: ClientResource, clientJSON: ClientJSON): ClientResource {
@@ -166,6 +142,7 @@ export function applyHostedAuthClientJSON(client: ClientResource, clientJSON: Cl
   return mutableClient.fromJSON(clientJSON);
 }
 
+// Redemption only: creation handles its own 401s via the signed_out retry above.
 async function throwHostedAuthAPIResponseError(
   response: HostedAuthResponse,
   clerk: HostedAuthClerkInstance,

@@ -185,9 +185,7 @@ export function useHostedAuth(): {
     // failure below does not leave the local client stale against the rotated token.
     applyHostedAuthClientJSON(clerk.client, clientJSON);
 
-    const createdSessionId = normalizeSessionId(
-      callbackParams.get('created_session_id') || clientJSON.last_active_session_id,
-    );
+    const createdSessionId = callbackParams.get('created_session_id') || clientJSON.last_active_session_id || null;
     if (!createdSessionId) {
       return errorThrower.throw('Hosted auth completion did not include a created session id.');
     }
@@ -273,10 +271,6 @@ function getHostedAuthClerk(): HostedAuthClerkInstance {
   }
 
   return hostedAuthClerk as HostedAuthClerkInstance;
-}
-
-function normalizeSessionId(sessionId: string | null | undefined): string | null {
-  return sessionId || null;
 }
 
 function createState(): string {
