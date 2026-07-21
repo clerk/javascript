@@ -77,6 +77,9 @@ describe('ConfigureProviderStep', () => {
     // The OIDC sub-flow mounts on its first step. Before the fix this threw
     // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
     expect(await screen.findByText(/create a new oidc application/i)).toBeInTheDocument();
+    const redirectUri = screen.getByRole('textbox') as HTMLInputElement;
+    expect(redirectUri).toHaveAttribute('readonly');
+    expect(redirectUri.value).toMatch(/^https:\/\/.+\/v1\/oauth_callback$/);
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

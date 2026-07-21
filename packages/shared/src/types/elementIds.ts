@@ -31,6 +31,7 @@ export type FieldId =
   | 'idpMetadata'
   | 'idpMetadataUrl'
   | 'idpSsoUrl'
+  | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'
   | 'web3WalletName'

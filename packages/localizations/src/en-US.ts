@@ -252,6 +252,11 @@ export const enUS: LocalizationResource = {
         mainHeaderTitle: 'Configure your identity provider',
         redirectUriStep: {
           headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {

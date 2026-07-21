@@ -1529,6 +1529,10 @@ export type __internal_LocalizationResource = {
         mainHeaderTitle: LocalizationValue;
         redirectUriStep: {
           headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          redirectUri: {
+            label: LocalizationValue;
+          };
         };
         claimsStep: {
           headerSubtitle: LocalizationValue;

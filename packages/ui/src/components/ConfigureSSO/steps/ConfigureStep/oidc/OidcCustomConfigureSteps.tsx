@@ -1,6 +1,11 @@
+import { useClerk } from '@clerk/shared/react';
 import { type JSX } from 'react';
 
-import { localizationKeys } from '@/customizables';
+import { Col, localizationKeys, Text } from '@/customizables';
+import { ClipboardInput } from '@/elements/ClipboardInput';
+import { Form } from '@/elements/Form';
+import { Checkmark, Clipboard } from '@/icons';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
@@ -41,6 +46,13 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
 
 const OidcRedirectUriStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { frontendApi } = useClerk();
+  const redirectUri = `https://${frontendApi}/v1/oauth_callback`;
+  const redirectUriField = useFormControl('redirectUri', redirectUri, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.redirectUri.label'),
+    isRequired: false,
+  });
 
   return (
     <>
@@ -51,7 +63,28 @@ const OidcRedirectUriStep = (): JSX.Element => {
         <InnerStepCounter />
       </Step.Header>
 
-      <Step.Body />
+      <Step.Body>
+        <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
+          <Col sx={theme => ({ gap: theme.space.$1x5 })}>
+            <Text
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.paragraph')}
+            />
+          </Col>
+
+          <Form.ControlRow elementId={redirectUriField.id}>
+            <Form.CommonInputWrapper {...redirectUriField.props}>
+              <ClipboardInput
+                value={redirectUri}
+                readOnly
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
+              />
+            </Form.CommonInputWrapper>
+          </Form.ControlRow>
+        </Step.Section>
+      </Step.Body>
 
       <Step.Footer>
         <Step.Footer.Reset />
