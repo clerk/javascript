@@ -1,6 +1,6 @@
 import { constants } from '@clerk/backend/internal';
 
-const clerkProtectionOrigin = 'https://*.clerk.com';
+const clerkProtectionOrigin = 'https://*.protect.clerk.com';
 
 /**
  * Valid CSP directives according to the CSP Level 3 specification

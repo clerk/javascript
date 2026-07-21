@@ -31,11 +31,11 @@ describe('CSP Header Utils', () => {
 
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual(
-        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com",
       );
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com",
       );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
@@ -85,8 +85,8 @@ describe('CSP Header Utils', () => {
 
         for (const directiveName of ['script-src', 'connect-src', 'frame-src']) {
           const directiveSources = directives.find(d => d.startsWith(directiveName))?.split(' ');
-          expect(directiveSources).toContain('https://*.clerk.com');
-          expect(directiveSources).not.toContain('https://*.protect.clerk.com');
+          expect(directiveSources).toContain('https://*.protect.clerk.com');
+          expect(directiveSources).not.toContain('https://*.clerk.com');
           expect(directiveSources).not.toContain('https://*.client.protect.clerk.com');
         }
 
@@ -111,11 +111,11 @@ describe('CSP Header Utils', () => {
       const directives = headerValue.split('; ');
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual(
-        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com",
       );
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com",
       );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
@@ -260,7 +260,7 @@ describe('CSP Header Utils', () => {
 
       const directives = result.headers[0][1].split('; ');
       expect(directives).toContainEqual(
-        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com https://api.example.com`,
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com https://api.example.com`,
       );
 
       const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
@@ -270,7 +270,7 @@ describe('CSP Header Utils', () => {
       expect(imgSrcDirective).toContain('https://images.example.com');
 
       expect(directives).toContainEqual(
-        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com https://frames.example.com`,
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com https://frames.example.com`,
       );
     });
 
@@ -280,12 +280,12 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
 
       expect(directives).toContainEqual(
-        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com",
       );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
@@ -326,11 +326,11 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
 
       expect(directives).toContainEqual(
-        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com`,
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com`,
       );
       expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
       expect(directives).toContainEqual(
-        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com`,
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com`,
       );
 
       expect(directives).toContainEqual(`default-src 'self'`);
@@ -392,12 +392,12 @@ describe('CSP Header Utils', () => {
       const directives = result.headers[0][1].split('; ');
 
       expect(directives).toContainEqual(
-        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.clerk.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://img.clerk.com https://images.clerkstage.dev https://*.protect.clerk.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
-        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.clerk.com value1 value2",
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://*.protect.clerk.com value1 value2",
       );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
