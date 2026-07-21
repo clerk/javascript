@@ -395,7 +395,12 @@ function getCatchAllReplacements() {
        */
       pattern: /\*\*Examples\*\* ((?:`[^`]+`)(?: `[^`]+`)*)/g,
       replace: (/** @type {string} */ _match, /** @type {string} */ capturedGroup) => {
-        return `Examples: ${capturedGroup.split(' ').join(', ')}.`;
+        // Extract each backtick-delimited example and join them. Splitting on ' '
+        // instead would break apart examples that contain internal spaces (e.g. an
+        // array literal like `["/orgs/:slug", "/orgs/:slug/(.*)"]`), inserting a
+        // spurious comma mid-value.
+        const examples = capturedGroup.match(/`[^`]+`/g) ?? [];
+        return `Examples: ${examples.join(', ')}.`;
       },
     },
   ];
