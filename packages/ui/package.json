@@ -50,6 +50,11 @@
       "import": "./dist/themes/experimental.js",
       "default": "./dist/themes/experimental.js"
     },
+    "./experimental": {
+      "types": "./dist/experimental/index.d.ts",
+      "import": "./dist/experimental/index.js",
+      "default": "./dist/experimental/index.js"
+    },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
     "./register": {
       "import": {

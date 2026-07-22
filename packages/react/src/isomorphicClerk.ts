@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -284,6 +285,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       : [...ALLOWED_PROTOCOLS, ...(this.options.allowedRedirectProtocols ?? [])];
     windowNavigate(to, { allowedProtocols });
   };
+
+  /**
+   * Proxies to the inner Clerk instance's ModuleManager. Returns `undefined`
+   * before clerk-js has loaded; composed UI components read this getter
+   * (via `useClerk()`) to resolve dynamic-imported modules and fall back to a
+   * rejecting manager while it is `undefined`.
+   *
+   * @internal
+   */
+  public get __internal_moduleManager(): ModuleManager | undefined {
+    return this.clerkjs?.__internal_moduleManager;
+  }
 
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;

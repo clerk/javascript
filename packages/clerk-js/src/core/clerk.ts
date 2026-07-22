@@ -275,6 +275,20 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+  #moduleManager = new ModuleManager();
+
+  /**
+   * Cross-bundle handle to the ModuleManager. clerk-js is loaded standalone
+   * from the CDN with its own inlined @clerk/shared, so plain property access
+   * is the only channel that reliably crosses that boundary. This getter is
+   * how IsomorphicClerk forwards the manager to consumers that import
+   * @clerk/shared from node_modules (e.g. @clerk/react, @clerk/ui).
+   *
+   * @internal
+   */
+  get __internal_moduleManager(): ModuleManager {
+    return this.#moduleManager;
+  }
 
   get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
     if (!this.#queryClient) {
@@ -558,7 +572,7 @@ export class Clerk implements ClerkInterface {
             () => this,
             () => this.environment,
             this.#options,
-            new ModuleManager(),
+            this.#moduleManager,
           ),
       );
     }
