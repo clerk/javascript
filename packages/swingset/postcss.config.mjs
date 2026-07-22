@@ -15,9 +15,6 @@ const uiRoot = resolve(__dirname, '../ui');
 export default {
   plugins: {
     '@stylexjs/postcss-plugin': {
-      // `../ui/src/mosaic` is consumed from source (aliased), so point the scanner at it
-      // explicitly — auto-discovery only walks the package's own tree and direct deps.
-      include: [resolve(uiRoot, 'src/mosaic/**/*.{ts,tsx}')],
       useCSSLayers: true,
       babelConfig: {
         babelrc: false,
