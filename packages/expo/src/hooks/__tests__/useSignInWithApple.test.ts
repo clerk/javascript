@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -202,6 +203,58 @@ describe('useSignInWithApple', () => {
         unsafeMetadata: undefined,
       });
       expect(response.createdSessionId).toBe('existing-user-session-id');
+    });
+
+    test('should fall back to sign-in when the instance restricts sign-ups', async () => {
+      const mockIdentityToken = 'mock-identity-token';
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: mockIdentityToken,
+        fullName: null,
+      });
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Sign-ups restricted', {
+          data: [{ code: 'sign_up_mode_restricted', message: 'Sign-ups restricted' }],
+          status: 403,
+        }),
+      );
+
+      const mockSignInWithSession = { ...mockSignIn, createdSessionId: 'existing-user-session-id' };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInWithSession,
+        setActive: mockSetActive,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      const response = await result.current.startAppleAuthenticationFlow();
+
+      expect(mockSignInWithSession.create).toHaveBeenCalledWith({
+        strategy: 'oauth_token_apple',
+        token: mockIdentityToken,
+      });
+      expect(response.createdSessionId).toBe('existing-user-session-id');
+      expect(response.setActive).toBe(mockSetActive);
+    });
+
+    test('should rethrow sign-up errors that are not sign-up restrictions', async () => {
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: 'mock-identity-token',
+        fullName: null,
+      });
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Invalid token', {
+          data: [{ code: 'oauth_token_invalid', message: 'Invalid token' }],
+          status: 422,
+        }),
+      );
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow('Invalid token');
+      expect(mockSignIn.create).not.toHaveBeenCalled();
     });
 
     test('should handle user cancellation gracefully', async () => {

@@ -140,56 +140,55 @@ export async function executeGoogleAuthenticationFlow(
       };
     }
 
-    const { idToken, user } = response.data;
+    const { idToken } = response.data;
 
     try {
-      // Sign up first so the name is recorded; existing accounts fall through as transferable.
-      await signUp.create({
+      // Try to sign in with the Google One Tap strategy
+      await signIn.create({
         strategy: 'google_one_tap',
         token: idToken,
-        firstName: user?.givenName ?? undefined,
-        lastName: user?.familyName ?? undefined,
-        unsafeMetadata: params?.unsafeMetadata,
       });
 
-      // Check if the account already exists (needs to transfer to SignIn)
-      const accountAlreadyExists = signUp.verifications.externalAccount.status === 'transferable';
+      // Check if we need to transfer to SignUp (user doesn't exist yet)
+      const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
 
-      if (accountAlreadyExists) {
-        // Account exists - transfer to SignIn to complete authentication
-        await signIn.create({
+      if (userNeedsToBeCreated) {
+        // User doesn't exist - create a new SignUp with transfer
+        await signUp.create({
           transfer: true,
+          unsafeMetadata: params?.unsafeMetadata,
         });
 
         return {
-          createdSessionId: signIn.createdSessionId,
+          createdSessionId: signUp.createdSessionId,
           setActive,
           signIn,
           signUp,
         };
       }
 
-      // New user - the SignUp completed with the name attached
+      // User exists - return the SignIn session
       return {
-        createdSessionId: signUp.createdSessionId,
+        createdSessionId: signIn.createdSessionId,
         setActive,
         signIn,
         signUp,
       };
-    } catch (signUpError: unknown) {
-      // Handle the case where the account already exists (external_account_exists)
+    } catch (signInError: unknown) {
+      // Handle the case where the user doesn't exist (external_account_not_found)
       if (
-        isClerkAPIResponseError(signUpError) &&
-        signUpError.errors?.some(err => err.code === 'external_account_exists')
+        isClerkAPIResponseError(signInError) &&
+        signInError.errors?.some(err => err.code === 'external_account_not_found')
       ) {
-        // Account exists - sign in with the token directly
-        await signIn.create({
+        // User doesn't exist - create a new SignUp with the token
+        await signUp.create({
           strategy: 'google_one_tap',
           token: idToken,
+          unsafeMetadata: params?.unsafeMetadata,
         });
 
         return {
-          createdSessionId: signIn.createdSessionId,
+          createdSessionId: signUp.createdSessionId,
           setActive,
           signIn,
           signUp,
@@ -197,7 +196,7 @@ export async function executeGoogleAuthenticationFlow(
       }
 
       // Re-throw if it's a different error
-      throw signUpError;
+      throw signInError;
     }
   } catch (error: unknown) {
     // Handle Google Sign-In cancellation errors

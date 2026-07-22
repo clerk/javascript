@@ -1,4 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
@@ -106,14 +107,40 @@ export function useSignInWithApple() {
         return errorThrower.throw('No identity token received from Apple Sign-In.');
       }
 
-      // Sign up first so the name is recorded; existing accounts fall through as transferable.
-      await signUp.create({
-        strategy: 'oauth_token_apple',
-        token: identityToken,
-        firstName: fullName?.givenName ?? undefined,
-        lastName: fullName?.familyName ?? undefined,
-        unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
-      });
+      try {
+        // Sign-up first so a new user's name is recorded; an existing account
+        // resolves as transferable below instead of throwing.
+        await signUp.create({
+          strategy: 'oauth_token_apple',
+          token: identityToken,
+          firstName: fullName?.givenName ?? undefined,
+          lastName: fullName?.familyName ?? undefined,
+          unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
+        });
+      } catch (signUpError: unknown) {
+        // Restricted/waitlist instances reject sign-up creation before checking
+        // whether the account exists, so fall back to sign-in for existing users.
+        if (
+          isClerkAPIResponseError(signUpError) &&
+          signUpError.errors?.some(
+            err => err.code === 'sign_up_mode_restricted' || err.code === 'sign_up_restricted_waitlist',
+          )
+        ) {
+          await signIn.create({
+            strategy: 'oauth_token_apple',
+            token: identityToken,
+          });
+
+          return {
+            createdSessionId: signIn.createdSessionId,
+            setActive,
+            signIn,
+            signUp,
+          };
+        }
+
+        throw signUpError;
+      }
 
       // Check if the account already exists (needs to transfer to SignIn)
       const accountAlreadyExists = signUp.verifications.externalAccount.status === 'transferable';
