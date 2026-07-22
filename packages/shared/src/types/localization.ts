@@ -1602,8 +1602,10 @@ export type __internal_LocalizationResource = {
           };
           paragraph: LocalizationValue;
           scopes: {
-            description: LocalizationValue;
-            title: LocalizationValue;
+            addButton: LocalizationValue;
+            label: LocalizationValue;
+            optional: LocalizationValue;
+            placeholder: LocalizationValue;
           };
         };
       };

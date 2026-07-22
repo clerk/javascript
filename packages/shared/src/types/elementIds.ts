@@ -37,6 +37,7 @@ export type FieldId =
   | 'userInfoUrl'
   | 'clientId'
   | 'clientSecret'
+  | 'scopes'
   | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'

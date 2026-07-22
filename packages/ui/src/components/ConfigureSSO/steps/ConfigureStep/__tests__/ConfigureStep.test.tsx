@@ -12,7 +12,12 @@ import type { EnterpriseConnectionProviderType } from '../../../types';
 // left undefined so that footer self-hides in this isolated render.
 const contextState = vi.hoisted(() => ({
   provider: undefined as string | undefined,
-  enterpriseConnection: undefined as { id: string; oauthConfig: { discoveryUrl?: string } | null } | undefined,
+  enterpriseConnection: undefined as
+    | {
+        id: string;
+        oauthConfig: { discoveryUrl?: string; authUrl?: string; tokenUrl?: string; userInfoUrl?: string } | null;
+      }
+    | undefined,
 }));
 const updateConnection = vi.hoisted(() => vi.fn());
 
@@ -81,7 +86,7 @@ describe('ConfigureProviderStep', () => {
 
     // The OIDC sub-flow mounts on its first step. Before the fix this threw
     // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
-    expect(await screen.findByText(/create a new oidc application/i)).toBeInTheDocument();
+    expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
     const redirectUri = screen.getByRole('textbox') as HTMLInputElement;
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri.value).toMatch(/^https:\/\/.+\/v1\/oauth_callback$/);
@@ -156,7 +161,7 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
-  it('saves credentials and displays the required OIDC scopes', async () => {
+  it('saves credentials and lets the user manage optional OIDC scopes', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
     updateConnection.mockReset();
@@ -181,6 +186,11 @@ describe('ConfigureProviderStep', () => {
 
     expect(screen.getByText('openid')).toBeInTheDocument();
     expect(screen.getByText('profile')).toBeInTheDocument();
+    expect(screen.getByText('Optional')).toBeInTheDocument();
+
+    const scopeField = document.querySelector('input[name="scopes"]') as HTMLInputElement;
+    await userEvent.type(scopeField, 'email');
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
     expect(screen.getByText('email')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
@@ -190,6 +200,31 @@ describe('ConfigureProviderStep', () => {
         oidc: { clientId: 'client_123', clientSecret: 'secret_456' },
       });
     });
+  });
+
+  it('populates manual endpoints resolved from discovery', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        discoveryUrl: 'https://idp.example/.well-known/openid-configuration',
+        authUrl: 'https://idp.example/authorize',
+        tokenUrl: 'https://idp.example/token',
+        userInfoUrl: 'https://idp.example/userinfo',
+      },
+    };
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    const [, manualMode] = await screen.findAllByRole('radio');
+    await userEvent.click(manualMode);
+
+    expect(document.querySelector('input[name="authUrl"]')).toHaveValue('https://idp.example/authorize');
+    expect(document.querySelector('input[name="tokenUrl"]')).toHaveValue('https://idp.example/token');
+    expect(document.querySelector('input[name="userInfoUrl"]')).toHaveValue('https://idp.example/userinfo');
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

@@ -278,11 +278,12 @@ export const enUS: LocalizationResource = {
             label: 'Client secret',
             placeholder: 'Paste client secret here...',
           },
-          paragraph:
-            'In your identity provider’s OIDC application, retrieve your application credentials and paste them below.',
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
           scopes: {
-            description: 'Make sure your application requests the following scopes:',
-            title: 'Required scopes',
+            addButton: 'Add',
+            label: 'Scopes',
+            optional: 'Optional',
+            placeholder: 'Paste scope here...',
           },
         },
         endpointsStep: {
