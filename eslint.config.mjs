@@ -7,6 +7,7 @@ import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
 import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
+import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
@@ -539,7 +540,19 @@ export default tseslint.config([
     name: 'packages/ui/mosaic',
     files: ['packages/ui/src/mosaic/**/*'],
     ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    plugins: {
+      '@stylexjs': pluginStylex,
+    },
     rules: {
+      '@stylexjs/enforce-extension': 'error',
+      '@stylexjs/no-legacy-contextual-styles': 'error',
+      '@stylexjs/no-lookahead-selectors': 'error',
+      '@stylexjs/no-nonstandard-styles': 'error',
+      '@stylexjs/no-conflicting-props': 'error',
+      '@stylexjs/no-unused': 'error',
+      '@stylexjs/sort-keys': 'error',
+      '@stylexjs/valid-shorthands': 'error',
+      '@stylexjs/valid-styles': 'error',
       // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
       // the outer component. Both rules only see the empty inner element and always report.
       'jsx-a11y/heading-has-content': 'off',
@@ -560,6 +573,17 @@ export default tseslint.config([
             "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
         },
       ],
+    },
+  },
+  {
+    // StyleX `create()` files author conditions raw (`@media (hover: hover)`, `:hover`) — StyleX
+    // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
+    // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
+    // `@stylexjs/*` rules from the mosaic block still cover these files.
+    name: 'packages/ui/mosaic - stylex styles',
+    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
     },
   },
   {

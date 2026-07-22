@@ -61,9 +61,7 @@ export function OrganizationProfileDeleteSectionView({
             <Button
               intent='destructive'
               {...props}
-              sx={{
-                flexShrink: 0,
-              }}
+              style={{ flexShrink: 0 }}
               type='button'
             >
               Delete organization

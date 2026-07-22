@@ -61,9 +61,7 @@ export function OrganizationProfileLeaveSectionView({
             <Button
               intent='destructive'
               {...props}
-              sx={{
-                flexShrink: 0,
-              }}
+              style={{ flexShrink: 0 }}
             >
               Leave organization
             </Button>
