@@ -99,40 +99,44 @@ export function useSignInWithApple() {
         nonce,
       });
 
-      // Extract the identity token from the credential
-      const { identityToken } = credential;
+      // Apple only returns the name on the first authorization, so it must be
+      // captured now and passed straight into sign-up or it's lost for good.
+      const { identityToken, fullName } = credential;
 
       if (!identityToken) {
         return errorThrower.throw('No identity token received from Apple Sign-In.');
       }
 
-      // Create a SignIn with the Apple ID token strategy
-      await signIn.create({
+      // Sign-up first so a new user's name is recorded; an existing account
+      // resolves as transferable below instead of throwing.
+      await signUp.create({
         strategy: 'oauth_token_apple',
         token: identityToken,
+        firstName: fullName?.givenName ?? undefined,
+        lastName: fullName?.familyName ?? undefined,
+        unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
       });
 
-      // Check if we need to transfer to SignUp (user doesn't exist yet)
-      const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
+      // Check if the account already exists (needs to transfer to SignIn)
+      const accountAlreadyExists = signUp.verifications.externalAccount.status === 'transferable';
 
-      if (userNeedsToBeCreated) {
-        // User doesn't exist - create a new SignUp with transfer
-        await signUp.create({
+      if (accountAlreadyExists) {
+        // Account exists - transfer to SignIn to complete authentication
+        await signIn.create({
           transfer: true,
-          unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
         });
 
         return {
-          createdSessionId: signUp.createdSessionId,
+          createdSessionId: signIn.createdSessionId,
           setActive,
           signIn,
           signUp,
         };
       }
 
-      // User exists - return the SignIn session
+      // New user - the SignUp completed with the name attached
       return {
-        createdSessionId: signIn.createdSessionId,
+        createdSessionId: signUp.createdSessionId,
         setActive,
         signIn,
         signUp,

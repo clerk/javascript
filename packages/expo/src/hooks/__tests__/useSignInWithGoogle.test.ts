@@ -94,14 +94,16 @@ describe('useSignInWithGoogle', () => {
   const mockSignIn = {
     create: vi.fn(),
     createdSessionId: 'test-session-id',
-    firstFactorVerification: {
-      status: 'verified',
-    },
   };
 
   const mockSignUp = {
     create: vi.fn(),
-    createdSessionId: null,
+    createdSessionId: 'new-user-session-id',
+    verifications: {
+      externalAccount: {
+        status: 'unverified',
+      },
+    },
   };
 
   const mockSetActive = vi.fn();
@@ -134,21 +136,33 @@ describe('useSignInWithGoogle', () => {
       expect(typeof result.current.startGoogleAuthenticationFlow).toBe('function');
     });
 
-    test('should successfully sign in existing user', async () => {
+    test('should sign up a new user and pass through their name', async () => {
       const mockIdToken = 'mock-id-token';
       mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
         type: 'success',
-        data: { idToken: mockIdToken },
+        data: {
+          idToken: mockIdToken,
+          user: {
+            id: 'google-user-id',
+            email: 'jane@example.com',
+            name: 'Jane Doe',
+            givenName: 'Jane',
+            familyName: 'Doe',
+            photo: null,
+          },
+        },
       });
       mocks.isSuccessResponse.mockReturnValue(true);
 
-      mockSignIn.create.mockResolvedValue(undefined);
-      mockSignIn.firstFactorVerification.status = 'verified';
-      mockSignIn.createdSessionId = 'test-session-id';
+      mockSignUp.create.mockResolvedValue(undefined);
+      mockSignUp.verifications.externalAccount.status = 'unverified';
+      mockSignUp.createdSessionId = 'new-user-session-id';
 
       const { result } = renderHook(() => useSignInWithGoogle());
 
-      const response = await result.current.startGoogleAuthenticationFlow();
+      const response = await result.current.startGoogleAuthenticationFlow({
+        unsafeMetadata: { source: 'test' },
+      });
 
       expect(mocks.ClerkGoogleOneTapSignIn.configure).toHaveBeenCalledWith({
         webClientId: 'mock-web-client-id.apps.googleusercontent.com',
@@ -156,32 +170,46 @@ describe('useSignInWithGoogle', () => {
       expect(mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn).toHaveBeenCalledWith({
         nonce: 'mock-uuid-nonce',
       });
-      expect(mockSignIn.create).toHaveBeenCalledWith({
+      expect(mockSignUp.create).toHaveBeenCalledWith({
         strategy: 'google_one_tap',
         token: mockIdToken,
+        firstName: 'Jane',
+        lastName: 'Doe',
+        unsafeMetadata: { source: 'test' },
       });
-      expect(response.createdSessionId).toBe('test-session-id');
+      expect(mockSignIn.create).not.toHaveBeenCalled();
+      expect(response.createdSessionId).toBe('new-user-session-id');
       expect(response.setActive).toBe(mockSetActive);
     });
 
-    test('should handle transfer flow for new user', async () => {
+    test('should transfer to sign-in when the account already exists', async () => {
       const mockIdToken = 'mock-id-token';
       mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
         type: 'success',
-        data: { idToken: mockIdToken },
+        data: {
+          idToken: mockIdToken,
+          user: {
+            id: 'google-user-id',
+            email: 'jane@example.com',
+            name: 'Jane Doe',
+            givenName: 'Jane',
+            familyName: 'Doe',
+            photo: null,
+          },
+        },
       });
       mocks.isSuccessResponse.mockReturnValue(true);
 
-      mockSignIn.create.mockResolvedValue(undefined);
-      mockSignIn.firstFactorVerification.status = 'transferable';
+      mockSignUp.create.mockResolvedValue(undefined);
+      mockSignUp.verifications.externalAccount.status = 'transferable';
 
-      const mockSignUpWithSession = { ...mockSignUp, createdSessionId: 'new-user-session-id' };
+      const mockSignInWithSession = { ...mockSignIn, createdSessionId: 'existing-user-session-id' };
       mocks.useClerk.mockReturnValue({
         loaded: true,
         setActive: mockSetActive,
         client: {
-          signIn: mockSignIn,
-          signUp: mockSignUpWithSession,
+          signIn: mockSignInWithSession,
+          signUp: mockSignUp,
         },
       });
 
@@ -191,15 +219,17 @@ describe('useSignInWithGoogle', () => {
         unsafeMetadata: { source: 'test' },
       });
 
-      expect(mockSignIn.create).toHaveBeenCalledWith({
+      expect(mockSignUp.create).toHaveBeenCalledWith({
         strategy: 'google_one_tap',
         token: mockIdToken,
-      });
-      expect(mockSignUpWithSession.create).toHaveBeenCalledWith({
-        transfer: true,
+        firstName: 'Jane',
+        lastName: 'Doe',
         unsafeMetadata: { source: 'test' },
       });
-      expect(response.createdSessionId).toBe('new-user-session-id');
+      expect(mockSignInWithSession.create).toHaveBeenCalledWith({
+        transfer: true,
+      });
+      expect(response.createdSessionId).toBe('existing-user-session-id');
     });
 
     test('should handle user cancellation gracefully', async () => {
@@ -245,36 +275,46 @@ describe('useSignInWithGoogle', () => {
       expect(response.createdSessionId).toBe(null);
     });
 
-    test('should fall back to signUp when external_account_not_found error occurs', async () => {
+    test('should fall back to sign-in when external_account_exists error occurs', async () => {
       const mockIdToken = 'mock-id-token';
       mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
         type: 'success',
-        data: { idToken: mockIdToken },
+        data: {
+          idToken: mockIdToken,
+          user: {
+            id: 'google-user-id',
+            email: 'jane@example.com',
+            name: 'Jane Doe',
+            givenName: 'Jane',
+            familyName: 'Doe',
+            photo: null,
+          },
+        },
       });
       mocks.isSuccessResponse.mockReturnValue(true);
 
-      // Mock signIn.create to throw external_account_not_found Clerk error
+      // Mock signUp.create to throw external_account_exists Clerk error
       const externalAccountError = {
-        errors: [{ code: 'external_account_not_found' }],
-        message: 'External account not found',
+        errors: [{ code: 'external_account_exists' }],
+        message: 'External account exists',
       };
-      mockSignIn.create.mockRejectedValue(externalAccountError);
+      mockSignUp.create.mockRejectedValue(externalAccountError);
 
       // Mock isClerkAPIResponseError to return true for this error
       mocks.isClerkAPIResponseError.mockReturnValue(true);
 
-      // Mock signUp.create to succeed with a new session
-      const mockSignUpWithSession = {
-        ...mockSignUp,
+      // Mock signIn.create to succeed with a new session
+      const mockSignInWithSession = {
+        ...mockSignIn,
         create: vi.fn().mockResolvedValue(undefined),
-        createdSessionId: 'new-signup-session-id',
+        createdSessionId: 'existing-user-session-id',
       };
       mocks.useClerk.mockReturnValue({
         loaded: true,
         setActive: mockSetActive,
         client: {
-          signIn: mockSignIn,
-          signUp: mockSignUpWithSession,
+          signIn: mockSignInWithSession,
+          signUp: mockSignUp,
         },
       });
 
@@ -284,21 +324,23 @@ describe('useSignInWithGoogle', () => {
         unsafeMetadata: { referral: 'google' },
       });
 
-      // Verify signIn.create was called first
-      expect(mockSignIn.create).toHaveBeenCalledWith({
+      // Verify signUp.create was called first
+      expect(mockSignUp.create).toHaveBeenCalledWith({
         strategy: 'google_one_tap',
         token: mockIdToken,
-      });
-
-      // Verify signUp.create was called as fallback with the token
-      expect(mockSignUpWithSession.create).toHaveBeenCalledWith({
-        strategy: 'google_one_tap',
-        token: mockIdToken,
+        firstName: 'Jane',
+        lastName: 'Doe',
         unsafeMetadata: { referral: 'google' },
       });
 
+      // Verify signIn.create was called as fallback with the token
+      expect(mockSignInWithSession.create).toHaveBeenCalledWith({
+        strategy: 'google_one_tap',
+        token: mockIdToken,
+      });
+
       // Verify the session was created
-      expect(response.createdSessionId).toBe('new-signup-session-id');
+      expect(response.createdSessionId).toBe('existing-user-session-id');
       expect(response.setActive).toBe(mockSetActive);
     });
   });
