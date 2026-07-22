@@ -155,7 +155,7 @@
     },
     "lint:publint": {
       "dependsOn": ["build"],
-      "inputs": ["dist/**", "package.json"],
+      "inputs": ["dist/**", "dist-mosaic/**", "package.json"],
       "outputs": []
     },
     "lint:attw": {

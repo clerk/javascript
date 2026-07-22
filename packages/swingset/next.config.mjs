@@ -1,3 +1,4 @@
+import stylexPlugin from '@stylexjs/unplugin/webpack';
 import createMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -57,6 +58,22 @@ const nextConfig = {
     };
     excludeRawQuery(config.module.rules);
     config.module.rules.push({ resourceQuery: /raw/, type: 'asset/source' });
+
+    // Swingset consumes Mosaic from source, so StyleX (`defineVars`/`create`/`props`) must be
+    // compiled here — otherwise the calls hit the runtime and throw. The unplugin transforms the
+    // StyleX *JS only* (calls → static atom references), keeping SWC intact so `next/font` and the
+    // Emotion transform keep working. The CSS is emitted separately by `@stylexjs/postcss-plugin`
+    // (`@stylex` in `globals.css`), so this runs in extraction mode (no `runtimeInjection`); both
+    // share the same StyleX babel version/options so the atom hashes match, and the plugin's dev
+    // "no CSS asset" warning is expected and harmless. `useCSSLayers: true` matches the published
+    // build so atoms carry StyleX's `@layer priorityN` precedence.
+    config.plugins.push(
+      stylexPlugin({
+        dev: process.env.NODE_ENV !== 'production',
+        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
+        useCSSLayers: true,
+      }),
+    );
 
     config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
