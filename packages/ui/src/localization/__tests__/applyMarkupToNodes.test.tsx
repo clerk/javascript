@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import type { Tokens } from '../applyTokensToString';
 import { applyMarkupAndTokens, stripMarkup } from '../applyMarkupToNodes';
+import type { Tokens } from '../applyTokensToString';
 
 const html = (node: ReactNode) => renderToStaticMarkup(node as any);
 

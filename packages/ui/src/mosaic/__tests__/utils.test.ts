@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { defaultMosaicVariables, resolveVariables } from '../variables';
 import { alpha } from '../utils';
+import { defaultMosaicVariables, resolveVariables } from '../variables';
 
 describe('alpha', () => {
   it('produces a color-mix expression', () => {

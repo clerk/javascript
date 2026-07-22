@@ -36,7 +36,7 @@ function splitSelectorList(selectorText: string): string[] {
 function hasClerkWithAdjacency(selector: string): boolean {
   // Pattern: .cl-class followed by combinator/space and another selector
   // Or: another selector followed by combinator/space and .cl-class
-  const clerkWithDescendant = /\.cl-[A-Za-z0-9_-]+[\s>+~]+[.#\w\[:]/;
+  const clerkWithDescendant = /\.cl-[A-Za-z0-9_-]+[\s>+~]+[.#\w[:]/;
   const descendantWithClerk = /[.#\w\]:][\s>+~]+\.cl-[A-Za-z0-9_-]+/;
 
   return clerkWithDescendant.test(selector) || descendantWithClerk.test(selector);

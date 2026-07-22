@@ -236,18 +236,18 @@ describe('useSlot / slot sugar', () => {
 describe('type inference', () => {
   it('infers variant prop names and values', () => {
     // Type-only assertions — never executed, validated by `tsc` during type-check.
-    () => {
+    function _typeAssertions() {
       useRecipe(buttonRecipe, { variants: { color: 'danger', size: 'sm', loading: true } });
       // @ts-expect-error 'nope' is not a valid `color`
       useRecipe(buttonRecipe, { variants: { color: 'nope' } });
       // @ts-expect-error `loading` is a boolean variant, not a string
       useRecipe(buttonRecipe, { variants: { loading: 'true' } });
-    };
+    }
     expect(true).toBe(true);
   });
 
   it('defaultVariants only accepts valid variant keys and values', () => {
-    () => {
+    function _typeAssertions() {
       defineSlotRecipe({
         slot: 'button',
         variants: { color: { primary: {}, danger: {} } },
@@ -260,12 +260,12 @@ describe('type inference', () => {
         // @ts-expect-error 'unknown' is not a declared variant axis
         defaultVariants: { unknown: 'primary' },
       });
-    };
+    }
     expect(true).toBe(true);
   });
 
   it('compoundVariants entries only accept valid variant keys and values', () => {
-    () => {
+    function _typeAssertions() {
       defineSlotRecipe({
         slot: 'button',
         variants: { color: { primary: {}, danger: {} }, size: { sm: {}, md: {} } },
@@ -282,7 +282,7 @@ describe('type inference', () => {
           { unknown: 'primary', css: {} },
         ],
       });
-    };
+    }
     expect(true).toBe(true);
   });
 });
