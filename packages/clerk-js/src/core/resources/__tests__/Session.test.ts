@@ -2,7 +2,7 @@ import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { clerkMock, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
 import { TokenId } from '@/utils/tokenId';
 
 import { eventBus } from '../../events';
@@ -1841,6 +1841,95 @@ describe('Session', () => {
 
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       expect(fetchSpy.mock.calls[0][0].body).not.toHaveProperty('forceOrigin');
+    });
+  });
+
+  describe('sends tab_state in /tokens request body', () => {
+    let originalHasFocusDescriptor: PropertyDescriptor | undefined;
+    let originalVisibilityStateDescriptor: PropertyDescriptor | undefined;
+
+    const createSession = () =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+    const setDocumentState = (hasFocus: boolean, visibilityState: DocumentVisibilityState) => {
+      Object.defineProperty(document, 'hasFocus', { value: () => hasFocus, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { value: visibilityState, configurable: true });
+    };
+
+    beforeEach(() => {
+      originalHasFocusDescriptor = Object.getOwnPropertyDescriptor(document, 'hasFocus');
+      originalVisibilityStateDescriptor = Object.getOwnPropertyDescriptor(document, 'visibilityState');
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+      mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+      vi.unstubAllGlobals();
+      if (originalHasFocusDescriptor) {
+        Object.defineProperty(document, 'hasFocus', originalHasFocusDescriptor);
+      } else {
+        Reflect.deleteProperty(document, 'hasFocus');
+      }
+      if (originalVisibilityStateDescriptor) {
+        Object.defineProperty(document, 'visibilityState', originalVisibilityStateDescriptor);
+      } else {
+        Reflect.deleteProperty(document, 'visibilityState');
+      }
+    });
+
+    it.each([
+      ['focused', true, 'hidden'],
+      ['visible', false, 'visible'],
+      ['hidden', false, 'hidden'],
+    ])('serializes tab_state=%s', async (tabState, hasFocus, visibilityState) => {
+      setDocumentState(hasFocus, visibilityState as DocumentVisibilityState);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe(`organization_id=&tab_state=${tabState}`);
+    });
+
+    it('omits tab_state when document is undefined', async () => {
+      vi.stubGlobal('document', undefined);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus is not a function', async () => {
+      Object.defineProperty(document, 'hasFocus', { value: undefined, configurable: true });
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus throws', async () => {
+      Object.defineProperty(document, 'hasFocus', {
+        value: () => {
+          throw new Error('focus unavailable');
+        },
+        configurable: true,
+      });
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
     });
   });
 

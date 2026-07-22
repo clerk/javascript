@@ -54,6 +54,26 @@ import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenF
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
+const getTabState = (): 'focused' | 'visible' | 'hidden' | undefined => {
+  try {
+    if (typeof document === 'undefined' || typeof document.hasFocus !== 'function') {
+      return undefined;
+    }
+
+    if (document.hasFocus()) {
+      return 'focused';
+    }
+
+    if (document.visibilityState === 'visible') {
+      return 'visible';
+    }
+
+    return 'hidden';
+  } catch {
+    return undefined;
+  }
+};
+
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
 
@@ -485,10 +505,12 @@ export class Session extends BaseResource implements SessionResource {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
     const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const tabState = template ? undefined : getTabState();
     const params: Record<string, string | null> = template
       ? {}
       : {
           organizationId: organizationId ?? null,
+          ...(tabState ? { tabState } : {}),
           ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
