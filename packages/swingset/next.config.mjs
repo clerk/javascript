@@ -73,8 +73,9 @@ const nextConfig = {
 
     // Swingset consumes Mosaic from source, so StyleX (`defineVars`/`create`/`props`) must be
     // compiled here — otherwise the calls hit the runtime and throw. The plugin transforms the
-    // aliased `../ui/src/mosaic` files and appends the collected CSS into `globals.css`. Plain
-    // rules (`useCSSLayers: false`) so they coexist with swingset's own unlayered Tailwind CSS.
+    // aliased `../ui/src/mosaic` files and appends the collected CSS into `globals.css`. Match the
+    // published build (`tsdown.mosaic.config.mts`): `useCSSLayers: true` so atoms carry StyleX's
+    // `@layer priorityN` precedence, the same CSS real consumers import.
     // The unplugin only compiles the StyleX *JS* here (turns `defineVars`/`create`/`props`
     // into static atom references so nothing hits the runtime). It keeps SWC intact, so
     // `next/font` and the Emotion transform keep working. The actual CSS is emitted by the
@@ -86,7 +87,7 @@ const nextConfig = {
       stylexPlugin({
         dev: process.env.NODE_ENV !== 'production',
         unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
-        useCSSLayers: false,
+        useCSSLayers: true,
         lightningcssOptions: { targets: stylexTargets },
       }),
     );

@@ -18,7 +18,7 @@ export default {
       // `../ui/src/mosaic` is consumed from source (aliased), so point the scanner at it
       // explicitly — auto-discovery only walks the package's own tree and direct deps.
       include: [resolve(uiRoot, 'src/mosaic/**/*.{ts,tsx}')],
-      useCSSLayers: false,
+      useCSSLayers: true,
       babelConfig: {
         babelrc: false,
         configFile: false,
