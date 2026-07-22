@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import React, { type JSX } from 'react';
 
 import {
@@ -71,8 +70,8 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
 
 const OidcRedirectUriStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-  const { frontendApi } = useClerk();
-  const redirectUri = `https://${frontendApi}/v1/oauth_callback`;
+  const { enterpriseConnection } = useConfigureSSO();
+  const redirectUri = enterpriseConnection?.oauthConfig?.redirectUri ?? '';
   const redirectUriField = useFormControl('redirectUri', redirectUri, {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.redirectUri.label'),

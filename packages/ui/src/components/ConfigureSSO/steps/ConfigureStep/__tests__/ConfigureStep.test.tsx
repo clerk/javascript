@@ -15,7 +15,13 @@ const contextState = vi.hoisted(() => ({
   enterpriseConnection: undefined as
     | {
         id: string;
-        oauthConfig: { discoveryUrl?: string; authUrl?: string; tokenUrl?: string; userInfoUrl?: string } | null;
+        oauthConfig: {
+          redirectUri?: string;
+          discoveryUrl?: string;
+          authUrl?: string;
+          tokenUrl?: string;
+          userInfoUrl?: string;
+        } | null;
       }
     | undefined,
 }));
@@ -79,7 +85,10 @@ describe('ConfigureProviderStep', () => {
 
   it('renders the OIDC configure steps for a derived provider key without throwing', async () => {
     contextState.provider = 'oidc_clerk_dev';
-    contextState.enterpriseConnection = undefined;
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: { redirectUri: 'https://instance.example/v1/oauth_callback' },
+    };
     const { wrapper } = await createFixtures();
 
     const { userEvent } = renderStep(wrapper);
@@ -89,7 +98,7 @@ describe('ConfigureProviderStep', () => {
     expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
     const redirectUri = screen.getByRole('textbox') as HTMLInputElement;
     expect(redirectUri).toHaveAttribute('readonly');
-    expect(redirectUri.value).toMatch(/^https:\/\/.+\/v1\/oauth_callback$/);
+    expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 

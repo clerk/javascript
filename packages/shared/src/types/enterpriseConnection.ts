@@ -100,6 +100,7 @@ export interface EnterpriseOAuthConfigJSON {
   name: string;
   provider_key?: string;
   client_id: string;
+  redirect_uri?: string;
   discovery_url?: string;
   auth_url?: string;
   token_url?: string;
@@ -115,6 +116,7 @@ export interface EnterpriseOAuthConfigResource {
   name: string;
   clientId: string;
   providerKey?: string;
+  redirectUri?: string;
   discoveryUrl?: string;
   authUrl?: string;
   tokenUrl?: string;
