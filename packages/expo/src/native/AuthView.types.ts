@@ -7,6 +7,9 @@
  */
 export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
 
+/** Android presentation used by the native authentication view. */
+export type AuthViewPresentation = 'inline' | 'bottomSheet';
+
 /**
  * Props for the AuthView component.
  *
@@ -25,6 +28,17 @@ export interface AuthViewProps {
    * @default 'signInOrUp'
    */
   mode?: AuthViewMode;
+
+  /**
+   * Android presentation for the native authentication view.
+   *
+   * `'inline'` preserves the standard behavior and fills the parent container.
+   * `'bottomSheet'` presents the same Clerk flow in a Material bottom sheet.
+   * This option is ignored on iOS, where the parent controls presentation.
+   *
+   * @default 'inline'
+   */
+  presentation?: AuthViewPresentation;
 
   /**
    * Whether the authentication view can be dismissed by the user.

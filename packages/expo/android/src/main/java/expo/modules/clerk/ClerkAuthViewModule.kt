@@ -2,9 +2,19 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
@@ -30,6 +40,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   var isDismissible: Boolean = true
   var logoMaxHeight: Float? = null
   var mode: String? = null
+  var presentation: String = "inline"
 
   private val onAuthEvent by EventDispatcher()
 
@@ -61,9 +72,37 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   }
 
   @Composable
+  @OptIn(ExperimentalMaterial3Api::class)
   override fun Content() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
+    debugLog(
+      TAG,
+      "setupView - mode: $mode, presentation: $presentation, isDismissible: $isDismissible, activity: $activity",
+    )
 
+    if (presentation != "bottomSheet") {
+      ClerkAuthView()
+      return
+    }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    ModalBottomSheet(
+      onDismissRequest = ::sendDismissEvent,
+      sheetState = sheetState,
+      containerColor = clerkBackgroundColor(),
+    ) {
+      BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val authHeight =
+          if (sheetState.currentValue == SheetValue.Expanded) maxHeight else maxHeight / 2
+
+        Box(modifier = Modifier.fillMaxWidth().height(authHeight)) {
+          ClerkAuthView()
+        }
+      }
+    }
+  }
+
+  @Composable
+  private fun ClerkAuthView() {
     AuthView(
       modifier = Modifier.fillMaxSize(),
       clerkTheme = authTheme(),
@@ -74,6 +113,17 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
         sendDismissEvent()
       },
     )
+  }
+
+  @Composable
+  private fun clerkBackgroundColor(): Color {
+    val isDarkMode = isSystemInDarkTheme()
+    val customTheme = Clerk.customTheme
+    val modeColors = if (isDarkMode) customTheme?.darkColors else customTheme?.lightColors
+
+    return modeColors?.background
+      ?: customTheme?.colors?.background
+      ?: if (isDarkMode) Color(0xFF131316) else Color.White
   }
 
   private fun authTheme(): ClerkTheme? {
@@ -117,6 +167,10 @@ class ClerkAuthViewModule : Module() {
 
       Prop("logoMaxHeight") { view: ClerkAuthNativeView, logoMaxHeight: Float? ->
         view.logoMaxHeight = logoMaxHeight
+      }
+
+      Prop("presentation") { view: ClerkAuthNativeView, presentation: String? ->
+        view.presentation = presentation ?: "inline"
       }
 
       OnViewDidUpdateProps { view: ClerkAuthNativeView ->
