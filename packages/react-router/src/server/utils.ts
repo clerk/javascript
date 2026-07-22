@@ -141,29 +141,3 @@ export function getResponseClerkState(
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
 };
-
-/**
- * Patches request to avoid duplex issues with unidici
- * For more information, see:
- * https://github.com/nodejs/node/issues/46221
- * https://github.com/whatwg/fetch/pull/1457
- * @internal
- */
-export const patchRequest = (request: Request) => {
-  // Omit `signal` from the clone: Node 24's bundled undici tightened the
-  // instanceof AbortSignal check, which rejects cross-realm signals (e.g.
-  // those carried by framework Request subclasses).
-  const clonedRequest = new Request(request.url, {
-    headers: request.headers,
-    method: request.method,
-    redirect: request.redirect,
-    cache: request.cache,
-  });
-
-  // If duplex is not set, set it to 'half' to avoid duplex issues with unidici
-  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null && !('duplex' in clonedRequest)) {
-    (clonedRequest as unknown as { duplex: 'half' }).duplex = 'half';
-  }
-
-  return clonedRequest;
-};

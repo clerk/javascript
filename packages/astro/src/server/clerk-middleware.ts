@@ -18,6 +18,7 @@ import {
 import { htmlSafeJson } from '@clerk/shared/htmlSafeJson';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
@@ -83,7 +84,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     await initCloudflareEnv();
 
-    const clerkRequest = createClerkRequest(context.request);
+    const patchedRequest = patchRequest(context.request);
+    const clerkRequest = createClerkRequest(patchedRequest);
 
     // Resolve keyless URLs per-request in development
     let keylessClaimUrl: string | undefined;
