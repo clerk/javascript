@@ -34,7 +34,6 @@ export type {
 } from '@clerk/backend';
 
 export { clerkMiddleware } from './clerk-middleware';
-export { createRouteMatcher } from './route-matcher';
 export { clerkClient } from './clerk-client';
 
 /**
