@@ -84,37 +84,36 @@ export const OrganizationMembers = withCardStateProvider(() => {
               <TabsList sx={t => ({ gap: t.space.$2 })}>
                 {canReadMemberships && (
                   <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
-                    {!!memberships?.count && (
-                      <NotificationCountBadge
-                        shouldAnimate={!query}
-                        notificationCount={memberships.count}
-                        colorScheme='outline'
-                      />
-                    )}
+                    <NotificationCountBadge
+                      shouldAnimate={false}
+                      isLoading={!memberships?.data || memberships.isLoading}
+                      notificationCount={memberships?.count ?? 0}
+                      colorScheme='outline'
+                    />
                   </Tab>
                 )}
                 {canManageMemberships && (
                   <Tab
                     localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
                   >
-                    {invitations?.data && !invitations.isLoading && (
-                      <NotificationCountBadge
-                        notificationCount={invitations.count}
-                        colorScheme='outline'
-                      />
-                    )}
+                    <NotificationCountBadge
+                      shouldAnimate={false}
+                      isLoading={!invitations?.data || invitations.isLoading}
+                      notificationCount={invitations?.count ?? 0}
+                      colorScheme='outline'
+                    />
                   </Tab>
                 )}
                 {canManageMemberships && isDomainsEnabled && (
                   <Tab
                     localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}
                   >
-                    {membershipRequests?.data && !membershipRequests.isLoading && (
-                      <NotificationCountBadge
-                        notificationCount={membershipRequests.count}
-                        colorScheme='outline'
-                      />
-                    )}
+                    <NotificationCountBadge
+                      shouldAnimate={false}
+                      isLoading={!membershipRequests?.data || membershipRequests.isLoading}
+                      notificationCount={membershipRequests?.count ?? 0}
+                      colorScheme='outline'
+                    />
                   </Tab>
                 )}
               </TabsList>

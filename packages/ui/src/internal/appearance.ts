@@ -647,6 +647,7 @@ export type ElementsConfig = {
   notificationBadge: WithOptions;
   buttonArrowIcon: WithOptions;
   spinner: WithOptions;
+  skeleton: WithOptions;
 
   apiKeys: WithOptions;
   apiKeysHeader: WithOptions;
