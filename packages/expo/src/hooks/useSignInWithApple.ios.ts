@@ -108,8 +108,7 @@ export function useSignInWithApple() {
       }
 
       try {
-        // Sign-up first so a new user's name is recorded; an existing account
-        // resolves as transferable below instead of throwing.
+        // Sign-up first so a new user's name is recorded; an existing account resolves as transferable below.
         await signUp.create({
           strategy: 'oauth_token_apple',
           token: identityToken,
@@ -118,8 +117,7 @@ export function useSignInWithApple() {
           unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
         });
       } catch (signUpError: unknown) {
-        // Restricted/waitlist instances reject sign-up creation before checking
-        // whether the account exists, so fall back to sign-in for existing users.
+        // Restricted/waitlist instances reject sign-up before the account-exists check, so existing users sign in.
         if (
           isClerkAPIResponseError(signUpError) &&
           signUpError.errors?.some(
@@ -142,11 +140,9 @@ export function useSignInWithApple() {
         throw signUpError;
       }
 
-      // Check if the account already exists (needs to transfer to SignIn)
       const accountAlreadyExists = signUp.verifications.externalAccount.status === 'transferable';
 
       if (accountAlreadyExists) {
-        // Account exists - transfer to SignIn to complete authentication
         await signIn.create({
           transfer: true,
         });
@@ -159,7 +155,6 @@ export function useSignInWithApple() {
         };
       }
 
-      // New user - the SignUp completed with the name attached
       return {
         createdSessionId: signUp.createdSessionId,
         setActive,
