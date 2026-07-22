@@ -1,5 +1,27 @@
-import { descriptors, localizationKeys, Span } from '../customizables';
-import { common, type PropsOfComponent } from '../styledSystem';
+import { Badge, descriptors, localizationKeys, Span } from '../customizables';
+import { animations, common, type PropsOfComponent } from '../styledSystem';
+
+export type LoadingBadgeProps = Omit<PropsOfComponent<typeof Badge>, 'children' | 'colorScheme'>;
+export const LoadingBadge = ({ sx, ...props }: LoadingBadgeProps): JSX.Element => {
+  return (
+    <Badge
+      {...props}
+      aria-hidden
+      sx={[
+        t => ({
+          backgroundColor: `${t.colors.$colorMutedForeground} !important`,
+          border: '0 !important',
+          boxShadow: 'none !important',
+          opacity: 0.16,
+          animation: `${animations.pulse} 2s ${t.transitionTiming.$bezier} infinite`,
+        }),
+        sx,
+      ]}
+    >
+      {'\u00A0'}
+    </Badge>
+  );
+};
 
 export type LastAuthenticationStrategyBadgeProps = PropsOfComponent<typeof Span> & { overlay?: boolean };
 export const LastAuthenticationStrategyBadge = ({

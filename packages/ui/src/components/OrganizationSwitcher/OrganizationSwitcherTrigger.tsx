@@ -1,13 +1,14 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
+import { LoadingBadge } from '@/ui/elements/Badge';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
 import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
-import { Button, descriptors, Icon, localizationKeys, useLocalizations } from '../../customizables';
+import { useEnvironment, useOrganizationSwitcherContext, useSubscription } from '../../contexts';
+import { Badge, Box, Button, descriptors, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -62,6 +63,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             size='xs'
             organization={organization}
+            badge={<PlanBadge />}
             avatarSx={t => ({ borderRadius: t.radii.$sm })}
             sx={{ maxWidth: '30ch' }}
           />
@@ -93,6 +95,107 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     );
   }),
 );
+
+const SwitcherPlanBadge = ({
+  label,
+  slug,
+  colorScheme = 'secondary',
+}: {
+  label: string;
+  slug: string;
+  colorScheme?: 'primary' | 'secondary';
+}) => (
+  <Badge
+    elementDescriptor={descriptors.organizationSwitcherTriggerBadge}
+    elementId={descriptors.organizationSwitcherTriggerBadge.setId(slug)}
+    colorScheme={colorScheme}
+    title={label}
+    sx={{ minWidth: 0, maxWidth: '14ch' }}
+  >
+    <Box
+      as='span'
+      sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+    >
+      {label}
+    </Box>
+  </Badge>
+);
+
+const ClerkBillingPlanBadge = () => {
+  const { isLoading, isFetching, subscriptionItems } = useSubscription();
+
+  if (isLoading || isFetching) {
+    // 5ch is specifically chosen to balance the size of "Free" versus paid plans in Inter
+    return <LoadingBadge sx={{ width: '5ch' }} />;
+  }
+
+  const activeSubscriptionItem = subscriptionItems.find(si => si.status === 'active' || si.status === 'past_due');
+  if (!activeSubscriptionItem) {
+    return null;
+  }
+
+  const { slug, name, isDefault } = activeSubscriptionItem.plan;
+
+  return (
+    <SwitcherPlanBadge
+      label={name}
+      slug={slug}
+      colorScheme={isDefault ? 'primary' : 'secondary'}
+    />
+  );
+};
+
+const CustomRenderPlanBadge = ({
+  renderPlanBadge,
+}: {
+  renderPlanBadge: () => Promise<{ label: string; slug: string; colorScheme?: 'primary' | 'secondary' }>;
+}) => {
+  const [state, setState] = useState<{
+    isLoading: boolean;
+    data: { label: string; slug: string; colorScheme?: 'primary' | 'secondary' } | null;
+  }>({ isLoading: true, data: null });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await renderPlanBadge();
+        setState({ isLoading: false, data });
+      } catch {
+        setState({ isLoading: false, data: null });
+      }
+    })();
+  }, [renderPlanBadge]);
+
+  if (state.isLoading) {
+    return <LoadingBadge sx={{ width: '5ch' }} />;
+  }
+
+  if (state.data) {
+    const { label, slug, colorScheme } = state.data;
+    return (
+      <SwitcherPlanBadge
+        label={label}
+        slug={slug}
+        colorScheme={colorScheme}
+      />
+    );
+  }
+
+  return null;
+};
+
+const PlanBadge = () => {
+  const { renderPlanBadge } = useOrganizationSwitcherContext();
+  if (!renderPlanBadge) {
+    return null;
+  }
+
+  if (typeof renderPlanBadge === 'boolean') {
+    return <ClerkBillingPlanBadge />;
+  }
+
+  return <CustomRenderPlanBadge renderPlanBadge={renderPlanBadge} />;
+};
 
 const NotificationCountBadgeSwitcherTrigger = () => {
   /**

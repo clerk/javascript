@@ -128,6 +128,10 @@ const navbarSlideIn = keyframes`
   100% {opacity: 1; transform: translateX(0);}
 `;
 
+const pulse = keyframes`
+  50% { opacity: 0.5; }
+`;
+
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
@@ -143,4 +147,5 @@ export const animations = {
   inDelayAnimation,
   outAnimation,
   notificationAnimation,
+  pulse,
 };

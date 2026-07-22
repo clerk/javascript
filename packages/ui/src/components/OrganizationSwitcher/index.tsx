@@ -4,7 +4,12 @@ import { cloneElement, useCallback, useId, useRef } from 'react';
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
 import { Popover } from '@/ui/elements/Popover';
 
-import { AcceptedInvitationsProvider, useOrganizationSwitcherContext, withCoreUserGuard } from '../../contexts';
+import {
+  AcceptedInvitationsProvider,
+  SubscriberTypeContext,
+  useOrganizationSwitcherContext,
+  withCoreUserGuard,
+} from '../../contexts';
 import { Flow } from '../../customizables';
 import { usePopover } from '../../hooks';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
@@ -64,22 +69,24 @@ const _OrganizationSwitcher = () => {
   const { __experimental_asStandalone } = useOrganizationSwitcherContext();
 
   return (
-    <Flow.Root
-      flow='organizationSwitcher'
-      sx={{ display: 'inline-flex' }}
-    >
-      <AcceptedInvitationsProvider>
-        {__experimental_asStandalone ? (
-          <OrganizationSwitcherPopover
-            close={typeof __experimental_asStandalone === 'function' ? __experimental_asStandalone : undefined}
-          />
-        ) : (
-          <OrganizationSwitcherWithFloatingTree>
-            <OrganizationSwitcherPopover />
-          </OrganizationSwitcherWithFloatingTree>
-        )}
-      </AcceptedInvitationsProvider>
-    </Flow.Root>
+    <SubscriberTypeContext.Provider value='organization'>
+      <Flow.Root
+        flow='organizationSwitcher'
+        sx={{ display: 'inline-flex' }}
+      >
+        <AcceptedInvitationsProvider>
+          {__experimental_asStandalone ? (
+            <OrganizationSwitcherPopover
+              close={typeof __experimental_asStandalone === 'function' ? __experimental_asStandalone : undefined}
+            />
+          ) : (
+            <OrganizationSwitcherWithFloatingTree>
+              <OrganizationSwitcherPopover />
+            </OrganizationSwitcherWithFloatingTree>
+          )}
+        </AcceptedInvitationsProvider>
+      </Flow.Root>
+    </SubscriberTypeContext.Provider>
   );
 };
 

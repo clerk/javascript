@@ -1,7 +1,7 @@
 import type { OrganizationPreviewId, UserOrganizationInvitationResource, UserResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { descriptors, Flex, Text } from '../customizables';
+import { Box, descriptors, Flex, Text } from '../customizables';
 import { useLocalizeCustomRoles } from '../hooks/useFetchRoles';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { OrganizationAvatar } from './OrganizationAvatar';
@@ -84,11 +84,16 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
           variant={mainTextSize}
           as='span'
-          truncate
-          sx={mainIdentifierSx}
+          sx={[t => ({ display: 'flex', alignItems: 'center', gap: t.space.$1, minWidth: 0 }), mainIdentifierSx]}
           title={organization.name}
         >
-          {organization.name} {badge}
+          <Box
+            as='span'
+            sx={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {organization.name}
+          </Box>
+          {badge}
         </Text>
 
         {roleLabel && (
