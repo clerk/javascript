@@ -1,0 +1,48 @@
+plugins {
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+}
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+
+group = 'com.clerk.e2ehooks'
+version = '1.0.0'
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+  namespace "com.clerk.e2ehooks"
+
+  compileSdk safeExtGet("compileSdkVersion", 36)
+
+  defaultConfig {
+    minSdk safeExtGet("minSdkVersion", 24)
+    targetSdk safeExtGet("targetSdkVersion", 36)
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  kotlinOptions {
+    jvmTarget = "17"
+    // clerk-android metadata is Kotlin 2.3.x; Expo SDKs compile with 2.1.x.
+    freeCompilerArgs += ['-Xskip-metadata-version-check']
+  }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+
+  // Provided at runtime by the @clerk/expo native module; keep versions in sync
+  // with packages/expo/android/build.gradle.
+  compileOnly("com.clerk:clerk-android-api:1.0.36") {
+    exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
+  }
+}
