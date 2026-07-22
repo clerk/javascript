@@ -129,6 +129,11 @@ export function useSignInWithApple() {
             token: identityToken,
           });
 
+          // A transferable sign-in means the user doesn't exist; surface the original restriction error.
+          if (signIn.firstFactorVerification.status === 'transferable') {
+            throw signUpError;
+          }
+
           return {
             createdSessionId: signIn.createdSessionId,
             setActive,
