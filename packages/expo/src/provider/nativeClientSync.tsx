@@ -40,6 +40,7 @@ type NativeRefreshFromJsOptions = {
 
 export type NativeRefreshFromJsController = {
   cancel: () => void;
+  getInFlightDeviceTokenPush?: () => { deviceToken: string | null } | null;
 };
 
 export type DeviceTokenCacheListener = (deviceToken: string | null) => void;
@@ -204,22 +205,32 @@ function getDefaultSignedInSession(client: ClientResource | null | undefined): S
   return client.signedInSessions[0] ?? null;
 }
 
-async function refreshJsClientFromServer(clerkInstance: SyncableClerkInstance): Promise<ClientResource | null> {
+async function fetchRefreshedJsClient(clerkInstance: SyncableClerkInstance): Promise<ClientResource | null> {
   const client = clerkInstance.client as RefreshableClientResource | undefined;
 
   if (typeof client?.fetch !== 'function' || typeof clerkInstance.updateClient !== 'function') {
     return null;
   }
 
-  const refreshedClient = await client.fetch({ fetchMaxTries: 1 });
-  clerkInstance.updateClient(refreshedClient);
+  return client.fetch({ fetchMaxTries: 1 });
+}
 
-  return refreshedClient;
+function isForeignSessionlessClient(
+  previousClient: ClientResource | null | undefined,
+  refreshedClient: ClientResource,
+): boolean {
+  if (!previousClient?.id || !refreshedClient.id || previousClient.id === refreshedClient.id) {
+    return false;
+  }
+
+  return Boolean(getDefaultSignedInSession(previousClient)) && refreshedClient.signedInSessions.length === 0;
 }
 
 async function refreshJsClientFromNativeState({
   clerkInstance,
   nativeDeviceToken,
+  previousDeviceToken,
+  rejectForeignSessionlessClient = false,
   reloadInitialResources,
   shouldSyncDeviceToken = true,
   suppressTokenCacheNotificationsRef,
@@ -227,11 +238,15 @@ async function refreshJsClientFromNativeState({
 }: {
   clerkInstance: SyncableClerkInstance;
   nativeDeviceToken: string | null;
+  previousDeviceToken?: string | null;
+  rejectForeignSessionlessClient?: boolean;
   reloadInitialResources: boolean;
   shouldSyncDeviceToken?: boolean;
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
+  const previousClient = clerkInstance.client;
+
   if (shouldSyncDeviceToken) {
     await syncNativeDeviceTokenToCache({
       deviceToken: nativeDeviceToken,
@@ -240,8 +255,17 @@ async function refreshJsClientFromNativeState({
     });
   }
 
-  const refreshedClient = await refreshJsClientFromServer(clerkInstance);
+  const refreshedClient = await fetchRefreshedJsClient(clerkInstance);
   if (refreshedClient) {
+    if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClient, refreshedClient)) {
+      // Restoring the previous token also notifies native to re-sync to it.
+      if (shouldSyncDeviceToken && previousDeviceToken !== undefined) {
+        await syncDeviceTokenToCache(tokenCache, previousDeviceToken);
+      }
+      return true;
+    }
+
+    clerkInstance.updateClient?.(refreshedClient);
     await reconcileJsActiveSessionFromClient({
       clerkInstance,
     });
@@ -434,12 +458,16 @@ async function syncNativeClientToJs({
     return;
   }
 
+  const previousDeviceToken = didChangeDeviceToken ? await getCachedDeviceToken(tokenCache) : undefined;
+
   await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
     nativeRefreshFromJsControllerRef?.current?.cancel();
 
     await refreshJsClientFromNativeState({
       clerkInstance,
       nativeDeviceToken,
+      previousDeviceToken,
+      rejectForeignSessionlessClient: true,
       reloadInitialResources: true,
       shouldSyncDeviceToken: didChangeDeviceToken,
       suppressTokenCacheNotificationsRef,
@@ -476,6 +504,7 @@ export function NativeClientSync({
   const pendingNativeRefreshRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const pendingNativeRefreshBeforeReadyRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const nativeRefreshGenerationRef = useRef(0);
+  const inFlightDeviceTokenPushRef = useRef<{ deviceToken: string | null } | null>(null);
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
 
@@ -484,11 +513,17 @@ export function NativeClientSync({
     pendingNativeRefreshBeforeReadyRef.current = null;
     nativeRefreshGenerationRef.current += 1;
     isRefreshingNativeFromJsRef.current = false;
+    inFlightDeviceTokenPushRef.current = null;
+  }, []);
+
+  const getInFlightDeviceTokenPush = useCallback(() => {
+    return isRefreshingNativeFromJsRef.current ? inFlightDeviceTokenPushRef.current : null;
   }, []);
 
   useEffect(() => {
     nativeRefreshFromJsControllerRef.current = {
       cancel: cancelNativeRefreshFromJs,
+      getInFlightDeviceTokenPush,
     };
 
     return () => {
@@ -496,7 +531,7 @@ export function NativeClientSync({
         nativeRefreshFromJsControllerRef.current = null;
       }
     };
-  }, [cancelNativeRefreshFromJs, nativeRefreshFromJsControllerRef]);
+  }, [cancelNativeRefreshFromJs, getInFlightDeviceTokenPush, nativeRefreshFromJsControllerRef]);
 
   useEffect(() => {
     if (
@@ -563,15 +598,23 @@ export function NativeClientSync({
   }, [clerkInstance, suppressJsClientChangedRef]);
 
   const queueNativeRefreshFromJs = useCallback((options: NativeRefreshFromJsOptions): void => {
+    const trackInFlightDeviceTokenPush = (pushOptions: NativeRefreshFromJsOptions) => {
+      if (pushOptions.didChangeDeviceToken) {
+        inFlightDeviceTokenPushRef.current = { deviceToken: pushOptions.deviceToken ?? null };
+      }
+    };
+
     if (isRefreshingNativeFromJsRef.current) {
       pendingNativeRefreshRef.current = mergePendingNativeRefreshOptions(pendingNativeRefreshRef.current, options);
       nativeRefreshGenerationRef.current += 1;
+      trackInFlightDeviceTokenPush(pendingNativeRefreshRef.current);
       return;
     }
 
     const initialGeneration = nativeRefreshGenerationRef.current + 1;
     nativeRefreshGenerationRef.current = initialGeneration;
     isRefreshingNativeFromJsRef.current = true;
+    trackInFlightDeviceTokenPush(options);
 
     const refreshNativeFromJsClient = async (
       options: NativeRefreshFromJsOptions,
@@ -623,6 +666,7 @@ export function NativeClientSync({
     })().finally(() => {
       if (latestRunGeneration === nativeRefreshGenerationRef.current || pendingNativeRefreshRef.current === null) {
         isRefreshingNativeFromJsRef.current = false;
+        inFlightDeviceTokenPushRef.current = null;
       }
     });
   }, []);
@@ -966,6 +1010,13 @@ export function useNativeClientEventSync({
     }
 
     if (nativeClientEvent.sourceId?.startsWith(nativeClientSyncSourceIdPrefix)) {
+      return;
+    }
+
+    const inFlightDeviceTokenPush = nativeRefreshFromJsControllerRef.current?.getInFlightDeviceTokenPush?.();
+    if (inFlightDeviceTokenPush && nativeClientEvent.deviceToken !== inFlightDeviceTokenPush.deviceToken) {
+      // The event was computed before the device token JS is currently pushing
+      // to native; that push realigns native, so the stale token must not win.
       return;
     }
 
