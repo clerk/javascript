@@ -12,14 +12,14 @@ import type {
   EnvironmentResource,
   GoogleOneTapProps,
   OrganizationProfileModalProps,
-  SignInProps,
   SignInModalProps,
-  SignUpProps,
+  SignInProps,
   SignUpModalProps,
+  SignUpProps,
   UserProfileModalProps,
   UserProfileProps,
-  WaitlistProps,
   WaitlistModalProps,
+  WaitlistProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense, useCallback, useRef, useSyncExternalStore } from 'react';

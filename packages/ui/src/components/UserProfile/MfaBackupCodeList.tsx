@@ -61,16 +61,12 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
           <Text
             localizationKey={localizationKeys('userProfile.backupCodePage.title__codelist')}
             variant='subtitle'
-            sx={t => ({
-              textAlign: 'start',
-            })}
+            sx={{ textAlign: 'start' }}
           />
           <Text
             localizationKey={subtitle}
             variant='body'
-            sx={t => ({
-              textAlign: 'start',
-            })}
+            sx={{ textAlign: 'start' }}
             colorScheme='secondary'
           />
         </Col>

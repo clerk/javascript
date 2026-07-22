@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isStepReachable, initialState, reduce, type WizardConfig, type WizardState } from '../reducer';
+import { initialState, isStepReachable, reduce, type WizardConfig, type WizardState } from '../reducer';
 import type { WizardStepDescriptor } from '../types';
 
 const cfg = (descriptors: WizardStepDescriptor[]): WizardConfig => ({ descriptors });
