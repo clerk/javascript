@@ -1592,6 +1592,19 @@ export type __internal_LocalizationResource = {
         };
         credentialsStep: {
           headerSubtitle: LocalizationValue;
+          clientId: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          clientSecret: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          paragraph: LocalizationValue;
+          scopes: {
+            description: LocalizationValue;
+            title: LocalizationValue;
+          };
         };
       };
       samlOkta: {

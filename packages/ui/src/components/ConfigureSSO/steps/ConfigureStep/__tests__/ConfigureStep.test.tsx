@@ -156,6 +156,42 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
+  it('saves credentials and displays the required OIDC scopes', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(document.querySelector('input[name="clientId"]')).not.toBeNull();
+    });
+
+    const clientId = document.querySelector('input[name="clientId"]') as HTMLInputElement;
+    const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
+    await userEvent.type(clientId, 'client_123');
+    await userEvent.type(clientSecret, 'secret_456');
+
+    expect(screen.getByText('openid')).toBeInTheDocument();
+    expect(screen.getByText('profile')).toBeInTheDocument();
+    expect(screen.getByText('email')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenLastCalledWith('ent_123', {
+        oidc: { clientId: 'client_123', clientSecret: 'secret_456' },
+      });
+    });
+  });
+
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {
     contextState.provider = 'ldap_enterprise';
     const { wrapper } = await createFixtures();

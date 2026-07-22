@@ -404,7 +404,49 @@ const OidcEndpointsStep = (): JSX.Element => {
 };
 
 const OidcCredentialsStep = (): JSX.Element => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const card = useCardState();
+  const { goNext, goPrev, isFirstStep } = useWizard();
+  const {
+    enterpriseConnection,
+    enterpriseConnectionMutations: { updateConnection },
+  } = useConfigureSSO();
+  const clientIdField = useFormControl('clientId', enterpriseConnection?.oauthConfig?.clientId ?? '', {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.placeholder'),
+    isRequired: true,
+  });
+  const clientSecretField = useFormControl('clientSecret', '', {
+    type: 'password',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientSecret.label'),
+    placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientSecret.placeholder'),
+    isRequired: true,
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const canSubmit = clientIdField.value.trim().length > 0 && clientSecretField.value.trim().length > 0 && !isSubmitting;
+
+  const handleContinue = async (): Promise<void> => {
+    if (!enterpriseConnection || !canSubmit) {
+      return;
+    }
+
+    card.setError(undefined);
+    setIsSubmitting(true);
+
+    try {
+      await updateConnection(enterpriseConnection.id, {
+        oidc: {
+          clientId: clientIdField.value.trim(),
+          clientSecret: clientSecretField.value.trim(),
+        },
+      });
+      void goNext();
+    } catch (err) {
+      handleError(err as Error, [clientIdField, clientSecretField], card.setError);
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -415,20 +457,76 @@ const OidcCredentialsStep = (): JSX.Element => {
         <InnerStepCounter />
       </Step.Header>
 
-      <Step.Body />
+      <Step.Body>
+        <Step.Section
+          fill
+          gap={5}
+        >
+          <Text
+            as='p'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.paragraph')}
+          />
+
+          <Form.ControlRow elementId={clientIdField.id}>
+            <Form.PlainInput {...clientIdField.props} />
+          </Form.ControlRow>
+
+          <Form.ControlRow elementId={clientSecretField.id}>
+            <Form.PasswordInput {...clientSecretField.props} />
+          </Form.ControlRow>
+
+          <Col gap={2}>
+            <Text
+              as='p'
+              variant='subtitle'
+              localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.scopes.title')}
+            />
+            <Text
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys(
+                'configureSSO.configureStep.oidcCustom.credentialsStep.scopes.description',
+              )}
+            />
+            <Flex
+              wrap='wrap'
+              sx={theme => ({ gap: theme.space.$2 })}
+            >
+              {OIDC_REQUIRED_SCOPES.map(scope => (
+                <Badge
+                  key={scope}
+                  colorScheme='primary'
+                >
+                  <Text
+                    as='span'
+                    sx={{ fontFamily: 'monospace' }}
+                  >
+                    {scope}
+                  </Text>
+                </Badge>
+              ))}
+            </Flex>
+          </Col>
+
+          <ActiveConnectionAlert />
+        </Step.Section>
+      </Step.Body>
 
       <Step.Footer>
         <Step.Footer.Reset />
         <Step.Footer.Previous
           onClick={() => goPrev()}
-          isDisabled={isFirstStep}
+          isDisabled={isFirstStep || isSubmitting}
         />
-        {/* Terminal step: the connection submit lands with the credentials step ticket; disabled as a placeholder. */}
         <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
+          onClick={handleContinue}
+          isLoading={isSubmitting}
+          isDisabled={!canSubmit}
         />
       </Step.Footer>
     </>
   );
 };
+
+const OIDC_REQUIRED_SCOPES = ['openid', 'profile', 'email'] as const;

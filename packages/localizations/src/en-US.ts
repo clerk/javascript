@@ -270,6 +270,20 @@ export const enUS: LocalizationResource = {
         },
         credentialsStep: {
           headerSubtitle: 'Add your application credentials',
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          paragraph:
+            'In your identity provider’s OIDC application, retrieve your application credentials and paste them below.',
+          scopes: {
+            description: 'Make sure your application requests the following scopes:',
+            title: 'Required scopes',
+          },
         },
         endpointsStep: {
           headerSubtitle: 'Add your identity provider’s endpoints',
