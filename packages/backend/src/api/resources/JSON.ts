@@ -1,4 +1,12 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
+import type {
+  BillingPerUnitTotalJSON,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionItemSeatsJSON,
+  BillingTotalsJSON as SharedBillingTotalsJSON,
+  LastAuthenticationStrategy,
+  SignUpStatus,
+  VerificationStatus,
+} from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,
@@ -1006,25 +1014,25 @@ type BillingSubscriptionItemStatus =
  */
 export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
+  instance_id: string;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
   payer_id?: string;
+  price_id?: string;
   period_start: number;
   period_end: number | null;
-  is_free_trial?: boolean;
+  is_free_trial: boolean;
   ended_at: number | null;
   created_at: number;
   updated_at: number;
   canceled_at: number | null;
   past_due_at: number | null;
-  lifetime_paid: BillingMoneyAmountJSON | null;
-  next_payment?: {
-    amount: number;
-    date: number;
-  } | null;
-  amount: BillingMoneyAmountJSON;
+  lifetime_paid?: BillingMoneyAmountJSON | null;
+  next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+  amount?: BillingMoneyAmountJSON | null;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
+  seats?: BillingSubscriptionItemSeatsJSON;
 }
 
 /**
@@ -1127,6 +1135,7 @@ export interface BillingSubscriptionWebhookEventJSON extends ClerkResourceJSON {
 
 export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscription;
+  instance_id: string;
   status: 'active' | 'past_due' | 'canceled' | 'ended' | 'abandoned' | 'incomplete';
   payer_id: string;
   created_at: number;
@@ -1137,6 +1146,8 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   next_payment?: {
     date: number;
     amount: BillingMoneyAmountJSON;
+    per_unit_totals?: BillingPerUnitTotalJSON[];
+    totals?: SharedBillingTotalsJSON;
   };
   eligible_for_free_trial?: boolean;
 }
