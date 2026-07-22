@@ -1,5 +1,5 @@
-import { Tabs as HeadlessTabs } from '@clerk/headless/tabs';
 import type { TabsProps } from '@clerk/headless/tabs';
+import { Tabs as HeadlessTabs } from '@clerk/headless/tabs';
 import type { FunctionComponent } from 'react';
 
 import { withMosaicSlot } from './withMosaicSlot';

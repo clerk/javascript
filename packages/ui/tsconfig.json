@@ -22,6 +22,8 @@
     "declarationMap": true,
     "allowJs": true,
     "paths": {
+      // Test-only imports; vitest.config.mts aliases these to clerk-js at runtime.
+      "@/core/*": ["../clerk-js/src/core/*"],
       "@/*": ["./src/*"],
       // Adding this to avoid changes in the ui files
       // in order to make git merges easier

@@ -21,12 +21,7 @@ export function OrganizationProfileLeaveSectionView({
   const isLeaving = snapshot.value === 'leaving';
 
   return (
-    <Box
-      sx={t => ({
-        width: '100%',
-        containerType: 'inline-size',
-      })}
-    >
+    <Box sx={{ width: '100%', containerType: 'inline-size' }}>
       <Box
         sx={t => ({
           display: 'flex',

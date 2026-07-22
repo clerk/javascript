@@ -14,7 +14,7 @@ import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { AuthApp, ThreeDotsCircle, Mobile } from '../../icons';
+import { AuthApp, Mobile, ThreeDotsCircle } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 

@@ -103,7 +103,7 @@ describe('UserButton', () => {
         });
       });
 
-      const { getByText, getByRole, userEvent } = render(
+      const { getByRole, userEvent } = render(
         <UNSAFE_PortalProvider getContainer={getContainer}>
           <UserButton />
         </UNSAFE_PortalProvider>,

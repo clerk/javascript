@@ -3,12 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
-import { OrganizationList } from '../';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/test-utils';
+import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 

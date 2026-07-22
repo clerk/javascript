@@ -324,6 +324,7 @@ export default tseslint.config([
       'custom-rules': {
         rules: {
           'no-global-object': noGlobalObject,
+          'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
         },
@@ -519,14 +520,6 @@ export default tseslint.config([
   {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
-    plugins: {
-      'custom-rules': {
-        rules: {
-          'no-navigate-useClerk': noNavigateUseClerk,
-          'no-unstable-methods': noUnstableMethods,
-        },
-      },
-    },
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
@@ -535,8 +528,12 @@ export default tseslint.config([
   {
     name: 'packages/ui',
     files: ['packages/ui/src/**/*'],
+    // Tests assert on style values they receive; they are not authoring styles.
+    ignores: ['packages/ui/src/**/__tests__/**', 'packages/ui/src/**/*.test.{ts,tsx}'],
     rules: {
       'custom-rules/no-physical-css-properties': 'error',
+      'custom-rules/no-navigate-useClerk': 'error',
+      'custom-rules/no-unstable-methods': 'error',
     },
   },
   {
@@ -556,6 +553,10 @@ export default tseslint.config([
       '@stylexjs/sort-keys': 'error',
       '@stylexjs/valid-shorthands': 'error',
       '@stylexjs/valid-styles': 'error',
+      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
+      // the outer component. Both rules only see the empty inner element and always report.
+      'jsx-a11y/heading-has-content': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
       'no-restricted-syntax': [
         'error',
         {
@@ -590,6 +591,19 @@ export default tseslint.config([
     files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+      // vitest's `importOriginal<typeof import('...')>()` has no type-import equivalent.
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', disallowTypeAnnotations: false, fixStyle: 'separate-type-imports' },
+      ],
+    },
+  },
+  {
+    name: 'packages - vitest type tests',
+    files: ['packages/*/src/**/*.test-d.ts'],
+    rules: {
+      // Type tests bind values only to read their type back off with `typeof`.
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   {
