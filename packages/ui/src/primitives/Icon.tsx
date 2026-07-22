@@ -29,6 +29,11 @@ const { applyVariants, filterProps } = createVariants(theme => ({
 // @ts-ignore
 export type IconProps = StyleVariants<typeof applyVariants> & {
   icon: React.ComponentType;
+  // Icon renders an <svg>; allow the accessibility attributes an svg accepts so a
+  // meaningful icon can carry a name (decorative ones stay aria-hidden).
+  role?: React.AriaRole;
+  'aria-label'?: string;
+  'aria-hidden'?: boolean;
 };
 
 export const Icon = (props: IconProps): JSX.Element => {
