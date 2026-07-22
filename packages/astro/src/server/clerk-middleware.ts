@@ -41,7 +41,7 @@ import type {
   AuthFn,
   SessionAuthObjectWithRedirect,
 } from './types';
-import { isRedirect, setHeader } from './utils';
+import { isRedirect, patchRequest, setHeader } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
@@ -83,7 +83,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     await initCloudflareEnv();
 
-    const clerkRequest = createClerkRequest(context.request);
+    const patchedRequest = patchRequest(context.request);
+    const clerkRequest = createClerkRequest(patchedRequest);
 
     // Resolve keyless URLs per-request in development
     let keylessClaimUrl: string | undefined;
