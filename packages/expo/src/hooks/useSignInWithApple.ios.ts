@@ -99,16 +99,14 @@ export function useSignInWithApple() {
         nonce,
       });
 
-      // Apple only returns the name on the first authorization, so it must be
-      // captured now and passed straight into sign-up or it's lost for good.
+      // Apple only returns the name on first authorization, so capture it now before it's lost.
       const { identityToken, fullName } = credential;
 
       if (!identityToken) {
         return errorThrower.throw('No identity token received from Apple Sign-In.');
       }
 
-      // Sign-up first so a new user's name is recorded; an existing account
-      // resolves as transferable below instead of throwing.
+      // Sign up first so the name is recorded; existing accounts fall through as transferable.
       await signUp.create({
         strategy: 'oauth_token_apple',
         token: identityToken,

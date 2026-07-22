@@ -143,8 +143,7 @@ export async function executeGoogleAuthenticationFlow(
     const { idToken, user } = response.data;
 
     try {
-      // Sign up first so a new user's name is recorded; an existing account
-      // resolves as transferable below instead of throwing.
+      // Sign up first so the name is recorded; existing accounts fall through as transferable.
       await signUp.create({
         strategy: 'google_one_tap',
         token: idToken,
