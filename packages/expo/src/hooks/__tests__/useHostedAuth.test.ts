@@ -5,7 +5,7 @@ import type { ClientJSON } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { createCodeChallenge, useHostedAuth } from '../useHostedAuth';
+import { useHostedAuth } from '../useHostedAuth';
 
 const moduleWithLoad = Module as unknown as {
   _load: (request: string, parent?: unknown, isMain?: boolean) => unknown;
@@ -55,32 +55,8 @@ vi.mock('react-native', () => {
   };
 });
 
-vi.mock('expo-auth-session', () => {
-  return {
-    makeRedirectUri: mocks.makeRedirectUri,
-  };
-});
-
-vi.mock('expo-web-browser', () => {
-  return {
-    openAuthSessionAsync: mocks.openAuthSessionAsync,
-  };
-});
-
-vi.mock('expo-crypto', () => {
-  return {
-    CryptoDigestAlgorithm: {
-      SHA256: 'SHA256',
-    },
-    CryptoEncoding: {
-      BASE64: 'BASE64',
-    },
-    digestStringAsync: mocks.digestStringAsync,
-    getRandomBytes: mocks.getRandomBytes,
-    randomUUID: mocks.randomUUID,
-  };
-});
-
+// The expo-* optional deps are loaded via require() at call time, which resolves through
+// Module._load (spied in beforeEach) rather than vitest's ESM mock registry.
 const mockFapiRequest = vi.fn();
 const mockCodeVerifier = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
 const mockCodeChallenge = 'mock-code-challenge-_';
@@ -311,12 +287,12 @@ describe('useHostedAuth', () => {
     mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
 
     const { result } = renderHook(() => useHostedAuth());
-    await result.current.startHostedAuth({ authSessionOptions: { showInRecents: true } });
+    await result.current.startHostedAuth({ authSessionOptions: { showInRecents: true, preferEphemeralSession: true } });
 
     expect(mocks.openAuthSessionAsync).toHaveBeenCalledWith(
       'https://example.accounts.dev/sign-in',
       'myapp:///hosted-auth-callback',
-      { showInRecents: true },
+      { showInRecents: true, preferEphemeralSession: true },
     );
   });
 
@@ -332,38 +308,21 @@ describe('useHostedAuth', () => {
     expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
   });
 
-  test('falls back to the reloaded client session when callback session id is absent', async () => {
+  test('rejects a callback without a created session id before redeeming', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
       url: 'myapp:///hosted-auth-callback?state=generated-state-123&rotating_token_nonce=nonce-123',
     });
-    mockHostedAuthRedeemResponse({ lastActiveSessionId: 'sess_reloaded' });
-
-    const { result } = renderHook(() => useHostedAuth());
-    const response = await result.current.startHostedAuth();
-
-    expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_reloaded' });
-    expect(response.createdSessionId).toBe('sess_reloaded');
-  });
-
-  test('rejects a redeemed client response without a created session id but still applies the client', async () => {
-    mockHostedAuthResponse();
-    mocks.openAuthSessionAsync.mockResolvedValue({
-      type: 'success',
-      url: 'myapp:///hosted-auth-callback?state=generated-state-123&rotating_token_nonce=nonce-123',
-    });
-    mockHostedAuthRedeemResponse();
 
     const { result } = renderHook(() => useHostedAuth());
 
     await expect(result.current.startHostedAuth()).rejects.toThrow(
-      'Hosted auth completion did not include a created session id.',
+      'Hosted auth callback did not include the created session.',
     );
 
-    expect(mockFapiRequest).toHaveBeenNthCalledWith(2, expect.objectContaining({ path: '/client' }));
-    // The client token is already rotated after redemption, so the client JSON must be applied before the throw.
-    expect(mockClient.fromJSON).toHaveBeenCalledWith(expect.objectContaining({ object: 'client' }));
+    // The rotating token nonce must not be consumed on a malformed callback.
+    expect(mockFapiRequest).toHaveBeenCalledTimes(1);
     expect(mockSetActive).not.toHaveBeenCalled();
   });
 
@@ -396,8 +355,9 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
 
     await expect(result.current.startHostedAuth()).rejects.toThrow(
-      'Hosted auth created session was not found on the redeemed client.',
+      'Hosted auth completion did not include the created session.',
     );
+    // The client token is already rotated after redemption, so the client JSON must be applied before the throw.
     expect(mockClient.fromJSON).toHaveBeenCalledWith(expect.objectContaining({ object: 'client' }));
     expect(mockSetActive).not.toHaveBeenCalled();
   });
@@ -414,7 +374,9 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
     const firstAttempt = result.current.startHostedAuth();
 
-    await expect(result.current.startHostedAuth()).rejects.toThrow('Hosted auth is already in progress.');
+    await expect(result.current.startHostedAuth()).rejects.toThrow(
+      'A hosted authentication session is already in progress.',
+    );
 
     resolveBrowser({ type: 'dismiss' });
     await expect(firstAttempt).resolves.toEqual(
@@ -458,6 +420,29 @@ describe('useHostedAuth', () => {
     const { result } = renderHook(() => useHostedAuth());
 
     await expect(result.current.startHostedAuth()).rejects.toThrow('Unable to open browser');
+  });
+
+  test('derives the S256 code challenge from the verifier per RFC 7636', async () => {
+    mocks.digestStringAsync.mockImplementation((_algorithm: string, value: string) =>
+      Promise.resolve(createHash('sha256').update(value, 'ascii').digest('base64')),
+    );
+    const expectedChallenge = createHash('sha256')
+      .update(mockCodeVerifier, 'ascii')
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+    mockHostedAuthResponse();
+    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
+
+    const { result } = renderHook(() => useHostedAuth());
+    await result.current.startHostedAuth();
+
+    expect(mockFapiRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({ codeChallenge: expectedChallenge }),
+      }),
+    );
   });
 
   test('generates a secure state with expo-crypto when one is not provided', async () => {
@@ -682,17 +667,6 @@ describe('useHostedAuth', () => {
     expect(mockHandleUnauthenticated).not.toHaveBeenCalled();
     expect(mockFapiRequest).toHaveBeenCalledTimes(1);
     expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
-  });
-});
-
-describe('createCodeChallenge', () => {
-  test('derives the S256 code challenge from the RFC 7636 appendix B vector', async () => {
-    const sha256Base64 = (value: string) =>
-      Promise.resolve(createHash('sha256').update(value, 'ascii').digest('base64'));
-
-    await expect(createCodeChallenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk', sha256Base64)).resolves.toBe(
-      'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
-    );
   });
 });
 

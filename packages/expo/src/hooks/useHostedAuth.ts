@@ -44,7 +44,7 @@ export type StartHostedAuthParams = {
   /**
    * Options forwarded to `expo-web-browser` when opening the hosted auth session.
    */
-  authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
+  authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents' | 'preferEphemeralSession'>;
 };
 
 /**
@@ -69,10 +69,8 @@ type HostedAuthPKCE = {
 /**
  * Returns helpers for authenticating native Expo users through Clerk's hosted Account Portal.
  *
- * On Android, the default redirect URL depends on an intent filter that only the Clerk Expo
- * config plugin registers: the plugin must be enabled in `app.json` and the native project
- * rebuilt (for example with `npx expo prebuild`), or the browser cannot return to the app
- * after auth completes. See {@link StartHostedAuthParams.redirectUrl}.
+ * On Android, the default redirect URL requires the Clerk Expo config plugin;
+ * see {@link StartHostedAuthParams.redirectUrl}.
  */
 export function useHostedAuth(): {
   startHostedAuth: (params?: StartHostedAuthParams) => Promise<StartHostedAuthReturnType>;
@@ -85,7 +83,7 @@ export function useHostedAuth(): {
    */
   async function startHostedAuth(params: StartHostedAuthParams = {}): Promise<StartHostedAuthReturnType> {
     if (hostedAuthInProgress) {
-      return errorThrower.throw('Hosted auth is already in progress.');
+      return errorThrower.throw('A hosted authentication session is already in progress.');
     }
 
     hostedAuthInProgress = true;
@@ -129,7 +127,7 @@ export function useHostedAuth(): {
     assertSupportedRedirectUrl(redirectUrl);
     const state = createState();
     const pkce = await createPKCE();
-    const hostedAuth = await createHostedAuth(
+    const hostedAuthUrl = await createHostedAuth(
       {
         redirectUrl,
         codeChallenge: pkce.codeChallenge,
@@ -140,7 +138,7 @@ export function useHostedAuth(): {
     );
 
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
-      hostedAuth.url,
+      hostedAuthUrl,
       redirectUrl,
       params.authSessionOptions,
     );
@@ -171,6 +169,11 @@ export function useHostedAuth(): {
       return errorThrower.throw('Hosted auth callback did not include a rotating token nonce.');
     }
 
+    const createdSessionId = callbackParams.get('created_session_id');
+    if (!createdSessionId) {
+      return errorThrower.throw('Hosted auth callback did not include the created session.');
+    }
+
     const clientJSON = await redeemHostedAuth(
       {
         rotatingTokenNonce,
@@ -185,12 +188,8 @@ export function useHostedAuth(): {
     // failure below does not leave the local client stale against the rotated token.
     applyHostedAuthClientJSON(clerk.client, clientJSON);
 
-    const createdSessionId = callbackParams.get('created_session_id') || clientJSON.last_active_session_id || null;
-    if (!createdSessionId) {
-      return errorThrower.throw('Hosted auth completion did not include a created session id.');
-    }
     if (!clientJSON.sessions.some(session => session.id === createdSessionId)) {
-      return errorThrower.throw('Hosted auth created session was not found on the redeemed client.');
+      return errorThrower.throw('Hosted auth completion did not include the created session.');
     }
 
     await clerk.setActive({
@@ -277,32 +276,18 @@ function createState(): string {
   return loadExpoCrypto().randomUUID();
 }
 
+// S256 code challenge per RFC 7636: base64url of the SHA-256 digest of the verifier.
 async function createPKCE(): Promise<HostedAuthPKCE> {
   const Crypto = loadExpoCrypto();
   const codeVerifier = bytesToHex(Crypto.getRandomBytes(32));
-  const codeChallenge = await createCodeChallenge(codeVerifier, verifier =>
-    Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, verifier, {
-      encoding: Crypto.CryptoEncoding.BASE64,
-    }),
-  );
+  const digest = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, codeVerifier, {
+    encoding: Crypto.CryptoEncoding.BASE64,
+  });
 
   return {
     codeVerifier,
-    codeChallenge,
+    codeChallenge: base64ToBase64Url(digest),
   };
-}
-
-/**
- * Derives the S256 PKCE code challenge (RFC 7636) from a code verifier,
- * given a function that returns the standard-base64 SHA-256 digest of a string.
- *
- * @internal Exported for testing.
- */
-export async function createCodeChallenge(
-  codeVerifier: string,
-  sha256Base64: (value: string) => Promise<string>,
-): Promise<string> {
-  return base64ToBase64Url(await sha256Base64(codeVerifier));
 }
 
 function loadExpoCrypto(): typeof ExpoCrypto {

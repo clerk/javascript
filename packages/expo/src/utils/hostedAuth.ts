@@ -20,10 +20,6 @@ export type RedeemHostedAuthParams = {
   codeVerifier: string;
 };
 
-export type HostedAuthResource = {
-  url: string;
-};
-
 type HostedAuthJSON = {
   object: 'hosted_auth';
   url: string;
@@ -58,7 +54,7 @@ export type HostedAuthClerkInstance = {
 export async function createHostedAuth(
   params: CreateHostedAuthParams,
   clerk: HostedAuthClerkInstance,
-): Promise<HostedAuthResource> {
+): Promise<string> {
   const request = () =>
     clerk.getFapiClient().request({
       method: 'POST',
@@ -85,9 +81,7 @@ export async function createHostedAuth(
     return errorThrower.throw('Hosted auth creation returned an invalid response.');
   }
 
-  return {
-    url: hostedAuthJSON.url,
-  };
+  return hostedAuthJSON.url;
 }
 
 export async function redeemHostedAuth(
