@@ -29,16 +29,20 @@ export const styles = stylex.create({
   filledPrimary: {
     backgroundColor: {
       default: colorVars['--cl-color-primary'],
-      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`,
       ':active': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 24%)`,
+      '@media (hover: hover)': {
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`,
+      },
     },
     color: colorVars['--cl-color-primary-foreground'],
   },
   filledDestructive: {
     backgroundColor: {
       default: colorVars['--cl-color-destructive'],
-      ':hover': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 12%)`,
       ':active': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 24%)`,
+      '@media (hover: hover)': {
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 12%)`,
+      },
     },
     color: colorVars['--cl-color-destructive-foreground'],
   },

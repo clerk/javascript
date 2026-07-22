@@ -575,6 +575,17 @@ export default tseslint.config([
     },
   },
   {
+    // StyleX `create()` files author conditions raw (`@media (hover: hover)`, `:hover`) — StyleX
+    // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
+    // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
+    // `@stylexjs/*` rules from the mosaic block still cover these files.
+    name: 'packages/ui/mosaic - stylex styles',
+    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
     name: 'packages - vitest',
     files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
