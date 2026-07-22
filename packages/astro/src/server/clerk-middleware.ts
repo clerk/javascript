@@ -18,6 +18,7 @@ import {
 import { htmlSafeJson } from '@clerk/shared/htmlSafeJson';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
@@ -41,7 +42,7 @@ import type {
   AuthFn,
   SessionAuthObjectWithRedirect,
 } from './types';
-import { isRedirect, patchRequest, setHeader } from './utils';
+import { isRedirect, setHeader } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
