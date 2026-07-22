@@ -1,5 +1,13 @@
 # @clerk/ui
 
+## 1.25.7
+
+### Patch Changes
+
+- Ensure the keyless prompt renders above application content by setting an explicit `z-index`. ([#9211](https://github.com/clerk/javascript/pull/9211)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The OAuth consent screen now shows a recognizable brand mark for well-known OAuth clients (Claude, ChatGPT) when the requesting application has not uploaded its own logo. ([#9158](https://github.com/clerk/javascript/pull/9158)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.25.6
 
 ### Patch Changes
