@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, sizeVars, spacingVars, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   base: {
@@ -8,7 +8,7 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-element'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    gap: spacingVars['--cl-spacing-2'],
+    gap: space['2'],
     outline: {
       default: 'none',
       ':focus-visible': `2px solid color-mix(in oklab, ${colorVars['--cl-color-primary']} 50%, transparent)`,
@@ -63,16 +63,16 @@ export const styles = stylex.create({
 
   // size — height-driven; padding sets only the inline axis
   sizeSm: {
-    paddingInline: spacingVars['--cl-spacing-2'],
+    paddingInline: space['2'],
     fontSize: typeScaleVars['--cl-text-label-sm-size'],
     lineHeight: typeScaleVars['--cl-text-label-sm-leading'],
-    height: sizeVars['--cl-size-element-sm'],
+    height: space['7'],
   },
   sizeMd: {
-    paddingInline: spacingVars['--cl-spacing-3'],
+    paddingInline: space['3'],
     fontSize: typeScaleVars['--cl-text-label-size'],
     lineHeight: typeScaleVars['--cl-text-label-leading'],
-    height: sizeVars['--cl-size-element-md'],
+    height: space['8'],
   },
 
   // shape — icon buttons zero their inline padding; width tracks the height
@@ -84,8 +84,8 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-full'],
     paddingInline: 0,
   },
-  iconSizeSm: { width: sizeVars['--cl-size-element-sm'] },
-  iconSizeMd: { width: sizeVars['--cl-size-element-md'] },
+  iconSizeSm: { width: space['7'] },
+  iconSizeMd: { width: space['8'] },
 
   // state / modifiers
   fullWidth: { width: '100%' },

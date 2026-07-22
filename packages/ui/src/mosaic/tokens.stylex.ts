@@ -38,18 +38,6 @@ const colorDefaults = {
 export const colorVars = stylex.defineVars(colorDefaults);
 
 // =============================================================================
-// Size Tokens — interactive element heights
-// =============================================================================
-
-const sizeDefaults = {
-  '--cl-size-element-sm': '1.75rem',
-  '--cl-size-element-md': '2rem',
-  '--cl-size-element-lg': '2.25rem',
-} as const;
-
-export const sizeVars = stylex.defineVars(sizeDefaults);
-
-// =============================================================================
 // Radius Tokens
 // =============================================================================
 
@@ -66,27 +54,40 @@ export const radiusVars = stylex.defineVars(radiusDefaults);
 // =============================================================================
 // Spacing Tokens
 // =============================================================================
-// Astryx's scale expressed in rems rather than pixels (1rem = 16px).
+// `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's
+// model). Overriding it rescales every gap, pad, and control height at once.
 
 const spacingDefaults = {
-  '--cl-spacing-0': '0rem',
-  '--cl-spacing-0-5': '0.125rem',
-  '--cl-spacing-1': '0.25rem',
-  '--cl-spacing-1-5': '0.375rem',
-  '--cl-spacing-2': '0.5rem',
-  '--cl-spacing-3': '0.75rem',
-  '--cl-spacing-4': '1rem',
-  '--cl-spacing-5': '1.25rem',
-  '--cl-spacing-6': '1.5rem',
-  '--cl-spacing-7': '1.75rem',
-  '--cl-spacing-8': '2rem',
-  '--cl-spacing-9': '2.25rem',
-  '--cl-spacing-10': '2.5rem',
-  '--cl-spacing-11': '2.75rem',
-  '--cl-spacing-12': '3rem',
+  '--cl-spacing': '0.25rem',
 } as const;
 
 export const spacingVars = stylex.defineVars(spacingDefaults);
+
+// The scale is `defineConsts`, not `defineVars`: each step is inlined at build
+// time as `calc(var(--cl-spacing) * n)`, so it carries no custom property of its
+// own. `space['2']` reads like Tailwind's `space-2` and stays a shared token
+// (StyleX inlines it cross-module; a plain helper function cannot be).
+const step = (multiple: number): string => `calc(var(--cl-spacing) * ${multiple})`;
+
+export const space = stylex.defineConsts({
+  '0': '0px',
+  '0.5': step(0.5),
+  '1': step(1),
+  '1.5': step(1.5),
+  '2': step(2),
+  '2.5': step(2.5),
+  '3': step(3),
+  '3.5': step(3.5),
+  '4': step(4),
+  '5': step(5),
+  '6': step(6),
+  '7': step(7),
+  '8': step(8),
+  '9': step(9),
+  '10': step(10),
+  '11': step(11),
+  '12': step(12),
+});
 
 // =============================================================================
 // Typography Tokens — type scale
