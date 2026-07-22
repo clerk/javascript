@@ -72,9 +72,15 @@ const OidcRedirectUriStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
   const redirectUri = enterpriseConnection?.oauthConfig?.redirectUri ?? '';
+  const debugRedirectUri = enterpriseConnection?.oauthConfig?.debugRedirectUri ?? '';
   const redirectUriField = useFormControl('redirectUri', redirectUri, {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.redirectUri.label'),
+    isRequired: false,
+  });
+  const debugRedirectUriField = useFormControl('debugRedirectUri', debugRedirectUri, {
+    type: 'text',
+    label: localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.debugRedirectUri.label'),
     isRequired: false,
   });
 
@@ -101,6 +107,17 @@ const OidcRedirectUriStep = (): JSX.Element => {
             <Form.CommonInputWrapper {...redirectUriField.props}>
               <ClipboardInput
                 value={redirectUri}
+                readOnly
+                copyIcon={Clipboard}
+                copiedIcon={Checkmark}
+              />
+            </Form.CommonInputWrapper>
+          </Form.ControlRow>
+
+          <Form.ControlRow elementId={debugRedirectUriField.id}>
+            <Form.CommonInputWrapper {...debugRedirectUriField.props}>
+              <ClipboardInput
+                value={debugRedirectUri}
                 readOnly
                 copyIcon={Clipboard}
                 copiedIcon={Checkmark}

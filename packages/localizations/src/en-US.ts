@@ -323,6 +323,9 @@ export const enUS: LocalizationResource = {
           redirectUri: {
             label: 'Authorized redirect URI',
           },
+          debugRedirectUri: {
+            label: 'Authorized redirect URL (only for debug)',
+          },
         },
       },
       samlCustom: {

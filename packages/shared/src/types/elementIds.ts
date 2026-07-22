@@ -39,6 +39,7 @@ export type FieldId =
   | 'clientSecret'
   | 'scopes'
   | 'redirectUri'
+  | 'debugRedirectUri'
   | 'acsUrl'
   | 'spEntityId'
   | 'web3WalletName'

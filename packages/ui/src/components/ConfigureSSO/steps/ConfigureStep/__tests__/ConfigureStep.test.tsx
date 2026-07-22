@@ -17,6 +17,7 @@ const contextState = vi.hoisted(() => ({
         id: string;
         oauthConfig: {
           redirectUri?: string;
+          debugRedirectUri?: string;
           discoveryUrl?: string;
           authUrl?: string;
           tokenUrl?: string;
@@ -87,7 +88,10 @@ describe('ConfigureProviderStep', () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = {
       id: 'ent_123',
-      oauthConfig: { redirectUri: 'https://instance.example/v1/oauth_callback' },
+      oauthConfig: {
+        redirectUri: 'https://instance.example/v1/oauth_callback',
+        debugRedirectUri: 'https://instance.example/v1/oauth_callback/debug',
+      },
     };
     const { wrapper } = await createFixtures();
 
@@ -96,9 +100,11 @@ describe('ConfigureProviderStep', () => {
     // The OIDC sub-flow mounts on its first step. Before the fix this threw
     // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
     expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
-    const redirectUri = screen.getByRole('textbox') as HTMLInputElement;
+    const [redirectUri, debugRedirectUri] = screen.getAllByRole('textbox') as HTMLInputElement[];
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
+    expect(debugRedirectUri).toHaveAttribute('readonly');
+    expect(debugRedirectUri).toHaveValue('https://instance.example/v1/oauth_callback/debug');
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
