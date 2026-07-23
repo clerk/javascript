@@ -752,30 +752,53 @@ export interface PaginatedResponseJSON {
   total_count?: number;
 }
 
+export interface EnterpriseConnectionSamlConnectionLoginHintJSON {
+  mode: 'email_address' | 'custom_attribute' | 'off';
+  source?: string;
+}
+
+export interface EnterpriseConnectionCustomAttributeJSON {
+  name: string;
+  key: string;
+  sso_path: string;
+  scim_path: string;
+  multi_valued: boolean;
+}
+
 export interface EnterpriseConnectionSamlConnectionJSON {
   id: string;
   name: string;
-  idp_entity_id: string;
-  idp_sso_url: string;
-  idp_certificate: string;
-  idp_certificate_issued_at: number;
-  idp_certificate_expires_at: number;
-  idp_metadata_url: string;
-  idp_metadata: string;
-  acs_url: string;
-  sp_entity_id: string;
-  sp_metadata_url: string;
-  sync_user_attributes: boolean;
+  idp_entity_id?: string;
+  idp_sso_url?: string;
+  idp_certificate?: string;
+  idp_certificate_issued_at?: number;
+  idp_certificate_expires_at?: number;
+  idp_metadata_url?: string;
+  /** @deprecated The Backend API does not return this field. */
+  idp_metadata?: string;
+  acs_url?: string;
+  sp_entity_id?: string;
+  sp_metadata_url?: string;
+  /** @deprecated The Backend API does not return this field on the nested SAML connection. Use the top-level `sync_user_attributes` instead. */
+  sync_user_attributes?: boolean;
+  active: boolean;
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
+  force_authn: boolean;
+  login_hint: EnterpriseConnectionSamlConnectionLoginHintJSON;
 }
 
 export interface EnterpriseConnectionOauthConfigJSON {
   id: string;
+  provider_key: string;
   name: string;
-  client_id: string;
-  discovery_url: string;
-  logo_public_url: string;
+  client_id?: string;
+  discovery_url?: string;
+  auth_url?: string;
+  token_url?: string;
+  user_info_url?: string;
+  logo_public_url?: string;
+  requires_pkce: boolean;
   created_at: number;
   updated_at: number;
 }
@@ -783,12 +806,19 @@ export interface EnterpriseConnectionOauthConfigJSON {
 export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.EnterpriseConnection;
   name: string;
+  provider: string;
+  logo_public_url?: string;
   domains: string[];
-  organization_id: string | null;
+  organization_id?: string | null;
   active: boolean;
   sync_user_attributes: boolean;
-  allow_subdomains: boolean;
+  /** @deprecated The Backend API does not return this field at the top level. Use `saml_connection.allow_subdomains` instead. */
+  allow_subdomains?: boolean;
   disable_additional_identifications: boolean;
+  allow_organization_account_linking: boolean;
+  authenticatable: boolean;
+  disable_jit_provisioning: boolean;
+  custom_attributes?: EnterpriseConnectionCustomAttributeJSON[];
   created_at: number;
   updated_at: number;
   saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
