@@ -32,16 +32,16 @@ function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as AvatarProps;
 }
 
-const IMAGE_SRC = 'https://github.com/shadcn.png';
+const IMAGE_SRC = 'https://github.com/clerk.png';
 
 export function Primary(props: Record<string, unknown>) {
   return (
     <Avatar {...knobsAsProps(props)}>
       <AvatarImage
         src={IMAGE_SRC}
-        alt='@shadcn'
+        alt='@clerk'
       />
-      <AvatarFallback>CN</AvatarFallback>
+      <AvatarFallback>CL</AvatarFallback>
     </Avatar>
   );
 }
@@ -51,9 +51,9 @@ export function Fallback(props: Record<string, unknown>) {
     <Avatar {...knobsAsProps(props)}>
       <AvatarImage
         src='https://example.com/broken.png'
-        alt='@shadcn'
+        alt='@clerk'
       />
-      <AvatarFallback>CN</AvatarFallback>
+      <AvatarFallback>CL</AvatarFallback>
     </Avatar>
   );
 }
@@ -69,9 +69,9 @@ export function Sizes(props: Record<string, unknown>) {
         >
           <AvatarImage
             src={IMAGE_SRC}
-            alt='@shadcn'
+            alt='@clerk'
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>CL</AvatarFallback>
         </Avatar>
       ))}
     </div>
@@ -89,9 +89,9 @@ export function Shapes(props: Record<string, unknown>) {
         >
           <AvatarImage
             src={IMAGE_SRC}
-            alt='@shadcn'
+            alt='@clerk'
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>CL</AvatarFallback>
         </Avatar>
       ))}
     </div>
