@@ -100,6 +100,8 @@ import {
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
+const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_first_factor', 'prepare_second_factor'];
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -115,7 +117,9 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
-  protected override coalescedPostActions: readonly string[] = ['prepare_first_factor', 'prepare_second_factor'];
+  protected override get coalescedPostActions(): readonly string[] {
+    return COALESCED_POST_ACTIONS;
+  }
 
   /**
    * The current status of the sign-in process.

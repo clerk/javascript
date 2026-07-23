@@ -30,6 +30,7 @@ export type BaseMutateParams = {
 };
 
 const COALESCED_POST_TTL_MS = 15_000;
+const COALESCED_POST_ACTIONS: readonly string[] = [];
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
   if (!payloadErrors) {
@@ -60,8 +61,11 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
-  protected coalescedPostActions: readonly string[] = [];
   #pendingCoalescedPosts = new Map<string, Promise<this>>();
+
+  protected get coalescedPostActions(): readonly string[] {
+    return COALESCED_POST_ACTIONS;
+  }
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();

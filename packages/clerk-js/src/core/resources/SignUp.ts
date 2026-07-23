@@ -76,10 +76,14 @@ declare global {
   }
 }
 
+const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_verification'];
+
 export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
-  protected override coalescedPostActions: readonly string[] = ['prepare_verification'];
+  protected override get coalescedPostActions(): readonly string[] {
+    return COALESCED_POST_ACTIONS;
+  }
 
   id: string | undefined;
   private _status: SignUpStatus | null = null;
