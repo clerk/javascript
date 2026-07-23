@@ -52,4 +52,21 @@ describe('Mosaic Badge', () => {
     expect(badge).toHaveAttribute('id', 'status');
     expect(badge).toHaveAttribute('aria-label', 'Status');
   });
+
+  it('renders a custom element via render, keeping the styling contract', () => {
+    render(
+      <Badge
+        intent='success'
+        // eslint-disable-next-line jsx-a11y/anchor-has-content -- Badge injects the children into the rendered anchor.
+        render={<a href='/status' />}
+      >
+        Active
+      </Badge>,
+    );
+    const badge = screen.getByRole('link', { name: 'Active' });
+    expect(badge.tagName).toBe('A');
+    expect(badge).toHaveAttribute('href', '/status');
+    expect(badge).toHaveClass('cl-badge');
+    expect(badge).toHaveAttribute('data-intent', 'success');
+  });
 });
