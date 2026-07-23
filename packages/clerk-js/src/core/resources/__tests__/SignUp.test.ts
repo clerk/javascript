@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
@@ -35,6 +36,32 @@ describe('SignUp', () => {
     const signUp = new SignUp();
     const snapshot = JSON.stringify(signUp);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('prepareVerification', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('coalesces concurrent identical preparations', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const params = { strategy: 'email_code' as const };
+
+      const first = signUp.prepareVerification(params);
+      const second = signUp.prepareVerification(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      await Promise.all([first, second]);
+    });
   });
 
   describe('authenticateWithRedirect with an OAuth transport', () => {

@@ -5,7 +5,6 @@ import { eventBus } from '../../events';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
-import { SignUp } from '../SignUp';
 
 // Mock the authenticateWithPopup module
 vi.mock('../../../utils/authenticateWithPopup', async () => {
@@ -224,26 +223,6 @@ describe('SignIn', () => {
       deferred.resolve({
         client: null,
         response: { id: 'signin_456' },
-      });
-      await Promise.all([first, second]);
-    });
-
-    it('coalesces concurrent sign-up verification preparations', async () => {
-      const deferred = createDeferredPromise<any>();
-      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
-      BaseResource._fetch = mockFetch;
-
-      const signUp = new SignUp({ id: 'signup_123' } as any);
-      const params = { strategy: 'email_code' as const };
-
-      const first = signUp.prepareVerification(params);
-      const second = signUp.prepareVerification(params);
-
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-
-      deferred.resolve({
-        client: null,
-        response: { id: 'signup_123' },
       });
       await Promise.all([first, second]);
     });
