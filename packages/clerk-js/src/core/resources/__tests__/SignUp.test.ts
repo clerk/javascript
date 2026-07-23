@@ -62,6 +62,118 @@ describe('SignUp', () => {
       });
       await Promise.all([first, second]);
     });
+
+    it('does not coalesce preparations for different verifications', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+
+      await Promise.all([
+        signUp.prepareVerification({ strategy: 'email_code' }),
+        signUp.prepareVerification({ strategy: 'phone_code' }),
+      ]);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request succeeds', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const params = { strategy: 'email_code' as const };
+
+      await signUp.prepareVerification(params);
+      await signUp.prepareVerification(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request fails', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('prepare failed'))
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signup_123' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const params = { strategy: 'email_code' as const };
+
+      await expect(signUp.prepareVerification(params)).rejects.toThrow('prepare failed');
+      await signUp.prepareVerification(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not coalesce preparations across different sign-up attempts', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const params = { strategy: 'email_code' as const };
+
+      const first = signUp.prepareVerification(params);
+      signUp.id = 'signup_456';
+      const second = signUp.prepareVerification(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signup_456' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('coalesces concurrent preparations from the future API', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+
+      const first = signUp.__internal_future.sendEmailCode();
+      const second = signUp.__internal_future.sendEmailCode();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('does not coalesce concurrent verification attempts', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const params = { strategy: 'email_code' as const, code: '123456' };
+
+      const first = signUp.attemptVerification(params);
+      const second = signUp.attemptVerification(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signup_123' },
+      });
+      await Promise.all([first, second]);
+    });
   });
 
   describe('authenticateWithRedirect with an OAuth transport', () => {
