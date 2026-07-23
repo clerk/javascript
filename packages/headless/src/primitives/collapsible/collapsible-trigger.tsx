@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsibleTriggerProps = ComponentProps<'button'>;
@@ -30,7 +30,7 @@ export function CollapsibleTrigger(props: CollapsibleTriggerProps) {
   // override it, or the trigger/panel aria pairing would silently break.
   merged.id = triggerId;
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
     state,

@@ -1,9 +1,9 @@
 'use client';
 
-import { useFloatingTree, useListItem, useMergeRefs } from '@floating-ui/react';
+import { useFloatingTree, useListItem } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useMenuContext } from './menu-context';
 
 export interface MenuItemProps extends ComponentProps<'button'> {
@@ -24,8 +24,6 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
   const item = useListItem({ label: disabled ? null : label });
   const isActive = item.index === activeIndex;
 
-  const combinedRef = useMergeRefs([item.ref, ref]);
-
   const state = {
     active: isActive,
     disabled: !!disabled,
@@ -34,7 +32,6 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
   const ownProps = {
     'data-cl-slot': 'menu-item',
     type: 'button',
-    ref: combinedRef,
     role: 'menuitem',
     tabIndex: isActive ? 0 : -1,
     ...(disabled && { 'aria-disabled': true }),
@@ -51,9 +48,10 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
     }),
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
+    ref: [item.ref, ref],
     state,
     stateAttributesMapping: {
       active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Props for {@link DialogBackdrop}. */
@@ -14,20 +14,17 @@ export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropPro
     const { render, ...otherProps } = props;
     const { open, mounted, transitionProps } = useDialogContext();
 
-    if (!mounted) {
-      return null;
-    }
-
     const state = { open };
 
     const defaultProps = {
-      ref,
       ...transitionProps,
     } satisfies DefaultProps<'div'>;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
+      enabled: mounted,
+      ref,
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),

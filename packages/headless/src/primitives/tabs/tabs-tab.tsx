@@ -1,9 +1,9 @@
 'use client';
 
-import { CompositeItem, useMergeRefs } from '@floating-ui/react';
+import { CompositeItem } from '@floating-ui/react';
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsTabProps extends ComponentProps<'button'> {
@@ -19,7 +19,6 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
   const tabId = `${tabsId}-tab-${tabValue}`;
   const panelId = `${tabsId}-panel-${tabValue}`;
   const internalRef = useRef<HTMLButtonElement | null>(null);
-  const combinedRef = useMergeRefs([internalRef, ref]);
 
   useLayoutEffect(() => {
     registerTab(tabValue, internalRef.current);
@@ -33,7 +32,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
 
   return (
     <CompositeItem
-      ref={combinedRef}
+      ref={internalRef}
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
@@ -77,15 +76,27 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         // override it, or the tab/panel aria pairing would silently break.
         merged.id = tabId;
 
-        return renderElement({
+        // CompositeItem injects its roving-tabindex ref via compositeProps; hand it to
+        // useRender's ref param (which owns ref-merging) instead of leaving it in props,
+        // where useRender's merged ref would overwrite it and break focus navigation.
+        const { ref: compositeRef, ...mergedProps } = merged;
+
+        // floating-ui's CompositeItem invokes this render callback synchronously and
+        // unconditionally during its own render (see renderJsx), so useRender runs in a
+        // stable hook position on the CompositeItem fiber. The rule can't see that.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        return useRender({
           defaultTagName: 'button',
           render,
+          // SAFETY: mergeProps returns Record<string, unknown>; the ref CompositeItem
+          // injected is a valid React ref at runtime.
+          ref: [internalRef, compositeRef as React.Ref<unknown>, ref],
           state,
           stateAttributesMapping: {
             selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
             disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
           },
-          props: merged,
+          props: mergedProps,
         });
       }}
     >

@@ -3,7 +3,7 @@
 import { type CSSProperties, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { OtpContext, type OtpContextValue, type OtpSlot } from './otp-context';
 import { inputModeForPattern, type OtpPattern, sanitize } from './otp-utils';
 
@@ -200,7 +200,7 @@ export function OtpRoot(props: OtpProps) {
 
   return (
     <OtpContext.Provider value={contextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,

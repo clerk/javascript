@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { usePopoverContext } from './popover-context';
 
 export type PopoverTitleProps = Omit<ComponentProps<'h2'>, 'id'>;
@@ -21,7 +21,7 @@ export function PopoverTitle(props: PopoverTitleProps) {
     id: labelId,
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'h2',
     render,
     props: mergeProps<'h2'>(defaultProps, otherProps),

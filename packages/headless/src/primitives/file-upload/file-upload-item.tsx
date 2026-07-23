@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { FileUploadItemContext, type FileUploadItemContextValue, useFileUploadContext } from './file-upload-context';
 
 export interface FileUploadItemProps extends ComponentProps<'div'> {
@@ -26,7 +26,7 @@ export function FileUploadItem(props: FileUploadItemProps) {
 
   return (
     <FileUploadItemContext.Provider value={itemContextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,

@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingFocusManager, FloatingList, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useSelectContext } from './select-context';
 
 export type SelectPositionerProps = ComponentProps<'div'>;
@@ -24,12 +24,6 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     } = useSelectContext();
 
     const side = placement.split('-')[0];
-
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -57,7 +51,6 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     const ownProps = {
       'data-cl-slot': 'select-positioner',
       'data-cl-side': side,
-      ref: combinedRef,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -71,6 +64,22 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       merged.id = floatingProps.id;
     }
 
+    const element = useRender({
+      defaultTagName: 'div',
+      render,
+      enabled: mounted,
+      // floating-ui types `setFloating` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setFloating, ref],
+      props: merged,
+    });
+
+    if (!element) {
+      return null;
+    }
+
     return (
       <FloatingFocusManager
         context={floatingContext}
@@ -80,12 +89,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
           elementsRef={elementsRef}
           labelsRef={labelsRef}
         >
-          {renderElement({
-            defaultTagName: 'div',
-            render,
-            enabled: mounted,
-            props: merged,
-          })}
+          {element}
         </FloatingList>
       </FloatingFocusManager>
     );

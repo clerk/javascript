@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export type AutocompletePopupProps = ComponentProps<'div'>;
@@ -13,17 +12,15 @@ export const AutocompletePopup = React.forwardRef<HTMLDivElement, AutocompletePo
     const { render, ...otherProps } = props;
     const { popupRef, transitionProps } = useAutocompleteContext();
 
-    const combinedRef = useMergeRefs([popupRef, ref]);
-
     const defaultProps = {
       'data-cl-slot': 'autocomplete-popup',
-      ref: combinedRef,
       ...transitionProps,
     };
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
+      ref: [popupRef, ref],
       props: mergeProps<'div'>(defaultProps, otherProps),
     });
   },

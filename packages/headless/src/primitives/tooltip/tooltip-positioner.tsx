@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipPositionerProps = ComponentProps<'div'>;
@@ -13,12 +12,6 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const { render, ...otherProps } = props;
     const { mounted, refs, floatingStyles, placement, getFloatingProps } = useTooltipContext();
 
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
-
     const side = placement.split('-')[0];
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
@@ -26,7 +19,6 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const ownProps = {
       'data-cl-slot': 'tooltip-positioner',
       'data-cl-side': side,
-      ref: combinedRef,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -37,10 +29,15 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     // A consumer-supplied id must not override it, or the aria pairing would silently break.
     merged.id = wiredId;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
       enabled: mounted,
+      // floating-ui types `setFloating` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setFloating, ref],
       props: merged,
     });
   },

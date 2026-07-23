@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React, { useCallback } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useOtpContext } from './otp-context';
 import { inputModeForPattern, removeAt, replaceAt, sanitize } from './otp-utils';
 
@@ -36,8 +35,6 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     element => registerInput(index, element),
     [registerInput, index],
   );
-  // Compose our slot registration with any ref the consumer forwards.
-  const setRef = useMergeRefs([registerRef, forwardedRef]);
 
   // Roving tab order: the focused slot is the tab stop, or the next empty slot
   // when the field is unfocused, so Tab enters and leaves the group once.
@@ -47,7 +44,6 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
 
   const defaultProps: Record<string, unknown> = {
     'data-cl-slot': 'otp-input',
-    ref: setRef,
     value: char,
     type: mask ? 'password' : 'text',
     inputMode: inputModeForPattern(pattern),
@@ -202,9 +198,10 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'input',
     render,
+    ref: [registerRef, forwardedRef],
     state,
     stateAttributesMapping: {
       active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),

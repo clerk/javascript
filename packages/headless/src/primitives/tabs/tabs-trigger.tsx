@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsTriggerProps extends ComponentProps<'button'> {
@@ -15,7 +14,6 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
   const { render, value: tabValue, disabled, ...otherProps } = props;
   const { value: selectedValue, setValue, tabsId, registerTab } = useTabsContext();
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const combinedRef = useMergeRefs([triggerRef, ref]);
 
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
@@ -33,7 +31,6 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
 
   const defaultProps = {
     'data-cl-slot': 'tabs-trigger',
-    ref: combinedRef,
     id: tabId,
     role: 'tab' as const,
     type: 'button' as const,
@@ -52,9 +49,10 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
   // override it, or the tab/panel aria pairing would silently break.
   merged.id = tabId;
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
+    ref: [triggerRef, ref],
     state,
     stateAttributesMapping: {
       selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),

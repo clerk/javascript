@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingFocusManager, FloatingList, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export type AutocompletePositionerProps = ComponentProps<'div'>;
@@ -16,19 +16,12 @@ export const AutocompletePositioner = React.forwardRef<HTMLDivElement, Autocompl
 
     const side = placement.split('-')[0];
 
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
-
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
     const ownProps = {
       'data-cl-slot': 'autocomplete-positioner',
       'data-cl-side': side,
-      ref: combinedRef,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -39,6 +32,22 @@ export const AutocompletePositioner = React.forwardRef<HTMLDivElement, Autocompl
     // override it, or the aria-controls pairing would silently break.
     if (wiredId != null) {
       merged.id = wiredId;
+    }
+
+    const element = useRender({
+      defaultTagName: 'div',
+      render,
+      // floating-ui types `setFloating` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setFloating, ref],
+      enabled: mounted,
+      props: merged,
+    });
+
+    if (!element) {
+      return null;
     }
 
     return (
@@ -52,12 +61,7 @@ export const AutocompletePositioner = React.forwardRef<HTMLDivElement, Autocompl
           elementsRef={elementsRef}
           labelsRef={labelsRef}
         >
-          {renderElement({
-            defaultTagName: 'div',
-            render,
-            enabled: mounted,
-            props: merged,
-          })}
+          {element}
         </FloatingList>
       </FloatingFocusManager>
     );

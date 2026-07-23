@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadContext } from './file-upload-context';
 
 export type FileUploadTriggerProps = ComponentProps<'button'>;
@@ -18,7 +18,7 @@ export function FileUploadTrigger(props: FileUploadTriggerProps) {
     onClick: () => openFilePicker(),
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
     state,

@@ -3,7 +3,7 @@
 import { type CSSProperties, type ReactNode, useCallback, useId, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { isFileAccepted } from './accept';
 import { FileUploadContext, type FileUploadContextValue } from './file-upload-context';
 
@@ -170,7 +170,7 @@ export function FileUploadRoot(props: FileUploadProps) {
 
   return (
     <FileUploadContext.Provider value={contextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { DrawerAttrs } from './css-vars';
 
 /** Props for {@link DrawerHandleGrip}. */
@@ -20,13 +20,13 @@ export const DrawerHandleGrip = React.forwardRef<HTMLDivElement, DrawerHandlePro
     const { render, ...otherProps } = props;
 
     const defaultProps = {
-      ref,
       [DrawerAttrs.handle]: '',
     } satisfies DefaultProps<'div'>;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
+      ref,
       props: mergeProps<'div'>(defaultProps, otherProps),
     });
   },

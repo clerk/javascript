@@ -3,7 +3,7 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Props for {@link DialogViewport}. */
@@ -25,33 +25,35 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
     const { render, lockScroll = true, ...otherProps } = props;
     const { open, mounted, transitionProps, modal } = useDialogContext();
 
-    if (!mounted) {
-      return null;
-    }
-
     const state = { open };
 
     const defaultProps = {
-      ref,
       ...transitionProps,
       style: modal ? undefined : { pointerEvents: 'auto' as const },
     } satisfies DefaultProps<'div'>;
+
+    const element = useRender({
+      defaultTagName: 'div',
+      render,
+      enabled: mounted,
+      ref,
+      state,
+      stateAttributesMapping: {
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+      },
+      props: mergeProps<'div'>(defaultProps, otherProps),
+    });
+
+    if (!element) {
+      return null;
+    }
 
     return (
       <FloatingOverlay
         lockScroll={lockScroll}
         style={modal ? undefined : { pointerEvents: 'none' }}
       >
-        {renderElement({
-          defaultTagName: 'div',
-          render,
-          state,
-          stateAttributesMapping: {
-            open: (v: boolean): Record<string, string> | null =>
-              v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' },
-          },
-          props: mergeProps<'div'>(defaultProps, otherProps),
-        })}
+        {element}
       </FloatingOverlay>
     );
   },

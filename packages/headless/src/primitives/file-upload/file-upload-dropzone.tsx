@@ -2,7 +2,7 @@
 
 import { type DragEvent, useRef, useState } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadContext } from './file-upload-context';
 
 export type FileUploadDropzoneProps = ComponentProps<'div'>;
@@ -61,7 +61,7 @@ export function FileUploadDropzone(props: FileUploadDropzoneProps) {
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'div',
     render,
     state,

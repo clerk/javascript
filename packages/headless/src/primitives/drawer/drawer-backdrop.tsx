@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { DrawerAttrs } from './css-vars';
 import { useDrawerContext } from './drawer-context';
 
@@ -16,22 +15,17 @@ export const DrawerBackdrop = React.forwardRef<HTMLDivElement, DrawerBackdropPro
     const { render, ...otherProps } = props;
     const { open, mounted, transitionProps, backdropRef, drag } = useDrawerContext();
 
-    const combinedRef = useMergeRefs([backdropRef, ref]);
-
-    if (!mounted) {
-      return null;
-    }
-
     const state = { open, swiping: drag.isDragging };
 
     const defaultProps = {
-      ref: combinedRef,
       ...transitionProps,
     } satisfies DefaultProps<'div'>;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
+      enabled: mounted,
+      ref: [backdropRef, ref],
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
