@@ -2,10 +2,58 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { useRender } from './use-render';
+import { mergeProps, useRender } from './use-render';
 
 afterEach(() => {
   cleanup();
+});
+
+describe('mergeProps', () => {
+  it('merges two plain objects', () => {
+    const result = mergeProps<'div'>({ id: 'a', 'data-x': '1' }, { 'data-y': '2' });
+    expect(result).toEqual({ id: 'a', 'data-x': '1', 'data-y': '2' });
+  });
+
+  it('second argument overrides first for plain props', () => {
+    const result = mergeProps<'div'>({ id: 'a' }, { id: 'b' });
+    expect(result.id).toBe('b');
+  });
+
+  it('chains event handlers', () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    const result = mergeProps<'button'>({ onClick: first }, { onClick: second });
+
+    (result.onClick as (...args: unknown[]) => void)();
+
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('shallow-merges style objects', () => {
+    const result = mergeProps<'div'>(
+      { style: { color: 'red', fontSize: 14 } },
+      { style: { color: 'blue', padding: 8 } },
+    );
+    expect(result.style).toEqual({
+      color: 'blue',
+      fontSize: 14,
+      padding: 8,
+    });
+  });
+
+  it('concatenates className', () => {
+    const result = mergeProps<'div'>({ className: 'base' }, { className: 'extra' });
+    expect(result.className).toBe('base extra');
+  });
+
+  it('does not chain non-event-handler functions', () => {
+    const ref1 = vi.fn();
+    const ref2 = vi.fn();
+    const result = mergeProps<'div'>({ ref: ref1 }, { ref: ref2 });
+    // ref is not an event handler (doesn't match /^on[A-Z]/), so it's overwritten
+    expect(result.ref).toBe(ref2);
+  });
 });
 
 describe('useRender', () => {

@@ -1,8 +1,97 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
-import type { DefaultProps, RenderProp, StateAttributesMapping } from './render-element';
-import { mergeProps } from './render-element';
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+/**
+ * A render prop: a function that receives computed HTML props and returns a JSX element.
+ */
+export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> = (props: Props) => React.ReactElement;
+
+/**
+ * Props accepted by any primitive part. Extends the native props for `Tag`
+ * and adds the optional `render` escape hatch, narrowed to that tag's props.
+ */
+export type ComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> & {
+  render?: RenderProp<React.ComponentPropsWithRef<Tag>>;
+};
+
+/**
+ * The props a primitive part applies to its own rendered element. Extends the
+ * native props for `Tag` and additionally permits internal `data-*` attributes
+ * (e.g. `data-cl-slot`), which `@types/react` intentionally omits from its
+ * element prop types.
+ *
+ * Use with `satisfies` to type-check authored default props — this validates
+ * every key against the real element props while still allowing our `data-*`
+ * attributes, instead of laundering the whole object past the checker with an
+ * `as` assertion.
+ */
+export type DefaultProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> &
+  Record<`data-${string}`, string>;
+
+/**
+ * Maps state keys to functions that return data-attribute objects (or null).
+ */
+export type StateAttributesMapping<S> = {
+  [K in keyof S]?: (value: S[K]) => Record<string, string> | null;
+};
+
+// ---------------------------------------------------------------------------
+// mergeProps
+// ---------------------------------------------------------------------------
+
+type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
+  | React.ComponentPropsWithRef<Tag>
+  | Record<string, unknown>;
+
+/**
+ * Merges two props objects. Event handlers are chained (both fire),
+ * `style` is shallow-merged, `className` is concatenated, and
+ * everything else is overwritten by the second argument.
+ */
+export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
+  a: PropsInput<Tag>,
+  b: PropsInput<Tag>,
+): Record<string, unknown>;
+export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown>): Record<string, unknown> {
+  const merged: Record<string, unknown> = { ...a };
+
+  for (const key of Object.keys(b)) {
+    const bVal = b[key];
+
+    if (
+      key.charCodeAt(0) === 111 /* o */ &&
+      key.charCodeAt(1) === 110 /* n */ &&
+      key.charCodeAt(2) >= 65 /* A */ &&
+      key.charCodeAt(2) <= 90 /* Z */ &&
+      typeof a[key] === 'function' &&
+      typeof bVal === 'function'
+    ) {
+      // Chain event handlers — internal fires first, consumer fires second
+      const aHandler = a[key] as (...args: unknown[]) => void;
+      const bHandler = bVal as (...args: unknown[]) => void;
+      merged[key] = (...args: unknown[]) => {
+        aHandler(...args);
+        bHandler(...args);
+      };
+    } else if (key === 'style' && a.style && bVal) {
+      merged.style = { ...(a.style as object), ...(bVal as object) };
+    } else if (key === 'className' && typeof a.className === 'string' && typeof bVal === 'string') {
+      merged.className = `${a.className} ${bVal}`;
+    } else {
+      merged[key] = bVal;
+    }
+  }
+
+  return merged;
+}
+
+// ---------------------------------------------------------------------------
+// useRender
+// ---------------------------------------------------------------------------
 
 /**
  * A `render` prop: a render function, or a React element to clone with the
@@ -62,9 +151,8 @@ interface UseRenderParamsAlways<
 
 /**
  * Renders a primitive part with render-prop support, conditional rendering, and
- * state-to-data-attribute mapping. Unlike `renderElement`, `render` accepts a
- * React element (cloned with merged props) as well as a function, and refs are
- * merged internally via `ref`.
+ * state-to-data-attribute mapping. `render` accepts a React element (cloned with
+ * merged props) as well as a function, and refs are merged internally via `ref`.
  *
  * Hook: call it unconditionally. When `enabled` is omitted the element is always
  * rendered (returns ReactElement); when passed it may be skipped (returns null).
@@ -108,7 +196,7 @@ export function useRender<
 
   if (typeof render === 'function') {
     // SAFETY: computedProps is the tag's props widened with data-* attrs; the render
-    // function is declared to receive this tag's props. Matches renderElement above.
+    // function is declared to receive this tag's props.
     return render({ ...computedProps, ref: mergedRef } as React.ComponentPropsWithRef<Tag>);
   }
 
