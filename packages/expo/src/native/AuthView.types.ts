@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react';
+
 /**
  * Authentication mode that determines which flows are available to the user.
  *
@@ -15,6 +17,15 @@ export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
  * state changes.
  */
 export interface AuthViewProps {
+  /**
+   * Replaces the dashboard-configured logo with custom React Native content.
+   *
+   * The native authentication UI does not apply sizing, spacing, or accessibility
+   * attributes to this content. The provided element must define its own layout
+   * and accessibility behavior.
+   */
+  logo?: ReactElement;
+
   /**
    * Authentication mode that determines which flows are available.
    *
