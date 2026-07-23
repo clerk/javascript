@@ -1286,7 +1286,6 @@ export const enUS: LocalizationResource = {
       subtitle: 'Your backup code is the one you got when setting up two-step authentication.',
       title: 'Enter a backup code',
     },
-    differentAccountAction: 'Sign in as a different account',
     emailCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",

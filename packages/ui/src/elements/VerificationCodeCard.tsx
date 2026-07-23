@@ -42,16 +42,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
         <VerificationCodeContent {...props} />
       </Card.Content>
 
-      <Card.Footer>
-        {props.onDifferentAccountClicked && (
-          <Card.Action elementId='signIn'>
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.differentAccountAction')}
-              onClick={props.onDifferentAccountClicked}
-            />
-          </Card.Action>
-        )}
-      </Card.Footer>
+      <Card.Footer />
     </Card.Root>
   );
 };
@@ -125,6 +116,14 @@ export const VerificationCodeContent = (props: PropsWithChildren<VerificationCod
                   props.alternativeMethodsLabel ?? localizationKeys('footerActionLink__useAnotherMethod')
                 }
                 onClick={props.onShowAlternativeMethodsClicked}
+              />
+            </Card.Action>
+          )}
+          {props.onDifferentAccountClicked && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionLink
+                localizationKey={localizationKeys('backButton')}
+                onClick={props.onDifferentAccountClicked}
               />
             </Card.Action>
           )}

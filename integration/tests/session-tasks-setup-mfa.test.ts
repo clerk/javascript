@@ -243,8 +243,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
       // complete it if this is the wrong account.
       await u.page.getByText(/check your phone/i).waitFor({ state: 'visible' });
 
-      // The "Sign in as a different account" action abandons the attempt and returns to the start.
-      const differentAccount = u.page.getByRole('link', { name: /sign in as a different account/i });
+      // The "Back" action abandons the attempt and returns to the start.
+      const differentAccount = u.page.getByRole('link', { name: /^back$/i });
       await expect(differentAccount).toBeVisible();
       await differentAccount.click();
 
