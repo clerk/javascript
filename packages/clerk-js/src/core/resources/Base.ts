@@ -29,6 +29,8 @@ export type BaseMutateParams = {
   path?: string;
 };
 
+const COALESCED_POST_TTL_MS = 15_000;
+
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
   if (!payloadErrors) {
     return;
@@ -243,8 +245,14 @@ export abstract class BaseResource {
       return pending;
     }
 
+    // The TTL guards against a stalled request (no client-side fetch timeout) pinning the entry and
+    // silently swallowing retries such as "resend code" until page reload.
+    const expireTimer = setTimeout(() => this.#pendingCoalescedPosts.delete(key), COALESCED_POST_TTL_MS);
     const post = this._baseMutate<J>({ ...params, method: 'POST' }).finally(() => {
-      this.#pendingCoalescedPosts.delete(key);
+      clearTimeout(expireTimer);
+      if (this.#pendingCoalescedPosts.get(key) === post) {
+        this.#pendingCoalescedPosts.delete(key);
+      }
     });
     this.#pendingCoalescedPosts.set(key, post);
     return post;

@@ -185,6 +185,28 @@ describe('SignIn', () => {
       await Promise.all([first, second]);
     });
 
+    it('allows a new preparation after a pending request stalls past the coalescing TTL', () => {
+      vi.useFakeTimers();
+      try {
+        const mockFetch = vi.fn().mockReturnValue(new Promise(() => {}));
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+        void signIn.prepareFirstFactor(params);
+        void signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(15_000);
+
+        void signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('does not coalesce preparations across different sign-in attempts', async () => {
       const deferred = createDeferredPromise<any>();
       const mockFetch = vi.fn().mockReturnValue(deferred.promise);
