@@ -15,13 +15,7 @@ import type {
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
-const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_verification'];
-
 export class EmailAddress extends BaseResource implements EmailAddressResource {
-  protected override get coalescedPostActions(): readonly string[] {
-    return COALESCED_POST_ACTIONS;
-  }
-
   id!: string;
   emailAddress = '';
   matchesSsoConnection = false;
@@ -44,6 +38,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   prepareVerification = (params: PrepareEmailAddressVerificationParams): Promise<this> => {
     return this._basePost<EmailAddressJSON>({
       action: 'prepare_verification',
+      coalesce: true,
       body: { ...params },
     });
   };

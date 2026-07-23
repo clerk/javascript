@@ -9,13 +9,7 @@ import type {
 
 import { BaseResource, Verification } from './internal';
 
-const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_verification'];
-
 export class Web3Wallet extends BaseResource implements Web3WalletResource {
-  protected override get coalescedPostActions(): readonly string[] {
-    return COALESCED_POST_ACTIONS;
-  }
-
   id!: string;
   web3Wallet = '';
   verification!: VerificationResource;
@@ -36,6 +30,7 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
   prepareVerification = (params: PrepareWeb3WalletVerificationParams): Promise<this> => {
     return this._basePost<Web3WalletJSON>({
       action: 'prepare_verification',
+      coalesce: true,
       body: { ...params },
     });
   };

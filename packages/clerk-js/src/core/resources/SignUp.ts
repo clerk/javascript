@@ -76,14 +76,8 @@ declare global {
   }
 }
 
-const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_verification'];
-
 export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
-
-  protected override get coalescedPostActions(): readonly string[] {
-    return COALESCED_POST_ACTIONS;
-  }
 
   id: string | undefined;
   private _status: SignUpStatus | null = null;
@@ -194,6 +188,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePost({
       body: params,
       action: 'prepare_verification',
+      coalesce: true,
     });
   };
 
@@ -979,6 +974,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_code' },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -999,6 +995,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -1026,6 +1023,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -1169,6 +1167,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
+        coalesce: true,
       });
 
       const { message } = this.#resource.verifications.web3Wallet;

@@ -25,13 +25,13 @@ export type BaseFetchOptions = ClerkResourceReloadParams & {
 export type BaseMutateParams = {
   action?: string;
   body?: any;
+  coalesce?: boolean;
   method?: HTTPMethod;
   path?: string;
   signal?: AbortSignal;
 };
 
 const COALESCED_POST_TTL_MS = 30_000;
-const COALESCED_POST_ACTIONS: readonly string[] = [];
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
   if (!payloadErrors) {
@@ -63,10 +63,6 @@ export abstract class BaseResource {
   pathRoot = '';
 
   #pendingCoalescedPosts?: Map<string, { promise: Promise<this>; controller: AbortController; expiresAt: number }>;
-
-  protected get coalescedPostActions(): readonly string[] {
-    return COALESCED_POST_ACTIONS;
-  }
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
@@ -240,7 +236,7 @@ export abstract class BaseResource {
   }
 
   protected async _basePost<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
-    if (!params.action || !this.coalescedPostActions.includes(params.action)) {
+    if (!params.coalesce) {
       return this._baseMutate<J>({ ...params, method: 'POST' });
     }
 

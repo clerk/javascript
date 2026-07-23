@@ -100,8 +100,6 @@ import {
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
-const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_first_factor', 'prepare_second_factor'];
-
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -117,9 +115,6 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
-  protected override get coalescedPostActions(): readonly string[] {
-    return COALESCED_POST_ACTIONS;
-  }
 
   /**
    * The current status of the sign-in process.
@@ -270,6 +265,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
+      coalesce: true,
     });
   };
 
@@ -361,6 +357,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
+      coalesce: true,
     });
   };
 
@@ -888,6 +885,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'reset_password_email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -931,6 +929,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'reset_password_phone_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1088,6 +1087,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId: emailCodeFactor.emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1140,6 +1140,7 @@ class SignInFuture implements SignInFutureResource {
           strategy: 'email_link',
         },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1192,6 +1193,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId: phoneCodeFactor.phoneNumberId, strategy: 'phone_code', channel },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1257,6 +1259,7 @@ class SignInFuture implements SignInFutureResource {
             strategy: 'enterprise_sso',
           },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1324,6 +1327,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
 
       const { message } = this.firstFactorVerification;
@@ -1395,6 +1399,7 @@ class SignInFuture implements SignInFutureResource {
         await this.#resource.__internal_basePost({
           body: { strategy: 'passkey' },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1447,6 +1452,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'phone_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
@@ -1473,6 +1479,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'email_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
