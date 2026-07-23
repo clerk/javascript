@@ -62,7 +62,7 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
-  #pendingCoalescedPosts = new Map<string, Promise<this>>();
+  #pendingCoalescedPosts?: Map<string, { promise: Promise<this>; controller: AbortController; expiresAt: number }>;
 
   protected get coalescedPostActions(): readonly string[] {
     return COALESCED_POST_ACTIONS;
@@ -245,24 +245,21 @@ export abstract class BaseResource {
     }
 
     const key = this.#coalescedPostKey(params);
-    const pending = this.#pendingCoalescedPosts.get(key);
-    if (pending) {
-      return pending;
+    const posts = (this.#pendingCoalescedPosts ??= new Map());
+    const pending = posts.get(key);
+    if (pending && Date.now() < pending.expiresAt) {
+      return pending.promise;
     }
+    pending?.controller.abort();
 
     const controller = new AbortController();
-    const expireTimer = setTimeout(() => {
-      this.#pendingCoalescedPosts.delete(key);
-      controller.abort();
-    }, COALESCED_POST_TTL_MS);
-    const post = this._baseMutate<J>({ ...params, method: 'POST', signal: controller.signal }).finally(() => {
-      clearTimeout(expireTimer);
-      if (this.#pendingCoalescedPosts.get(key) === post) {
-        this.#pendingCoalescedPosts.delete(key);
+    const promise = this._baseMutate<J>({ ...params, method: 'POST', signal: controller.signal }).finally(() => {
+      if (posts.get(key)?.promise === promise) {
+        posts.delete(key);
       }
     });
-    this.#pendingCoalescedPosts.set(key, post);
-    return post;
+    posts.set(key, { promise, controller, expiresAt: Date.now() + COALESCED_POST_TTL_MS });
+    return promise;
   }
 
   #coalescedPostKey(params: BaseMutateParams): string {

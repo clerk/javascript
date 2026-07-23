@@ -198,10 +198,10 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledTimes(1);
 
         vi.advanceTimersByTime(30_000);
-        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(true);
 
         void signIn.prepareFirstFactor(params);
         expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(true);
         expect(mockFetch.mock.calls[1][0].signal.aborted).toBe(false);
       } finally {
         vi.useRealTimers();
