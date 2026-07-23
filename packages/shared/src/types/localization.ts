@@ -1533,9 +1533,6 @@ export type __internal_LocalizationResource = {
           redirectUri: {
             label: LocalizationValue;
           };
-          debugRedirectUri: {
-            label: LocalizationValue;
-          };
         };
         claimsStep: {
           attributeMappingTable: {
