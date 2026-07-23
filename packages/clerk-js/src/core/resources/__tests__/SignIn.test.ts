@@ -197,10 +197,12 @@ describe('SignIn', () => {
         void signIn.prepareFirstFactor(params);
         expect(mockFetch).toHaveBeenCalledTimes(1);
 
-        vi.advanceTimersByTime(15_000);
+        vi.advanceTimersByTime(30_000);
+        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(true);
 
         void signIn.prepareFirstFactor(params);
         expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch.mock.calls[1][0].signal.aborted).toBe(false);
       } finally {
         vi.useRealTimers();
       }
@@ -503,6 +505,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -517,6 +520,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -531,6 +535,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -545,6 +550,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_0',
             strategy: 'email_code',
@@ -917,6 +923,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'email_code',
@@ -951,6 +958,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_456',
             strategy: 'email_code',
@@ -1023,6 +1031,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             redirectUrl: 'https://example.com/verify',
@@ -1057,6 +1066,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             redirectUrl: 'https://other.com/verify',
@@ -1094,6 +1104,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_456',
             redirectUrl: 'https://example.com/verify',
@@ -1242,6 +1253,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1273,6 +1285,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1308,6 +1321,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_456',
             strategy: 'phone_code',
@@ -1374,6 +1388,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'reset_password_email_code',
@@ -1439,6 +1454,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'reset_password_phone_code',
@@ -1468,6 +1484,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'reset_password_phone_code',
@@ -1598,6 +1615,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_second_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1640,6 +1658,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_second_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'email_code',
@@ -1716,6 +1735,7 @@ describe('SignIn', () => {
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ins/signin_123/prepare_first_factor',
+            signal: expect.any(AbortSignal),
             body: { strategy: 'passkey' },
           }),
         );
@@ -2023,6 +2043,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             web3WalletId: 'wallet_123',
             strategy: 'web3_metamask_signature',
@@ -2355,6 +2376,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'enterprise_sso',
             redirectUrl: 'https://example.com/sso-callback',
@@ -2410,6 +2432,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_ticket/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'enterprise_sso',
             redirectUrl: 'https://example.com/sso-callback',
@@ -2516,6 +2539,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(1, {
           method: 'POST',
           path: '/client/sign_ins/signin_enterprise/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: expect.objectContaining({
             strategy: 'enterprise_sso',
           }),

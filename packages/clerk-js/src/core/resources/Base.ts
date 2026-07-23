@@ -27,9 +27,10 @@ export type BaseMutateParams = {
   body?: any;
   method?: HTTPMethod;
   path?: string;
+  signal?: AbortSignal;
 };
 
-const COALESCED_POST_TTL_MS = 15_000;
+const COALESCED_POST_TTL_MS = 30_000;
 const COALESCED_POST_ACTIONS: readonly string[] = [];
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
@@ -226,9 +227,9 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
+    const { action, body, method, path, signal } = params;
     // TODO @userland-errors:
-    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
+    const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body, signal });
     return this.fromJSON((json?.response || json) as J);
   }
 
@@ -249,10 +250,12 @@ export abstract class BaseResource {
       return pending;
     }
 
-    // The TTL guards against a stalled request (no client-side fetch timeout) pinning the entry and
-    // silently swallowing retries such as "resend code" until page reload.
-    const expireTimer = setTimeout(() => this.#pendingCoalescedPosts.delete(key), COALESCED_POST_TTL_MS);
-    const post = this._baseMutate<J>({ ...params, method: 'POST' }).finally(() => {
+    const controller = new AbortController();
+    const expireTimer = setTimeout(() => {
+      this.#pendingCoalescedPosts.delete(key);
+      controller.abort();
+    }, COALESCED_POST_TTL_MS);
+    const post = this._baseMutate<J>({ ...params, method: 'POST', signal: controller.signal }).finally(() => {
       clearTimeout(expireTimer);
       if (this.#pendingCoalescedPosts.get(key) === post) {
         this.#pendingCoalescedPosts.delete(key);

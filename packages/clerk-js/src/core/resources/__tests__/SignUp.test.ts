@@ -623,6 +623,7 @@ describe('SignUp', () => {
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ups/signup_123/prepare_verification',
+            signal: expect.any(AbortSignal),
             body: expect.objectContaining({
               strategy: 'phone_code',
             }),
@@ -652,6 +653,7 @@ describe('SignUp', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ups/signup_123/prepare_verification',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'email_link',
             redirectUrl: 'https://example.com/verify',
@@ -674,6 +676,7 @@ describe('SignUp', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ups/signup_123/prepare_verification',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'email_link',
             redirectUrl: 'https://other.com/verify',
