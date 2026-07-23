@@ -1,5 +1,5 @@
-import { ASSIGN } from './types';
 import type { AssignAction, EventObject } from './types';
+import { ASSIGN } from './types';
 
 /**
  * Context-update action creator. The returned object is recognised by the

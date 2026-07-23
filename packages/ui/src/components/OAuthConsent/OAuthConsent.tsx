@@ -13,6 +13,7 @@ import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
+import { getKnownOAuthClient } from './knownClients';
 import {
   ListGroup,
   ListGroupContent,
@@ -21,7 +22,7 @@ import {
   ListGroupItem,
   ListGroupItemLabel,
 } from './ListGroup';
-import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
+import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
@@ -89,6 +90,11 @@ function _OAuthConsent() {
   const { t } = useLocalizations();
   const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
+
+  // When the OAuth app has no uploaded logo, fall back to a recognized client's
+  // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
+  // the app-owner-set name, so a look-alike name cannot borrow the branding.
+  const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -159,16 +165,20 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
@@ -176,20 +186,24 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
                   <Box sx={{ position: 'relative' }}>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
-                    <LogoGroupIcon
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
+                    <LogoGroupItemContainer
                       size='sm'
                       sx={t => ({
                         position: 'absolute',
-                        bottom: `calc(${t.space.$3} * -1)`,
-                        insetInlineEnd: `calc(${t.space.$3} * -1)`,
+                        bottom: `calc(${t.space.$2x5} * -1)`,
+                        insetInlineEnd: `calc(${t.space.$2x5} * -1)`,
                       })}
-                    />
+                    >
+                      <LogoGroupIcon />
+                    </LogoGroupItemContainer>
                   </Box>
                 </LogoGroup>
               )}
@@ -197,18 +211,32 @@ function _OAuthConsent() {
               {!oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <LogoGroupIcon />
+                    <LogoGroupItemContainer>
+                      <LogoGroupIcon
+                        icon={knownClient?.icon}
+                        iconSx={knownClient?.iconSx}
+                        label={knownClient?.name}
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
               {/* no avatars */}
               {!oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
-                  <LogoGroupIcon />
+                  <LogoGroupItemContainer>
+                    <LogoGroupIcon
+                      icon={knownClient?.icon}
+                      iconSx={knownClient?.iconSx}
+                      label={knownClient?.name}
+                    />
+                  </LogoGroupItemContainer>
                 </LogoGroup>
               )}
               <Header.Title localizationKey={oauthApplicationName} />

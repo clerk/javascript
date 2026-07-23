@@ -1,4 +1,4 @@
-import { requireNativeModule } from 'expo';
+import { requireOptionalNativeModule } from 'expo';
 
 type NativeMap = Record<string, unknown>;
 
@@ -10,4 +10,6 @@ interface Spec {
   signOut(): Promise<void>;
 }
 
-export default requireNativeModule<Spec>('ClerkGoogleSignIn');
+// Optional so getNativeModule() surfaces its actionable error rather than
+// throwing at import time.
+export default requireOptionalNativeModule<Spec>('ClerkGoogleSignIn');

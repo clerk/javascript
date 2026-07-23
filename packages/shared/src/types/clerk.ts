@@ -1044,7 +1044,7 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session) are mounted.
    *
-   * @param opts - Options to control the redirect (e.g. redirect URL after tasks are complete).
+   * @param opts - Options to control the redirect (e.g., redirect URL after tasks are complete).
    */
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
@@ -1201,7 +1201,7 @@ export interface Clerk {
   apiKeys: APIKeysNamespace;
 
   /**
-   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   * OAuth application helpers (e.g., consent metadata for custom consent UIs).
    */
   oauthApplication: OAuthApplicationNamespace;
 
@@ -1389,7 +1389,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     polling?: boolean;
     /**
-     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g., by selecting a specific session.
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
@@ -1952,7 +1952,7 @@ export type UserProfileProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
-   * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
+   * e.g., <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
   /*
@@ -1969,7 +1969,7 @@ export type UserProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <UserProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2018,7 +2018,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <OrganizationProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2125,7 +2125,7 @@ export type UserButtonProps = UserButtonProfileMode & {
 
   /**
    * Specify options for the underlying <UserProfile /> component.
-   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+   * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
@@ -2227,7 +2227,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     appearance?: ClerkAppearanceTheme;
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+     * e.g., <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
   };
@@ -2347,7 +2347,7 @@ type PricingTableBaseProps = {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify options for the underlying <Checkout /> component.
-   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   * e.g., <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
    */
   checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };

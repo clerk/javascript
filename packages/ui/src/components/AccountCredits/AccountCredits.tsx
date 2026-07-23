@@ -1,4 +1,5 @@
 import { ProfileSection } from '@/ui/elements/Section';
+
 import { useCreditBalance, useSubscriberTypeLocalizationRoot } from '../../contexts';
 import { localizationKeys, Text, useLocalizations } from '../../customizables';
 import { useRouter } from '../../router';

@@ -3,8 +3,8 @@ import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-
 import { act, renderHook, waitFor } from '@/test/utils';
+
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,

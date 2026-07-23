@@ -55,6 +55,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'logoGroup',
   'logoGroupItem',
+  'logoGroupItemContainer',
   'logoGroupIcon',
   'logoGroupSeparator',
 
