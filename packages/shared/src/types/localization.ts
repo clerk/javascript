@@ -1403,6 +1403,10 @@ export type __internal_LocalizationResource = {
         google: LocalizationValue;
         microsoft: LocalizationValue;
       };
+      oidc: {
+        groupLabel: LocalizationValue;
+        oidcProvider: LocalizationValue;
+      };
       warning: LocalizationValue;
     };
     changeProviderDialog: {
@@ -1520,6 +1524,21 @@ export type __internal_LocalizationResource = {
       activeConnectionWarning: {
         title: LocalizationValue;
         dismiss: LocalizationValue;
+      };
+      oidcCustom: {
+        mainHeaderTitle: LocalizationValue;
+        redirectUriStep: {
+          headerSubtitle: LocalizationValue;
+        };
+        claimsStep: {
+          headerSubtitle: LocalizationValue;
+        };
+        endpointsStep: {
+          headerSubtitle: LocalizationValue;
+        };
+        credentialsStep: {
+          headerSubtitle: LocalizationValue;
+        };
       };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;

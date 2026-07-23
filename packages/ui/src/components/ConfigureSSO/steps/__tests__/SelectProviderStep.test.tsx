@@ -25,6 +25,7 @@ const changeProvider = vi.fn();
 const contextState = vi.hoisted(() => ({
   provider: undefined as 'saml_okta' | 'saml_custom' | 'saml_google' | undefined,
   hasConnection: false,
+  isOIDCFlowEnabled: false,
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
@@ -39,6 +40,7 @@ vi.mock('../../ConfigureSSOContext', () => ({
       provider: contextState.provider,
       hasConnection: contextState.hasConnection,
     },
+    isOIDCFlowEnabled: contextState.isOIDCFlowEnabled,
   }),
 }));
 
@@ -62,6 +64,7 @@ const resetMocks = () => {
   changeProvider.mockResolvedValue(undefined);
   contextState.provider = undefined;
   contextState.hasConnection = false;
+  contextState.isOIDCFlowEnabled = false;
 };
 
 describe('SelectProviderStep', () => {
@@ -103,6 +106,30 @@ describe('SelectProviderStep', () => {
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/okta\.svg/);
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/saml\.svg/);
     expect(collectedStyles).toMatch(/img\.clerk\.com\/static\/google\.svg/);
+  });
+
+  describe('OIDC provider (experimental flag)', () => {
+    it('hides the OIDC provider tile when the flag is off', async () => {
+      resetMocks();
+      const { wrapper } = await createFixtures();
+      renderStep(wrapper);
+
+      // SAML is unaffected by the gate; only OIDC is hidden.
+      expect(screen.getByRole('radio', { name: 'Okta Workforce' })).toBeInTheDocument();
+      expect(screen.queryByRole('radio', { name: 'OIDC Provider' })).not.toBeInTheDocument();
+    });
+
+    it('shows the OIDC provider tile when the flag is on', async () => {
+      resetMocks();
+      contextState.isOIDCFlowEnabled = true;
+      const { wrapper } = await createFixtures();
+      const { container } = renderStep(wrapper);
+
+      expect(screen.getByRole('radio', { name: 'OIDC Provider' })).toBeInTheDocument();
+      // Four SAML tiles plus the single OIDC tile.
+      const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
+      expect(iconSpans).toHaveLength(5);
+    });
   });
 
   it('disables Continue when no provider is selected', async () => {
