@@ -7,6 +7,9 @@
 export { Button } from '../components/button';
 export type { ButtonProps } from '../components/button';
 
+export { Item } from '../components/item';
+export type { ItemMediaProps, ItemProps } from '../components/item';
+
 import { colorVars, radiusVars, space, spacingVars, typeScaleVars } from '../tokens.stylex';
 
 export { colorVars, radiusVars, space, spacingVars, typeScaleVars };

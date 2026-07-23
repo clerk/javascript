@@ -1,0 +1,92 @@
+import * as ItemStories from './item.stories';
+
+# Item
+
+Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Media`, `Item.Content`, `Item.Title`, …) and renders as a `<div>` by default. Pass a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ItemStories}
+/>
+
+### Variants
+
+<Story
+  name='Variants'
+  storyModule={ItemStories}
+/>
+
+### Interactive
+
+<Story
+  name='Interactive'
+  storyModule={ItemStories}
+/>
+
+### Group
+
+<Story
+  name='Group'
+  storyModule={ItemStories}
+/>
+
+## Usage
+
+```tsx
+import { Item } from '@clerk/ui/mosaic/components/item';
+
+<Item.Group>
+  <Item render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
+    <Item.Media variant='icon'>
+      <BuildingIcon />
+    </Item.Media>
+    <Item.Content>
+      <Item.Title>Test Organization</Item.Title>
+      <Item.Description>Member</Item.Description>
+    </Item.Content>
+    <Item.Actions>
+      <Button variant='outline'>Manage</Button>
+    </Item.Actions>
+  </Item>
+</Item.Group>;
+```
+
+## Parts
+
+| Part               | Slot (`data-cl-slot` / class) | Description                                                          |
+| ------------------ | ----------------------------- | -------------------------------------------------------------------- |
+| `Item`             | `cl-item`                     | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Media`       | `cl-item-media`               | Leading (or trailing) media: icon, image, or avatar.                 |
+| `Item.Content`     | `cl-item-content`             | Vertical stack that grows to fill the row between media and actions. |
+| `Item.Title`       | `cl-item-title`               | Primary label.                                                       |
+| `Item.Description` | `cl-item-description`         | Secondary text, clamped to two lines. Renders a `<p>`.               |
+| `Item.Actions`     | `cl-item-actions`             | Trailing controls (buttons, badges).                                 |
+| `Item.Footer`      | `cl-item-footer`              | Full-width band below the content row for supplementary metadata.    |
+| `Item.Group`       | `cl-item-group`               | Vertical list wrapper (`role="list"`).                               |
+| `Item.Separator`   | `cl-item-separator`           | Thin divider (`<hr>`) between rows.                                  |
+
+Every part accepts a `render` prop for element polymorphism and forwards a ref.
+
+## Styling
+
+The root reflects its props as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
+
+| Prop      | Attribute          | Values                              | Default   |
+| --------- | ------------------ | ----------------------------------- | --------- |
+| `variant` | `data-variant`     | `default` \| `outline` \| `muted`   | `default` |
+| `size`    | `data-size`        | `default` \| `sm`                   | `default` |
+| `render`  | `data-interactive` | present when a `render` is provided | —         |
+
+```css
+/* Tighten a specific list's rows and re-theme the muted variant */
+.cl-item[data-size='sm'] {
+  --cl-spacing: 0.2rem;
+}
+.cl-item[data-variant='muted'] {
+  background-color: var(--cl-color-card);
+}
+```
+
+`Item.Media` also carries `data-variant` (`default` | `icon` | `image`): `icon` renders a bordered `--cl-color-muted` tile, `image` a rounded avatar frame that clips its child. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).
