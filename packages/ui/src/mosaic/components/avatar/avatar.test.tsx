@@ -1,27 +1,55 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Avatar } from './avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+
+// jsdom never fires load/error on images, so drive `new window.Image()` manually.
+// Each instance resolves to the outcome keyed by its `src`.
+type Outcome = 'load' | 'error';
+let outcomes: Record<string, Outcome> = {};
+
+class MockImage {
+  onload: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  set src(value: string) {
+    queueMicrotask(() => {
+      if (outcomes[value] === 'error') {
+        this.onerror?.();
+      } else {
+        this.onload?.();
+      }
+    });
+  }
+}
+
+vi.stubGlobal('Image', MockImage);
+
+afterEach(() => {
+  outcomes = {};
+});
 
 describe('Mosaic Avatar', () => {
-  it('applies default variants when none are passed', () => {
-    render(<Avatar data-testid='avatar'>AC</Avatar>);
+  it('applies default variants and reflects them as data attributes', () => {
+    render(
+      <Avatar data-testid='avatar'>
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>,
+    );
     const avatar = screen.getByTestId('avatar');
     expect(avatar).toHaveClass('cl-avatar');
     expect(avatar).toHaveAttribute('data-shape', 'circle');
     expect(avatar).toHaveAttribute('data-size', 'md');
-    expect(avatar).toHaveTextContent('AC');
   });
 
-  it('reflects shape and size as data attributes', () => {
+  it('reflects shape and size overrides', () => {
     render(
       <Avatar
         data-testid='avatar'
         shape='square'
         size='lg'
       >
-        AC
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>,
     );
     const avatar = screen.getByTestId('avatar');
@@ -29,48 +57,69 @@ describe('Mosaic Avatar', () => {
     expect(avatar).toHaveAttribute('data-size', 'lg');
   });
 
-  it('renders an image when src is provided instead of children', () => {
+  it('shows the fallback while the image has not loaded', () => {
+    outcomes['https://example.com/a.png'] = 'error';
     render(
-      <Avatar
-        src='https://example.com/a.png'
-        alt='Alex'
-      >
-        AC
+      <Avatar>
+        <AvatarImage src='https://example.com/a.png' />
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>,
     );
-    const img = screen.getByRole('img', { name: 'Alex' });
+    const fallback = screen.getByText('CN');
+    expect(fallback).toHaveClass('cl-avatar-fallback');
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('renders the image and hides the fallback once it loads', async () => {
+    outcomes['https://example.com/a.png'] = 'load';
+    render(
+      <Avatar>
+        <AvatarImage
+          src='https://example.com/a.png'
+          alt='Alex'
+        />
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>,
+    );
+    const img = await screen.findByRole('img', { name: 'Alex' });
+    expect(img).toHaveClass('cl-avatar-image');
     expect(img).toHaveAttribute('src', 'https://example.com/a.png');
-    expect(screen.queryByText('AC')).not.toBeInTheDocument();
+    expect(screen.queryByText('CN')).not.toBeInTheDocument();
   });
 
-  it('wires consumer className/style through to the element', () => {
+  it('keeps the fallback when the image errors', async () => {
+    outcomes['https://example.com/bad.png'] = 'error';
     render(
-      <Avatar
-        data-testid='avatar'
-        className='my-avatar'
-        style={{ marginTop: '8px' }}
-      >
-        AC
+      <Avatar>
+        <AvatarImage src='https://example.com/bad.png' />
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>,
     );
-    const avatar = screen.getByTestId('avatar');
-    expect(avatar).toHaveClass('cl-avatar', 'my-avatar');
-    expect(avatar).toHaveStyle({ marginTop: '8px' });
+    await waitFor(() => expect(screen.getByText('CN')).toBeInTheDocument());
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('forwards arbitrary props and the ref', () => {
+  it('wires consumer className/style/ref through to the root', () => {
     const ref = React.createRef<HTMLSpanElement>();
     render(
       <Avatar
         ref={ref}
         data-testid='avatar'
-        aria-label='User avatar'
+        className='my-avatar'
+        style={{ marginTop: '8px' }}
       >
-        AC
+        <AvatarFallback>CN</AvatarFallback>
       </Avatar>,
     );
     const avatar = screen.getByTestId('avatar');
     expect(ref.current).toBe(avatar);
-    expect(avatar).toHaveAttribute('aria-label', 'User avatar');
+    expect(avatar).toHaveClass('cl-avatar', 'my-avatar');
+    expect(avatar).toHaveStyle({ marginTop: '8px' });
+  });
+
+  it('throws when a part is rendered outside <Avatar>', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<AvatarFallback>CN</AvatarFallback>)).toThrow(/must be rendered inside <Avatar>/);
+    spy.mockRestore();
   });
 });

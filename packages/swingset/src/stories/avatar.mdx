@@ -2,7 +2,7 @@ import * as AvatarStories from './avatar.stories';
 
 # Avatar
 
-Avatar represents a user or entity with an image, falling back to initials or an icon when no image is available.
+Avatar represents a user or entity as an image, falling back to initials or an icon when the image is missing or fails to load. It is a compound component: `Avatar` clips and sizes the box, `Avatar.Image` renders the picture once it loads, and `Avatar.Fallback` shows until then.
 
 ## Playground
 
@@ -13,25 +13,42 @@ Avatar represents a user or entity with an image, falling back to initials or an
 
 ## Props
 
+`shape` and `size` live on the `Avatar` root:
+
 <PropTable meta={AvatarStories.meta} />
 
 ## Usage
 
-<Usage
-  component='Avatar'
-  module='@clerk/ui/mosaic/components/avatar'
->
-  AC
-</Usage>
+```tsx
+import { Avatar, AvatarImage, AvatarFallback } from '@clerk/ui/mosaic/components/avatar';
+
+<Avatar>
+  <AvatarImage
+    src='https://github.com/shadcn.png'
+    alt='@shadcn'
+  />
+  <AvatarFallback>CN</AvatarFallback>
+</Avatar>;
+```
+
+## Parts
+
+| Part             | Slot (`.cl-*`)       | Description                                                            |
+| ---------------- | -------------------- | ---------------------------------------------------------------------- |
+| `Avatar`         | `cl-avatar`          | Root. Owns `shape` / `size`, clips its children to the shape.          |
+| `AvatarImage`    | `cl-avatar-image`    | Renders an `<img>` once the source loads; renders nothing until then.  |
+| `AvatarFallback` | `cl-avatar-fallback` | Rendered while the image is pending or has failed. Optional `delayMs`. |
 
 ---
 
 ## Examples
 
-### Image
+### Fallback
+
+When the image fails to load, the fallback stays visible.
 
 <Story
-  name='Image'
+  name='Fallback'
   storyModule={AvatarStories}
 />
 

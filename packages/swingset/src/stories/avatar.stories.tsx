@@ -32,49 +32,48 @@ function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as AvatarProps;
 }
 
-const IMAGE_SRC = 'https://images.clerk.dev/uploaded/img_avatar-placeholder.png';
+const IMAGE_SRC = 'https://github.com/shadcn.png';
 
 export function Primary(props: Record<string, unknown>) {
-  return <Avatar {...knobsAsProps(props)}>AC</Avatar>;
+  return (
+    <Avatar {...knobsAsProps(props)}>
+      <AvatarImage
+        src={IMAGE_SRC}
+        alt='@shadcn'
+      />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  );
 }
 
-export function Image(props: Record<string, unknown>) {
+export function Fallback(props: Record<string, unknown>) {
   return (
-    <Avatar
-      {...knobsAsProps(props)}
-      src={IMAGE_SRC}
-      alt='Alex Carpenter'
-    />
+    <Avatar {...knobsAsProps(props)}>
+      <AvatarImage
+        src='https://example.com/broken.png'
+        alt='@shadcn'
+      />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
   );
 }
 
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <Avatar
-        {...knobsAsProps(props)}
-        size='xs'
-      >
-        XS
-      </Avatar>
-      <Avatar
-        {...knobsAsProps(props)}
-        size='sm'
-      >
-        SM
-      </Avatar>
-      <Avatar
-        {...knobsAsProps(props)}
-        size='md'
-      >
-        MD
-      </Avatar>
-      <Avatar
-        {...knobsAsProps(props)}
-        size='lg'
-      >
-        LG
-      </Avatar>
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
+        <Avatar
+          key={size}
+          {...knobsAsProps(props)}
+          size={size}
+        >
+          <AvatarImage
+            src={IMAGE_SRC}
+            alt='@shadcn'
+          />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      ))}
     </div>
   );
 }
@@ -82,18 +81,19 @@ export function Sizes(props: Record<string, unknown>) {
 export function Shapes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <Avatar
-        {...knobsAsProps(props)}
-        shape='circle'
-      >
-        AC
-      </Avatar>
-      <Avatar
-        {...knobsAsProps(props)}
-        shape='square'
-      >
-        AC
-      </Avatar>
+      {(['circle', 'square'] as const).map(shape => (
+        <Avatar
+          key={shape}
+          {...knobsAsProps(props)}
+          shape={shape}
+        >
+          <AvatarImage
+            src={IMAGE_SRC}
+            alt='@shadcn'
+          />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      ))}
     </div>
   );
 }
