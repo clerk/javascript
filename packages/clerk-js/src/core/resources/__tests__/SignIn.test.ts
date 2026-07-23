@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
@@ -34,6 +35,174 @@ describe('SignIn', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('prepareSecondFactor', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('coalesces concurrent identical preparations', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      const first = signIn.prepareSecondFactor(params);
+      const second = signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('does not coalesce preparations for different factors', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+
+      await Promise.all([
+        signIn.prepareSecondFactor({ strategy: 'email_code', emailAddressId: 'email_123' }),
+        signIn.prepareSecondFactor({ strategy: 'email_code', emailAddressId: 'email_456' }),
+      ]);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request succeeds', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      await signIn.prepareSecondFactor(params);
+      await signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request fails', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('prepare failed'))
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      await expect(signIn.prepareSecondFactor(params)).rejects.toThrow('prepare failed');
+      await signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('factor preparation across APIs', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('coalesces concurrent first-factor preparations', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      const first = signIn.prepareFirstFactor(params);
+      const second = signIn.prepareFirstFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('coalesces concurrent first-factor preparations from the future API', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      signIn.supportedFirstFactors = [
+        { strategy: 'email_code', emailAddressId: 'email_123', safeIdentifier: 't***@example.com' },
+      ];
+
+      const first = signIn.__internal_future.emailCode.sendCode({ emailAddressId: 'email_123' });
+      const second = signIn.__internal_future.emailCode.sendCode({ emailAddressId: 'email_123' });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('coalesces concurrent second-factor preparations from the future API', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      signIn.supportedSecondFactors = [
+        { strategy: 'email_code', emailAddressId: 'email_123', safeIdentifier: 't***@example.com' },
+      ];
+
+      const first = signIn.__internal_future.mfa.sendEmailCode();
+      const second = signIn.__internal_future.mfa.sendEmailCode();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('does not coalesce concurrent factor attempts', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, code: '123456' };
+
+      const first = signIn.attemptFirstFactor(params);
+      const second = signIn.attemptFirstFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
   });
 
   describe('authenticateWithRedirect with an OAuth transport', () => {

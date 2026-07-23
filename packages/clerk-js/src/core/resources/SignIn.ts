@@ -98,7 +98,17 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, UserData, Verification } from './internal';
+import { type BaseMutateParams, BaseResource, UserData, Verification } from './internal';
+
+const isFactorPreparationAction = (action?: string): action is 'prepare_first_factor' | 'prepare_second_factor' =>
+  action === 'prepare_first_factor' || action === 'prepare_second_factor';
+
+const factorPreparationKey = (params: BaseMutateParams): string => {
+  const body = Object.entries(params.body ?? {})
+    .filter(([, value]) => value !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right));
+  return JSON.stringify([params.path, params.action, body]);
+};
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -115,6 +125,25 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
+  #pendingFactorPreparations = new Map<string, Promise<this>>();
+
+  protected override _basePost(params: BaseMutateParams = {}): Promise<this> {
+    if (!isFactorPreparationAction(params.action)) {
+      return super._basePost(params);
+    }
+
+    const key = factorPreparationKey(params);
+    const pending = this.#pendingFactorPreparations.get(key);
+    if (pending) {
+      return pending;
+    }
+
+    const preparation = super._basePost(params).finally(() => {
+      this.#pendingFactorPreparations.delete(key);
+    });
+    this.#pendingFactorPreparations.set(key, preparation);
+    return preparation;
+  }
 
   /**
    * The current status of the sign-in process.
