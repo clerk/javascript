@@ -75,6 +75,13 @@ const { applyVariants, filterProps } = createVariants(
             [vars.border]: theme.colors.$danger500,
             [vars.alpha]: theme.colors.$dangerAlpha50,
           },
+          warning: {
+            [vars.accent]: theme.colors.$warning500,
+            [vars.accentHover]: theme.colors.$warning600,
+            [vars.accentContrast]: theme.colors.$white,
+            [vars.border]: theme.colors.$warning500,
+            [vars.alpha]: theme.colors.$warningAlpha50,
+          },
         },
         variant: {
           solid: {

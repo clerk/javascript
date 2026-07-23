@@ -1,0 +1,105 @@
+import { isVirtualClick } from '@floating-ui/react/utils';
+import * as React from 'react';
+
+import { Box, Button } from '../customizables';
+import { useDevMode } from '../hooks/useDevMode';
+import { useFormField } from '../primitives/hooks/useFormField';
+import { common } from '../styledSystem';
+import type { FieldDevHintValue } from './FieldDevHint';
+
+type FieldDevInsertButtonProps = React.PropsWithChildren<{ hint: FieldDevHintValue }>;
+
+/**
+ * Dev-only affordance: renders the field's input with a small "use test credential"
+ * button overlaid inside it, right-aligned. The button is shown while the input is
+ * focused and its value is not yet a valid test credential (per `hint.isTestValue`),
+ * so it stays available while a developer types a non-test address and hides once the
+ * value is a test credential. When no predicate is given it hides as soon as the field
+ * has any value. It reserves matching padding on the input so text/placeholder never
+ * runs beneath it. Renders nothing outside dev mode.
+ */
+export const FieldDevInsertButton = (props: FieldDevInsertButtonProps) => {
+  const { showDevModeNotice } = useDevMode();
+  const { value } = useFormField();
+  const { action, isTestValue } = props.hint;
+
+  const stringValue = typeof value === 'string' ? value : '';
+  const hasValue = stringValue.length > 0;
+  // With a predicate, keep offering the button until the value is a real test credential
+  // (so it stays visible while the developer types a non-test address). Without one, fall
+  // back to hiding as soon as the field has any value.
+  const isTestCredential = isTestValue ? isTestValue(stringValue) : hasValue;
+
+  const [isFocused, setIsFocused] = React.useState(false);
+  const [buttonWidth, setButtonWidth] = React.useState(0);
+  const boxRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  const visible = !!action && showDevModeNotice && isFocused && !isTestCredential;
+
+  React.useLayoutEffect(() => {
+    if (visible && buttonRef.current) {
+      setButtonWidth(buttonRef.current.offsetWidth);
+    }
+  }, [visible, action?.label]);
+
+  const label = action?.label;
+
+  return (
+    <Box
+      ref={boxRef}
+      onFocus={() => setIsFocused(true)}
+      // Keep focused while focus moves within the field (e.g. onto the button itself),
+      // so the button does not unmount out from under a click.
+      onBlur={e => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setIsFocused(false);
+        }
+      }}
+      sx={t => ({
+        position: 'relative',
+        ...(visible &&
+          buttonWidth > 0 && {
+            // Reserve room for the button (its width) plus its trailing inset and a small gap.
+            '& input': { paddingInlineEnd: `calc(${buttonWidth}px + ${t.space.$2})` },
+          }),
+      })}
+    >
+      {props.children}
+      {visible && (
+        <Button
+          ref={buttonRef}
+          variant='outline'
+          textVariant='buttonSmall'
+          localizationKey={typeof label === 'string' ? undefined : label}
+          // Prevent the mousedown from blurring the input, so it stays focused through a pointer click.
+          onMouseDown={e => e.preventDefault()}
+          onClick={e => {
+            action?.onInsert();
+            // The button unmounts once a test credential is inserted. Pointer clicks keep focus on the
+            // input via onMouseDown above; only keyboard/AT activation (a virtual click) would drop focus
+            // out of the field, so restore it in that case. `isVirtualClick` also avoids re-opening the
+            // on-screen keyboard on touch. Mirrors InputWithIcon's clear button.
+            if (isVirtualClick(e.nativeEvent)) {
+              boxRef.current?.querySelector('input')?.focus({ preventScroll: true });
+            }
+          }}
+          sx={t => ({
+            // Reuse the canonical trailing-button geometry (symmetric $1 inset, radius
+            // concentric with the input's), then layer on the text-button chrome.
+            ...common.inputTrailingButton(t),
+            paddingBlock: 0,
+            color: t.colors.$neutralAlpha600,
+            backgroundColor: t.colors.$colorBackground,
+            whiteSpace: 'nowrap',
+            // Above the phone input's container, which sets position:relative; z-index:1
+            // and would otherwise paint over the button and swallow the click.
+            zIndex: 2,
+          })}
+        >
+          {typeof label === 'string' ? label : undefined}
+        </Button>
+      )}
+    </Box>
+  );
+};

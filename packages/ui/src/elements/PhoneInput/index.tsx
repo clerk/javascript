@@ -34,6 +34,17 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
     locationBasedCountryIso,
   });
 
+  // The component seeds its internal state from `value` only on mount. Sync later
+  // programmatic `value` changes (e.g. inserting a test phone number, or a parent
+  // clearing the field) into the internal state; guarded on inequality so it never
+  // loops with onChange.
+  useEffect(() => {
+    if (typeof value === 'string' && value !== numberWithCode) {
+      setNumberAndIso(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   const callOnChangeProp = () => {
     // Quick and dirty way to match this component's public API
     // with every other Input component, so we can use the same helpers

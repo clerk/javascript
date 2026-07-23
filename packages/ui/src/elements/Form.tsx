@@ -12,6 +12,8 @@ import { LastAuthenticationStrategyBadge } from './Badge';
 import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
+import type { FieldDevHintValue } from './FieldDevHint';
+import { FieldDevInsertButton } from './FieldDevInsertButton';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -126,17 +128,29 @@ type CommonInputProps = CommonFieldRootProps & {
   onActionClicked?: React.MouseEventHandler;
   icon?: React.ComponentType;
   isLastAuthenticationStrategy?: boolean;
+  devHint?: FieldDevHintValue;
 };
 
 const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
-  const { isOptional, isLastAuthenticationStrategy, icon, actionLabel, children, onActionClicked, ...fieldProps } =
-    props;
+  const {
+    isOptional,
+    isLastAuthenticationStrategy,
+    icon,
+    actionLabel,
+    children,
+    onActionClicked,
+    devHint,
+    ...fieldProps
+  } = props;
   return (
     <Field.Root {...fieldProps}>
       <Col
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
-        sx={{ position: 'relative', flex: '1 1 auto' }}
+        sx={{
+          position: 'relative',
+          flex: '1 1 auto',
+        }}
       >
         <Flex
           direction='col'
@@ -158,7 +172,7 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
             <Field.Action />
           </Field.LabelRow>
 
-          {children}
+          {devHint ? <FieldDevInsertButton hint={devHint}>{children}</FieldDevInsertButton> : children}
         </Flex>
 
         <Field.Feedback />

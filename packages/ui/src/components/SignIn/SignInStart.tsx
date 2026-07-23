@@ -19,6 +19,8 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { isClerkTestEmail, toClerkTestEmail } from '@/ui/utils/clerkTestEmail';
+import { isClerkTestPhoneNumber } from '@/ui/utils/clerkTestPhoneNumber';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -571,6 +573,27 @@ function SignInStartInternal(): JSX.Element {
   // @ts-expect-error `action` is not typed
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
+  const identifierDevHint =
+    identifierAttribute === 'phone_number'
+      ? {
+          text: 'Testing? Use a test phone number so you skip a real SMS. Verify it on the next screen with the code 424242.',
+          action: {
+            label: 'Use test number',
+            onInsert: () => identifierField.setValue('+12015550100'),
+          },
+          isTestValue: isClerkTestPhoneNumber,
+        }
+      : identifierAttribute === 'email_address' || identifierAttribute === 'email_address_username'
+        ? {
+            text: 'Testing? Use a test email so you skip a real inbox. Verify it on the next screen with the code 424242.',
+            action: {
+              label: 'Use test email',
+              onInsert: () => identifierField.setValue(toClerkTestEmail(identifierField.value)),
+            },
+            isTestValue: isClerkTestEmail,
+          }
+        : undefined;
+
   const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
   const isIdentifierLastAuthenticationStrategy =
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
@@ -635,6 +658,7 @@ function SignInStartInternal(): JSX.Element {
                         <DynamicField
                           actionLabel={nextIdentifier?.action}
                           onActionClicked={switchToNextIdentifier}
+                          devHint={identifierDevHint}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
