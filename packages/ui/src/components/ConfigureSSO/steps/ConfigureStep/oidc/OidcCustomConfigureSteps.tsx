@@ -15,7 +15,6 @@ const OIDC_STEPS: WizardStepConfig[] = [
 
 export const OidcCustomConfigureSteps = (): JSX.Element => {
   return (
-    // Linear, guard-less sub-flow: mount on the first step, mirroring the SAML custom inner wizard.
     <Wizard
       steps={OIDC_STEPS}
       initialStepId={OIDC_STEPS[0].id}

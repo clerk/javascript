@@ -12,7 +12,7 @@ import { InnerStepCounter } from '../../../../elements/Wizard/InnerStepCounter';
 import {
   IdentityProviderConfigurationModes,
   type IdpConfigurationMode,
-} from '../../saml/shared/IdentityProviderConfigurationModes';
+} from '../shared/IdentityProviderConfigurationModes';
 import {
   OidcEndpointsConfigurationForm,
   type OidcEndpointsConfigurationFormProps,

@@ -5,7 +5,7 @@ import { type LocalizationKey, Text } from '@/customizables';
 import { Form } from '@/elements/Form';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
-import { ActiveConnectionAlert } from '../../saml/shared/ActiveConnectionAlert';
+import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
 
 type FormControl = FormControlState<FieldId>;
 

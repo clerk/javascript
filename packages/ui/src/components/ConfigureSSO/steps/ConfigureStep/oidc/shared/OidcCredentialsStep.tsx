@@ -12,7 +12,7 @@ import { useConfigureSSO } from '../../../../ConfigureSSOContext';
 import { Step } from '../../../../elements/Step';
 import { useWizard } from '../../../../elements/Wizard';
 import { InnerStepCounter } from '../../../../elements/Wizard/InnerStepCounter';
-import { ActiveConnectionAlert } from '../../saml/shared/ActiveConnectionAlert';
+import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
 
 export const OidcCredentialsStep = (): JSX.Element => {
   const card = useCardState();

@@ -21,7 +21,7 @@ import { ArrowUpTray, Close } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { ActiveConnectionAlert } from './ActiveConnectionAlert';
+import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
 import type { IdpConfigurationMode } from './IdentityProviderConfigurationModes';
 
 type CardState = ReturnType<typeof useCardState>;
