@@ -10,7 +10,13 @@ import type {
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
+const COALESCED_POST_ACTIONS: readonly string[] = ['prepare_verification'];
+
 export class PhoneNumber extends BaseResource implements PhoneNumberResource {
+  protected override get coalescedPostActions(): readonly string[] {
+    return COALESCED_POST_ACTIONS;
+  }
+
   id!: string;
   phoneNumber = '';
   reservedForSecondFactor = false;

@@ -46,6 +46,7 @@ describe('Web3 wallet', () => {
       body: {
         strategy: 'web3_metamask_signature',
       },
+      signal: expect.any(AbortSignal),
     });
   });
 
