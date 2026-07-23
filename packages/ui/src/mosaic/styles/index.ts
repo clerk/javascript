@@ -4,6 +4,8 @@
 // static `styles.css`. Keep it isolated from Emotion/un-migrated code — grow it
 // as components migrate.
 
+export { Avatar } from '../components/avatar';
+export type { AvatarProps } from '../components/avatar';
 export { Button } from '../components/button';
 export type { ButtonProps } from '../components/button';
 
