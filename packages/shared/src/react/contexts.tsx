@@ -70,7 +70,7 @@ export type UseCheckoutOptions = {
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * The ID of the Subscription Plan to check out (e.g. `cplan_xxx`).
+   * The ID of the Subscription Plan to check out (e.g., `cplan_xxx`).
    */
   planId: string;
   /**

@@ -114,6 +114,7 @@ export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
     nodeId,
     close,
     isOpen,
+    // eslint-disable-next-line custom-rules/no-physical-css-properties -- floating-ui computes physical x/y for the chosen strategy
     styles: { position: strategy, top: y ?? 0, left: x ?? 0 },
     context,
     getReferenceProps,

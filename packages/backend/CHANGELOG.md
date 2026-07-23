@@ -1,5 +1,40 @@
 # Change Log
 
+## 3.13.0
+
+### Minor Changes
+
+- Add an `fapiUrl` option to Frontend API proxy helpers so requests can target a custom Clerk Frontend API URL. ([#9223](https://github.com/clerk/javascript/pull/9223)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
+## 3.12.0
+
+### Minor Changes
+
+- Fix a cross-origin handshake bypass where `isKnownClerkReferrer()` trusted overly broad referrer hosts as Clerk-owned: any `accounts.*` host (e.g. `accounts.attacker.com`), plus dev account-portal domains (`*.accounts.dev` and legacy suffixes) on production instances. These let unrelated origins skip the handshake and its session-freshness check. The referrer is now trusted only for the accounts portal derived from the instance's frontend API, plus dev account-portal domains on non-production instances. ([#9145](https://github.com/clerk/javascript/pull/9145)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add an optional `orgId` parameter to `createSignInToken()` for activating an Organization when the token is redeemed. ([#9192](https://github.com/clerk/javascript/pull/9192)) by [@swolfand](https://github.com/swolfand)
+
+### Patch Changes
+
+- Standardize JSDoc punctuation to always follow `e.g.` and `i.e.` with a comma (`e.g.,` / `i.e.,`), matching the docs style guide. Comment-only change; no runtime behavior is affected. This keeps the generated Typedoc reference output consistent. ([#9201](https://github.com/clerk/javascript/pull/9201)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add the required `provider` field to `CreateEnterpriseConnectionParams`. The Backend API has always required `provider` when creating an enterprise connection, so calls to `createEnterpriseConnection()` without it type-checked but failed at runtime. The field is typed to the supported provider values (`'saml_custom'`, `'saml_okta'`, `'saml_google'`, `'saml_microsoft'`, `'oidc_custom'`, `'oidc_github_enterprise'`, `'oidc_gitlab'`), so unsupported values are also caught at compile time. ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+
+- Add the remaining optional enterprise connection parameters supported by the Backend API. `CreateEnterpriseConnectionParams` and `UpdateEnterpriseConnectionParams` now accept `allowOrganizationAccountLinking`, `customAttributes`, `authenticatable`, and `disableJitProvisioning` (update also accepts `disableAdditionalIdentifications`), and SAML params accept `loginHint` for configuring the `login_hint` sent to the IdP. ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+
+- Align `CreateEnterpriseConnectionParams` and `UpdateEnterpriseConnectionParams` with the Backend API contract: ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+  - `name` and `domains` are now required on `CreateEnterpriseConnectionParams`. The Backend API already rejected requests missing either of them, so calls that omitted these fields failed at runtime; the types now surface this at compile time.
+  - Deprecated `syncUserAttributes` on `CreateEnterpriseConnectionParams`. The Backend API ignores this parameter on create; use `updateEnterpriseConnection()` to set it.
+  - Deprecated `provider` on `UpdateEnterpriseConnectionParams`. The Backend API ignores this parameter on update; the provider cannot be changed after creation.
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+
 ## 3.11.7
 
 ### Patch Changes

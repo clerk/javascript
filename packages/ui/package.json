@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.25.5",
+  "version": "1.25.8",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -11,6 +11,7 @@
   "author": "Clerk",
   "sideEffects": [
     "./src/utils/setWebpackChunkPublicPath.ts",
+    "./dist-mosaic/styles.css",
     "./register/*"
   ],
   "type": "module",
@@ -51,6 +52,10 @@
       "default": "./dist/themes/experimental.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
+    "./styles.css": {
+      "types": "./styles.css.d.ts",
+      "default": "./dist-mosaic/styles.css"
+    },
     "./register": {
       "import": {
         "types": "./register/index.d.ts",
@@ -66,12 +71,15 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "dist-mosaic",
+    "styles.css.d.ts",
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze",
     "build:esm": "tsdown",
+    "build:mosaic": "tsdown --config tsdown.mosaic.config.mts",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
@@ -84,8 +92,8 @@
     "dev:sandbox:serve": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${UI_PORT:-4011}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
-    "lint:disabled": "eslint src",
     "lint:publint": "publint",
     "showerrors": "tsc",
     "test": "vitest run",
@@ -103,6 +111,7 @@
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
+    "@stylexjs/stylex": "0.19.0",
     "@swc/helpers": "catalog:repo",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",
@@ -119,6 +128,9 @@
     "@rspack/core": "catalog:rspack",
     "@rspack/dev-server": "catalog:rspack",
     "@rspack/plugin-react-refresh": "catalog:rspack",
+    "@stylexjs/eslint-plugin": "0.19.0",
+    "@stylexjs/rollup-plugin": "0.19.0",
+    "@stylexjs/unplugin": "0.19.0",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
@@ -126,6 +138,7 @@
     "cross-fetch": "^4.1.0",
     "minimatch": "^10.2.5",
     "tsdown": "catalog:repo",
+    "unplugin": "^2.3.11",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {

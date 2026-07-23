@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
 
-import { SignInFactorOne } from '../SignInFactorOne';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
+import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

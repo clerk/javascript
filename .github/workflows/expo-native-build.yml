@@ -10,6 +10,7 @@ on:
       - 'integration/templates/expo-native/**'
       - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
+      - 'packages/expo-google-signin/**'
   workflow_dispatch:
 
 permissions:
@@ -74,11 +75,12 @@ jobs:
       - name: Install monorepo dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build and pack @clerk/expo
+      - name: Build and pack Clerk packages
         run: |
           pnpm --filter @clerk/expo... build
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -88,8 +90,10 @@ jobs:
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
           pnpm install --no-frozen-lockfile
-          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-*.tgz)"
-          pnpm add "$SDK_TARBALL" -w
+          # [0-9] keeps this glob off the clerk-expo-google-signin tarball.
+          SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
+          GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
+          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
           # launcher (unreachable Metro in CI), which stalls every Maestro
           # flow on a blank screen. Skip it on e2e jobs only.
