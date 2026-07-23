@@ -1,5 +1,5 @@
-import type { ComponentProps } from '@clerk/headless/utils';
-import { renderElement } from '@clerk/headless/utils';
+import type { ComponentProps, RenderProp } from '@clerk/headless/utils';
+import { useRender } from '@clerk/headless/utils';
 import React from 'react';
 
 import type { RecipeVariantProps } from '../slot-recipe';
@@ -42,7 +42,9 @@ declare module '../registry' {
 }
 
 /** Props for the Text component combining p element attributes with recipe variants. */
-export type TextProps = ComponentProps<'p'> & RecipeVariantProps<typeof textRecipe>;
+export type TextProps = Omit<ComponentProps<'p'>, 'render'> & {
+  render?: RenderProp<React.ComponentPropsWithRef<'p'>> | React.ReactElement;
+} & RecipeVariantProps<typeof textRecipe>;
 
 export const TextContext = React.createContext<Partial<TextProps> | null>(null);
 
@@ -54,8 +56,18 @@ export const TextContext = React.createContext<Partial<TextProps> | null>(null);
 export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(rawProps, ref) {
   const { size, intent, sx, render, ...rest } = useContextProps(rawProps, TextContext);
   const { root } = useRecipe(textRecipe, { variants: { size, intent }, sx });
-  if (render) {
-    return renderElement({ defaultTagName: 'p', render, props: { ref, ...root, ...rest } as Record<string, unknown> });
+  // useRender only runs for `render` (function or element); Emotion processes `css`
+  // inside the consumer's own JSX there. The no-render fallback must stay JSX —
+  // React.createElement bypasses Emotion's factory, leaking css to the DOM.
+  const element = useRender({
+    defaultTagName: 'p',
+    render,
+    ref,
+    enabled: Boolean(render),
+    props: { ...root, ...rest },
+  });
+  if (element) {
+    return element;
   }
   return (
     <p

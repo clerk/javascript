@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Props for {@link DialogTrigger}. */
@@ -15,24 +14,22 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
     const { render, ...otherProps } = props;
     const { open, refs, getReferenceProps } = useDialogContext();
 
-    // floating-ui types `setReference` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setReference, ref]);
-
     const state = { open };
 
     const ownProps = {
       type: 'button',
-      ref: combinedRef,
     } satisfies DefaultProps<'button'>;
 
     const defaultProps = { ...ownProps, ...getReferenceProps() };
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'button',
       render,
+      // floating-ui types `setReference` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),

@@ -34,7 +34,7 @@ export type DefaultProps<Tag extends keyof React.JSX.IntrinsicElements> = React.
 /**
  * Maps state keys to functions that return data-attribute objects (or null).
  */
-type StateAttributesMapping<S> = {
+export type StateAttributesMapping<S> = {
   [K in keyof S]?: (value: S[K]) => Record<string, string> | null;
 };
 
