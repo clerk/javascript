@@ -180,6 +180,44 @@ describe('SignInFactorOne', () => {
           await screen.findByText('Use another method');
           await screen.findByText(`Email code to ${email}`);
         });
+
+        it.each([
+          {
+            name: 'path router',
+            initialUrl: `/sign-in/factor-one?${SIGN_IN_RESET_PASSWORD_INTENT_PARAM}=true&preserved=value`,
+            expectedUrl: '/sign-in/factor-one?preserved=value',
+          },
+          {
+            name: 'hash router',
+            initialUrl: `/sign-in#/factor-one?${SIGN_IN_RESET_PASSWORD_INTENT_PARAM}=true&preserved=value`,
+            expectedUrl: '/sign-in#/factor-one?preserved=value',
+          },
+        ])('removes the reset intent when leaving under the $name', async ({ initialUrl, expectedUrl }) => {
+          const originalUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+          window.history.replaceState(window.history.state, '', initialUrl);
+
+          try {
+            const { wrapper, fixtures } = await createFixturesWithResetIntent(f => {
+              f.withEmailAddress();
+              f.withPassword();
+              f.withPreferredSignInStrategy({ strategy: 'password' });
+              f.startSignInWithEmailAddress({
+                supportEmailCode: true,
+                supportPassword: true,
+                supportResetPassword: true,
+              });
+            });
+            const { userEvent } = render(<SignInFactorOne />, { wrapper });
+            await screen.findByText('Reset your password');
+
+            await userEvent.click(screen.getByText('Back'));
+
+            expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe(expectedUrl);
+            expect(fixtures.router.refresh).toHaveBeenCalled();
+          } finally {
+            window.history.replaceState(window.history.state, '', originalUrl);
+          }
+        });
       });
 
       it('should render the Forgot Password alternative methods component when clicking on "Forgot password" (email)', async () => {

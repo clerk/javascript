@@ -6,6 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
+import { hasUrlInFragment } from '../../../utils';
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -62,16 +63,33 @@ function determineAlternativeMethodsMode(
   return 'forgot';
 }
 
-function removeSignInResetPasswordIntentParam(): void {
+function removeSignInResetPasswordIntentParam(): boolean {
   if (typeof window === 'undefined') {
-    return;
+    return false;
   }
 
   const url = new URL(window.location.href);
+  let removed = false;
+
   if (url.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
     url.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+    removed = true;
+  }
+
+  if (hasUrlInFragment(url)) {
+    const fragmentUrl = new URL(url.hash.substring(1), url.origin);
+    if (fragmentUrl.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
+      fragmentUrl.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+      url.hash = `#${fragmentUrl.pathname}${fragmentUrl.search}${fragmentUrl.hash}`;
+      removed = true;
+    }
+  }
+
+  if (removed) {
     window.history.replaceState(window.history.state, '', url);
   }
+
+  return removed;
 }
 
 function SignInFactorOneInternal(): JSX.Element {
@@ -178,7 +196,9 @@ function SignInFactorOneInternal(): JSX.Element {
       // This search param only exists if the user clicked "Forgot password?" on the
       // start page, it's a way to go directly to the password reset screen.
       // If it does exist, we want to remove it on exit so refresh works correctly after.
-      removeSignInResetPasswordIntentParam();
+      if (removeSignInResetPasswordIntentParam()) {
+        router.refresh();
+      }
       toggle?.();
     };
     const backHandler: React.MouseEventHandler<Element> = () => {
