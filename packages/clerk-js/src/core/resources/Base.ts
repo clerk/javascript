@@ -252,7 +252,6 @@ export abstract class BaseResource {
     if (pending && Date.now() < pending.expiresAt) {
       return pending.promise;
     }
-    pending?.controller.abort();
 
     const controller = new AbortController();
     const promise = this._baseMutate<J>({ ...params, method: 'POST', signal: controller.signal }).finally(() => {

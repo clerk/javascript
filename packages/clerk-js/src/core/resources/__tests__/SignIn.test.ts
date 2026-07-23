@@ -184,25 +184,45 @@ describe('SignIn', () => {
       await Promise.all([first, second]);
     });
 
-    it('allows a new preparation after a pending request stalls past the coalescing TTL', () => {
+    it('allows a new preparation after the TTL without aborting the pending request', async () => {
       vi.useFakeTimers();
       try {
-        const mockFetch = vi.fn().mockReturnValue(new Promise(() => {}));
+        const firstDeferred = createDeferredPromise<any>();
+        const secondDeferred = createDeferredPromise<any>();
+        const mockFetch = vi
+          .fn()
+          .mockReturnValueOnce(firstDeferred.promise)
+          .mockReturnValueOnce(secondDeferred.promise);
         BaseResource._fetch = mockFetch;
 
         const signIn = new SignIn({ id: 'signin_123' } as any);
         const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
 
-        void signIn.prepareFirstFactor(params);
-        void signIn.prepareFirstFactor(params);
+        const first = signIn.prepareFirstFactor(params);
+        const duplicate = signIn.prepareFirstFactor(params);
         expect(mockFetch).toHaveBeenCalledTimes(1);
 
         vi.advanceTimersByTime(30_000);
 
-        void signIn.prepareFirstFactor(params);
+        const replacement = signIn.prepareFirstFactor(params);
         expect(mockFetch).toHaveBeenCalledTimes(2);
-        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(true);
+        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(false);
         expect(mockFetch.mock.calls[1][0].signal.aborted).toBe(false);
+
+        firstDeferred.resolve({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        await Promise.all([first, duplicate]);
+
+        const replacementDuplicate = signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+
+        secondDeferred.resolve({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        await Promise.all([replacement, replacementDuplicate]);
       } finally {
         vi.useRealTimers();
       }
