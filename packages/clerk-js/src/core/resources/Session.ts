@@ -44,7 +44,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
-import { isTabFocused } from '@/utils/isTabFocused';
+import { getTabState, isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
@@ -55,25 +55,8 @@ import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenF
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
-const getTabState = (): 'focused' | 'visible' | 'hidden' | undefined => {
-  try {
-    if (typeof document === 'undefined' || typeof document.hasFocus !== 'function') {
-      return undefined;
-    }
-
-    if (document.hasFocus()) {
-      return 'focused';
-    }
-
-    if (document.visibilityState === 'visible') {
-      return 'visible';
-    }
-
-    return 'hidden';
-  } catch {
-    return undefined;
-  }
-};
+const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
+  isTabFocused() === false ? {} : { onRefresh };
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -239,17 +222,9 @@ export class Session extends BaseResource implements SessionResource {
       SessionTokenCache.set({
         tokenId,
         tokenResolver: Promise.resolve(token),
-        ...(isTabFocused() !== false
-          ? {
-              onRefresh: () =>
-                this.#refreshTokenInBackground(
-                  undefined,
-                  this.lastActiveOrganizationId,
-                  tokenId,
-                  shouldDispatchTokenUpdate,
-                ),
-            }
-          : {}),
+        ...focusedRefresh(() =>
+          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
+        ),
       });
     }
   };
@@ -590,12 +565,9 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
-      ...(isTabFocused() !== false
-        ? {
-            onRefresh: () =>
-              this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
-          }
-        : {}),
+      ...focusedRefresh(() =>
+        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      ),
     });
 
     return tokenResolver.then(token => {
@@ -661,12 +633,9 @@ export class Session extends BaseResource implements SessionResource {
         SessionTokenCache.set({
           tokenId,
           tokenResolver: Promise.resolve(token),
-          ...(isTabFocused() !== false
-            ? {
-                onRefresh: () =>
-                  this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
-              }
-            : {}),
+          ...focusedRefresh(() =>
+            this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          ),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })

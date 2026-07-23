@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { restoreDocument, setDocument, setDocumentHasFocus, setDocumentHasFocusValue } from '@/test/document-helpers';
+
 vi.mock('../safeLock', () => ({
   SafeLock: () => ({
     acquireLockAndRun: (cb: () => Promise<unknown>) => cb(),
@@ -7,36 +9,6 @@ vi.mock('../safeLock', () => ({
 }));
 
 import { FOCUSED_POLLER_INTERVAL_IN_MS, POLLER_INTERVAL_IN_MS, SessionCookiePoller } from '../SessionCookiePoller';
-
-const originalDocument = globalThis.document;
-const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
-const originalHasFocusDescriptor = Object.getOwnPropertyDescriptor(originalDocument, 'hasFocus');
-
-const setDocumentHasFocus = (value: boolean) => {
-  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value: () => value });
-};
-
-const setDocumentHasFocusValue = (value: unknown) => {
-  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value });
-};
-
-const setDocument = (value: unknown) => {
-  Object.defineProperty(globalThis, 'document', { configurable: true, value });
-};
-
-const restoreDocument = () => {
-  if (originalDocumentDescriptor) {
-    Object.defineProperty(globalThis, 'document', originalDocumentDescriptor);
-  } else {
-    Reflect.deleteProperty(globalThis, 'document');
-  }
-
-  if (originalHasFocusDescriptor) {
-    Object.defineProperty(originalDocument, 'hasFocus', originalHasFocusDescriptor);
-  } else {
-    Reflect.deleteProperty(originalDocument, 'hasFocus');
-  }
-};
 
 describe('SessionCookiePoller', () => {
   let poller: SessionCookiePoller | undefined;

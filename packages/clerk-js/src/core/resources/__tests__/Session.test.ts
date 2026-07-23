@@ -3,6 +3,13 @@ import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import {
+  restoreDocument,
+  setDocument,
+  setDocumentHasFocus,
+  setDocumentHasFocusValue,
+  setDocumentVisibilityState,
+} from '@/test/document-helpers';
 import { TokenId } from '@/utils/tokenId';
 
 import { eventBus } from '../../events';
@@ -16,36 +23,6 @@ const baseFapiClientOptions = {
     return 'sess_1qq9oy5GiNHxdR2XWU6gG6mIcBX';
   },
   instanceType: 'development' as InstanceType,
-};
-
-const originalDocument = globalThis.document;
-const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
-const originalHasFocusDescriptor = Object.getOwnPropertyDescriptor(originalDocument, 'hasFocus');
-
-const setDocumentHasFocus = (value: boolean) => {
-  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value: () => value });
-};
-
-const setDocumentHasFocusValue = (value: unknown) => {
-  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value });
-};
-
-const setDocument = (value: unknown) => {
-  Object.defineProperty(globalThis, 'document', { configurable: true, value });
-};
-
-const restoreDocument = () => {
-  if (originalDocumentDescriptor) {
-    Object.defineProperty(globalThis, 'document', originalDocumentDescriptor);
-  } else {
-    Reflect.deleteProperty(globalThis, 'document');
-  }
-
-  if (originalHasFocusDescriptor) {
-    Object.defineProperty(originalDocument, 'hasFocus', originalHasFocusDescriptor);
-  } else {
-    Reflect.deleteProperty(originalDocument, 'hasFocus');
-  }
 };
 
 describe('Session', () => {
@@ -1960,9 +1937,6 @@ describe('Session', () => {
   });
 
   describe('sends tab_state in /tokens request body', () => {
-    let originalHasFocusDescriptor: PropertyDescriptor | undefined;
-    let originalVisibilityStateDescriptor: PropertyDescriptor | undefined;
-
     const createSession = () =>
       new Session({
         status: 'active',
@@ -1975,31 +1949,13 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-    const setDocumentState = (hasFocus: boolean, visibilityState: DocumentVisibilityState) => {
-      Object.defineProperty(document, 'hasFocus', { value: () => hasFocus, configurable: true });
-      Object.defineProperty(document, 'visibilityState', { value: visibilityState, configurable: true });
-    };
-
     beforeEach(() => {
-      originalHasFocusDescriptor = Object.getOwnPropertyDescriptor(document, 'hasFocus');
-      originalVisibilityStateDescriptor = Object.getOwnPropertyDescriptor(document, 'visibilityState');
       BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
       mockFetch(true, 200, { object: 'token', jwt: mockJwt });
     });
 
     afterEach(() => {
       BaseResource.clerk = null as any;
-      vi.unstubAllGlobals();
-      if (originalHasFocusDescriptor) {
-        Object.defineProperty(document, 'hasFocus', originalHasFocusDescriptor);
-      } else {
-        Reflect.deleteProperty(document, 'hasFocus');
-      }
-      if (originalVisibilityStateDescriptor) {
-        Object.defineProperty(document, 'visibilityState', originalVisibilityStateDescriptor);
-      } else {
-        Reflect.deleteProperty(document, 'visibilityState');
-      }
     });
 
     it.each([
@@ -2007,7 +1963,8 @@ describe('Session', () => {
       ['visible', false, 'visible'],
       ['hidden', false, 'hidden'],
     ])('serializes tab_state=%s', async (tabState, hasFocus, visibilityState) => {
-      setDocumentState(hasFocus, visibilityState as DocumentVisibilityState);
+      setDocumentHasFocus(hasFocus);
+      setDocumentVisibilityState(visibilityState as DocumentVisibilityState);
 
       await createSession().getToken({ skipCache: true });
 
@@ -2016,7 +1973,7 @@ describe('Session', () => {
     });
 
     it('omits tab_state when document is undefined', async () => {
-      vi.stubGlobal('document', undefined);
+      setDocument(undefined);
 
       await createSession().getToken({ skipCache: true });
 
@@ -2025,7 +1982,7 @@ describe('Session', () => {
     });
 
     it('omits tab_state when document.hasFocus is not a function', async () => {
-      Object.defineProperty(document, 'hasFocus', { value: undefined, configurable: true });
+      setDocumentHasFocusValue(undefined);
 
       await createSession().getToken({ skipCache: true });
 
@@ -2034,11 +1991,8 @@ describe('Session', () => {
     });
 
     it('omits tab_state when document.hasFocus throws', async () => {
-      Object.defineProperty(document, 'hasFocus', {
-        value: () => {
-          throw new Error('focus unavailable');
-        },
-        configurable: true,
+      setDocumentHasFocusValue(() => {
+        throw new Error('focus unavailable');
       });
 
       await createSession().getToken({ skipCache: true });
