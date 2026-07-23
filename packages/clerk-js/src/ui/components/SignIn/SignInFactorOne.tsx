@@ -6,6 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
+import { hasUrlInFragment } from '../../../utils';
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -13,7 +14,7 @@ import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections } from './shared';
+import { hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -62,6 +63,35 @@ function determineAlternativeMethodsMode(
   return 'forgot';
 }
 
+function removeSignInResetPasswordIntentParam(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const url = new URL(window.location.href);
+  let removed = false;
+
+  if (url.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
+    url.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+    removed = true;
+  }
+
+  if (hasUrlInFragment(url)) {
+    const fragmentUrl = new URL(url.hash.substring(1), url.origin);
+    if (fragmentUrl.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
+      fragmentUrl.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+      url.hash = `#${fragmentUrl.pathname}${fragmentUrl.search}${fragmentUrl.hash}`;
+      removed = true;
+    }
+  }
+
+  if (removed) {
+    window.history.replaceState(window.history.state, '', url);
+  }
+
+  return removed;
+}
+
 function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
@@ -97,13 +127,17 @@ function SignInFactorOneInternal(): JSX.Element {
     supportedFirstFactors,
   });
 
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
-    () => !currentFactor || !factorHasLocalStrategy(currentFactor),
-  );
-
   const resetPasswordFactor = useResetPasswordFactor();
+  const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
 
-  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(() => {
+    const defaultShow = !currentFactor || !factorHasLocalStrategy(currentFactor);
+    return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
+  });
+
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
+    () => resetPasswordIntent && !!resetPasswordFactor,
+  );
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
@@ -158,10 +192,19 @@ function SignInFactorOneInternal(): JSX.Element {
     const canGoBack = factorHasLocalStrategy(currentFactor);
 
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
-    const backHandler = () => {
+    const leaveAlternativeMethods = () => {
+      // This search param only exists if the user clicked "Forgot password?" on the
+      // start page, it's a way to go directly to the password reset screen.
+      // If it does exist, we want to remove it on exit so refresh works correctly after.
+      if (removeSignInResetPasswordIntentParam()) {
+        router.refresh();
+      }
+      toggle?.();
+    };
+    const backHandler: React.MouseEventHandler<Element> = () => {
       card.setError(undefined);
       setPasswordErrorCode(null);
-      toggle?.();
+      leaveAlternativeMethods();
     };
 
     const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode);
@@ -172,7 +215,7 @@ function SignInFactorOneInternal(): JSX.Element {
         onBackLinkClick={canGoBack ? backHandler : undefined}
         onFactorSelected={f => {
           selectFactor(f);
-          toggle?.();
+          leaveAlternativeMethods();
         }}
         currentFactor={currentFactor}
       />

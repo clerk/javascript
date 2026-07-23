@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
 
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -139,6 +140,84 @@ describe('SignInFactorOne', () => {
         expect(screen.queryByText('Or, sign in with another method')).not.toBeInTheDocument();
         await screen.findByText(`Email code to ${email}`);
         expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
+      });
+
+      describe('reset password intent from start page', () => {
+        const { createFixtures: createFixturesWithResetIntent } = bindCreateFixtures('SignIn', {
+          router: { queryParams: { [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' } },
+        });
+
+        it('opens the forgot password screen when a reset factor exists', async () => {
+          const { wrapper } = await createFixturesWithResetIntent(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPreferredSignInStrategy({ strategy: 'password' });
+            f.startSignInWithEmailAddress({
+              supportEmailCode: true,
+              supportPassword: true,
+              supportResetPassword: true,
+            });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          await screen.findByText('Forgot Password?');
+          await screen.findByText('Reset your password');
+        });
+
+        it('opens use another method when no reset factor exists', async () => {
+          const email = 'test@clerk.com';
+          const { wrapper } = await createFixturesWithResetIntent(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPreferredSignInStrategy({ strategy: 'password' });
+            f.startSignInWithEmailAddress({
+              supportEmailCode: true,
+              supportPassword: true,
+              supportResetPassword: false,
+              identifier: email,
+            });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          await screen.findByText('Use another method');
+          await screen.findByText(`Email code to ${email}`);
+        });
+
+        it.each([
+          {
+            name: 'path router',
+            initialUrl: `/sign-in/factor-one?${SIGN_IN_RESET_PASSWORD_INTENT_PARAM}=true&preserved=value`,
+            expectedUrl: '/sign-in/factor-one?preserved=value',
+          },
+          {
+            name: 'hash router',
+            initialUrl: `/sign-in#/factor-one?${SIGN_IN_RESET_PASSWORD_INTENT_PARAM}=true&preserved=value`,
+            expectedUrl: '/sign-in#/factor-one?preserved=value',
+          },
+        ])('removes the reset intent when leaving under the $name', async ({ initialUrl, expectedUrl }) => {
+          const originalUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+          window.history.replaceState(window.history.state, '', initialUrl);
+
+          try {
+            const { wrapper, fixtures } = await createFixturesWithResetIntent(f => {
+              f.withEmailAddress();
+              f.withPassword();
+              f.withPreferredSignInStrategy({ strategy: 'password' });
+              f.startSignInWithEmailAddress({
+                supportEmailCode: true,
+                supportPassword: true,
+                supportResetPassword: true,
+              });
+            });
+            const { userEvent } = render(<SignInFactorOne />, { wrapper });
+            await screen.findByText('Reset your password');
+
+            await userEvent.click(screen.getByText('Back'));
+
+            expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe(expectedUrl);
+            expect(fixtures.router.refresh).toHaveBeenCalled();
+          } finally {
+            window.history.replaceState(window.history.state, '', originalUrl);
+          }
+        });
       });
 
       it('should render the Forgot Password alternative methods component when clicking on "Forgot password" (email)', async () => {
