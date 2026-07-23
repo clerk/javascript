@@ -24,6 +24,7 @@ vi.mock('../../utils/native-module', () => {
 
 vi.mock('react-native', () => {
   return {
+    Platform: { OS: 'android' },
     Text: ({ children }: { children?: React.ReactNode }) => React.createElement('span', null, children),
     View: ({ children }: { children?: React.ReactNode }) => React.createElement('div', null, children),
   };
@@ -38,6 +39,18 @@ describe('AuthView', () => {
     render(<AuthView logoMaxHeight={64} />);
 
     expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ logoMaxHeight: 64 });
+  });
+
+  test('uses inline presentation by default', () => {
+    render(<AuthView />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ presentation: 'inline' });
+  });
+
+  test('passes bottom sheet presentation to the native auth view', () => {
+    render(<AuthView presentation='bottomSheet' />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ presentation: 'bottomSheet' });
   });
 
   test('calls onDismiss when the native auth view emits dismissed', () => {
