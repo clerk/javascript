@@ -58,6 +58,14 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
+  /**
+   * POST actions listed here are coalesced: while a request for an action with an identical body is
+   * in flight on this resource, subsequent identical calls return the pending promise instead of
+   * issuing a duplicate request.
+   */
+  protected coalescedPostActions: readonly string[] = [];
+  #pendingCoalescedPosts = new Map<string, Promise<this>>();
+
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();
   }
@@ -230,7 +238,28 @@ export abstract class BaseResource {
   }
 
   protected async _basePost<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
-    return this._baseMutate<J>({ ...params, method: 'POST' });
+    if (!params.action || !this.coalescedPostActions.includes(params.action)) {
+      return this._baseMutate<J>({ ...params, method: 'POST' });
+    }
+
+    const key = this.#coalescedPostKey(params);
+    const pending = this.#pendingCoalescedPosts.get(key);
+    if (pending) {
+      return pending;
+    }
+
+    const post = this._baseMutate<J>({ ...params, method: 'POST' }).finally(() => {
+      this.#pendingCoalescedPosts.delete(key);
+    });
+    this.#pendingCoalescedPosts.set(key, post);
+    return post;
+  }
+
+  #coalescedPostKey(params: BaseMutateParams): string {
+    const body = Object.entries(params.body ?? {})
+      .filter(([, value]) => value !== undefined)
+      .sort(([left], [right]) => (left < right ? -1 : 1));
+    return JSON.stringify([this.id, params.path, params.action, body]);
   }
 
   protected async _basePostBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {

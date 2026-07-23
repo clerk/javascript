@@ -98,17 +98,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { type BaseMutateParams, BaseResource, UserData, Verification } from './internal';
-
-const isFactorPreparationAction = (action?: string): action is 'prepare_first_factor' | 'prepare_second_factor' =>
-  action === 'prepare_first_factor' || action === 'prepare_second_factor';
-
-const factorPreparationKey = (params: BaseMutateParams): string => {
-  const body = Object.entries(params.body ?? {})
-    .filter(([, value]) => value !== undefined)
-    .sort(([left], [right]) => left.localeCompare(right));
-  return JSON.stringify([params.path, params.action, body]);
-};
+import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -125,25 +115,7 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
-  #pendingFactorPreparations = new Map<string, Promise<this>>();
-
-  protected override _basePost(params: BaseMutateParams = {}): Promise<this> {
-    if (!isFactorPreparationAction(params.action)) {
-      return super._basePost(params);
-    }
-
-    const key = factorPreparationKey(params);
-    const pending = this.#pendingFactorPreparations.get(key);
-    if (pending) {
-      return pending;
-    }
-
-    const preparation = super._basePost(params).finally(() => {
-      this.#pendingFactorPreparations.delete(key);
-    });
-    this.#pendingFactorPreparations.set(key, preparation);
-    return preparation;
-  }
+  protected override coalescedPostActions: readonly string[] = ['prepare_first_factor', 'prepare_second_factor'];
 
   /**
    * The current status of the sign-in process.
@@ -244,6 +216,10 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * @remarks If an identical preparation for this sign-in is already in flight, its pending request is reused and no
+   * additional verification is sent.
+   */
   prepareFirstFactor = (params: PrepareFirstFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.prepareFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
@@ -380,6 +356,10 @@ export class SignIn extends BaseResource implements SignInResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
+  /**
+   * @remarks If an identical preparation for this sign-in is already in flight, its pending request is reused and no
+   * additional verification is sent.
+   */
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.prepareSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({
