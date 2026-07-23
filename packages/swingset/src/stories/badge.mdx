@@ -1,0 +1,43 @@
+import * as BadgeStories from './badge.stories';
+
+# Badge
+
+Badge labels the status or category of the thing next to it. It is presentational only — it renders a `span`, has no interactive behavior, and its `intent` carries meaning through color, so keep the label itself self-describing for anyone who can't see it.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={BadgeStories}
+/>
+
+## Props
+
+<PropTable meta={BadgeStories.meta} />
+
+## Usage
+
+<Usage
+  component='Badge'
+  module='@clerk/ui/mosaic/components/badge'
+>
+  Badge Label
+</Usage>
+
+---
+
+## Examples
+
+### Intents
+
+<Story
+  name='Intents'
+  storyModule={BadgeStories}
+/>
+
+### With an icon
+
+<Story
+  name='WithIcon'
+  storyModule={BadgeStories}
+/>

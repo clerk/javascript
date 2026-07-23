@@ -1,6 +1,12 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
+import {
+  Intents as BadgeIntents,
+  meta as badgeMeta,
+  Primary as BadgePrimary,
+  WithIcon as BadgeWithIcon,
+} from '../stories/badge.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
   Centered as CardCentered,
@@ -115,6 +121,13 @@ const organizationProfileMembersPanelModule: StoryModule = {
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
+const badgeModule: StoryModule = {
+  meta: badgeMeta,
+  Primary: BadgePrimary,
+  Intents: BadgeIntents,
+  WithIcon: BadgeWithIcon,
+};
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
@@ -171,6 +184,7 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
+  badgeModule,
   buttonModule,
   cardComponentModule,
   inputModule,
