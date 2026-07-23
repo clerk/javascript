@@ -72,14 +72,17 @@ function mergeTwoProps(base: PropsObject, overrides: PropsObject): PropsObject {
  * `className`/`style` into one spreadable object. Positional, mirroring astryx's
  * helper so the consumer's `className` and `style` can be passed raw:
  *
- *   mergeProps(themeProps('button', { variant }), stylex.props(...), className, style)
+ *   mergeStyleProps(themeProps('button', { variant }), stylex.props(...), className, style)
  *
  * The trailing pair disambiguates by type — a string is a `className`, an object
  * is a `style` — which is why `style` is accepted directly rather than wrapped.
  * Order is deliberate: stable class + data-attrs, then StyleX atoms, then the
  * consumer's `className`/`style` last so they win.
+ *
+ * Distinct from `@clerk/headless`'s `mergeProps`: this only fuses styling output
+ * (className/style) and does not chain event handlers.
  */
-export function mergeProps(
+export function mergeStyleProps(
   first: PropsObject,
   second?: PropsObject | string,
   classNameOrStyle?: string | React.CSSProperties,
