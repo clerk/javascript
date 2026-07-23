@@ -18,4 +18,4 @@ export type ColorVarName = keyof typeof colorVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type SpacingVarName = keyof typeof spacingVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
-export { mergeProps, themeProps } from '../props';
+export { mergeStyleProps, themeProps } from '../props';

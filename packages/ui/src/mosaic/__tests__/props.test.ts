@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mergeProps, themeProps } from '../props';
+import { mergeStyleProps, themeProps } from '../props';
 
 // The public styling contract lives here, not in any one component: the stable
 // `.cl-<slot>` class, `data-<axis>` variant reflection, and the class/style merge
@@ -37,38 +37,38 @@ describe('themeProps', () => {
   });
 });
 
-describe('mergeProps', () => {
+describe('mergeStyleProps', () => {
   it('concatenates className across bags, base first', () => {
-    const merged = mergeProps({ className: 'cl-button' }, { className: 'x1 x2' });
+    const merged = mergeStyleProps({ className: 'cl-button' }, { className: 'x1 x2' });
     expect(merged.className).toBe('cl-button x1 x2');
   });
 
   it('accepts a trailing string as an appended className', () => {
-    const merged = mergeProps({ className: 'cl-button' }, { className: 'x1' }, 'consumer');
+    const merged = mergeStyleProps({ className: 'cl-button' }, { className: 'x1' }, 'consumer');
     expect(merged.className).toBe('cl-button x1 consumer');
   });
 
   it('accepts a trailing object as a style and lets it win', () => {
-    const merged = mergeProps({ style: { marginTop: '2px', color: 'red' } }, undefined, { marginTop: '8px' });
+    const merged = mergeStyleProps({ style: { marginTop: '2px', color: 'red' } }, undefined, { marginTop: '8px' });
     expect(merged.style).toEqual({ marginTop: '8px', color: 'red' });
   });
 
   it('disambiguates the trailing className and style pair by position', () => {
-    const merged = mergeProps({ className: 'cl-button' }, undefined, 'consumer', { marginTop: '8px' });
+    const merged = mergeStyleProps({ className: 'cl-button' }, undefined, 'consumer', { marginTop: '8px' });
     expect(merged.className).toBe('cl-button consumer');
     expect(merged.style).toEqual({ marginTop: '8px' });
   });
 
   it('treats a string second argument as a className', () => {
-    expect(mergeProps({ className: 'cl-button' }, 'consumer').className).toBe('cl-button consumer');
+    expect(mergeStyleProps({ className: 'cl-button' }, 'consumer').className).toBe('cl-button consumer');
   });
 
   it('drops className entirely when nothing contributes one', () => {
-    expect(mergeProps({ 'data-intent': 'primary' }, {})).not.toHaveProperty('className');
+    expect(mergeStyleProps({ 'data-intent': 'primary' }, {})).not.toHaveProperty('className');
   });
 
   it('preserves non-class/style props from both bags', () => {
-    const merged = mergeProps({ 'data-intent': 'primary' }, { role: 'button' });
+    const merged = mergeStyleProps({ 'data-intent': 'primary' }, { role: 'button' });
     expect(merged).toMatchObject({ 'data-intent': 'primary', role: 'button' });
   });
 });
