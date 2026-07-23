@@ -28,6 +28,14 @@ const fakeConsentInfoWithOrgScope = {
   ],
 };
 
+const fakeConsentInfoWithPrivateMetadataScope = {
+  ...fakeConsentInfo,
+  scopes: [
+    ...fakeConsentInfo.scopes,
+    { scope: 'private_metadata', description: 'Your private metadata', requiresConsent: true },
+  ],
+};
+
 /**
  * `oauthApplication` is a getter on the Clerk prototype and cannot be assigned
  * directly. Use Object.defineProperty to replace it with a configurable mock.
@@ -97,6 +105,24 @@ describe('OAuthConsent', () => {
       oauthClientId: 'client_test',
       redirectUri: 'https://app.example/callback',
     });
+  });
+
+  it('identifies private metadata as potentially sensitive data set by the Clerk application', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithPrivateMetadataScope),
+    });
+
+    const { getByText, queryByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Your private metadata set by TestApp, which may include sensitive information')).toBeVisible();
+    });
+    expect(queryByText('Your private metadata')).toBeNull();
   });
 
   it('renders a single form with allow/deny submit buttons in the public flow', async () => {

@@ -27,6 +27,7 @@ import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
+const PRIVATE_METADATA_SCOPE = 'private_metadata';
 const USER_ORG_READ_SCOPE = 'user:org:read';
 
 function _OAuthConsent() {
@@ -148,7 +149,15 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE);
+  const displayedScopes = scopes
+    .filter(item => item.scope !== OFFLINE_ACCESS_SCOPE)
+    .map(item => ({
+      ...item,
+      description:
+        item.scope === PRIVATE_METADATA_SCOPE
+          ? `Your private metadata set by ${applicationName}, which may include sensitive information`
+          : item.description,
+    }));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
