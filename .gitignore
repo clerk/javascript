@@ -2,6 +2,7 @@
 
 # compiled output
 dist
+dist-mosaic
 tmp
 out-tsc
 out

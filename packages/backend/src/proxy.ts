@@ -27,6 +27,11 @@ export interface FrontendApiProxyOptions {
    * The Clerk secret key. Falls back to CLERK_SECRET_KEY env var.
    */
   secretKey?: string;
+  /**
+   * The Clerk Frontend API URL. Falls back to the CLERK_FAPI_URL environment variable.
+   * If not provided, the URL is derived from the publishable key.
+   */
+  fapiUrl?: string;
 }
 
 /**
@@ -109,6 +114,20 @@ export function stripTrailingSlashes(str: string): string {
     str = str.slice(0, -1);
   }
   return str;
+}
+
+function normalizeFapiUrl(fapiUrl: string): string {
+  const url = new URL(fapiUrl);
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('FAPI URL must use http or https');
+  }
+
+  if (url.username || url.password || url.search || url.hash) {
+    throw new Error('FAPI URL must not include credentials, a query string, or a hash');
+  }
+
+  return stripTrailingSlashes(url.toString());
 }
 
 /**
@@ -233,10 +252,23 @@ export async function clerkFrontendApiProxy(request: Request, options?: Frontend
     );
   }
 
-  // Derive the FAPI URL and construct the target URL.
+  // Resolve the FAPI URL and construct the target URL.
   // Use string concatenation instead of `new URL(path, base)` to avoid
   // protocol-relative resolution (e.g., "//evil.com" resolving to a different host).
-  const fapiBaseUrl = fapiUrlFromPublishableKey(publishableKey);
+  let fapiBaseUrl: string;
+  try {
+    fapiBaseUrl = normalizeFapiUrl(
+      options?.fapiUrl ||
+        (typeof process !== 'undefined' ? process.env?.CLERK_FAPI_URL : undefined) ||
+        fapiUrlFromPublishableKey(publishableKey),
+    );
+  } catch (error) {
+    return createErrorResponse(
+      'proxy_configuration_error',
+      error instanceof Error ? error.message : 'Invalid FAPI URL',
+      500,
+    );
+  }
   const fapiHost = new URL(fapiBaseUrl).host;
   const targetPath = requestUrl.pathname.slice(proxyPath.length) || '/';
   const targetUrl = new URL(`${fapiBaseUrl}${targetPath}`);
