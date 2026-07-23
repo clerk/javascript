@@ -4,12 +4,46 @@ import React from 'react';
 import { mergeProps, themeProps } from '../../props';
 import { styles } from './avatar.styles';
 
-export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
-  shape?: 'circle' | 'square';
-  size?: 'lg' | 'md' | 'sm' | 'xs';
-  /** Image source. When set, renders an `<img>` filling the box; otherwise `children` is the fallback. */
-  src?: string;
-  alt?: string;
+type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
+
+interface AvatarContextValue {
+  status: ImageLoadingStatus;
+  onStatusChange: (status: ImageLoadingStatus) => void;
+}
+
+const AvatarContext = React.createContext<AvatarContextValue | null>(null);
+
+function useAvatarContext(part: string): AvatarContextValue {
+  const context = React.useContext(AvatarContext);
+  if (!context) {
+    throw new Error(`<${part}> must be rendered inside <Avatar>`);
+  }
+  return context;
+}
+
+/** Preload `src` and report its load status, so the fallback shows until the image resolves. */
+function useImageLoadingStatus(src: string | undefined): ImageLoadingStatus {
+  const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
+
+  React.useEffect(() => {
+    if (!src) {
+      setStatus('error');
+      return;
+    }
+
+    let active = true;
+    const image = new window.Image();
+    setStatus('loading');
+    image.onload = () => active && setStatus('loaded');
+    image.onerror = () => active && setStatus('error');
+    image.src = src;
+
+    return () => {
+      active = false;
+    };
+  }, [src]);
+
+  return status;
 }
 
 const sizeStyles = {
@@ -19,30 +53,95 @@ const sizeStyles = {
   lg: styles.sizeLg,
 } as const;
 
+export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
+  shape?: 'circle' | 'square';
+  size?: 'lg' | 'md' | 'sm' | 'xs';
+}
+
 export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatar(
-  { shape = 'circle', size = 'md', src, alt = '', className, style, children, ...rest },
+  { shape = 'circle', size = 'md', className, style, children, ...rest },
   ref,
 ) {
+  const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
+  const value = React.useMemo<AvatarContextValue>(() => ({ status, onStatusChange: setStatus }), [status]);
+
+  return (
+    <AvatarContext.Provider value={value}>
+      <span
+        ref={ref}
+        {...mergeProps(
+          themeProps('avatar', { shape, size }),
+          stylex.props(styles.base, shape === 'circle' ? styles.shapeCircle : styles.shapeSquare, sizeStyles[size]),
+          className,
+          style,
+        )}
+        {...rest}
+      >
+        {children}
+      </span>
+    </AvatarContext.Provider>
+  );
+});
+
+export type AvatarImageProps = React.ComponentPropsWithRef<'img'>;
+
+export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
+  { src, alt = '', className, style, ...rest },
+  ref,
+) {
+  const { onStatusChange } = useAvatarContext('AvatarImage');
+  const status = useImageLoadingStatus(src);
+
+  React.useEffect(() => {
+    onStatusChange(status);
+  }, [onStatusChange, status]);
+
+  if (status !== 'loaded') {
+    return null;
+  }
+
+  return (
+    <img
+      ref={ref}
+      src={src}
+      alt={alt}
+      {...mergeProps(themeProps('avatar-image'), stylex.props(styles.image), className, style)}
+      {...rest}
+    />
+  );
+});
+
+export interface AvatarFallbackProps extends React.ComponentPropsWithRef<'span'> {
+  /** Wait this many ms before showing the fallback, to avoid a flash on fast connections. */
+  delayMs?: number;
+}
+
+export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(function MosaicAvatarFallback(
+  { delayMs, className, style, children, ...rest },
+  ref,
+) {
+  const { status } = useAvatarContext('AvatarFallback');
+  const [canRender, setCanRender] = React.useState(delayMs === undefined);
+
+  React.useEffect(() => {
+    if (delayMs === undefined) {
+      return;
+    }
+    const timer = setTimeout(() => setCanRender(true), delayMs);
+    return () => clearTimeout(timer);
+  }, [delayMs]);
+
+  if (!canRender || status === 'loaded') {
+    return null;
+  }
+
   return (
     <span
       ref={ref}
-      {...mergeProps(
-        themeProps('avatar', { shape, size }),
-        stylex.props(styles.base, shape === 'circle' ? styles.shapeCircle : styles.shapeSquare, sizeStyles[size]),
-        className,
-        style,
-      )}
+      {...mergeProps(themeProps('avatar-fallback'), stylex.props(styles.fallback), className, style)}
       {...rest}
     >
-      {src ? (
-        <img
-          alt={alt}
-          src={src}
-          {...stylex.props(styles.image)}
-        />
-      ) : (
-        children
-      )}
+      {children}
     </span>
   );
 });
