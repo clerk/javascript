@@ -63,6 +63,7 @@ export const huHU: LocalizationResource = {
   badge__canceledEndsAt: "Lemondva • Lejár: {{ date | shortDate('hu-HU') }}",
   badge__currentPlan: 'Jelenlegi csomag',
   badge__default: 'Alapértelmezett',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lejár: {{ date | shortDate('hu-HU') }}",
   badge__expired: 'Lejárt',
   badge__freeTrial: 'Ingyenes próbaverzió',

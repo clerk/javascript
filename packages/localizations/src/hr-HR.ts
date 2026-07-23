@@ -63,6 +63,7 @@ export const hrHR: LocalizationResource = {
   badge__canceledEndsAt: "Otkazan • Završava {{ date | shortDate('hr-HR') }}",
   badge__currentPlan: 'Trenutni plan',
   badge__default: 'Zadano',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Završava {{ date | shortDate('hr-HR') }}",
   badge__expired: 'Isteklo',
   badge__freeTrial: 'Besplatno probno razdoblje',

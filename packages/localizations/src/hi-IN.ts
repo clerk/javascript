@@ -63,6 +63,7 @@ export const hiIN: LocalizationResource = {
   badge__canceledEndsAt: "रद्द • समाप्त {{ date | shortDate('hi-IN') }}",
   badge__currentPlan: 'वर्तमान योजना',
   badge__default: 'डिफ़ॉल्ट',
+  badge__deprovisioned: undefined,
   badge__endsAt: "समाप्त {{ date | shortDate('hi-IN') }}",
   badge__expired: 'समाप्त',
   badge__freeTrial: 'निःशुल्क परीक्षण',

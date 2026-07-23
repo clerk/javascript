@@ -63,6 +63,7 @@ export const faIR: LocalizationResource = {
   badge__canceledEndsAt: "لغو شد • پایان می‌یابد {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'طرح فعلی',
   badge__default: 'پیش فرض',
+  badge__deprovisioned: undefined,
   badge__endsAt: "به پایان می رسد {{ date | shortDate('en-US') }}",
   badge__expired: 'مننقضی شده',
   badge__freeTrial: undefined,
