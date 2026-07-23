@@ -3,6 +3,7 @@ export { atom } from './atom';
 export { allTasks } from 'nanostores';
 export { browser } from './browser';
 export { localeFrom } from './locale-from';
+export { direction } from './direction';
 export { formatter } from './formatter';
 export { params } from './params';
 export { count } from './count';

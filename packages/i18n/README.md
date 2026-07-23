@@ -7,12 +7,26 @@
 Every primitive returns a nanostores store — `.get()` / `.subscribe()` / `.listen()` (and `.set()` for writable stores):
 
 ```ts
-import { atom, browser, localeFrom, formatter } from '@clerk/i18n';
+import { atom, browser, localeFrom, formatter, direction } from '@clerk/i18n';
 
 const $setting = atom<string | null>(null); // writable
 const $browser = browser({ available: ['en', 'fr'] }); // from navigator.languages
 const $locale = localeFrom($setting, $browser); // first non-null, else 'en'
 const $fmt = formatter($locale); // reactive Intl wrapper
+const $dir = direction($locale); // 'ltr' | 'rtl', follows the locale
+```
+
+`formatter($locale)` exposes locale-bound `time`, `number`, `relativeTime`, `list`, and `currency` (Intl instances are cached per options key):
+
+```ts
+$fmt.get().list(['Google', 'GitHub', 'Apple']); // "Google, GitHub, and Apple"
+$fmt.get().list(['Google', 'GitHub'], { type: 'disjunction' }); // "Google or GitHub"
+```
+
+`direction($locale)` resolves text direction (via `Intl.Locale` text info, falling back to a known RTL-language list). Bind it to a container's `dir`:
+
+```tsx
+<div dir={useStore($dir)}>…</div>
 ```
 
 ## Messages
@@ -119,6 +133,16 @@ Non-React consumers can use `formatToParts(message, values)` for a flat resolved
 ## SSR
 
 For SSR, create stores per request (module-level stores share state across requests). Seed the `cache` option with server-fetched data so the first render is correct and single-pass. Call `await allTasks()` or `translationsLoading(i18n)` to flush in-flight loads before streaming.
+
+If a per-request instance shares a long-lived `$locale` store, call `i18n.dispose()` when the request ends to release its subscription (an app-lived singleton never needs this).
+
+`i18n.loading` is `true` while any locale load is in flight; `i18n.error` holds the last load failure (cleared on the next success) so you can surface fallback UI or record telemetry:
+
+```ts
+i18n.error.subscribe(err => {
+  if (err) clerk.telemetry?.record(/* … */);
+});
+```
 
 For React Server Components, `loadTranslations` is a convenience that awaits the instance's load and returns the snapshot:
 

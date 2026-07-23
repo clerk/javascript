@@ -12,6 +12,11 @@ export interface Formatter {
   number(value: number | bigint, opts?: Intl.NumberFormatOptions): string;
   relativeTime(value: number, unit: Intl.RelativeTimeFormatUnit, opts?: Intl.RelativeTimeFormatOptions): string;
   /**
+   * Joins a list into a locale-aware string ("A, B, and C"). `type: 'disjunction'`
+   * produces "A, B, or C". Common in auth UI (social provider lists).
+   */
+  list(items: string[], opts?: Intl.ListFormatOptions): string;
+  /**
    * Formats a minor-unit amount (e.g. cents) as a locale-aware currency string.
    * `style: 'short'` strips trailing zeros (requires `trailingZeroDisplay` support; Chrome 99+, Safari 15.4+).
    */
@@ -28,6 +33,7 @@ export function formatter($locale: ReadableStore<string>): ReadableStore<Formatt
     const dtf: Record<string, Intl.DateTimeFormat> = {};
     const nf: Record<string, Intl.NumberFormat> = {};
     const rtf: Record<string, Intl.RelativeTimeFormat> = {};
+    const lf: Record<string, Intl.ListFormat> = {};
     const currency = createCurrencyFormatter(locale);
 
     return {
@@ -45,6 +51,11 @@ export function formatter($locale: ReadableStore<string>): ReadableStore<Formatt
         const key = JSON.stringify(opts);
         rtf[key] ??= new Intl.RelativeTimeFormat(locale, { numeric: 'auto', ...opts });
         return rtf[key].format(value, unit);
+      },
+      list(items, opts = {}) {
+        const key = JSON.stringify(opts);
+        lf[key] ??= new Intl.ListFormat(locale, opts);
+        return lf[key].format(items);
       },
       currency,
     };

@@ -44,6 +44,17 @@ export interface I18n {
   <B extends Record<string, unknown>>(namespace: string, base: B): MessageStore<B>;
   /** True while any locale load is in flight. Await it with `translationsLoading`. */
   loading: ReadableStore<boolean>;
+  /**
+   * The last locale-load error, or `undefined`. Set when a `get` rejects, cleared
+   * on the next successful load. Subscribe to surface fallback UI or telemetry.
+   */
+  error: ReadableStore<unknown>;
+  /**
+   * Tear down the standing locale subscription. Optional for an app-lived
+   * instance, but call it for transient instances that share a long-lived
+   * `$locale` (per-request SSR, tests) to avoid leaking a listener on it.
+   */
+  dispose(): void;
 }
 
 /** Stable empty-overrides store, used when no `overrides` store is supplied. */
@@ -65,7 +76,18 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
   // `translationsLoading`/`loadTranslations` so server-only rendering waits for
   // this instance only (unlike the global `allTasks`).
   const $loading = atom(false);
+  // Last load error, cleared on the next success. Surfaced via `api.error`.
+  const $error = atom<unknown>(undefined);
   let inFlight = 0;
+
+  // Per-locale Intl caches. `Intl.PluralRules` (and the currency formatter) are
+  // stateless given a locale but costly to build, so they are memoized here and
+  // reused by `buildEntry` across recomputes — a single override change
+  // recomputes every namespace, so per-recompute construction adds up fast.
+  const pluralRules: Record<string, Intl.PluralRules> = {};
+  const getPluralRules = (locale: string) => (pluralRules[locale] ??= new Intl.PluralRules(locale));
+  const currencyFormatters: Record<string, ReturnType<typeof createCurrencyFormatter>> = {};
+  const getCurrency = (locale: string) => (currencyFormatters[locale] ??= createCurrencyFormatter(locale));
 
   function fetchLocale(locale: string): Promise<void> {
     // `task()` registers the load with nanostores so `allTasks()` can await it
@@ -87,11 +109,14 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
             const next: LocaleCache = { ...$resolved.get() };
             next[locale] = { ...next[locale], ...merged };
             $resolved.set(next);
+            $error.set(undefined);
           })
           // A failed load leaves the locale unresolved (messages fall back to base).
-          // Clear the slot so a later locale switch can retry instead of being
-          // permanently poisoned by a single transient failure.
-          .catch(() => {
+          // Record the error (surfaced via `api.error`) and clear the slot so a
+          // later locale switch can retry instead of being permanently poisoned
+          // by a single transient failure.
+          .catch((err: unknown) => {
+            $error.set(err);
             delete pending[locale];
           })
           .finally(() => {
@@ -106,8 +131,8 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
 
   // Standing subscription: whenever the active locale is one we have not loaded
   // (and is not the base locale), fetch it. `subscribe` fires immediately, so the
-  // initial locale is handled too.
-  $locale.subscribe(locale => {
+  // initial locale is handled too. Retained so `dispose` can tear it down.
+  const unsubscribeLocale = $locale.subscribe(locale => {
     if (locale !== baseLocale && !$resolved.get()[locale]) {
       void fetchLocale(locale);
     }
@@ -123,7 +148,7 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
     }
 
     if (marker?._type === 'count') {
-      const rules = new Intl.PluralRules(locale);
+      const rules = getPluralRules(locale);
       const forms: PluralForms =
         override && typeof override === 'object'
           ? { ...marker.forms, ...(override as Partial<PluralForms>) }
@@ -135,11 +160,11 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
     }
 
     if (marker?._type === 'currency') {
-      return createCurrencyFormatter(locale);
+      return getCurrency(locale);
     }
 
     if (marker?._type === 'count-params') {
-      const rules = new Intl.PluralRules(locale);
+      const rules = getPluralRules(locale);
       const forms: PluralForms =
         override && typeof override === 'object'
           ? { ...marker.forms, ...(override as Partial<PluralForms>) }
@@ -196,6 +221,6 @@ export function createI18n($locale: ReadableStore<string>, options: CreateI18nOp
     return Object.assign(store, { i18n: api, namespace, base });
   }
 
-  const api: I18n = Object.assign(i18n, { loading: $loading });
+  const api: I18n = Object.assign(i18n, { loading: $loading, error: $error, dispose: unsubscribeLocale });
   return api;
 }

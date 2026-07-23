@@ -295,4 +295,70 @@ describe('createI18n', () => {
       expect($msg.get().hi).toBe('Hello');
     });
   });
+
+  describe('error', () => {
+    it('exposes the load error and clears it on a later success', async () => {
+      const get = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('offline'))
+        .mockResolvedValueOnce({ common: { hi: 'Bonjour' } });
+      const $locale = atom('en');
+      const i18n = createI18n($locale, { get });
+
+      expect(i18n.error.get()).toBeUndefined();
+
+      $locale.set('fr');
+      await flush();
+      expect(i18n.error.get()).toBeInstanceOf(Error);
+
+      $locale.set('en');
+      $locale.set('fr'); // retry -> success
+      await flush();
+      expect(i18n.error.get()).toBeUndefined();
+    });
+  });
+
+  describe('locale Intl caching', () => {
+    // Perf: Intl.PluralRules is expensive to construct. It must be built once per
+    // locale, not once per plural message on every recompute (a single override
+    // change recomputes every namespace).
+    it('reuses Intl.PluralRules across recomputes instead of rebuilding it per message', () => {
+      const RealPluralRules = Intl.PluralRules;
+      // Return a real instance; spyOn on a constructor otherwise loses `new`.
+      const spy = vi.spyOn(Intl, 'PluralRules').mockImplementation(locale => new RealPluralRules(locale));
+      try {
+        const $overrides = atom(defineLocalization({}));
+        const i18n = createI18n(atom('en'), { get: vi.fn(), overrides: $overrides });
+        const $msg = i18n('common', {
+          a: count({ one: '{count} a', other: '{count} as' }),
+          b: count({ one: '{count} b', other: '{count} bs' }),
+        });
+        $msg.subscribe(vi.fn()); // keep the computed live
+
+        $msg.get().a(1);
+        // Several recomputes: two count messages would rebuild PluralRules each time.
+        $overrides.set(defineLocalization({ 'common.x': '1' }));
+        $overrides.set(defineLocalization({ 'common.x': '2' }));
+        $msg.get().b(2);
+
+        expect(spy).toHaveBeenCalledTimes(1); // one 'en' PluralRules total
+      } finally {
+        spy.mockRestore();
+      }
+    });
+  });
+
+  describe('dispose', () => {
+    it('stops fetching on locale changes after dispose', async () => {
+      const get = vi.fn(() => Promise.resolve({ common: { hi: 'Bonjour' } }));
+      const $locale = atom('en');
+      const i18n = createI18n($locale, { get });
+
+      i18n.dispose();
+
+      $locale.set('fr');
+      await flush();
+      expect(get).not.toHaveBeenCalled(); // subscription torn down, no fetch
+    });
+  });
 });

@@ -16,6 +16,15 @@ describe('formatter', () => {
     expect(formatter(atom('en')).get().relativeTime(-1, 'day')).toBe('yesterday');
   });
 
+  it('formats a list, reacting to locale changes', () => {
+    const $locale = atom('en');
+    const $fmt = formatter($locale);
+    expect($fmt.get().list(['Google', 'GitHub', 'Apple'])).toBe('Google, GitHub, and Apple');
+    expect($fmt.get().list(['Google', 'GitHub'], { type: 'disjunction' })).toBe('Google or GitHub');
+    $locale.set('de');
+    expect($fmt.get().list(['Google', 'GitHub', 'Apple'])).toBe('Google, GitHub und Apple');
+  });
+
   it('formats a timestamp', () => {
     const out = formatter(atom('en-US'))
       .get()

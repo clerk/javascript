@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createElement, Fragment, useCallback, useMemo, useSyncExternalStore } from 'react';
+import { createElement, Fragment, useCallback, useSyncExternalStore } from 'react';
 
 import type { RichText } from '../message-format';
 import { walk } from '../message-format';
@@ -77,8 +77,13 @@ export function Message({ of, values, components }: MessageProps): ReactNode {
   return formatToReact(of, { values, components });
 }
 
-/** Hook form of {@link Message}: returns the folded React nodes for a `RichText`. */
+/**
+ * Hook form of {@link Message}: returns the folded React nodes for a `RichText`.
+ * The fold (`walk`) is cheap and callers typically pass fresh `values`/`components`
+ * objects each render, so this renders directly rather than memoizing on inputs
+ * that would change every render anyway.
+ */
 export function useMessage(message: RichText, options: MessageRenderOptions = {}): ReactNode {
   const { values, components } = options;
-  return useMemo(() => formatToReact(message, { values, components }), [message, values, components]);
+  return formatToReact(message, { values, components });
 }
