@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.25.7
+
+### Patch Changes
+
+- Moved the internal `patchRequest()` helper for reuse across framework SDKs. ([#9220](https://github.com/clerk/javascript/pull/9220)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.25.6
 
 ### Patch Changes
