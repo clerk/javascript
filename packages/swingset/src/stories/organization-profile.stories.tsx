@@ -6,6 +6,7 @@ import type { StoryMeta } from '@/lib/types';
 import { Default as OrganizationProfileApiKeysPanelDemo } from './organization-profile-api-keys-panel.stories';
 import { Default as OrganizationProfileGeneralPanelDemo } from './organization-profile-general-panel.stories';
 import { Default as OrganizationProfileMembersPanelDemo } from './organization-profile-members-panel.stories';
+import { Default as OrganizationProfileSecurityPanelDemo } from './organization-profile-security-panel.stories';
 
 export const meta: StoryMeta = {
   group: 'Organization',
@@ -19,6 +20,7 @@ export function Default() {
       general={<OrganizationProfileGeneralPanelDemo />}
       members={<OrganizationProfileMembersPanelDemo />}
       apiKeys={<OrganizationProfileApiKeysPanelDemo />}
+      security={<OrganizationProfileSecurityPanelDemo />}
     />
   );
 }

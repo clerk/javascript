@@ -10,6 +10,7 @@
     "moduleDetection": "force",
     "lib": ["ES2023", "DOM"],
     "paths": {
+      "@/components/ConfigureSSO/*": ["../ui/src/components/ConfigureSSO/*"],
       "@/*": ["./src/*"],
       "@clerk/ui/mosaic": ["../ui/src/mosaic"],
       "@clerk/ui/mosaic/*": ["../ui/src/mosaic/*"],
