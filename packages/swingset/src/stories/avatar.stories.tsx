@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@clerk/ui/mosaic/components/avatar';
 
 import type { StoryMeta } from '@/lib/types';
 
