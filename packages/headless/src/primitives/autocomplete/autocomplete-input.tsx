@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export type AutocompleteInputProps = ComponentProps<'input'>;
@@ -23,18 +22,11 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
       valuesByIndexRef,
     } = useAutocompleteContext();
 
-    // floating-ui types `setReference` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setReference, ref]);
-
     const state = { open };
 
     const defaultProps = {
       'data-cl-slot': 'autocomplete-input',
       ...getReferenceProps({
-        ref: combinedRef,
         value: inputValue,
         'aria-autocomplete': 'list' as const,
         onChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -53,9 +45,14 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
       }),
     };
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'input',
       render,
+      // floating-ui types `setReference` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),

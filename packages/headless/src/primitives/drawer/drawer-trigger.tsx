@@ -1,9 +1,8 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React, { useCallback, useContext, useSyncExternalStore } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { DrawerContext } from './drawer-context';
 import type { DrawerHandle } from './drawer-handle';
 
@@ -35,12 +34,6 @@ export const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerPr
       () => handle?.isOpen ?? false,
     );
 
-    // floating-ui types `setReference` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([ctx?.refs.setReference, ref]);
-
     if (!handle && !ctx) {
       throw new Error('Drawer.Trigger must be used within <Drawer.Root> or be given a `handle`');
     }
@@ -50,14 +43,25 @@ export const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerPr
     const defaultProps = handle
       ? {
           type: 'button' as const,
-          ref,
           onClick: () => handle.toggle(),
         }
-      : { type: 'button' as const, ref: combinedRef, ...ctx?.getReferenceProps() };
+      : { type: 'button' as const, ...ctx?.getReferenceProps() };
 
-    return renderElement({
+    // floating-ui types `setReference` as a method signature, but at runtime it's
+    // a stable callback that doesn't use `this`, so the unbound-method check is a
+    // false positive here.
+    const finalRef = handle
+      ? ref
+      : [
+          // eslint-disable-next-line @typescript-eslint/unbound-method
+          ctx?.refs.setReference,
+          ref,
+        ];
+
+    return useRender({
       defaultTagName: 'button',
       render,
+      ref: finalRef,
       state: { open },
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),

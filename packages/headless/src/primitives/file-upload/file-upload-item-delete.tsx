@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadContext, useFileUploadItemContext } from './file-upload-context';
 
 export type FileUploadItemDeleteProps = ComponentProps<'button'>;
@@ -23,7 +23,7 @@ export function FileUploadItemDelete(props: FileUploadItemDeleteProps) {
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
     state,

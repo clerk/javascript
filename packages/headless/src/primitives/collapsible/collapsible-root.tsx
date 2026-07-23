@@ -3,7 +3,7 @@
 import { type ReactNode, useId, useMemo } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { CollapsibleContext, type CollapsibleContextValue } from './collapsible-context';
 
 export interface CollapsibleProps extends ComponentProps<'div'> {
@@ -41,7 +41,7 @@ export function CollapsibleRoot(props: CollapsibleProps) {
 
   return (
     <CollapsibleContext.Provider value={contextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,

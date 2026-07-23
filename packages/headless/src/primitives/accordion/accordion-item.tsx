@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { AccordionItemContext, type AccordionItemContextValue, useAccordionContext } from './accordion-context';
 
 export interface AccordionItemProps extends ComponentProps<'div'> {
@@ -34,7 +34,7 @@ export function AccordionItem(props: AccordionItemProps) {
 
   return (
     <AccordionItemContext.Provider value={itemContextValue}>
-      {renderElement({
+      {useRender({
         defaultTagName: 'div',
         render,
         state,

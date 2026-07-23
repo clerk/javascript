@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingList, useMergeRefs } from '@floating-ui/react';
+import { FloatingList } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export type AutocompleteListProps = ComponentProps<'div'>;
@@ -18,18 +18,11 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
       return () => setInlineMode(false);
     }, [setInlineMode]);
 
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
-
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
     const ownProps = {
       'data-cl-slot': 'autocomplete-list',
-      ref: combinedRef,
     } satisfies DefaultProps<'div'>;
 
     const defaultProps = { ...ownProps, ...floatingProps };
@@ -46,9 +39,14 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
         elementsRef={elementsRef}
         labelsRef={labelsRef}
       >
-        {renderElement({
+        {useRender({
           defaultTagName: 'div',
           render,
+          // floating-ui types `setFloating` as a method signature, but at runtime it's
+          // a stable callback that doesn't use `this`, so the unbound-method check is a
+          // false positive here.
+          // eslint-disable-next-line @typescript-eslint/unbound-method
+          ref: [refs.setFloating, ref],
           props: merged,
         })}
       </FloatingList>

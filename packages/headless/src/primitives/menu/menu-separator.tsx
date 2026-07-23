@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 
 export type MenuSeparatorProps = ComponentProps<'div'>;
 
@@ -12,7 +12,7 @@ export function MenuSeparator(props: MenuSeparatorProps) {
     role: 'separator' as const,
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'div',
     render,
     props: mergeProps<'div'>(defaultProps, otherProps),

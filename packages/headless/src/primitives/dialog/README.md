@@ -112,7 +112,7 @@ Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by t
 
 ## Authoring rule for new primitives
 
-Each styleable surface = one part. Layout infrastructure (overlay, scroll lock, focus manager, portal) wraps a `renderElement` call rather than fusing with it. The dialog split — `Backdrop` (semi-transparent surface) vs. `Viewport` (fixed centering + scroll lock) — exists because mosaic needs to style each layer independently. Apply the same decomposition to future primitives that combine positioning with a styled surface.
+Each styleable surface = one part. Layout infrastructure (overlay, scroll lock, focus manager, portal) wraps a `useRender` call rather than fusing with it. The dialog split — `Backdrop` (semi-transparent surface) vs. `Viewport` (fixed centering + scroll lock) — exists because mosaic needs to style each layer independently. Apply the same decomposition to future primitives that combine positioning with a styled surface.
 
 ## ARIA
 
