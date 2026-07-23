@@ -8,11 +8,9 @@ import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex
 // background it's dropped onto.
 export const styles = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-inner'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
+    borderRadius: radiusVars['--cl-radius-full'],
     gap: space['1'],
-    paddingInline: space['1.5'],
+    paddingInline: space['2'],
     alignItems: 'center',
     boxSizing: 'border-box',
     display: 'inline-flex',
@@ -26,28 +24,23 @@ export const styles = stylex.create({
   },
 
   primary: {
-    borderColor: `color-mix(in oklab, ${colorVars['--cl-color-primary']} 24%, transparent)`,
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-primary']} 12%, transparent)`,
-    color: colorVars['--cl-color-primary'],
+    backgroundColor: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-primary-foreground'],
   },
   secondary: {
-    borderColor: `color-mix(in oklab, ${colorVars['--cl-color-muted-foreground']} 24%, transparent)`,
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-muted-foreground']} 12%, transparent)`,
+    backgroundColor: colorVars['--cl-color-muted'],
     color: colorVars['--cl-color-muted-foreground'],
   },
   warning: {
-    borderColor: `color-mix(in oklab, ${colorVars['--cl-color-warning']} 24%, transparent)`,
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-warning']} 12%, transparent)`,
+    backgroundColor: colorVars['--cl-color-warning-faded'],
     color: colorVars['--cl-color-warning'],
   },
   destructive: {
-    borderColor: `color-mix(in oklab, ${colorVars['--cl-color-destructive']} 24%, transparent)`,
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-destructive']} 12%, transparent)`,
+    backgroundColor: colorVars['--cl-color-destructive-faded'],
     color: colorVars['--cl-color-destructive'],
   },
   success: {
-    borderColor: `color-mix(in oklab, ${colorVars['--cl-color-success']} 24%, transparent)`,
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-success']} 12%, transparent)`,
+    backgroundColor: colorVars['--cl-color-success-faded'],
     color: colorVars['--cl-color-success'],
   },
 });
