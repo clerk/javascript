@@ -875,6 +875,7 @@ export const enUS: LocalizationResource = {
       title: 'Redirect URL',
     },
     scopeList: {
+      privateMetadata: 'Your private metadata set by {{applicationName}}, which may include sensitive information',
       title: 'This will allow {{applicationName}} access to:',
     },
     subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
