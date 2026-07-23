@@ -7,6 +7,7 @@ const formatWarning = (msg: string) => {
 const createMessageForDisabledOrganizations = (
   componentName:
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationSwitcher'
     | 'OrganizationList'
     | 'CreateOrganization'
@@ -18,9 +19,17 @@ const createMessageForDisabledOrganizations = (
   );
 };
 
-const createCannotRenderComponentWhenOrgDoesNotExist = (componentName: 'OrganizationProfile' | 'ConfigureSSO') => {
+const createCannotRenderComponentWhenOrgDoesNotExist = (
+  componentName: 'OrganizationProfile' | 'InviteMembers' | 'ConfigureSSO',
+) => {
   return formatWarning(
     `<${componentName}/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  );
+};
+
+const createCannotRenderComponentWhenPermissionIsMissing = (componentName: 'InviteMembers', permission: string) => {
+  return formatWarning(
+    `<${componentName}/> cannot render unless the current user has the \`${permission}\` permission. Since the current user is missing this permission, this is no-op. Render it only for members who can manage memberships, for example by wrapping it in <Show when={{ permission: '${permission}' }}>.`,
   );
 };
 
@@ -54,6 +63,7 @@ const warnings = {
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   createCannotRenderComponentWhenOrgDoesNotExist,
+  createCannotRenderComponentWhenPermissionIsMissing,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:

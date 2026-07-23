@@ -16,6 +16,7 @@ export {
   CreateOrganization,
   GoogleOneTap,
   HandleSSOCallback,
+  InviteMembersButton,
   OAuthConsent,
   OrganizationList,
   OrganizationSwitcher,
