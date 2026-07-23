@@ -51,9 +51,8 @@ import {
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 describe('resolveConfigureSteps', () => {
-  it('dispatches a derived OIDC provider key to the OIDC sub-flow by prefix (not the oidc_custom literal)', () => {
-    // The regression: the backend returns `oidc_<slug>` derived from the connection
-    // name (e.g. `clerk.dev` → `oidc_clerk_dev`), never the `oidc_custom` input alias.
+  it('dispatches custom and legacy OIDC provider keys to the OIDC sub-flow', () => {
+    expect(resolveConfigureSteps('oauth_custom_clerk_dev')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_clerk_dev')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_ghe_acme')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_gitlab_ent_acme')).toBe(OidcCustomConfigureSteps);
@@ -83,8 +82,8 @@ describe('ConfigureProviderStep', () => {
       { wrapper },
     );
 
-  it('renders the OIDC configure steps for a derived provider key without throwing', async () => {
-    contextState.provider = 'oidc_clerk_dev';
+  it('renders the OIDC configure steps for a custom OAuth provider key without throwing', async () => {
+    contextState.provider = 'oauth_custom_clerk_dev';
     contextState.enterpriseConnection = {
       id: 'ent_123',
       oauthConfig: {
@@ -95,8 +94,6 @@ describe('ConfigureProviderStep', () => {
 
     const { userEvent } = renderStep(wrapper);
 
-    // The OIDC sub-flow mounts on its first step. Before the fix this threw
-    // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
     expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
     const [redirectUri] = screen.getAllByRole('textbox') as HTMLInputElement[];
     expect(redirectUri).toHaveAttribute('readonly');
