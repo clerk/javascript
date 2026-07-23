@@ -1341,6 +1341,7 @@ export type __internal_LocalizationResource = {
   oauthConsent: {
     subtitle: LocalizationValue<'applicationName' | 'identifier'>;
     scopeList: {
+      privateMetadata: LocalizationValue<'applicationName'>;
       title: LocalizationValue<'applicationName'>;
     };
     action__deny: LocalizationValue;

@@ -155,7 +155,7 @@ function _OAuthConsent() {
       ...item,
       description:
         item.scope === PRIVATE_METADATA_SCOPE
-          ? `Your private metadata set by ${applicationName}, which may include sensitive information`
+          ? t(localizationKeys('oauthConsent.scopeList.privateMetadata', { applicationName }))
           : item.description,
     }));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
