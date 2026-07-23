@@ -44,6 +44,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
+import { isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
@@ -238,8 +239,17 @@ export class Session extends BaseResource implements SessionResource {
       SessionTokenCache.set({
         tokenId,
         tokenResolver: Promise.resolve(token),
-        onRefresh: () =>
-          this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
+        ...(isTabFocused() !== false
+          ? {
+              onRefresh: () =>
+                this.#refreshTokenInBackground(
+                  undefined,
+                  this.lastActiveOrganizationId,
+                  tokenId,
+                  shouldDispatchTokenUpdate,
+                ),
+            }
+          : {}),
       });
     }
   };
@@ -580,7 +590,12 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
-      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      ...(isTabFocused() !== false
+        ? {
+            onRefresh: () =>
+              this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          }
+        : {}),
     });
 
     return tokenResolver.then(token => {
@@ -646,7 +661,12 @@ export class Session extends BaseResource implements SessionResource {
         SessionTokenCache.set({
           tokenId,
           tokenResolver: Promise.resolve(token),
-          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          ...(isTabFocused() !== false
+            ? {
+                onRefresh: () =>
+                  this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+              }
+            : {}),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })

@@ -18,6 +18,36 @@ const baseFapiClientOptions = {
   instanceType: 'development' as InstanceType,
 };
 
+const originalDocument = globalThis.document;
+const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'document');
+const originalHasFocusDescriptor = Object.getOwnPropertyDescriptor(originalDocument, 'hasFocus');
+
+const setDocumentHasFocus = (value: boolean) => {
+  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value: () => value });
+};
+
+const setDocumentHasFocusValue = (value: unknown) => {
+  Object.defineProperty(globalThis.document, 'hasFocus', { configurable: true, value });
+};
+
+const setDocument = (value: unknown) => {
+  Object.defineProperty(globalThis, 'document', { configurable: true, value });
+};
+
+const restoreDocument = () => {
+  if (originalDocumentDescriptor) {
+    Object.defineProperty(globalThis, 'document', originalDocumentDescriptor);
+  } else {
+    Reflect.deleteProperty(globalThis, 'document');
+  }
+
+  if (originalHasFocusDescriptor) {
+    Object.defineProperty(originalDocument, 'hasFocus', originalHasFocusDescriptor);
+  } else {
+    Reflect.deleteProperty(originalDocument, 'hasFocus');
+  }
+};
+
 describe('Session', () => {
   beforeEach(() => {
     // Mock Date.now() to make the test tokens appear valid
@@ -29,6 +59,7 @@ describe('Session', () => {
 
   afterEach(() => {
     SessionTokenCache.clear();
+    restoreDocument();
     vi.useRealTimers();
   });
 
@@ -43,6 +74,83 @@ describe('Session', () => {
     afterEach(() => {
       dispatchSpy?.mockRestore();
       BaseResource.clerk = null as any;
+    });
+
+    describe('focus-biased proactive refresh', () => {
+      const createSession = (lastActiveToken?: SessionJSON['last_active_token']) =>
+        new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: lastActiveToken,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+      it('registers proactive refresh after a focused network mint', async () => {
+        setDocumentHasFocus(true);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('does not register proactive refresh after an unfocused network mint', async () => {
+        setDocumentHasFocus(false);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+      });
+
+      it('does not register proactive refresh for an unfocused hydrated token', async () => {
+        setDocumentHasFocus(false);
+
+        createSession({ object: 'token', jwt: mockJwt });
+        await Promise.resolve();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toBeUndefined();
+      });
+
+      it('registers proactive refresh when document.hasFocus is not callable', async () => {
+        setDocumentHasFocusValue(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('registers proactive refresh when document.hasFocus throws', async () => {
+        setDocumentHasFocusValue(() => {
+          throw new Error('broken document');
+        });
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
+
+      it('registers proactive refresh when document is missing', async () => {
+        setDocument(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(SessionTokenCache.get({ tokenId })?.entry.onRefresh).toEqual(expect.any(Function));
+      });
     });
 
     it('dispatches token:update event on getToken without active organization', async () => {
@@ -543,6 +651,10 @@ describe('Session', () => {
     });
 
     describe('timer-based proactive refresh', () => {
+      beforeEach(() => {
+        setDocumentHasFocus(true);
+      });
+
       it('triggers background refresh via timer before leeway period', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
@@ -687,6 +799,9 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
+        expect(
+          SessionTokenCache.get({ tokenId: TokenId.build('session_1', undefined, null) })?.entry.onRefresh,
+        ).toEqual(expect.any(Function));
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
