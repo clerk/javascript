@@ -33,6 +33,12 @@ export type BaseMutateParams = {
 
 const COALESCED_POST_TTL_MS = 30_000;
 
+type PendingCoalescedPost<T> = {
+  promise: Promise<T>;
+  controller: AbortController;
+  expiresAt: number;
+};
+
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
   if (!payloadErrors) {
     return;
@@ -62,7 +68,7 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
-  #pendingCoalescedPosts?: Map<string, { promise: Promise<this>; controller: AbortController; expiresAt: number }>;
+  #pendingCoalescedPosts?: Map<string, PendingCoalescedPost<this>>;
 
   static get fapiClient(): FapiClient {
     return BaseResource.clerk.getFapiClient();

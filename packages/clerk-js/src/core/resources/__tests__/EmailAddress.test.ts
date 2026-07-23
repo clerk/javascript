@@ -1,5 +1,5 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
 import type { EmailAddressJSON } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, EmailAddress } from '../internal';
