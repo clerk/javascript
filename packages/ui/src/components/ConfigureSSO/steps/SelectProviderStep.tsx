@@ -72,8 +72,9 @@ const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
 
 /**
  * The picker works in input aliases; an existing connection reports back its real
- * provider (OIDC as an open `oidc_<slug>` family), so collapse it onto the card
- * that represents it — every OIDC family maps to the single `oidc_custom` card.
+ * provider (OIDC as an open `oauth_custom_<slug>` or `oidc_*` family), so collapse
+ * it onto the card that represents it — every OIDC family maps to the single
+ * `oidc_custom` card.
  */
 const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
   isOidcProvider(provider) ? 'oidc_custom' : provider;

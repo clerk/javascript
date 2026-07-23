@@ -241,17 +241,88 @@ export const enUS: LocalizationResource = {
       },
       oidcCustom: {
         claimsStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: 'Attribute Name',
+              userAttribute: 'User Attribute',
+            },
+            rows: {
+              subject: {
+                attributeName: 'External user ID',
+                userAttribute: 'sub',
+              },
+              email: {
+                attributeName: 'Primary email',
+                userAttribute: 'email',
+              },
+              firstName: {
+                attributeName: 'First name',
+                userAttribute: 'given_name',
+              },
+              lastName: {
+                attributeName: 'Last name',
+                userAttribute: 'family_name',
+              },
+            },
+          },
           headerSubtitle: 'Set the claims your identity provider includes in the ID token',
+          paragraph: 'Your user ID token must include the following claims:',
         },
         credentialsStep: {
           headerSubtitle: 'Add your application credentials',
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
+          scopes: {
+            addButton: 'Add',
+            label: 'Scopes',
+            optional: 'Optional',
+            placeholder: 'Paste scope here...',
+          },
         },
         endpointsStep: {
           headerSubtitle: 'Add your identity provider’s endpoints',
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
         },
         mainHeaderTitle: 'Configure your identity provider',
         redirectUriStep: {
           headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {

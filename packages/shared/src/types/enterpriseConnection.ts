@@ -100,7 +100,11 @@ export interface EnterpriseOAuthConfigJSON {
   name: string;
   provider_key?: string;
   client_id: string;
+  redirect_uri?: string;
   discovery_url?: string;
+  auth_url?: string;
+  token_url?: string;
+  user_info_url?: string;
   logo_public_url?: string | null;
   requires_pkce?: boolean;
   created_at: number;
@@ -112,7 +116,11 @@ export interface EnterpriseOAuthConfigResource {
   name: string;
   clientId: string;
   providerKey?: string;
+  redirectUri?: string;
   discoveryUrl?: string;
+  authUrl?: string;
+  tokenUrl?: string;
+  userInfoUrl?: string;
   logoPublicUrl?: string | null;
   requiresPkce?: boolean;
   createdAt: Date | null;

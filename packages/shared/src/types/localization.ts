@@ -1529,15 +1529,84 @@ export type __internal_LocalizationResource = {
         mainHeaderTitle: LocalizationValue;
         redirectUriStep: {
           headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          redirectUri: {
+            label: LocalizationValue;
+          };
         };
         claimsStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
+            };
+            rows: {
+              subject: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              email: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              firstName: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+              lastName: {
+                attributeName: LocalizationValue;
+                userAttribute: LocalizationValue;
+              };
+            };
+          };
           headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
         };
         endpointsStep: {
           headerSubtitle: LocalizationValue;
+          discoveryUrl: {
+            description: LocalizationValue;
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          manual: {
+            authUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            description: LocalizationValue;
+            tokenUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            userInfoUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+          };
+          modes: {
+            ariaLabel: LocalizationValue;
+            discoveryUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
         };
         credentialsStep: {
           headerSubtitle: LocalizationValue;
+          clientId: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          clientSecret: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          paragraph: LocalizationValue;
+          scopes: {
+            addButton: LocalizationValue;
+            label: LocalizationValue;
+            optional: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
         };
       };
       samlOkta: {

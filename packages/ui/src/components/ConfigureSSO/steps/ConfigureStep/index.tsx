@@ -28,8 +28,9 @@ const STEPS_BY_SAML_PROVIDER: Record<SamlProviderType, ConfigureStepsComponent> 
 
 /**
  * Resolves the configure sub-flow for a created connection's provider. OIDC is an
- * open, backend-derived family (`oidc_<slug>`), so every OIDC provider shares one
- * sub-flow and is matched by protocol prefix; SAML stays an exact-literal lookup.
+ * open, backend-derived family (`oauth_custom_<slug>` or `oidc_*`), so every OIDC
+ * provider shares one sub-flow and is matched by protocol prefix; SAML stays an
+ * exact-literal lookup.
  * Returns `undefined` for an unrecognized provider so the caller can degrade.
  */
 export const resolveConfigureSteps = (

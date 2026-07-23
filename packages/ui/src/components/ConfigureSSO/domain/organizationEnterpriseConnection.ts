@@ -8,12 +8,11 @@ import type {
 import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
 
 /**
- * OIDC providers are recognized by protocol prefix, never by literal: the backend
- * stores a derived `oidc_<slug>` key (open family), so the read-back provider is
- * not a fixed enum. SAML providers stay exact literals. Single source of the
- * prefix notion — dispatch and configuration checks both read it from here.
+ * Custom OIDC uses `oauth_custom_<slug>`, while GitHub Enterprise and GitLab
+ * retain their `oidc_*` keys. SAML providers stay exact literals.
  */
-export const isOidcProvider = (provider: string): provider is OidcProviderType => provider.startsWith('oidc');
+export const isOidcProvider = (provider: string): provider is OidcProviderType =>
+  provider.startsWith('oidc_') || provider.startsWith('oauth_custom_');
 
 /**
  * The email whose domain backs the connection: the user's primary address if
@@ -102,9 +101,6 @@ export const organizationEnterpriseConnection = ({
   const hasMinimumConfiguration = isEnterpriseConnectionConfigured(connection);
 
   return {
-    // Boundary cast at the FAPI edge: SAML returns exact literals, OIDC an open
-    // `oidc_<slug>` family. An unrecognized value degrades downstream (dispatch
-    // falls back), so the honest open type — not the `oidc_custom` input alias — holds here.
     provider: connection?.provider as EnterpriseConnectionProviderType | undefined,
     hasConnection,
     isActive,

@@ -10,13 +10,28 @@ import type { EnterpriseConnectionProviderType } from '../../../types';
 // The dispatch reads `organizationEnterpriseConnection.provider`. The nested
 // sub-flows also read `enterpriseConnection` (via `Step.Footer.Reset`), which is
 // left undefined so that footer self-hides in this isolated render.
-const contextState = vi.hoisted(() => ({ provider: undefined as string | undefined }));
+const contextState = vi.hoisted(() => ({
+  provider: undefined as string | undefined,
+  enterpriseConnection: undefined as
+    | {
+        id: string;
+        oauthConfig: {
+          redirectUri?: string;
+          discoveryUrl?: string;
+          authUrl?: string;
+          tokenUrl?: string;
+          userInfoUrl?: string;
+        } | null;
+      }
+    | undefined,
+}));
+const updateConnection = vi.hoisted(() => vi.fn());
 
 vi.mock('../../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
-    enterpriseConnection: undefined,
+    enterpriseConnection: contextState.enterpriseConnection,
     contentRef: { current: null },
-    enterpriseConnectionMutations: {},
+    enterpriseConnectionMutations: { updateConnection },
     organizationEnterpriseConnection: {
       provider: contextState.provider,
       hasConnection: true,
@@ -36,9 +51,8 @@ import {
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 describe('resolveConfigureSteps', () => {
-  it('dispatches a derived OIDC provider key to the OIDC sub-flow by prefix (not the oidc_custom literal)', () => {
-    // The regression: the backend returns `oidc_<slug>` derived from the connection
-    // name (e.g. `clerk.dev` → `oidc_clerk_dev`), never the `oidc_custom` input alias.
+  it('dispatches custom and legacy OIDC provider keys to the OIDC sub-flow', () => {
+    expect(resolveConfigureSteps('oauth_custom_clerk_dev')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_clerk_dev')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_ghe_acme')).toBe(OidcCustomConfigureSteps);
     expect(resolveConfigureSteps('oidc_gitlab_ent_acme')).toBe(OidcCustomConfigureSteps);
@@ -68,15 +82,157 @@ describe('ConfigureProviderStep', () => {
       { wrapper },
     );
 
-  it('renders the OIDC configure steps for a derived provider key without throwing', async () => {
-    contextState.provider = 'oidc_clerk_dev';
+  it('renders the OIDC configure steps for a custom OAuth provider key without throwing', async () => {
+    contextState.provider = 'oauth_custom_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        redirectUri: 'https://instance.example/v1/oauth_callback',
+      },
+    };
     const { wrapper } = await createFixtures();
 
-    renderStep(wrapper);
+    const { userEvent } = renderStep(wrapper);
 
-    // The OIDC sub-flow mounts on its first step. Before the fix this threw
-    // `No steps found for provider: oidc_clerk_dev` and white-screened the wizard.
-    expect(await screen.findByText(/create a new oidc application/i)).toBeInTheDocument();
+    expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
+    const [redirectUri] = screen.getAllByRole('textbox') as HTMLInputElement[];
+    expect(redirectUri).toHaveAttribute('readonly');
+    expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(5);
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    const [discoveryMode, manualMode] = await screen.findAllByRole('radio');
+    expect(discoveryMode).toBeChecked();
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.click(manualMode);
+
+    expect(screen.getAllByRole('textbox')).toHaveLength(3);
+  });
+
+  it('saves the discovery endpoint before advancing to credentials', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenCalledWith('ent_123', {
+        oidc: { discoveryUrl: 'https://idp.example/.well-known/openid-configuration' },
+      });
+    });
+  });
+
+  it('saves manual endpoints before advancing to credentials', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    const [, manualMode] = await screen.findAllByRole('radio');
+    await userEvent.click(manualMode);
+
+    const [authUrl, tokenUrl, userInfoUrl] = screen.getAllByRole('textbox');
+    await userEvent.type(authUrl, 'https://idp.example/authorize');
+    await userEvent.type(tokenUrl, 'https://idp.example/token');
+    await userEvent.type(userInfoUrl, 'https://idp.example/userinfo');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenCalledWith('ent_123', {
+        oidc: {
+          authUrl: 'https://idp.example/authorize',
+          tokenUrl: 'https://idp.example/token',
+          userInfoUrl: 'https://idp.example/userinfo',
+        },
+      });
+    });
+  });
+
+  it('saves credentials and lets the user manage optional OIDC scopes', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(document.querySelector('input[name="clientId"]')).not.toBeNull();
+    });
+
+    const clientId = document.querySelector('input[name="clientId"]') as HTMLInputElement;
+    const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
+    await userEvent.type(clientId, 'client_123');
+    await userEvent.type(clientSecret, 'secret_456');
+
+    expect(screen.getByText('openid')).toBeInTheDocument();
+    expect(screen.getByText('profile')).toBeInTheDocument();
+    expect(screen.getByText('Optional')).toBeInTheDocument();
+
+    const scopeField = document.querySelector('input[name="scopes"]') as HTMLInputElement;
+    await userEvent.type(scopeField, 'email');
+    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.getByText('email')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenLastCalledWith('ent_123', {
+        oidc: { clientId: 'client_123', clientSecret: 'secret_456' },
+      });
+    });
+  });
+
+  it('populates manual endpoints resolved from discovery', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        discoveryUrl: 'https://idp.example/.well-known/openid-configuration',
+        authUrl: 'https://idp.example/authorize',
+        tokenUrl: 'https://idp.example/token',
+        userInfoUrl: 'https://idp.example/userinfo',
+      },
+    };
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    const [, manualMode] = await screen.findAllByRole('radio');
+    await userEvent.click(manualMode);
+
+    expect(document.querySelector('input[name="authUrl"]')).toHaveValue('https://idp.example/authorize');
+    expect(document.querySelector('input[name="tokenUrl"]')).toHaveValue('https://idp.example/token');
+    expect(document.querySelector('input[name="userInfoUrl"]')).toHaveValue('https://idp.example/userinfo');
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

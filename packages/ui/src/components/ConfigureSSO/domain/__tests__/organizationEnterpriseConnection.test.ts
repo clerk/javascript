@@ -61,7 +61,7 @@ const fullyConfiguredSaml = makeSamlConnection({
 const configuredOidc = makeOauthConfig({ clientId: 'client_abc' });
 
 const makeOidcConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
-  makeConnection({ provider: 'oidc_custom', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
+  makeConnection({ provider: 'oauth_custom_acme', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
 
 // Builds the entity with sensible defaults; each test overrides what it cares
 // about.
@@ -93,10 +93,10 @@ describe('organizationEnterpriseConnection', () => {
     it('connection → its provider', () => {
       expect(derive({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
     });
-    it('carries a derived OIDC key verbatim — the open family, not the oidc_custom alias', () => {
-      // The backend derives `oidc_<slug>` from the connection name; the entity must
-      // expose that real value so dispatch can prefix-match it.
-      expect(derive({ connection: makeConnection({ provider: 'oidc_clerk_dev' }) }).provider).toBe('oidc_clerk_dev');
+    it('carries a custom OIDC key verbatim', () => {
+      expect(derive({ connection: makeConnection({ provider: 'oauth_custom_clerk_dev' }) }).provider).toBe(
+        'oauth_custom_clerk_dev',
+      );
     });
   });
 

@@ -2,12 +2,11 @@
 export type SamlProviderType = 'saml_okta' | 'saml_custom' | 'saml_google' | 'saml_microsoft';
 
 /**
- * The OIDC provider family a created connection reports back. The backend derives
- * the key from the connection name (`oidc_<slug>`, plus `oidc_ghe_<slug>` and
- * `oidc_gitlab_ent_<slug>`), so it is an open string, never the `oidc_custom`
- * input alias the picker sends.
+ * The OIDC provider family a created connection reports back. Custom OIDC uses
+ * an `oauth_custom_<slug>` key, while GitHub Enterprise and GitLab retain their
+ * `oidc_*` keys for provider-specific user resolution.
  */
-export type OidcProviderType = `oidc_${string}`;
+export type OidcProviderType = `oidc_${string}` | `oauth_custom_${string}`;
 
 /**
  * The provider the SELECT step SENDS on create. OIDC always creates through the
@@ -17,7 +16,7 @@ export type ProviderType = SamlProviderType | 'oidc_custom';
 
 /**
  * The provider a created connection READS BACK. SAML narrows to the exact literals;
- * OIDC is the open, backend-derived family — dispatch on this by protocol, not literal.
+ * OIDC is an open, backend-derived family — dispatch on this by protocol, not literal.
  */
 export type EnterpriseConnectionProviderType = SamlProviderType | OidcProviderType;
 
