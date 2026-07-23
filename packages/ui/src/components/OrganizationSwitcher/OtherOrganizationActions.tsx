@@ -1,11 +1,12 @@
 import React from 'react';
 
+import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
+import { Add } from '@/icons';
+
 import { descriptors, localizationKeys } from '../../customizables';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
-import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
-import { Add } from '@/icons';
 
 export interface OrganizationActionListProps extends UserMembershipListProps {
   onCreateOrganizationClick: React.MouseEventHandler;
@@ -26,7 +27,7 @@ const CreateOrganizationButton = ({
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
-        padding: `${t.space.$5} ${t.space.$5}`,
+        padding: `${t.space.$4} ${t.space.$5}`,
       })}
       iconSx={t => ({
         width: t.sizes.$9,
@@ -34,7 +35,7 @@ const CreateOrganizationButton = ({
       })}
       iconBoxSx={t => ({
         width: t.sizes.$9,
-        height: t.sizes.$6,
+        height: t.sizes.$9,
       })}
       spinnerSize='sm'
     />

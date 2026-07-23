@@ -78,8 +78,8 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        '&:focus-within,&[data-focus-within="true"]': {
-          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        '&:has(:focus-visible),&:focus-within': {
+          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus-visible'],
         },
       })}
     >
@@ -93,10 +93,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           <CountryCodeListItem
             sx={theme => ({
               '&:hover': {
-                backgroundColor: theme.colors.$neutralAlpha100,
+                backgroundColor: theme.colors.$neutralAlpha50,
               },
               '&[data-focused="true"]': {
-                backgroundColor: theme.colors.$neutralAlpha150,
+                backgroundColor: theme.colors.$neutralAlpha50,
               },
             })}
             isSelected={isSelected}
@@ -119,7 +119,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             borderEndEndRadius: '0',
             borderStartEndRadius: '0',
             paddingInlineEnd: t.space.$2,
-            ':focus': {
+            '&:focus-visible': {
               zIndex: 2,
               boxShadow: 'none',
             },
@@ -145,10 +145,13 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           </Text>
         </SelectButton>
         <SelectOptionList
-          sx={{ padding: '0 0' }}
+          sx={{ padding: 0 }}
           containerSx={theme => ({
-            gap: 0,
-            padding: `${theme.space.$0x5} 0`,
+            overflowX: 'clip',
+            gap: theme.space.$0x5,
+            paddingBlock: theme.space.$1,
+            paddingInline: theme.space.$0x5,
+            scrollPaddingBlock: theme.space.$1,
           })}
         />
       </Select>
@@ -191,7 +194,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
                 borderStartStartRadius: 0,
                 borderEndStartRadius: 0,
                 paddingInlineStart: t.space.$1,
-                '&:focus': {
+                '&:focus-visible': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
                 },
@@ -220,10 +223,17 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       center
       sx={[
         theme => ({
+          position: 'relative',
           width: '100%',
           gap: theme.space.$2,
           padding: `${theme.space.$1x5} ${theme.space.$4}`,
           color: theme.colors.$colorForeground,
+          borderRadius: theme.radii.$sm,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: `calc(${theme.space.$0x25} * -1) calc(${theme.space.$1} * -1)`,
+          },
         }),
         sx,
       ]}

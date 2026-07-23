@@ -1,15 +1,24 @@
 /** @jsxImportSource @emotion/react */
-import { OrganizationProfile } from '@clerk/ui/mosaic/aio/organization-profile';
+import { OrganizationProfileView } from '@clerk/ui/mosaic/organization/organization-profile-view';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { Default as OrganizationProfileApiKeysPanelDemo } from './organization-profile-api-keys-panel.stories';
+import { Default as OrganizationProfileGeneralPanelDemo } from './organization-profile-general-panel.stories';
+import { Default as OrganizationProfileMembersPanelDemo } from './organization-profile-members-panel.stories';
+
 export const meta: StoryMeta = {
-  group: 'AIO',
+  group: 'Organization',
   title: 'OrganizationProfile',
-  label: 'Org Profile',
-  source: 'packages/ui/src/mosaic/aio/organization-profile.tsx',
+  source: 'packages/ui/src/mosaic/organization/organization-profile.tsx',
 };
 
 export function Default() {
-  return <OrganizationProfile />;
+  return (
+    <OrganizationProfileView
+      general={<OrganizationProfileGeneralPanelDemo />}
+      members={<OrganizationProfileMembersPanelDemo />}
+      apiKeys={<OrganizationProfileApiKeysPanelDemo />}
+    />
+  );
 }

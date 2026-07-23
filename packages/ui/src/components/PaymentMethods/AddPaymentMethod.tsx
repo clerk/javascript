@@ -206,7 +206,14 @@ const AddPaymentMethodForm = ({ children }: PropsWithChildren) => {
 
     const { data, error } = await submitPaymentElement();
     if (error) {
-      return; // just return, since stripe will handle the error
+      card.setIdle();
+      // Validation errors are already rendered inline by Stripe's PaymentElement.
+      // Non-validation errors (e.g. 3DS authentication failure) are not surfaced by
+      // Stripe's UI, so we display them ourselves.
+      if (error.error.type !== 'validation_error') {
+        card.setError(error.error.message);
+      }
+      return;
     }
     try {
       await onSuccess(data);

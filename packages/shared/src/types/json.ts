@@ -20,6 +20,7 @@ import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
 import type {
+  OrganizationDomainOwnershipVerificationStatus,
   OrganizationDomainOwnershipVerificationStrategy,
   OrganizationDomainVerificationStatus,
   OrganizationEnrollmentMode,
@@ -147,6 +148,21 @@ export interface SignUpJSON extends ClerkResourceJSON {
   legal_accepted_at: number | null;
   locale: string | null;
   verifications: SignUpVerificationsJSON | null;
+  protect_check?: ProtectCheckJSON | null;
+}
+
+export interface ProtectCheckJSON {
+  /**
+   * Always `'pending'` when surfaced to clients. Completed checks are never emitted on the wire.
+   */
+  status: 'pending';
+  token: string;
+  sdk_url: string;
+  /**
+   * Unix epoch timestamp in **milliseconds** at which the challenge expires.
+   */
+  expires_at?: number;
+  ui_hints?: Record<string, string>;
 }
 
 /**
@@ -436,7 +452,7 @@ export interface OrganizationDomainVerificationJSON {
 }
 
 export interface OrganizationDomainOwnershipVerificationJSON {
-  status: OrganizationDomainVerificationStatus;
+  status: OrganizationDomainOwnershipVerificationStatus;
   strategy: OrganizationDomainOwnershipVerificationStrategy;
   attempts: number | null;
   expire_at: number | null;
@@ -686,7 +702,7 @@ export interface BillingPlanUnitPriceTierJSON extends ClerkResourceJSON {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  *
- * Represents unit pricing for a specific unit type (for example, seats) on a plan.
+ * Represents unit pricing for a specific unit type (e.g., seats) on a plan.
  */
 export interface BillingPlanUnitPriceJSON {
   name: string;
@@ -749,7 +765,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   free_trial_days?: number | null;
   free_trial_enabled?: boolean;
   /**
-   * Per-unit pricing tiers for this plan (for example, seats).
+   * Per-unit pricing tiers for this plan (e.g., seats).
    */
   unit_prices?: BillingPlanUnitPriceJSON[];
   available_prices?: BillingPriceJSON[];
@@ -808,7 +824,7 @@ export interface BillingStatementGroupJSON extends ClerkResourceJSON {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  *
- * Per-payment cost breakdown including optional base fee and per-unit (for example, seats) subtotals.
+ * Per-payment cost breakdown including optional base fee and per-unit (e.g., seats) subtotals.
  */
 export interface BillingPaymentTotalsJSON {
   subtotal: BillingMoneyAmountJSON;
@@ -837,7 +853,7 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   charge_type: BillingPaymentChargeType;
   status: BillingPaymentStatus;
   /**
-   * Per-payment breakdown with optional base fee and per-unit (for example, seats)
+   * Per-payment breakdown with optional base fee and per-unit (e.g., seats)
    * subtotals. Absent on older responses.
    */
   totals?: BillingPaymentTotalsJSON | null;
@@ -925,6 +941,26 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
   eligible_for_free_trial: boolean;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditBalanceJSON {
+  object: 'commerce_credit_balance';
+  balance: BillingMoneyAmountJSON | null;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingCreditLedgerJSON {
+  object: 'commerce_credit_ledger';
+  id: string;
+  amount: BillingMoneyAmountJSON;
+  source_type: string;
+  source_id: string;
+  created_at: number;
 }
 
 /**
@@ -1029,7 +1065,7 @@ export interface BillingCheckoutTotalsJSON {
   base_fee: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
   /**
-   * Per-unit cost breakdown for items actively being purchased in this checkout (for example, seats being added).
+   * Per-unit cost breakdown for items actively being purchased in this checkout (e.g., seats being added).
    * When only adding seats mid-cycle, this only covers the seats being added, not seats already paid for.
    * Omitted when the checkout is not seat-based.
    */

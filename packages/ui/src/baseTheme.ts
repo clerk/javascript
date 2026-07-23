@@ -75,6 +75,18 @@ const checkboxBaseStyles = (theme: InternalTheme) => ({
   },
 });
 
+// Clerk theme tightens the trailing-button geometry (see `common.inputTrailingButton` for the
+// simple-theme base) so it sits flush inside the denser default-theme input. Apply to every
+// button anchored to the trailing edge of an input.
+const inputTrailingButtonStyles = (theme: InternalTheme) => ({
+  insetInlineEnd: theme.space.$0x75,
+  insetBlock: theme.space.$0x75,
+  borderRadius: `calc(${theme.radii.$md} - ${theme.space.$0x75})`,
+  '&::before': {
+    inset: `calc(${theme.space.$0x75} * -1)`,
+  },
+});
+
 const inputStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
   ...inputShadowStyles(theme, {
@@ -138,10 +150,28 @@ const clerkTheme: Appearance = {
                 theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
               ].toString(),
             },
+            '&:focus:not(:focus-visible)': {
+              boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+            },
+            '&:focus-visible': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+              ].toString(),
+            },
           },
           '&[data-color="danger"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
             '&:focus': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
+              ].toString(),
+            },
+            '&:focus:not(:focus-visible)': {
+              boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+            },
+            '&:focus-visible': {
               boxShadow: [
                 BUTTON_SOLID_SHADOW(theme.colors.$danger500),
                 theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
@@ -158,11 +188,29 @@ const clerkTheme: Appearance = {
               theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
             ].toString(),
           },
+          '&:focus:not(:focus-visible)': {
+            boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+          },
+          '&:focus-visible': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+            ].toString(),
+          },
         },
         '&[data-variant="bordered"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
           '&:focus': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
+            ].toString(),
+          },
+          '&:focus:not(:focus-visible)': {
+            boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
+          },
+          '&:focus-visible': {
             boxShadow: [
               BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
               theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
@@ -221,7 +269,7 @@ const clerkTheme: Appearance = {
       },
       selectSearchInput__countryCode: {
         boxShadow: 'none',
-        '&:focus': { boxShadow: 'none' },
+        '&:focus-visible': { boxShadow: 'none' },
       },
       cardBox: {
         borderWidth: 0,
@@ -269,6 +317,8 @@ const clerkTheme: Appearance = {
         borderWidth: 0,
         boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$borderAlpha100}`,
       },
+      formFieldInputShowPasswordButton: inputTrailingButtonStyles(theme),
+      searchInputClearButton: inputTrailingButtonStyles(theme),
     };
   },
 } satisfies Appearance;

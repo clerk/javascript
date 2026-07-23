@@ -2,12 +2,12 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import type * as CSS from 'csstype';
 
 import { useMosaicAppearance } from './appearance';
-import { expandConditions } from './conditions';
 import type { MosaicConditionKey } from './conditions';
+import { expandConditions } from './conditions';
 import { useMosaicTheme } from './MosaicProvider';
 import { resolveSlotClassName, resolveSlotCss } from './resolveSlot';
-import { defaultMosaicVariables, resolveVariables } from './variables';
 import type { MosaicTheme } from './variables';
+import { defaultMosaicVariables, resolveVariables } from './variables';
 
 // ─── Public Types ─────────────────────────────────────────────────────────────
 
@@ -140,18 +140,21 @@ export function defineSlotRecipe<V extends Record<string, Record<string, StyleRu
 export function defineSlotRecipe(
   configOrFn: SlotRecipeConfig | ((theme: MosaicTheme) => SlotRecipeConfig),
 ): SlotRecipe<string, unknown> {
-  const cache = typeof configOrFn === 'function' ? new WeakMap<MosaicTheme, SlotRecipeConfig>() : null;
-  const resolveConfig = (theme: MosaicTheme): SlotRecipeConfig => {
-    if (typeof configOrFn !== 'function') {
-      return configOrFn;
-    }
-    let cached = cache!.get(theme);
-    if (!cached) {
-      cached = configOrFn(theme);
-      cache!.set(theme, cached);
-    }
-    return cached;
-  };
+  let resolveConfig: (theme: MosaicTheme) => SlotRecipeConfig;
+  if (typeof configOrFn === 'function') {
+    const buildConfig = configOrFn;
+    const cache = new WeakMap<MosaicTheme, SlotRecipeConfig>();
+    resolveConfig = theme => {
+      let cached = cache.get(theme);
+      if (!cached) {
+        cached = buildConfig(theme);
+        cache.set(theme, cached);
+      }
+      return cached;
+    };
+  } else {
+    resolveConfig = () => configOrFn;
+  }
 
   // Slot identity is theme-independent, so probe once against the default theme.
   const probe = resolveConfig(resolveVariables(defaultMosaicVariables));

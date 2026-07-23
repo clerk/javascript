@@ -68,7 +68,7 @@ export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
                         'organizationProfile.membersPage.invitationsTab.autoInvitations.headerSubtitle',
                       )}
                       sx={t => ({
-                        paddingInlineStart: t.space.$10,
+                        paddingInlineStart: t.space.$8x5,
                         color: t.colors.$colorMutedForeground,
                         [mqu.md]: {
                           paddingInlineStart: 0,

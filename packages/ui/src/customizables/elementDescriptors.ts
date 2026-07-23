@@ -55,6 +55,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'logoGroup',
   'logoGroupItem',
+  'logoGroupItemContainer',
   'logoGroupIcon',
   'logoGroupSeparator',
 
@@ -177,6 +178,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldInputShowPasswordIcon',
   'formFieldInputCopyToClipboardButton',
   'formFieldInputCopyToClipboardIcon',
+  'searchInput',
+  'searchInputClearButton',
 
   'phoneInputBox',
   'formInputGroup',
@@ -586,6 +589,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOVerifyDomainCardRemoveButton',
   'configureSSOVerifyDomainCardTxtRecord',
   'configureSSOVerifyDomainCardTxtRecordValue',
+  'configureSSOVerifyDomainCardExpired',
   'configureSSOEmailVerificationForm',
   'configureSSOEmailVerificationIcon',
   'configureSSOEmailVerificationTitle',

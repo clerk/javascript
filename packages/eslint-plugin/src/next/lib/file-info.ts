@@ -16,8 +16,7 @@ const RESOURCE_EXTENSIONS = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
 /**
  * @param rootDir Project root to relativize against — typically from
  *   `resolveProjectRoot()` (explicit option, nearest `eslint.config.*`, or ESLint
- *   `cwd`). When omitted or when the file lies outside `rootDir`, the absolute
- *   path is scanned for an `app` segment instead.
+ *   `cwd`). Returns `null` when the file lies outside `rootDir`.
  */
 export function getRelativeFolder(filename: string | undefined, rootDir: string | undefined): string | null {
   if (!filename) {
@@ -25,39 +24,40 @@ export function getRelativeFolder(filename: string | undefined, rootDir: string 
   }
   const normalizedFile = filename.replaceAll('\\', '/');
 
-  // Prefer a project-relative path so that noise in the absolute prefix (a home
-  // directory like `/Users/app/...`, a monorepo root, etc.) can't be mistaken
-  // for the Next.js App Router root. When the file lives outside `rootDir` (e.g.
-  // in `RuleTester`, which lints in-memory code), fall back to the absolute path.
-  let candidate = normalizedFile;
-  if (rootDir) {
-    const normalizedRoot = rootDir.replaceAll('\\', '/');
-    const rel = path.posix.relative(normalizedRoot, normalizedFile);
-    if (rel && !rel.startsWith('..')) {
-      candidate = rel;
-    }
+  if (!rootDir) {
+    return null;
   }
 
-  // The App Router root is the first path segment that is exactly `app` (this
-  // also covers the `src/app/` convention, where the leading `src` segment is
-  // simply skipped). Folder globs in config are rooted at `app/...`, so we
-  // re-root the returned folder there. Matching whole segments (rather than the
-  // `/app/` substring) avoids false positives like `myapp` or `app-utils`.
-  const segments = candidate.split('/');
-  const appIdx = segments.findIndex(seg => seg === 'app');
-  if (appIdx !== -1) {
-    return path.posix.dirname(segments.slice(appIdx).join('/'));
+  const normalizedRoot = rootDir.replaceAll('\\', '/');
+  const rel = path.posix.relative(normalizedRoot, normalizedFile);
+  if (!rel || rel === '..' || rel.startsWith('../')) {
+    return null;
   }
 
-  // No `app` segment: only meaningful when we have a project-relative path.
-  if (candidate !== normalizedFile) {
-    return path.posix.dirname(candidate);
-  }
-  return null;
+  return path.posix.dirname(rel);
 }
 
-export function getFileKind(filename: string | undefined): FileKind | null {
-  if (!filename) {
+/**
+ * Whether `relativeFolder` lies under a Next.js App Router root, relative to
+ * the configured project root. Only Next.js' supported root layouts (`app/...`
+ * and `src/app/...`) count; monorepo apps should set `rootDir` per app.
+ */
+export function isUnderAppRouterRoot(relativeFolder: string): boolean {
+  return (
+    relativeFolder === 'app' ||
+    relativeFolder.startsWith('app/') ||
+    relativeFolder === 'src/app' ||
+    relativeFolder.startsWith('src/app/')
+  );
+}
+
+/**
+ * App Router resource kind (`page`, `layout`, etc.) when the file lives under an
+ * App Router root. Returns `null` for the same basename outside `app/` (e.g.
+ * `utils/page.tsx`).
+ */
+export function getAppRouterFileKind(filename: string | undefined, relativeFolder: string | null): FileKind | null {
+  if (!filename || !relativeFolder || !isUnderAppRouterRoot(relativeFolder)) {
     return null;
   }
   const base = path.basename(filename).replace(RESOURCE_EXTENSIONS, '');

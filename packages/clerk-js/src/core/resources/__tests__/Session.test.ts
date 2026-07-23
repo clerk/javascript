@@ -3,6 +3,7 @@ import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { TokenId } from '@/utils/tokenId';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
@@ -2040,6 +2041,250 @@ describe('Session', () => {
       expect(session.actor).toEqual(actor);
       expect(session.agent).toEqual(actor);
       expect(session.agent?.type).toBe('agent');
+    });
+  });
+
+  describe('session-minter monotonic guard', () => {
+    const NOW = 1666648250;
+    const DEFAULT_SID = 'sess_minter';
+
+    // Mirrors tokenCache.test.ts:37 — header carries `oiat`, payload carries `sid`/`iat`/`exp`
+    // (+ optional `org_id`). Pass `undefined` for oiat to emit a pre-feature token (no header).
+    function createJwtWithOiat(
+      iatSeconds: number,
+      oiatSeconds: number | undefined,
+      opts: { sid?: string; org?: string | null } = {},
+    ): string {
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (typeof oiatSeconds === 'number') {
+        header.oiat = oiatSeconds;
+      }
+      const payload: Record<string, unknown> = {
+        sid: opts.sid ?? DEFAULT_SID,
+        iat: iatSeconds,
+        exp: iatSeconds + 60,
+      };
+      if (opts.org) {
+        payload.org_id = opts.org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    }
+
+    function deferred<T = any>() {
+      let resolve!: (value: T) => void;
+      let reject!: (reason?: unknown) => void;
+      const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    }
+
+    const makeSession = (overrides: Partial<SessionJSON> = {}) =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        ...overrides,
+      } as SessionJSON);
+
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      SessionTokenCache.clear();
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: true },
+        },
+      }) as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+      SessionTokenCache.clear();
+    });
+
+    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve high then low)', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ skipCache: true });
+      const pLow = session.getToken({ skipCache: true });
+
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+
+      // Each skipCache call returns its own mint (main parity): the low fetch resolves last and
+      // returns low, but it never regresses the cache slot or lastActiveToken.
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(await session.getToken()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('concurrent skipCache mints return their own token; cache slot and lastActiveToken stay freshest (resolve low then high)', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dFirst = deferred();
+      const dSecond = deferred();
+      fetchSpy.mockReturnValueOnce(dFirst.promise as any).mockReturnValueOnce(dSecond.promise as any);
+
+      const pFirst = session.getToken({ skipCache: true });
+      const pSecond = session.getToken({ skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity).
+      dFirst.resolve({ object: 'token', jwt: low });
+      await expect(pFirst).resolves.toBe(low);
+
+      dSecond.resolve({ object: 'token', jwt: high });
+      await expect(pSecond).resolves.toBe(high);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(await session.getToken()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('a stale fetch after a fresh one returns its own mint but never regresses lastActiveToken or the next /tokens token field', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: high })
+        .mockResolvedValueOnce({ object: 'token', jwt: low })
+        .mockResolvedValueOnce({ object: 'token', jwt: low });
+
+      expect(await session.getToken()).toBe(high);
+      // Each skipCache call returns its own mint (main parity), so the staler fetches return low.
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+
+      // The first stale fetch carried high as the previous token, and the next request still does,
+      // proving lastActiveToken never regressed to the stale token.
+      expect(fetchSpy.mock.calls[1][0].body.token).toBe(high);
+      expect(fetchSpy.mock.calls[2][0].body.token).toBe(high);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('explicit organizationId does not write lastActiveToken but keeps its own cache monotonic', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30, { org: 'org_other' });
+      const low = createJwtWithOiat(NOW, NOW, { org: 'org_other' });
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ organizationId: 'org_other', skipCache: true });
+      const pLow = session.getToken({ organizationId: 'org_other', skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', undefined, 'org_other');
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(session.lastActiveToken).toBeNull();
+    });
+
+    it('template tokens never write lastActiveToken and keep the template cache monotonic', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ template: 't', skipCache: true });
+      const pLow = session.getToken({ template: 't', skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity); the cache slot still stays freshest.
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', 't', null);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(high);
+      expect(session.lastActiveToken).toBeNull();
+    });
+
+    it("resolving one session's fetch never writes another session's lastActiveToken", async () => {
+      const sessionA = makeSession({ id: 'session_A' } as Partial<SessionJSON>);
+      const sessionB = makeSession({ id: 'session_B' } as Partial<SessionJSON>);
+      const tokenA = createJwtWithOiat(NOW, NOW + 30, { sid: 'sess_A' });
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: tokenA });
+
+      expect(await sessionA.getToken()).toBe(tokenA);
+
+      expect(sessionA.lastActiveToken?.getRawString()).toBe(tokenA);
+      expect(sessionB.lastActiveToken).toBeNull();
+    });
+
+    it('successive tokens without oiat keep writing lastActiveToken (equal rank, newest wins)', async () => {
+      const session = makeSession();
+      const first = createJwtWithOiat(NOW, undefined);
+      const second = createJwtWithOiat(NOW + 5, undefined);
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: first })
+        .mockResolvedValueOnce({ object: 'token', jwt: second });
+
+      expect(await session.getToken()).toBe(first);
+      expect(session.lastActiveToken?.getRawString()).toBe(first);
+
+      expect(await session.getToken({ skipCache: true })).toBe(second);
+      expect(session.lastActiveToken?.getRawString()).toBe(second);
+    });
+
+    it('an org-switch token minted with a lower oiat still replaces the previous org lastActiveToken', async () => {
+      const session = makeSession();
+      const personalHigh = createJwtWithOiat(NOW, NOW + 30);
+      const orgLow = createJwtWithOiat(NOW + 5, NOW, { org: 'org_next' });
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: personalHigh })
+        .mockResolvedValueOnce({ object: 'token', jwt: orgLow });
+
+      expect(await session.getToken()).toBe(personalHigh);
+      expect(session.lastActiveToken?.getRawString()).toBe(personalHigh);
+
+      // setActive commits the new organization before its first token fetch.
+      session.lastActiveOrganizationId = 'org_next';
+
+      expect(await session.getToken()).toBe(orgLow);
+      // A cross-org lastActiveToken is not a freshness baseline: the new org's token
+      // wins even though a stale edge minted it with a lower oiat.
+      expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
     });
   });
 });

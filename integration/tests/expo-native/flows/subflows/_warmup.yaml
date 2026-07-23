@@ -1,0 +1,11 @@
+# Cold-boot warmup, not a test. Lets the JS bundle parse and the a11y tree
+# populate once, so the first real flow doesn't eat the cold-start cost and
+# flake its in-flow waits. Excluded from the per-flow loop (lives in subflows/).
+appId: com.clerk.exponativebuildfixture
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: 'auth-state'
+    timeout: 90000

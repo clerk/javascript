@@ -6,7 +6,6 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { Col, descriptors, Flex, Icon, localizationKeys, SimpleButton, Spinner, Text } from '../../customizables';
 import { ChevronLeft } from '../../icons';
-import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
@@ -48,23 +47,27 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     setView('wizard');
   };
 
-  if (isLoading) {
+  // Gate the page-level loading overview to the overview view only. A wizard is
+  // only ever opened after the overview has settled (it gates on `isLoading`),
+  // so once `view === 'wizard'` the connection data is present and stays warm; a
+  // later `isLoading` flip (e.g. the test-runs query cold-loading after a
+  // configure write) must not tear the open wizard down and reseat it — each
+  // wizard step owns its own loading UI.
+  if (isLoading && view === 'overview') {
     return (
-      <ConfigureSSOProtect>
-        <SecurityPageOverview fillHeight>
-          <Flex
-            align='center'
-            justify='center'
-            sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
-          >
-            <Spinner
-              size='xs'
-              colorScheme='neutral'
-              elementDescriptor={descriptors.spinner}
-            />
-          </Flex>
-        </SecurityPageOverview>
-      </ConfigureSSOProtect>
+      <SecurityPageOverview fillHeight>
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+        >
+          <Spinner
+            size='xs'
+            colorScheme='neutral'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      </SecurityPageOverview>
     );
   }
 
@@ -89,35 +92,31 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     </SimpleButton>
   );
 
-  return (
-    <ConfigureSSOProtect>
-      {view === 'overview' ? (
-        <SecurityPageOverview>
-          <SecuritySsoSection
-            connection={organizationEnterpriseConnection}
-            enterpriseConnection={enterpriseConnection}
-            setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
-            deleteConnection={enterpriseConnectionMutations.deleteConnection}
-            organizationName={organization?.name ?? ''}
-            contentRef={contentRef}
-            onConfigure={openWizard}
-          />
-        </SecurityPageOverview>
-      ) : (
-        <ConfigureSSOWizard
-          organizationEnterpriseConnection={organizationEnterpriseConnection}
-          testRuns={testRuns}
-          enterpriseConnection={enterpriseConnection}
-          contentRef={contentRef}
-          enterpriseConnectionMutations={enterpriseConnectionMutations}
-          organizationDomainMutations={organizationDomainMutations}
-          organizationDomains={organizationDomains}
-          forceInitialStep={forceFirstStep}
-          title={backControl}
-          onExit={exitWizard}
-        />
-      )}
-    </ConfigureSSOProtect>
+  return view === 'overview' ? (
+    <SecurityPageOverview>
+      <SecuritySsoSection
+        connection={organizationEnterpriseConnection}
+        enterpriseConnection={enterpriseConnection}
+        setConnectionActive={enterpriseConnectionMutations.setConnectionActive}
+        deleteConnection={enterpriseConnectionMutations.deleteConnection}
+        organizationName={organization?.name ?? ''}
+        contentRef={contentRef}
+        onConfigure={openWizard}
+      />
+    </SecurityPageOverview>
+  ) : (
+    <ConfigureSSOWizard
+      organizationEnterpriseConnection={organizationEnterpriseConnection}
+      testRuns={testRuns}
+      enterpriseConnection={enterpriseConnection}
+      contentRef={contentRef}
+      enterpriseConnectionMutations={enterpriseConnectionMutations}
+      organizationDomainMutations={organizationDomainMutations}
+      organizationDomains={organizationDomains}
+      forceInitialStep={forceFirstStep}
+      title={backControl}
+      onExit={exitWizard}
+    />
   );
 };
 

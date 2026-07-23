@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
+import { ALLOWED_PROTOCOLS, windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
@@ -264,6 +265,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
     return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
   }
+
+  public __internal_windowNavigate: Clerk['__internal_windowNavigate'] = (to, opts) => {
+    const clerkjs = this.clerkjs;
+    if (typeof clerkjs?.__internal_windowNavigate === 'function') {
+      clerkjs.__internal_windowNavigate(to, opts);
+      return;
+    }
+
+    // Older clerk-js lacks this navigation chokepoint, so delegating would silently no-op. Fall back to
+    // the shared helper (browser-only, it touches window.location) so newer @clerk/ui still navigates and
+    // rejects disallowed protocols on an older clerk-js, honoring allowedRedirectProtocols unless opted out.
+    if (!inBrowser()) {
+      return;
+    }
+    const allowedProtocols = opts?.useStaticAllowlistOnly
+      ? ALLOWED_PROTOCOLS
+      : [...ALLOWED_PROTOCOLS, ...(this.options.allowedRedirectProtocols ?? [])];
+    windowNavigate(to, { allowedProtocols });
+  };
 
   constructor(options: IsomorphicClerkOptions) {
     this.#publishableKey = options?.publishableKey;

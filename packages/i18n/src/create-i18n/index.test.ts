@@ -324,8 +324,11 @@ describe('createI18n', () => {
     // change recomputes every namespace).
     it('reuses Intl.PluralRules across recomputes instead of rebuilding it per message', () => {
       const RealPluralRules = Intl.PluralRules;
-      // Return a real instance; spyOn on a constructor otherwise loses `new`.
-      const spy = vi.spyOn(Intl, 'PluralRules').mockImplementation(locale => new RealPluralRules(locale));
+      // Regular function (not an arrow) so it stays `new`-able; returns a real
+      // instance since spying on a constructor otherwise loses `new`.
+      const spy = vi.spyOn(Intl, 'PluralRules').mockImplementation(function (locale?: Intl.LocalesArgument) {
+        return new RealPluralRules(locale);
+      });
       try {
         const $overrides = atom(defineLocalization({}));
         const i18n = createI18n(atom('en'), { get: vi.fn(), overrides: $overrides });

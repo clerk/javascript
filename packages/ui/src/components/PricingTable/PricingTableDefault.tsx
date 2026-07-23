@@ -13,7 +13,7 @@ import { getPlanSeatLimit, getSeatUnitPrice, organizationExceedsPlanSeatLimit } 
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import { useProtect } from '../../common';
-import { normalizeFormatted, usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -313,6 +313,7 @@ interface CardHeaderProps {
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
   const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
   const { name } = plan;
+  const { $ } = useLocalizations();
 
   const fee = React.useMemo(() => {
     if (!plan.annualMonthlyFee) {
@@ -352,8 +353,8 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     if (!displayedFee) {
       return '';
     }
-    return `${displayedFee.currencySymbol}${normalizeFormatted(displayedFee.amountFormatted)}`;
-  }, [displayedFee]);
+    return $(displayedFee, { style: 'short' });
+  }, [displayedFee, $]);
 
   return (
     <Box
@@ -608,7 +609,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
 });
 
 const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
-  const { t } = useLocalizations();
+  const { t, $ } = useLocalizations();
   const unitPrices = plan.unitPrices;
   const period = t(localizationKeys('billing.month'));
   const periodAbbreviation = t(localizationKeys('billing.monthAbbreviation'));
@@ -624,8 +625,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
       return null;
     }
 
-    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) =>
-      `${tier.feePerBlock.currencySymbol}${normalizeFormatted(tier.feePerBlock.amountFormatted)}`;
+    const formatTierFee = (tier: BillingPlanUnitPrice['tiers'][number]) => $(tier.feePerBlock, { style: 'short' });
     const getCapacityText = (endsAfterBlock: number | null) =>
       endsAfterBlock === null
         ? localizationKeys('billing.pricingTable.seatCost.unlimitedSeats')
@@ -712,7 +712,7 @@ const CardFeaturesListSeatCost = ({ plan }: { plan: BillingPlanResource }) => {
     }
 
     return null;
-  }, [period, periodAbbreviation, plan.fee, plan.annualMonthlyFee, t, unitPrices]);
+  }, [period, periodAbbreviation, plan.fee, plan.annualMonthlyFee, t, unitPrices, $]);
 
   if (!seatRows?.length) {
     return null;

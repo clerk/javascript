@@ -26,6 +26,7 @@ function DestructiveTrigger(props: HTMLAttributes<HTMLElement>) {
 export function Default() {
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmationValue, setConfirmationValue] = useState('');
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -43,8 +44,11 @@ export function Default() {
       description='Are you sure you want to delete this organization?'
       primaryActionLabel='Delete organization'
       resourceName='Example organization'
+      confirmationValue={confirmationValue}
+      onConfirmationValueChange={setConfirmationValue}
       onDelete={handleDelete}
       isDeleting={isDeleting}
+      canSubmit={confirmationValue === 'Example organization' && !isDeleting}
     />
   );
 }

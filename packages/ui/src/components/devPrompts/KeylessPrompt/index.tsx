@@ -361,6 +361,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
       css={css`
         ${CSS_RESET};
         position: fixed;
+        z-index: 2147483647;
         border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
         background-color: #1f1f1f;
         box-shadow:

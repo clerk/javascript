@@ -18,6 +18,7 @@ on:
       - 'packages/chrome-extension/**'
       - 'packages/clerk-js/**'
       - 'packages/expo/**'
+      - 'packages/expo-google-signin/**'
       - 'packages/expo-passkeys/**'
       - 'packages/express/**'
       - 'packages/fastify/**'
@@ -54,6 +55,7 @@ env:
     --filter=@clerk/chrome-extension
     --filter=@clerk/clerk-js
     --filter=@clerk/expo
+    --filter=@clerk/expo-google-signin
     --filter=@clerk/expo-passkeys
     --filter=@clerk/express
     --filter=@clerk/fastify
@@ -107,7 +109,7 @@ jobs:
 
       - name: Generate API snapshot
         run: |
-          npx --yes "@clerk/break-check@0.5.0" snapshot \
+          npx --yes "@clerk/break-check@0.6.0" snapshot \
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Upload baseline artifact
@@ -172,9 +174,9 @@ jobs:
         run: echo "BREAK_CHECK_FILTERS=$BREAK_CHECK_FILTERS" >> "$GITHUB_ENV"
 
       - name: Break Check
-        uses: clerk/break-check@28f2635be18aa1127189f088a564645efb3aad90 # v0.5.0
+        uses: clerk/break-check@92be9cc726c848b9567c7b869e9b11dc761ddd6e # v0.6.0
         with:
-          break-check-version: '0.5.0'
+          break-check-version: '0.6.0'
           # The PR head is already checked out, so build it in place rather than
           # in a second head worktree.
           head-ref: ''

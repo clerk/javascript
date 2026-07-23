@@ -2,6 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
@@ -10,7 +11,6 @@ import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
-import { patchRequest } from './utils';
 
 type RequestStateContextValue = {
   requestState: RequestState<any>;
@@ -25,14 +25,9 @@ export const requestStateContext = createContext<RequestStateContextValue | null
  * It checks the request's cookies and headers for a session JWT and, if found,
  * attaches the Auth object to a context.
  *
- * @example
- * // react-router.config.ts
- * export default {
- *   future: {
- *     v8_middleware: true,
- *   },
- * }
+ * If you're using React Router v7, enable the v8_middleware future flag in your react-router.config.ts file.
  *
+ * @example
  * // root.tsx
  * export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()]
  */

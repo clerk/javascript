@@ -1,11 +1,12 @@
-import { type ComponentProps, type ReactElement, useCallback } from 'react';
+import { type ReactElement, useCallback } from 'react';
+import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
 
-type AuthNativeEvent = Parameters<NonNullable<ComponentProps<typeof NativeClerkAuthView>['onAuthEvent']>>[0];
+type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -36,7 +37,12 @@ type AuthNativeEvent = Parameters<NonNullable<ComponentProps<typeof NativeClerkA
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss }: AuthViewProps): ReactElement {
+export function AuthView({
+  mode = 'signInOrUp',
+  isDismissible = true,
+  logoMaxHeight,
+  onDismiss,
+}: AuthViewProps): ReactElement {
   const handleAuthEvent = useCallback(
     (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -63,6 +69,7 @@ export function AuthView({ mode = 'signInOrUp', isDismissible = true, onDismiss 
       style={{ flex: 1 }}
       mode={mode}
       isDismissible={isDismissible}
+      logoMaxHeight={logoMaxHeight}
       onAuthEvent={handleAuthEvent}
     />
   );

@@ -1,7 +1,13 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpField, SignUpIdentificationField, SignUpStatus, SignUpVerificationResource } from './signUpCommon';
+import type {
+  ProtectCheckResource,
+  SignUpField,
+  SignUpIdentificationField,
+  SignUpStatus,
+  SignUpVerificationResource,
+} from './signUpCommon';
 import type {
   AppleIdTokenStrategy,
   EnterpriseSSOStrategy,
@@ -85,6 +91,14 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
    * The Web3 wallet address, made up of 0x + 40 hexadecimal characters. Only supported if [Web3 authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#web3-authentication) is enabled in the instance settings.
    */
   web3Wallet?: string;
+}
+
+/** @generateWithEmptyComment */
+export interface SignUpFutureSubmitProtectCheckParams {
+  /**
+   * The proof token produced by the Protect challenge SDK.
+   */
+  proofToken: string;
 }
 
 /** @generateWithEmptyComment */
@@ -462,6 +476,12 @@ export interface SignUpFutureResource {
   readonly locale: string | null;
 
   /**
+   * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
+   * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   */
+  readonly protectCheck: ProtectCheckResource | null;
+
+  /**
    * Indicates that the sign-up can be discarded (has been finalized or explicitly reset).
    *
    * @internal
@@ -510,6 +530,11 @@ export interface SignUpFutureResource {
    * Performs a Web3-based sign-up.
    */
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   */
+  submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Converts a sign-up with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.

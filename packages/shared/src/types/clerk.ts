@@ -288,6 +288,16 @@ export interface Clerk {
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
+  /**
+   * @internal
+   * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
+   * By default the resolved URL is validated against the customer-supplied
+   * `allowedRedirectProtocols` option (static defaults ∪ the customer extension).
+   * Disallowed protocols and scheme-relative inputs (`//host`) are rejected with a console warning.
+   * Pass `useStaticAllowlistOnly: true` to opt out of the customer extension.
+   */
+  __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1034,7 +1044,7 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session) are mounted.
    *
-   * @param opts - Options to control the redirect (e.g. redirect URL after tasks are complete).
+   * @param opts - Options to control the redirect (e.g., redirect URL after tasks are complete).
    */
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
@@ -1191,7 +1201,7 @@ export interface Clerk {
   apiKeys: APIKeysNamespace;
 
   /**
-   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   * OAuth application helpers (e.g., consent metadata for custom consent UIs).
    */
   oauthApplication: OAuthApplicationNamespace;
 
@@ -1242,6 +1252,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-in is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-in component.
+     */
+    signInProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
+     */
+    signUpProtectCheckUrl?: string | null;
     /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
@@ -1369,7 +1389,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     polling?: boolean;
     /**
-     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g., by selecting a specific session.
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
@@ -1381,7 +1401,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
@@ -1424,19 +1444,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
     telemetry?:
       | false
       | {
-          /**
-           * If `true`, telemetry will not be collected.
-           */
+          /** Whether telemetry will be collected. */
           disabled?: boolean;
-          /**
-           * If `true`, telemetry events are only logged to the console and not sent to Clerk
-           */
+          /** Whether telemetry events are only logged to the console and not sent to Clerk. */
           debug?: boolean;
-          /**
-           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
-           *
-           * @default true
-           */
+          /** Whether the sampling rates provided per telemetry event will be ignored and all events will be sent. Defaults to `true`. */
           perEventSampling?: boolean;
         };
 
@@ -1469,6 +1481,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * directly with the provided Clerk instance. Used by React Native / Expo.
          */
         runtimeEnvironment: 'headless';
+        /**
+         * Temporary flag that gates the self-serve OIDC flow in `<ConfigureSSO />`. Remove once the self-serve OIDC flow reaches GA.
+         */
+        oidcSelfServe: boolean;
       },
       Record<string, any>
     >;
@@ -1936,7 +1952,7 @@ export type UserProfileProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
-   * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
+   * e.g., <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
   /*
@@ -1953,7 +1969,7 @@ export type UserProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <UserProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2002,7 +2018,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <OrganizationProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2109,7 +2125,7 @@ export type UserButtonProps = UserButtonProfileMode & {
 
   /**
    * Specify options for the underlying <UserProfile /> component.
-   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+   * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
@@ -2211,7 +2227,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     appearance?: ClerkAppearanceTheme;
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+     * e.g., <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
   };
@@ -2331,7 +2347,7 @@ type PricingTableBaseProps = {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify options for the underlying <Checkout /> component.
-   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   * e.g., <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
    */
   checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
@@ -2771,6 +2787,15 @@ export interface ClerkAuthenticateWithWeb3Params {
    * The URL to navigate to if [second factor](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is required.
    */
   secondFactorUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-in flow.
+   */
+  protectCheckUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-up flow (when the web3
+   * attempt falls back to sign-up).
+   */
+  signUpProtectCheckUrl?: string;
   /**
    * The name of the wallet to use for authentication.
    */

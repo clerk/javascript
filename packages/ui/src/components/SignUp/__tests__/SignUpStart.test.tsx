@@ -1,4 +1,3 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';

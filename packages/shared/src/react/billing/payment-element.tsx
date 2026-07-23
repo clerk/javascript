@@ -303,10 +303,11 @@ export type UsePaymentElementReturn = {
        * An object containing information about the initialized payment provider. It is `undefined` until `isProviderReady` is `true`.
        */
       provider: {
+        /** The name of the payment provider. */
         name: 'stripe';
       };
       /**
-       * Indicates whether the underlying payment provider (e.g. Stripe) has been fully initialized.
+       * Indicates whether the underlying payment provider (e.g., Stripe) has been fully initialized.
        */
       isProviderReady: true;
     }

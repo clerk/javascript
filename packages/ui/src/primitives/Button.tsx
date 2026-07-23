@@ -40,7 +40,7 @@ const { applyVariants, filterProps } = createVariants(
             padding: `${theme.space.$1} ${theme.space.$3}`,
           },
           sm: {
-            padding: `${theme.space.$1x5} ${theme.space.$3}`,
+            padding: `${theme.space.$1x75} ${theme.space.$3}`,
           },
           md: {
             padding: `${theme.space.$2x5} ${theme.space.$5}`,
@@ -86,7 +86,7 @@ const { applyVariants, filterProps } = createVariants(
             '&:hover': {
               backgroundColor: vars.accentHover,
             },
-            '&:focus': props.hoverAsFocus
+            '&:focus-visible': props.hoverAsFocus
               ? {
                   backgroundColor: vars.accentHover,
                 }
@@ -98,7 +98,7 @@ const { applyVariants, filterProps } = createVariants(
             borderColor: theme.colors.$borderAlpha150,
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
-            '&:focus': props.hoverAsFocus
+            '&:focus-visible': props.hoverAsFocus
               ? { backgroundColor: theme.colors.$neutralAlpha50, borderColor: theme.colors.$borderAlpha300 }
               : undefined,
           },
@@ -109,14 +109,16 @@ const { applyVariants, filterProps } = createVariants(
             color: vars.accentContrast,
             backgroundColor: vars.accent,
             '&:hover': { backgroundColor: vars.accentHover },
-            '&:focus': props.hoverAsFocus
+            '&:focus-visible': props.hoverAsFocus
               ? { backgroundColor: vars.accentHover, borderColor: theme.colors.$borderAlpha300 }
               : undefined,
           },
           ghost: {
             color: vars.accent,
             '&:hover': { backgroundColor: vars.alpha, color: vars.accentHover },
-            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.alpha, color: vars.accentHover } : undefined,
+            '&:focus-visible': props.hoverAsFocus
+              ? { backgroundColor: vars.alpha, color: vars.accentHover }
+              : undefined,
           },
           link: {
             minHeight: 'fit-content',
@@ -126,7 +128,7 @@ const { applyVariants, filterProps } = createVariants(
             padding: 0,
             color: theme.colors.$primary500,
             '&:hover': { textDecoration: 'underline' },
-            '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
+            '&:focus-visible': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
           },
           linkDanger: {
             minHeight: 'fit-content',
@@ -136,7 +138,7 @@ const { applyVariants, filterProps } = createVariants(
             padding: 0,
             color: theme.colors.$danger500,
             '&:hover': { textDecoration: 'underline' },
-            '&:focus': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
+            '&:focus-visible': props.hoverAsFocus ? { textDecoration: 'underline' } : undefined,
           },
           unstyled: {},
           roundWrapper: { padding: 0, margin: 0, height: 'unset', width: 'unset', minHeight: 'unset' },

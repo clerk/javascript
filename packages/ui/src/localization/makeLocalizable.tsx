@@ -11,6 +11,7 @@ import { defaultResource } from './defaultEnglishResource';
 import type { LocalizationKey } from './localizationKeys';
 import { localizationKeys } from './localizationKeys';
 import { useParsedLocalizationResource } from './parseLocalization';
+import { useCurrencyFormatter } from './useCurrencyFormatter';
 
 type Localizable<T> = T & {
   localizationKey?: LocalizationKey | string;
@@ -64,6 +65,8 @@ export const useLocalizations = () => {
   const { localization } = useOptions();
   const parsedResource = useParsedLocalizationResource();
   const globalTokens = useGlobalTokens();
+  const locale = localization?.locale || (defaultResource.locale as string);
+  const $ = useCurrencyFormatter(locale);
 
   const t = (localizationKey: LocalizationKey | string | undefined) => {
     if (!localizationKey || typeof localizationKey === 'string') {
@@ -104,7 +107,7 @@ export const useLocalizations = () => {
     );
   };
 
-  return { t, translateError, locale: localization?.locale || (defaultResource.locale as string) };
+  return { t, translateError, locale, $ };
 };
 
 const localizationKeyAttribute = (localizationKey: LocalizationKey) => {

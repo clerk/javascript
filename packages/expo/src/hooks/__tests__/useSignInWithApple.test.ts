@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -52,14 +53,16 @@ describe('useSignInWithApple', () => {
   const mockSignIn = {
     create: vi.fn(),
     createdSessionId: 'test-session-id',
-    firstFactorVerification: {
-      status: 'verified',
-    },
   };
 
   const mockSignUp = {
     create: vi.fn(),
-    createdSessionId: null,
+    createdSessionId: 'new-user-session-id',
+    verifications: {
+      externalAccount: {
+        status: 'unverified',
+      },
+    },
   };
 
   const mockSetActive = vi.fn();
@@ -94,19 +97,25 @@ describe('useSignInWithApple', () => {
       expect(typeof result.current.startAppleAuthenticationFlow).toBe('function');
     });
 
-    test('should successfully sign in existing user', async () => {
+    test('should sign up a new user and pass through their name', async () => {
       const mockIdentityToken = 'mock-identity-token';
       mocks.signInAsync.mockResolvedValue({
         identityToken: mockIdentityToken,
+        fullName: {
+          givenName: 'Jane',
+          familyName: 'Appleseed',
+        },
       });
 
-      mockSignIn.create.mockResolvedValue(undefined);
-      mockSignIn.firstFactorVerification.status = 'verified';
-      mockSignIn.createdSessionId = 'test-session-id';
+      mockSignUp.create.mockResolvedValue(undefined);
+      mockSignUp.verifications.externalAccount.status = 'unverified';
+      mockSignUp.createdSessionId = 'new-user-session-id';
 
       const { result } = renderHook(() => useSignInWithApple());
 
-      const response = await result.current.startAppleAuthenticationFlow();
+      const response = await result.current.startAppleAuthenticationFlow({
+        unsafeMetadata: { source: 'test' },
+      });
 
       expect(mocks.isAvailableAsync).toHaveBeenCalled();
       expect(mocks.randomUUID).toHaveBeenCalled();
@@ -116,44 +125,169 @@ describe('useSignInWithApple', () => {
           nonce: 'test-nonce-uuid',
         }),
       );
-      expect(mockSignIn.create).toHaveBeenCalledWith({
+      expect(mockSignUp.create).toHaveBeenCalledWith({
         strategy: 'oauth_token_apple',
         token: mockIdentityToken,
+        firstName: 'Jane',
+        lastName: 'Appleseed',
+        unsafeMetadata: { source: 'test' },
       });
-      expect(response.createdSessionId).toBe('test-session-id');
+      expect(mockSignIn.create).not.toHaveBeenCalled();
+      expect(response.createdSessionId).toBe('new-user-session-id');
       expect(response.setActive).toBe(mockSetActive);
     });
 
-    test('should handle transfer flow for new user', async () => {
+    test('should transfer to sign-in when the account already exists', async () => {
       const mockIdentityToken = 'mock-identity-token';
       mocks.signInAsync.mockResolvedValue({
         identityToken: mockIdentityToken,
+        fullName: {
+          givenName: 'Jane',
+          familyName: 'Appleseed',
+        },
       });
 
-      mockSignIn.create.mockResolvedValue(undefined);
-      mockSignIn.firstFactorVerification.status = 'transferable';
+      mockSignUp.create.mockResolvedValue(undefined);
+      mockSignUp.verifications.externalAccount.status = 'transferable';
 
-      const mockSignUpWithSession = { ...mockSignUp, createdSessionId: 'new-user-session-id' };
-      mocks.useSignUp.mockReturnValue({
-        signUp: mockSignUpWithSession,
+      const mockSignInWithSession = { ...mockSignIn, createdSessionId: 'existing-user-session-id' };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInWithSession,
+        setActive: mockSetActive,
         isLoaded: true,
       });
 
       const { result } = renderHook(() => useSignInWithApple());
 
-      const response = await result.current.startAppleAuthenticationFlow({
-        unsafeMetadata: { source: 'test' },
+      const response = await result.current.startAppleAuthenticationFlow();
+
+      expect(mockSignUp.create).toHaveBeenCalledWith({
+        strategy: 'oauth_token_apple',
+        token: mockIdentityToken,
+        firstName: 'Jane',
+        lastName: 'Appleseed',
+        unsafeMetadata: undefined,
+      });
+      expect(mockSignInWithSession.create).toHaveBeenCalledWith({
+        transfer: true,
+      });
+      expect(response.createdSessionId).toBe('existing-user-session-id');
+    });
+
+    test('should handle a credential without a name (returning user)', async () => {
+      const mockIdentityToken = 'mock-identity-token';
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: mockIdentityToken,
+        fullName: null,
       });
 
-      expect(mockSignIn.create).toHaveBeenCalledWith({
+      mockSignUp.create.mockResolvedValue(undefined);
+      mockSignUp.verifications.externalAccount.status = 'transferable';
+
+      const mockSignInWithSession = { ...mockSignIn, createdSessionId: 'existing-user-session-id' };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInWithSession,
+        setActive: mockSetActive,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      const response = await result.current.startAppleAuthenticationFlow();
+
+      expect(mockSignUp.create).toHaveBeenCalledWith({
+        strategy: 'oauth_token_apple',
+        token: mockIdentityToken,
+        firstName: undefined,
+        lastName: undefined,
+        unsafeMetadata: undefined,
+      });
+      expect(response.createdSessionId).toBe('existing-user-session-id');
+    });
+
+    test('should fall back to sign-in when the instance restricts sign-ups', async () => {
+      const mockIdentityToken = 'mock-identity-token';
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: mockIdentityToken,
+        fullName: null,
+      });
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Sign-ups restricted', {
+          data: [{ code: 'sign_up_mode_restricted', message: 'Sign-ups restricted' }],
+          status: 403,
+        }),
+      );
+
+      const mockSignInWithSession = {
+        ...mockSignIn,
+        createdSessionId: 'existing-user-session-id',
+        firstFactorVerification: { status: 'verified' },
+      };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInWithSession,
+        setActive: mockSetActive,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      const response = await result.current.startAppleAuthenticationFlow();
+
+      expect(mockSignInWithSession.create).toHaveBeenCalledWith({
         strategy: 'oauth_token_apple',
         token: mockIdentityToken,
       });
-      expect(mockSignUp.create).toHaveBeenCalledWith({
-        transfer: true,
-        unsafeMetadata: { source: 'test' },
+      expect(response.createdSessionId).toBe('existing-user-session-id');
+      expect(response.setActive).toBe(mockSetActive);
+    });
+
+    test('should surface the restriction error for a new user when sign-ups are restricted', async () => {
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: 'mock-identity-token',
+        fullName: null,
       });
-      expect(response.createdSessionId).toBe('new-user-session-id');
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Sign-ups restricted', {
+          data: [{ code: 'sign_up_mode_restricted', message: 'Sign-ups restricted' }],
+          status: 403,
+        }),
+      );
+
+      const mockSignInTransferable = {
+        ...mockSignIn,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      };
+      mocks.useSignIn.mockReturnValue({
+        signIn: mockSignInTransferable,
+        setActive: mockSetActive,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow('Sign-ups restricted');
+    });
+
+    test('should rethrow sign-up errors that are not sign-up restrictions', async () => {
+      mocks.signInAsync.mockResolvedValue({
+        identityToken: 'mock-identity-token',
+        fullName: null,
+      });
+
+      mockSignUp.create.mockRejectedValue(
+        new ClerkAPIResponseError('Invalid token', {
+          data: [{ code: 'oauth_token_invalid', message: 'Invalid token' }],
+          status: 422,
+        }),
+      );
+
+      const { result } = renderHook(() => useSignInWithApple());
+
+      await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow('Invalid token');
+      expect(mockSignIn.create).not.toHaveBeenCalled();
     });
 
     test('should handle user cancellation gracefully', async () => {

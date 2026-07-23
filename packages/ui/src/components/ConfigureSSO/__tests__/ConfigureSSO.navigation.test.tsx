@@ -163,6 +163,45 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     expect(queryByText(/test your sso connection/i)).not.toBeInTheDocument();
   });
 
+  it('reset → re-derive: deleting from the first configure step lands on select-provider (no blank)', async () => {
+    const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);
+
+    // First settle: an unconfigured connection ⇒ mounts on the first configure
+    // step (Configure Okta Workforce, step 1 of 4). After the delete's revalidate:
+    // no connection ⇒ the nested clamp re-seats to select-provider.
+    fixtures.clerk.organization?.getEnterpriseConnections
+      .mockResolvedValueOnce([unconfiguredConnection] as any)
+      .mockResolvedValue([] as any);
+    fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({ id: 'ent_new' } as any);
+    fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    } as any);
+    mockVerifiedDomains(fixtures);
+
+    const { findByText, getByRole, getByLabelText, findByRole, userEvent, queryByRole } = render(<ConfigureSSO />, {
+      wrapper,
+    });
+
+    // Mounts directly on the first configure step (existing connection resumes here).
+    await findByRole('heading', { name: /configure okta workforce/i });
+
+    // Reset from the configure-step footer: type-to-confirm with the organization
+    // name and confirm.
+    await userEvent.click(getByRole('button', { name: /reset connection/i }));
+    await userEvent.type(getByLabelText(/below to continue/i), 'Org1');
+    const confirmButton = await findByRole('button', { name: /reset connection/i });
+    await waitFor(() => expect(confirmButton).toBeEnabled());
+    await userEvent.click(confirmButton);
+
+    // The nested wizard self-corrects to select-provider — a real rendered step,
+    // not the blank pane the unguarded nested clamp used to strand on.
+    await findByText(/select your identity provider/i);
+    await waitFor(() => {
+      expect(queryByRole('heading', { name: /configure okta workforce/i })).not.toBeInTheDocument();
+    });
+  });
+
   // A card error surfaced on one step must not leak into the next. Each top-level
   // step owns its own `CardStateProvider`, so the error lives in the departed
   // step's scope only — leaving that step unmounts the provider and the error

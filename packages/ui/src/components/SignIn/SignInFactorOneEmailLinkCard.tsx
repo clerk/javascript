@@ -14,6 +14,7 @@ import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router/RouteContext';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 
 type SignInFactorOneEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: EmailLinkFactor;
@@ -71,6 +72,11 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   };
 
   const completeSignInFlow = async (si: SignInResource) => {
+    // An email-link verification can resolve into a protect_check gate; route to it before
+    // dispatching on the underlying status, otherwise the user is stranded on the link card.
+    if (navigateOnSignInProtectGate(si, navigate, '../protect-check')) {
+      return;
+    }
     if (si.status === 'complete') {
       return setActive({
         session: si.createdSessionId,

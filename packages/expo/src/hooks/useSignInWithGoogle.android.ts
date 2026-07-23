@@ -15,11 +15,13 @@ export type {
  * Features:
  * - Native Google One Tap UI
  * - Built-in nonce support for replay attack protection
- * - No additional dependencies required
+ *
+ * Requires the `@clerk/expo-google-signin` package to be installed and its Expo
+ * config plugin added, which provide the native module.
  *
  * @example
  * ```tsx
- * import { useSignInWithGoogle } from '@clerk/clerk-expo';
+ * import { useSignInWithGoogle } from '@clerk/expo/google';
  * import { Button } from 'react-native';
  *
  * function GoogleSignInButton() {

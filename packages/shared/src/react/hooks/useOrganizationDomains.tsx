@@ -137,10 +137,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
   const unverifiedOwnershipDomainIds = useMemo(
     () =>
       (response?.data ?? [])
-        .filter(
-          (domain: OrganizationDomainResource) =>
-            domain.ownershipVerification && domain.ownershipVerification.status !== 'verified',
-        )
+        .filter((domain: OrganizationDomainResource) => domain.ownershipVerification?.status === 'unverified')
         .map((domain: OrganizationDomainResource) => domain.id),
     [response?.data],
   );

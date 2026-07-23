@@ -28,14 +28,20 @@ const mocks = vi.hoisted(() => {
     clerkInstance: {
       __internal_reloadInitialResources: vi.fn(),
       addListener: vi.fn(),
+      addOnLoaded: vi.fn(),
       client: undefined as unknown,
       handleUnauthenticated: vi.fn(),
-      loaded: true,
+      loaded: false,
+      off: vi.fn(),
+      on: vi.fn(),
       session: undefined as unknown,
       setActive: vi.fn(),
+      status: 'loading',
       updateClient: vi.fn(),
     },
     clerkListener: undefined as (() => void) | undefined,
+    clerkOnLoaded: undefined as (() => void) | undefined,
+    clerkStatusListener: undefined as ((status: string) => void) | undefined,
   };
 });
 
@@ -89,7 +95,6 @@ vi.mock('../../specs/NativeClerkModule', () => {
       addListener: vi.fn(),
       configure: mocks.configure,
       getClientToken: mocks.getClientToken,
-      removeListeners: vi.fn(),
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
   };
@@ -124,17 +129,22 @@ describe('ClerkProvider native client sync', () => {
     vi.clearAllMocks();
     mocks.nativeClientEvent = null;
     mocks.configure.mockResolvedValue(undefined);
-    mocks.getClientToken.mockResolvedValue('native-client-token');
+    mocks.getClientToken.mockResolvedValue(null);
     mocks.syncClientStateFromJs.mockResolvedValue(undefined);
-    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.tokenCache.getToken.mockResolvedValue(null);
     mocks.tokenCache.saveToken.mockResolvedValue(undefined);
     mocks.tokenCache.clearToken.mockResolvedValue(undefined);
     mocks.clerkOptions = undefined;
     mocks.clerkInstance.__internal_reloadInitialResources.mockResolvedValue(undefined);
+    mocks.clerkInstance.addOnLoaded = vi.fn();
     mocks.clerkInstance.client = undefined;
     mocks.clerkInstance.handleUnauthenticated = vi.fn().mockResolvedValue(undefined);
+    mocks.clerkInstance.loaded = true;
+    mocks.clerkInstance.off.mockReset();
+    mocks.clerkInstance.on.mockReset();
     mocks.clerkInstance.session = undefined;
     mocks.clerkInstance.setActive.mockResolvedValue(undefined);
+    mocks.clerkInstance.status = 'ready';
     mocks.clerkInstance.updateClient = vi.fn();
     mocks.clerkInstance.updateClient.mockImplementation(client => {
       mocks.clerkInstance.client = client;
@@ -144,13 +154,48 @@ describe('ClerkProvider native client sync', () => {
         : currentSession;
     });
     mocks.clerkListener = undefined;
+    mocks.clerkOnLoaded = undefined;
+    mocks.clerkStatusListener = undefined;
+    mocks.clerkInstance.addOnLoaded.mockImplementation(listener => {
+      mocks.clerkOnLoaded = listener;
+    });
     mocks.clerkInstance.addListener.mockImplementation(listener => {
       mocks.clerkListener = listener;
       return vi.fn();
     });
+    mocks.clerkInstance.on.mockImplementation((event, listener) => {
+      if (event === 'status') {
+        mocks.clerkStatusListener = listener;
+      }
+    });
   });
 
-  test('configures native with the cached device token during bootstrap', async () => {
+  test('configures native once with the cached device token during StrictMode bootstrap', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.getClientToken.mockResolvedValue('client-token');
+
+    render(
+      <React.StrictMode>
+        <ClerkProvider
+          publishableKey='pk_test_123'
+          tokenCache={mocks.tokenCache}
+        />
+      </React.StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
+    });
+    expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
+  });
+
+  test('syncs the native device token to JS after Clerk loads during bootstrap', async () => {
+    mocks.clerkInstance.loaded = false;
+    mocks.clerkInstance.status = 'loading';
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+
     render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -159,8 +204,164 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
+      expect(mocks.clerkInstance.on).toHaveBeenCalledWith('status', expect.any(Function));
     });
+    expect(mocks.configure).not.toHaveBeenCalled();
+    expect(mocks.getClientToken).not.toHaveBeenCalled();
+    expect(mocks.tokenCache.saveToken).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
+    act(() => {
+      mocks.clerkListener?.();
+    });
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+
+    await act(async () => {
+      mocks.clerkInstance.loaded = true;
+      mocks.clerkInstance.status = 'ready';
+      mocks.clerkStatusListener?.('ready');
+    });
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
+    });
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
+    expect(mocks.clerkInstance.off).toHaveBeenCalledWith('status', expect.any(Function));
+  });
+
+  test('syncs a JS token rotated during bootstrap to native exactly once', async () => {
+    const configure = deferred();
+    mocks.configure.mockReturnValue(configure.promise);
+    mocks.tokenCache.getToken.mockResolvedValueOnce('cached-client-token').mockResolvedValue('rotated-client-token');
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'cached-client-token');
+    });
+    expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+
+    act(() => {
+      configure.resolve();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(
+        'rotated-client-token',
+        'clerk-expo-js-sync-bootstrap',
+        true,
+        true,
+      );
+    });
+    expect(mocks.syncClientStateFromJs).toHaveBeenCalledTimes(1);
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
+  });
+
+  test('flushes one JS client change that occurs after JS loads but before native is ready', async () => {
+    const configure = deferred();
+    mocks.configure.mockReturnValue(configure.promise);
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledTimes(1);
+      expect(mocks.clerkInstance.addListener).toHaveBeenCalled();
+    });
+
+    act(() => {
+      mocks.clerkListener?.();
+    });
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+
+    act(() => {
+      configure.resolve();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(null, expect.any(String), true, false);
+    });
+    expect(mocks.syncClientStateFromJs).toHaveBeenCalledTimes(1);
+  });
+
+  test('keeps synchronization enabled when native configure rejects', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    mocks.configure.mockRejectedValue(new Error('native refresh failed'));
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledTimes(1);
+    });
+
+    act(() => {
+      mocks.clerkListener?.();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(null, expect.any(String), true, false);
+    });
+
+    consoleError.mockRestore();
+  });
+
+  test('keeps native recovery authoritative when JS creates a client from an empty cache', async () => {
+    mocks.tokenCache.getToken.mockResolvedValueOnce(null).mockResolvedValue('anonymous-js-token');
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
+    });
+    expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null);
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not notify native when the token cache writes the current token again', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.getClientToken.mockResolvedValue('client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.clerkInstance.addListener).toHaveBeenCalled();
+    });
+
+    mocks.syncClientStateFromJs.mockClear();
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+    });
+
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
   });
 
   test('syncs JS token cache changes when ClerkProvider uses the default token cache', async () => {
@@ -184,9 +385,6 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('reloads JS resources after native emits a device token change', async () => {
-    mocks.tokenCache.getToken.mockResolvedValue(null);
-    mocks.getClientToken.mockResolvedValue(null);
-
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -199,7 +397,6 @@ describe('ClerkProvider native client sync', () => {
     });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
-    mocks.getClientToken.mockClear();
 
     mocks.nativeClientEvent = {
       issuedAt: 1,
@@ -220,10 +417,11 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
     });
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
-    expect(mocks.getClientToken).not.toHaveBeenCalled();
   });
 
   test('reloads JS resources after native clears the device token', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue(null);
+
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -262,8 +460,6 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('reloads JS resources after a native client-only change without rewriting the token cache', async () => {
-    mocks.getClientToken.mockResolvedValue(null);
-
     const { rerender } = render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -341,7 +537,6 @@ describe('ClerkProvider native client sync', () => {
 
   test('keeps token cache notifications suppressed across overlapping native token writes', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
-    mocks.getClientToken.mockResolvedValue(null);
 
     const firstSave = deferred();
     const secondSave = deferred();
@@ -444,7 +639,6 @@ describe('ClerkProvider native client sync', () => {
       fetch: vi.fn().mockResolvedValue(refreshedClient),
     };
     mocks.clerkInstance.session = activeSession;
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -508,7 +702,6 @@ describe('ClerkProvider native client sync', () => {
       mocks.clerkInstance.session = session;
       return Promise.resolve();
     });
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -568,7 +761,6 @@ describe('ClerkProvider native client sync', () => {
       }),
     };
     mocks.clerkInstance.session = removedSession;
-    mocks.getClientToken.mockResolvedValue(null);
 
     const { rerender } = render(
       <ClerkProvider
@@ -642,7 +834,6 @@ describe('ClerkProvider native client sync', () => {
       mocks.clerkInstance.session = session;
       return Promise.resolve();
     });
-    mocks.getClientToken.mockResolvedValue(null);
 
     render(
       <ClerkProvider
@@ -1087,6 +1278,9 @@ describe('ClerkProvider native client sync', () => {
   });
 
   test('refreshes native from the server after the JS token cache is cleared', async () => {
+    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.getClientToken.mockResolvedValue('client-token');
+
     render(
       <ClerkProvider
         publishableKey='pk_test_123'
@@ -1095,7 +1289,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.clerkInstance.addListener).toHaveBeenCalled();
     });
 
     mocks.syncClientStateFromJs.mockClear();

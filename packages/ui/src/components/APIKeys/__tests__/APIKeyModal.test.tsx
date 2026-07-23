@@ -15,7 +15,7 @@ describe('APIKeyModal modalRoot behavior', () => {
     modalRoot.current = container;
     document.body.appendChild(container);
 
-    const { container: testContainer } = render(
+    render(
       <AppearanceProvider appearanceKey='signIn'>
         <InternalThemeProvider>
           <APIKeyModal
@@ -43,7 +43,7 @@ describe('APIKeyModal modalRoot behavior', () => {
     modalRoot.current = container;
     document.body.appendChild(container);
 
-    const { container: testContainer } = render(
+    render(
       <AppearanceProvider appearanceKey='signIn'>
         <InternalThemeProvider>
           <APIKeyModal
@@ -76,7 +76,7 @@ describe('APIKeyModal modalRoot behavior', () => {
 
     const getContainer = () => container2;
 
-    const { container: testContainer } = render(
+    render(
       <AppearanceProvider appearanceKey='signIn'>
         <InternalThemeProvider>
           <UNSAFE_PortalProvider getContainer={getContainer}>

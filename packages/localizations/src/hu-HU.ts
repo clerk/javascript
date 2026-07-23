@@ -210,9 +210,9 @@ export const huHU: LocalizationResource = {
     subtotalRenewal: undefined,
     switchPlan: 'Váltás erre a csomagra',
     switchToAnnual: 'Váltás éves fizetésre',
-    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{currency}}{{price}} / év',
+    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{price}} / év',
     switchToMonthly: 'Váltás havi fizetésre',
-    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{currency}}{{price}} / hó',
+    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{price}} / hó',
     totalDue: 'Fizetendő összeg',
     totalDuePerPeriod: undefined,
     totalDueToday: 'Mai fizetendő összeg',
@@ -223,7 +223,26 @@ export const huHU: LocalizationResource = {
     yearPerUnit: 'Év / {{unitName}}',
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
@@ -234,26 +253,25 @@ export const huHU: LocalizationResource = {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -263,7 +281,6 @@ export const huHU: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -304,7 +321,6 @@ export const huHU: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -352,7 +368,6 @@ export const huHU: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -389,7 +404,6 @@ export const huHU: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -419,6 +433,8 @@ export const huHU: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -438,21 +454,17 @@ export const huHU: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -500,7 +512,6 @@ export const huHU: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -532,7 +543,6 @@ export const huHU: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -573,7 +583,6 @@ export const huHU: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -620,38 +629,9 @@ export const huHU: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
-      },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
-        title: undefined,
       },
     },
     missingManageEnterpriseConnectionsPermission: {
@@ -663,8 +643,11 @@ export const huHU: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Nincs igazolva',
         badge__verified: 'Igazolva',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -675,14 +658,15 @@ export const huHU: LocalizationResource = {
           valueLabel: 'Érték',
         },
         verifiedAtLabel: "Igazolva: {{ date | shortDate('hu-HU') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} hozzáadása',
         messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
       },
       formButtonPrimary__add: 'Hozzáadás',
-      formFieldInputPlaceholder__domain: 'Írja be ide a tartományát, majd kattintson a Hozzáadás gombra a kezdéshez',
-      formFieldLabel__domain: 'Tartományok',
+      formFieldInputPlaceholder__domain: 'Tartomány hozzáadása',
+      formFieldLabel__domain: 'Tartomány',
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
@@ -904,6 +888,15 @@ export const huHU: LocalizationResource = {
     badge__manualInvitation: 'Nincs automatikus felvétel',
     badge__unverified: 'Nincs visszaigazolva',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nincs fizetési előzmény',
         notFound: 'A fizetési kísérlet nem található',
@@ -1106,6 +1099,9 @@ export const huHU: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1234,6 +1230,9 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a hitelesítő alkalmazás által generált kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -1380,6 +1379,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'A folytatáshoz, kérlek írd be a visszaigazoló kódot, amit a telefonodra küldtünk.',
       title: 'Ellenőrizd a telefonod',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Jelszó visszaállítása',
       requiredMessage: 'Biztonsági okokból, muszáj megváltoztatnod a jelszavadat.',
@@ -1485,6 +1490,12 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be a visszaigazoló kódot, amit a telefonodra kaptál',
       title: 'Erősítsd meg a telefonszámod',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Bejelentkezés',
@@ -1634,6 +1645,7 @@ export const huHU: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} már tagja a szervezetnek.',
     api_key_name_already_exists: 'Ez az API kulcs név már létezik.',
     api_key_usage_exceeded: 'Elérted a használati korlátot. A korlát eltávolításához válts fizetős csomagra.',
@@ -1711,6 +1723,14 @@ export const huHU: LocalizationResource = {
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: 'Nem található Web3 tárca bővítmény. Kérlek telepíts egyet a folytatáshoz.',
     web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',
@@ -1764,9 +1784,9 @@ export const huHU: LocalizationResource = {
     action__openUserMenu: 'Felhasználói menü megnyitása',
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
-    label__userButtonPopover: 'Fiókpanel',
     label__accountActions: 'Fiókműveletek',
     label__activeSessions: 'Aktív munkamenetek',
+    label__userButtonPopover: 'Fiókpanel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1788,6 +1808,15 @@ export const huHU: LocalizationResource = {
       title__codelist: 'Tartalék kódok',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nincs fizetési előzmény',
         notFound: 'A fizetési kísérlet nem található',

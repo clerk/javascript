@@ -1,13 +1,16 @@
-import { render } from '@testing-library/react';
+import { ClerkInstanceContext } from '@clerk/shared/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { EnvironmentProvider } from '@/contexts';
 import { AppearanceProvider, useAppearance } from '@/customizables';
 import type { ParsedAppearance } from '@/customizables/parseAppearance';
 import { FlowMetadataProvider } from '@/elements/contexts';
 import { ModalContext } from '@/elements/Modal';
 import { InternalThemeProvider } from '@/styledSystem';
 
+import { CardFooter } from '../CardFooter';
 import { CardRoot } from '../CardRoot';
 
 let captured: ParsedAppearance;
@@ -45,6 +48,35 @@ const renderCard = ({ elevation, globalAppearance, appearance, withModal }: Rend
         </FlowMetadataProvider>
       </InternalThemeProvider>
     </AppearanceProvider>,
+  );
+};
+
+const devEnvironment = {
+  displayConfig: {
+    branded: false,
+    showDevModeWarning: true,
+  },
+  isDevelopmentOrStaging: () => true,
+};
+
+const renderCardWithFooter = ({ appearance }: Pick<RenderCardOptions, 'appearance'> = {}) => {
+  return render(
+    <ClerkInstanceContext.Provider value={{ value: { client: {}, user: {} } as any }}>
+      <EnvironmentProvider value={devEnvironment as any}>
+        <AppearanceProvider
+          appearanceKey='signIn'
+          appearance={appearance as any}
+        >
+          <InternalThemeProvider>
+            <FlowMetadataProvider flow='signIn'>
+              <CardRoot>
+                <CardFooter />
+              </CardRoot>
+            </FlowMetadataProvider>
+          </InternalThemeProvider>
+        </AppearanceProvider>
+      </EnvironmentProvider>
+    </ClerkInstanceContext.Provider>,
   );
 };
 
@@ -159,6 +191,33 @@ describe('CardRoot augmentedAppearance — flush', () => {
     expect(captured.parsedElements[1].footer?.['>:first-of-type']?.padding).toBe(0);
     expect(captured.parsedElements[2].footer?.background).toBe('blue');
     expect(captured.parsedElements[2].footer?.['>:first-of-type']?.padding).toBe('16px');
+  });
+
+  it('adds flush-only dev mode indicator overrides', () => {
+    renderCard({ elevation: 'flush' });
+    expect(captured.parsedElements[1].footer?.['& [data-clerk-dev-mode-overlay]']?.display).toBe('none');
+    expect(captured.parsedElements[1].footer?.['& [data-clerk-dev-mode-notice]']?.textAlign).toBe('center');
+    expect(captured.parsedElements[1].footer?.['& [data-clerk-dev-mode-notice]']?.padding).toBe(0);
+  });
+});
+
+describe('CardRoot dev mode indicator rendering', () => {
+  it('raised cards render both the patterned overlay and development mode text markers', () => {
+    const { container } = renderCardWithFooter();
+    const notice = screen.getByText('Development mode');
+
+    expect(notice.hasAttribute('data-clerk-dev-mode-notice')).toBe(true);
+    expect(container.querySelector('[data-clerk-dev-mode-overlay]')).not.toBeNull();
+  });
+
+  it('flush cards keep the development mode text and hide the patterned overlay through flush styling', () => {
+    const { container } = renderCardWithFooter({ appearance: { options: { elevation: 'flush' } } });
+    const notice = screen.getByText('Development mode');
+    const overlay = container.querySelector('[data-clerk-dev-mode-overlay]');
+
+    expect(notice.hasAttribute('data-clerk-dev-mode-notice')).toBe(true);
+    expect(overlay).not.toBeNull();
+    expect(getComputedStyle(overlay as HTMLElement).display).toBe('none');
   });
 });
 

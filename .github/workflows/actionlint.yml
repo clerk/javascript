@@ -1,0 +1,43 @@
+name: Actionlint
+
+# Lint GitHub Actions workflows for syntax errors, unsafe patterns, and shell
+# bugs. Part of SDK-79 / Monorepo Supply-Chain Hardening. Runs on every PR so it
+# always reports a status and can be wired up as a required check.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: Lint workflows
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_SHORT && fromJSON(vars.TIMEOUT_MINUTES_SHORT) || 5 }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          show-progress: false
+          sparse-checkout: .github
+          sparse-checkout-cone-mode: false
+
+      - name: Run actionlint
+        # Pinned by digest (immutable). rhysd/actionlint 1.7.12; the image bundles a
+        # matching shellcheck. Bump the version and refresh the digest together.
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        env:
+          # Intentional word-splitting ($TURBO_ARGS etc., SC2086) and minor style
+          # (SC2129, SC2162) are excluded; every other shellcheck rule stays on.
+          SHELLCHECK_OPTS: --exclude=SC2086,SC2129,SC2162
+        with:
+          args: -color

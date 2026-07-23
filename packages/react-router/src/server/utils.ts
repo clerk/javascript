@@ -1,11 +1,17 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { constants, debugRequestState } from '@clerk/backend/internal';
 import { parse as parseCookie } from 'cookie';
-import type { AppLoadContext, UNSAFE_DataWithResponseInit } from 'react-router';
+import type { UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
 import { canUseKeyless } from '../utils/feature-flags';
 import type { AdditionalStateOptions } from './types';
+
+// AppLoadContext was removed from React Router v8. Keep a structural type for the context shape we use.
+type ReactRouterContext = Record<string, any> & {
+  get?: <T>(context: unknown) => T | undefined;
+  set?: <T>(context: unknown, value: T) => void;
+};
 
 export function isResponse(value: any): value is Response {
   return (
@@ -43,17 +49,18 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
 }
 
 /**
- * `get` and `set` properties will only be available if v8_middleware flag is enabled
- * See: https://reactrouter.com/upgrading/future#futurev8_middleware
+ * `get` and `set` properties are available when React Router middleware is enabled.
  */
-export const IsOptIntoMiddleware = (context: AppLoadContext) => {
+export const IsOptIntoMiddleware = (
+  context: ReactRouterContext,
+): context is ReactRouterContext & Required<Pick<ReactRouterContext, 'get' | 'set'>> => {
   return 'get' in context && 'set' in context;
 };
 
 export const injectRequestStateIntoResponse = async (
   response: Response,
   requestState: RequestState,
-  context: AppLoadContext,
+  context: ReactRouterContext,
   additionalStateOptions: AdditionalStateOptions = {},
   includeClerkHeaders = false,
 ) => {
@@ -82,7 +89,7 @@ export const injectRequestStateIntoResponse = async (
  */
 export function getResponseClerkState(
   requestState: RequestState,
-  context: AppLoadContext,
+  context: ReactRouterContext,
   additionalStateOptions: AdditionalStateOptions = {},
 ) {
   const { reason, message, isSignedIn, ...rest } = requestState;
@@ -133,30 +140,4 @@ export function getResponseClerkState(
  */
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
-};
-
-/**
- * Patches request to avoid duplex issues with unidici
- * For more information, see:
- * https://github.com/nodejs/node/issues/46221
- * https://github.com/whatwg/fetch/pull/1457
- * @internal
- */
-export const patchRequest = (request: Request) => {
-  // Omit `signal` from the clone: Node 24's bundled undici tightened the
-  // instanceof AbortSignal check, which rejects cross-realm signals (e.g.
-  // those carried by framework Request subclasses).
-  const clonedRequest = new Request(request.url, {
-    headers: request.headers,
-    method: request.method,
-    redirect: request.redirect,
-    cache: request.cache,
-  });
-
-  // If duplex is not set, set it to 'half' to avoid duplex issues with unidici
-  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null && !('duplex' in clonedRequest)) {
-    (clonedRequest as unknown as { duplex: 'half' }).duplex = 'half';
-  }
-
-  return clonedRequest;
 };

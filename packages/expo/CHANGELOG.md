@@ -1,5 +1,249 @@
 # Change Log
 
+## 4.0.1
+
+### Patch Changes
+
+- Fix `useSignInWithApple` dropping the user's first and last name on native sign-up. The hook now signs up first with the name from the Apple credential and falls back to sign-in when the account already exists, including on instances with restricted or waitlist sign-up mode. ([#9214](https://github.com/clerk/javascript/pull/9214)) by [@claude](https://github.com/apps/claude)
+
+  Note: Apple only shares the name on the app's first authorization. To verify the fix with an Apple ID that has already signed in to your app, delete the user in the Clerk Dashboard and remove the app's entry under Settings > Sign in with Apple on the device, then sign in again.
+
+- Updated dependencies []:
+  - @clerk/react@6.12.6
+
+## 4.0.0
+
+### Major Changes
+
+- Drop support for Expo SDK 53. The minimum supported version is now Expo SDK 54. ([#9015](https://github.com/clerk/javascript/pull/9015)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Expo maintains each SDK release for approximately one year and SDK 53 is now outside that window. Upgrade your app to Expo SDK 54 or later before updating these packages.
+
+- The native Google Sign-In module has moved out of `@clerk/expo` into a new optional package, `@clerk/expo-google-signin`. Apps that don't use `useSignInWithGoogle` no longer pull in the native Google Sign-In dependencies during prebuild. ([#9015](https://github.com/clerk/javascript/pull/9015)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  If you use native Google Sign-In, install the new package:
+
+  ```sh
+  npx expo install @clerk/expo-google-signin
+  ```
+
+  add its config plugin alongside `@clerk/expo` in your app config:
+
+  ```json
+  {
+    "expo": {
+      "plugins": ["@clerk/expo", "@clerk/expo-google-signin"]
+    }
+  }
+  ```
+
+  then rebuild your native app. The `useSignInWithGoogle` hook is still exported from `@clerk/expo/google` and its API is unchanged; it now requires `@clerk/expo-google-signin` to provide the native module, and throws an actionable error if it is missing.
+
+### Patch Changes
+
+- Fix a crash on Android in Expo Go where rendering `<ClerkProvider>` failed with `Cannot find native module 'ClerkExpo'`, even for JavaScript-only flows that use no native components. ([#9203](https://github.com/clerk/javascript/pull/9203)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+  - @clerk/clerk-js@6.25.6
+  - @clerk/react@6.12.6
+
+## 3.7.8
+
+### Patch Changes
+
+- Reduce redundant native and JavaScript client refreshes during Expo startup. ([#9140](https://github.com/clerk/javascript/pull/9140)) by [@mikepitre](https://github.com/mikepitre)
+
+## 3.7.7
+
+### Patch Changes
+
+- Fix Android native UI components crashing before window attachment or becoming unresponsive after navigation detaches and reattaches their views. ([#9178](https://github.com/clerk/javascript/pull/9178)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Prevent Expo apps from accumulating duplicate initialization requests while the Clerk API is unavailable or the app reloads. ([#9173](https://github.com/clerk/javascript/pull/9173)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/react@6.12.5
+  - @clerk/clerk-js@6.25.5
+
+## 3.7.6
+
+### Patch Changes
+
+- Add a `logoMaxHeight` prop to `AuthView`, allowing Expo apps to control the maximum height of the managed logo on Android and iOS. ([#9154](https://github.com/clerk/javascript/pull/9154)) by [@swolfand](https://github.com/swolfand)
+
+  Usage:
+
+  ```tsx
+  <AuthView logoMaxHeight={64} />
+  ```
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+  - @clerk/clerk-js@6.25.4
+  - @clerk/react@6.12.4
+
+## 3.7.5
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.35` to `1.0.36`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.36. ([#9152](https://github.com/clerk/javascript/pull/9152)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.1` to `1.3.2`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.2. ([#9151](https://github.com/clerk/javascript/pull/9151)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/clerk-js@6.25.3
+  - @clerk/shared@4.25.3
+  - @clerk/react@6.12.3
+
+## 3.7.4
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.34` to `1.0.35`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.35. ([#9138](https://github.com/clerk/javascript/pull/9138)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.0` to `1.3.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.1. ([#9137](https://github.com/clerk/javascript/pull/9137)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.25.2
+
+## 3.7.3
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.33` to `1.0.34`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.34. ([#9119](https://github.com/clerk/javascript/pull/9119)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.9` to `1.3.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.0. ([#9120](https://github.com/clerk/javascript/pull/9120)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+  - @clerk/react@6.12.2
+  - @clerk/clerk-js@6.25.2
+
+## 3.7.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.32` to `1.0.33`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.33. ([#9110](https://github.com/clerk/javascript/pull/9110)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.7` to `1.2.9`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.9. ([#9111](https://github.com/clerk/javascript/pull/9111)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+  - @clerk/clerk-js@6.25.1
+  - @clerk/react@6.12.1
+
+## 3.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+  - @clerk/clerk-js@6.25.0
+  - @clerk/react@6.12.0
+
+## 3.7.0
+
+### Minor Changes
+
+- Add support for Expo SDK 57 ([#9069](https://github.com/clerk/javascript/pull/9069)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`73d73ec`](https://github.com/clerk/javascript/commit/73d73ecd425c3c0c02070b84b5c669ed8d74249e), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/clerk-js@6.24.0
+  - @clerk/shared@4.24.0
+  - @clerk/react@6.11.4
+
+## 3.6.5
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.31` to `1.0.32`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.32. ([#9053](https://github.com/clerk/javascript/pull/9053)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.6` to `1.2.7`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.7. ([#9054](https://github.com/clerk/javascript/pull/9054)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/react@6.11.3
+  - @clerk/clerk-js@6.23.0
+
+## 3.6.4
+
+### Patch Changes
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915), [`c5697d7`](https://github.com/clerk/javascript/commit/c5697d7df140705d327cd0aa68fa94199e57f219)]:
+  - @clerk/clerk-js@6.23.0
+  - @clerk/shared@4.23.0
+  - @clerk/react@6.11.3
+
+## 3.6.3
+
+### Patch Changes
+
+- Send Expo host SDK headers from the Android native bridge. ([#9031](https://github.com/clerk/javascript/pull/9031)) by [@mikepitre](https://github.com/mikepitre)
+
+- Record `useSignInWithGoogle` usage ([#9012](https://github.com/clerk/javascript/pull/9012)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix persisted session restoration when the native Clerk singleton is created before `ClerkProvider` receives the app's token cache. ([#8928](https://github.com/clerk/javascript/pull/8928)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Clarify the native Google Sign-In migration warning to mention the required Expo config plugin. ([#9019](https://github.com/clerk/javascript/pull/9019)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/clerk-js@6.22.1
+  - @clerk/react@6.11.2
+  - @clerk/shared@4.22.1
+
+## 3.6.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.2.5` to `1.2.6`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.6. ([#9007](https://github.com/clerk/javascript/pull/9007)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+## 3.6.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.30` to `1.0.31`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.31. ([#8996](https://github.com/clerk/javascript/pull/8996)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Allow Expo native theme JSON to configure secondary button background and foreground colors for native SSO buttons. ([#8997](https://github.com/clerk/javascript/pull/8997)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`19ce04a`](https://github.com/clerk/javascript/commit/19ce04aab6387c430dc41e51c6130a88cc543cc8), [`2492043`](https://github.com/clerk/javascript/commit/24920437b0c61c4852be830d5495e53ae956e37d)]:
+  - @clerk/clerk-js@6.22.0
+  - @clerk/shared@4.22.0
+  - @clerk/react@6.11.1
+
+## 3.6.0
+
+### Minor Changes
+
+- Align the iOS native Clerk module and native views with Android by registering them through Expo Modules. ([#8976](https://github.com/clerk/javascript/pull/8976)) by [@mikepitre](https://github.com/mikepitre)
+
+### Patch Changes
+
+- Add a development warning and API docs note that native Google Sign-In will require installing `@clerk/expo-google-signin` in the next major version. ([#8991](https://github.com/clerk/javascript/pull/8991)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 3.5.4
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.28` to `1.0.30`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.30. ([#8954](https://github.com/clerk/javascript/pull/8954)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.2.4` to `1.2.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.2.5. ([#8978](https://github.com/clerk/javascript/pull/8978)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`59f7327`](https://github.com/clerk/javascript/commit/59f73279ecb1b4e61eded0c68aa951211dd0db40)]:
+  - @clerk/clerk-js@6.21.1
+  - @clerk/react@6.11.0
+
+## 3.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`c38d853`](https://github.com/clerk/javascript/commit/c38d8534b916936acbe4131fac58c8743e684eab), [`7e3174a`](https://github.com/clerk/javascript/commit/7e3174a4f861ad89667c3d0c63b6f2d0c001bcb6), [`97039bb`](https://github.com/clerk/javascript/commit/97039bb871a33ccc2c9e46f011e4cbbc1459fb1e), [`f43071d`](https://github.com/clerk/javascript/commit/f43071d8d98194c22e34d1d72ed8d0cf0b6b0f0e), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0e0ff11`](https://github.com/clerk/javascript/commit/0e0ff110fdab5f0ffb0a8896c1f864605c1f809d), [`0039618`](https://github.com/clerk/javascript/commit/003961810786af49daba5a3e82e34378d52b885c), [`6224165`](https://github.com/clerk/javascript/commit/6224165e6f91714b438236fc58e4aaeab30136d1), [`a7f923c`](https://github.com/clerk/javascript/commit/a7f923c715f3084cd613477f76b11dc977e7f21f), [`a536a0d`](https://github.com/clerk/javascript/commit/a536a0d5b31a5fcba31813ed34f9494a4ec4851b)]:
+  - @clerk/shared@4.21.0
+  - @clerk/clerk-js@6.21.0
+  - @clerk/react@6.11.0
+
 ## 3.5.2
 
 ### Patch Changes

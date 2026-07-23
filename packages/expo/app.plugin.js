@@ -6,8 +6,7 @@
  * 1. iOS is configured with the required deployment target and metadata
  * 2. Android is configured with packaging exclusions for dependencies
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
   withXcodeProject,
@@ -148,47 +147,13 @@ const withClerkAndroid = config => {
 };
 
 /**
- * Add Google Sign-In URL scheme to Info.plist (from main branch)
- */
-const withClerkGoogleSignIn = config => {
-  const iosUrlScheme =
-    process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME ||
-    (config.extra && config.extra.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME);
-
-  if (!iosUrlScheme) {
-    return config;
-  }
-
-  return withInfoPlist(config, modConfig => {
-    if (!Array.isArray(modConfig.modResults.CFBundleURLTypes)) {
-      modConfig.modResults.CFBundleURLTypes = [];
-    }
-
-    const schemeExists = modConfig.modResults.CFBundleURLTypes.some(urlType =>
-      urlType.CFBundleURLSchemes?.includes(iosUrlScheme),
-    );
-
-    if (!schemeExists) {
-      modConfig.modResults.CFBundleURLTypes.push({
-        CFBundleURLSchemes: [iosUrlScheme],
-      });
-      console.log(`✅ Added Google Sign-In URL scheme: ${iosUrlScheme}`);
-    }
-
-    return modConfig;
-  });
-};
-
-/**
  * Combined Clerk Expo plugin
  *
  * When this plugin is configured in app.json/app.config.js:
  * 1. iOS gets the deployment target and metadata required by Clerk native views
  * 2. Android gets packaging exclusions for dependency conflicts
- * 3. Google Sign-In URL scheme is configured (if env var is set)
  *
- * Native modules are registered via Expo Modules autolinking on Android and
- * React Native autolinking on iOS (RCTViewManager).
+ * Native modules and views are registered via Expo Modules autolinking.
  */
 /**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.
@@ -227,7 +192,8 @@ const withClerkAppleSignIn = config => {
  * Accepts a `theme` prop pointing to a JSON file with optional keys:
  *   - colors: { primary, background, input, danger, success, warning,
  *               foreground, mutedForeground, primaryForeground, inputForeground,
- *               neutral, border, ring, muted, shadow }  (hex color strings)
+ *               neutral, border, ring, muted, shadow, secondaryButtonBackground,
+ *               secondaryButtonForeground }  (hex color strings)
  *   - darkColors: same keys as colors (for dark mode)
  *   - design: { fontFamily: string, borderRadius: number }
  *
@@ -250,6 +216,8 @@ const VALID_COLOR_KEYS = [
   'ring',
   'muted',
   'shadow',
+  'secondaryButtonBackground',
+  'secondaryButtonForeground',
 ];
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
@@ -344,7 +312,6 @@ const withClerkExpo = (config, props = {}) => {
   if (appleSignIn !== false) {
     config = withClerkAppleSignIn(config);
   }
-  config = withClerkGoogleSignIn(config);
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
   config = withClerkTheme(config, props);
