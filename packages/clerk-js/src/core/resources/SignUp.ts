@@ -185,10 +185,6 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  /**
-   * @remarks If an identical preparation for this sign-up is already in flight, its pending request is reused and no
-   * additional verification is sent.
-   */
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
     debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({

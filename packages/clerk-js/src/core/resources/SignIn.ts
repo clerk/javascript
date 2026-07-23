@@ -216,10 +216,6 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  /**
-   * @remarks If an identical preparation for this sign-in is already in flight, its pending request is reused and no
-   * additional verification is sent.
-   */
   prepareFirstFactor = (params: PrepareFirstFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.prepareFirstFactor', { id: this.id, strategy: params.strategy });
     let config;
@@ -356,10 +352,6 @@ export class SignIn extends BaseResource implements SignInResource {
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
-  /**
-   * @remarks If an identical preparation for this sign-in is already in flight, its pending request is reused and no
-   * additional verification is sent.
-   */
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.prepareSecondFactor', { id: this.id, strategy: params.strategy });
     return this._basePost({

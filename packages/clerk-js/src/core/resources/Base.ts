@@ -58,11 +58,6 @@ export abstract class BaseResource {
   id?: string;
   pathRoot = '';
 
-  /**
-   * POST actions listed here are coalesced: while a request for an action with an identical body is
-   * in flight on this resource, subsequent identical calls return the pending promise instead of
-   * issuing a duplicate request.
-   */
   protected coalescedPostActions: readonly string[] = [];
   #pendingCoalescedPosts = new Map<string, Promise<this>>();
 
