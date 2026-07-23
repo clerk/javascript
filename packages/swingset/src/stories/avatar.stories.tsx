@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
-import { Avatar, AvatarFallback, AvatarImage } from '@clerk/ui/mosaic/components/avatar';
+import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -36,25 +36,25 @@ const IMAGE_SRC = 'https://github.com/clerk.png';
 
 export function Primary(props: Record<string, unknown>) {
   return (
-    <Avatar {...knobsAsProps(props)}>
-      <AvatarImage
+    <Avatar.Root {...knobsAsProps(props)}>
+      <Avatar.Image
         src={IMAGE_SRC}
         alt='@clerk'
       />
-      <AvatarFallback>CL</AvatarFallback>
-    </Avatar>
+      <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
   );
 }
 
 export function Fallback(props: Record<string, unknown>) {
   return (
-    <Avatar {...knobsAsProps(props)}>
-      <AvatarImage
+    <Avatar.Root {...knobsAsProps(props)}>
+      <Avatar.Image
         src='https://example.com/broken.png'
         alt='@clerk'
       />
-      <AvatarFallback>CL</AvatarFallback>
-    </Avatar>
+      <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
   );
 }
 
@@ -62,17 +62,17 @@ export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
-        <Avatar
+        <Avatar.Root
           key={size}
           {...knobsAsProps(props)}
           size={size}
         >
-          <AvatarImage
+          <Avatar.Image
             src={IMAGE_SRC}
             alt='@clerk'
           />
-          <AvatarFallback>CL</AvatarFallback>
-        </Avatar>
+          <Avatar.Fallback>CL</Avatar.Fallback>
+        </Avatar.Root>
       ))}
     </div>
   );
@@ -82,17 +82,17 @@ export function Shapes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       {(['circle', 'square'] as const).map(shape => (
-        <Avatar
+        <Avatar.Root
           key={shape}
           {...knobsAsProps(props)}
           shape={shape}
         >
-          <AvatarImage
+          <Avatar.Image
             src={IMAGE_SRC}
             alt='@clerk'
           />
-          <AvatarFallback>CL</AvatarFallback>
-        </Avatar>
+          <Avatar.Fallback>CL</Avatar.Fallback>
+        </Avatar.Root>
       ))}
     </div>
   );

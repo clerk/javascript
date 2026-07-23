@@ -16,7 +16,7 @@ const AvatarContext = React.createContext<AvatarContextValue | null>(null);
 function useAvatarContext(part: string): AvatarContextValue {
   const context = React.useContext(AvatarContext);
   if (!context) {
-    throw new Error(`<${part}> must be rendered inside <Avatar>`);
+    throw new Error(`<${part}> must be rendered inside <Avatar.Root>`);
   }
   return context;
 }
@@ -58,7 +58,7 @@ export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
   size?: 'lg' | 'md' | 'sm' | 'xs';
 }
 
-export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatar(
+const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
   { shape = 'circle', size = 'md', className, style, children, ...rest },
   ref,
 ) {
@@ -85,11 +85,11 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mo
 
 export type AvatarImageProps = React.ComponentPropsWithRef<'img'>;
 
-export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
+const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
   { src, alt = '', className, style, ...rest },
   ref,
 ) {
-  const { onStatusChange } = useAvatarContext('AvatarImage');
+  const { onStatusChange } = useAvatarContext('Avatar.Image');
   const status = useImageLoadingStatus(src);
 
   React.useEffect(() => {
@@ -116,11 +116,11 @@ export interface AvatarFallbackProps extends React.ComponentPropsWithRef<'span'>
   delayMs?: number;
 }
 
-export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(function MosaicAvatarFallback(
+const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(function MosaicAvatarFallback(
   { delayMs, className, style, children, ...rest },
   ref,
 ) {
-  const { status } = useAvatarContext('AvatarFallback');
+  const { status } = useAvatarContext('Avatar.Fallback');
   const [canRender, setCanRender] = React.useState(delayMs === undefined);
 
   React.useEffect(() => {
@@ -145,3 +145,13 @@ export const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackPr
     </span>
   );
 });
+
+/**
+ * Compound avatar. `Avatar.Root` clips and sizes the box; `Avatar.Image` renders
+ * once its source loads; `Avatar.Fallback` shows until then.
+ */
+export const Avatar = {
+  Root: AvatarRoot,
+  Image: AvatarImage,
+  Fallback: AvatarFallback,
+};

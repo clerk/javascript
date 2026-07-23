@@ -2,7 +2,7 @@ import * as AvatarStories from './avatar.stories';
 
 # Avatar
 
-Avatar represents a user or entity as an image, falling back to initials or an icon when the image is missing or fails to load. It is a compound component: `Avatar` clips and sizes the box, `Avatar.Image` renders the picture once it loads, and `Avatar.Fallback` shows until then.
+Avatar represents a user or entity as an image, falling back to initials or an icon when the image is missing or fails to load. It is a compound component: `Avatar.Root` clips and sizes the box, `Avatar.Image` renders the picture once it loads, and `Avatar.Fallback` shows until then.
 
 ## Playground
 
@@ -13,31 +13,31 @@ Avatar represents a user or entity as an image, falling back to initials or an i
 
 ## Props
 
-`shape` and `size` live on the `Avatar` root:
+`shape` and `size` live on `Avatar.Root`:
 
 <PropTable meta={AvatarStories.meta} />
 
 ## Usage
 
 ```tsx
-import { Avatar, AvatarImage, AvatarFallback } from '@clerk/ui/mosaic/components/avatar';
+import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 
-<Avatar>
-  <AvatarImage
+<Avatar.Root>
+  <Avatar.Image
     src='https://github.com/clerk.png'
     alt='@clerk'
   />
-  <AvatarFallback>CL</AvatarFallback>
-</Avatar>;
+  <Avatar.Fallback>CL</Avatar.Fallback>
+</Avatar.Root>;
 ```
 
 ## Parts
 
-| Part             | Slot (`.cl-*`)       | Description                                                            |
-| ---------------- | -------------------- | ---------------------------------------------------------------------- |
-| `Avatar`         | `cl-avatar`          | Root. Owns `shape` / `size`, clips its children to the shape.          |
-| `AvatarImage`    | `cl-avatar-image`    | Renders an `<img>` once the source loads; renders nothing until then.  |
-| `AvatarFallback` | `cl-avatar-fallback` | Rendered while the image is pending or has failed. Optional `delayMs`. |
+| Part              | Slot (`.cl-*`)       | Description                                                            |
+| ----------------- | -------------------- | ---------------------------------------------------------------------- |
+| `Avatar.Root`     | `cl-avatar`          | Owns `shape` / `size`, clips its children to the shape.                |
+| `Avatar.Image`    | `cl-avatar-image`    | Renders an `<img>` once the source loads; renders nothing until then.  |
+| `Avatar.Fallback` | `cl-avatar-fallback` | Rendered while the image is pending or has failed. Optional `delayMs`. |
 
 ---
 
