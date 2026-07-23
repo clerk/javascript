@@ -1,0 +1,17 @@
+import * as OrganizationBillingPaymentDetailStories from './organization-billing-payment-detail.stories';
+
+# Organization Billing Payment Detail
+
+A single payment attempt's detail screen — the header with status, the cost breakdown (plan fee, seats, subtotal, credits and discounts), and a total. Reached from the payments list or from a statement charge; navigates back to the payments list.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingPaymentDetailStories}
+  composition={[
+    {
+      name: 'OrganizationBillingPanel',
+      href: '/organization/organization-billing-panel',
+      layer: 'Organization',
+    },
+  ]}
+/>

@@ -35,6 +35,34 @@ import {
 } from '../stories/input.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OrganizationBillingAccountCreditsSectionDefault,
+  meta as organizationBillingAccountCreditsSectionMeta,
+} from '../stories/organization-billing-account-credits-section.stories';
+import {
+  Default as OrganizationBillingPanelDefault,
+  meta as organizationBillingPanelMeta,
+} from '../stories/organization-billing-panel.stories';
+import {
+  Default as OrganizationBillingPaymentDetailDefault,
+  meta as organizationBillingPaymentDetailMeta,
+} from '../stories/organization-billing-payment-detail.stories';
+import {
+  Default as OrganizationBillingPaymentMethodsSectionDefault,
+  meta as organizationBillingPaymentMethodsSectionMeta,
+} from '../stories/organization-billing-payment-methods-section.stories';
+import {
+  Default as OrganizationBillingPaymentsSectionDefault,
+  meta as organizationBillingPaymentsSectionMeta,
+} from '../stories/organization-billing-payments-section.stories';
+import {
+  Default as OrganizationBillingStatementDetailDefault,
+  meta as organizationBillingStatementDetailMeta,
+} from '../stories/organization-billing-statement-detail.stories';
+import {
+  Default as OrganizationBillingStatementsSectionDefault,
+  meta as organizationBillingStatementsSectionMeta,
+} from '../stories/organization-billing-statements-section.stories';
+import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,
 } from '../stories/organization-profile.stories';
@@ -112,6 +140,34 @@ const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Default: OrganizationProfileMembersPanelDefault,
 };
+const organizationBillingPanelModule: StoryModule = {
+  meta: organizationBillingPanelMeta,
+  Default: OrganizationBillingPanelDefault,
+};
+const organizationBillingAccountCreditsSectionModule: StoryModule = {
+  meta: organizationBillingAccountCreditsSectionMeta,
+  Default: OrganizationBillingAccountCreditsSectionDefault,
+};
+const organizationBillingStatementsSectionModule: StoryModule = {
+  meta: organizationBillingStatementsSectionMeta,
+  Default: OrganizationBillingStatementsSectionDefault,
+};
+const organizationBillingPaymentsSectionModule: StoryModule = {
+  meta: organizationBillingPaymentsSectionMeta,
+  Default: OrganizationBillingPaymentsSectionDefault,
+};
+const organizationBillingPaymentMethodsSectionModule: StoryModule = {
+  meta: organizationBillingPaymentMethodsSectionMeta,
+  Default: OrganizationBillingPaymentMethodsSectionDefault,
+};
+const organizationBillingStatementDetailModule: StoryModule = {
+  meta: organizationBillingStatementDetailMeta,
+  Default: OrganizationBillingStatementDetailDefault,
+};
+const organizationBillingPaymentDetailModule: StoryModule = {
+  meta: organizationBillingPaymentDetailMeta,
+  Default: OrganizationBillingPaymentDetailDefault,
+};
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
@@ -164,6 +220,13 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationBillingPanelModule,
+  organizationBillingAccountCreditsSectionModule,
+  organizationBillingStatementsSectionModule,
+  organizationBillingPaymentsSectionModule,
+  organizationBillingPaymentMethodsSectionModule,
+  organizationBillingStatementDetailModule,
+  organizationBillingPaymentDetailModule,
   organizationProfileProfileSectionModule,
   organizationProfileDomainsSectionModule,
   organizationProfileLeaveSectionModule,

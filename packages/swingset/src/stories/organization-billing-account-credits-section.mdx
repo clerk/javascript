@@ -1,0 +1,17 @@
+import * as OrganizationBillingAccountCreditsSectionStories from './organization-billing-account-credits-section.stories';
+
+# Organization Billing Account Credits Section
+
+The account-credits section of the organization billing panel — shows the current credit balance and a link to the credit-history screen. It renders nothing when there is no credit balance.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingAccountCreditsSectionStories}
+  composition={[
+    {
+      name: 'OrganizationBillingPanel',
+      href: '/organization/organization-billing-panel',
+      layer: 'Organization',
+    },
+  ]}
+/>

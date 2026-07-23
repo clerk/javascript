@@ -1,5 +1,13 @@
 import type { ReactElement } from 'react';
 
+import { OrganizationBillingAccountCreditsSection } from './organization-billing-account-credits-section';
+import { OrganizationBillingPanel } from './organization-billing-panel';
+import { OrganizationBillingPaymentDetail } from './organization-billing-payment-detail';
+import { OrganizationBillingPaymentMethodsSection } from './organization-billing-payment-methods-section';
+import { OrganizationBillingPaymentsSection } from './organization-billing-payments-section';
+import { OrganizationBillingStatementDetail } from './organization-billing-statement-detail';
+import { OrganizationBillingStatementsSection } from './organization-billing-statements-section';
+import { OrganizationBillingSubscriptionsSection } from './organization-billing-subscriptions-section';
 import { useOrganizationProfileController } from './organization-profile.controller';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileDeleteSection } from './organization-profile-delete-section';
@@ -19,6 +27,7 @@ function OrganizationProfileRoot(): ReactElement | null {
     <OrganizationProfileView
       general={<OrganizationProfileGeneralPanel />}
       members={<OrganizationProfileMembersPanel />}
+      billing={<OrganizationBillingPanel />}
       apiKeys={<OrganizationProfileApiKeysPanel />}
     />
   );
@@ -41,4 +50,12 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   DeleteSection: OrganizationProfileDeleteSection,
   ApiKeysPanel: OrganizationProfileApiKeysPanel,
   MembersPanel: OrganizationProfileMembersPanel,
+  BillingPanel: OrganizationBillingPanel,
+  BillingSubscriptionsSection: OrganizationBillingSubscriptionsSection,
+  BillingAccountCreditsSection: OrganizationBillingAccountCreditsSection,
+  BillingStatementsSection: OrganizationBillingStatementsSection,
+  BillingPaymentsSection: OrganizationBillingPaymentsSection,
+  BillingPaymentMethodsSection: OrganizationBillingPaymentMethodsSection,
+  BillingStatementDetail: OrganizationBillingStatementDetail,
+  BillingPaymentDetail: OrganizationBillingPaymentDetail,
 });
