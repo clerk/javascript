@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { mergeProps, themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -69,7 +69,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
     <AvatarContext.Provider value={value}>
       <span
         ref={ref}
-        {...mergeProps(
+        {...mergeStyleProps(
           themeProps('avatar', { shape, size }),
           stylex.props(styles.base, shape === 'circle' ? styles.shapeCircle : styles.shapeSquare, sizeStyles[size]),
           className,
@@ -105,7 +105,7 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
       ref={ref}
       src={src}
       alt={alt}
-      {...mergeProps(themeProps('avatar-image'), stylex.props(styles.image), className, style)}
+      {...mergeStyleProps(themeProps('avatar-image'), stylex.props(styles.image), className, style)}
       {...rest}
     />
   );
@@ -138,7 +138,7 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
   return (
     <span
       ref={ref}
-      {...mergeProps(themeProps('avatar-fallback'), stylex.props(styles.fallback), className, style)}
+      {...mergeStyleProps(themeProps('avatar-fallback'), stylex.props(styles.fallback), className, style)}
       {...rest}
     >
       {children}
