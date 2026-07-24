@@ -1,4 +1,6 @@
-import type { ClerkGlobalHookError } from '../errors/globalHookError';
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -139,11 +141,13 @@ export type SDKMetadata = {
 
 /**
  * A callback function that is called when Clerk resources change.
+ *
  * @inline
  */
 export type ListenerCallback = (emission: Resources) => void;
 /**
  * Optional configuration for the `addListener()` method.
+ *
  * @param skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
  * @inline
  */
@@ -188,7 +192,8 @@ export type SetActiveNavigate = (params: {
 
 /**
  * A callback that runs after sign out completes.
- * @inline */
+ *
+  @inline */
 export type SignOutCallback = () => void | Promise<any>;
 
 /**
@@ -298,6 +303,20 @@ export interface Clerk {
    */
   __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
 
+  /**
+   * Internal handle to the bundled ModuleManager. Exposed so framework SDK
+   * wrappers (e.g. IsomorphicClerk) can forward it to composed UI components
+   * that need dynamic-imported modules (Coinbase Wallet, Base, Stripe, zxcvbn).
+   * Plain property access crosses the bundle boundary that other channels
+   * cannot — clerk-js inlines its own @clerk/shared, so module-scoped state is
+   * invisible to consumers loading @clerk/shared from node_modules. It is
+   * `undefined` on a wrapper whose inner clerk-js has not loaded yet, so
+   * readers must handle the absent case.
+   *
+   * @internal
+   */
+  __internal_moduleManager: ModuleManager | undefined;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -317,6 +336,7 @@ export interface Clerk {
 
   /**
    * Indicates whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   *
    * @inline
    */
   isStandardBrowser: boolean | undefined;
@@ -350,6 +370,7 @@ export interface Clerk {
    * `effect()` that can be used to subscribe to changes from Signals.
    *
    * @hidden
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
@@ -398,6 +419,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk Checkout drawer.
+   *
    * @hidden
    */
   __internal_closeCheckout: () => void;
@@ -412,6 +434,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk PlanDetails drawer.
+   *
    * @hidden
    */
   __internal_closePlanDetails: () => void;
@@ -426,6 +449,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
+   *
    * @hidden
    */
   __internal_closeSubscriptionDetails: () => void;
@@ -440,12 +464,14 @@ export interface Clerk {
 
   /**
    * Closes the Clerk user verification modal.
+   *
    * @hidden
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   *
    * @hidden
    */
   __internal_attemptToEnableEnvironmentSetting: (
@@ -454,12 +480,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
+   *
    * @hidden
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
+   *
    * @hidden
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
@@ -939,12 +967,14 @@ export interface Clerk {
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured `afterSignUpUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
@@ -1100,6 +1130,7 @@ export interface Clerk {
 
   /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+   *
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1385,6 +1416,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     *
      * @default true
      */
     polling?: boolean;
@@ -1401,7 +1433,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
