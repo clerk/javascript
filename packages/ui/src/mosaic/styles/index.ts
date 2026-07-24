@@ -10,15 +10,20 @@ export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Button } from '../components/button';
 export type { ButtonProps } from '../components/button';
+export { Heading, HeadingContext } from '../components/heading';
+export type { HeadingProps } from '../components/heading';
+export { Text, TextContext } from '../components/text';
+export type { TextProps } from '../components/text';
 
-import { colorVars, radiusVars, space, spacingVars, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, spacingVars, typeScaleVars } from '../tokens.stylex';
 
-export { colorVars, radiusVars, space, spacingVars, typeScaleVars };
+export { colorVars, fontWeightVars, radiusVars, space, spacingVars, typeScaleVars };
 
 // Derived here, not in `tokens.stylex.ts`: `@stylexjs/enforce-extension` requires a
 // `.stylex.ts` file to export nothing but its `defineVars` results. The vars are keyed
 // by the same `--cl-*` names, so `keyof typeof …Vars` reproduces each token union.
 export type ColorVarName = keyof typeof colorVars;
+export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type SpacingVarName = keyof typeof spacingVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;

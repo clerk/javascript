@@ -162,7 +162,7 @@ export function OrganizationProfileMembersPanelView({
           intent='destructive'
           size='sm'
           role='alert'
-          sx={t => ({ marginBlockEnd: t.spacing(3) })}
+          style={{ marginBlockEnd: 'calc(var(--cl-spacing) * 3)' }}
         >
           {snapshot.context.error}
         </Text>
@@ -233,7 +233,7 @@ export function OrganizationProfileMembersPanelView({
                       <Box sx={t => ({ display: 'flex', alignItems: 'center', gap: t.spacing(1.5) })}>
                         <Text
                           size='sm'
-                          sx={t => ({ fontWeight: t.font.medium })}
+                          style={{ fontWeight: 500 }}
                         >
                           {row.name}
                         </Text>

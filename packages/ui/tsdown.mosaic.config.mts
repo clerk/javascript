@@ -37,7 +37,10 @@ export default defineConfig({
   minify: false,
   // Use the standard React JSX runtime, not Emotion's — the Mosaic build must be Emotion-free.
   tsconfig: './tsconfig.mosaic.json',
-  external: ['react', 'react-dom', '@stylexjs/stylex', '@clerk/headless', '@clerk/headless/utils'],
+  // `@clerk/headless` stays external here (the main build inlines it): this entry exists to
+  // extract `styles.css`, and only that file is exported from the package — so there is nothing
+  // to gain from pulling the primitives and their deps into a bundle nobody imports.
+  external: ['react', 'react-dom', '@stylexjs/stylex', /^@clerk\/headless/],
   plugins: [
     stylexPlugin({
       fileName: 'styles.css',

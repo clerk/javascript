@@ -108,7 +108,7 @@ function DomainRow({ domain, canManage, onManage, onVerify, onRemove }: DomainRo
       >
         <Text
           render={p => <span {...p} />}
-          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {domain.name}
         </Text>
