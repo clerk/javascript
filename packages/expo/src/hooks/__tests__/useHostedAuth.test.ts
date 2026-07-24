@@ -213,7 +213,7 @@ describe('useHostedAuth', () => {
     {
       platform: 'android',
       expoConfig: { android: { package: 'com.example.android' } },
-      redirectUrl: 'clerk://com.example.android.callback',
+      redirectUrl: 'clerk://com.example.android.hosted-callback',
     },
   ])('uses the canonical $platform callback registered by Clerk', async ({ platform, expoConfig, redirectUrl }) => {
     mocks.platformOS = platform;

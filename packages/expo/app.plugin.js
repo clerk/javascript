@@ -24,7 +24,7 @@ const packageJson = require('./package.json');
 const CLERK_MIN_IOS_VERSION = '17.0';
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
-  const callbackHost = `${packageName}.callback`;
+  const callbackHost = `${packageName}.hosted-callback`;
   const intentFilters = mainActivity['intent-filter'] || [];
   const hasAndroidName = (entries, name) => entries?.some(entry => entry.$?.['android:name'] === name);
   const callbackIsRegistered = intentFilters.some(

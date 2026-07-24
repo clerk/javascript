@@ -29,7 +29,7 @@ export type StartHostedAuthParams = {
    * configured application identifier fall back to `AuthSession.makeRedirectUri`.
    * Custom values must use a non-HTTP URL scheme.
    *
-   * On Android, the default `clerk://<package>.callback` URL only reaches the app
+   * On Android, the default `clerk://<package>.hosted-callback` URL only reaches the app
    * when the Clerk Expo config plugin is enabled in `app.json` and the native
    * project has been rebuilt (for example with `npx expo prebuild`), because the
    * plugin registers the matching intent filter. Without it, the browser cannot
@@ -215,7 +215,7 @@ function getDefaultRedirectUrl(AuthSessionModule: typeof AuthSession): string {
   }
   if (appIdentifier && Platform.OS === 'android') {
     warnAndroidDefaultRedirectOnce();
-    return `clerk://${appIdentifier}.callback`;
+    return `clerk://${appIdentifier}.hosted-callback`;
   }
 
   return AuthSessionModule.makeRedirectUri({
@@ -228,7 +228,7 @@ function warnAndroidDefaultRedirectOnce(): void {
   if (__DEV__ && !hasWarnedAndroidDefaultRedirect) {
     hasWarnedAndroidDefaultRedirect = true;
     console.warn(
-      '[useHostedAuth] The default Android redirect URL relies on the `clerk://<package>.callback` intent ' +
+      '[useHostedAuth] The default Android redirect URL relies on the `clerk://<package>.hosted-callback` intent ' +
         'filter registered by the Clerk Expo config plugin. If the plugin is not enabled in app.json or the ' +
         'native project has not been rebuilt since (e.g. `npx expo prebuild`), the browser cannot redirect ' +
         'back to the app and hosted auth will hang. Alternatively, pass a custom `redirectUrl` handled by the app.',

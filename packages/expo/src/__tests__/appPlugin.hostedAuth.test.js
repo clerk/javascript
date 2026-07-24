@@ -9,7 +9,7 @@ const hostedAuthIntentFilter = () => ({
     { $: { 'android:name': 'android.intent.category.DEFAULT' } },
     { $: { 'android:name': 'android.intent.category.BROWSABLE' } },
   ],
-  data: [{ $: { 'android:scheme': 'clerk', 'android:host': 'com.example.app.callback' } }],
+  data: [{ $: { 'android:scheme': 'clerk', 'android:host': 'com.example.app.hosted-callback' } }],
 });
 
 describe('addHostedAuthIntentFilter', () => {
