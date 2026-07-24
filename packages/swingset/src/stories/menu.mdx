@@ -5,7 +5,7 @@ import * as MenuStories from './menu.stories';
 A floating list of actions opened from a trigger, from `@clerk/headless`. It is a
 **headless** primitive: it supplies open state, portalling, floating-ui positioning,
 roving-focus keyboard navigation with typeahead, submenu coordination, and ARIA wiring, but
-ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes each
+ships **no styles** — you bring your own CSS by targeting the `data-*` attributes each
 part emits.
 
 ## Example
@@ -109,18 +109,17 @@ props beyond standard HTML attributes for their default element.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute                | Applies To        | Description                                        |
-| ------------------------ | ----------------- | -------------------------------------------------- |
-| `data-cl-slot`           | All parts         | Part identifier                                    |
-| `data-cl-open`           | Trigger, Popup    | Present when the menu is open                      |
-| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
-| `data-cl-active`         | Item              | Present on the keyboard-highlighted item           |
-| `data-cl-disabled`       | Item              | Present when the item is disabled                  |
-| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
-| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
-| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+| Attribute             | Applies To        | Description                                        |
+| --------------------- | ----------------- | -------------------------------------------------- |
+| `data-open`           | Trigger, Popup    | Present when the menu is open                      |
+| `data-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-active`         | Item              | Present on the keyboard-highlighted item           |
+| `data-disabled`       | Item              | Present when the item is disabled                  |
+| `data-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-starting-style` | Popup             | Present on the entering frame                      |
+| `data-ending-style`   | Popup             | Present during the exit animation                  |
 
 The positioner exposes anchor/viewport geometry as CSS variables:
 
@@ -133,7 +132,7 @@ The positioner exposes anchor/viewport geometry as CSS variables:
 | `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |
 
 ```css
-[data-cl-slot='menu-item'][data-cl-active] {
+.cl-menu-item[data-active] {
   background: rgba(0, 0, 0, 0.06);
 }
 ```

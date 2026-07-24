@@ -11,7 +11,6 @@ export function PopoverClose(props: PopoverCloseProps) {
 
   const defaultProps = {
     type: 'button' as const,
-    'data-cl-slot': 'popover-close',
     onClick() {
       setOpen(false);
     },

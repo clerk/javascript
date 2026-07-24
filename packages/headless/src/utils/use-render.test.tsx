@@ -110,7 +110,7 @@ describe('useRender', () => {
         defaultTagName: 'button',
         state: { open: true },
         stateAttributesMapping: {
-          open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+          open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
         },
         props: { 'data-testid': 'test' },
       });
@@ -118,8 +118,8 @@ describe('useRender', () => {
     render(<C />);
 
     const el = screen.getByTestId('test');
-    expect(el).toHaveAttribute('data-cl-open', '');
-    expect(el).not.toHaveAttribute('data-cl-closed');
+    expect(el).toHaveAttribute('data-open', '');
+    expect(el).not.toHaveAttribute('data-closed');
   });
 
   it('merges a single ref onto the rendered element', () => {
@@ -219,7 +219,7 @@ describe('useRender', () => {
         ref,
         state: { open: true },
         stateAttributesMapping: {
-          open: (v: boolean) => (v ? { 'data-cl-open': '' } : null),
+          open: (v: boolean) => (v ? { 'data-open': '' } : null),
         },
         props: { id: 'test' },
       });
@@ -229,7 +229,7 @@ describe('useRender', () => {
     expect(renderFn).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'test',
-        'data-cl-open': '',
+        'data-open': '',
         ref: expect.any(Function),
       }),
     );

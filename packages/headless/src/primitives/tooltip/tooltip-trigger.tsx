@@ -16,7 +16,6 @@ export const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTrigger
 
     const ownProps = {
       type: 'button',
-      'data-cl-slot': 'tooltip-trigger',
     } satisfies DefaultProps<'button'>;
 
     const defaultProps = { ...ownProps, ...getReferenceProps() };
@@ -26,7 +25,7 @@ export const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTrigger
       render,
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       // floating-ui types `setReference` as a method signature, but at runtime it's
       // a stable callback that doesn't use `this`, so the unbound-method check is a

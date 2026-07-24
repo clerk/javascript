@@ -27,25 +27,6 @@ function renderTabs(props: Partial<React.ComponentProps<typeof Tabs.Root>> = {})
 }
 
 describe('Tabs', () => {
-  describe('slot attributes', () => {
-    it('renders list with data-cl-slot', () => {
-      renderTabs();
-      expect(document.querySelector('[data-cl-slot="tabs-list"]')).toBeInTheDocument();
-    });
-
-    it('renders tabs with data-cl-slot', () => {
-      renderTabs();
-      const tabs = document.querySelectorAll('[data-cl-slot="tabs-tab"]');
-      expect(tabs).toHaveLength(3);
-    });
-
-    it('renders panels with data-cl-slot', () => {
-      renderTabs();
-      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
-      expect(panels).toHaveLength(3);
-    });
-  });
-
   describe('ARIA attributes', () => {
     it('list has role=tablist', () => {
       renderTabs();
@@ -136,10 +117,10 @@ describe('Tabs', () => {
       expect(screen.getByText('Settings content')).toBeVisible();
     });
 
-    it('marks selected tab with data-cl-selected', () => {
+    it('marks selected tab with data-selected', () => {
       renderTabs();
-      expect(screen.getByText('Account')).toHaveAttribute('data-cl-selected', '');
-      expect(screen.getByText('Settings').hasAttribute('data-cl-selected')).toBe(false);
+      expect(screen.getByText('Account')).toHaveAttribute('data-selected', '');
+      expect(screen.getByText('Settings').hasAttribute('data-selected')).toBe(false);
     });
 
     it('calls onValueChange on selection', async () => {
@@ -338,9 +319,9 @@ describe('Tabs', () => {
       );
     }
 
-    it('disabled tab has data-cl-disabled', () => {
+    it('disabled tab has data-disabled', () => {
       renderWithDisabled();
-      expect(screen.getByText('Settings')).toHaveAttribute('data-cl-disabled', '');
+      expect(screen.getByText('Settings')).toHaveAttribute('data-disabled', '');
     });
 
     it('disabled tab has aria-disabled', () => {
@@ -383,11 +364,6 @@ describe('Tabs', () => {
         </Tabs.Root>,
       );
     }
-
-    it('renders with data-cl-slot', () => {
-      renderWithIndicator();
-      expect(document.querySelector('[data-cl-slot="tabs-indicator"]')).toBeInTheDocument();
-    });
 
     it('has position absolute', () => {
       renderWithIndicator();
@@ -462,7 +438,7 @@ describe('Tabs', () => {
         );
 
         const indicator = screen.getByTestId('indicator');
-        const list = document.querySelector('[data-cl-slot="tabs-list"]') as HTMLElement;
+        const list = screen.getByRole('tablist');
 
         // The indicator should have registered an observer for its active tab.
         expect(observers.length).toBeGreaterThan(0);
@@ -472,8 +448,8 @@ describe('Tabs', () => {
         const rect = (left: number, width: number) =>
           ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
         list.getBoundingClientRect = () => rect(0, 400);
-        for (const tab of document.querySelectorAll('[data-cl-slot="tabs-tab"]')) {
-          (tab as HTMLElement).getBoundingClientRect = () => rect(0, 250);
+        for (const tab of screen.getAllByRole('tab')) {
+          tab.getBoundingClientRect = () => rect(0, 250);
         }
 
         // Fire every observer the tree created.
@@ -493,7 +469,7 @@ describe('Tabs', () => {
   describe('panel visibility', () => {
     it('hides non-selected panels with hidden attribute', () => {
       renderTabs();
-      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
+      const panels = screen.queryAllByRole('tabpanel', { hidden: true });
       const visible = Array.from(panels).filter(p => !p.hasAttribute('hidden'));
       const hidden = Array.from(panels).filter(p => p.hasAttribute('hidden'));
 
@@ -501,15 +477,15 @@ describe('Tabs', () => {
       expect(hidden).toHaveLength(2);
     });
 
-    it('non-selected panels have data-cl-hidden', () => {
+    it('non-selected panels have data-hidden', () => {
       renderTabs();
-      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"][data-cl-hidden]');
+      const panels = screen.queryAllByRole('tabpanel', { hidden: true }).filter(p => p.hasAttribute('data-hidden'));
       expect(panels).toHaveLength(2);
     });
 
     it('non-selected panels have inert attribute, selected panel does not', () => {
       renderTabs();
-      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
+      const panels = screen.queryAllByRole('tabpanel', { hidden: true });
       const inert = Array.from(panels).filter(p => p.hasAttribute('inert'));
       const notInert = Array.from(panels).filter(p => !p.hasAttribute('inert'));
       // Presence check only — `inertProps` emits the value each React major reflects
@@ -524,7 +500,7 @@ describe('Tabs', () => {
 
       await user.click(screen.getByText('Settings'));
 
-      const panels = document.querySelectorAll('[data-cl-slot="tabs-panel"]');
+      const panels = screen.queryAllByRole('tabpanel', { hidden: true });
       const [account, settings, billing] = Array.from(panels);
       expect(account).toHaveAttribute('inert');
       expect(settings).not.toHaveAttribute('inert');
@@ -581,7 +557,7 @@ describe('Tabs', () => {
       );
 
       expect(ref.current).toBeInstanceOf(HTMLButtonElement);
-      expect(ref.current).toHaveAttribute('data-cl-slot', 'tabs-tab');
+      expect(ref.current).toHaveAttribute('role', 'tab');
     });
   });
 

@@ -33,7 +33,6 @@ export const FileUploadItemPreview = React.forwardRef<HTMLImageElement, FileUplo
     }, [file, isImage]);
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'file-upload-item-preview',
       src: objectUrl,
       alt: file.name,
     };

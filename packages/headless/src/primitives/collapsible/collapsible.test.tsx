@@ -9,31 +9,17 @@ afterEach(() => cleanup());
 
 function renderCollapsible(props: Partial<React.ComponentProps<typeof Collapsible.Root>> = {}) {
   return render(
-    <Collapsible.Root {...props}>
-      <Collapsible.Trigger>Toggle</Collapsible.Trigger>
-      <Collapsible.Panel>Content</Collapsible.Panel>
+    <Collapsible.Root
+      data-testid='collapsible-root'
+      {...props}
+    >
+      <Collapsible.Trigger data-testid='collapsible-trigger'>Toggle</Collapsible.Trigger>
+      <Collapsible.Panel data-testid='collapsible-panel'>Content</Collapsible.Panel>
     </Collapsible.Root>,
   );
 }
 
 describe('Collapsible', () => {
-  describe('slot attributes', () => {
-    it('renders root with data-cl-slot', () => {
-      renderCollapsible();
-      expect(document.querySelector('[data-cl-slot="collapsible-root"]')).toBeInTheDocument();
-    });
-
-    it('renders trigger with data-cl-slot', () => {
-      renderCollapsible();
-      expect(document.querySelector('[data-cl-slot="collapsible-trigger"]')).toBeInTheDocument();
-    });
-
-    it('renders panel with data-cl-slot when open', () => {
-      renderCollapsible({ defaultOpen: true });
-      expect(document.querySelector('[data-cl-slot="collapsible-panel"]')).toBeInTheDocument();
-    });
-  });
-
   describe('open/close', () => {
     it('opens panel on trigger click', async () => {
       const user = userEvent.setup();
@@ -42,7 +28,7 @@ describe('Collapsible', () => {
       await user.click(screen.getByRole('button', { name: 'Toggle' }));
 
       expect(screen.getByText('Content')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="collapsible-root"]')).toHaveAttribute('data-cl-open', '');
+      expect(document.querySelector('[data-testid="collapsible-root"]')).toHaveAttribute('data-open', '');
     });
 
     it('closes panel on second trigger click', async () => {
@@ -51,7 +37,7 @@ describe('Collapsible', () => {
 
       await user.click(screen.getByRole('button', { name: 'Toggle' }));
 
-      expect(document.querySelector('[data-cl-slot="collapsible-root"]')).toHaveAttribute('data-cl-closed', '');
+      expect(document.querySelector('[data-testid="collapsible-root"]')).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -67,7 +53,7 @@ describe('Collapsible', () => {
     it('starts closed by default', () => {
       renderCollapsible();
       expect(screen.queryByText('Content')).not.toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="collapsible-root"]')).toHaveAttribute('data-cl-closed', '');
+      expect(document.querySelector('[data-testid="collapsible-root"]')).toHaveAttribute('data-closed', '');
     });
 
     it('starts open with defaultOpen=true', () => {
@@ -106,14 +92,14 @@ describe('Collapsible', () => {
     it('trigger has aria-controls linked to panel id', () => {
       renderCollapsible({ defaultOpen: true });
       const trigger = screen.getByRole('button', { name: 'Toggle' });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]');
+      const panel = document.querySelector('[data-testid="collapsible-panel"]');
       expect(trigger).toHaveAttribute('aria-controls', panel?.getAttribute('id'));
     });
 
     it('panel has aria-labelledby linked to trigger id', () => {
       renderCollapsible({ defaultOpen: true });
       const trigger = screen.getByRole('button', { name: 'Toggle' });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]');
+      const panel = document.querySelector('[data-testid="collapsible-panel"]');
       expect(panel).toHaveAttribute('aria-labelledby', trigger.getAttribute('id'));
     });
 
@@ -126,11 +112,11 @@ describe('Collapsible', () => {
       render(
         <Collapsible.Root defaultOpen>
           <Collapsible.Trigger id='consumer-trigger-id'>Toggle</Collapsible.Trigger>
-          <Collapsible.Panel>Content</Collapsible.Panel>
+          <Collapsible.Panel data-testid='collapsible-panel'>Content</Collapsible.Panel>
         </Collapsible.Root>,
       );
       const trigger = screen.getByRole('button', { name: 'Toggle' });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]');
+      const panel = document.querySelector('[data-testid="collapsible-panel"]');
 
       // The wired ids are owned by the primitive: a consumer-supplied id must
       // not silently break the aria pairing between trigger and panel.
@@ -142,19 +128,19 @@ describe('Collapsible', () => {
   describe('animation lifecycle', () => {
     it('panel is not in DOM when closed', () => {
       renderCollapsible();
-      expect(document.querySelector('[data-cl-slot="collapsible-panel"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="collapsible-panel"]')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on panel when open', () => {
+    it('applies data-open on panel when open', () => {
       renderCollapsible({ defaultOpen: true });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]');
-      expect(panel).toHaveAttribute('data-cl-open', '');
+      const panel = document.querySelector('[data-testid="collapsible-panel"]');
+      expect(panel).toHaveAttribute('data-open', '');
     });
 
     it('does not apply starting-style on initially open panel', () => {
       renderCollapsible({ defaultOpen: true });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]');
-      expect(panel).not.toHaveAttribute('data-cl-starting-style');
+      const panel = document.querySelector('[data-testid="collapsible-panel"]');
+      expect(panel).not.toHaveAttribute('data-starting-style');
     });
 
     it('pins --collapsible-panel-height/width while the open animation is in progress', () => {
@@ -165,7 +151,7 @@ describe('Collapsible', () => {
       ];
       try {
         renderCollapsible({ defaultOpen: true });
-        const panel = document.querySelector('[data-cl-slot="collapsible-panel"]') as HTMLElement;
+        const panel = document.querySelector('[data-testid="collapsible-panel"]') as HTMLElement;
         expect(panel.getAttribute('style')).toContain('--collapsible-panel-height');
         expect(panel.getAttribute('style')).toContain('--collapsible-panel-width');
       } finally {
@@ -181,7 +167,7 @@ describe('Collapsible', () => {
       // With no running animations the panel drops the measured pixel dimensions so
       // it flows naturally with its content.
       renderCollapsible({ defaultOpen: true });
-      const panel = document.querySelector('[data-cl-slot="collapsible-panel"]') as HTMLElement;
+      const panel = document.querySelector('[data-testid="collapsible-panel"]') as HTMLElement;
       const style = panel.getAttribute('style') ?? '';
       expect(style).not.toContain('--collapsible-panel-height');
       expect(style).not.toContain('--collapsible-panel-width');
@@ -204,10 +190,10 @@ describe('Collapsible', () => {
       expect(screen.getByRole('button', { name: 'Toggle' })).toHaveAttribute('aria-disabled', 'true');
     });
 
-    it('applies data-cl-disabled on root and trigger', () => {
+    it('applies data-disabled on root and trigger', () => {
       renderCollapsible({ disabled: true });
-      expect(document.querySelector('[data-cl-slot="collapsible-root"]')).toHaveAttribute('data-cl-disabled', '');
-      expect(document.querySelector('[data-cl-slot="collapsible-trigger"]')).toHaveAttribute('data-cl-disabled', '');
+      expect(document.querySelector('[data-testid="collapsible-root"]')).toHaveAttribute('data-disabled', '');
+      expect(document.querySelector('[data-testid="collapsible-trigger"]')).toHaveAttribute('data-disabled', '');
     });
   });
 

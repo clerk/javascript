@@ -5,7 +5,7 @@ import * as FileUploadStories from './file-upload.stories';
 A file picker that accepts input from a trigger button or drag-and-drop, from `@clerk/headless`.
 It is a **headless** primitive: it owns the selected-file state, a hidden `<input type="file">`,
 `accept` filtering (applied to both the picker and dropped files), single/multiple modes, and image
-preview thumbnails, but ships **no styles** — you bring your own CSS by targeting the `data-cl-*`
+preview thumbnails, but ships **no styles** — you bring your own CSS by targeting the `data-*`
 attributes each part emits.
 
 ## Example
@@ -133,23 +133,22 @@ take no additional props beyond standard HTML attributes for their default eleme
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute          | Applies To                          | Description                                     |
-| ------------------ | ----------------------------------- | ----------------------------------------------- |
-| `data-cl-slot`     | All parts                           | Part identifier (e.g. `"file-upload-dropzone"`) |
-| `data-cl-empty`    | Root                                | Present when no files are selected              |
-| `data-cl-dragging` | Dropzone                            | Present while a valid drag is over the zone     |
-| `data-cl-image`    | Item                                | Present when the item's file is an image        |
-| `data-cl-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                           |
+| Attribute       | Applies To                          | Description                                 |
+| --------------- | ----------------------------------- | ------------------------------------------- |
+| `data-empty`    | Root                                | Present when no files are selected          |
+| `data-dragging` | Dropzone                            | Present while a valid drag is over the zone |
+| `data-image`    | Item                                | Present when the item's file is an image    |
+| `data-disabled` | Root, Trigger, Dropzone, ItemDelete | Present when disabled                       |
 
 ```css
-[data-cl-slot='file-upload-dropzone'] {
+.cl-file-upload-dropzone {
   border: 2px dashed var(--color-border);
   border-radius: 8px;
   padding: 24px;
 }
-[data-cl-slot='file-upload-dropzone'][data-cl-dragging] {
+.cl-file-upload-dropzone[data-dragging] {
   border-color: var(--color-accent);
   background: var(--color-accent-subtle);
 }

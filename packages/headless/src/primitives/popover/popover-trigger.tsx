@@ -16,7 +16,6 @@ export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTrigger
 
     const ownProps = {
       type: 'button',
-      'data-cl-slot': 'popover-trigger',
     } satisfies DefaultProps<'button'>;
 
     const defaultProps = { ...ownProps, ...getReferenceProps() };
@@ -31,7 +30,7 @@ export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTrigger
       ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });

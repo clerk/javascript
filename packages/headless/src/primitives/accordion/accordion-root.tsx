@@ -57,14 +57,13 @@ export function AccordionRoot(props: AccordionProps) {
           const { 'aria-orientation': _ao, ...restCompositeProps } = compositeProps;
 
           const defaultProps: Record<string, unknown> = {
-            'data-cl-slot': 'accordion-root',
             onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
               if (event.key !== 'Home' && event.key !== 'End') {
                 return;
               }
               event.preventDefault();
               const items = Array.from(
-                event.currentTarget.querySelectorAll<HTMLElement>('[data-cl-slot="accordion-trigger"]:not([disabled])'),
+                event.currentTarget.querySelectorAll<HTMLElement>('[aria-expanded]:not([disabled])'),
               );
               if (items.length === 0) {
                 return;

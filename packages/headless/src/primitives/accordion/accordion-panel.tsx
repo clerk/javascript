@@ -94,13 +94,12 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     const effectiveTransitionProps = !hasBeenClosed.current
       ? {
           ...transitionProps,
-          'data-cl-starting-style': undefined,
+          'data-starting-style': undefined,
           style: undefined,
         }
       : transitionProps;
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'accordion-panel',
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
@@ -123,7 +122,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       ref: [panelRef, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: merged,
     });

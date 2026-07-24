@@ -13,8 +13,7 @@ export function MenuArrow(props: MenuArrowProps) {
 
   return (
     <FloatingArrow
-      data-cl-slot='menu-arrow'
-      data-cl-side={side}
+      data-side={side}
       {...props}
       ref={arrowRef}
       context={floatingContext}

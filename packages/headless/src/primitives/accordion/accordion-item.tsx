@@ -28,9 +28,7 @@ export function AccordionItem(props: AccordionItemProps) {
 
   const state = { open, disabled };
 
-  const defaultProps = {
-    'data-cl-slot': 'accordion-item',
-  };
+  const defaultProps = {};
 
   return (
     <AccordionItemContext.Provider value={itemContextValue}>
@@ -39,8 +37,8 @@ export function AccordionItem(props: AccordionItemProps) {
         render,
         state,
         stateAttributesMapping: {
-          open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
-          disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+          open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+          disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

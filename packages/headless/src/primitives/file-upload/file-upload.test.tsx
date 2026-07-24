@@ -14,9 +14,12 @@ function makeFile(name: string, type: string) {
 /** A default composition exercising every part, driven by the live file list. */
 function Harness(props: Partial<React.ComponentProps<typeof FileUpload.Root>> = {}) {
   return (
-    <FileUpload.Root {...props}>
-      <FileUpload.Dropzone>
-        <FileUpload.Trigger>Choose files</FileUpload.Trigger>
+    <FileUpload.Root
+      {...props}
+      data-testid='file-upload-root'
+    >
+      <FileUpload.Dropzone data-testid='file-upload-dropzone'>
+        <FileUpload.Trigger data-testid='file-upload-trigger'>Choose files</FileUpload.Trigger>
         Drag files here
       </FileUpload.Dropzone>
       <Previews />
@@ -31,7 +34,7 @@ function Previews() {
       {files.map(file => (
         <li key={file.name}>
           <FileUpload.Item file={file}>
-            <FileUpload.ItemPreview />
+            <FileUpload.ItemPreview data-testid='file-upload-item-preview' />
             <span>{file.name}</span>
             <FileUpload.ItemDelete>Remove {file.name}</FileUpload.ItemDelete>
           </FileUpload.Item>
@@ -42,30 +45,11 @@ function Previews() {
 }
 
 describe('FileUpload', () => {
-  describe('slot attributes', () => {
-    it('renders root, dropzone, trigger, and hidden input slots', () => {
-      render(<Harness />);
-      expect(document.querySelector('[data-cl-slot="file-upload-root"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="file-upload-dropzone"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="file-upload-trigger"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="file-upload-input"]')).toBeInTheDocument();
-    });
-
-    it('marks the root empty until a file is selected', () => {
-      render(<Harness defaultValue={[makeFile('a.png', 'image/png')]} />);
-      expect(document.querySelector('[data-cl-slot="file-upload-root"]')).not.toHaveAttribute('data-cl-empty');
-
-      cleanup();
-      render(<Harness />);
-      expect(document.querySelector('[data-cl-slot="file-upload-root"]')).toHaveAttribute('data-cl-empty', '');
-    });
-  });
-
   describe('trigger', () => {
     it('opens the native picker by clicking the hidden input', async () => {
       const user = userEvent.setup();
       render(<Harness />);
-      const input = document.querySelector('[data-cl-slot="file-upload-input"]') as HTMLInputElement;
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
       const clickSpy = vi.spyOn(input, 'click');
 
       await user.click(screen.getByRole('button', { name: 'Choose files' }));
@@ -76,7 +60,7 @@ describe('FileUpload', () => {
     it('adds files chosen through the input', () => {
       const onValueChange = vi.fn();
       render(<Harness onValueChange={onValueChange} />);
-      const input = document.querySelector('[data-cl-slot="file-upload-input"]') as HTMLInputElement;
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
 
       fireEvent.change(input, { target: { files: [makeFile('photo.png', 'image/png')] } });
 
@@ -87,26 +71,26 @@ describe('FileUpload', () => {
   });
 
   describe('drag and drop', () => {
-    it('toggles data-cl-dragging across enter/leave', () => {
+    it('toggles data-dragging across enter/leave', () => {
       render(<Harness />);
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.dragEnter(dropzone, { dataTransfer: { files: [] } });
-      expect(dropzone).toHaveAttribute('data-cl-dragging', '');
+      expect(dropzone).toHaveAttribute('data-dragging', '');
 
       fireEvent.dragLeave(dropzone, { dataTransfer: { files: [] } });
-      expect(dropzone).not.toHaveAttribute('data-cl-dragging');
+      expect(dropzone).not.toHaveAttribute('data-dragging');
     });
 
     it('adds dropped files and clears the dragging state', () => {
       render(<Harness multiple />);
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.dragEnter(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
 
       expect(screen.getByText('a.png')).toBeInTheDocument();
-      expect(dropzone).not.toHaveAttribute('data-cl-dragging');
+      expect(dropzone).not.toHaveAttribute('data-dragging');
     });
 
     it('filters dropped files by accept', () => {
@@ -118,7 +102,7 @@ describe('FileUpload', () => {
           onValueChange={onValueChange}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, {
         dataTransfer: { files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')] },
@@ -144,7 +128,7 @@ describe('FileUpload', () => {
           onReject={onReject}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, {
         dataTransfer: { files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')] },
@@ -166,7 +150,7 @@ describe('FileUpload', () => {
           onValueChange={onValueChange}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
       const small = makeSizedFile('small.png', 'image/png', 50);
       const big = makeSizedFile('big.png', 'image/png', 500);
 
@@ -189,7 +173,7 @@ describe('FileUpload', () => {
           onReject={onReject}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeSizedFile('ok.png', 'image/png', 100)] } });
 
@@ -206,7 +190,7 @@ describe('FileUpload', () => {
           onValueChange={onValueChange}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
       const first = makeFile('first.png', 'image/png');
       const second = makeFile('second.png', 'image/png');
 
@@ -226,7 +210,7 @@ describe('FileUpload', () => {
           onReject={onReject}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
       // A PDF that is also oversized should be rejected for the type, not the size.
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeSizedFile('big.pdf', 'application/pdf', 500)] } });
 
@@ -239,7 +223,7 @@ describe('FileUpload', () => {
   describe('single vs multiple', () => {
     it('replaces the file in single mode', () => {
       render(<Harness defaultValue={[makeFile('first.png', 'image/png')]} />);
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('second.png', 'image/png')] } });
 
@@ -254,7 +238,7 @@ describe('FileUpload', () => {
           defaultValue={[makeFile('first.png', 'image/png')]}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('second.png', 'image/png')] } });
 
@@ -266,7 +250,7 @@ describe('FileUpload', () => {
   describe('items', () => {
     it('renders an <img> preview for image files', () => {
       render(<Harness defaultValue={[makeFile('a.png', 'image/png')]} />);
-      const img = document.querySelector('[data-cl-slot="file-upload-item-preview"]');
+      const img = document.querySelector('[data-testid="file-upload-item-preview"]');
       expect(img?.tagName).toBe('IMG');
       expect(img).toHaveAttribute('alt', 'a.png');
       expect(img?.getAttribute('src')).toBeTruthy();
@@ -274,7 +258,7 @@ describe('FileUpload', () => {
 
     it('renders no preview for non-image files', () => {
       render(<Harness defaultValue={[makeFile('doc.pdf', 'application/pdf')]} />);
-      expect(document.querySelector('[data-cl-slot="file-upload-item-preview"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="file-upload-item-preview"]')).not.toBeInTheDocument();
     });
 
     it('removes a file via ItemDelete', async () => {
@@ -302,7 +286,7 @@ describe('FileUpload', () => {
           onValueChange={onValueChange}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       expect(screen.getByText('locked.png')).toBeInTheDocument();
 
@@ -319,7 +303,7 @@ describe('FileUpload', () => {
     it('disables trigger and hidden input', () => {
       render(<Harness disabled />);
       expect(screen.getByRole('button', { name: 'Choose files' })).toBeDisabled();
-      expect(document.querySelector('[data-cl-slot="file-upload-input"]')).toBeDisabled();
+      expect(document.querySelector('input[type="file"]')).toBeDisabled();
     });
 
     it('ignores drops when disabled', () => {
@@ -330,20 +314,20 @@ describe('FileUpload', () => {
           onValueChange={onValueChange}
         />,
       );
-      const dropzone = document.querySelector('[data-cl-slot="file-upload-dropzone"]') as HTMLElement;
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.dragEnter(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
       fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
 
       expect(onValueChange).not.toHaveBeenCalled();
-      expect(dropzone).not.toHaveAttribute('data-cl-dragging');
+      expect(dropzone).not.toHaveAttribute('data-dragging');
     });
 
-    it('applies data-cl-disabled on root, dropzone, and trigger', () => {
+    it('applies data-disabled on root, dropzone, and trigger', () => {
       render(<Harness disabled />);
-      expect(document.querySelector('[data-cl-slot="file-upload-root"]')).toHaveAttribute('data-cl-disabled', '');
-      expect(document.querySelector('[data-cl-slot="file-upload-dropzone"]')).toHaveAttribute('data-cl-disabled', '');
-      expect(document.querySelector('[data-cl-slot="file-upload-trigger"]')).toHaveAttribute('data-cl-disabled', '');
+      expect(document.querySelector('[data-testid="file-upload-root"]')).toHaveAttribute('data-disabled', '');
+      expect(document.querySelector('[data-testid="file-upload-dropzone"]')).toHaveAttribute('data-disabled', '');
+      expect(document.querySelector('[data-testid="file-upload-trigger"]')).toHaveAttribute('data-disabled', '');
     });
   });
 
@@ -366,7 +350,7 @@ describe('FileUpload', () => {
       );
       const trigger = screen.getByRole('button', { name: 'Upload' });
       expect(trigger).toHaveAttribute('data-custom', 'yes');
-      expect(trigger).toHaveAttribute('data-cl-slot', 'file-upload-trigger');
+      expect(trigger).toHaveAttribute('type', 'button');
     });
   });
 

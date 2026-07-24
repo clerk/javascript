@@ -20,8 +20,7 @@ export const AutocompletePositioner = React.forwardRef<HTMLDivElement, Autocompl
     const wiredId = floatingProps.id;
 
     const ownProps = {
-      'data-cl-slot': 'autocomplete-positioner',
-      'data-cl-side': side,
+      'data-side': side,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 

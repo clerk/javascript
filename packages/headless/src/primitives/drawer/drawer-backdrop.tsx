@@ -28,7 +28,7 @@ export const DrawerBackdrop = React.forwardRef<HTMLDivElement, DrawerBackdropPro
       ref: [backdropRef, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
         swiping: (v: boolean): Record<string, string> | null => (v ? { [DrawerAttrs.swiping]: '' } : null),
       },
       props: mergeProps<'div'>(defaultProps, otherProps),

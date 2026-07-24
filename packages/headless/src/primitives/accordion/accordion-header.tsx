@@ -7,9 +7,7 @@ export type AccordionHeaderProps = ComponentProps<'h3'>;
 export function AccordionHeader(props: AccordionHeaderProps) {
   const { render, ...otherProps } = props;
 
-  const defaultProps = {
-    'data-cl-slot': 'accordion-header',
-  };
+  const defaultProps = {};
 
   return useRender({
     defaultTagName: 'h3',

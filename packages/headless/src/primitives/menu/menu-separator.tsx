@@ -8,7 +8,6 @@ export function MenuSeparator(props: MenuSeparatorProps) {
   const { render, ...otherProps } = props;
 
   const defaultProps = {
-    'data-cl-slot': 'menu-separator',
     role: 'separator' as const,
   };
 

@@ -36,7 +36,6 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
-          'data-cl-slot': 'tabs-tab',
           id: tabId,
           role: 'tab' as const,
           type: 'button' as const,
@@ -93,8 +92,8 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
           ref: [internalRef, compositeRef as React.Ref<unknown>, ref],
           state,
           stateAttributesMapping: {
-            selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
-            disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+            selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+            disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
           },
           props: mergedProps,
         });

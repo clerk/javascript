@@ -141,14 +141,13 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 ## Data Attributes
 
-| Attribute                         | Applies To | Description                              |
-| --------------------------------- | ---------- | ---------------------------------------- |
-| `data-cl-slot`                    | All parts  | Part identifier (e.g. `"select-option"`) |
-| `data-cl-open` / `data-cl-closed` | Trigger    | Popup open state                         |
-| `data-cl-selected`                | Option     | The currently selected option            |
-| `data-cl-active`                  | Option     | The keyboard-highlighted option          |
-| `data-cl-disabled`                | Option     | Disabled option                          |
-| `data-cl-side`                    | Positioner | Resolved placement side                  |
+| Attribute                   | Applies To | Description                     |
+| --------------------------- | ---------- | ------------------------------- |
+| `data-open` / `data-closed` | Trigger    | Popup open state                |
+| `data-selected`             | Option     | The currently selected option   |
+| `data-active`               | Option     | The keyboard-highlighted option |
+| `data-disabled`             | Option     | Disabled option                 |
+| `data-side`                 | Positioner | Resolved placement side         |
 
 ## Important Notes
 

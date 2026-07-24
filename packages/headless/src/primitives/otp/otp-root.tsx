@@ -175,7 +175,6 @@ export function OtpRoot(props: OtpProps) {
   const state = { disabled, complete, empty: value.length === 0 };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'otp-root',
     role: 'group',
     children: (
       <>
@@ -190,7 +189,6 @@ export function OtpRoot(props: OtpProps) {
             tabIndex={-1}
             autoComplete='one-time-code'
             inputMode={inputModeForPattern(pattern)}
-            data-cl-slot='otp-hidden-input'
             style={visuallyHiddenInputStyle}
           />
         ) : null}
@@ -205,9 +203,9 @@ export function OtpRoot(props: OtpProps) {
         render,
         state,
         stateAttributesMapping: {
-          disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
-          complete: (v: boolean) => (v ? { 'data-cl-complete': '' } : null),
-          empty: (v: boolean) => (v ? { 'data-cl-empty': '' } : null),
+          disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+          complete: (v: boolean) => (v ? { 'data-complete': '' } : null),
+          empty: (v: boolean) => (v ? { 'data-empty': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

@@ -17,7 +17,6 @@ export function PopoverTitle(props: PopoverTitleProps) {
   }, [setHasTitle]);
 
   const defaultProps = {
-    'data-cl-slot': 'popover-title',
     id: labelId,
   };
 

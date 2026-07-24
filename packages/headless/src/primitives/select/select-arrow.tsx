@@ -13,8 +13,7 @@ export function SelectArrow(props: SelectArrowProps) {
 
   return (
     <FloatingArrow
-      data-cl-slot='select-arrow'
-      data-cl-side={side}
+      data-side={side}
       {...props}
       ref={arrowRef}
       context={floatingContext}

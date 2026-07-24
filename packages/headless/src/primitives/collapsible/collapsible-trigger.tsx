@@ -12,7 +12,6 @@ export function CollapsibleTrigger(props: CollapsibleTriggerProps) {
   const state = { open, disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'collapsible-trigger',
     id: triggerId,
     type: 'button' as const,
     'aria-expanded': open,
@@ -35,8 +34,8 @@ export function CollapsibleTrigger(props: CollapsibleTriggerProps) {
     render,
     state,
     stateAttributesMapping: {
-      open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: merged,
   });

@@ -50,8 +50,7 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
     });
 
     const ownProps = {
-      'data-cl-slot': 'menu-positioner',
-      'data-cl-side': side,
+      'data-side': side,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 

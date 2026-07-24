@@ -43,7 +43,6 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
     };
 
     const ownProps = {
-      'data-cl-slot': 'autocomplete-option',
       id,
       role: 'option',
       'aria-selected': isActive,
@@ -73,9 +72,9 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
       ref: [itemRef, ref],
       state,
       stateAttributesMapping: {
-        selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
-        active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-        disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+        selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+        active: (v: boolean) => (v ? { 'data-active': '' } : null),
+        disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
       },
       props: merged,
     });

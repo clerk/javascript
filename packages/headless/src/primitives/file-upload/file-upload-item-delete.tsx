@@ -13,7 +13,6 @@ export function FileUploadItemDelete(props: FileUploadItemDeleteProps) {
   const state = { disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-item-delete',
     type: 'button' as const,
     disabled,
     onClick: () => {
@@ -28,7 +27,7 @@ export function FileUploadItemDelete(props: FileUploadItemDeleteProps) {
     render,
     state,
     stateAttributesMapping: {
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });

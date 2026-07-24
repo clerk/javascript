@@ -12,7 +12,6 @@ export const PopoverPopup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(
   const { popupRef, transitionProps } = usePopoverContext();
 
   const defaultProps = {
-    'data-cl-slot': 'popover-popup',
     ...transitionProps,
   };
 

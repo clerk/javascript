@@ -37,13 +37,12 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
 
   const effectiveTransitionProps =
     shouldForceMount && !hasBeenDeselected.current
-      ? { ...transitionProps, 'data-cl-starting-style': undefined, style: undefined }
+      ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
       : transitionProps;
 
   const state = { hidden: !isSelected };
 
   const defaultProps = {
-    'data-cl-slot': 'tabs-panel',
     id: panelId,
     role: 'tabpanel' as const,
     'aria-labelledby': tabId,
@@ -69,7 +68,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     ref: [panelRef, ref],
     state,
     stateAttributesMapping: {
-      hidden: (v: boolean) => (v ? { 'data-cl-hidden': '' } : null),
+      hidden: (v: boolean) => (v ? { 'data-hidden': '' } : null),
     },
     props: merged,
   });

@@ -30,7 +30,6 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
   };
 
   const ownProps = {
-    'data-cl-slot': 'menu-item',
     type: 'button',
     role: 'menuitem',
     tabIndex: isActive ? 0 : -1,
@@ -54,8 +53,8 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
     ref: [item.ref, ref],
     state,
     stateAttributesMapping: {
-      active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      active: (v: boolean) => (v ? { 'data-active': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'button'>(defaultProps, safeOtherProps),
   });

@@ -43,7 +43,6 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
   const state = { active: activeIndex === index, filled: char !== '', disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'otp-input',
     value: char,
     type: mask ? 'password' : 'text',
     inputMode: inputModeForPattern(pattern),
@@ -204,9 +203,9 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     ref: [registerRef, forwardedRef],
     state,
     stateAttributesMapping: {
-      active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-      filled: (v: boolean) => (v ? { 'data-cl-filled': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      active: (v: boolean) => (v ? { 'data-active': '' } : null),
+      filled: (v: boolean) => (v ? { 'data-filled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'input'>(defaultProps, otherProps),
   });

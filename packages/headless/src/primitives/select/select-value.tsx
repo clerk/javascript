@@ -39,7 +39,6 @@ export function SelectValue(props: SelectValueProps) {
     selectedValue !== undefined ? (selectedLabel ?? resolveLabel(selectedValue, items, valueToLabelRef)) : placeholder;
 
   const defaultProps = {
-    'data-cl-slot': 'select-value',
     children: displayText,
   };
 

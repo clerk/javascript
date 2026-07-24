@@ -26,7 +26,6 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
 
   const ownProps = {
     type: 'button',
-    'data-cl-slot': 'menu-trigger',
     ...(isNested && {
       role: 'menuitem',
       tabIndex: parentContext?.activeIndex === item.index ? 0 : -1,
@@ -45,7 +44,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
     ref: [refs.setReference, isNested ? item.ref : null, ref ?? null],
     state,
     stateAttributesMapping: {
-      open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+      open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });

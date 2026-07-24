@@ -25,7 +25,6 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
     const state = { open };
 
     const defaultProps = {
-      'data-cl-slot': 'autocomplete-input',
       ...getReferenceProps({
         value: inputValue,
         'aria-autocomplete': 'list' as const,
@@ -55,7 +54,7 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
       ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: mergeProps<'input'>(defaultProps, otherProps),
     });

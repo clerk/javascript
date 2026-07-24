@@ -45,7 +45,8 @@ export function cssVars(opts?: { sideOffset?: number }): Middleware {
       style.setProperty('--cl-available-height', `${availableHeight}px`);
 
       // Transform origin — points back toward the anchor
-      const arrowEl = elements.floating.querySelector("[data-cl-slot$='-arrow']");
+      // The arrow is the only FloatingArrow <svg> descendant carrying data-side.
+      const arrowEl = elements.floating.querySelector('svg[data-side]');
 
       let transformX: number;
       let transformY: number;

@@ -64,20 +64,20 @@ describe('useTransition', () => {
 
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({
-      'data-cl-open': '',
-      'data-cl-starting-style': '',
+      'data-open': '',
+      'data-starting-style': '',
       style: { transition: 'none' },
     });
   });
 
-  it('clears starting-style after first frame, keeps data-cl-open', () => {
+  it('clears starting-style after first frame, keeps data-open', () => {
     const ref = createElementRef();
     const { result } = renderHook(() => useTransition({ open: true, ref }));
 
     act(() => flushRaf());
 
     expect(result.current.transitionProps).toEqual({
-      'data-cl-open': '',
+      'data-open': '',
     });
   });
 
@@ -97,8 +97,8 @@ describe('useTransition', () => {
 
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionProps).toEqual({
-      'data-cl-closed': '',
-      'data-cl-ending-style': '',
+      'data-closed': '',
+      'data-ending-style': '',
     });
 
     // Cleanup: resolve to prevent hanging
@@ -186,12 +186,12 @@ describe('useTransition', () => {
     rerender({ open: true });
 
     expect(result.current.mounted).toBe(true);
-    expect(result.current.transitionProps['data-cl-open']).toBe('');
+    expect(result.current.transitionProps['data-open']).toBe('');
 
     // After rAF, ending-style is cleared and we're in stable open state
     act(() => flushRaf());
-    expect(result.current.transitionProps['data-cl-ending-style']).toBeUndefined();
-    expect(result.current.transitionProps['data-cl-open']).toBe('');
+    expect(result.current.transitionProps['data-ending-style']).toBeUndefined();
+    expect(result.current.transitionProps['data-open']).toBe('');
 
     // Cleanup
     el.getAnimations = vi.fn(() => [] as unknown as Animation[]);

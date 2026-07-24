@@ -5,7 +5,7 @@ import * as AutocompleteStories from './autocomplete.stories';
 A text input paired with a filtered list of suggestions, from `@clerk/headless`. It is a
 **headless** primitive: it supplies input text, selected value, and open state, portalling,
 floating-ui positioning, virtual-focus keyboard navigation, and ARIA `combobox` wiring, but
-ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes each
+ships **no styles** — you bring your own CSS by targeting the `data-*` attributes each
 part emits. It does **no filtering of its own**: you read `inputValue` and render the
 surviving options.
 
@@ -103,17 +103,16 @@ default element. `Autocomplete.Portal` accepts `root`.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute          | Applies To        | Description                                        |
-| ------------------ | ----------------- | -------------------------------------------------- |
-| `data-cl-slot`     | All parts         | Part identifier                                    |
-| `data-cl-open`     | Input             | Present when the popup is open                     |
-| `data-cl-closed`   | Input             | Present when the popup is closed                   |
-| `data-cl-selected` | Option            | Present on the option matching the selected value  |
-| `data-cl-active`   | Option            | Present on the keyboard-highlighted option         |
-| `data-cl-disabled` | Option            | Present on a disabled option                       |
-| `data-cl-side`     | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| Attribute       | Applies To        | Description                                        |
+| --------------- | ----------------- | -------------------------------------------------- |
+| `data-open`     | Input             | Present when the popup is open                     |
+| `data-closed`   | Input             | Present when the popup is closed                   |
+| `data-selected` | Option            | Present on the option matching the selected value  |
+| `data-active`   | Option            | Present on the keyboard-highlighted option         |
+| `data-disabled` | Option            | Present on a disabled option                       |
+| `data-side`     | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
 
 The positioner exposes anchor/viewport geometry as CSS variables (and sets an inline
 `width` matching the input and a `max-height` of the available viewport height):
