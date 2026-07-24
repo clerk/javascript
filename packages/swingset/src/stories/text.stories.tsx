@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { TextProps } from '@clerk/ui/mosaic/components/text';
-import { Text, textRecipe } from '@clerk/ui/mosaic/components/text';
+import { Text } from '@clerk/ui/mosaic/components/text';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,11 +8,29 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './text.stories?raw';
 
+// StyleX has no runtime recipe to derive knobs from, so the variant surface is described
+// here to drive the playground + prop table. Keys mirror `TextProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Text',
-  source: 'packages/ui/src/mosaic/components/text.tsx',
-  styles: textRecipe,
+  source: 'packages/ui/src/mosaic/components/text/text.tsx',
+  styles: {
+    _variants: {
+      size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
+      intent: {
+        primary: {},
+        primaryForeground: {},
+        destructive: {},
+        destructiveForeground: {},
+        muted: {},
+        mutedForeground: {},
+      },
+    },
+    _defaultVariants: {
+      size: 'sm',
+      intent: 'primary',
+    },
+  },
 };
 
 // Story functions accept Record<string,unknown> (knob values) and cast to TextProps.
