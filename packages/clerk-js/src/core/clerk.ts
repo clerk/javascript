@@ -1454,7 +1454,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (disabledUserAPIKeysFeature(this, this.environment)) {
+    if (!this.organization && disabledUserAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForUserWhenDisabled, {
           code: CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE,
