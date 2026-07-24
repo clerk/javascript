@@ -49,8 +49,9 @@ import { Select } from '@clerk/headless/select';
 </Select.Root>;
 ```
 
-- **Each part accepts native props for its tag plus a `render` prop.** Unused
-  parts tree-shake out.
+- **Each element-rendering part accepts native props for its tag plus a `render`
+  prop.** Pass-through parts (`Root`, `Portal`) render no element of their own
+  and have their own APIs instead. Unused parts tree-shake out.
 - **Style by className/`data-*`**, never by a slot attribute — the primitives
   don't emit one.
 - **`render` is the override escape hatch.** It takes a function

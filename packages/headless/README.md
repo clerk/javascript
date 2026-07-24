@@ -50,7 +50,7 @@ All primitives follow the same compound component pattern. They emit zero styles
 ## Architecture
 
 - **Compound components** — each primitive exports a namespace (e.g. `Select.Trigger`, `Select.Popup`) backed by per-part files so unused parts tree-shake out
-- **`useRender`** — every part calls this hook instead of returning JSX directly, enabling consumer `render` prop overrides (function or element) and automatic state-to-data-attribute mapping
+- **`useRender`** — every part that renders a DOM element calls this hook instead of returning JSX directly, enabling consumer `render` prop overrides (function or element) and automatic state-to-data-attribute mapping
 - **`data-*` attributes** — state (`data-open`, `data-selected`, `data-active`) and animation lifecycle (`data-starting-style`, `data-ending-style`); parts are targeted by consumer-supplied classNames, not by an emitted slot attribute
 - **CSS-driven animations** — the transition system uses `data-*` attributes and the Web Animations API (`getAnimations().finished`) so all timing lives in CSS
 - **Floating UI** — positioning, interactions, focus management, dismiss handling, list navigation, and ARIA are all delegated to `@floating-ui/react`
