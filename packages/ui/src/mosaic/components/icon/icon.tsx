@@ -25,18 +25,11 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   const props = mergeStyleProps(themeProps('icon', { size }), stylex.props(styles.base, sizes[size]), className, style);
 
   if (override) {
-    // Cloning an element (rather than calling a render fn) is what lets overrides be plain
-    // elements, which unlike functions serialize across the RSC boundary.
+    // `ref` is deliberately not forwarded: it is typed for the built-in `SVGSVGElement`, but an
+    // override can be any element. A consumer that needs one puts it on the element they author.
     //
-    // Icon's `ref` is intentionally not forwarded to the override. It is typed for the built-in
-    // `SVGSVGElement`, but an override can be any element, so forwarding would mistype it (or drop
-    // it for a non-forwardRef component). A consumer that needs a ref puts one on the element they
-    // author (`icons: { name: <svg ref={r} /> }`); cloneElement preserves it, since we do not set
-    // `ref` here.
-    //
-    // SAFETY: React 18 types `ReactElement.props` as `any`; we only read an optional className to
-    // merge with Mosaic's so a consumer's own class survives. cloneElement re-validates the merged
-    // props against the element's real type at render, surfacing any mismatch there.
+    // SAFETY: React 18 types `ReactElement.props` as `any`; we only read an optional className.
+    // cloneElement re-validates the merged props against the element's real type at render.
     const overrideClassName = (override.props as { className?: string }).className;
     return React.cloneElement(override, { ...rest, ...mergeStyleProps(props, overrideClassName) });
   }
