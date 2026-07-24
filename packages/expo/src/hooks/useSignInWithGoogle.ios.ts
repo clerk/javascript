@@ -15,14 +15,13 @@ export type {
  * Features:
  * - Native Google Sign-In UI
  * - Built-in nonce support for replay attack protection
- * - No additional dependencies required
  *
- * In the next major version, apps using native Google Sign-In will need to install
- * `@clerk/expo-google-signin` alongside `@clerk/expo` and add its Expo config plugin.
+ * Requires the `@clerk/expo-google-signin` package to be installed and its Expo
+ * config plugin added, which provide the native module.
  *
  * @example
  * ```tsx
- * import { useSignInWithGoogle } from '@clerk/expo';
+ * import { useSignInWithGoogle } from '@clerk/expo/google';
  * import { Button } from 'react-native';
  *
  * function GoogleSigninButton() {

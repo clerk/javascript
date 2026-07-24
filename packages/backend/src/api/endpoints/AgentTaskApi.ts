@@ -4,7 +4,7 @@ import { AbstractAPI } from './AbstractApi';
 
 /** @generateWithEmptyComment */
 export type CreateAgentTaskParams = {
-  /** The user to create an Agent Task for. Provide either a `userId` or an `identifier` (e.g. an email address, phone number, or username). */
+  /** The user to create an Agent Task for. Provide either a `userId` or an `identifier` (e.g., an email address, phone number, or username). */
   onBehalfOf:
     | {
         /** The identifier of the user to create an Agent Task for. */

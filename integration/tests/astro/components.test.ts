@@ -416,7 +416,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   });
 
   // ----- redirect
-  test('redirects to sign-in when unauthenticated (middleware)', async ({ page, context }) => {
+  test('redirects to sign-in when unauthenticated (user page)', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();
     await u.page.getByRole('link', { name: 'User', exact: true }).click();
@@ -430,6 +430,13 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.page.waitForURL(
       `${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/organization`)}`,
     );
+  });
+
+  test('redirects to sign-in when unauthenticated (discover page)', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/discover');
+    await u.page.waitForURL(`${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/discover`)}`);
+    await u.po.signIn.waitForMounted();
   });
 
   // ---- protect

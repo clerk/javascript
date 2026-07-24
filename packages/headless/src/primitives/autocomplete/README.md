@@ -129,14 +129,13 @@ Navigation loops and auto-scrolls the active option into view.
 
 ## Data Attributes
 
-| Attribute                         | Applies To        | Description                                   |
-| --------------------------------- | ----------------- | --------------------------------------------- |
-| `data-cl-slot`                    | All parts         | Part identifier (e.g. `"autocomplete-input"`) |
-| `data-cl-open` / `data-cl-closed` | Input             | Popup open state                              |
-| `data-cl-selected`                | Option            | The currently selected option                 |
-| `data-cl-active`                  | Option            | The keyboard-highlighted option               |
-| `data-cl-disabled`                | Option            | Disabled option                               |
-| `data-cl-side`                    | Positioner, Arrow | Resolved placement side                       |
+| Attribute                   | Applies To        | Description                     |
+| --------------------------- | ----------------- | ------------------------------- |
+| `data-open` / `data-closed` | Input             | Popup open state                |
+| `data-selected`             | Option            | The currently selected option   |
+| `data-active`               | Option            | The keyboard-highlighted option |
+| `data-disabled`             | Option            | Disabled option                 |
+| `data-side`                 | Positioner, Arrow | Resolved placement side         |
 
 ## Open/Close Behavior
 

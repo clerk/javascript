@@ -4,6 +4,10 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
+import { E2EControls } from './components/E2EControls';
+import { GoogleSignInButton } from './components/GoogleSignInButton';
+import { JsSignInForm } from './components/JsSignInForm';
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 if (!publishableKey) {
@@ -14,6 +18,7 @@ function NativeBuildFixture() {
   const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [e2eStatus, setE2eStatus] = useState<string | null>(null);
 
   return (
     <View style={styles.container}>
@@ -29,6 +34,10 @@ function NativeBuildFixture() {
         title='Open native AuthView'
         onPress={() => setIsAuthOpen(true)}
       />
+      {!isSignedIn && <GoogleSignInButton />}
+      {!isSignedIn && <JsSignInForm onStatus={setE2eStatus} />}
+      {isSignedIn && <E2EControls onStatus={setE2eStatus} />}
+      {e2eStatus && <Text testID='e2e-status'>{e2eStatus}</Text>}
       {isSignedIn && (
         <Button
           testID='sign-out-button'
@@ -63,7 +72,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 16,
+    gap: 12,
     justifyContent: 'center',
     padding: 24,
   },

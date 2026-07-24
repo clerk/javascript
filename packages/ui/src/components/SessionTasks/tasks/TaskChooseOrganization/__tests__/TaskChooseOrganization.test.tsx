@@ -11,8 +11,8 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 import { clearFetchCache } from '@/ui/hooks/useFetch';
 
-import { TaskChooseOrganization } from '..';
 import type { FakeOrganizationParams } from '../../../../CreateOrganization/__tests__/CreateOrganization.test';
+import { TaskChooseOrganization } from '..';
 
 type FakeOrganizationParams = {
   id: string;
