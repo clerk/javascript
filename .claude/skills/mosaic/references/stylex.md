@@ -18,15 +18,15 @@ conventions to follow by hand, not guarantees the toolchain makes for you.
 
 ## File layout & the `.stylex.ts` convention
 
-| File                              | Holds                                                      |
-| --------------------------------- | ---------------------------------------------------------- |
-| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)            |
-| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms            |
-| `<family>.styles.ts`              | **shared** atoms imported by a whole component family      |
-| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states |
-| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeProps`    |
-| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeProps` |
-| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types            |
+| File                              | Holds                                                           |
+| --------------------------------- | --------------------------------------------------------------- |
+| `tokens.stylex.ts`                | `defineVars` / `defineConsts` only (the tokens)                 |
+| `<comp>/<comp>.styles.ts`         | `stylex.create({...})` — this component's atoms                 |
+| `<family>.styles.ts`              | **shared** atoms imported by a whole component family           |
+| `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states      |
+| `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`    |
+| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps` |
+| `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                 |
 
 The `@stylexjs` eslint rules run on `src/mosaic/**`. The `enforce-extension`
 rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
@@ -320,13 +320,13 @@ The element carries three things, and nothing else is a contract:
 plus a kebab-cased `data-<axis>` reflection of the visual props, so consumers
 target stable data-attribute selectors, not collision-prone class names.
 
-`mergeProps` fuses everything in precedence order — **theme props → StyleX atoms →
+`mergeStyleProps` fuses everything in precedence order — **theme props → StyleX atoms →
 consumer `className`/`style`** — so the consumer always wins. It concatenates
 className left-to-right and merges `style` with the consumer object spread last:
 
 ```tsx
 <button
-  {...mergeProps(
+  {...mergeStyleProps(
     themeProps('button', { intent, variant }),
     stylex.props(styles.base, variants[variant], xstyle),
     className,
@@ -336,12 +336,12 @@ className left-to-right and merges `style` with the consumer object spread last:
 ```
 
 - **DO** put consumer `xstyle` **last** inside `stylex.props(...)` (so their atoms
-  win the cascade) and consumer `className`/`style` last inside `mergeProps` (so
+  win the cascade) and consumer `className`/`style` last inside `mergeStyleProps` (so
   their raw CSS wins).
 - **DON'T** forward `xstyle` down to internal slot elements — it targets the slot
   the consumer named, not your private structure.
 - **DON'T** call `stylex.props` twice on one element or spread `{...props}` after
-  the merge result — fuse everything through the one `mergeProps` call.
+  the merge result — fuse everything through the one `mergeStyleProps` call.
 
 ## Build & CSS delivery (two contexts, same babel)
 
@@ -372,7 +372,7 @@ token colors aren't down-leveled into an invalid polyfill.
 - Avoid manual `@layer` / `@property` inside `create` (StyleX owns layering;
   `@property` compiles but emits invalid output).
 - No need for `stylex.firstThatWorks` or `stylex.attrs` — a proven full library
-  ships without either; reach for conditional-value objects and `mergeProps`
+  ships without either; reach for conditional-value objects and `mergeStyleProps`
   instead.
 - Dynamic functions-in-`create` are allowed but exceptional — see "Dynamic styles"
   above. Default to static atoms, variant maps, and conditional-value objects; use
