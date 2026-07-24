@@ -1,4 +1,3 @@
-import { urlDecodeB64 } from '@clerk/shared/internal/clerk-js/encoders';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
 import { type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
@@ -423,51 +422,31 @@ function mergePendingNativeRefreshOptions(
   return merged;
 }
 
-async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise<string | null> {
+const tokenCacheReadTimedOut = Symbol('tokenCacheReadTimedOut');
+
+// `undefined` = read timed out, `null` = confirmed missing token.
+async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise<string | null | undefined> {
   if (!tokenCache) {
     return null;
   }
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   try {
-    return (
-      (await Promise.race([
-        tokenCache.getToken(CLERK_CLIENT_JWT_KEY),
-        new Promise<null>(resolve => {
-          timeoutId = setTimeout(() => resolve(null), tokenCacheReadTimeoutMs);
-        }),
-      ])) ?? null
-    );
+    const result = await Promise.race([
+      tokenCache.getToken(CLERK_CLIENT_JWT_KEY),
+      new Promise<typeof tokenCacheReadTimedOut>(resolve => {
+        timeoutId = setTimeout(() => resolve(tokenCacheReadTimedOut), tokenCacheReadTimeoutMs);
+      }),
+    ]);
+    if (result === tokenCacheReadTimedOut) {
+      return undefined;
+    }
+    return result ?? null;
   } finally {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
   }
-}
-
-function getDeviceTokenIssuedAt(deviceToken: string | null): number | null {
-  if (!deviceToken) {
-    return null;
-  }
-
-  try {
-    const payload = deviceToken.split('.')[1];
-    if (!payload) {
-      return null;
-    }
-
-    const { iat } = JSON.parse(urlDecodeB64(payload)) as { iat?: unknown };
-    return typeof iat === 'number' && Number.isFinite(iat) ? iat : null;
-  } catch {
-    return null;
-  }
-}
-
-function isStrictlyOlderDeviceToken(currentDeviceToken: string, incomingDeviceToken: string | null): boolean {
-  const currentIssuedAt = getDeviceTokenIssuedAt(currentDeviceToken);
-  const incomingIssuedAt = getDeviceTokenIssuedAt(incomingDeviceToken);
-
-  return currentIssuedAt !== null && incomingIssuedAt !== null && currentIssuedAt > incomingIssuedAt;
 }
 
 async function syncNativeClientToJs({
@@ -505,11 +484,13 @@ async function syncNativeClientToJs({
   const previousDeviceToken = didChangeDeviceToken ? await getCachedDeviceToken(tokenCache) : undefined;
   const hasSignedInJsClient = Boolean(getDefaultSignedInSession(clerkInstance.client));
 
-  if (didChangeDeviceToken && hasSignedInJsClient && previousDeviceToken) {
-    if (
-      isStrictlyOlderDeviceToken(previousDeviceToken, nativeDeviceToken) ||
-      !canRefreshJsClientFromServer(clerkInstance)
-    ) {
+  if (didChangeDeviceToken && hasSignedInJsClient) {
+    // Timed-out cache read leaves no rollback snapshot, so keep JS authoritative.
+    if (previousDeviceToken === undefined) {
+      return;
+    }
+
+    if (previousDeviceToken && !canRefreshJsClientFromServer(clerkInstance)) {
       nativeRefreshFromJsControllerRef?.current?.syncDeviceTokenToNative(previousDeviceToken);
       return;
     }
@@ -776,12 +757,15 @@ export function NativeClientSync({
         return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
           try {
             const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
+            const previousDeviceToken = await getCachedDeviceToken(tokenCache);
             // Native may have already moved the server-side client to a new
             // active session. Refresh JS before allowing Clerk JS' stale-session
             // 401 path to collapse the whole client to signed out.
             const didRecover = await refreshJsClientFromNativeState({
               clerkInstance,
               nativeDeviceToken,
+              previousDeviceToken,
+              rejectForeignSessionlessClient: true,
               reloadInitialResources: false,
               suppressTokenCacheNotificationsRef,
               tokenCache,
@@ -947,7 +931,7 @@ export function useNativeClientBootstrap({
 
             let initialJsDeviceToken: string | null = null;
             try {
-              initialJsDeviceToken = await getCachedDeviceToken(tokenCache);
+              initialJsDeviceToken = (await getCachedDeviceToken(tokenCache)) ?? null;
             } catch (e) {
               if (__DEV__) {
                 console.warn('[ClerkProvider] Token cache read failed:', e);
@@ -966,7 +950,7 @@ export function useNativeClientBootstrap({
             }
 
             if (clerkInstance) {
-              const currentJsDeviceToken = await getCachedDeviceToken(tokenCache);
+              const currentJsDeviceToken = (await getCachedDeviceToken(tokenCache)) ?? null;
               const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
 
               if (!isCurrentConfiguration() || currentJsDeviceToken === nativeDeviceToken) {
