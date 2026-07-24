@@ -8,8 +8,6 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './heading.stories?raw';
 
-// StyleX has no runtime recipe to derive knobs from, so the variant surface is described
-// here to drive the playground + prop table. Keys mirror `HeadingProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Heading',

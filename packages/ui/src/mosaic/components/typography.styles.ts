@@ -2,10 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, typeScaleVars } from '../tokens.stylex';
 
-// Shared typography surface. `Heading` and `Text` render the same size and color
-// axes, so the atoms live here once and each component composes what it needs on
-// top (Heading adds a weight; Text adds nothing).
-
 export type TypographySize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 
 export type TypographyIntent =
