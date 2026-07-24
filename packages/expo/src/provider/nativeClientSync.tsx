@@ -25,6 +25,7 @@ export type SyncableClerkInstance = {
   status?: string;
   setActive?: (params: { session: SignedInSessionResource | string | null }) => Promise<void>;
   updateClient?: (client: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }) => void;
+  __internal_setActiveInProgress?: boolean;
   __internal_reloadInitialResources?: () => void | Promise<void>;
 };
 
@@ -523,13 +524,13 @@ export function NativeClientSync({
         // even if the refreshed client still has another signed-in session.
         // Keep that transient state internal so native session switching does
         // not dismiss mounted native UI before setActive settles on JS.
-        isReconcilingRemovedActiveSession = true;
         originalUpdateClient(newClient, { __internal_dangerouslySkipEmit: true });
 
-        if (alreadyReconcilingRemovedActiveSession) {
+        if (clerkInstance.__internal_setActiveInProgress || alreadyReconcilingRemovedActiveSession) {
           return;
         }
 
+        isReconcilingRemovedActiveSession = true;
         void runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
           try {
             await clerkInstance.setActive?.({ session: fallbackSession });
