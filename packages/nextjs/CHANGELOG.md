@@ -1,5 +1,18 @@
 # Change Log
 
+## 7.6.0
+
+### Minor Changes
+
+- Add an `fapiUrl` option to Frontend API proxy helpers so requests can target a custom Clerk Frontend API URL. ([#9223](https://github.com/clerk/javascript/pull/9223)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`848eefe`](https://github.com/clerk/javascript/commit/848eefe6dcc23cbad617a5c6ccb582eaae2a9bac), [`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/backend@3.13.0
+  - @clerk/shared@4.25.7
+  - @clerk/react@6.12.7
+
 ## 7.5.22
 
 ### Patch Changes

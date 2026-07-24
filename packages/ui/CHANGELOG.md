@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.25.8
+
+### Patch Changes
+
+- Use logical CSS properties for the organization members footer and the MFA setup task header, so both lay out correctly in right-to-left locales. ([#9218](https://github.com/clerk/javascript/pull/9218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/localizations@4.13.7
+
 ## 1.25.7
 
 ### Patch Changes

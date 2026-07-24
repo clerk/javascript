@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.0.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.3.2` to `1.3.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.3. ([#9227](https://github.com/clerk/javascript/pull/9227)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/clerk-js@6.25.7
+  - @clerk/react@6.12.7
+
 ## 4.0.1
 
 ### Patch Changes

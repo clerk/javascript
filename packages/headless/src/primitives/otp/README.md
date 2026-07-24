@@ -13,7 +13,7 @@ across the slots. Supports controlled/uncontrolled value, a character `pattern`,
 - Any fixed-length PIN or code split into per-character boxes.
 
 Each slot is a real, individually styleable `<input>` — the primitive emits zero styles and injects
-no global CSS. Everything is driven by `data-cl-*` attributes.
+no global CSS. Everything is driven by `data-*` attributes.
 
 ## Usage
 
@@ -148,14 +148,13 @@ and the `Ctrl`/`Cmd` boundary jumps stay logical (first / last-entered).
 
 ## Data Attributes
 
-| Attribute          | Applies To  | Description                                   |
-| ------------------ | ----------- | --------------------------------------------- |
-| `data-cl-slot`     | All parts   | Part identifier (`"otp-root"`, `"otp-input"`) |
-| `data-cl-empty`    | Root        | Present when no character has been entered    |
-| `data-cl-complete` | Root        | Present when every slot is filled             |
-| `data-cl-disabled` | Root, Input | Present when disabled                         |
-| `data-cl-active`   | Input       | Present when the slot holds focus             |
-| `data-cl-filled`   | Input       | Present when the slot holds a character       |
+| Attribute       | Applies To  | Description                                |
+| --------------- | ----------- | ------------------------------------------ |
+| `data-empty`    | Root        | Present when no character has been entered |
+| `data-complete` | Root        | Present when every slot is filled          |
+| `data-disabled` | Root, Input | Present when disabled                      |
+| `data-active`   | Input       | Present when the slot holds focus          |
+| `data-filled`   | Input       | Present when the slot holds a character    |
 
 ## ARIA
 
