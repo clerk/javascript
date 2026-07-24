@@ -83,7 +83,9 @@ export function useBillingRouter(): { router: RouteContextValue; route: BillingR
             window.location.href = to;
             return;
           }
-        } catch {}
+        } catch {
+          // `to` is not an absolute URL; fall through to relative-route handling.
+        }
         const newRoute = resolveNavigation(to);
         setRoute(newRoute);
         if (options?.searchParams) {
