@@ -63,7 +63,9 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
   const onDoneRef = useRef(options?.onDone);
   onDoneRef.current = options?.onDone;
   useEffect(() => {
-    snapshot.status === 'done' && onDoneRef.current?.();
+    if (snapshot.status === 'done') {
+      onDoneRef.current?.();
+    }
   }, [snapshot.status]);
 
   return [snapshot, actor.send, actor];
@@ -126,9 +128,10 @@ export function useMachineLogger<TContext extends object>(label: string, snapsho
     const previous = prevValue.current;
     prevValue.current = current;
 
-    previous === undefined && console.log(`[${label}] ${current}`, snapshot.context);
-    previous !== undefined &&
-      previous !== current &&
+    if (previous === undefined) {
+      console.log(`[${label}] ${current}`, snapshot.context);
+    } else if (previous !== current) {
       console.log(`[${label}] ${previous} → ${current}`, snapshot.context);
+    }
   });
 }

@@ -21,12 +21,7 @@ export function OrganizationProfileDeleteSectionView({
   const isDeleting = snapshot.value === 'deleting';
 
   return (
-    <Box
-      sx={t => ({
-        width: '100%',
-        containerType: 'inline-size',
-      })}
-    >
+    <Box sx={{ width: '100%', containerType: 'inline-size' }}>
       <Box
         sx={t => ({
           display: 'flex',
@@ -66,9 +61,7 @@ export function OrganizationProfileDeleteSectionView({
             <Button
               intent='destructive'
               {...props}
-              sx={{
-                flexShrink: 0,
-              }}
+              style={{ flexShrink: 0 }}
               type='button'
             >
               Delete organization

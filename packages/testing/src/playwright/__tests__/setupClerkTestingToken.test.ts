@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ERROR_MISSING_FRONTEND_API_URL } from '../../common/errors';
 
 // We need to reset the module-level WeakSet between tests
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 let setupClerkTestingToken: (typeof import('../setupClerkTestingToken'))['setupClerkTestingToken'];
 
 function createMockRoute(

@@ -4,7 +4,7 @@ import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
 // unstyled — so it faithfully reflects what `@clerk/headless` provides: file selection via
-// a trigger or drag-and-drop, live image previews, and the `data-cl-*` attributes each part
+// a trigger or drag-and-drop, live image previews, and the `data-*` attributes each part
 // emits, with zero appearance. The only inline styles below constrain the preview thumbnail
 // so a full-resolution image can't blow out the demo; they are not part of the primitive.
 // It is embedded once into the overview via `<Story>` in the MDX (the one thing prose can't

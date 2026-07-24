@@ -395,7 +395,9 @@ function getCatchAllReplacements() {
        */
       pattern: /\*\*Examples\*\* ((?:`[^`]+`)(?: `[^`]+`)*)/g,
       replace: (/** @type {string} */ _match, /** @type {string} */ capturedGroup) => {
-        return `Examples: ${capturedGroup.split(' ').join(', ')}.`;
+        // Match backtick-delimited examples individually; splitting on ' ' breaks examples with internal spaces.
+        const examples = capturedGroup.match(/`[^`]+`/g) ?? [];
+        return `Examples: ${examples.join(', ')}.`;
       },
     },
   ];

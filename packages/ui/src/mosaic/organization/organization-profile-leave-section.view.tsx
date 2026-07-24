@@ -21,12 +21,7 @@ export function OrganizationProfileLeaveSectionView({
   const isLeaving = snapshot.value === 'leaving';
 
   return (
-    <Box
-      sx={t => ({
-        width: '100%',
-        containerType: 'inline-size',
-      })}
-    >
+    <Box sx={{ width: '100%', containerType: 'inline-size' }}>
       <Box
         sx={t => ({
           display: 'flex',
@@ -66,9 +61,7 @@ export function OrganizationProfileLeaveSectionView({
             <Button
               intent='destructive'
               {...props}
-              sx={{
-                flexShrink: 0,
-              }}
+              style={{ flexShrink: 0 }}
             >
               Leave organization
             </Button>

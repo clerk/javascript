@@ -1,11 +1,12 @@
 import React from 'react';
 
+import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
+import { Add } from '@/icons';
+
 import { descriptors, localizationKeys } from '../../customizables';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
-import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
-import { Add } from '@/icons';
 
 export interface OrganizationActionListProps extends UserMembershipListProps {
   onCreateOrganizationClick: React.MouseEventHandler;

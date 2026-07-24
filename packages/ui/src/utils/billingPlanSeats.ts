@@ -61,13 +61,19 @@ export type SeatChargeSummary = {
  * Returns `{ totalSeats, included, paidTier }` otherwise.
  */
 export const summarizeSeatCharges = (seatsTotal: BillingPerUnitTotal | null | undefined): SeatChargeSummary | null => {
-  if (!seatsTotal) return null;
+  if (!seatsTotal) {
+    return null;
+  }
   const paidTier = seatsTotal.tiers.find(tier => tier.feePerBlock.amount > 0);
-  if (!paidTier) return null;
+  if (!paidTier) {
+    return null;
+  }
   let totalSeats = 0;
   let included = 0;
   for (const tier of seatsTotal.tiers) {
-    if (tier.quantity === null) continue;
+    if (tier.quantity === null) {
+      continue;
+    }
     totalSeats += tier.quantity;
     if (tier.feePerBlock.amount === 0) {
       included += tier.quantity;

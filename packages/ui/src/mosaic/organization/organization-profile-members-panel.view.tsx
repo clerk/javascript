@@ -151,7 +151,7 @@ export function OrganizationProfileMembersPanelView({
           type='submit'
           variant='outline'
           size='sm'
-          sx={{ flexShrink: 0 }}
+          style={{ flexShrink: 0 }}
         >
           Search
         </Button>

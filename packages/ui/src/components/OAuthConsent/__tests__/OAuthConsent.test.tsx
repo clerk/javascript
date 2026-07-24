@@ -542,4 +542,31 @@ describe('OAuthConsent', () => {
       });
     });
   });
+
+  it('renders the branded logo badge for a recognized client with no uploaded logo', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({
+        ...fakeConsentInfo,
+        oauthApplicationName: 'Claude',
+        oauthApplicationLogoUrl: '',
+        redirectDomain: 'claude.ai',
+      }),
+    });
+
+    const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Claude')).toBeVisible();
+      const icon = baseElement.querySelector('.cl-logoGroupIcon');
+      expect(icon).not.toBeNull();
+      // The brand mark conveys which app is requesting access, so it needs an accessible name.
+      expect(icon).toHaveAttribute('role', 'img');
+      expect(icon).toHaveAttribute('aria-label', 'Claude');
+    });
+  });
 });
