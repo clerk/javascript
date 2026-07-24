@@ -8,6 +8,8 @@ export { Button } from '../components/button';
 export type { ButtonProps } from '../components/button';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
+export { Icon } from '../components/icon';
+export type { IconProps } from '../components/icon';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 

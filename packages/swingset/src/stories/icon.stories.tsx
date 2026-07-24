@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { IconProps } from '@clerk/ui/mosaic/components/icon';
-import { Icon, iconRecipe } from '@clerk/ui/mosaic/components/icon';
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
 import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 
@@ -10,11 +10,21 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './icon.stories?raw';
 
+// StyleX has no runtime recipe to derive knobs from, so the variant surface is described
+// here to drive the playground + prop table. Keys mirror `IconProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Icon',
-  source: 'packages/ui/src/mosaic/components/icon.tsx',
-  styles: iconRecipe,
+  source: 'packages/ui/src/mosaic/components/icon/icon.tsx',
+  styleEngine: 'stylex',
+  styles: {
+    _variants: {
+      size: { sm: {}, md: {}, lg: {} },
+    },
+    _defaultVariants: {
+      size: 'md',
+    },
+  },
 };
 
 // Story functions accept Record<string,unknown> (knob values) and cast to IconProps.
@@ -78,8 +88,8 @@ export function Override() {
   return (
     <MosaicProvider
       appearance={{
-        // Overrides are elements now, not render functions: Mosaic injects its sizing className and
-        // `data-cl-slot` into the element via cloneElement, so the replacement only needs its viewBox
+        // Overrides are elements, not render functions: Mosaic injects its sizing className and
+        // `data-size` into the element via cloneElement, so the replacement only needs its viewBox
         // + paths. Passing an element (vs a function) also lets overrides be supplied from a Server
         // Component, since elements serialize across the RSC boundary.
         icons: {
