@@ -1,9 +1,9 @@
 import type React from 'react';
 import { describe, expectTypeOf, test } from 'vitest';
 
-import type { ComponentProps } from './render-element';
+import type { ComponentProps } from './use-render';
 
-describe('render-element', () => {
+describe('use-render', () => {
   test('render prop arg is narrowed to the element tag props, not the generic HTMLAttributes<HTMLElement>', () => {
     type Props = ComponentProps<'button'>;
     type RenderArg = NonNullable<Props['render']> extends (props: infer P) => React.ReactElement ? P : never;

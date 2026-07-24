@@ -1,6 +1,6 @@
 'use client';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadContext, useFileUploadItemContext } from './file-upload-context';
 
 export type FileUploadItemDeleteProps = ComponentProps<'button'>;
@@ -13,7 +13,6 @@ export function FileUploadItemDelete(props: FileUploadItemDeleteProps) {
   const state = { disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-item-delete',
     type: 'button' as const,
     disabled,
     onClick: () => {
@@ -23,12 +22,12 @@ export function FileUploadItemDelete(props: FileUploadItemDeleteProps) {
     },
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
     state,
     stateAttributesMapping: {
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });

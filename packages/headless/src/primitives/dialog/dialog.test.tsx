@@ -36,7 +36,7 @@ describe('Dialog', () => {
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
+      expect(trigger).toHaveAttribute('data-open', '');
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
@@ -47,7 +47,7 @@ describe('Dialog', () => {
       await user.keyboard('{Escape}');
 
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('closes via Close button', async () => {
@@ -58,7 +58,7 @@ describe('Dialog', () => {
       await user.click(closeBtn);
 
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -124,31 +124,31 @@ describe('Dialog', () => {
       expect(screen.queryByTestId('dialog-backdrop')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on popup when open', async () => {
+    it('applies data-open on popup when open', async () => {
       const user = userEvent.setup();
       renderDialog();
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      expect(screen.getByRole('dialog')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open', '');
     });
 
-    it('applies data-cl-open on backdrop when open', async () => {
+    it('applies data-open on backdrop when open', async () => {
       const user = userEvent.setup();
       renderDialog();
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      expect(screen.getByTestId('dialog-backdrop')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByTestId('dialog-backdrop')).toHaveAttribute('data-open', '');
     });
 
-    it('applies data-cl-open on viewport when open', async () => {
+    it('applies data-open on viewport when open', async () => {
       const user = userEvent.setup();
       renderDialog();
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-      expect(screen.getByTestId('dialog-viewport')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByTestId('dialog-viewport')).toHaveAttribute('data-open', '');
     });
 
     it('viewport is not rendered when closed', () => {
@@ -196,17 +196,17 @@ describe('Dialog', () => {
   });
 
   describe('trigger state attributes', () => {
-    it('trigger has data-cl-closed when dialog is hidden', () => {
+    it('trigger has data-closed when dialog is hidden', () => {
       renderDialog();
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
-    it('trigger has data-cl-open when dialog is visible', () => {
+    it('trigger has data-open when dialog is visible', () => {
       renderDialog({ defaultOpen: true });
       // When modal is open, the trigger's container gets aria-hidden, so query by test id.
       const trigger = screen.getByTestId('dialog-trigger');
-      expect(trigger).toHaveAttribute('data-cl-open', '');
+      expect(trigger).toHaveAttribute('data-open', '');
     });
   });
 
