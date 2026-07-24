@@ -310,6 +310,50 @@ value, sub-pattern A collapses it to a single `--var` atom; reach for a raw inli
 > values, and even then the first move is usually to write a single `--cl`/`--_cl`
 > var rather than a raw inline style.
 
+**Every condition is a value key, never a top-level object.** A pseudo/at-rule
+goes _inside_ the property it modifies (`transitionProperty: { default: …, '@media …': … }`),
+not as a bare key on the style object. A top-level `'@media …': { … }` block is
+legacy syntax and the `@stylexjs/no-legacy-contextual-styles` +
+`@stylexjs/valid-styles` rules reject it (only `::before`/`::after` may sit at the
+top level). Reduced-motion is the common case:
+
+```ts
+transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'none' },
+```
+
+### Reacting to `data-*` state (the headless-transition case)
+
+Headless primitives drive animation off `data-*` attributes — e.g. the popover
+popup carries its own `data-starting-style` (entering frame) and
+`data-ending-style` (exiting). You can style off these in StyleX; it depends on
+_whose_ attribute you're reading:
+
+- **The element's own attribute → wrap in `:where(...)`.** Conditional keys must
+  start with `:` or `@`, so a bare `[data-*]` is rejected — but `:where([data-*])`
+  is a valid pseudo-class string that matches the same element (zero specificity;
+  StyleX self-doubles the atom class so the conditional still wins):
+
+  ```ts
+  popup: {
+    opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
+    transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.98)' },
+    transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'none' },
+    transitionDuration: '150ms',
+  },
+  ```
+
+- **Another element's attribute → `stylex.when.*`.** For relational state use
+  `stylex.when.ancestor(sel)` / `.descendant(sel)` / `.siblingBefore(sel)` /
+  `.siblingAfter(sel)` / `.anySibling(sel)`, each taking a `:${string}` or
+  `[${string}]` selector and returning a valid conditional key
+  (`:where-ancestor(...)` etc.). Use this when a parent/sibling owns the state
+  (e.g. a `[data-open]` container theming its children); use `:where([data-*])`
+  when the element owns it.
+
+So: `:where(...)` for self-state, `stylex.when.*` for relational state. Both
+compile to real attribute selectors in `styles.css`, so animation stays
+CSS-native — no JS state plumbing through the component.
+
 ## Public contract & composition (`props.ts`)
 
 The element carries three things, and nothing else is a contract:
@@ -367,7 +411,8 @@ token colors aren't down-leveled into an invalid polyfill.
   `::before`/`::after`/`::backdrop`, `@starting-style` (enter animations),
   `stylex.keyframes(...)`, `anchor-size(width|height)` (popover/menu matching its
   trigger), CSS counters, `@media (hover: hover)` / `(prefers-reduced-motion)` /
-  `(pointer: coarse)`.
+  `(pointer: coarse)`, `data-*` state via `:where([data-*])` (self) or
+  `stylex.when.*` (relational) — see "Reacting to `data-*` state" above.
 - Prefer CSS-native solutions over JS workarounds for anything StyleX supports.
 - Avoid manual `@layer` / `@property` inside `create` (StyleX owns layering;
   `@property` compiles but emits invalid output).
