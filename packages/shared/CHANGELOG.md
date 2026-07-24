@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.25.8
+
+### Patch Changes
+
+- Internal plumbing to support `@clerk/ui` composed `UserProfile` / `OrganizationProfile` subcomponents. ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.25.7
 
 ### Patch Changes
