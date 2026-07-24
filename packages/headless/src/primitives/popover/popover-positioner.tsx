@@ -28,8 +28,7 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
     const side = placement.split('-')[0];
 
     const ownProps = {
-      'data-cl-slot': 'popover-positioner',
-      'data-cl-side': side,
+      'data-side': side,
       style: floatingStyles,
       ...(hasTitle && { 'aria-labelledby': labelId }),
       ...(hasDescription && { 'aria-describedby': descriptionId }),

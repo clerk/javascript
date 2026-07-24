@@ -12,7 +12,6 @@ export const TooltipPopup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(
   const { popupRef, transitionProps } = useTooltipContext();
 
   const defaultProps = {
-    'data-cl-slot': 'tooltip-popup',
     ...transitionProps,
   };
 

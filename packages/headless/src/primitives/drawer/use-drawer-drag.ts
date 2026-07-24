@@ -19,7 +19,7 @@ export interface UseDrawerDragOptions {
   open: boolean;
   /** When true (default), a downward release past threshold closes the drawer. */
   dismissible: boolean;
-  /** When true, only a press starting on `[data-cl-drawer-handle]` drags. */
+  /** When true, only a press starting on `[data-drawer-handle]` drags. */
   handleOnly: boolean;
   snapPoints?: number[];
   snap: SnapController | null;

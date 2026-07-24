@@ -45,7 +45,7 @@ function DrawerFixture(props: Partial<React.ComponentProps<typeof Drawer.Root>> 
             <div data-testid='scrollable'>scrollable content</div>
             <button
               type='button'
-              data-cl-drawer-no-drag
+              data-drawer-no-drag
               data-testid='nodrag'
             >
               No drag
@@ -238,7 +238,7 @@ describe('Drawer', () => {
       const trigger = screen.getByRole('button', { name: 'Open drawer' });
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
+      expect(trigger).toHaveAttribute('data-open', '');
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
@@ -248,7 +248,7 @@ describe('Drawer', () => {
 
       await user.keyboard('{Escape}');
 
-      expect(screen.getByTestId('trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('closes via Close button', async () => {
@@ -257,7 +257,7 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
-      expect(screen.getByTestId('trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -370,7 +370,7 @@ describe('Drawer', () => {
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(handle.isOpen).toBe(true);
-      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-open', '');
     });
 
     it('handle.close() closes the drawer and updates the trigger', async () => {
@@ -382,7 +382,7 @@ describe('Drawer', () => {
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
       expect(handle.isOpen).toBe(false);
-      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByTestId('ext-trigger')).toHaveAttribute('data-closed', '');
     });
 
     it('fires onOpenChange for handle-driven transitions', async () => {
@@ -438,15 +438,15 @@ describe('Drawer', () => {
       expect(popup).toHaveAttribute('aria-describedby', desc.getAttribute('id'));
     });
 
-    it('applies data-cl-open on popup, backdrop and viewport when open', async () => {
+    it('applies data-open on popup, backdrop and viewport when open', async () => {
       const user = userEvent.setup();
       render(<DrawerFixture />);
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
-      expect(screen.getByRole('dialog')).toHaveAttribute('data-cl-open', '');
-      expect(screen.getByTestId('backdrop')).toHaveAttribute('data-cl-open', '');
-      expect(screen.getByTestId('viewport')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open', '');
+      expect(screen.getByTestId('backdrop')).toHaveAttribute('data-open', '');
+      expect(screen.getByTestId('viewport')).toHaveAttribute('data-open', '');
     });
   });
 
@@ -578,11 +578,11 @@ describe('Drawer', () => {
       clock.t += 50;
       fireEvent.pointerMove(popup, { pointerId: 1, clientY: 50 });
 
-      expect(popup).toHaveAttribute('data-cl-swiping', '');
+      expect(popup).toHaveAttribute('data-swiping', '');
       expect(swipeProgress(popup)).toBe('0.125'); // 50 / 400
 
       fireEvent.pointerUp(popup, { pointerId: 1, clientY: 50 });
-      expect(popup).not.toHaveAttribute('data-cl-swiping');
+      expect(popup).not.toHaveAttribute('data-swiping');
     });
 
     it('rubber-bands upward over-drag without ever moving the sheet downward', () => {
@@ -653,7 +653,7 @@ describe('Drawer', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
-    it('does not drag from a [data-cl-drawer-no-drag] subtree', () => {
+    it('does not drag from a [data-drawer-no-drag] subtree', () => {
       const onOpenChange = vi.fn();
       render(
         <DrawerFixture
@@ -923,8 +923,8 @@ describe('Drawer', () => {
       );
       const popup = screen.getByRole('dialog');
       expect(snapOffset(popup)).toBe('0px');
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
-      expect(popup).toHaveAttribute('data-cl-expanded', '');
+      expect(popup).toHaveAttribute('data-snap', '1');
+      expect(popup).toHaveAttribute('data-expanded', '');
     });
 
     it('positions at a controlled activeSnapPoint', () => {
@@ -937,8 +937,8 @@ describe('Drawer', () => {
       );
       const popup = screen.getByRole('dialog');
       expect(snapOffset(popup)).toBe('400px');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
-      expect(popup).not.toHaveAttribute('data-cl-expanded');
+      expect(popup).toHaveAttribute('data-snap', '0');
+      expect(popup).not.toHaveAttribute('data-expanded');
     });
 
     it('settles to the closest snap point on a slow release', () => {
@@ -957,7 +957,7 @@ describe('Drawer', () => {
 
       expect(onActiveSnapPointChange).toHaveBeenCalledWith(0);
       expect(snapOffset(popup)).toBe('400px');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
     });
 
     it('fast upward flick steps to the next-higher snap point', () => {
@@ -1066,7 +1066,7 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).not.toHaveAttribute('data-cl-snap');
+      expect(popup).not.toHaveAttribute('data-snap');
       expect(snapOffset(popup)).toBe('');
     });
 
@@ -1079,7 +1079,7 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // clamped to lastIndex, not NaN
+      expect(popup).toHaveAttribute('data-snap', '1'); // clamped to lastIndex, not NaN
       expect(snapOffset(popup)).toBe('0px');
     });
   });
@@ -1098,16 +1098,16 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
       let popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       drag(popup, 0, 260, 300); // settle to snap 0 (closest to offset(0) = 400)
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       await user.keyboard('{Escape}');
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
       popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // reset to the default
+      expect(popup).toHaveAttribute('data-snap', '1'); // reset to the default
       expect(snapOffset(popup)).toBe('0px');
     });
 
@@ -1122,16 +1122,16 @@ describe('Drawer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
       let popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       drag(popup, 400, 0, 300); // move up to snap 1
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       await user.keyboard('{Escape}');
       await user.click(screen.getByRole('button', { name: 'Open drawer' }));
 
       popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0'); // back to the provided default
+      expect(popup).toHaveAttribute('data-snap', '0'); // back to the provided default
     });
 
     it('does not reset the snap point when a close is canceled', async () => {
@@ -1147,15 +1147,15 @@ describe('Drawer', () => {
         />,
       );
       const popup = screen.getByRole('dialog');
-      expect(popup).toHaveAttribute('data-cl-snap', '0');
+      expect(popup).toHaveAttribute('data-snap', '0');
 
       drag(popup, 400, 0, 300); // move up to snap 1
-      expect(popup).toHaveAttribute('data-cl-snap', '1');
+      expect(popup).toHaveAttribute('data-snap', '1');
 
       await user.keyboard('{Escape}');
 
       expect(onOpenChange).toHaveBeenCalledWith(false); // the consumer was asked to close
-      expect(popup).toHaveAttribute('data-cl-snap', '1'); // but the snap point was not reset
+      expect(popup).toHaveAttribute('data-snap', '1'); // but the snap point was not reset
     });
   });
 
@@ -1346,16 +1346,16 @@ describe('Drawer', () => {
       render(<NestedFixture />);
 
       const parentPopup = screen.getByRole('dialog'); // only the parent is open initially
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
 
       await user.click(screen.getByRole('button', { name: 'Open child' }));
 
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('1');
 
       const childPopup = screen.getByText('Child drawer').closest('[role="dialog"]');
-      expect(childPopup).toHaveAttribute('data-cl-nested', '');
-      expect(parentPopup).toHaveAttribute('data-cl-open', ''); // parent survives the child opening
+      expect(childPopup).toHaveAttribute('data-nested', '');
+      expect(parentPopup).toHaveAttribute('data-open', ''); // parent survives the child opening
     });
 
     it('clears the parent nested-open state when the child closes', async () => {
@@ -1364,11 +1364,11 @@ describe('Drawer', () => {
 
       const parentPopup = screen.getByRole('dialog');
       await user.click(screen.getByRole('button', { name: 'Open child' }));
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
 
       await user.click(screen.getByRole('button', { name: 'Close child' }));
 
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
     });
 
@@ -1383,7 +1383,7 @@ describe('Drawer', () => {
 
       expect(screen.getByText('Inner dialog')).toBeInTheDocument();
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open');
     });
 
     function getChildPopup() {
@@ -1407,16 +1407,16 @@ describe('Drawer', () => {
       clock.t += 50;
       fireEvent.pointerMove(childPopup, { pointerId: 1, clientY: 200 }); // 200 / 400 = 0.5
 
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-swiping', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-swiping', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0.5');
 
       // Fast, past-threshold release = dismiss. The parent settles toward full (1),
       // the same direction the open-count drop takes it, so the styled scale never
       // jumps backward.
       fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 200 });
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-swiping');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('1');
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-open'); // child dismissed
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-open'); // child dismissed
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('0');
     });
 
@@ -1437,9 +1437,9 @@ describe('Drawer', () => {
       // Small, slow release = snap back. The child stays open, so the parent
       // returns to its scaled-back rest (0) and remains nested-open.
       fireEvent.pointerUp(childPopup, { pointerId: 1, clientY: 40 });
-      expect(parentPopup).not.toHaveAttribute('data-cl-nested-drawer-swiping');
+      expect(parentPopup).not.toHaveAttribute('data-nested-drawer-swiping');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedCount)).toBe('1');
     });
 
@@ -1462,7 +1462,7 @@ describe('Drawer', () => {
       // Opening the next child must re-scale the parent, not leave it parked at 1.
       await user.click(screen.getByRole('button', { name: 'Open child' }));
       expect(parentPopup.style.getPropertyValue(DrawerCssVars.nestedDragProgress)).toBe('0');
-      expect(parentPopup).toHaveAttribute('data-cl-nested-drawer-open', '');
+      expect(parentPopup).toHaveAttribute('data-nested-drawer-open', '');
     });
 
     it('clamps the reported nested progress to the 0..1 range', async () => {

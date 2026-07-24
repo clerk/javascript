@@ -13,7 +13,6 @@ export const AutocompletePopup = React.forwardRef<HTMLDivElement, AutocompletePo
     const { popupRef, transitionProps } = useAutocompleteContext();
 
     const defaultProps = {
-      'data-cl-slot': 'autocomplete-popup',
       ...transitionProps,
     };
 

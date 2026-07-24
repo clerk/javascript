@@ -44,7 +44,6 @@ export function SelectOption(props: SelectOptionProps) {
   };
 
   const ownProps = {
-    'data-cl-slot': 'select-option',
     type: 'button',
     role: 'option',
     'aria-selected': isSelected,
@@ -68,9 +67,9 @@ export function SelectOption(props: SelectOptionProps) {
     render,
     state,
     stateAttributesMapping: {
-      selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
-      active: (v: boolean) => (v ? { 'data-cl-active': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+      active: (v: boolean) => (v ? { 'data-active': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     ref: [itemRef, isSelected ? selectedItemRef : null],
     props: mergeProps<'button'>(defaultProps, otherProps),

@@ -12,7 +12,6 @@ export function FileUploadTrigger(props: FileUploadTriggerProps) {
   const state = { disabled };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-trigger',
     type: 'button' as const,
     disabled,
     onClick: () => openFilePicker(),
@@ -23,7 +22,7 @@ export function FileUploadTrigger(props: FileUploadTriggerProps) {
     render,
     state,
     stateAttributesMapping: {
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: mergeProps<'button'>(defaultProps, otherProps),
   });

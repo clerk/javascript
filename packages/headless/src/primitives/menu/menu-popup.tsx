@@ -12,7 +12,6 @@ export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(functi
   const { popupRef, transitionProps } = useMenuContext();
 
   const defaultProps = {
-    'data-cl-slot': 'menu-popup',
     ...transitionProps,
   };
 

@@ -21,9 +21,7 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
-    const ownProps = {
-      'data-cl-slot': 'autocomplete-list',
-    } satisfies DefaultProps<'div'>;
+    const ownProps = {} satisfies DefaultProps<'div'>;
 
     const defaultProps = { ...ownProps, ...floatingProps };
 

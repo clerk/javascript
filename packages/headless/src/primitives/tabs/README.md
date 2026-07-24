@@ -115,16 +115,15 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                | Applies To   | Description                                           |
-| ------------------------ | ------------ | ----------------------------------------------------- |
-| `data-cl-slot`           | All parts    | Part identifier (e.g. `"tabs-tab"`, `"tabs-trigger"`) |
-| `data-cl-selected`       | Tab, Trigger | Active tab                                            |
-| `data-cl-disabled`       | Tab, Trigger | Disabled tab                                          |
-| `data-cl-hidden`         | Panel        | Inactive panel                                        |
-| `data-cl-open`           | Panel        | Selected panel (when `shouldForceMount`)              |
-| `data-cl-closed`         | Panel        | Deselected panel (when `shouldForceMount`)            |
-| `data-cl-starting-style` | Panel        | Enter animation frame (when `shouldForceMount`)       |
-| `data-cl-ending-style`   | Panel        | Exit animation frame (when `shouldForceMount`)        |
+| Attribute             | Applies To   | Description                                     |
+| --------------------- | ------------ | ----------------------------------------------- |
+| `data-selected`       | Tab, Trigger | Active tab                                      |
+| `data-disabled`       | Tab, Trigger | Disabled tab                                    |
+| `data-hidden`         | Panel        | Inactive panel                                  |
+| `data-open`           | Panel        | Selected panel (when `shouldForceMount`)        |
+| `data-closed`         | Panel        | Deselected panel (when `shouldForceMount`)      |
+| `data-starting-style` | Panel        | Enter animation frame (when `shouldForceMount`) |
+| `data-ending-style`   | Panel        | Exit animation frame (when `shouldForceMount`)  |
 
 ## CSS Variables
 
@@ -142,7 +141,7 @@ No additional props beyond standard HTML attributes and the `render` prop.
 Use these to animate the indicator:
 
 ```css
-[data-cl-slot='tabs-indicator'] {
+.cl-tabs-indicator {
   position: absolute;
   left: var(--cl-tab-left);
   width: var(--cl-tab-width);
@@ -165,20 +164,20 @@ When `shouldForceMount` is set, panels expose a direction variable for direction
 Use this to drive directional slide animations:
 
 ```css
-[data-cl-slot='tabs-panel'] {
+.cl-tabs-panel {
   --_direction: var(--cl-tab-transition-direction, 1);
   transition:
     opacity 200ms,
     translate 200ms;
 }
-[data-cl-slot='tabs-panel'][data-cl-starting-style],
-[data-cl-slot='tabs-panel'][data-cl-ending-style] {
+.cl-tabs-panel[data-starting-style],
+.cl-tabs-panel[data-ending-style] {
   opacity: 0;
 }
-[data-cl-slot='tabs-panel'][data-cl-starting-style] {
+.cl-tabs-panel[data-starting-style] {
   translate: calc(var(--_direction) * 8px) 0;
 }
-[data-cl-slot='tabs-panel'][data-cl-ending-style] {
+.cl-tabs-panel[data-ending-style] {
   translate: calc(var(--_direction) * -8px) 0;
 }
 ```

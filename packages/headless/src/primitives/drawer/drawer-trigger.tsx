@@ -64,7 +64,7 @@ export const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerPr
       ref: finalRef,
       state: { open },
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });

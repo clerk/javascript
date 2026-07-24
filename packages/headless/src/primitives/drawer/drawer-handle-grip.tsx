@@ -9,7 +9,7 @@ import { DrawerAttrs } from './css-vars';
 export type DrawerHandleProps = ComponentProps<'div'>;
 
 /**
- * The visual drag grip. Carries `data-cl-drawer-handle`, which is also the
+ * The visual drag grip. Carries `data-drawer-handle`, which is also the
  * hit-test target when `Drawer.Root` has `handleOnly`. It is presentational by
  * default (no ARIA role) so it does not add a nameless control to the
  * accessibility tree — keyboard users dismiss via `Escape` / `Drawer.Close`.

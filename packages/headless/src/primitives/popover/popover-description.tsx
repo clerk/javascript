@@ -17,7 +17,6 @@ export function PopoverDescription(props: PopoverDescriptionProps) {
   }, [setHasDescription]);
 
   const defaultProps = {
-    'data-cl-slot': 'popover-description',
     id: descriptionId,
   };
 

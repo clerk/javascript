@@ -99,10 +99,9 @@ The Mosaic dialog exposes the following slots that can be styled via `appearance
 Override per slot through `appearance.elements` — e.g. `{ 'dialog-popup': { borderRadius: 24 } }`.
 State attributes from the headless layer are also available for CSS targeting:
 
-| Attribute                | Applies To                         | Description                       |
-| ------------------------ | ---------------------------------- | --------------------------------- |
-| `data-cl-slot`           | All parts                          | Part identifier                   |
-| `data-cl-open`           | Trigger, Backdrop, Viewport, Popup | Present when the dialog is open   |
-| `data-cl-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (during exit) |
-| `data-cl-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame     |
-| `data-cl-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation |
+| Attribute             | Applies To                         | Description                       |
+| --------------------- | ---------------------------------- | --------------------------------- |
+| `data-open`           | Trigger, Backdrop, Viewport, Popup | Present when the dialog is open   |
+| `data-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (during exit) |
+| `data-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame     |
+| `data-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation |

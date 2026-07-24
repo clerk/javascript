@@ -127,13 +127,12 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 
 ## Data Attributes
 
-| Attribute                         | Applies To        | Description                          |
-| --------------------------------- | ----------------- | ------------------------------------ |
-| `data-cl-slot`                    | All parts         | Part identifier (e.g. `"menu-item"`) |
-| `data-cl-open` / `data-cl-closed` | Trigger           | Menu open state                      |
-| `data-cl-active`                  | Item              | Keyboard-focused item                |
-| `data-cl-disabled`                | Item              | Disabled item                        |
-| `data-cl-side`                    | Positioner, Arrow | Resolved placement side              |
+| Attribute                   | Applies To        | Description             |
+| --------------------------- | ----------------- | ----------------------- |
+| `data-open` / `data-closed` | Trigger           | Menu open state         |
+| `data-active`               | Item              | Keyboard-focused item   |
+| `data-disabled`             | Item              | Disabled item           |
+| `data-side`                 | Positioner, Arrow | Resolved placement side |
 
 ## Nested Menu Behavior
 
@@ -144,7 +143,7 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 
 ## Important Notes
 
-- **No built-in animations.** The positioner simply mounts/unmounts. Use `data-cl-open`/`data-cl-closed` for CSS-driven transitions.
+- **No built-in animations.** The positioner simply mounts/unmounts. Use `data-open`/`data-closed` for CSS-driven transitions.
 - **Disabled items use `aria-disabled`, not `disabled`.** They remain focusable for keyboard users.
 - **`label` is required on `Menu.Item`** — it drives typeahead matching. Disabled items are excluded from typeahead.
 

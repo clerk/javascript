@@ -12,12 +12,12 @@ function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>>
   return render(
     <Popover.Root {...props}>
       <Popover.Trigger>Open popover</Popover.Trigger>
-      <Popover.Positioner>
-        <Popover.Popup>
-          <Popover.Title>Popover Title</Popover.Title>
-          <Popover.Description>Some description</Popover.Description>
+      <Popover.Positioner data-testid='popover-positioner'>
+        <Popover.Popup data-testid='popover-popup'>
+          <Popover.Title data-testid='popover-title'>Popover Title</Popover.Title>
+          <Popover.Description data-testid='popover-description'>Some description</Popover.Description>
           <p>Popover content</p>
-          <Popover.Close>Close</Popover.Close>
+          <Popover.Close data-testid='popover-close'>Close</Popover.Close>
         </Popover.Popup>
       </Popover.Positioner>
     </Popover.Root>,
@@ -25,24 +25,6 @@ function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>>
 }
 
 describe('Popover', () => {
-  describe('slot attributes', () => {
-    it('renders trigger with data-cl-slot', () => {
-      renderPopover();
-      const trigger = screen.getByRole('button', { name: 'Open popover' });
-      expect(trigger).toHaveAttribute('data-cl-slot', 'popover-trigger');
-    });
-
-    it('renders all parts with correct slot attributes when open', () => {
-      renderPopover({ defaultOpen: true });
-
-      expect(document.querySelector('[data-cl-slot="popover-positioner"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="popover-popup"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="popover-title"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="popover-description"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="popover-close"]')).toBeInTheDocument();
-    });
-  });
-
   describe('open/close', () => {
     it('opens on trigger click', async () => {
       const user = userEvent.setup();
@@ -51,8 +33,8 @@ describe('Popover', () => {
       const trigger = screen.getByRole('button', { name: 'Open popover' });
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
-      expect(document.querySelector('[data-cl-slot="popover-popup"]')).toBeInTheDocument();
+      expect(trigger).toHaveAttribute('data-open', '');
+      expect(document.querySelector('[data-testid="popover-popup"]')).toBeInTheDocument();
     });
 
     it('closes on trigger click when open', async () => {
@@ -63,7 +45,7 @@ describe('Popover', () => {
       await user.click(trigger);
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('closes on Escape', async () => {
@@ -73,7 +55,7 @@ describe('Popover', () => {
       await user.keyboard('{Escape}');
 
       const trigger = screen.getByRole('button', { name: 'Open popover' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('closes via Close button', async () => {
@@ -84,7 +66,7 @@ describe('Popover', () => {
       await user.click(closeBtn);
 
       const trigger = screen.getByRole('button', { name: 'Open popover' });
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -102,11 +84,11 @@ describe('Popover', () => {
       const user = userEvent.setup();
       renderPopover({ defaultOpen: true });
 
-      expect(document.querySelector('[data-cl-slot="popover-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="popover-popup"]')).toBeInTheDocument();
 
       await user.click(document.body);
 
-      expect(document.querySelector('[data-cl-slot="popover-popup"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="popover-popup"]')).not.toBeInTheDocument();
     });
   });
 
@@ -114,7 +96,7 @@ describe('Popover', () => {
     it('respects controlled open prop', () => {
       renderPopover({ open: true });
 
-      expect(document.querySelector('[data-cl-slot="popover-positioner"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="popover-positioner"]')).toBeInTheDocument();
     });
 
     it('does not open when controlled open is false', async () => {
@@ -123,7 +105,7 @@ describe('Popover', () => {
 
       await user.click(screen.getByRole('button', { name: 'Open popover' }));
 
-      expect(document.querySelector('[data-cl-slot="popover-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="popover-positioner"]')).not.toBeInTheDocument();
     });
   });
 
@@ -131,8 +113,8 @@ describe('Popover', () => {
     it('positioner has aria-labelledby linked to title', () => {
       renderPopover({ defaultOpen: true });
 
-      const title = document.querySelector('[data-cl-slot="popover-title"]');
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const title = document.querySelector('[data-testid="popover-title"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
 
       expect(title).toHaveAttribute('id');
       expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
@@ -141,8 +123,8 @@ describe('Popover', () => {
     it('positioner has aria-describedby linked to description', () => {
       renderPopover({ defaultOpen: true });
 
-      const desc = document.querySelector('[data-cl-slot="popover-description"]');
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const desc = document.querySelector('[data-testid="popover-description"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
 
       expect(desc).toHaveAttribute('id');
       expect(positioner).toHaveAttribute('aria-describedby', desc?.getAttribute('id'));
@@ -158,9 +140,9 @@ describe('Popover', () => {
       // their public props) — the aria pairing must always resolve correctly.
       renderPopover({ defaultOpen: true });
 
-      const title = document.querySelector('[data-cl-slot="popover-title"]');
-      const desc = document.querySelector('[data-cl-slot="popover-description"]');
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const title = document.querySelector('[data-testid="popover-title"]');
+      const desc = document.querySelector('[data-testid="popover-description"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
 
       expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
       expect(positioner).toHaveAttribute('aria-describedby', desc?.getAttribute('id'));
@@ -174,7 +156,7 @@ describe('Popover', () => {
       render(
         <Popover.Root defaultOpen>
           <Popover.Trigger>Open popover</Popover.Trigger>
-          <Popover.Positioner>
+          <Popover.Positioner data-testid='popover-positioner'>
             <Popover.Popup>
               <p>Popover content</p>
             </Popover.Popup>
@@ -182,7 +164,7 @@ describe('Popover', () => {
         </Popover.Root>,
       );
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
       expect(positioner).not.toHaveAttribute('aria-labelledby');
       expect(positioner).not.toHaveAttribute('aria-describedby');
     });
@@ -191,17 +173,17 @@ describe('Popover', () => {
       render(
         <Popover.Root defaultOpen>
           <Popover.Trigger>Open popover</Popover.Trigger>
-          <Popover.Positioner>
+          <Popover.Positioner data-testid='popover-positioner'>
             <Popover.Popup>
-              <Popover.Title>Popover Title</Popover.Title>
+              <Popover.Title data-testid='popover-title'>Popover Title</Popover.Title>
               <p>Popover content</p>
             </Popover.Popup>
           </Popover.Positioner>
         </Popover.Root>,
       );
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
-      const title = document.querySelector('[data-cl-slot="popover-title"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      const title = document.querySelector('[data-testid="popover-title"]');
       expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
       expect(positioner).not.toHaveAttribute('aria-describedby');
     });
@@ -210,27 +192,27 @@ describe('Popover', () => {
   describe('animation lifecycle', () => {
     it('positioner is not rendered when closed', () => {
       renderPopover();
-      expect(document.querySelector('[data-cl-slot="popover-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="popover-positioner"]')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on popup when open', async () => {
+    it('applies data-open on popup when open', async () => {
       const user = userEvent.setup();
       renderPopover();
 
       await user.click(screen.getByRole('button', { name: 'Open popover' }));
 
-      const popup = document.querySelector('[data-cl-slot="popover-popup"]');
-      expect(popup).toHaveAttribute('data-cl-open', '');
+      const popup = document.querySelector('[data-testid="popover-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
     });
 
-    it('positioner has data-cl-side', async () => {
+    it('positioner has data-side', async () => {
       const user = userEvent.setup();
       renderPopover();
 
       await user.click(screen.getByRole('button', { name: 'Open popover' }));
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
     });
   });
 
@@ -251,15 +233,15 @@ describe('Popover', () => {
     it('accepts custom placement', () => {
       renderPopover({ defaultOpen: true, placement: 'top-start' });
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side', 'top');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'top');
     });
 
     it('defaults to bottom placement', () => {
       renderPopover({ defaultOpen: true });
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side', 'bottom');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'bottom');
     });
   });
 
@@ -272,7 +254,7 @@ describe('Popover', () => {
       // FloatingFocusManager schedules focus via requestAnimationFrame
       await new Promise(r => requestAnimationFrame(r));
 
-      const positioner = document.querySelector('[data-cl-slot="popover-positioner"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
       expect(positioner?.contains(document.activeElement)).toBe(true);
     });
 
@@ -322,21 +304,6 @@ describe('Popover', () => {
       );
 
       expect(ref.current).toBeInstanceOf(HTMLButtonElement);
-      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-trigger');
-    });
-
-    it('forwards a consumer ref on Positioner (FloatingFocusManager wrapper shape)', () => {
-      const ref = createRef<HTMLDivElement>();
-      render(
-        <Popover.Root defaultOpen>
-          <Popover.Trigger>Open popover</Popover.Trigger>
-          <Popover.Positioner ref={ref}>
-            <Popover.Popup>content</Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Root>,
-      );
-
-      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-positioner');
     });
   });
 
@@ -355,7 +322,7 @@ describe('Popover', () => {
       );
 
       expect(ref.current).not.toBeNull();
-      expect(ref.current).toHaveAttribute('data-cl-slot', 'popover-arrow');
+      expect(ref.current).toHaveAttribute('data-side');
     });
   });
 });

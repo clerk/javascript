@@ -49,8 +49,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     });
 
     const ownProps = {
-      'data-cl-slot': 'select-positioner',
-      'data-cl-side': side,
+      'data-side': side,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 

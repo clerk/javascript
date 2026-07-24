@@ -12,7 +12,6 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
   const { popupRef, transitionProps } = useSelectContext();
 
   const defaultProps = {
-    'data-cl-slot': 'select-popup',
     ...transitionProps,
   };
 

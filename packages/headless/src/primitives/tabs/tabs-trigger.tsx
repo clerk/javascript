@@ -30,7 +30,6 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
   };
 
   const defaultProps = {
-    'data-cl-slot': 'tabs-trigger',
     id: tabId,
     role: 'tab' as const,
     type: 'button' as const,
@@ -55,8 +54,8 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
     ref: [triggerRef, ref],
     state,
     stateAttributesMapping: {
-      selected: (v: boolean) => (v ? { 'data-cl-selected': '' } : null),
-      disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+      selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
+      disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
     props: merged,
   });

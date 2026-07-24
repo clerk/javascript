@@ -95,13 +95,12 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
     const effectiveTransitionProps = !hasBeenClosed.current
       ? {
           ...transitionProps,
-          'data-cl-starting-style': undefined,
+          'data-starting-style': undefined,
           style: undefined,
         }
       : transitionProps;
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'collapsible-panel',
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
@@ -125,7 +124,7 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
       ref: [panelRef, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: merged,
     });

@@ -18,7 +18,6 @@ export function TabsList(props: TabsListProps) {
       orientation={orientation}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
-          'data-cl-slot': 'tabs-list',
           role: 'tablist' as const,
           onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
             if (event.key !== 'Home' && event.key !== 'End') {

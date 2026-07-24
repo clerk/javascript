@@ -20,9 +20,7 @@ export function FileUploadItem(props: FileUploadItemProps) {
 
   const state = { image: file.type.startsWith('image/') };
 
-  const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-item',
-  };
+  const defaultProps: Record<string, unknown> = {};
 
   return (
     <FileUploadItemContext.Provider value={itemContextValue}>
@@ -31,7 +29,7 @@ export function FileUploadItem(props: FileUploadItemProps) {
         render,
         state,
         stateAttributesMapping: {
-          image: (v: boolean) => (v ? { 'data-cl-image': '' } : null),
+          image: (v: boolean) => (v ? { 'data-image': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

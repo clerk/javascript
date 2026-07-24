@@ -73,12 +73,11 @@ All parts accept a `render` prop for polymorphic rendering and standard HTML att
 
 ## Data Attributes
 
-| Attribute          | Applies To           | Description                                  |
-| ------------------ | -------------------- | -------------------------------------------- |
-| `data-cl-slot`     | All parts            | Part identifier (e.g. `"collapsible-panel"`) |
-| `data-cl-open`     | Root, Trigger, Panel | Present when the panel is open               |
-| `data-cl-closed`   | Root, Trigger, Panel | Present when the panel is closed             |
-| `data-cl-disabled` | Root, Trigger        | Present when disabled                        |
+| Attribute       | Applies To           | Description                      |
+| --------------- | -------------------- | -------------------------------- |
+| `data-open`     | Root, Trigger, Panel | Present when the panel is open   |
+| `data-closed`   | Root, Trigger, Panel | Present when the panel is closed |
+| `data-disabled` | Root, Trigger        | Present when disabled            |
 
 ## CSS Animation
 
@@ -92,12 +91,12 @@ All parts accept a `render` prop for polymorphic rendering and standard HTML att
 Use these for height/width-based animations:
 
 ```css
-[data-cl-slot='collapsible-panel'] {
+.cl-collapsible-panel {
   overflow: hidden;
   height: var(--collapsible-panel-height);
   transition: height 200ms ease;
 }
-[data-cl-slot='collapsible-panel'][data-cl-closed] {
+.cl-collapsible-panel[data-closed] {
   height: 0;
 }
 ```

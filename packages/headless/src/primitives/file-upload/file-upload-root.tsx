@@ -137,7 +137,6 @@ export function FileUploadRoot(props: FileUploadProps) {
   const state = { disabled, empty: files.length === 0 };
 
   const defaultProps: Record<string, unknown> = {
-    'data-cl-slot': 'file-upload-root',
     children: (
       <>
         <input
@@ -152,7 +151,6 @@ export function FileUploadRoot(props: FileUploadProps) {
           // taken out of the tab order to avoid a redundant, unlabelled field.
           aria-hidden='true'
           tabIndex={-1}
-          data-cl-slot='file-upload-input'
           style={visuallyHiddenInputStyle}
           onChange={event => {
             const list = event.currentTarget.files;
@@ -175,8 +173,8 @@ export function FileUploadRoot(props: FileUploadProps) {
         render,
         state,
         stateAttributesMapping: {
-          disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
-          empty: (v: boolean) => (v ? { 'data-cl-empty': '' } : null),
+          disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
+          empty: (v: boolean) => (v ? { 'data-empty': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

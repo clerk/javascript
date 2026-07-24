@@ -69,7 +69,6 @@ export function TabsIndicator(props: TabsIndicatorProps) {
   }, [value, getTabElement, orientation, listElement]);
 
   const defaultProps = {
-    'data-cl-slot': 'tabs-indicator',
     'aria-hidden': true as const,
     style,
   };

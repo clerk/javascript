@@ -17,8 +17,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const wiredId = floatingProps.id;
 
     const ownProps = {
-      'data-cl-slot': 'tooltip-positioner',
-      'data-cl-side': side,
+      'data-side': side,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 

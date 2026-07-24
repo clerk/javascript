@@ -32,7 +32,7 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
       ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: mergeProps<'button'>(defaultProps, otherProps),
     });

@@ -20,7 +20,6 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
-          'data-cl-slot': 'accordion-trigger',
           id: triggerId,
           type: 'button' as const,
           'aria-expanded': open,
@@ -59,9 +58,8 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
           ref: compositeRef as React.Ref<unknown>,
           state,
           stateAttributesMapping: {
-            open: (v: boolean): Record<string, string> | null =>
-              v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' },
-            disabled: (v: boolean) => (v ? { 'data-cl-disabled': '' } : null),
+            open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+            disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
           },
           props: mergedProps,
         });

@@ -23,21 +23,21 @@ export const DrawerCssVars = {
 
 export const DrawerAttrs = {
   /** On Popup/Backdrop during drag — the styled layer zeroes transition-duration so it follows the finger. */
-  swiping: 'data-cl-swiping',
+  swiping: 'data-swiping',
   /** Active snap point index. */
-  snap: 'data-cl-snap',
+  snap: 'data-snap',
   /** Present when the active snap point is the full-height one. */
-  expanded: 'data-cl-expanded',
+  expanded: 'data-expanded',
   /** Present on a parent while one of its nested drawers is open. */
-  nestedOpen: 'data-cl-nested-drawer-open',
+  nestedOpen: 'data-nested-drawer-open',
   /** Present on a parent while one of its nested drawers is being dragged. */
-  nestedSwiping: 'data-cl-nested-drawer-swiping',
+  nestedSwiping: 'data-nested-drawer-swiping',
   /** Present on a drawer that is itself nested inside another. */
-  nested: 'data-cl-nested',
+  nested: 'data-nested',
   /** Marks the grip; also the hit-test target when `handleOnly` is set. */
-  handle: 'data-cl-drawer-handle',
+  handle: 'data-drawer-handle',
   /** Consumer opt-out, read by `shouldDrag` to exclude a subtree from dragging. */
-  noDrag: 'data-cl-drawer-no-drag',
+  noDrag: 'data-drawer-no-drag',
 } as const;
 
 /**
