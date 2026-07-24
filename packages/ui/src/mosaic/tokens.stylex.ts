@@ -92,10 +92,8 @@ export const space = stylex.defineConsts({
 // =============================================================================
 // Typography Tokens — type scale
 // =============================================================================
-// One named step scale (`xs` → `2xl`) that every text-bearing component sizes
-// against — Heading and Text expose it as their `size` variant, Button picks the
-// steps its heights allow. `defineVars` values are single CSS values, so size and
-// leading are each their own var.
+// One named step scale every text-bearing component sizes against. `defineVars`
+// values are single CSS values, so size and leading are each their own var.
 
 const typeScaleDefaults = {
   '--cl-text-xs-size': '0.75rem',
@@ -117,8 +115,7 @@ export const typeScaleVars = stylex.defineVars(typeScaleDefaults);
 // =============================================================================
 // Typography Tokens — font weight
 // =============================================================================
-// Named weights, kept separate from the step scale: weight and size vary
-// independently (a `sm` Text can be medium; a `2xl` Heading is semibold).
+// Kept separate from the step scale: weight and size vary independently.
 
 const fontWeightDefaults = {
   '--cl-font-normal': '400',

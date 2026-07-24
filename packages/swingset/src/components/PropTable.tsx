@@ -17,8 +17,6 @@ interface PropTableProps {
   extra?: ExtraProp[];
 }
 
-// Engine-specific escape hatches. StyleX components have no `sx`; they merge the
-// consumer's `className`/`style` after their own atoms instead.
 const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
 const STYLEX_ROWS: ExtraProp[] = [
   { name: 'className', type: 'string' },
