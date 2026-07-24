@@ -1,0 +1,115 @@
+import * as PopoverStories from './popover.component.stories';
+
+# Popover
+
+The Mosaic `Popover` — the styled Mosaic component composed from the `@clerk/headless` popover
+primitive and themed with StyleX. It is a reusable floating card anchored to a trigger: drop any
+inner content into `Popover.Content` and an optional `Popover.Footer`. It inherits the primitive's
+positioning, focus management, and ARIA wiring.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={PopoverStories}
+/>
+
+## Usage
+
+```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Popover } from '@clerk/ui/mosaic/components/popover';
+
+<Popover trigger={props => <Button {...props}>Open popover</Button>}>
+  <Popover.Content>Flexible inner content.</Popover.Content>
+  <Popover.Footer>
+    <Button
+      intent='destructive'
+      fullWidth
+    >
+      Sign out of all accounts
+    </Button>
+  </Popover.Footer>
+</Popover>;
+```
+
+The `trigger` render prop receives the interaction props (ARIA attributes, click handler) from the
+headless layer and should spread them onto whatever element opens the popover.
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Popover
+  open={open}
+  onOpenChange={setOpen}
+  trigger={props => <Button {...props}>Open</Button>}
+>
+  <Popover.Content>Flexible inner content.</Popover.Content>
+</Popover>;
+```
+
+### Placement
+
+`placement` sets the preferred side and alignment; `sideOffset` sets the gap from the trigger. The
+popup flips and shifts automatically to stay in view.
+
+```tsx
+<Popover
+  placement='bottom-end'
+  sideOffset={8}
+  trigger={props => <Button {...props}>Open</Button>}
+>
+  <Popover.Content>Aligned to the trigger's end edge.</Popover.Content>
+</Popover>;
+```
+
+## Parts
+
+The convenience `Popover` composes the trigger and a portalled, positioned popup. For custom
+layouts, compose the compound parts directly.
+
+| Part                  | Slot                 | Description                                                    |
+| --------------------- | -------------------- | -------------------------------------------------------------- |
+| `Popover.Root`        | —                    | State provider; owns open/close and placement.                 |
+| `Popover.Trigger`     | —                    | Anchor element; accepts a `render` prop.                       |
+| `Popover.Portal`      | —                    | Portals the popup out to the document body.                    |
+| `Popover.Positioner`  | `popover-positioner` | Floating wrapper; owns positioning, stacking, `data-side`.     |
+| `Popover.Popup`       | `popover-popup`      | The card surface; holds content + footer, runs the enter/exit. |
+| `Popover.Content`     | `popover-content`    | Flexible inner content region; scrolls on overflow.            |
+| `Popover.Footer`      | `popover-footer`     | Footer region, separated from content by a top border.         |
+| `Popover.Close`       | —                    | Dismisses the popover; accepts a `render` prop.                |
+| `Popover.Title`       | —                    | Heading; wired to the popup's `aria-labelledby`.               |
+| `Popover.Description` | —                    | Description; wired to the popup's `aria-describedby`.          |
+| `Popover.Arrow`       | —                    | Optional arrow pointing at the trigger.                        |
+
+## Styling
+
+Unlike the slot-recipe components, the Mosaic popover is themed with **StyleX**. Each styled part
+carries a stable `.cl-<slot>` class (the slots in the table above) alongside the StyleX atoms.
+Consumers never target the hashed atomic classes — override by targeting the `.cl-*` slot from a
+CSS layer that wins over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-popover-popup {
+    border-radius: 20px;
+  }
+}
+```
+
+State attributes from the headless layer are available for CSS targeting:
+
+| Attribute             | Applies To     | Description                                         |
+| --------------------- | -------------- | --------------------------------------------------- |
+| `data-open`           | Trigger, Popup | Present when the popover is open                    |
+| `data-closed`         | Trigger, Popup | Present when closed (during exit)                   |
+| `data-starting-style` | Popup          | Present on the entering frame                       |
+| `data-ending-style`   | Popup          | Present during the exit animation                   |
+| `data-side`           | Positioner     | Resolved side (`top` / `bottom` / `left` / `right`) |
+
+The popup's default enter/exit transition (opacity + scale) is driven off `data-starting-style` /
+`data-ending-style` and is disabled under `prefers-reduced-motion: reduce`.

@@ -17,6 +17,9 @@ export type { IconProps } from '../components/icon';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
+export { Popover } from '../components/popover';
+export type { PopoverProps } from '../components/popover';
+
 import { colorVars, fontWeightVars, radiusVars, space, spacingVars, typeScaleVars } from '../tokens.stylex';
 
 export { colorVars, fontWeightVars, radiusVars, space, spacingVars, typeScaleVars };
