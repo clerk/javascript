@@ -183,8 +183,23 @@ backgroundColor: {
 
 - **DO** guard `:hover` behind `@media (hover: hover)` so it never sticks on touch;
   leave `:active`, `:focus-visible`, `:disabled` unguarded.
-- **DO** use `:focus-visible` for focus rings (never bare `:focus`), and
-  `:focus-within` on wrapping containers.
+- **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
+  **container** that should ring when a child is focused, use
+  `:has(:focus-visible)` — **not** `:focus-within`. `:focus-within` matches any
+  descendant focus, including a mouse click, so the container ring would flash on
+  click; `:has(:focus-visible)` matches only keyboard-visible focus, so the
+  container ring tracks the same modality as the element's own. `:has(:focus-visible)`
+  is a plain conditional-value key, no special API:
+
+  ```ts
+  // container.styles.ts — the wrapper rings only on keyboard focus of a child
+  outline:       { default: null, ':has(:focus-visible)': `2px solid ${colorVars['--cl-color-primary']}` },
+  outlineOffset: { default: null, ':has(:focus-visible)': space['0.5'] },
+  ```
+
+  Reach for `:focus-within` only when you genuinely want an any-modality reaction
+  (keep an affordance visible while a descendant is focused), never for a ring.
+
 - **DO** use `default: null` when a property exists **only** in a pseudo/state
   branch, so the atom doesn't emit a base value that would clobber a merged style:
 
