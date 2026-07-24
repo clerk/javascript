@@ -14,6 +14,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Text',
   source: 'packages/ui/src/mosaic/components/text/text.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },

@@ -14,6 +14,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Heading',
   source: 'packages/ui/src/mosaic/components/heading/heading.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },

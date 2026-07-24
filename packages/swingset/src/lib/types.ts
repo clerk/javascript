@@ -49,6 +49,12 @@ export interface StoryMeta {
    * source" link to the file on GitHub. See `lib/source.ts`.
    */
   source?: string;
+  /**
+   * Which styling engine the documented component is built on. Drives the prop rows that
+   * are engine-specific: Emotion components take `sx`, StyleX components take `className`
+   * and `style`. Defaults to `'emotion'` — set `'stylex'` once a component is migrated.
+   */
+  styleEngine?: 'emotion' | 'stylex';
   styles?: {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;

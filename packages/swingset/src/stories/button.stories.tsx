@@ -14,6 +14,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button/button.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       intent: { primary: {}, destructive: {} },

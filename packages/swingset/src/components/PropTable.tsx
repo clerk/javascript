@@ -17,7 +17,13 @@ interface PropTableProps {
   extra?: ExtraProp[];
 }
 
+// Engine-specific escape hatches. StyleX components have no `sx`; they merge the
+// consumer's `className`/`style` after their own atoms instead.
 const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
+const STYLEX_ROWS: ExtraProp[] = [
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+];
 
 export function PropTable({ meta, extra = [] }: PropTableProps) {
   const playground = usePlayground();
@@ -35,7 +41,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    SX_ROW,
+    ...(meta.styleEngine === 'stylex' ? STYLEX_ROWS : [SX_ROW]),
   ];
 
   return (
@@ -51,7 +57,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       <tbody>
         {rows.map(row => {
           // The default is a static cell; the Value column is the live control. Variant
-          // props get a knob there; non-variant rows (sx, extra) have no control.
+          // props get a knob there; non-variant rows (the engine rows, extra) have no control.
           const knob = playground?.knobs[row.name];
           return (
             <tr key={row.name}>
