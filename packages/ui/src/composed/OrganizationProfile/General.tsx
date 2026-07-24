@@ -26,7 +26,15 @@ function GeneralComposed({ children }: PropsWithChildren): ReactNode {
 
 export function OrganizationProfileGeneralPanel({ children }: PropsWithChildren): ReactNode {
   if (!children) {
-    return <OrganizationGeneralPage />;
+    // Unlike AccountPage/SecurityPage, OrganizationGeneralPage does not self-wrap in a
+    // CardStateProvider. Mounted <OrganizationProfile /> supplies one at its root, so the
+    // leave/delete confirmation forms (useLeaveWithRevalidations -> useCardState) resolve it.
+    // The composed panel is a standalone entry point, so it must provide the same root here.
+    return (
+      <CardStateProvider>
+        <OrganizationGeneralPage />
+      </CardStateProvider>
+    );
   }
 
   // The section confirmation forms (leave/delete) call useCardState(), so children must be wrapped

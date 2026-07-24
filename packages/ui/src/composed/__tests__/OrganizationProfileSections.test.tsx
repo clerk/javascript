@@ -135,6 +135,25 @@ describe('OrganizationProfile composed sections', () => {
     });
   });
 
+  describe('General — default page mode (no children)', () => {
+    it('provides CardState so the leave-organization confirmation can open', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'TestOrg' }] });
+      });
+
+      fixtures.clerk.organization?.getDomains.mockReturnValue(Promise.resolve({ data: [], total_count: 0 }));
+
+      const { userEvent } = render(<OrganizationProfileGeneralPanel />, { wrapper });
+
+      // Before the fix, LeaveOrganizationForm's useLeaveWithRevalidations() calls useCardState()
+      // with no ancestor CardStateProvider and throws "CardState not found".
+      await userEvent.click(await screen.findByRole('button', { name: /leave organization/i }));
+
+      await waitFor(() => expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument());
+    });
+  });
+
   describe('General — section outside page', () => {
     it('useRequirePage throws when rendered outside a page component', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
