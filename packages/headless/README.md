@@ -19,7 +19,7 @@ This package is **internal** (`private: true`) and consumed by `@clerk/ui`. It e
 | Tabs         | `@clerk/headless/tabs`         | Tab navigation with animated indicator                        |
 | Tooltip      | `@clerk/headless/tooltip`      | Hover/focus tooltip with configurable delay and group support |
 
-Shared utilities are available at `@clerk/headless/utils` (includes `renderElement` and `mergeProps`).
+Shared utilities are available at `@clerk/headless/utils` (includes `useRender` and `mergeProps`).
 
 Each primitive has its own README in `src/primitives/<name>/` with full API docs, props tables, keyboard navigation, and data attributes.
 
@@ -50,7 +50,7 @@ All primitives follow the same compound component pattern. They emit zero styles
 ## Architecture
 
 - **Compound components** — each primitive exports a namespace (e.g. `Select.Trigger`, `Select.Popup`) backed by per-part files so unused parts tree-shake out
-- **`renderElement`** — every part uses this instead of returning JSX directly, enabling consumer `render` prop overrides and automatic state-to-data-attribute mapping
+- **`useRender`** — every part calls this hook instead of returning JSX directly, enabling consumer `render` prop overrides (function or element) and automatic state-to-data-attribute mapping
 - **`data-*` attributes** — state (`data-open`, `data-selected`, `data-active`) and animation lifecycle (`data-starting-style`, `data-ending-style`); parts are targeted by consumer-supplied classNames, not by an emitted slot attribute
 - **CSS-driven animations** — the transition system uses `data-*` attributes and the Web Animations API (`getAnimations().finished`) so all timing lives in CSS
 - **Floating UI** — positioning, interactions, focus management, dismiss handling, list navigation, and ARIA are all delegated to `@floating-ui/react`
@@ -117,9 +117,9 @@ Consumers can then style with the theme:
 
 Without the annotation, `tsc` emits **TS2742**:
 
-> The inferred type of `Dialog` cannot be named without a reference to `@clerk/headless/dist/utils/render-element`. This is likely not portable.
+> The inferred type of `Dialog` cannot be named without a reference to `@clerk/headless/dist/utils/use-render`. This is likely not portable.
 
-`makeCustomizable<P>` returns an internal `CustomizablePrimitive<P>` type. When TS rolls up `.d.ts`, it resolves `DialogTriggerProps = ComponentProps<'button'>` back to its source file (`headless/dist/utils/render-element`), which **isn't in the package `exports` map**. The explicit `FunctionComponent<Customizable<DialogXProps>>` annotation forces TS to reference the named `DialogXProps` type from `@clerk/headless/dialog` (a public entry) instead of expanding it.
+`makeCustomizable<P>` returns an internal `CustomizablePrimitive<P>` type. When TS rolls up `.d.ts`, it resolves `DialogTriggerProps = ComponentProps<'button'>` back to its source file (`headless/dist/utils/use-render`), which **isn't in the package `exports` map**. The explicit `FunctionComponent<Customizable<DialogXProps>>` annotation forces TS to reference the named `DialogXProps` type from `@clerk/headless/dialog` (a public entry) instead of expanding it.
 
 This applies to **every** headless primitive consumed through `makeCustomizable` — Popover, Tooltip, Menu, Select, etc. Each gets its own wrapper module under `packages/ui/src/primitives/<Name>.tsx` following the pattern above.
 
