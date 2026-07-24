@@ -1,11 +1,11 @@
 import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
-import { useSignInWithGoogle } from '@clerk/expo/google';
 import { AuthView, UserButton } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
 import { E2EControls } from './components/E2EControls';
+import { GoogleSignInButton } from './components/GoogleSignInButton';
 import { JsSignInForm } from './components/JsSignInForm';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -17,9 +17,7 @@ if (!publishableKey) {
 function NativeBuildFixture() {
   const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
-  const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [googleResult, setGoogleResult] = useState<string | null>(null);
   const [e2eStatus, setE2eStatus] = useState<string | null>(null);
 
   return (
@@ -36,19 +34,7 @@ function NativeBuildFixture() {
         title='Open native AuthView'
         onPress={() => setIsAuthOpen(true)}
       />
-      {!isSignedIn && (
-        <Button
-          testID='google-sign-in-button'
-          title='Sign in with Google'
-          onPress={() => {
-            void startGoogleAuthenticationFlow().catch((error: unknown) => {
-              const message = error instanceof Error ? error.message : String(error);
-              setGoogleResult(message.replace(/\s+/g, ' '));
-            });
-          }}
-        />
-      )}
-      {googleResult && <Text testID='google-result'>{googleResult}</Text>}
+      {!isSignedIn && <GoogleSignInButton />}
       {!isSignedIn && <JsSignInForm onStatus={setE2eStatus} />}
       {isSignedIn && <E2EControls onStatus={setE2eStatus} />}
       {e2eStatus && <Text testID='e2e-status'>{e2eStatus}</Text>}

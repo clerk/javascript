@@ -15,8 +15,7 @@ export function E2EControls({ onStatus }: { onStatus: (status: string | null) =>
     onStatus(null);
     try {
       const didCorrupt = await E2EHooks?.corruptNativeDeviceToken();
-      // Delay the marker so Maestro cannot race the native client event and
-      // the JS sync settling.
+      // Delayed so Maestro cannot race the native event and the JS sync settling.
       setTimeout(() => onStatus(didCorrupt ? 'corrupt-done' : 'corrupt-failed'), 3000);
     } catch {
       onStatus('corrupt-failed');

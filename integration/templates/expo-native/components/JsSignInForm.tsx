@@ -12,19 +12,21 @@ export function JsSignInForm({ onStatus }: { onStatus: (status: string) => void 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
 
+  const reportError = (message: string) => onStatus(`sign-in-error ${message}`.replace(/\s+/g, ' ').trim());
+
   const onJsSignIn = async () => {
     try {
       const { error } = await signIn.password({ identifier, password });
       if (error) {
-        onStatus(`sign-in-error ${error.message ?? ''}`.replace(/\s+/g, ' ').trim());
+        reportError(error.message ?? '');
         return;
       }
       const { error: finalizeError } = await signIn.finalize();
       if (finalizeError) {
-        onStatus(`sign-in-error ${finalizeError.message ?? ''}`.replace(/\s+/g, ' ').trim());
+        reportError(finalizeError.message ?? '');
       }
     } catch (error) {
-      onStatus(`sign-in-error ${String(error)}`.replace(/\s+/g, ' '));
+      reportError(String(error));
     }
   };
 
