@@ -1,8 +1,7 @@
-import type { ClerkPaginatedResponse, OrganizationMembershipResource } from '@clerk/shared/types';
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { render, screen } from '@/test/utils';
 
 import { OrganizationGeneralPage } from '../../components/OrganizationProfile/OrganizationGeneralPage';
 

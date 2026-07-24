@@ -5,7 +5,7 @@ import { render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { clearFetchCache } from '../../../hooks';
-import { SecurityPassword, SecurityPasskeys, SecurityMfa, SecurityDelete } from '../SecuritySections';
+import { SecurityDelete, SecurityMfa, SecurityPasskeys, SecurityPassword } from '../SecuritySections';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 

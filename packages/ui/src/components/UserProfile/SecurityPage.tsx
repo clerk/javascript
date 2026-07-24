@@ -3,7 +3,7 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { localizationKeys } from '../../customizables';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
-import { SecurityPassword, SecurityPasskeys, SecurityMfa, SecurityDelete } from './SecuritySections';
+import { SecurityDelete, SecurityMfa, SecurityPasskeys, SecurityPassword } from './SecuritySections';
 
 export const SecurityPage = withCardStateProvider(() => {
   const card = useCardState();
