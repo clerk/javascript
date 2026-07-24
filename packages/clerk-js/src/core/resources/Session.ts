@@ -44,6 +44,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
+import { getTabState, isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
@@ -53,6 +54,9 @@ import { SessionTokenCache } from '../tokenCache';
 import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
+  isTabFocused() === false ? {} : { onRefresh };
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -218,8 +222,9 @@ export class Session extends BaseResource implements SessionResource {
       SessionTokenCache.set({
         tokenId,
         tokenResolver: Promise.resolve(token),
-        onRefresh: () =>
+        ...focusedRefresh(() =>
           this.#refreshTokenInBackground(undefined, this.lastActiveOrganizationId, tokenId, shouldDispatchTokenUpdate),
+        ),
       });
     }
   };
@@ -485,10 +490,12 @@ export class Session extends BaseResource implements SessionResource {
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
     const sessionMinterEnabled = Session.clerk?.__internal_environment?.authConfig?.sessionMinter;
+    const tabState = template ? undefined : getTabState();
     const params: Record<string, string | null> = template
       ? {}
       : {
           organizationId: organizationId ?? null,
+          ...(tabState ? { tabState } : {}),
           ...(sessionMinterEnabled && this.lastActiveToken ? { token: this.lastActiveToken.getRawString() } : {}),
           ...(sessionMinterEnabled && skipCache ? { forceOrigin: 'true' } : {}),
         };
@@ -558,7 +565,9 @@ export class Session extends BaseResource implements SessionResource {
     SessionTokenCache.set({
       tokenId,
       tokenResolver,
-      onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      ...focusedRefresh(() =>
+        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+      ),
     });
 
     return tokenResolver.then(token => {
@@ -624,7 +633,9 @@ export class Session extends BaseResource implements SessionResource {
         SessionTokenCache.set({
           tokenId,
           tokenResolver: Promise.resolve(token),
-          onRefresh: () => this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          ...focusedRefresh(() =>
+            this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+          ),
         });
         this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
       })
