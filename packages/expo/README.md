@@ -25,6 +25,9 @@
 
 </div>
 
+> [!WARNING]
+> `@clerk/clerk-expo` is deprecated. Migrate to `@clerk/expo` by following the [Core 3 upgrade guide](https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3).
+
 ## Getting Started
 
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_expo) is the easiest way to add authentication and user management to your Expo application. Add sign up, sign in, and profile management to your application in minutes.
