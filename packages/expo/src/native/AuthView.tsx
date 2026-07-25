@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
-import { Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
@@ -39,6 +39,7 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  */
 export function AuthView({
   mode = 'signInOrUp',
+  presentation = 'inline',
   isDismissible = true,
   logoMaxHeight,
   onDismiss,
@@ -68,6 +69,7 @@ export function AuthView({
     <NativeClerkAuthView
       style={{ flex: 1 }}
       mode={mode}
+      {...(Platform.OS === 'android' ? { presentation } : {})}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
       onAuthEvent={handleAuthEvent}

@@ -29,7 +29,7 @@
  */
 
 export { AuthView } from './AuthView';
-export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export type { AuthViewProps, AuthViewMode, AuthViewPresentation } from './AuthView.types';
 export { UserButton } from './UserButton';
 export { UserProfileView } from './UserProfileView';
 export type { UserProfileViewProps } from './UserProfileView';
