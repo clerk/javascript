@@ -1,3 +1,4 @@
+import type { TokenResource } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../events';
@@ -29,6 +30,55 @@ describe('State', () => {
     // Restore original clerk references to prevent global state leakage
     SignUp.clerk = originalSignUpClerk;
     SignIn.clerk = originalSignInClerk;
+  });
+
+  describe('sessionTokenSignal', () => {
+    const createToken = (token: string): TokenResource =>
+      ({
+        getRawString: () => token,
+      }) as TokenResource;
+
+    it('starts unloaded', () => {
+      expect(_state.sessionTokenSignal()).toEqual({ isLoaded: false, token: undefined });
+    });
+
+    it('stores loaded null and valid token states', () => {
+      _state.__internal_setSessionToken(null);
+      expect(_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: null });
+
+      _state.__internal_setSessionToken(createToken('token_1'));
+      expect(_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: 'token_1' });
+    });
+
+    it('treats empty token strings as loaded null state', () => {
+      _state.__internal_setSessionToken(createToken(''));
+      expect(_state.sessionTokenSignal()).toEqual({ isLoaded: true, token: null });
+    });
+
+    it('can return to unloaded state', () => {
+      _state.__internal_setSessionToken(createToken('token_1'));
+      _state.__internal_setSessionToken(undefined);
+
+      expect(_state.sessionTokenSignal()).toEqual({ isLoaded: false, token: undefined });
+    });
+
+    it('does not notify subscribers when the raw token value is unchanged', () => {
+      const listener = vi.fn();
+      const unsubscribe = _state.__internal_effect(() => {
+        _state.sessionTokenSignal();
+        listener();
+      });
+
+      listener.mockClear();
+      _state.__internal_setSessionToken(createToken('token_1'));
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      listener.mockClear();
+      _state.__internal_setSessionToken(createToken('token_1'));
+      expect(listener).not.toHaveBeenCalled();
+
+      unsubscribe();
+    });
   });
 
   describe('shouldIgnoreNullUpdate behavior', () => {

@@ -1,6 +1,7 @@
 import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
+import type { TokenResource } from './token';
 import type { WaitlistResource } from './waitlist';
 
 /**
@@ -198,6 +199,20 @@ export interface WaitlistSignal {
   (): NullableWaitlistSignal;
 }
 
+export type SessionTokenSignalValue =
+  | {
+      isLoaded: false;
+      token: undefined;
+    }
+  | {
+      isLoaded: true;
+      token: string | null;
+    };
+
+export interface SessionTokenSignal {
+  (): SessionTokenSignalValue;
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
@@ -213,6 +228,11 @@ export interface State {
    * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
    */
   waitlistSignal: WaitlistSignal;
+
+  /**
+   * A Signal that updates when the active session token changes.
+   */
+  sessionTokenSignal: SessionTokenSignal;
 
   /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
@@ -236,4 +256,9 @@ export interface State {
    * An instance of the Waitlist resource.
    */
   __internal_waitlist: WaitlistResource;
+
+  /**
+   * Updates the active session token signal.
+   */
+  __internal_setSessionToken: (token: TokenResource | null | undefined) => void;
 }

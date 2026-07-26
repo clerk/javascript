@@ -1,6 +1,6 @@
 import type { ClerkError } from '@clerk/shared/error';
-import type { State as StateInterface } from '@clerk/shared/types';
-import { computed, effect } from 'alien-signals';
+import type { SessionTokenSignalValue, State as StateInterface, TokenResource } from '@clerk/shared/types';
+import { computed, effect, signal } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
@@ -23,6 +23,8 @@ import {
 } from './signals';
 
 export class State implements StateInterface {
+  private sessionTokenInternalSignal = signal<SessionTokenSignalValue>({ isLoaded: false, token: undefined });
+
   signInResourceSignal = signInResourceSignal;
   signInErrorSignal = signInErrorSignal;
   signInFetchSignal = signInFetchSignal;
@@ -37,6 +39,8 @@ export class State implements StateInterface {
   waitlistErrorSignal = waitlistErrorSignal;
   waitlistFetchSignal = waitlistFetchSignal;
   waitlistSignal = waitlistComputedSignal;
+
+  sessionTokenSignal = computed(() => this.sessionTokenInternalSignal());
 
   private _waitlistInstance: Waitlist;
 
@@ -55,6 +59,17 @@ export class State implements StateInterface {
   get __internal_waitlist() {
     return this._waitlistInstance;
   }
+
+  __internal_setSessionToken = (token: TokenResource | null | undefined) => {
+    const nextValue = token === undefined ? unloadedTokenSignalValue : loadedTokenSignalValue(token?.getRawString());
+    const previousValue = this.sessionTokenInternalSignal();
+
+    if (previousValue.isLoaded === nextValue.isLoaded && previousValue.token === nextValue.token) {
+      return;
+    }
+
+    this.sessionTokenInternalSignal(nextValue);
+  };
 
   private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
     if (payload.resource instanceof SignIn) {
@@ -106,6 +121,12 @@ export class State implements StateInterface {
       this.waitlistFetchSignal({ status: payload.status });
     }
   };
+}
+
+const unloadedTokenSignalValue = { isLoaded: false, token: undefined } as const;
+
+function loadedTokenSignalValue(token: string | null | undefined): SessionTokenSignalValue {
+  return { isLoaded: true, token: token || null };
 }
 
 /**
