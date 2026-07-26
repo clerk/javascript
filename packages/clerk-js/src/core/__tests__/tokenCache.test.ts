@@ -410,7 +410,7 @@ describe('SessionTokenCache', () => {
 
     it('removes token when it expires within the leeway threshold', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
-      const iat = nowSeconds;
+      const iat = nowSeconds - 13;
       const exp = iat + 20;
       const soonJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
 
@@ -419,7 +419,7 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ createdAt: nowSeconds - 13, tokenId: 'soon_expired_token', tokenResolver });
+      SessionTokenCache.set({ createdAt: nowSeconds, tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
