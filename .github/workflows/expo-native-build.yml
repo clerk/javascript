@@ -304,9 +304,9 @@ jobs:
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
-            adb install -r integration/templates/expo-native/android/app/build/outputs/apk/release/app-release.apk &&
             cd integration/tests/expo-native &&
-            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh adb shell am force-stop com.clerk.exponativebuildfixture
+            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
+            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
 
       # Runs before the artifact upload so the credentials are already dead
       # by the time the debug files become downloadable.
