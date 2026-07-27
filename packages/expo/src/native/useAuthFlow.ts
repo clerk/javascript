@@ -71,8 +71,14 @@ export function useAuthFlow(): UseAuthFlowReturn {
       void nativeModule
         .getAuthFlowState()
         .then(state => {
-          if (isMounted && !didReceiveEvent && isNativeAuthFlowState(state)) {
+          if (!isMounted || didReceiveEvent) {
+            return;
+          }
+
+          if (isNativeAuthFlowState(state)) {
             setNativeState(state);
+          } else {
+            setUseJsFallback(true);
           }
         })
         .catch(error => {

@@ -88,4 +88,14 @@ describe('useAuthFlow', () => {
     expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
     expect(mocks.moduleAddListener).not.toHaveBeenCalled();
   });
+
+  test('falls back to JS session state when the native auth-flow state is invalid', async () => {
+    mocks.getAuthFlowState.mockResolvedValue({ isLoaded: true });
+
+    const { result } = renderHook(() => useAuthFlow());
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
+    });
+  });
 });
