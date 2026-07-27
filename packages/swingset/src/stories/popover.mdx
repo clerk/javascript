@@ -5,7 +5,7 @@ import * as PopoverStories from './popover.stories';
 A floating panel anchored to a trigger, holding interactive content, from `@clerk/headless`.
 It is a **headless** primitive: it supplies open state, portalling, floating-ui positioning
 (flip/shift/arrow), focus management, dismissal (outside press / Escape), and ARIA wiring,
-but ships **no styles** — you bring your own CSS by targeting the `data-cl-*` attributes
+but ships **no styles** — you bring your own CSS by targeting the `data-*` attributes
 each part emits.
 
 ## Example
@@ -96,16 +96,15 @@ Alignment and collision padding are encoded in the single `placement` prop.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute                | Applies To        | Description                                        |
-| ------------------------ | ----------------- | -------------------------------------------------- |
-| `data-cl-slot`           | All parts         | Part identifier                                    |
-| `data-cl-open`           | Trigger, Popup    | Present when the popover is open                   |
-| `data-cl-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
-| `data-cl-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
-| `data-cl-starting-style` | Popup             | Present on the entering frame                      |
-| `data-cl-ending-style`   | Popup             | Present during the exit animation                  |
+| Attribute             | Applies To        | Description                                        |
+| --------------------- | ----------------- | -------------------------------------------------- |
+| `data-open`           | Trigger, Popup    | Present when the popover is open                   |
+| `data-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
+| `data-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
+| `data-starting-style` | Popup             | Present on the entering frame                      |
+| `data-ending-style`   | Popup             | Present during the exit animation                  |
 
 The positioner exposes anchor/viewport geometry as CSS variables for sizing and
 transform-origin-based animations:
@@ -119,13 +118,13 @@ transform-origin-based animations:
 | `--cl-transform-origin` | `transform-origin` pointing back toward the anchor    |
 
 ```css
-[data-cl-slot='popover-popup'] {
+.cl-popover-popup {
   transform-origin: var(--cl-transform-origin);
   opacity: 1;
   transition: opacity 120ms ease, transform 120ms ease;
 }
-[data-cl-slot='popover-popup'][data-cl-starting-style],
-[data-cl-slot='popover-popup'][data-cl-ending-style] {
+.cl-popover-popup[data-starting-style],
+.cl-popover-popup[data-ending-style] {
   opacity: 0;
   transform: scale(0.95);
 }

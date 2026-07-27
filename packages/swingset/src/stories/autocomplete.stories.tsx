@@ -7,7 +7,7 @@ import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
 // unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
-// positioning, keyboard navigation, and ARIA wiring via the `data-cl-*` attributes each
+// positioning, keyboard navigation, and ARIA wiring via the `data-*` attributes each
 // part emits, with zero appearance. It is embedded once into the overview via `<Story>`
 // in the MDX (the one thing prose can't convey: that typing filters the list the consumer
 // supplies). There is no interactive knob canvas for headless primitives.

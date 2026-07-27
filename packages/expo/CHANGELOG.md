@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`34d18fa`](https://github.com/clerk/javascript/commit/34d18fa9bbca9c4a13614529b953765392a6b76d), [`010661a`](https://github.com/clerk/javascript/commit/010661a6edcc1cd4373faa1736ab87b84c5a189f), [`010661a`](https://github.com/clerk/javascript/commit/010661a6edcc1cd4373faa1736ab87b84c5a189f)]:
+  - @clerk/clerk-js@6.25.9
+
+## 4.0.3
+
+### Patch Changes
+
+- Prevent native client updates from replacing a signed-in Expo client with a stale or sessionless client. Native-to-JS synchronization now validates client changes before applying them, restores the previous token when validation fails, and applies the same protection during 401 recovery. ([#9222](https://github.com/clerk/javascript/pull/9222)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/clerk-js@6.25.8
+  - @clerk/shared@4.25.8
+  - @clerk/react@6.12.8
+
 ## 4.0.2
 
 ### Patch Changes

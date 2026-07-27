@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.6.0
+
+### Minor Changes
+
+- Bump the minimum supported React Router v8 version to `8.3.0`, which fixes duplicate `react-router` instances during `react-router dev` SSR that broke the Router context ([remix-run/react-router#15232](https://github.com/remix-run/react-router/issues/15232)). ([#9229](https://github.com/clerk/javascript/pull/9229)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 3.5.15
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/react@6.12.8
+  - @clerk/backend@3.13.1
+
 ## 3.5.14
 
 ### Patch Changes

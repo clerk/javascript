@@ -288,7 +288,7 @@ describe('connectionBackingEmail', () => {
   const email = (id: string, status: 'verified' | 'unverified'): EmailAddressResource =>
     ({ id, emailAddress: `${id}@acme.com`, verification: { status } }) as EmailAddressResource;
 
-  const makeUser = (overrides: Partial<UserResource>): UserResource => overrides as UserResource;
+  const makeUser = (overrides: Partial<UserResource>): UserResource => overrides;
 
   it('returns the primary email when one is present', () => {
     const primary = email('primary', 'verified');

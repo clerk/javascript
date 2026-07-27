@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useLayoutEffect, useRef, useState } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useTabsContext } from './tabs-context';
 
 export type TabsIndicatorProps = ComponentProps<'span'>;
@@ -69,12 +69,11 @@ export function TabsIndicator(props: TabsIndicatorProps) {
   }, [value, getTabElement, orientation, listElement]);
 
   const defaultProps = {
-    'data-cl-slot': 'tabs-indicator',
     'aria-hidden': true as const,
     style,
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'span',
     render,
     props: mergeProps<'span'>(defaultProps, otherProps),

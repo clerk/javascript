@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { mergeProps, themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './button.styles';
 
 export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
@@ -33,7 +33,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       ref={ref}
       type='button'
       disabled={disabled}
-      {...mergeProps(
+      {...mergeStyleProps(
         themeProps('button', { intent, variant, size, shape, fullWidth, disabled }),
         stylex.props(
           styles.base,
