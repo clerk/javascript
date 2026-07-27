@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.6.0
+
+### Minor Changes
+
+- Bump the minimum supported React Router v8 version to `8.3.0`, which fixes duplicate `react-router` instances during `react-router dev` SSR that broke the Router context ([remix-run/react-router#15232](https://github.com/remix-run/react-router/issues/15232)). ([#9229](https://github.com/clerk/javascript/pull/9229)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 3.5.15
 
 ### Patch Changes
