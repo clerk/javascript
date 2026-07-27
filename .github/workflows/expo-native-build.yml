@@ -79,18 +79,8 @@ jobs:
               pnpm-workspace.yaml \
               tsconfig.json \
               turbo.json \
-              packages/backend \
-              packages/clerk-js \
               packages/expo \
               packages/expo-google-signin \
-              packages/expo-passkeys \
-              packages/headless \
-              packages/localizations \
-              packages/msw \
-              packages/react \
-              packages/shared \
-              packages/testing \
-              packages/ui \
               "$FIXTURE_DIR" |
               git hash-object --stdin
           )"
