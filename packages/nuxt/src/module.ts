@@ -41,7 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     version: PACKAGE_VERSION,
     configKey: 'clerk',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '>=4.0.0',
     },
   },
   setup(options, nuxt) {
