@@ -1601,12 +1601,6 @@ export type __internal_LocalizationResource = {
             placeholder: LocalizationValue;
           };
           paragraph: LocalizationValue;
-          scopes: {
-            addButton: LocalizationValue;
-            label: LocalizationValue;
-            optional: LocalizationValue;
-            placeholder: LocalizationValue;
-          };
         };
       };
       samlOkta: {

@@ -169,7 +169,7 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
-  it('saves credentials and lets the user manage optional OIDC scopes', async () => {
+  it('saves OIDC credentials', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
     updateConnection.mockReset();
@@ -191,15 +191,6 @@ describe('ConfigureProviderStep', () => {
     const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
     await userEvent.type(clientId, 'client_123');
     await userEvent.type(clientSecret, 'secret_456');
-
-    expect(screen.getByText('openid')).toBeInTheDocument();
-    expect(screen.getByText('profile')).toBeInTheDocument();
-    expect(screen.getByText('Optional')).toBeInTheDocument();
-
-    const scopeField = document.querySelector('input[name="scopes"]') as HTMLInputElement;
-    await userEvent.type(scopeField, 'email');
-    await userEvent.click(screen.getByRole('button', { name: 'Add' }));
-    expect(screen.getByText('email')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
