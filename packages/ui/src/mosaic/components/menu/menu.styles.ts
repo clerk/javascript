@@ -3,9 +3,11 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  // Positioning is applied inline by the headless positioner; this only clears the
+  // focus outline it receives. No z-index: the portalled, fixed positioner already
+  // paints above page content, and consumers own their own stacking order.
   positioner: {
     outline: 'none',
-    zIndex: 50,
   },
 
   popup: {
