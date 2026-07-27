@@ -25,6 +25,7 @@ export type SyncableClerkInstance = {
   status?: string;
   setActive?: (params: { session: SignedInSessionResource | string | null }) => Promise<void>;
   updateClient?: (client: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }) => void;
+  __internal_setActiveInProgress?: boolean;
   __internal_reloadInitialResources?: () => void | Promise<void>;
 };
 
@@ -221,15 +222,29 @@ function fetchRefreshedJsClient(clerkInstance: SyncableClerkInstance): Promise<C
   return client.fetch({ fetchMaxTries: 1 });
 }
 
+type ClientIdentitySnapshot = {
+  id: string | null;
+  hasSignedInSession: boolean;
+};
+
+function snapshotClientIdentity(client: ClientResource | null | undefined): ClientIdentitySnapshot {
+  return {
+    id: client?.id ?? null,
+    hasSignedInSession: Boolean(client && getDefaultSignedInSession(client)),
+  };
+}
+
+// Refreshing mutates the client in place and resolves with that same object, so this compares
+// against values captured before the refresh rather than a reference that mutated underneath.
 function isForeignSessionlessClient(
-  previousClient: ClientResource | null | undefined,
+  previousSnapshot: ClientIdentitySnapshot,
   refreshedClient: ClientResource,
 ): boolean {
-  if (!previousClient?.id || !refreshedClient.id || previousClient.id === refreshedClient.id) {
+  if (!previousSnapshot.id || !refreshedClient.id || previousSnapshot.id === refreshedClient.id) {
     return false;
   }
 
-  return Boolean(getDefaultSignedInSession(previousClient)) && refreshedClient.signedInSessions.length === 0;
+  return previousSnapshot.hasSignedInSession && refreshedClient.signedInSessions.length === 0;
 }
 
 async function refreshJsClientFromNativeState({
@@ -251,7 +266,7 @@ async function refreshJsClientFromNativeState({
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
-  const previousClient = clerkInstance.client;
+  const previousClientSnapshot = snapshotClientIdentity(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
     if (!rejectForeignSessionlessClient || !shouldSyncDeviceToken || previousDeviceToken === undefined) {
@@ -278,7 +293,7 @@ async function refreshJsClientFromNativeState({
   }
 
   if (refreshedClient) {
-    if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClient, refreshedClient)) {
+    if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClientSnapshot, refreshedClient)) {
       await restorePreviousDeviceToken();
       return true;
     }
@@ -575,13 +590,13 @@ export function NativeClientSync({
         // even if the refreshed client still has another signed-in session.
         // Keep that transient state internal so native session switching does
         // not dismiss mounted native UI before setActive settles on JS.
-        isReconcilingRemovedActiveSession = true;
         originalUpdateClient(newClient, { __internal_dangerouslySkipEmit: true });
 
-        if (alreadyReconcilingRemovedActiveSession) {
+        if (clerkInstance.__internal_setActiveInProgress || alreadyReconcilingRemovedActiveSession) {
           return;
         }
 
+        isReconcilingRemovedActiveSession = true;
         void runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
           try {
             await clerkInstance.setActive?.({ session: fallbackSession });
