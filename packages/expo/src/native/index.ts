@@ -30,6 +30,8 @@
 
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export { useAuthFlow } from './useAuthFlow';
+export type { UseAuthFlowReturn } from './useAuthFlow';
 export { UserButton } from './UserButton';
 export { UserProfileView } from './UserProfileView';
 export type { UserProfileViewProps } from './UserProfileView';

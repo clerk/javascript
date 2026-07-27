@@ -7,8 +7,14 @@ import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.ClerkConfigurationOptions
 import com.clerk.api.network.model.client.Client
+import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.signin.SignIn
+import com.clerk.api.trusteddevice.TrustedDevice
+import com.clerk.api.trusteddevice.TrustedDeviceAvailability
+import com.clerk.api.trusteddevice.TrustedDeviceKeyManagerException
+import com.clerk.api.trusteddevice.TrustedDevicePolicy
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
@@ -19,12 +25,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
+private const val NATIVE_AUTH_FLOW_CHANGED_EVENT = "clerkNativeAuthFlowChanged"
 private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
 private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
 private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
@@ -36,12 +45,100 @@ private fun debugLog(tag: String, message: String) {
     }
 }
 
+internal fun trustedDeviceAvailabilityPayload(
+    availability: TrustedDeviceAvailability
+): Map<String, Any?> {
+    return mapOf(
+        "isAvailable" to availability.isAvailable,
+        "unavailableReason" to availability.unavailableReason?.name?.lowercase()
+    )
+}
+
+internal fun trustedDevicePayload(trustedDevice: TrustedDevice): Map<String, Any?> {
+    return mapOf(
+        "id" to trustedDevice.id,
+        "object" to "trusted_device",
+        "platform" to trustedDevice.platform.name.lowercase(),
+        "appIdentifier" to trustedDevice.appIdentifier,
+        "name" to trustedDevice.name,
+        "algorithm" to trustedDevice.algorithm,
+        "status" to trustedDevice.status.name.lowercase(),
+        "createdAt" to trustedDevice.createdAt,
+        "updatedAt" to trustedDevice.updatedAt,
+        "lastUsedAt" to trustedDevice.lastUsedAt,
+        "revokedAt" to trustedDevice.revokedAt
+    )
+}
+
+internal fun trustedDeviceSignInPayload(signIn: SignIn): Map<String, Any?> {
+    return mapOf(
+        "status" to signIn.status.name.lowercase(),
+        "createdSessionId" to signIn.createdSessionId
+    )
+}
+
+internal fun trustedDevicePolicy(policy: String): TrustedDevicePolicy? {
+    return when (policy) {
+        "biometry_current_set" -> TrustedDevicePolicy.BIOMETRY_CURRENT_SET
+        "biometry_any" -> TrustedDevicePolicy.BIOMETRY_ANY
+        "biometry_or_device_passcode" -> TrustedDevicePolicy.BIOMETRY_OR_DEVICE_PASSCODE
+        else -> null
+    }
+}
+
+internal data class TrustedDeviceBridgeError(
+    val code: String,
+    val message: String
+)
+
+internal fun trustedDeviceKeyManagerErrorCode(
+    code: TrustedDeviceKeyManagerException.Code
+): String = code.name.lowercase()
+
+internal fun trustedDeviceBridgeError(
+    throwable: Throwable,
+    fallbackCode: String,
+    fallbackMessage: String
+): TrustedDeviceBridgeError {
+    val keyManagerError = throwable as? TrustedDeviceKeyManagerException
+    return TrustedDeviceBridgeError(
+        code = keyManagerError?.code?.let(::trustedDeviceKeyManagerErrorCode) ?: fallbackCode,
+        message = throwable.message ?: fallbackMessage
+    )
+}
+
+internal fun trustedDeviceBridgeError(
+    failure: ClerkResult.Failure<ClerkErrorResponse>,
+    fallbackCode: String,
+    fallbackMessage: String
+): TrustedDeviceBridgeError {
+    val apiError = failure.error?.errors?.firstOrNull()
+    val throwable = failure.throwable
+    val keyManagerError = throwable as? TrustedDeviceKeyManagerException
+
+    return TrustedDeviceBridgeError(
+        code = apiError?.code
+            ?: keyManagerError?.code?.let(::trustedDeviceKeyManagerErrorCode)
+            ?: fallbackCode,
+        message = apiError?.longMessage
+            ?: apiError?.message
+            ?: throwable?.message
+            ?: fallbackMessage
+    )
+}
+
 class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var authFlowStateObserverJob: Job? = null
     private var clientStateObserverJob: Job? = null
     private var lastObservedClientState: ClientStateSnapshot? = null
     private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
+
+    private data class AuthFlowStateSnapshot(
+        val isLoaded: Boolean,
+        val isAuthFlowComplete: Boolean
+    )
 
     private data class ClientStateSnapshot(
         val client: Client?,
@@ -71,16 +168,19 @@ class ClerkExpoModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("ClerkExpo")
 
-        Events(NATIVE_CLIENT_CHANGED_EVENT)
+        Events(NATIVE_AUTH_FLOW_CHANGED_EVENT, NATIVE_CLIENT_CHANGED_EVENT)
 
         OnCreate {
             sharedInstance = this@ClerkExpoModule
+            startAuthFlowStateObserver()
         }
 
         OnDestroy {
             if (sharedInstance === this@ClerkExpoModule) {
                 sharedInstance = null
             }
+            authFlowStateObserverJob?.cancel()
+            authFlowStateObserverJob = null
             clientStateObserverJob?.cancel()
             clientStateObserverJob = null
         }
@@ -91,6 +191,10 @@ class ClerkExpoModule : Module() {
 
         AsyncFunction("getClientToken") { promise: Promise ->
             getClientToken(promise)
+        }
+
+        AsyncFunction("getAuthFlowState") { promise: Promise ->
+            promise.resolve(authFlowStatePayload())
         }
 
         AsyncFunction("syncClientStateFromJs") {
@@ -107,6 +211,38 @@ class ClerkExpoModule : Module() {
                 promise
             )
         }
+
+        AsyncFunction("getTrustedDeviceAvailability") {
+                id: String?,
+                identifierHint: String?,
+                promise: Promise ->
+            getTrustedDeviceAvailability(id, identifierHint, promise)
+        }
+
+        AsyncFunction("listTrustedDevices") { promise: Promise ->
+            listTrustedDevices(promise)
+        }
+
+        AsyncFunction("enrollTrustedDevice") {
+                deviceName: String?,
+                identifierHint: String?,
+                reason: String?,
+                policy: String,
+                promise: Promise ->
+            enrollTrustedDevice(deviceName, identifierHint, reason, policy, promise)
+        }
+
+        AsyncFunction("revokeTrustedDevice") { id: String, promise: Promise ->
+            revokeTrustedDevice(id, promise)
+        }
+
+        AsyncFunction("signInWithTrustedDevice") {
+                id: String?,
+                identifierHint: String?,
+                reason: String?,
+                promise: Promise ->
+            signInWithTrustedDevice(id, identifierHint, reason, promise)
+        }
     }
 
     private val reactContext: Context?
@@ -122,6 +258,37 @@ class ClerkExpoModule : Module() {
         }
 
         return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
+    }
+
+    private fun startAuthFlowStateObserver() {
+        if (authFlowStateObserverJob != null) {
+            return
+        }
+
+        authFlowStateObserverJob = coroutineScope.launch {
+            combine(Clerk.isInitialized, Clerk.isAuthFlowCompleteFlow) { isLoaded, isAuthFlowComplete ->
+                AuthFlowStateSnapshot(
+                    isLoaded = isLoaded,
+                    isAuthFlowComplete = isLoaded && isAuthFlowComplete
+                )
+            }
+                .distinctUntilChanged()
+                .collect { state ->
+                    sendEvent(NATIVE_AUTH_FLOW_CHANGED_EVENT, authFlowStatePayload(state))
+                }
+        }
+    }
+
+    private fun authFlowStatePayload(
+        state: AuthFlowStateSnapshot = AuthFlowStateSnapshot(
+            isLoaded = Clerk.isInitialized.value,
+            isAuthFlowComplete = Clerk.isInitialized.value && Clerk.isAuthFlowComplete
+        )
+    ): Map<String, Boolean> {
+        return mapOf(
+            "isLoaded" to state.isLoaded,
+            "isAuthFlowComplete" to state.isAuthFlowComplete
+        )
     }
 
     private fun startClientStateObserver() {
@@ -380,6 +547,178 @@ class ClerkExpoModule : Module() {
             debugLog(TAG, "getClientToken failed: ${e.message}")
             promise.resolve(null)
         }
+    }
+
+    // MARK: - trusted devices
+
+    private fun getTrustedDeviceAvailability(
+        id: String?,
+        identifierHint: String?,
+        promise: Promise
+    ) {
+        coroutineScope.launch {
+            try {
+                val availability = Clerk.trustedDevices.availability(id, identifierHint)
+                promise.resolve(trustedDeviceAvailabilityPayload(availability))
+            } catch (e: Exception) {
+                rejectTrustedDeviceException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_AVAILABILITY_FAILED",
+                    fallbackMessage = "Unable to determine trusted-device availability",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun listTrustedDevices(promise: Promise) {
+        coroutineScope.launch {
+            try {
+                when (val result = Clerk.trustedDevices.list()) {
+                    is ClerkResult.Success -> promise.resolve(result.value.map(::trustedDevicePayload))
+                    is ClerkResult.Failure -> rejectTrustedDeviceFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_LIST_FAILED",
+                        "Unable to list trusted devices",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectTrustedDeviceException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_LIST_FAILED",
+                    fallbackMessage = "Unable to list trusted devices",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun enrollTrustedDevice(
+        deviceName: String?,
+        identifierHint: String?,
+        reason: String?,
+        policy: String,
+        promise: Promise
+    ) {
+        val trustedDevicePolicy = trustedDevicePolicy(policy)
+        if (trustedDevicePolicy == null) {
+            promise.reject(
+                "invalid_trusted_device_policy",
+                "Invalid trusted-device policy: $policy",
+                null
+            )
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                when (
+                    val result = Clerk.trustedDevices.enroll(
+                        deviceName = deviceName,
+                        identifierHint = identifierHint,
+                        policy = trustedDevicePolicy,
+                        promptSubtitle = reason
+                    )
+                ) {
+                    is ClerkResult.Success -> promise.resolve(trustedDevicePayload(result.value))
+                    is ClerkResult.Failure -> rejectTrustedDeviceFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
+                        "Unable to enroll trusted device",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectTrustedDeviceException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
+                    fallbackMessage = "Unable to enroll trusted device",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun revokeTrustedDevice(id: String, promise: Promise) {
+        coroutineScope.launch {
+            try {
+                when (val result = Clerk.trustedDevices.revoke(id)) {
+                    is ClerkResult.Success -> promise.resolve(trustedDevicePayload(result.value))
+                    is ClerkResult.Failure -> rejectTrustedDeviceFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_REVOCATION_FAILED",
+                        "Unable to revoke trusted device",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectTrustedDeviceException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_REVOCATION_FAILED",
+                    fallbackMessage = "Unable to revoke trusted device",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun signInWithTrustedDevice(
+        id: String?,
+        identifierHint: String?,
+        reason: String?,
+        promise: Promise
+    ) {
+        coroutineScope.launch {
+            try {
+                when (
+                    val result = Clerk.trustedDevices.signIn(
+                        id = id,
+                        identifierHint = identifierHint,
+                        promptSubtitle = reason
+                    )
+                ) {
+                    is ClerkResult.Success -> promise.resolve(trustedDeviceSignInPayload(result.value))
+                    is ClerkResult.Failure -> rejectTrustedDeviceFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                        "Unable to sign in with trusted device",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectTrustedDeviceException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                    fallbackMessage = "Unable to sign in with trusted device",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun rejectTrustedDeviceFailure(
+        promise: Promise,
+        code: String,
+        fallbackMessage: String,
+        failure: ClerkResult.Failure<ClerkErrorResponse>
+    ) {
+        val error = trustedDeviceBridgeError(failure, code, fallbackMessage)
+        promise.reject(
+            error.code,
+            error.message,
+            failure.throwable
+        )
+    }
+
+    private fun rejectTrustedDeviceException(
+        promise: Promise,
+        fallbackCode: String,
+        fallbackMessage: String,
+        exception: Exception
+    ) {
+        val error = trustedDeviceBridgeError(exception, fallbackCode, fallbackMessage)
+        promise.reject(error.code, error.message, exception)
     }
 
     // MARK: - syncClientStateFromJs
