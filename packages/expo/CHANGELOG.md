@@ -1,5 +1,38 @@
 # Change Log
 
+## 4.0.3
+
+### Patch Changes
+
+- Prevent native client updates from replacing a signed-in Expo client with a stale or sessionless client. Native-to-JS synchronization now validates client changes before applying them, restores the previous token when validation fails, and applies the same protection during 401 recovery. ([#9222](https://github.com/clerk/javascript/pull/9222)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/clerk-js@6.25.8
+  - @clerk/shared@4.25.8
+  - @clerk/react@6.12.8
+
+## 4.0.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.3.2` to `1.3.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.3. ([#9227](https://github.com/clerk/javascript/pull/9227)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/clerk-js@6.25.7
+  - @clerk/react@6.12.7
+
+## 4.0.1
+
+### Patch Changes
+
+- Fix `useSignInWithApple` dropping the user's first and last name on native sign-up. The hook now signs up first with the name from the Apple credential and falls back to sign-in when the account already exists, including on instances with restricted or waitlist sign-up mode. ([#9214](https://github.com/clerk/javascript/pull/9214)) by [@claude](https://github.com/apps/claude)
+
+  Note: Apple only shares the name on the app's first authorization. To verify the fix with an Apple ID that has already signed in to your app, delete the user in the Clerk Dashboard and remove the app's entry under Settings > Sign in with Apple on the device, then sign in again.
+
+- Updated dependencies []:
+  - @clerk/react@6.12.6
+
 ## 4.0.0
 
 ### Major Changes

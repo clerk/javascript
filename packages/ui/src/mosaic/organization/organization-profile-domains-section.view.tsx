@@ -232,7 +232,7 @@ export function OrganizationProfileDomainsSectionView({
             type='button'
             disabled={list.isLoading}
             onClick={list.fetchNext}
-            sx={t => ({ marginBlockStart: t.spacing(3) })}
+            style={{ marginBlockStart: 'calc(0.25rem * 3)' }}
           >
             Load more
           </Button>
@@ -242,7 +242,7 @@ export function OrganizationProfileDomainsSectionView({
           <Button
             type='button'
             onClick={() => addVerify.send({ type: 'OPEN_ADD' })}
-            sx={t => ({ marginBlockStart: t.spacing(4) })}
+            style={{ marginBlockStart: 'calc(0.25rem * 4)' }}
           >
             Add domain
           </Button>

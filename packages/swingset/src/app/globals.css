@@ -5,6 +5,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Replaced at build time by @stylexjs/postcss-plugin with the compiled Mosaic CSS
+   (token :root defaults + atoms). See postcss.config.mjs. */
+@stylex;
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

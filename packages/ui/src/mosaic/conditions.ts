@@ -54,7 +54,7 @@ export function expandConditions(input: StyleRule): StyleRule {
       fastDeepMergeAndReplace(nest(chain, expanded), out);
     } else if (expanded && typeof expanded === 'object' && out[key] && typeof out[key] === 'object') {
       // A prior condition already expanded into this raw selector — merge rather than overwrite.
-      fastDeepMergeAndReplace(expanded, out[key] as StyleRule);
+      fastDeepMergeAndReplace(expanded, out[key]);
     } else {
       out[key] = expanded;
     }

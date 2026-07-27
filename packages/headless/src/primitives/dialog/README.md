@@ -97,11 +97,11 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                         | Applies To                         | Description |
-| --------------------------------- | ---------------------------------- | ----------- |
-| `data-cl-open` / `data-cl-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
+| Attribute                   | Applies To                         | Description |
+| --------------------------- | ---------------------------------- | ----------- |
+| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
 
-Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by the headless parts.
+The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
 ## Important Notes
 
@@ -112,7 +112,7 @@ Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by t
 
 ## Authoring rule for new primitives
 
-Each styleable surface = one part. Layout infrastructure (overlay, scroll lock, focus manager, portal) wraps a `renderElement` call rather than fusing with it. The dialog split — `Backdrop` (semi-transparent surface) vs. `Viewport` (fixed centering + scroll lock) — exists because mosaic needs to style each layer independently. Apply the same decomposition to future primitives that combine positioning with a styled surface.
+Each styleable surface = one part. Layout infrastructure (overlay, scroll lock, focus manager, portal) wraps a `useRender` call rather than fusing with it. The dialog split — `Backdrop` (semi-transparent surface) vs. `Viewport` (fixed centering + scroll lock) — exists because mosaic needs to style each layer independently. Apply the same decomposition to future primitives that combine positioning with a styled surface.
 
 ## ARIA
 
