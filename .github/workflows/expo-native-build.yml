@@ -79,8 +79,11 @@ jobs:
               pnpm-workspace.yaml \
               tsconfig.json \
               turbo.json \
+              packages/clerk-js \
               packages/expo \
               packages/expo-google-signin \
+              packages/react \
+              packages/shared \
               "$FIXTURE_DIR" |
               git hash-object --stdin
           )"
