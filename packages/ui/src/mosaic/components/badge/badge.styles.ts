@@ -2,10 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-// Every intent is the same recipe applied to one token: the token itself is the
-// text color, a 12% mix is the fill and a 24% mix the border. Mixing toward
-// `transparent` rather than a surface token keeps the badge legible on any
-// background it's dropped onto.
+// warning/negative/positive tint a faded fill and use the saturated token as text;
+// primary/neutral fill with the solid token and use its `-foreground` for text.
 export const styles = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-full'],
