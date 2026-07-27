@@ -6,12 +6,12 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './badge.styles';
 
 export type BadgeProps = Omit<ComponentProps<'span'>, 'render'> & {
-  intent?: 'primary' | 'secondary' | 'warning' | 'destructive' | 'success';
+  color?: 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
   render?: RenderProp<React.ComponentPropsWithRef<'span'>> | React.ReactElement;
 };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function MosaicBadge(
-  { intent = 'primary', render, className, style, ...rest },
+  { color = 'primary', render, className, style, ...rest },
   ref,
 ) {
   return useRender({
@@ -19,7 +19,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Mosa
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('badge', { intent }), stylex.props(styles.base, styles[intent]), className, style),
+      ...mergeStyleProps(themeProps('badge', { color }), stylex.props(styles.base, styles[color]), className, style),
       ...rest,
     },
   });

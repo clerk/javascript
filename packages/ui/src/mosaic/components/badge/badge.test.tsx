@@ -10,16 +10,16 @@ describe('Mosaic Badge', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  it('applies the default intent when none is passed', () => {
+  it('applies the default color when none is passed', () => {
     render(<Badge>Active</Badge>);
     const badge = screen.getByText('Active');
     expect(badge).toHaveClass('cl-badge');
-    expect(badge).toHaveAttribute('data-intent', 'primary');
+    expect(badge).toHaveAttribute('data-color', 'primary');
   });
 
-  it.each(['primary', 'secondary', 'warning', 'destructive', 'success'] as const)('reflects the %s intent', intent => {
-    render(<Badge intent={intent}>Active</Badge>);
-    expect(screen.getByText('Active')).toHaveAttribute('data-intent', intent);
+  it.each(['primary', 'neutral', 'warning', 'negative', 'positive'] as const)('reflects the %s color', color => {
+    render(<Badge color={color}>Active</Badge>);
+    expect(screen.getByText('Active')).toHaveAttribute('data-color', color);
   });
 
   it('lets the consumer className and style win', () => {
@@ -56,7 +56,7 @@ describe('Mosaic Badge', () => {
   it('renders a custom element via render, keeping the styling contract', () => {
     render(
       <Badge
-        intent='success'
+        color='positive'
         // eslint-disable-next-line jsx-a11y/anchor-has-content -- Badge injects the children into the rendered anchor.
         render={<a href='/status' />}
       >
@@ -67,6 +67,6 @@ describe('Mosaic Badge', () => {
     expect(badge.tagName).toBe('A');
     expect(badge).toHaveAttribute('href', '/status');
     expect(badge).toHaveClass('cl-badge');
-    expect(badge).toHaveAttribute('data-intent', 'success');
+    expect(badge).toHaveAttribute('data-color', 'positive');
   });
 });

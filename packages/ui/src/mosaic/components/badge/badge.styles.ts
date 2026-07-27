@@ -27,20 +27,20 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-primary'],
     color: colorVars['--cl-color-primary-foreground'],
   },
-  secondary: {
-    backgroundColor: colorVars['--cl-color-muted'],
-    color: colorVars['--cl-color-muted-foreground'],
+  neutral: {
+    backgroundColor: colorVars['--cl-color-neutral'],
+    color: colorVars['--cl-color-neutral-foreground'],
   },
   warning: {
     backgroundColor: colorVars['--cl-color-warning-faded'],
     color: colorVars['--cl-color-warning'],
   },
-  destructive: {
-    backgroundColor: colorVars['--cl-color-destructive-faded'],
-    color: colorVars['--cl-color-destructive'],
+  negative: {
+    backgroundColor: colorVars['--cl-color-negative-faded'],
+    color: colorVars['--cl-color-negative'],
   },
-  success: {
-    backgroundColor: colorVars['--cl-color-success-faded'],
-    color: colorVars['--cl-color-success'],
+  positive: {
+    backgroundColor: colorVars['--cl-color-positive-faded'],
+    color: colorVars['--cl-color-positive'],
   },
 });

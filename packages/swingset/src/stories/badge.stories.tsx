@@ -15,10 +15,10 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/badge/badge.tsx',
   styles: {
     _variants: {
-      intent: { primary: {}, secondary: {}, warning: {}, destructive: {}, success: {} },
+      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
     },
     _defaultVariants: {
-      intent: 'primary',
+      color: 'primary',
     },
   },
 };
@@ -33,38 +33,38 @@ export function Primary(props: Record<string, unknown>) {
   return <Badge {...knobsAsProps(props)}>Badge Label</Badge>;
 }
 
-export function Intents(props: Record<string, unknown>) {
+export function Colors(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
       <Badge
         {...knobsAsProps(props)}
-        intent='primary'
+        color='primary'
       >
         Primary
       </Badge>
       <Badge
         {...knobsAsProps(props)}
-        intent='secondary'
+        color='neutral'
       >
-        Secondary
+        Neutral
       </Badge>
       <Badge
         {...knobsAsProps(props)}
-        intent='warning'
+        color='warning'
       >
         Warning
       </Badge>
       <Badge
         {...knobsAsProps(props)}
-        intent='destructive'
+        color='negative'
       >
-        Destructive
+        Negative
       </Badge>
       <Badge
         {...knobsAsProps(props)}
-        intent='success'
+        color='positive'
       >
-        Success
+        Positive
       </Badge>
     </div>
   );
@@ -74,7 +74,7 @@ export function WithIcon(props: Record<string, unknown>) {
   return (
     <Badge
       {...knobsAsProps(props)}
-      intent='success'
+      color='positive'
     >
       <svg
         width='10'
