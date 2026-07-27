@@ -172,6 +172,23 @@ const withClerkKeychainService = (config, { keychainService } = {}) => {
   });
 };
 
+const withClerkFaceIDPermission = (config, { faceIDPermission } = {}) => {
+  if (faceIDPermission === undefined) {
+    return config;
+  }
+
+  if (typeof faceIDPermission !== 'string' || faceIDPermission.trim().length === 0) {
+    throw new Error('Clerk: faceIDPermission must be a non-empty string');
+  }
+
+  return withInfoPlist(config, modConfig => {
+    if (!Object.hasOwn(modConfig.modResults, 'NSFaceIDUsageDescription')) {
+      modConfig.modResults.NSFaceIDUsageDescription = faceIDPermission;
+    }
+    return modConfig;
+  });
+};
+
 /**
  * Add Sign in with Apple entitlement to the iOS app.
  * Required for the native Apple Sign In flow via ASAuthorizationController.
@@ -314,12 +331,14 @@ const withClerkExpo = (config, props = {}) => {
   }
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
+  config = withClerkFaceIDPermission(config, props);
   config = withClerkTheme(config, props);
   return config;
 };
 
 module.exports = withClerkExpo;
 module.exports._testing = {
+  withClerkFaceIDPermission,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,

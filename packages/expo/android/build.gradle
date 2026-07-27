@@ -20,8 +20,8 @@ def clerkExpoVersion = clerkExpoPackageJson.version.toString()
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
 ext {
   kotlinxCoroutinesVersion = "1.7.3"
-  clerkAndroidApiVersion = "1.0.36"
-  clerkAndroidUiVersion = "1.0.36"
+  clerkAndroidApiVersion = "1.0.37"
+  clerkAndroidUiVersion = "1.0.37"
   composeVersion = "1.7.0"
   activityComposeVersion = "1.9.0"
   lifecycleVersion = "2.8.0"
@@ -132,4 +132,6 @@ dependencies {
   implementation "androidx.activity:activity-compose:$activityComposeVersion"
   implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
   implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion"
+
+  testImplementation "junit:junit:4.13.2"
 }

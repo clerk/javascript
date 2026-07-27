@@ -13,8 +13,8 @@ export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
  * Props for the AuthView component.
  *
  * AuthView renders a native authentication UI inline (fills parent container).
- * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
- * state changes.
+ * Use `useAuthFlow()` to gate authenticated content when AuthView is a
+ * non-dismissible root view.
  */
 export interface AuthViewProps {
   /**

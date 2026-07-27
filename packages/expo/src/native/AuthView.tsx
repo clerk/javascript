@@ -16,22 +16,19 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
  *
  * After authentication completes, the session is automatically synced with the JS SDK.
- * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
- * state changes.
+ * Use `useAuthFlow()` when this is a non-dismissible root view so Clerk-owned
+ * post-authentication steps finish before authenticated content replaces it.
  *
  * @example
  * ```tsx
- * import { AuthView } from '@clerk/expo/native';
- * import { useAuth } from '@clerk/expo';
+ * import { AuthView, useAuthFlow } from '@clerk/expo/native';
  *
- * export default function SignInScreen() {
- *   const { isSignedIn } = useAuth();
+ * export default function RootScreen() {
+ *   const { isLoaded, isAuthFlowComplete } = useAuthFlow();
  *
- *   useEffect(() => {
- *     if (isSignedIn) router.replace('/home');
- *   }, [isSignedIn]);
+ *   if (!isLoaded) return null;
  *
- *   return <AuthView />;
+ *   return isAuthFlowComplete ? <HomeScreen /> : <AuthView isDismissible={false} />;
  * }
  * ```
  *
