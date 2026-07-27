@@ -34,11 +34,12 @@ function isNativeAuthFlowState(state: NativeAuthFlowState | undefined): state is
 }
 
 /**
- * Reports when authentication and Clerk-owned post-authentication steps are complete.
+ * Reports when authentication and an optional trusted-device enrollment prompt are complete.
  *
- * Use this hook to choose between a non-dismissible root `AuthView` and the
- * application's authenticated content. On platforms without native auth-flow
- * completion state, it falls back to the JS session state.
+ * Use this hook when trusted-device enrollment prompts are enabled and a
+ * non-dismissible root `AuthView` must remain mounted until the prompt finishes.
+ * On platforms without native auth-flow completion state, it falls back to the
+ * JS session state.
  */
 export function useAuthFlow(): UseAuthFlowReturn {
   const { isLoaded: isJsLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
