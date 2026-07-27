@@ -2,7 +2,7 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
-  Intents as BadgeIntents,
+  Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
   WithIcon as BadgeWithIcon,
@@ -124,7 +124,7 @@ const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: Car
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
-  Intents: BadgeIntents,
+  Colors: BadgeColors,
   WithIcon: BadgeWithIcon,
 };
 
