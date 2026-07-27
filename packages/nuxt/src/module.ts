@@ -135,10 +135,6 @@ export default defineNuxtModule<ModuleOptions>({
     addImportsDir(resolver.resolve('./runtime/composables'));
     addImports([
       {
-        name: 'createRouteMatcher',
-        from: resolver.resolve('./runtime/client'),
-      },
-      {
         name: 'updateClerkOptions',
         from: resolver.resolve('./runtime/client'),
       },
