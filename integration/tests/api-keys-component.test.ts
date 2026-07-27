@@ -388,6 +388,44 @@ test.describe('api keys component @machine', () => {
     await u.page.unrouteAll();
   });
 
+  test('standalone API keys component renders in org context when user API keys are disabled', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
+
+    let capturedSubject: string | null = null;
+    const apiKeyRequestPromise = u.page.waitForRequest(request => {
+      if (request.url().includes('api_keys')) {
+        const url = new URL(request.url());
+        capturedSubject = url.searchParams.get('subject');
+        return true;
+      }
+      return false;
+    });
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+
+    // Org API keys are listed, so the subject must be the organization
+    await apiKeyRequestPromise;
+    expect(capturedSubject).toBe(fakeOrganization.organization.id);
+
+    await u.page.unrouteAll();
+  });
+
   test.describe('api key list invalidation', () => {
     // Helper function to count actual API key rows (not empty state)
     const createAPIKeyCountHelper = (u: any) => async () => {

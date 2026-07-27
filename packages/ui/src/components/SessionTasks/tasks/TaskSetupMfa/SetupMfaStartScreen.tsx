@@ -38,8 +38,7 @@ export const SetupMfaStartScreen = withCardStateProvider((props: SetupMfaStartSc
           showLogo
           sx={t => ({
             paddingTop: t.space.$8,
-            paddingLeft: t.space.$8,
-            paddingRight: t.space.$8,
+            paddingInline: t.space.$8,
           })}
         >
           <Header.Title localizationKey={localizationKeys('taskSetupMfa.start.title')} />

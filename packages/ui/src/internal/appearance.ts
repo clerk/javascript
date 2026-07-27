@@ -183,6 +183,7 @@ export type ElementsConfig = {
 
   logoGroup: WithOptions;
   logoGroupItem: WithOptions;
+  logoGroupItemContainer: WithOptions;
   logoGroupIcon: WithOptions;
   logoGroupSeparator: WithOptions;
 
@@ -599,6 +600,7 @@ export type ElementsConfig = {
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
   profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
+  profilePageContent: WithOptions;
 
   // TODO: review
   formattedPhoneNumber: WithOptions;

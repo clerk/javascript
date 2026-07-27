@@ -2,6 +2,7 @@ import type { BillingSubscriptionItemResource, BillingSubscriptionResource } fro
 import { Fragment, useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
 import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
@@ -16,6 +17,7 @@ import {
 } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
+  Box,
   Col,
   Flex,
   Icon,
@@ -47,7 +49,7 @@ export function SubscriptionsList({
 }) {
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptionItems, data: subscription } = useSubscription();
+  const { subscriptionItems, data: subscription, isLoading } = useSubscription();
   const canManageBilling =
     useProtect(has => has({ permission: 'org:sys_billing:manage' })) || subscriberType === 'user';
   const { navigate } = useRouter();
@@ -92,94 +94,103 @@ export function SubscriptionsList({
         paddingTop: t.space.$1,
       })}
     >
-      {subscriptionItems.length > 0 && (
-        <Table
-          sx={t => ({
-            overflow: 'hidden',
-            'tr > td': {
-              paddingTop: t.space.$3,
-              paddingBottom: t.space.$3,
-              paddingInlineStart: t.space.$3,
-              paddingInlineEnd: t.space.$3,
-            },
-          })}
-          tableHeadVisuallyHidden
-        >
-          <Thead>
-            <Tr>
-              <Th
-                localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
-                )}
-              />
-              <Th
-                localizationKey={localizationKeys(
-                  `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
-                )}
-              />
-            </Tr>
-          </Thead>
-          <Tbody>
-            {sortedSubscriptionItems.map(subscriptionItem => (
-              <SubscriptionItemRow
-                key={subscriptionItem.id}
-                subscriptionItem={subscriptionItem}
-                length={sortedSubscriptionItems.length}
-              />
-            ))}
-            {subscription?.nextPayment ? (
-              <SubscriptionOverviewRow
-                nextPayment={subscription.nextPayment}
-                localizationRoot={localizationRoot}
+      {isLoading && subscriptionItems.length === 0 ? (
+        // Reserve the loaded height (42px card + gap + button) to avoid shifting content on load
+        <Box sx={t => ({ height: `calc(${t.space.$1} * 10.5 + ${t.space.$2} + ${t.space.$8})` })}>
+          <FullHeightLoader />
+        </Box>
+      ) : (
+        <>
+          {subscriptionItems.length > 0 && (
+            <Table
+              sx={t => ({
+                overflow: 'hidden',
+                'tr > td': {
+                  paddingTop: t.space.$3,
+                  paddingBottom: t.space.$3,
+                  paddingInlineStart: t.space.$3,
+                  paddingInlineEnd: t.space.$3,
+                },
+              })}
+              tableHeadVisuallyHidden
+            >
+              <Thead>
+                <Tr>
+                  <Th
+                    localizationKey={localizationKeys(
+                      `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__plan`,
+                    )}
+                  />
+                  <Th
+                    localizationKey={localizationKeys(
+                      `${localizationRoot}.billingPage.subscriptionsListSection.tableHeader__startDate`,
+                    )}
+                  />
+                </Tr>
+              </Thead>
+              <Tbody>
+                {sortedSubscriptionItems.map(subscriptionItem => (
+                  <SubscriptionItemRow
+                    key={subscriptionItem.id}
+                    subscriptionItem={subscriptionItem}
+                    length={sortedSubscriptionItems.length}
+                  />
+                ))}
+                {subscription?.nextPayment ? (
+                  <SubscriptionOverviewRow
+                    nextPayment={subscription.nextPayment}
+                    localizationRoot={localizationRoot}
+                  />
+                ) : null}
+              </Tbody>
+            </Table>
+          )}
+
+          <ProfileSection.ButtonGroup id='subscriptionsList'>
+            {billingPlansExist ? (
+              <ProfileSection.ArrowButton
+                id='subscriptionsList'
+                textLocalizationKey={subscriptionItems.length > 0 ? switchPlansLabel : newSubscriptionLabel}
+                sx={[
+                  t => ({
+                    justifyContent: 'start',
+                    height: t.sizes.$8,
+                    width: isManageButtonVisible ? 'unset' : undefined,
+                  }),
+                ]}
+                leftIcon={subscriptionItems.length > 0 ? ArrowUpDown : Plus}
+                rightIcon={null}
+                leftIconSx={t => ({
+                  width: t.sizes.$4,
+                  height: t.sizes.$4,
+                })}
+                onClick={() => void navigate('plans')}
               />
             ) : null}
-          </Tbody>
-        </Table>
+
+            {isManageButtonVisible ? (
+              <ProfileSection.ArrowButton
+                id='subscriptionsList'
+                textLocalizationKey={manageSubscriptionLabel}
+                sx={[
+                  t => ({
+                    justifyContent: 'start',
+                    height: t.sizes.$8,
+                    width: 'unset',
+                  }),
+                ]}
+                rightIcon={null}
+                leftIcon={Cog}
+                leftIconSx={t => ({
+                  width: t.sizes.$4,
+                  height: t.sizes.$4,
+                })}
+                onClick={event => openSubscriptionDetails(event)}
+              />
+            ) : null}
+          </ProfileSection.ButtonGroup>
+        </>
       )}
-
-      <ProfileSection.ButtonGroup id='subscriptionsList'>
-        {billingPlansExist ? (
-          <ProfileSection.ArrowButton
-            id='subscriptionsList'
-            textLocalizationKey={subscriptionItems.length > 0 ? switchPlansLabel : newSubscriptionLabel}
-            sx={[
-              t => ({
-                justifyContent: 'start',
-                height: t.sizes.$8,
-                width: isManageButtonVisible ? 'unset' : undefined,
-              }),
-            ]}
-            leftIcon={subscriptionItems.length > 0 ? ArrowUpDown : Plus}
-            rightIcon={null}
-            leftIconSx={t => ({
-              width: t.sizes.$4,
-              height: t.sizes.$4,
-            })}
-            onClick={() => void navigate('plans')}
-          />
-        ) : null}
-
-        {isManageButtonVisible ? (
-          <ProfileSection.ArrowButton
-            id='subscriptionsList'
-            textLocalizationKey={manageSubscriptionLabel}
-            sx={[
-              t => ({
-                justifyContent: 'start',
-                height: t.sizes.$8,
-                width: 'unset',
-              }),
-            ]}
-            rightIcon={null}
-            leftIcon={Cog}
-            leftIconSx={t => ({
-              width: t.sizes.$4,
-              height: t.sizes.$4,
-            })}
-            onClick={event => openSubscriptionDetails(event)}
-          />
-        ) : null}
-      </ProfileSection.ButtonGroup>
     </ProfileSection.Root>
   );
 }

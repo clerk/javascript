@@ -1,5 +1,89 @@
 # @clerk/ui
 
+## 1.26.0
+
+### Minor Changes
+
+- Expose composable `UserProfile` and `OrganizationProfile` subcomponents from `@clerk/ui/experimental` ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix `OrganizationProfileGeneralPanel` (from `@clerk/ui/experimental`) throwing "CardState not found" when opening the leave-organization or delete-organization confirmation in its default, no-children page mode. The panel now provides the same root `CardStateProvider` that a mounted `<OrganizationProfile />` supplies. ([#9243](https://github.com/clerk/javascript/pull/9243)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/localizations@4.13.8
+
+## 1.25.8
+
+### Patch Changes
+
+- Use logical CSS properties for the organization members footer and the MFA setup task header, so both lay out correctly in right-to-left locales. ([#9218](https://github.com/clerk/javascript/pull/9218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/localizations@4.13.7
+
+## 1.25.7
+
+### Patch Changes
+
+- Ensure the keyless prompt renders above application content by setting an explicit `z-index`. ([#9211](https://github.com/clerk/javascript/pull/9211)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The OAuth consent screen now shows a recognizable brand mark for well-known OAuth clients (Claude, ChatGPT) when the requesting application has not uploaded its own logo. ([#9158](https://github.com/clerk/javascript/pull/9158)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.25.6
+
+### Patch Changes
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+  - @clerk/localizations@4.13.6
+
+## 1.25.5
+
+### Patch Changes
+
+- Fix pressing `Escape` while a `Select` is open inside a `Drawer` (for example the payment method picker in Checkout) dismissing the entire Drawer. `Escape` now closes only the open `Select` and leaves the Drawer open. The `Select` now wires up its floating interaction props so it handles `Escape` itself, and the `Drawer` roots a floating tree so nested floating elements are recognized as its children. ([#9176](https://github.com/clerk/javascript/pull/9176)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve `Select` keyboard and screen reader support by routing navigation through floating-ui's interaction hooks. Pressing `ArrowUp`/`ArrowDown` on a focused, closed `Select` now opens the listbox, and the active option is announced via `aria-activedescendant`. The searchable variant (for example the `PhoneInput` country picker) now exposes a proper combobox: its input is marked `role="combobox"` with `aria-controls`, `aria-autocomplete="list"`, and `aria-activedescendant`, while the plain variant keeps its listbox semantics. ([#9179](https://github.com/clerk/javascript/pull/9179)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/localizations@4.13.5
+
+## 1.25.4
+
+### Patch Changes
+
+- Reduce layout shift while loading the organization and billing UI. The domain list, billing subscription section, and payment methods now reserve their loaded height while data is fetched, and the subscription section shows a loading indicator instead of rendering nothing. ([#9169](https://github.com/clerk/javascript/pull/9169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve phone input country selector and menu item styling, refining hover and focus states, spacing, and scroll padding. ([#9161](https://github.com/clerk/javascript/pull/9161)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix table row hover styling so the rounded bottom corners are only applied to the last row, matching the table's border radius. Previously any hovered row showed a stray corner radius. ([#9170](https://github.com/clerk/javascript/pull/9170)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Headings now use `text-wrap: balance` and body text uses `text-wrap: pretty` to reduce widows and orphans when text wraps across lines. This is a progressive enhancement that falls back to normal wrapping in browsers without support. ([#9157](https://github.com/clerk/javascript/pull/9157)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+  - @clerk/localizations@4.13.4
+
+## 1.25.3
+
+### Patch Changes
+
+- Fix small actions button border radius to ensure consistency. ([#9146](https://github.com/clerk/javascript/pull/9146)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Reduce the organization avatar's border radius in the `OrganizationSwitcher` trigger so it stays proportional at the smaller trigger size. ([#9148](https://github.com/clerk/javascript/pull/9148)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Set `box-sizing: border-box` on the spinner so its border no longer changes the rendered size and causes a layout shift. ([#9147](https://github.com/clerk/javascript/pull/9147)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+  - @clerk/localizations@4.13.3
+
 ## 1.25.2
 
 ### Patch Changes

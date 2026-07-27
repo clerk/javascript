@@ -9,7 +9,7 @@ const basePath = '/domains';
 /** @generateWithEmptyComment */
 export type AddDomainParams = {
   /**
-   * The new domain name. For development instances, can contain the port, e.g. `myhostname:3000`. For production instances, must be a valid FQDN, e.g. `mysite.com`. Cannot contain protocol scheme.
+   * The new domain name. For development instances, can contain the port, e.g., `myhostname:3000`. For production instances, must be a valid FQDN, e.g., `mysite.com`. Cannot contain protocol scheme.
    */
   name: string;
   /** Whether the new domain is a satellite domain. Only `true` is accepted at the moment. */

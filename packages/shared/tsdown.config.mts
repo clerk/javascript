@@ -44,7 +44,9 @@ export default defineConfig(({ watch, env }) => {
     {
       ...common,
       dts: false,
-      clean: true,
+      // Keep the previous build in place during watch rebuilds so downstream
+      // dev servers never resolve package exports against an empty dist.
+      clean: !watch,
       external: ['react', 'react-dom'],
       onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,
       // Route rolldown's shared chunks into a nested `_chunks/` directory. The

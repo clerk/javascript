@@ -33,6 +33,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
+  SignUpFutureSubmitProtectCheckParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
   SignUpFutureVerifications as SignUpFutureVerificationsType,
@@ -1201,7 +1202,7 @@ class SignUpFuture implements SignUpFutureResource {
    * @param params.proofToken - The proof token produced by the Protect challenge SDK.
    * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
    */
-  async submitProtectCheck(params: { proofToken: string }): Promise<{ error: ClerkError | null }> {
+  async submitProtectCheck(params: SignUpFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePatch({
         action: 'protect_check',

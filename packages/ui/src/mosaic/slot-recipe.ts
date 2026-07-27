@@ -140,18 +140,21 @@ export function defineSlotRecipe<V extends Record<string, Record<string, StyleRu
 export function defineSlotRecipe(
   configOrFn: SlotRecipeConfig | ((theme: MosaicTheme) => SlotRecipeConfig),
 ): SlotRecipe<string, unknown> {
-  const cache = typeof configOrFn === 'function' ? new WeakMap<MosaicTheme, SlotRecipeConfig>() : null;
-  const resolveConfig = (theme: MosaicTheme): SlotRecipeConfig => {
-    if (typeof configOrFn !== 'function') {
-      return configOrFn;
-    }
-    let cached = cache!.get(theme);
-    if (!cached) {
-      cached = configOrFn(theme);
-      cache!.set(theme, cached);
-    }
-    return cached;
-  };
+  let resolveConfig: (theme: MosaicTheme) => SlotRecipeConfig;
+  if (typeof configOrFn === 'function') {
+    const buildConfig = configOrFn;
+    const cache = new WeakMap<MosaicTheme, SlotRecipeConfig>();
+    resolveConfig = theme => {
+      let cached = cache.get(theme);
+      if (!cached) {
+        cached = buildConfig(theme);
+        cache.set(theme, cached);
+      }
+      return cached;
+    };
+  } else {
+    resolveConfig = () => configOrFn;
+  }
 
   // Slot identity is theme-independent, so probe once against the default theme.
   const probe = resolveConfig(resolveVariables(defaultMosaicVariables));

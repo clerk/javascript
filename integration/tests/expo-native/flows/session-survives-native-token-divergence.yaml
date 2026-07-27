@@ -1,0 +1,44 @@
+# Regression for the lazily-persisted-clients incident (MOBILE-594): a stale
+# native refresh hands JS a token for a brand-new session-less client, and the
+# JS session must survive. Sign-in happens through the JS runtime (not the
+# native AuthView) so the JS client owns the session, which is the topology
+# the incident requires. Android-only: the corrupt hook lives in the fixture's
+# android E2EHooks module, so the flow no-ops on iOS.
+appId: com.clerk.exponativebuildfixture
+name: JS session survives a divergent native client token
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow: subflows/open-app.yaml
+      - tapOn:
+          id: 'e2e-identifier-input'
+      - inputText: ${CLERK_TEST_EMAIL}
+      - tapOn:
+          id: 'e2e-password-input'
+      - inputText: ${CLERK_TEST_PASSWORD}
+      - hideKeyboard
+      - tapOn:
+          id: 'e2e-js-sign-in-button'
+      - runFlow: subflows/assert-signed-in.yaml
+      # Force the native SDK onto a stale token; its refresh emits a
+      # session-less client token to JS (the incident trigger). The fixture
+      # shows corrupt-done only after the sync had time to settle.
+      - tapOn:
+          id: 'e2e-corrupt-native-token-button'
+      - extendedWaitUntil:
+          visible: 'corrupt-done'
+          timeout: 30000
+      # Mint a session token with whatever the JS cache now holds. Without the
+      # adoption guard this fails and the session collapses (~44s in prod).
+      - tapOn:
+          id: 'e2e-refresh-token-button'
+      - extendedWaitUntil:
+          visible: 'token-ok'
+          timeout: 20000
+      - assertVisible: 'signed in'
+      # Leave the app signed out for whichever flow runs next.
+      - tapOn:
+          id: 'sign-out-button'
+      - runFlow: subflows/assert-signed-out.yaml

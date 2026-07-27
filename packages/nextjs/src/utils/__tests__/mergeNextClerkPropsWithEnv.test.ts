@@ -49,6 +49,17 @@ describe('mergeNextClerkPropsWithEnv', () => {
     expect(result.proxyUrl).toBe('');
   });
 
+  it('does not auto-derive proxyUrl when auto-proxy is disabled', () => {
+    process.env.CLERK_DISABLE_AUTO_PROXY = 'true';
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_Zm9vLmNsZXJrLmNvbSQ=';
+    process.env.VERCEL_TARGET_ENV = 'production';
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = 'myapp.vercel.app';
+
+    const result = mergeNextClerkPropsWithEnv({});
+
+    expect(result.proxyUrl).toBe('');
+  });
+
   it('does not override an explicit proxyUrl', () => {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_live_Zm9vLmNsZXJrLmNvbSQ=';
     process.env.VERCEL_TARGET_ENV = 'production';

@@ -94,6 +94,14 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
 }
 
 /** @generateWithEmptyComment */
+export interface SignUpFutureSubmitProtectCheckParams {
+  /**
+   * The proof token produced by the Protect challenge SDK.
+   */
+  proofToken: string;
+}
+
+/** @generateWithEmptyComment */
 export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
   /**
    * The user's email address. Only supported if [Email address](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#email) is enabled in the instance settings. Keep in mind that the email address requires an extra verification process.
@@ -524,10 +532,9 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain
-   * another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
    */
-  submitProtectCheck: (params: { proofToken: string }) => Promise<{ error: ClerkError | null }>;
+  submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Converts a sign-up with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.

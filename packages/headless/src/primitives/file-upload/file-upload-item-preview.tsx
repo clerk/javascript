@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { useFileUploadItemContext } from './file-upload-context';
 
 export type FileUploadItemPreviewProps = ComponentProps<'img'>;
@@ -33,15 +33,14 @@ export const FileUploadItemPreview = React.forwardRef<HTMLImageElement, FileUplo
     }, [file, isImage]);
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'file-upload-item-preview',
       src: objectUrl,
       alt: file.name,
-      ref,
     };
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'img',
       render,
+      ref,
       // Only render once we are an image with a ready object URL, so we never
       // emit an <img> with an empty src.
       enabled: isImage && objectUrl != null,

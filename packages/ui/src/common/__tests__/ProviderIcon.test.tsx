@@ -56,7 +56,6 @@ describe('ProviderIcon', () => {
       );
 
       const icon = screen.getByLabelText('Apple icon');
-      const styles = window.getComputedStyle(icon);
 
       // Check that mask-image is applied (via inline styles)
       expect(icon).toHaveStyle({
@@ -225,7 +224,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -242,7 +241,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );
@@ -261,7 +260,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -279,7 +278,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );

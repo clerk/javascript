@@ -6,7 +6,7 @@ import { CLERK_CLASS_RE, HAS_RE, POSITIONAL_PSEUDO_RE } from './cssPatterns';
 import { detectStructuralClerkCss } from './detectClerkStylesheetUsage';
 
 // Regex patterns for hasAdjacencyWithOtherSelector
-const OTHER_SELECTOR_RE = /[.#\w\[:]/;
+const OTHER_SELECTOR_RE = /[.#\w[:]/;
 const CLERK_CLASS_GLOBAL_RE = /\.cl-[A-Za-z0-9_-]+/g;
 const COMBINATOR_RE = /[>+~\s]/;
 

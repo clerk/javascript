@@ -1,0 +1,27 @@
+# Subflow: launch from a clean state and land signed out.
+appId: com.clerk.exponativebuildfixture
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: 'auth-state'
+    timeout: 30000
+# Text-only matching from here on: iOS failed combined id+text filters on RN
+# Text elements in CI while id-only and text-only both match. Also wait out
+# clerk-js init ('loading') with a retrying wait; assertVisible never retries.
+- extendedWaitUntil:
+    visible: 'signed (in|out)'
+    timeout: 45000
+# clearState does not wipe the iOS Keychain, so a session from a previous
+# flow (or retry attempt) can survive the relaunch. Sign out via JS first.
+- runFlow:
+    when:
+      visible: 'signed in'
+    commands:
+      - tapOn:
+          id: 'sign-out-button'
+      - extendedWaitUntil:
+          visible: 'signed out'
+          timeout: 15000
+- assertVisible: 'signed out'

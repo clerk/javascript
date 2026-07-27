@@ -6,7 +6,7 @@ A modal window that overlays the page and traps focus until dismissed, from
 `@clerk/headless`. It is a **headless** primitive: it supplies open state, portalling, an
 overlay surface, a centering viewport with optional body scroll lock, focus management,
 dismissal (outside press / Escape), and ARIA wiring, but ships **no styles** — you bring
-your own CSS by targeting the `data-cl-*` state attributes each part emits.
+your own CSS by targeting the `data-*` state attributes each part emits.
 
 ## Example
 
@@ -105,16 +105,15 @@ default element.
 
 ## Styling
 
-The headless parts don't emit `data-cl-slot` — slot identity is applied by the styled
-(Mosaic) layer. Target a part with your own class (or `render` prop) and combine it with
-the `data-cl-*` state attributes each part emits:
+The headless parts are unstyled. Target a part with your own class (or `render` prop) and
+combine it with the `data-*` state attributes each part emits:
 
-| Attribute                | Applies To                         | Description                                       |
-| ------------------------ | ---------------------------------- | ------------------------------------------------- |
-| `data-cl-open`           | Trigger, Backdrop, Viewport, Popup | Present when the dialog is open                   |
-| `data-cl-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (still mounted while exiting) |
-| `data-cl-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame                     |
-| `data-cl-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation                 |
+| Attribute             | Applies To                         | Description                                       |
+| --------------------- | ---------------------------------- | ------------------------------------------------- |
+| `data-open`           | Trigger, Backdrop, Viewport, Popup | Present when the dialog is open                   |
+| `data-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (still mounted while exiting) |
+| `data-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame                     |
+| `data-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation                 |
 
 The backdrop, viewport, and popup stay mounted through the exit animation, so enter/exit
 transitions are CSS-driven:
@@ -124,8 +123,8 @@ transitions are CSS-driven:
   opacity: 1;
   transition: opacity 150ms ease;
 }
-.dialog-popup[data-cl-starting-style],
-.dialog-popup[data-cl-ending-style] {
+.dialog-popup[data-starting-style],
+.dialog-popup[data-ending-style] {
   opacity: 0;
 }
 ```

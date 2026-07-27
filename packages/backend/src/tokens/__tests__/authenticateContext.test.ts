@@ -302,6 +302,16 @@ describe('AuthenticateContext', () => {
       expect(context.proxyUrl).toBeUndefined();
     });
 
+    it('does NOT auto-derive proxyUrl when auto-proxy is disabled', async () => {
+      process.env.CLERK_DISABLE_AUTO_PROXY = 'true';
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
     it('explicit proxyUrl takes precedence over auto-detection', async () => {
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
