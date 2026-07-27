@@ -21,6 +21,32 @@ export function JsSignInForm({ onStatus }: { onStatus: (status: string) => void 
         reportError(error.message ?? '');
         return;
       }
+
+      if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
+        const supportsEmailCode = signIn.supportedSecondFactors.some(factor => factor.strategy === 'email_code');
+        if (!supportsEmailCode) {
+          reportError(`Unsupported sign-in state: ${signIn.status}`);
+          return;
+        }
+
+        const { error: sendCodeError } = await signIn.mfa.sendEmailCode();
+        if (sendCodeError) {
+          reportError(sendCodeError.message ?? '');
+          return;
+        }
+
+        const { error: verifyCodeError } = await signIn.mfa.verifyEmailCode({ code: '424242' });
+        if (verifyCodeError) {
+          reportError(verifyCodeError.message ?? '');
+          return;
+        }
+      }
+
+      if (signIn.status !== 'complete' || !signIn.createdSessionId) {
+        reportError(`Sign-in incomplete: ${signIn.status}`);
+        return;
+      }
+
       const { error: finalizeError } = await signIn.finalize();
       if (finalizeError) {
         reportError(finalizeError.message ?? '');
