@@ -4,6 +4,8 @@ import * as IconStories from './icon.stories';
 
 Icon renders a named glyph from Mosaic's icon set. It sizes through the `size` variant and inherits color from `currentColor`. Any glyph can be swapped per name through `appearance.icons` on `MosaicProvider`. Mosaic's styling applies to an override just like the built-in glyph — so swapped icons stay visually consistent — and the override also carries the `.cl-icon` class and `data-size` attribute for targeting.
 
+Set `placement` when the icon sits beside text inside a container. It adds no styling of its own; it reflects `data-icon="inline-start"` or `data-icon="inline-end"` so the container can react — a `Button`, for example, tightens its padding on the side the icon sits with `:has([data-icon='inline-end'])`. The values are the CSS logical directions, so they follow the writing mode rather than naming a physical edge. Leave it unset for a standalone icon.
+
 ## Playground
 
 <Preview
@@ -15,7 +17,10 @@ Icon renders a named glyph from Mosaic's icon set. It sizes through the `size` v
 
 <PropTable
   meta={IconStories.meta}
-  extra={[{ name: 'name', type: 'IconName' }]}
+  extra={[
+    { name: 'name', type: 'IconName' },
+    { name: 'placement', type: "'inline-start' | 'inline-end'" },
+  ]}
 />
 
 ## Usage

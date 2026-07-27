@@ -41,6 +41,44 @@ describe('Mosaic Icon', () => {
     expect(svg).toHaveStyle({ marginTop: '8px' });
   });
 
+  it('emits no placement attribute when the icon is not placed', () => {
+    const { container } = wrap(<Icon name='chevron-right' />);
+    expect(container.querySelector('svg')).not.toHaveAttribute('data-icon');
+  });
+
+  it('reflects placement as data-icon so a container can select on it', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-end'
+      />,
+    );
+    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'inline-end');
+  });
+
+  it('does not leak the placement prop itself to the DOM', () => {
+    const { container } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-start'
+      />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).toHaveAttribute('data-icon', 'inline-start');
+    expect(svg).not.toHaveAttribute('placement');
+  });
+
+  it('reflects placement on an override element too', () => {
+    const { getByTestId } = wrap(
+      <Icon
+        name='chevron-right'
+        placement='inline-end'
+      />,
+      override,
+    );
+    expect(getByTestId('override')).toHaveAttribute('data-icon', 'inline-end');
+  });
+
   it('renders the override element instead of the default glyph', () => {
     const { getByTestId, container } = wrap(<Icon name='chevron-right' />, override);
     expect(getByTestId('override')).not.toBeNull();
