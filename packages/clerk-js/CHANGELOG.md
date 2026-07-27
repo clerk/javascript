@@ -1,5 +1,38 @@
 # Change Log
 
+## 6.25.9
+
+### Patch Changes
+
+- Fix the standalone `<APIKeys />` component failing to render when an organization is active and user API keys are disabled but organization API keys are enabled. The component now correctly checks the user API keys setting only when no organization is active. ([#9247](https://github.com/clerk/javascript/pull/9247)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bias proactive session token refresh ownership toward the focused browser tab and poll more often while focused in multi-tab apps. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- When running in a browser context, session token requests now include a `tab_state` parameter (`focused`, `visible`, or `hidden`) so the backend can distinguish foreground from background token refreshes. The parameter is omitted in environments without a document, such as extension service workers. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 6.25.8
+
+### Patch Changes
+
+- Internal plumbing to support `@clerk/ui` composed `UserProfile` / `OrganizationProfile` subcomponents. ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+
+## 6.25.7
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
+## 6.25.6
+
+### Patch Changes
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+
 ## 6.25.5
 
 ### Patch Changes

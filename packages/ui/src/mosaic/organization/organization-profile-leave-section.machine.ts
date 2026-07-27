@@ -55,6 +55,7 @@ export const organizationProfileLeaveSectionMachine = createMachine({
         },
       }),
     },
+    // eslint-disable-next-line custom-rules/no-physical-css-properties -- machine state name ("has left the org"), not CSS
     left: { type: 'final' },
   },
 });

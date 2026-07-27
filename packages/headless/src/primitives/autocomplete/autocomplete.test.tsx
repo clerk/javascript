@@ -36,13 +36,14 @@ function FilteredAutocomplete(
       onValueChange={props.onValueChange}
     >
       <Autocomplete.Input placeholder='Search fruits...' />
-      <Autocomplete.Positioner>
-        <Autocomplete.Popup>
+      <Autocomplete.Positioner data-testid='autocomplete-positioner'>
+        <Autocomplete.Popup data-testid='autocomplete-popup'>
           {filtered.map(f => (
             <Autocomplete.Option
               key={f.value}
               value={f.value}
               label={f.label}
+              data-testid='autocomplete-option'
             >
               {f.label}
             </Autocomplete.Option>
@@ -57,13 +58,14 @@ function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocompl
   return (
     <Autocomplete.Root {...props}>
       <Autocomplete.Input placeholder='Search fruits...' />
-      <Autocomplete.Positioner>
-        <Autocomplete.Popup>
+      <Autocomplete.Positioner data-testid='autocomplete-positioner'>
+        <Autocomplete.Popup data-testid='autocomplete-popup'>
           {fruits.map(f => (
             <Autocomplete.Option
               key={f.value}
               value={f.value}
               label={f.label}
+              data-testid='autocomplete-option'
             >
               {f.label}
             </Autocomplete.Option>
@@ -75,22 +77,6 @@ function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocompl
 }
 
 describe('Autocomplete', () => {
-  describe('slot attributes', () => {
-    it('renders input with data-cl-slot', () => {
-      render(<StaticAutocomplete />);
-      const input = screen.getByPlaceholderText('Search fruits...');
-      expect(input).toHaveAttribute('data-cl-slot', 'autocomplete-input');
-    });
-
-    it('renders all parts with correct slot attributes when open', () => {
-      render(<StaticAutocomplete defaultOpen />);
-
-      expect(document.querySelector('[data-cl-slot="autocomplete-positioner"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="autocomplete-popup"]')).toBeInTheDocument();
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]')).toHaveLength(4);
-    });
-  });
-
   describe('open/close', () => {
     it('opens when user types', async () => {
       const user = userEvent.setup();
@@ -99,7 +85,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'a');
 
-      expect(document.querySelector('[data-cl-slot="autocomplete-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-popup"]')).toBeInTheDocument();
     });
 
     it('closes when input is cleared', async () => {
@@ -109,11 +95,11 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'a');
 
-      expect(document.querySelector('[data-cl-slot="autocomplete-popup"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-popup"]')).toBeInTheDocument();
 
       await user.clear(input);
 
-      expect(input).toHaveAttribute('data-cl-closed', '');
+      expect(input).toHaveAttribute('data-closed', '');
     });
 
     it('closes on Escape', async () => {
@@ -124,7 +110,7 @@ describe('Autocomplete', () => {
       await user.type(input, 'a');
       await user.keyboard('{Escape}');
 
-      expect(input).toHaveAttribute('data-cl-closed', '');
+      expect(input).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -147,7 +133,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'ch');
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(1);
       expect(options[0]).toHaveTextContent('Cherry');
     });
@@ -159,7 +145,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'a');
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(1); // Only "Apple" starts with "a"
     });
   });
@@ -197,7 +183,7 @@ describe('Autocomplete', () => {
       await user.type(input, 'b');
       await user.click(screen.getByText('Banana'));
 
-      expect(input).toHaveAttribute('data-cl-closed', '');
+      expect(input).toHaveAttribute('data-closed', '');
     });
 
     it('returns focus to input after click selection', async () => {
@@ -221,7 +207,7 @@ describe('Autocomplete', () => {
       await user.type(input, 'a');
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
 
@@ -263,18 +249,18 @@ describe('Autocomplete', () => {
   });
 
   describe('option state attributes', () => {
-    it('marks active option with data-cl-active', async () => {
+    it('marks active option with data-active', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
       await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
 
       // First option is active by default (activeIndex starts at 0)
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[0]).toHaveAttribute('data-cl-active', '');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[0]).toHaveAttribute('data-active', '');
     });
 
-    it('marks selected option with data-cl-selected', () => {
+    it('marks selected option with data-selected', () => {
       render(
         <StaticAutocomplete
           defaultValue='banana'
@@ -282,8 +268,8 @@ describe('Autocomplete', () => {
         />,
       );
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[1]).toHaveAttribute('data-cl-selected', '');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
     });
   });
 
@@ -319,32 +305,32 @@ describe('Autocomplete', () => {
   describe('animation lifecycle', () => {
     it('positioner is not rendered when closed', () => {
       render(<StaticAutocomplete />);
-      expect(document.querySelector('[data-cl-slot="autocomplete-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-positioner"]')).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on popup when open', async () => {
+    it('applies data-open on popup when open', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
       await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
 
-      const popup = document.querySelector('[data-cl-slot="autocomplete-popup"]');
-      expect(popup).toHaveAttribute('data-cl-open', '');
+      const popup = document.querySelector('[data-testid="autocomplete-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
     });
 
-    it('positioner has data-cl-side', async () => {
+    it('positioner has data-side', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
       await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
 
-      const positioner = document.querySelector('[data-cl-slot="autocomplete-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side');
+      const positioner = document.querySelector('[data-testid="autocomplete-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
     });
   });
 
   describe('disabled option', () => {
-    it('renders disabled option with data-cl-disabled', () => {
+    it('renders disabled option with data-disabled', () => {
       render(
         <Autocomplete.Root defaultOpen>
           <Autocomplete.Input placeholder='Search...' />
@@ -353,6 +339,7 @@ describe('Autocomplete', () => {
               <Autocomplete.Option
                 value='apple'
                 label='Apple'
+                data-testid='autocomplete-option'
               >
                 Apple
               </Autocomplete.Option>
@@ -360,6 +347,7 @@ describe('Autocomplete', () => {
                 value='banana'
                 label='Banana'
                 disabled
+                data-testid='autocomplete-option'
               >
                 Banana
               </Autocomplete.Option>
@@ -368,8 +356,8 @@ describe('Autocomplete', () => {
         </Autocomplete.Root>,
       );
 
-      const disabledOption = screen.getByText('Banana').closest('[data-cl-slot="autocomplete-option"]');
-      expect(disabledOption).toHaveAttribute('data-cl-disabled', '');
+      const disabledOption = screen.getByText('Banana').closest('[data-testid="autocomplete-option"]');
+      expect(disabledOption).toHaveAttribute('data-disabled', '');
       expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
     });
 
@@ -419,12 +407,14 @@ describe('Autocomplete', () => {
                 value='apple'
                 label='Apple'
                 disabled
+                data-testid='autocomplete-option'
               >
                 Apple
               </Autocomplete.Option>
               <Autocomplete.Option
                 value='banana'
                 label='Banana'
+                data-testid='autocomplete-option'
               >
                 Banana
               </Autocomplete.Option>
@@ -436,7 +426,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search...');
       // Typing opens the list and highlights the first option (the disabled "Apple").
       await user.type(input, 'a');
-      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Apple');
 
       await user.keyboard('{Enter}');
@@ -459,12 +449,13 @@ describe('Autocomplete', () => {
           onValueChange={props.onValueChange}
         >
           <Autocomplete.Input placeholder='Search fruits...' />
-          <Autocomplete.List data-testid='list'>
+          <Autocomplete.List data-testid='autocomplete-list'>
             {filtered.map(f => (
               <Autocomplete.Option
                 key={f.value}
                 value={f.value}
                 label={f.label}
+                data-testid='autocomplete-option'
               >
                 {f.label}
               </Autocomplete.Option>
@@ -474,21 +465,21 @@ describe('Autocomplete', () => {
       );
     }
 
-    it('renders options with data-cl-slot', () => {
+    it('renders all options', () => {
       render(<InlineAutocomplete />);
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(4);
     });
 
-    it('renders list with data-cl-slot', () => {
+    it('renders list in inline mode', () => {
       render(<InlineAutocomplete />);
-      expect(document.querySelector('[data-cl-slot="autocomplete-list"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-list"]')).toBeInTheDocument();
     });
 
-    it('marks selected option with data-cl-selected via controlled value', () => {
+    it('marks selected option with data-selected via controlled value', () => {
       render(<InlineAutocomplete value='banana' />);
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[1]).toHaveAttribute('data-cl-selected', '');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
     });
 
     it('selects option on click', async () => {
@@ -509,7 +500,7 @@ describe('Autocomplete', () => {
       await user.click(input);
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
 
@@ -517,7 +508,7 @@ describe('Autocomplete', () => {
       render(<InlineAutocomplete />);
 
       const input = screen.getByRole('combobox');
-      const list = document.querySelector('[data-cl-slot="autocomplete-list"]');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
 
       expect(list).toHaveAttribute('id');
       expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
@@ -527,10 +518,14 @@ describe('Autocomplete', () => {
       render(
         <Autocomplete.Root open>
           <Autocomplete.Input placeholder='Search fruits...' />
-          <Autocomplete.List id='consumer-custom-id'>
+          <Autocomplete.List
+            id='consumer-custom-id'
+            data-testid='autocomplete-list'
+          >
             <Autocomplete.Option
               value='apple'
               label='Apple'
+              data-testid='autocomplete-option'
             >
               Apple
             </Autocomplete.Option>
@@ -539,7 +534,7 @@ describe('Autocomplete', () => {
       );
 
       const input = screen.getByRole('combobox');
-      const list = document.querySelector('[data-cl-slot="autocomplete-list"]');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
 
       // The listbox id is owned by floating-ui: a consumer-supplied id must not
       // override it, or the input's aria-controls pairing would silently break.
@@ -555,7 +550,7 @@ describe('Autocomplete', () => {
       await user.click(input);
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(activeOption).toHaveAttribute('id');
       expect(input).toHaveAttribute('aria-activedescendant', activeOption?.getAttribute('id'));
     });
@@ -579,7 +574,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'ch');
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(1);
       expect(options[0]).toHaveTextContent('Cherry');
     });
@@ -587,15 +582,15 @@ describe('Autocomplete', () => {
     it('preserves selected state after unmount and remount', () => {
       const { unmount } = render(<InlineAutocomplete value='cherry' />);
 
-      let options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[2]).toHaveAttribute('data-cl-selected', '');
+      let options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[2]).toHaveAttribute('data-selected', '');
 
       unmount();
 
       render(<InlineAutocomplete value='cherry' />);
 
-      options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[2]).toHaveAttribute('data-cl-selected', '');
+      options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[2]).toHaveAttribute('data-selected', '');
     });
 
     it('shows selected state after selecting then remounting', async () => {
@@ -628,13 +623,13 @@ describe('Autocomplete', () => {
 
       // Unmount (simulates popover close)
       await user.click(screen.getByTestId('toggle'));
-      expect(document.querySelector('[data-cl-slot="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
 
       // Remount (simulates popover reopen)
       await user.click(screen.getByTestId('toggle'));
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
-      expect(options[1]).toHaveAttribute('data-cl-selected', '');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
     });
   });
 
@@ -656,7 +651,7 @@ describe('Autocomplete', () => {
             }
           }}
         >
-          <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Autocomplete.Root
@@ -670,12 +665,13 @@ describe('Autocomplete', () => {
                 }}
               >
                 <Autocomplete.Input placeholder='Search...' />
-                <Autocomplete.List>
+                <Autocomplete.List data-testid='autocomplete-list'>
                   {filtered.map(f => (
                     <Autocomplete.Option
                       key={f.value}
                       value={f.value}
                       label={f.label}
+                      data-testid='autocomplete-option'
                     >
                       {f.label}
                     </Autocomplete.Option>
@@ -694,7 +690,7 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Pick a fruit...'));
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(4);
     });
 
@@ -705,7 +701,7 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Pick a fruit...'));
 
       const input = screen.getByRole('combobox');
-      const list = document.querySelector('[data-cl-slot="autocomplete-list"]');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
 
       expect(list).toHaveAttribute('id');
       expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
@@ -718,7 +714,7 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Pick a fruit...'));
 
       // Verify options rendered and input has focus
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options.length).toBeGreaterThan(0);
 
       const input = screen.getByPlaceholderText('Search...');
@@ -726,7 +722,7 @@ describe('Autocomplete', () => {
 
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
 
@@ -738,10 +734,10 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Banana'));
 
       expect(screen.getByText('Banana')).toBeInTheDocument();
-      expect(screen.getByText('Banana').closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
+      expect(screen.getByText('Banana').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
     });
 
-    it('shows data-cl-selected on previously selected option after reopen', async () => {
+    it('shows data-selected on previously selected option after reopen', async () => {
       const user = userEvent.setup();
       render(<AutocompleteInPopover />);
 
@@ -752,9 +748,9 @@ describe('Autocomplete', () => {
       // Reopen
       await user.click(screen.getByText('Cherry'));
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       const cherryOption = Array.from(options).find(o => o.textContent === 'Cherry');
-      expect(cherryOption).toHaveAttribute('data-cl-selected', '');
+      expect(cherryOption).toHaveAttribute('data-selected', '');
     });
 
     it('selects option with Enter after arrow navigation inside popover', async () => {
@@ -765,7 +761,7 @@ describe('Autocomplete', () => {
       await user.keyboard('{ArrowDown}{Enter}');
 
       // Should have selected the first option
-      expect(screen.getByText('Apple').closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
+      expect(screen.getByText('Apple').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
     });
   });
 
@@ -798,7 +794,7 @@ describe('Autocomplete', () => {
             }
           }}
         >
-          <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Autocomplete.Root
@@ -812,12 +808,16 @@ describe('Autocomplete', () => {
                 }}
               >
                 <Autocomplete.Input placeholder='Search...' />
-                <Autocomplete.List style={{ maxHeight: 80, overflowY: 'auto' }}>
+                <Autocomplete.List
+                  style={{ maxHeight: 80, overflowY: 'auto' }}
+                  data-testid='autocomplete-list'
+                >
                   {filtered.map(f => (
                     <Autocomplete.Option
                       key={f.value}
                       value={f.value}
                       label={f.label}
+                      data-testid='autocomplete-option'
                     >
                       {f.label}
                     </Autocomplete.Option>
@@ -837,11 +837,11 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Pick a fruit...'));
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
 
-    it('selected item has data-cl-active on reopen', async () => {
+    it('selected item has data-active on reopen', async () => {
       const user = userEvent.setup();
       render(<ScrollableAutocomplete />);
 
@@ -850,12 +850,12 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Grape'));
 
       // Reopen — trigger now shows "Grape"
-      await user.click(screen.getByText('Grape').closest('[data-cl-slot="popover-trigger"]')!);
+      await user.click(screen.getByText('Grape').closest('[data-testid="popover-trigger"]')!);
 
       // The selected option should be active
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       const grapeOption = Array.from(options).find(o => o.textContent === 'Grape');
-      expect(grapeOption).toHaveAttribute('data-cl-active', '');
+      expect(grapeOption).toHaveAttribute('data-active', '');
     });
 
     it('selected item is active on open when defaultValue is set', async () => {
@@ -864,9 +864,9 @@ describe('Autocomplete', () => {
 
       await user.click(screen.getByText('Grape'));
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       const grapeOption = Array.from(options).find(o => o.textContent === 'Grape');
-      expect(grapeOption).toHaveAttribute('data-cl-active', '');
+      expect(grapeOption).toHaveAttribute('data-active', '');
     });
   });
 
@@ -888,7 +888,7 @@ describe('Autocomplete', () => {
             }
           }}
         >
-          <Popover.Trigger>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
           <Popover.Positioner>
             <Popover.Popup>
               <Autocomplete.Root
@@ -902,12 +902,13 @@ describe('Autocomplete', () => {
                 }}
               >
                 <Autocomplete.Input placeholder='Search...' />
-                <Autocomplete.List>
+                <Autocomplete.List data-testid='autocomplete-list'>
                   {filtered.map(f => (
                     <Autocomplete.Option
                       key={f.value}
                       value={f.value}
                       label={f.label}
+                      data-testid='autocomplete-option'
                     >
                       {f.label}
                     </Autocomplete.Option>
@@ -926,12 +927,12 @@ describe('Autocomplete', () => {
 
       const trigger = screen.getByText('Pick a fruit...');
       await user.click(trigger);
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]').length).toBeGreaterThan(0);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]').length).toBeGreaterThan(0);
 
       await user.keyboard('{Escape}');
 
       // Popover should close — no options visible
-      expect(document.querySelector('[data-cl-slot="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
       expect(document.activeElement).toBe(trigger);
     });
 
@@ -972,7 +973,7 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Banana'));
 
       const input = screen.getByPlaceholderText('Search...');
-      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
 
       expect(document.activeElement).toBe(input);
       expect(active).toHaveTextContent('Banana');
@@ -1001,7 +1002,7 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Banana'));
 
       // Banana (index 1) should be active, not Apple (index 0)
-      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Banana');
     });
 
@@ -1014,7 +1015,7 @@ describe('Autocomplete', () => {
       await user.type(input, 'ch');
 
       // Should be filtered to Cherry only
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]')).toHaveLength(1);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(1);
 
       await user.keyboard('{Escape}');
 
@@ -1024,7 +1025,7 @@ describe('Autocomplete', () => {
       // Input should be cleared, all options visible
       const newInput = screen.getByPlaceholderText('Search...');
       expect((newInput as HTMLInputElement).value).toBe('');
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]')).toHaveLength(4);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(4);
     });
 
     it('navigates all options with repeated ArrowDown', async () => {
@@ -1034,19 +1035,19 @@ describe('Autocomplete', () => {
       await user.click(screen.getByText('Pick a fruit...'));
 
       await user.keyboard('{ArrowDown}');
-      let active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      let active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Apple');
 
       await user.keyboard('{ArrowDown}');
-      active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Banana');
 
       await user.keyboard('{ArrowDown}');
-      active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Cherry');
 
       await user.keyboard('{ArrowDown}');
-      active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Date');
     });
 
@@ -1058,7 +1059,7 @@ describe('Autocomplete', () => {
 
       // Navigate past all 4 options to loop back
       await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}');
-      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Apple');
     });
 
@@ -1070,7 +1071,7 @@ describe('Autocomplete', () => {
 
       // ArrowUp from no active item should go to last item (loop)
       await user.keyboard('{ArrowUp}');
-      const active = document.querySelector('[data-cl-slot="autocomplete-option"][data-cl-active]');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
       expect(active).toHaveTextContent('Date');
     });
 
@@ -1084,12 +1085,12 @@ describe('Autocomplete', () => {
       await user.type(input, 'b');
 
       // Only Banana should be shown, activeIndex should be 0
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]')).toHaveLength(1);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(1);
 
       await user.keyboard('{Enter}');
 
       // Popover should close and trigger should show Banana
-      expect(screen.getByText('Banana').closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
+      expect(screen.getByText('Banana').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
     });
 
     it('selects the highlighted item with Enter, closes the popover, and returns focus to the trigger', async () => {
@@ -1101,8 +1102,8 @@ describe('Autocomplete', () => {
       await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
       const updatedTrigger = screen.getByText('Banana');
-      expect(updatedTrigger.closest('[data-cl-slot="popover-trigger"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(updatedTrigger.closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
       expect(document.activeElement).toBe(updatedTrigger);
     });
 
@@ -1131,7 +1132,7 @@ describe('Autocomplete', () => {
       const input = screen.getByPlaceholderText('Search...');
       await user.type(input, 'd');
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       expect(options).toHaveLength(1);
       expect(options[0]).toHaveTextContent('Date');
     });
@@ -1150,10 +1151,10 @@ describe('Autocomplete', () => {
       // Input should be empty, all options should show
       const input = screen.getByPlaceholderText('Search...');
       expect((input as HTMLInputElement).value).toBe('');
-      expect(document.querySelectorAll('[data-cl-slot="autocomplete-option"]')).toHaveLength(4);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(4);
     });
 
-    it('selected option retains data-cl-selected on reopen', async () => {
+    it('selected option retains data-selected on reopen', async () => {
       const user = userEvent.setup();
       render(<AutocompleteInPopoverFull />);
 
@@ -1163,28 +1164,28 @@ describe('Autocomplete', () => {
       // Reopen
       await user.click(screen.getByText('Banana'));
 
-      const options = document.querySelectorAll('[data-cl-slot="autocomplete-option"]');
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
       const bananaOption = Array.from(options).find(o => o.textContent === 'Banana');
-      expect(bananaOption).toHaveAttribute('data-cl-selected', '');
+      expect(bananaOption).toHaveAttribute('data-selected', '');
     });
   });
 
   describe('input state attributes', () => {
-    it('input has data-cl-open when list is visible', async () => {
+    it('input has data-open when list is visible', async () => {
       const user = userEvent.setup();
       render(<FilteredAutocomplete />);
 
       const input = screen.getByPlaceholderText('Search fruits...');
       await user.type(input, 'a');
 
-      expect(input).toHaveAttribute('data-cl-open', '');
+      expect(input).toHaveAttribute('data-open', '');
     });
 
-    it('input has data-cl-closed when list is hidden', () => {
+    it('input has data-closed when list is hidden', () => {
       render(<FilteredAutocomplete />);
 
       const input = screen.getByPlaceholderText('Search fruits...');
-      expect(input).toHaveAttribute('data-cl-closed', '');
+      expect(input).toHaveAttribute('data-closed', '');
     });
   });
 

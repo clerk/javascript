@@ -121,7 +121,7 @@ describe('useAnimationsFinished', () => {
   });
 
   it('waits for starting-style attribute removal when open=true', async () => {
-    const el = createMockElement([], { 'data-cl-starting-style': '' });
+    const el = createMockElement([], { 'data-starting-style': '' });
     const ref = { current: el } as RefObject<HTMLElement | null>;
 
     const { result } = renderHook(() => useAnimationsFinished(ref, true));
@@ -134,7 +134,7 @@ describe('useAnimationsFinished', () => {
 
     // Remove the attribute — MutationObserver should fire
     await act(async () => {
-      el.removeAttribute('data-cl-starting-style');
+      el.removeAttribute('data-starting-style');
       // MutationObserver is async; wait a tick
       await new Promise(r => setTimeout(r, 0));
     });

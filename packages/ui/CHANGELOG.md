@@ -1,5 +1,47 @@
 # @clerk/ui
 
+## 1.26.0
+
+### Minor Changes
+
+- Expose composable `UserProfile` and `OrganizationProfile` subcomponents from `@clerk/ui/experimental` ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix `OrganizationProfileGeneralPanel` (from `@clerk/ui/experimental`) throwing "CardState not found" when opening the leave-organization or delete-organization confirmation in its default, no-children page mode. The panel now provides the same root `CardStateProvider` that a mounted `<OrganizationProfile />` supplies. ([#9243](https://github.com/clerk/javascript/pull/9243)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/localizations@4.13.8
+
+## 1.25.8
+
+### Patch Changes
+
+- Use logical CSS properties for the organization members footer and the MFA setup task header, so both lay out correctly in right-to-left locales. ([#9218](https://github.com/clerk/javascript/pull/9218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/localizations@4.13.7
+
+## 1.25.7
+
+### Patch Changes
+
+- Ensure the keyless prompt renders above application content by setting an explicit `z-index`. ([#9211](https://github.com/clerk/javascript/pull/9211)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The OAuth consent screen now shows a recognizable brand mark for well-known OAuth clients (Claude, ChatGPT) when the requesting application has not uploaded its own logo. ([#9158](https://github.com/clerk/javascript/pull/9158)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.25.6
+
+### Patch Changes
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+  - @clerk/localizations@4.13.6
+
 ## 1.25.5
 
 ### Patch Changes

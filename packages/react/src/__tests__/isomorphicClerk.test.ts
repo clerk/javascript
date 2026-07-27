@@ -48,6 +48,31 @@ describe('isomorphicClerk', () => {
     }).not.toThrow();
   });
 
+  // Regression: composed/subcomponent UserProfile reads moduleManager via
+  // `useClerk().__internal_moduleManager`. `useClerk()` returns the
+  // IsomorphicClerk wrapper, so its getter must chain through to the loaded
+  // clerk-js's own `__internal_moduleManager`. This plain property access is
+  // the cross-bundle channel: clerk-js ships standalone from the CDN with its
+  // own inlined @clerk/shared, so module-scoped state cannot bridge the two.
+  //
+  // Without this chain, every dynamic-imported feature (Coinbase Wallet, Base,
+  // Stripe, zxcvbn) falls back to a rejecting manager.
+  it('exposes the inner clerk-js moduleManager through the __internal_moduleManager getter', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
+
+    // Before clerk-js loads, the getter is undefined so readers fall back.
+    expect(isomorphicClerk.__internal_moduleManager).toBeUndefined();
+
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_moduleManager: mm,
+    };
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(isomorphicClerk.__internal_moduleManager).toBe(mm);
+  });
+
   it('updates props asynchronously after clerkjs has loaded', async () => {
     const propsHistory: any[] = [];
     const dummyClerkJS = {

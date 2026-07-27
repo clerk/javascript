@@ -4,6 +4,10 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
+import { E2EControls } from './components/E2EControls';
+import { GoogleSignInButton } from './components/GoogleSignInButton';
+import { JsSignInForm } from './components/JsSignInForm';
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 if (!publishableKey) {
@@ -14,6 +18,7 @@ function NativeBuildFixture() {
   const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [e2eStatus, setE2eStatus] = useState<string | null>(null);
 
   return (
     <View style={styles.container}>
@@ -29,6 +34,10 @@ function NativeBuildFixture() {
         title='Open native AuthView'
         onPress={() => setIsAuthOpen(true)}
       />
+      {!isSignedIn && <GoogleSignInButton />}
+      {!isSignedIn && <JsSignInForm onStatus={setE2eStatus} />}
+      {isSignedIn && <E2EControls onStatus={setE2eStatus} />}
+      {e2eStatus && <Text testID='e2e-status'>{e2eStatus}</Text>}
       {isSignedIn && (
         <Button
           testID='sign-out-button'
@@ -43,7 +52,17 @@ function NativeBuildFixture() {
         presentationStyle='pageSheet'
         onRequestClose={() => setIsAuthOpen(false)}
       >
-        <AuthView onDismiss={() => setIsAuthOpen(false)} />
+        <AuthView
+          logo={
+            <View
+              testID='custom-logo'
+              style={styles.customLogo}
+            >
+              <Text style={styles.customLogoText}>E2E Custom Logo</Text>
+            </View>
+          }
+          onDismiss={() => setIsAuthOpen(false)}
+        />
       </Modal>
     </View>
   );
@@ -63,9 +82,20 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 16,
+    gap: 12,
     justifyContent: 'center',
     padding: 24,
+  },
+  customLogo: {
+    backgroundColor: '#6C47FF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  customLogoText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   header: {
     alignItems: 'center',

@@ -55,6 +55,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'logoGroup',
   'logoGroupItem',
+  'logoGroupItemContainer',
   'logoGroupIcon',
   'logoGroupSeparator',
 
@@ -465,6 +466,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSectionPrimaryButton',
   'profileSectionButtonGroup',
   'profilePage',
+  'profilePageContent',
 
   'formattedPhoneNumber',
   'formattedPhoneNumberFlag',

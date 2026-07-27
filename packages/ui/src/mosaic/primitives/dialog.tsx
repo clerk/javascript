@@ -1,5 +1,5 @@
-import { Dialog as HeadlessDialog } from '@clerk/headless/dialog';
 import type { DialogPortalProps, DialogProps } from '@clerk/headless/dialog';
+import { Dialog as HeadlessDialog } from '@clerk/headless/dialog';
 import type { FunctionComponent } from 'react';
 
 import { withMosaicSlot } from './withMosaicSlot';

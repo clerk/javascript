@@ -86,7 +86,7 @@ export function OrganizationProfileProfileSectionView({
             <Button
               variant='outline'
               {...props}
-              sx={{ flexShrink: 0 }}
+              style={{ flexShrink: 0 }}
               type='button'
             >
               Edit profile

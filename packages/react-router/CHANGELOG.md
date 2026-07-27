@@ -1,5 +1,40 @@
 # Change Log
 
+## 3.6.0
+
+### Minor Changes
+
+- Bump the minimum supported React Router v8 version to `8.3.0`, which fixes duplicate `react-router` instances during `react-router dev` SSR that broke the Router context ([remix-run/react-router#15232](https://github.com/remix-run/react-router/issues/15232)). ([#9229](https://github.com/clerk/javascript/pull/9229)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 3.5.15
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/react@6.12.8
+  - @clerk/backend@3.13.1
+
+## 3.5.14
+
+### Patch Changes
+
+- Moved the internal `patchRequest()` helper for reuse across framework SDKs. ([#9220](https://github.com/clerk/javascript/pull/9220)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`848eefe`](https://github.com/clerk/javascript/commit/848eefe6dcc23cbad617a5c6ccb582eaae2a9bac), [`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/backend@3.13.0
+  - @clerk/shared@4.25.7
+  - @clerk/react@6.12.7
+
+## 3.5.13
+
+### Patch Changes
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a), [`ff5d991`](https://github.com/clerk/javascript/commit/ff5d991a2cb4de15c45e9666815fdfddf7bec862), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a), [`26530ce`](https://github.com/clerk/javascript/commit/26530ce5cff5f644e1656fdd418b343fb3773bec), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a)]:
+  - @clerk/backend@3.12.0
+  - @clerk/shared@4.25.6
+  - @clerk/react@6.12.6
+
 ## 3.5.12
 
 ### Patch Changes

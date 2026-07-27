@@ -199,7 +199,7 @@ No styles, so there's no knob canvas. The single demo renders the primitive **ra
 # Accordion
 
 <!-- Intro: state plainly that it's a headless primitive that ships no styles, and
-     that you target its `data-cl-*` attributes for appearance. -->
+     that you target its `data-*` state attributes for appearance. -->
 
 ## Example
 
@@ -222,7 +222,7 @@ No styles, so there's no knob canvas. The single demo renders the primitive **ra
 
 ## Styling
 
-<!-- Table of the `data-cl-*` attributes each part emits, plus any exposed CSS
+<!-- Table of the `data-*` state attributes each part emits, plus any exposed CSS
      custom properties (e.g. `--cl-accordion-panel-height`) with a CSS example. -->
 ```
 

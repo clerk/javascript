@@ -13,8 +13,7 @@ export function AutocompleteArrow(props: AutocompleteArrowProps) {
 
   return (
     <FloatingArrow
-      data-cl-slot='autocomplete-arrow'
-      data-cl-side={side}
+      data-side={side}
       {...props}
       ref={arrowRef}
       context={floatingContext}

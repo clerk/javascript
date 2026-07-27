@@ -16,8 +16,7 @@ export const TooltipArrow = React.forwardRef<SVGSVGElement, TooltipArrowProps>(f
 
   return (
     <FloatingArrow
-      data-cl-slot='tooltip-arrow'
-      data-cl-side={side}
+      data-side={side}
       {...props}
       ref={combinedRef}
       context={floatingContext}

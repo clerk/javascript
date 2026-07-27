@@ -22,10 +22,13 @@ function renderSelect(props: Partial<React.ComponentProps<typeof Select.Root>> =
       {...rest}
     >
       <Select.Trigger>
-        <Select.Value placeholder='Pick a fruit...' />
+        <Select.Value
+          data-testid='select-value'
+          placeholder='Pick a fruit...'
+        />
       </Select.Trigger>
-      <Select.Positioner>
-        <Select.Popup>
+      <Select.Positioner data-testid='select-positioner'>
+        <Select.Popup data-testid='select-popup'>
           {fruits.map(({ label, value }) => (
             <Select.Option
               key={value}
@@ -42,32 +45,6 @@ function renderSelect(props: Partial<React.ComponentProps<typeof Select.Root>> =
 }
 
 describe('Select', () => {
-  describe('slot attributes', () => {
-    it('renders trigger with data-cl-slot', () => {
-      renderSelect();
-      const trigger = screen.getByRole('combobox');
-      expect(trigger).toHaveAttribute('data-cl-slot', 'select-trigger');
-    });
-
-    it('renders value with data-cl-slot', () => {
-      renderSelect();
-      const value = document.querySelector('[data-cl-slot="select-value"]');
-      expect(value).toBeInTheDocument();
-    });
-
-    it('renders all parts with correct slot attributes when open', () => {
-      renderSelect({ defaultOpen: true });
-
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
-      const popup = document.querySelector('[data-cl-slot="select-popup"]');
-      const options = document.querySelectorAll('[data-cl-slot="select-option"]');
-
-      expect(positioner).toBeInTheDocument();
-      expect(popup).toBeInTheDocument();
-      expect(options).toHaveLength(3);
-    });
-  });
-
   describe('ARIA attributes', () => {
     it('keeps the trigger/listbox aria-controls pairing intact when a custom id is passed to the positioner', () => {
       render(
@@ -79,8 +56,11 @@ describe('Select', () => {
           <Select.Trigger>
             <Select.Value placeholder='Pick a fruit...' />
           </Select.Trigger>
-          <Select.Positioner id='consumer-custom-id'>
-            <Select.Popup>
+          <Select.Positioner
+            id='consumer-custom-id'
+            data-testid='select-positioner'
+          >
+            <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
                 <Select.Option
                   key={value}
@@ -96,7 +76,7 @@ describe('Select', () => {
       );
 
       const trigger = screen.getByRole('combobox');
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
 
       // The listbox id is owned by floating-ui: a consumer-supplied id must not
       // override it, or the trigger's aria-controls pairing would silently break.
@@ -108,19 +88,19 @@ describe('Select', () => {
   describe('items prop and label resolution', () => {
     it('shows placeholder when no value is selected', () => {
       renderSelect();
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Pick a fruit...');
     });
 
     it('resolves label from items before options mount', () => {
       renderSelect({ defaultValue: 'banana' });
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Banana');
     });
 
     it('resolves label for controlled value from items', () => {
       renderSelect({ value: 'cherry' });
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Cherry');
     });
 
@@ -131,10 +111,13 @@ describe('Select', () => {
           alignItemWithTrigger={false}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <Select.Option
                 value='banana'
                 label='Banana'
@@ -145,7 +128,7 @@ describe('Select', () => {
           </Select.Positioner>
         </Select.Root>,
       );
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('banana');
     });
 
@@ -155,10 +138,13 @@ describe('Select', () => {
       render(
         <Select.Root alignItemWithTrigger={false}>
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <Select.Option
                 value='x'
                 label='Special Item'
@@ -173,7 +159,7 @@ describe('Select', () => {
       await user.click(screen.getByRole('combobox'));
       await user.click(screen.getByText('Special Item'));
 
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Special Item');
     });
   });
@@ -186,8 +172,8 @@ describe('Select', () => {
       const trigger = screen.getByRole('combobox');
       await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('data-cl-open', '');
-      expect(document.querySelector('[data-cl-slot="select-popup"]')).toBeInTheDocument();
+      expect(trigger).toHaveAttribute('data-open', '');
+      expect(document.querySelector('[data-testid="select-popup"]')).toBeInTheDocument();
     });
 
     it('closes on Escape', async () => {
@@ -197,7 +183,7 @@ describe('Select', () => {
       await user.keyboard('{Escape}');
 
       const trigger = screen.getByRole('combobox');
-      expect(trigger).toHaveAttribute('data-cl-closed', '');
+      expect(trigger).toHaveAttribute('data-closed', '');
     });
 
     it('calls onOpenChange when toggled', async () => {
@@ -234,7 +220,7 @@ describe('Select', () => {
       await user.click(screen.getByRole('combobox'));
       await user.click(screen.getByText('Cherry'));
 
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toContain('Cherry');
     });
   });
@@ -252,10 +238,13 @@ describe('Select', () => {
           onValueChange={() => {}}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick a fruit...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick a fruit...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
                 <Select.Option
                   key={value}
@@ -273,7 +262,7 @@ describe('Select', () => {
       await user.click(screen.getByRole('combobox'));
       await user.click(screen.getByText('Banana'));
 
-      const value = document.querySelector('[data-cl-slot="select-value"]');
+      const value = document.querySelector('[data-testid="select-value"]');
       expect(value?.textContent).toBe('Apple');
     });
   });
@@ -287,7 +276,7 @@ describe('Select', () => {
       await user.click(trigger);
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="select-option"][data-cl-active]');
+      const activeOption = document.querySelector('[role="option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
 
@@ -303,9 +292,9 @@ describe('Select', () => {
         await user.keyboard(key);
 
         const options = screen.getAllByRole('option');
-        expect(options[1]).toHaveAttribute('data-cl-selected', '');
+        expect(options[1]).toHaveAttribute('data-selected', '');
         expect(document.activeElement).toBe(options[1]);
-        expect(options[1]).toHaveAttribute('data-cl-active', '');
+        expect(options[1]).toHaveAttribute('data-active', '');
       },
     );
 
@@ -322,10 +311,13 @@ describe('Select', () => {
           alignItemWithTrigger={false}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <div style={{ maxHeight: '100px', overflow: 'auto' }}>
                 {manyItems.map(({ label, value }) => (
                   <Select.Option
@@ -349,7 +341,7 @@ describe('Select', () => {
         await user.keyboard('{ArrowDown}');
       }
 
-      const activeOption = document.querySelector('[data-cl-slot="select-option"][data-cl-active]');
+      const activeOption = document.querySelector('[role="option"][data-active]');
       expect(activeOption).toBeInTheDocument();
 
       // The active item should be visible within its scroll container
@@ -374,10 +366,13 @@ describe('Select', () => {
           alignItemWithTrigger={false}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <div style={{ maxHeight: '100px', overflow: 'auto' }}>
                 {manyItems.map(({ label, value }) => (
                   <Select.Option
@@ -406,7 +401,7 @@ describe('Select', () => {
       // Reopen — the selected item should be scrolled into view
       await user.click(trigger);
 
-      const selectedOption = document.querySelector('[data-cl-slot="select-option"][data-cl-selected]');
+      const selectedOption = document.querySelector('[role="option"][data-selected]');
       expect(selectedOption).toBeInTheDocument();
 
       const scrollContainer = selectedOption!.closest('div[style]') as HTMLElement;
@@ -419,35 +414,38 @@ describe('Select', () => {
   });
 
   describe('option state attributes', () => {
-    it('marks selected option with data-cl-selected', () => {
+    it('marks selected option with data-selected', () => {
       renderSelect({ defaultValue: 'banana', defaultOpen: true });
 
-      const options = document.querySelectorAll('[data-cl-slot="select-option"]');
-      expect(options[1]).toHaveAttribute('data-cl-selected', '');
+      const options = document.querySelectorAll('[role="option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
     });
 
-    it('marks active option with data-cl-active', async () => {
+    it('marks active option with data-active', async () => {
       const user = userEvent.setup();
       renderSelect();
 
       await user.click(screen.getByRole('combobox'));
       await user.keyboard('{ArrowDown}');
 
-      const activeOption = document.querySelector('[data-cl-slot="select-option"][data-cl-active]');
+      const activeOption = document.querySelector('[role="option"][data-active]');
       expect(activeOption).toBeInTheDocument();
     });
   });
 
   describe('disabled option', () => {
-    it('renders disabled option with data-cl-disabled', async () => {
+    it('renders disabled option with data-disabled', async () => {
       const user = userEvent.setup();
       render(
         <Select.Root alignItemWithTrigger={false}>
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <Select.Option
                 value='apple'
                 label='Apple'
@@ -468,8 +466,8 @@ describe('Select', () => {
 
       await user.click(screen.getByRole('combobox'));
 
-      const disabledOption = screen.getByText('Banana').closest("[data-cl-slot='select-option']");
-      expect(disabledOption).toHaveAttribute('data-cl-disabled', '');
+      const disabledOption = screen.getByText('Banana').closest("[role='option']");
+      expect(disabledOption).toHaveAttribute('data-disabled', '');
       expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
     });
 
@@ -482,10 +480,13 @@ describe('Select', () => {
           alignItemWithTrigger={false}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <Select.Option
                 value='apple'
                 label='Apple'
@@ -531,28 +532,28 @@ describe('Select', () => {
   describe('animation lifecycle', () => {
     it('positioner is not rendered when closed', () => {
       renderSelect();
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).not.toBeInTheDocument();
     });
 
-    it('applies data-cl-open on popup when open', async () => {
+    it('applies data-open on popup when open', async () => {
       const user = userEvent.setup();
       renderSelect();
 
       await user.click(screen.getByRole('combobox'));
 
-      const popup = document.querySelector('[data-cl-slot="select-popup"]');
-      expect(popup).toHaveAttribute('data-cl-open', '');
+      const popup = document.querySelector('[data-testid="select-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
     });
 
-    it('positioner has data-cl-side', async () => {
+    it('positioner has data-side', async () => {
       const user = userEvent.setup();
       renderSelect();
 
       await user.click(screen.getByRole('combobox'));
 
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
-      expect(positioner).toHaveAttribute('data-cl-side');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
     });
   });
 
@@ -560,7 +561,7 @@ describe('Select', () => {
     it('respects controlled open prop', () => {
       renderSelect({ open: true });
 
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).toBeInTheDocument();
     });
 
@@ -570,7 +571,7 @@ describe('Select', () => {
 
       await user.click(screen.getByRole('combobox'));
 
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).not.toBeInTheDocument();
     });
   });
@@ -585,10 +586,13 @@ describe('Select', () => {
           defaultValue='banana'
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
                 <Select.Option
                   key={value}
@@ -604,7 +608,7 @@ describe('Select', () => {
       );
 
       // The positioner should render (alignItemWithTrigger doesn't prevent rendering)
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]');
+      const positioner = document.querySelector('[data-testid="select-positioner"]');
       expect(positioner).toBeInTheDocument();
     });
 
@@ -614,7 +618,7 @@ describe('Select', () => {
 
       await user.click(screen.getByRole('combobox'));
 
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]') as HTMLElement;
+      const positioner = document.querySelector('[data-testid="select-positioner"]') as HTMLElement;
       // Standard Floating UI positioning uses position: absolute with transform
       expect(positioner.style.position).toBe('absolute');
     });
@@ -632,10 +636,13 @@ describe('Select', () => {
           defaultValue='item-10'
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               {manyItems.map(({ label, value }) => (
                 <Select.Option
                   key={value}
@@ -651,7 +658,7 @@ describe('Select', () => {
       );
 
       const trigger = screen.getByRole('combobox');
-      const selectedOption = document.querySelector('[data-cl-slot="select-option"][data-cl-selected]');
+      const selectedOption = document.querySelector('[role="option"][data-selected]');
       expect(selectedOption).toBeInTheDocument();
 
       const triggerRect = trigger.getBoundingClientRect();
@@ -674,10 +681,13 @@ describe('Select', () => {
             defaultValue='item-5'
           >
             <Select.Trigger>
-              <Select.Value placeholder='Pick...' />
+              <Select.Value
+                data-testid='select-value'
+                placeholder='Pick...'
+              />
             </Select.Trigger>
-            <Select.Positioner>
-              <Select.Popup>
+            <Select.Positioner data-testid='select-positioner'>
+              <Select.Popup data-testid='select-popup'>
                 {manyItems.map(({ label, value }) => (
                   <Select.Option
                     key={value}
@@ -696,7 +706,7 @@ describe('Select', () => {
 
       await user.click(screen.getByRole('combobox'));
 
-      const positioner = document.querySelector('[data-cl-slot="select-positioner"]') as HTMLElement;
+      const positioner = document.querySelector('[data-testid="select-positioner"]') as HTMLElement;
       const initialTop = positioner.getBoundingClientRect().top;
 
       // Scroll the container
@@ -817,10 +827,13 @@ describe('Select', () => {
           alignItemWithTrigger={false}
         >
           <Select.Trigger>
-            <Select.Value placeholder='Pick a fruit...' />
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick a fruit...'
+            />
           </Select.Trigger>
-          <Select.Positioner>
-            <Select.Popup>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
               <Select.Option
                 value='apple'
                 label='Apple'
@@ -850,7 +863,7 @@ describe('Select', () => {
 
       const options = screen.getAllByRole('option');
       expect(options[0]).toHaveAttribute('aria-disabled', 'false');
-      expect(options[0]).toHaveAttribute('data-cl-active');
+      expect(options[0]).toHaveAttribute('data-active');
     });
   });
 });

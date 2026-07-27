@@ -1,6 +1,7 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware } from '@tanstack/react-start';
@@ -10,7 +11,7 @@ import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
-import { getResponseClerkState, patchRequest } from './utils';
+import { getResponseClerkState } from './utils';
 
 export const clerkMiddleware = (
   options?: ClerkMiddlewareOptions | ClerkMiddlewareOptionsCallback,

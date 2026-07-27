@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_version = '1.3.2'
+clerk_ios_version = '1.3.4'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
@@ -57,6 +57,10 @@ Pod::Spec.new do |s|
                    "ClerkAuthNativeView.swift",
                    "ClerkUserProfileNativeView.swift",
                    "ClerkUserButtonNativeView.swift"
+
+  s.test_spec 'Tests' do |test_spec|
+    test_spec.source_files = 'Tests/**/*.swift'
+  end
 
   install_modules_dependencies(s)
 end

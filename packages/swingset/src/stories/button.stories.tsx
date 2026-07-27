@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button, buttonRecipe } from '@clerk/ui/mosaic/components/button';
+import { Button } from '@clerk/ui/mosaic/components/button';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,11 +8,28 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './button.stories?raw';
 
+// StyleX has no runtime recipe to derive knobs from, so the variant surface is described
+// here to drive the playground + prop table. Keys mirror `ButtonProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
-  source: 'packages/ui/src/mosaic/components/button.tsx',
-  styles: buttonRecipe,
+  source: 'packages/ui/src/mosaic/components/button/button.tsx',
+  styles: {
+    _variants: {
+      intent: { primary: {}, destructive: {} },
+      variant: { filled: {}, outline: {}, ghost: {} },
+      size: { sm: {}, md: {} },
+      shape: { default: {}, square: {}, circle: {} },
+      fullWidth: { true: {}, false: {} },
+    },
+    _defaultVariants: {
+      intent: 'primary',
+      variant: 'filled',
+      size: 'md',
+      shape: 'default',
+      fullWidth: false,
+    },
+  },
 };
 
 // Story functions accept Record<string,unknown> (knob values) and cast to ButtonProps.
