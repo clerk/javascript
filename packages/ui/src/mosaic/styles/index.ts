@@ -14,6 +14,14 @@ export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export { Menu } from '../components/menu';
+export type {
+  MenuContentProps,
+  MenuItemProps,
+  MenuProps,
+  MenuSeparatorProps,
+  MenuTriggerProps,
+} from '../components/menu';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 

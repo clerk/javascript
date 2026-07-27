@@ -65,6 +65,28 @@ const Close = glyph(
   />,
 );
 
+const Ellipsis = glyph(
+  <path
+    d='M4 8h.008M8 8h.008M12 8h.008'
+    {...strokeProps}
+    strokeWidth={2.5}
+  />,
+);
+
+const Plus = glyph(
+  <path
+    d='M8 3.75V12.25M3.75 8H12.25'
+    {...strokeProps}
+  />,
+);
+
+const LogOut = glyph(
+  <path
+    d='M6.25 13.25H3.75V2.75H6.25M10.25 10.75L13 8L10.25 5.25M13 8H6.25'
+    {...strokeProps}
+  />,
+);
+
 /** Runtime name → glyph map. `Icon`'s `name` prop is typed from these keys. */
 export const iconRegistry = {
   'chevron-right': ChevronRight,
@@ -72,6 +94,9 @@ export const iconRegistry = {
   'chevron-down': ChevronDown,
   check: Check,
   close: Close,
+  ellipsis: Ellipsis,
+  plus: Plus,
+  'log-out': LogOut,
 } satisfies Record<string, IconComponent>;
 
 export type IconName = keyof typeof iconRegistry;

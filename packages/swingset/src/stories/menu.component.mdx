@@ -1,0 +1,124 @@
+import * as MenuStories from './menu.component.stories';
+
+# Menu
+
+The Mosaic `Menu` — the styled Mosaic component composed from the `@clerk/headless` menu primitive
+and themed with StyleX. It inherits the primitive's positioning, typeahead, roving keyboard
+navigation, and ARIA wiring, and adds the trigger, popup surface, and item styling.
+
+## Example
+
+Click the trigger, then use the arrow keys or type to move between items.
+
+<Story
+  name='Default'
+  storyModule={MenuStories}
+/>
+
+## Usage
+
+```tsx
+import { Menu } from '@clerk/ui/mosaic/components/menu';
+
+<Menu.Root>
+  <Menu.Trigger />
+  <Menu.Content>
+    <Menu.Item
+      label='Add workspace'
+      icon={<PlusIcon />}
+    />
+    <Menu.Separator />
+    <Menu.Item
+      label='Sign out'
+      onClick={signOut}
+    />
+  </Menu.Content>
+</Menu.Root>;
+```
+
+`Menu.Content` composes the portal, positioner, and popup, so items are the only children you write.
+
+### Trigger
+
+With no children, `Menu.Trigger` renders a square ghost `Button` holding an ellipsis glyph. Pass
+children for a labelled trigger, or `render` to supply your own element — it receives the computed
+props (ARIA attributes, click and keyboard handlers) to spread.
+
+```tsx
+<Menu.Trigger>Actions</Menu.Trigger>
+
+<Menu.Trigger render={props => <Avatar {...props} />} />
+```
+
+### Items
+
+`label` drives typeahead and, unless `children` is given, the visible text. `icon` renders a leading
+glyph sized and tinted by the item. `disabled` items are skipped by keyboard navigation and their
+`onClick` never fires. Activating an item closes the menu; pass `closeOnClick={false}` to keep it
+open.
+
+```tsx
+<Menu.Item
+  label='Delete'
+  disabled
+/>
+```
+
+### Placement
+
+`Menu.Root` takes `placement` and `sideOffset`; the popup flips and shifts automatically to stay in
+view, and its `max-height` tracks the available space so long menus scroll rather than overflow.
+
+```tsx
+<Menu.Root
+  placement='bottom-end'
+  sideOffset={8}
+>
+  …
+</Menu.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Menu.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  …
+</Menu.Root>;
+```
+
+## Parts
+
+| Part             | Slot                             | Description                                                           |
+| ---------------- | -------------------------------- | --------------------------------------------------------------------- |
+| `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.  |
+| `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis. |
+| `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
+| `Menu.Item`      | `menu-item`                      | A single action. Also emits `menu-item-icon` and `menu-item-label`.   |
+| `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
+
+## Styling
+
+Unlike the slot-recipe components, the Mosaic menu is themed with **StyleX**. Each styled part
+carries a stable `.cl-<slot>` class (the slots above) alongside the StyleX atoms. Consumers never
+target the hashed atomic classes — override by targeting the `.cl-*` slot from a CSS layer that wins
+over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-menu-popup {
+    border-radius: 20px;
+  }
+}
+```
+
+The popup's enter/exit transition is driven off its own `data-starting-style` /`data-ending-style`
+attributes and is disabled under `prefers-reduced-motion: reduce`. Item hover state is gated behind
+`@media (hover: hover)`, and the keyboard-active item is styled off `data-active`, so pointer and
+keyboard highlighting stay in sync.
