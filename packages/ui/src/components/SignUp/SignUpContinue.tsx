@@ -1,3 +1,4 @@
+import { removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect, useMemo } from 'react';
 
@@ -180,13 +181,16 @@ function SignUpContinueInternal() {
           verifyEmailPath: './verify-email-address',
           verifyPhonePath: './verify-phone-number',
           protectCheckPath: '../protect-check',
-          handleComplete: () =>
-            clerk.setActive({
+          handleComplete: () => {
+            removeClerkQueryParam('__clerk_ticket');
+            removeClerkQueryParam('__clerk_invitation_token');
+            return clerk.setActive({
               session: res.createdSessionId,
               navigate: async ({ session, decorateUrl }) => {
                 await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
               },
-            }),
+            });
+          },
           navigate,
           oidcPrompt: ctx.oidcPrompt,
         }),
