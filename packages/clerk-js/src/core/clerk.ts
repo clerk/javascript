@@ -656,6 +656,28 @@ export class Clerk implements ClerkInterface {
     return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
   }
 
+  /**
+   * Routes the post-sign-out navigation through `/v1/client/touch` when the client
+   * cookie is close to expiring, and returns `redirectUrl` unchanged otherwise.
+   *
+   * In practice this only adds a redirect on Safari. Signing out re-issues the client
+   * cookie from a fetch, which ITP caps at 7 days; every other browser gets 400 days
+   * and is never eligible. The cap matters because the client outlives sign-out and is
+   * what Client Trust uses to recognize a known device, so a user returning a week
+   * later would be challenged for a second factor. Touch is a top-level navigation,
+   * which ITP does not cap, so it restores the full lifetime.
+   */
+  #buildSignOutRedirectUrl(redirectUrl: string): string {
+    // In React Native, window exists but window.location does not, so the redirect
+    // cannot be resolved to an absolute URL. ITP does not apply there either.
+    if (!inBrowser() || typeof window.location === 'undefined' || !this.client?.isEligibleForTouch()) {
+      return redirectUrl;
+    }
+
+    const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+    return this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }));
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -696,7 +718,7 @@ export class Clerk implements ClerkInterface {
         if (signOutCallback) {
           await signOutCallback();
         } else {
-          await this.navigate(redirectUrl);
+          await this.navigate(this.#buildSignOutRedirectUrl(redirectUrl));
         }
       });
 
