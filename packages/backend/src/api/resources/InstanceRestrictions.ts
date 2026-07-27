@@ -11,7 +11,7 @@ export class InstanceRestrictions {
     readonly blockEmailSubaddresses: boolean,
     /** Whether the instance has [**Block sign-ups that use disposable email addresses**](https://clerk.com/docs/guides/secure/restricting-access#block-sign-ups-that-use-disposable-email-addresses) enabled. */
     readonly blockDisposableEmailDomains: boolean,
-    /** Whether the instance has [**Ignore dots for Gmail addresses**](https://clerk.com/docs/guides/secure/restricting-access#block-email-subaddresses) enabled. */
+    /** Whether the instance is set to [ignore dots for Gmail addresses](https://clerk.com/docs/guides/secure/restricting-access#block-email-subaddresses). */
     readonly ignoreDotsForGmailAddresses: boolean,
   ) {}
 
