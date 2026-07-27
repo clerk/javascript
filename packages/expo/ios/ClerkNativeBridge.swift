@@ -396,7 +396,22 @@ func userProfileCustomPageLabel(
 }
 
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
+private var clerkNativeAuthFlowChangedEmitter: (([String: Any]?) -> Void)?
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
+
+struct ClerkNativeErrorDescriptor {
+  let code: String
+  let message: String
+}
+
+private struct ClerkExpoTrustedDeviceError: LocalizedError {
+  let code: String
+  let message: String
+
+  var errorDescription: String? {
+    message
+  }
+}
 
 private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
   private static var hostSdkVersion: String? {
@@ -427,6 +442,8 @@ final class ClerkNativeBridge {
 
   private var clientObservationGeneration = 0
   private var lastObservedClientState: ClientStateSnapshot?
+  private var authFlowObservationGeneration = 0
+  private var lastObservedAuthFlowState: AuthFlowStateSnapshot?
   private var configurationDepth = 0
   private var jsOriginatedClientSyncDepth = 0
   private var pendingURL: URL?
@@ -437,6 +454,11 @@ final class ClerkNativeBridge {
   private struct ClientStateSnapshot: Equatable {
     let client: Client?
     let deviceToken: String?
+  }
+
+  private struct AuthFlowStateSnapshot: Equatable {
+    let isLoaded: Bool
+    let isAuthFlowComplete: Bool
   }
 
   private struct ClientStateChanges {
@@ -460,7 +482,10 @@ final class ClerkNativeBridge {
     configurationDepth += 1
     defer {
       lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
+      let authFlowState = Self.authFlowStateSnapshot()
+      lastObservedAuthFlowState = authFlowState
       configurationDepth = max(0, configurationDepth - 1)
+      Self.emitAuthFlowChanged(Self.authFlowStatePayload(authFlowState))
 
       // Overlapping calls can finish out of order, so replay once the last one settles and any
       // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
@@ -477,6 +502,7 @@ final class ClerkNativeBridge {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       startClientObserver(reset: true)
+      startAuthFlowObserver(reset: true)
 
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
@@ -487,6 +513,7 @@ final class ClerkNativeBridge {
 
     if Self.clerkConfigured {
       startClientObserver()
+      startAuthFlowObserver()
       let didUpdateDeviceToken = try await Self.syncTokenState(bearerToken: bearerToken)
       if didUpdateDeviceToken {
         await Self.waitForLoadedClient()
@@ -504,6 +531,7 @@ final class ClerkNativeBridge {
     Self.configuredPublishableKey = publishableKey
     Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
     startClientObserver()
+    startAuthFlowObserver()
 
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
@@ -575,6 +603,60 @@ final class ClerkNativeBridge {
         self.observeClient(generation: generation)
       }
     }
+  }
+
+  @MainActor
+  private func startAuthFlowObserver(reset: Bool = false) {
+    guard reset || authFlowObservationGeneration == 0 else {
+      return
+    }
+
+    authFlowObservationGeneration += 1
+    let generation = authFlowObservationGeneration
+    lastObservedAuthFlowState = Self.authFlowStateSnapshot()
+    observeAuthFlow(generation: generation)
+  }
+
+  @MainActor
+  private func observeAuthFlow(generation: Int) {
+    withObservationTracking {
+      _ = Self.authFlowStateSnapshot()
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.authFlowObservationGeneration else { return }
+
+        let newState = Self.authFlowStateSnapshot()
+        if let previousState = self.lastObservedAuthFlowState, newState != previousState {
+          self.lastObservedAuthFlowState = newState
+          if self.configurationDepth == 0 {
+            Self.emitAuthFlowChanged(Self.authFlowStatePayload(newState))
+          }
+        }
+
+        self.observeAuthFlow(generation: generation)
+      }
+    }
+  }
+
+  @MainActor
+  private static func authFlowStateSnapshot() -> AuthFlowStateSnapshot {
+    guard clerkConfigured else {
+      return AuthFlowStateSnapshot(isLoaded: false, isAuthFlowComplete: false)
+    }
+
+    return AuthFlowStateSnapshot(
+      isLoaded: Clerk.shared.isLoaded,
+      isAuthFlowComplete: Clerk.shared.isAuthFlowComplete
+    )
+  }
+
+  private static func authFlowStatePayload(_ state: AuthFlowStateSnapshot) -> [String: Any] {
+    [
+      "isLoaded": state.isLoaded,
+      "isAuthFlowComplete": state.isAuthFlowComplete,
+    ]
   }
 
   @MainActor
@@ -652,6 +734,184 @@ final class ClerkNativeBridge {
   func getClientToken() async -> String? {
     guard Self.clerkConfigured else { return nil }
     return Clerk.shared.deviceToken
+  }
+
+  @MainActor
+  func getAuthFlowState() -> [String: Any] {
+    Self.authFlowStatePayload(Self.authFlowStateSnapshot())
+  }
+
+  // MARK: - Trusted devices
+
+  @MainActor
+  func getTrustedDeviceAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
+    let availability = try await Clerk.shared.trustedDevices.availability(
+      id: id,
+      identifierHint: identifierHint
+    )
+
+    return [
+      "isAvailable": availability.isAvailable,
+      "unavailableReason": availability.unavailableReason
+        .map(Self.trustedDeviceUnavailableReason) ?? NSNull(),
+    ]
+  }
+
+  @MainActor
+  func listTrustedDevices() async throws -> [[String: Any]] {
+    let trustedDevices = try await Clerk.shared.trustedDevices.list()
+    return trustedDevices.map(Self.trustedDevicePayload)
+  }
+
+  @MainActor
+  func enrollTrustedDevice(
+    deviceName: String?,
+    identifierHint: String?,
+    reason: String?,
+    policy: String
+  ) async throws -> [String: Any] {
+    guard let trustedDevicePolicy = TrustedDevicePolicy(rawValue: policy) else {
+      throw ClerkExpoTrustedDeviceError(
+        code: "invalid_trusted_device_policy",
+        message: "Invalid trusted-device policy: \(policy)."
+      )
+    }
+
+    let trustedDevice = try await Clerk.shared.trustedDevices.enroll(
+      deviceName: deviceName,
+      identifierHint: identifierHint,
+      reason: reason,
+      policy: trustedDevicePolicy
+    )
+    return Self.trustedDevicePayload(trustedDevice)
+  }
+
+  @MainActor
+  func revokeTrustedDevice(id: String) async throws -> [String: Any] {
+    let trustedDevice = try await Clerk.shared.trustedDevices.revoke(id: id)
+    return Self.trustedDevicePayload(trustedDevice)
+  }
+
+  @MainActor
+  func signInWithTrustedDevice(
+    id: String?,
+    identifierHint: String?,
+    reason: String?
+  ) async throws -> [String: Any] {
+    let signIn = try await Clerk.shared.auth.signInWithTrustedDevice(
+      id: id,
+      identifierHint: identifierHint,
+      reason: reason
+    )
+
+    return [
+      "status": signIn.status.rawValue,
+      "createdSessionId": Self.bridgeValue(signIn.createdSessionId),
+    ]
+  }
+
+  private static func trustedDevicePayload(_ trustedDevice: TrustedDevice) -> [String: Any] {
+    [
+      "id": trustedDevice.id,
+      "object": trustedDevice.object,
+      "platform": trustedDevice.platform.rawValue,
+      "appIdentifier": trustedDevice.appIdentifier,
+      "name": bridgeValue(trustedDevice.name),
+      "algorithm": trustedDevice.algorithm.rawValue,
+      "status": trustedDevice.status.rawValue,
+      "createdAt": millisecondsSince1970(trustedDevice.createdAt),
+      "updatedAt": millisecondsSince1970(trustedDevice.updatedAt),
+      "lastUsedAt": optionalMillisecondsSince1970(trustedDevice.lastUsedAt),
+      "revokedAt": optionalMillisecondsSince1970(trustedDevice.revokedAt),
+    ]
+  }
+
+  private static func trustedDeviceUnavailableReason(
+    _ reason: TrustedDeviceAvailability.UnavailableReason
+  ) -> String {
+    snakeCase(reason.rawValue)
+  }
+
+  static func trustedDeviceErrorDescriptor(
+    _ error: Error,
+    fallbackCode: String
+  ) -> ClerkNativeErrorDescriptor {
+    if let error = error as? ClerkExpoTrustedDeviceError {
+      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    if let error = error as? ClerkAPIError {
+      return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    if let error = error as? TrustedDeviceKeyManagerError {
+      return ClerkNativeErrorDescriptor(
+        code: trustedDeviceKeyManagerErrorCode(error),
+        message: error.localizedDescription
+      )
+    }
+
+    return ClerkNativeErrorDescriptor(code: fallbackCode, message: error.localizedDescription)
+  }
+
+  private static func trustedDeviceKeyManagerErrorCode(
+    _ error: TrustedDeviceKeyManagerError
+  ) -> String {
+    switch error {
+    case .unsupportedPlatform:
+      "unsupported_platform"
+    case .biometricAuthenticationUnavailable:
+      "biometric_authentication_unavailable"
+    case .biometricAuthenticationCanceled:
+      "biometric_authentication_canceled"
+    case .biometricAuthenticationFailed:
+      "biometric_authentication_failed"
+    case .keyGenerationFailed:
+      "key_generation_failed"
+    case .keyNotFound:
+      "key_not_found"
+    case .invalidPublicKey:
+      "invalid_public_key"
+    case .publicKeyExportFailed:
+      "public_key_export_failed"
+    case .unsupportedAlgorithm:
+      "unsupported_algorithm"
+    case .signingFailed:
+      "signing_failed"
+    case .deletionFailed:
+      "key_deletion_failed"
+    @unknown default:
+      "trusted_device_key_manager_error"
+    }
+  }
+
+  private static func snakeCase(_ value: String) -> String {
+    value
+      .replacingOccurrences(
+        of: "([A-Z]+)([A-Z][a-z])",
+        with: "$1_$2",
+        options: .regularExpression
+      )
+      .replacingOccurrences(
+        of: "([a-z0-9])([A-Z])",
+        with: "$1_$2",
+        options: .regularExpression
+      )
+      .lowercased()
+  }
+
+  private static func millisecondsSince1970(_ date: Date) -> Double {
+    date.timeIntervalSince1970 * 1_000
+  }
+
+  private static func optionalMillisecondsSince1970(_ date: Date?) -> Any {
+    guard let date else { return NSNull() }
+    return millisecondsSince1970(date)
+  }
+
+  private static func bridgeValue<Value>(_ value: Value?) -> Any {
+    guard let value else { return NSNull() }
+    return value
   }
 
   // MARK: - Inline View Creation
@@ -790,6 +1050,19 @@ final class ClerkNativeBridge {
     clerkNativeClientEventQueue.sync {
       clerkNativeClientChangedEmitter = emitter
     }
+  }
+
+  static func setAuthFlowChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
+    clerkNativeClientEventQueue.sync {
+      clerkNativeAuthFlowChangedEmitter = emitter
+    }
+  }
+
+  static func emitAuthFlowChanged(_ body: [String: Any]? = nil) {
+    let emitter = clerkNativeClientEventQueue.sync {
+      clerkNativeAuthFlowChangedEmitter
+    }
+    emitter?(body)
   }
 
   /// Requests that ClerkProvider reload the JS client from native client state.
