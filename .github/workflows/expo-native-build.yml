@@ -100,6 +100,14 @@ jobs:
           DEV_CLIENT="expo-dev-client"
           if [ "$RUN_E2E" = "true" ]; then DEV_CLIENT=""; fi
           pnpm expo install expo-auth-session expo-constants expo-crypto $DEV_CLIENT expo-secure-store expo-web-browser
+          if [ "$RUN_E2E" = "true" ]; then
+            REACT_VERSION=$(node -p 'require("react/package.json").version')
+            REACT_DOM_VERSION=$(node -p 'require("react-dom/package.json").version')
+            if [ "$REACT_VERSION" != "$REACT_DOM_VERSION" ]; then
+              echo "::error::React version mismatch: react@$REACT_VERSION, react-dom@$REACT_DOM_VERSION"
+              exit 1
+            fi
+          fi
 
       - name: Check e2e secret availability
         id: gate
