@@ -222,15 +222,29 @@ function fetchRefreshedJsClient(clerkInstance: SyncableClerkInstance): Promise<C
   return client.fetch({ fetchMaxTries: 1 });
 }
 
+type ClientIdentitySnapshot = {
+  id: string | null;
+  hasSignedInSession: boolean;
+};
+
+function snapshotClientIdentity(client: ClientResource | null | undefined): ClientIdentitySnapshot {
+  return {
+    id: client?.id ?? null,
+    hasSignedInSession: Boolean(client && getDefaultSignedInSession(client)),
+  };
+}
+
+// Refreshing mutates the client in place and resolves with that same object, so this compares
+// against values captured before the refresh rather than a reference that mutated underneath.
 function isForeignSessionlessClient(
-  previousClient: ClientResource | null | undefined,
+  previousSnapshot: ClientIdentitySnapshot,
   refreshedClient: ClientResource,
 ): boolean {
-  if (!previousClient?.id || !refreshedClient.id || previousClient.id === refreshedClient.id) {
+  if (!previousSnapshot.id || !refreshedClient.id || previousSnapshot.id === refreshedClient.id) {
     return false;
   }
 
-  return Boolean(getDefaultSignedInSession(previousClient)) && refreshedClient.signedInSessions.length === 0;
+  return previousSnapshot.hasSignedInSession && refreshedClient.signedInSessions.length === 0;
 }
 
 async function refreshJsClientFromNativeState({
@@ -252,7 +266,7 @@ async function refreshJsClientFromNativeState({
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
-  const previousClient = clerkInstance.client;
+  const previousClientSnapshot = snapshotClientIdentity(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
     if (!rejectForeignSessionlessClient || !shouldSyncDeviceToken || previousDeviceToken === undefined) {
@@ -279,7 +293,7 @@ async function refreshJsClientFromNativeState({
   }
 
   if (refreshedClient) {
-    if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClient, refreshedClient)) {
+    if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClientSnapshot, refreshedClient)) {
       await restorePreviousDeviceToken();
       return true;
     }

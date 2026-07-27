@@ -809,6 +809,70 @@ describe('ClerkProvider native client sync', () => {
     expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
   });
 
+  test('rejects a foreign sessionless client when refreshing mutates the JS client in place', async () => {
+    const signedInSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalUpdateClient = mocks.clerkInstance.updateClient;
+
+    // Clerk JS mutates the client resource in place and resolves with that same object, so the
+    // refreshed client must not be modelled as a distinct object: the foreign-client guard has to
+    // compare against values captured before the refresh, not a reference that mutated underneath.
+    const client: Record<string, any> = {
+      id: 'client_1',
+      signedInSessions: [signedInSession],
+      lastActiveSessionId: 'session_1',
+    };
+    client.fetch = vi.fn().mockImplementation(() => {
+      client.id = 'client_2';
+      client.signedInSessions = [];
+      client.lastActiveSessionId = null;
+      return Promise.resolve(client);
+    });
+
+    mocks.clerkInstance.client = client;
+    mocks.clerkInstance.session = signedInSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+
+    originalUpdateClient.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: null,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(client.fetch).toHaveBeenCalled();
+    });
+
+    // The refreshed client belongs to a different client id and carries no signed-in sessions, so
+    // it must be discarded rather than applied over the session JS already has.
+    expect(originalUpdateClient).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.session).toBe(signedInSession);
+  });
+
   test('keeps the remaining JS session when the old active session becomes unauthenticated', async () => {
     const removedSession = {
       id: 'session_1',
