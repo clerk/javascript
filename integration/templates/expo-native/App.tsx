@@ -52,7 +52,17 @@ function NativeBuildFixture() {
         presentationStyle='pageSheet'
         onRequestClose={() => setIsAuthOpen(false)}
       >
-        <AuthView onDismiss={() => setIsAuthOpen(false)} />
+        <AuthView
+          logo={
+            <View
+              testID='custom-logo'
+              style={styles.customLogo}
+            >
+              <Text style={styles.customLogoText}>E2E Custom Logo</Text>
+            </View>
+          }
+          onDismiss={() => setIsAuthOpen(false)}
+        />
       </Modal>
     </View>
   );
@@ -75,6 +85,17 @@ const styles = StyleSheet.create({
     gap: 12,
     justifyContent: 'center',
     padding: 24,
+  },
+  customLogo: {
+    backgroundColor: '#6C47FF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  customLogoText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   header: {
     alignItems: 'center',
