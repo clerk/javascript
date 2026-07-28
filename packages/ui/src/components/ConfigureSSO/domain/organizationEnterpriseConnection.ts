@@ -57,7 +57,6 @@ export const isEnterpriseConnectionConfigured = (
   if (!connection) {
     return false;
   }
-  // OIDC exposes only the client ID on the resource; the secret and manual endpoints are write-only.
   if (isOidcProvider(connection.provider)) {
     return Boolean(connection.oauthConfig?.clientId);
   }

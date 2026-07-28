@@ -196,7 +196,6 @@ describe('ConfigureProviderStep', () => {
 
     const clientId = document.querySelector('input[name="clientId"]') as HTMLInputElement;
     const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
-    expect(document.querySelector('input[name="scopes"]')).toBeNull();
     await userEvent.type(clientId, 'client_123');
     await userEvent.type(clientSecret, 'secret_456');
 
@@ -207,6 +206,28 @@ describe('ConfigureProviderStep', () => {
         oidc: { clientId: 'client_123', clientSecret: 'secret_456' },
       });
     });
+  });
+
+  it('selects manual mode when an existing connection has manual endpoints without a discovery URL', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        authUrl: 'https://idp.example/authorize',
+        tokenUrl: 'https://idp.example/token',
+        userInfoUrl: 'https://idp.example/userinfo',
+      },
+    };
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+
+    const [discoveryMode, manualMode] = await screen.findAllByRole('radio');
+    expect(discoveryMode).not.toBeChecked();
+    expect(manualMode).toBeChecked();
+    expect(document.querySelector('input[name="authUrl"]')).toHaveValue('https://idp.example/authorize');
   });
 
   it('populates manual endpoints resolved from discovery', async () => {

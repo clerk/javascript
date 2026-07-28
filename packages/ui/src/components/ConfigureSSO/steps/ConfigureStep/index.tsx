@@ -26,13 +26,6 @@ const STEPS_BY_SAML_PROVIDER: Record<SamlProviderType, ConfigureStepsComponent> 
   saml_microsoft: SamlMicrosoftConfigureSteps,
 };
 
-/**
- * Resolves the configure sub-flow for a created connection's provider. OIDC is an
- * open, backend-derived family (`oauth_custom_<slug>` or `oidc_*`), so every OIDC
- * provider shares one sub-flow and is matched by protocol prefix; SAML stays an
- * exact-literal lookup.
- * Returns `undefined` for an unrecognized provider so the caller can degrade.
- */
 export const resolveConfigureSteps = (
   provider: EnterpriseConnectionProviderType,
 ): ConfigureStepsComponent | undefined =>
@@ -72,7 +65,6 @@ export const ConfigureStep = (): JSX.Element => {
 export const ConfigureProviderStep = (): JSX.Element | null => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
-  // Type guard: the provider should be defined by the time we reach configure.
   if (!c.provider) {
     return null;
   }
@@ -88,8 +80,6 @@ export const ConfigureProviderStep = (): JSX.Element | null => {
         {ConfigureSteps ? (
           <ConfigureSteps />
         ) : (
-          // A provider the SDK doesn't recognize (e.g. a newer backend family)
-          // degrades to a terminal state instead of white-screening the wizard.
           <>
             <Step.Header
               title='Unsupported provider'

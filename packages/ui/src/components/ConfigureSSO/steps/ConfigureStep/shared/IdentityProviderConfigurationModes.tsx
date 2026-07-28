@@ -3,32 +3,31 @@ import { type JSX } from 'react';
 import { type LocalizationKey, useLocalizations } from '@/customizables';
 import { SegmentedControl } from '@/elements/SegmentedControl';
 
-export type IdpConfigurationMode = 'discoveryUrl' | 'manual';
+export type SamlIdpConfigurationMode = 'metadataUrl' | 'metadataFile' | 'manual';
+export type OidcIdpConfigurationMode = 'discoveryUrl' | 'manual';
 
-type ModeLocalizationKeys = Partial<Record<IdpConfigurationMode, LocalizationKey>>;
-
-type IdentityProviderConfigurationModesProps = {
-  modes: readonly IdpConfigurationMode[];
-  value: IdpConfigurationMode;
-  onChange: (mode: IdpConfigurationMode) => void;
+type IdentityProviderConfigurationModesProps<Mode extends string> = {
+  modes: readonly Mode[];
+  value: Mode;
+  onChange: (mode: Mode) => void;
   labels: {
     ariaLabel: LocalizationKey;
-  } & ModeLocalizationKeys;
+  } & Partial<Record<Mode, LocalizationKey>>;
 };
 
-export const IdentityProviderConfigurationModes = ({
+export const IdentityProviderConfigurationModes = <Mode extends string>({
   modes,
   value,
   onChange,
   labels,
-}: IdentityProviderConfigurationModesProps): JSX.Element => {
+}: IdentityProviderConfigurationModesProps<Mode>): JSX.Element => {
   const { t } = useLocalizations();
 
   return (
     <SegmentedControl.Root
       aria-label={t(labels.ariaLabel)}
       value={value}
-      onChange={next => onChange(next as IdpConfigurationMode)}
+      onChange={next => onChange(next as Mode)}
       fullWidth
       size='lg'
     >

@@ -11,14 +11,14 @@ import { useWizard } from '../../../../elements/Wizard';
 import { InnerStepCounter } from '../../../../elements/Wizard/InnerStepCounter';
 import {
   IdentityProviderConfigurationModes,
-  type IdpConfigurationMode,
-} from '../shared/IdentityProviderConfigurationModes';
+  type OidcIdpConfigurationMode,
+} from '../../shared/IdentityProviderConfigurationModes';
 import {
   OidcEndpointsConfigurationForm,
   type OidcEndpointsConfigurationFormProps,
 } from './OidcEndpointsConfigurationForm';
 
-const OIDC_ENDPOINT_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+const OIDC_ENDPOINT_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly OidcIdpConfigurationMode[];
 
 export const OidcEndpointsStep = (): JSX.Element => {
   const card = useCardState();
@@ -28,7 +28,9 @@ export const OidcEndpointsStep = (): JSX.Element => {
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const oauthConfig = enterpriseConnection?.oauthConfig;
-  const [mode, setMode] = React.useState<IdpConfigurationMode>('discoveryUrl');
+  const [mode, setMode] = React.useState<OidcIdpConfigurationMode>(
+    oauthConfig?.authUrl && !oauthConfig.discoveryUrl ? 'manual' : 'discoveryUrl',
+  );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const discoveryUrlField = useFormControl('discoveryUrl', oauthConfig?.discoveryUrl ?? '', {

@@ -70,12 +70,6 @@ const PROVIDER_GROUPS: ReadonlyArray<{
 const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
 
-/**
- * The picker works in input aliases; an existing connection reports back its real
- * provider (OIDC as an open `oauth_custom_<slug>` or `oidc_*` family), so collapse
- * it onto the card that represents it — every OIDC family maps to the single
- * `oidc_custom` card.
- */
 const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
   isOidcProvider(provider) ? 'oidc_custom' : provider;
 
@@ -89,7 +83,6 @@ export const SelectProviderStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { t } = useLocalizations();
 
-  // OIDC is gated behind the experimental self-serve flag; SAML always shows.
   const providerGroups = React.useMemo(
     () => PROVIDER_GROUPS.filter(group => group.id !== 'oidc' || isOIDCFlowEnabled),
     [isOIDCFlowEnabled],
