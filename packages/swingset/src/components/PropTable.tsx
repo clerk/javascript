@@ -15,13 +15,15 @@ interface ExtraProp {
 interface PropTableProps {
   meta: StoryMeta;
   extra?: ExtraProp[];
-  /** Append the `sx` row. StyleX components (e.g. Badge) don't take `sx`, so pass `false`. */
-  sx?: boolean;
 }
 
 const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
+const STYLEX_ROWS: ExtraProp[] = [
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+];
 
-export function PropTable({ meta, extra = [], sx = true }: PropTableProps) {
+export function PropTable({ meta, extra = [] }: PropTableProps) {
   const playground = usePlayground();
   const variants = meta.styles?._variants ?? {};
   const defaults = meta.styles?._defaultVariants ?? {};
@@ -37,7 +39,7 @@ export function PropTable({ meta, extra = [], sx = true }: PropTableProps) {
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    ...(sx ? [SX_ROW] : []),
+    ...(meta.styleEngine === 'stylex' ? STYLEX_ROWS : [SX_ROW]),
   ];
 
   return (
@@ -53,7 +55,7 @@ export function PropTable({ meta, extra = [], sx = true }: PropTableProps) {
       <tbody>
         {rows.map(row => {
           // The default is a static cell; the Value column is the live control. Variant
-          // props get a knob there; non-variant rows (sx, extra) have no control.
+          // props get a knob there; non-variant rows (the engine rows, extra) have no control.
           const knob = playground?.knobs[row.name];
           return (
             <tr key={row.name}>

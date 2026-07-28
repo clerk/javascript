@@ -107,17 +107,36 @@ export const space = stylex.defineVars({
 // =============================================================================
 // Typography Tokens — type scale
 // =============================================================================
-// Size + weight + leading grouped per semantic slot, mirroring astryx's
-// `typeScaleVars`. `defineVars` values are single CSS values, so each facet is
-// its own var.
+// One named step scale every text-bearing component sizes against. `defineVars`
+// values are single CSS values, so size and leading are each their own var.
 
 const typeScaleDefaults = {
-  '--cl-text-label-size': '0.875rem',
-  '--cl-text-label-weight': '500',
-  '--cl-text-label-leading': 'calc(1.25 / 0.875)',
-  '--cl-text-label-sm-size': '0.75rem',
-  '--cl-text-label-sm-weight': '500',
-  '--cl-text-label-sm-leading': 'calc(1 / 0.75)',
+  '--cl-text-xs-size': '0.75rem',
+  '--cl-text-xs-leading': 'calc(1 / 0.75)',
+  '--cl-text-sm-size': '0.875rem',
+  '--cl-text-sm-leading': 'calc(1.25 / 0.875)',
+  '--cl-text-base-size': '1rem',
+  '--cl-text-base-leading': 'calc(1.5 / 1)',
+  '--cl-text-lg-size': '1.125rem',
+  '--cl-text-lg-leading': 'calc(1.75 / 1.125)',
+  '--cl-text-xl-size': '1.25rem',
+  '--cl-text-xl-leading': 'calc(1.75 / 1.25)',
+  '--cl-text-2xl-size': '1.5rem',
+  '--cl-text-2xl-leading': 'calc(2 / 1.5)',
 } as const;
 
 export const typeScaleVars = stylex.defineVars(typeScaleDefaults);
+
+// =============================================================================
+// Typography Tokens — font weight
+// =============================================================================
+// Kept separate from the step scale: weight and size vary independently.
+
+const fontWeightDefaults = {
+  '--cl-font-normal': '400',
+  '--cl-font-medium': '500',
+  '--cl-font-semibold': '600',
+  '--cl-font-bold': '700',
+} as const;
+
+export const fontWeightVars = stylex.defineVars(fontWeightDefaults);

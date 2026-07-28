@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   base: {
@@ -18,7 +18,7 @@ export const styles = stylex.create({
     cursor: 'pointer',
     display: 'inline-flex',
     fontFamily: 'inherit',
-    fontWeight: typeScaleVars['--cl-text-label-weight'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',
     transitionDuration: '150ms',
@@ -68,14 +68,14 @@ export const styles = stylex.create({
   // size — height-driven; padding sets only the inline axis
   sizeSm: {
     paddingInline: space['2'],
-    fontSize: typeScaleVars['--cl-text-label-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-label-sm-leading'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
     height: space['7'],
   },
   sizeMd: {
     paddingInline: space['3'],
-    fontSize: typeScaleVars['--cl-text-label-size'],
-    lineHeight: typeScaleVars['--cl-text-label-leading'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     height: space['8'],
   },
 

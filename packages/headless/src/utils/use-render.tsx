@@ -11,11 +11,21 @@ import * as React from 'react';
 export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> = (props: Props) => React.ReactElement;
 
 /**
+ * A `render` prop: a render function receiving the part's computed props, or a
+ * React element to clone with them (`render={<Link/>}`). The element form lets a
+ * part render a component whose own props diverge from the tag's, which a render
+ * function cannot express — it is typed to receive the tag's props verbatim.
+ */
+export type RenderPropOrElement<Tag extends keyof React.JSX.IntrinsicElements> =
+  | RenderProp<React.ComponentPropsWithRef<Tag>>
+  | React.ReactElement;
+
+/**
  * Props accepted by any primitive part. Extends the native props for `Tag`
  * and adds the optional `render` escape hatch, narrowed to that tag's props.
  */
 export type ComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> & {
-  render?: RenderProp<React.ComponentPropsWithRef<Tag>>;
+  render?: RenderPropOrElement<Tag>;
 };
 
 /**
@@ -92,14 +102,6 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
 // ---------------------------------------------------------------------------
 // useRender
 // ---------------------------------------------------------------------------
-
-/**
- * A `render` prop: a render function, or a React element to clone with the
- * part's computed props (`render={<Link/>}`).
- */
-type RenderPropOrElement<Tag extends keyof React.JSX.IntrinsicElements> =
-  | RenderProp<React.ComponentPropsWithRef<Tag>>
-  | React.ReactElement;
 
 /**
  * Reads the ref off a React element passed to `render`. React 19 exposes it on

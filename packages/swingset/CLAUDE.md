@@ -33,7 +33,7 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props, applies the variable overrides, and exposes a Reset button plus a collapsible `VariablesPanel` attached to the preview. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
 
-- **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants` (always appends `sx`); each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. Non-variant rows (`sx`, `extra`) stay static.
+- **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants`, then appends the escape-hatch rows for the component's styling engine (`meta.styleEngine`): Emotion components get `sx`, StyleX components get `className` + `style`. Each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. The engine rows and `extra` stay static.
 
 - **Variables live in the preview.** The `VariablesPanel` is a collapsible attached to `StoryPreview` (toggled from the preview's header), bound to the shared playground context so editing a Mosaic token override immediately re-themes the story rendered above it.
 
@@ -80,12 +80,14 @@ export const meta: StoryMeta = {
   title: 'Button', // drives slug + the page <h1>
   label: 'Delete Org', // optional friendlier sidebar text
   source: 'packages/ui/src/mosaic/components/button.tsx', // repo-root path → "View source"
+  styleEngine: 'stylex', // set on migrated components; defaults to 'emotion'
   styles: buttonRecipe, // CVA recipe — archetype A · simple only
 };
 ```
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
+- `styleEngine` names the styling engine behind the component. It only affects which escape-hatch row the `<PropTable>` appends (`sx` vs `className` + `style`), so it matters for archetype A. Set `'stylex'` on migrated components; leave it off for Emotion ones.
 - `styles` is the component's CVA recipe/style object and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Omit it for compound A components, and for B and C.
 
 Story files that render styled Mosaic components must start with the Emotion pragma `/** @jsxImportSource @emotion/react */`. Headless-primitive demos render raw and don't need it. Always import the component and its recipe explicitly — never `import *`.
@@ -156,7 +158,7 @@ import * as ButtonStories from './button.stories';
 
 - **Playground / Props / Usage are mandatory and always in this order.** The three share one playground state: editing a row in `<PropTable>` re-renders `<Preview>` above it and regenerates the `<Usage>` snippet below it.
 - The story file exports a primary demo (rendered by `<Preview>`) plus one named export per variation under **Examples**. Each story takes `props: Record<string, unknown>` and casts through a local `knobsAsProps` helper — knobs are dynamically typed, the component isn't.
-- Use `<PropTable>`'s `extra` for documenting non-variant props; `sx` is appended for you.
+- Use `<PropTable>`'s `extra` for documenting non-variant props; the styling escape hatch is appended for you (`sx`, or `className` + `style` when `meta.styleEngine` is `'stylex'`).
 - Use `<Usage props={{…}}>` to pin static, non-knob props in the generated snippet.
 - `<PropTable>` renders `Prop | Type | Default | Value`: the **Default** column is filled automatically from the recipe's `_defaultVariants`, and the **Value** column is the live knob seeded with that default. No manual default annotation is needed; see _Document the default value_ under Archetype B.
 

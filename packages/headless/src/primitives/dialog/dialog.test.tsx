@@ -193,6 +193,24 @@ describe('Dialog', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.getByText('Popup content')).toBeInTheDocument();
     });
+
+    it('renders a part into an element passed to `render`', () => {
+      function Title({ children, ...props }: { children?: React.ReactNode }) {
+        return <h3 {...props}>{children}</h3>;
+      }
+
+      render(
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Dialog.Title render={<Title />}>Element title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      const title = screen.getByRole('heading', { name: 'Element title' });
+      expect(title.tagName).toBe('H3');
+      expect(title).toHaveAttribute('id');
+    });
   });
 
   describe('trigger state attributes', () => {

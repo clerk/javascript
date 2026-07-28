@@ -13,6 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Badge',
   source: 'packages/ui/src/mosaic/components/badge/badge.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
