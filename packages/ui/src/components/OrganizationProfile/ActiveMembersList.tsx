@@ -7,9 +7,9 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { Protect } from '../../common/Gate';
-import { Badge, Box, descriptors, localizationKeys, Td, Text, Tr } from '../../customizables';
+import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { DataTable, RoleSelect } from './MemberListTable';
+import { DataTable, RoleSelect, RowContainer } from './MemberListTable';
 
 type ActiveMembersListProps = {
   memberships: ReturnType<typeof useOrganization>['memberships'];
@@ -89,14 +89,7 @@ const MemberRow = (props: {
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
-    <Tr
-      aria-disabled={isDeprovisioned}
-      sx={t =>
-        isDeprovisioned
-          ? { opacity: t.opacity.$disabled, ':hover': { backgroundColor: 'transparent' } }
-          : { ':hover': { backgroundColor: t.colors.$neutralAlpha50 } }
-      }
-    >
+    <RowContainer isDisabled={isDeprovisioned}>
       <Td>
         <UserPreview
           sx={{ maxWidth: '30ch' }}
@@ -162,6 +155,6 @@ const MemberRow = (props: {
           />
         </Protect>
       </Td>
-    </Tr>
+    </RowContainer>
   );
 };
