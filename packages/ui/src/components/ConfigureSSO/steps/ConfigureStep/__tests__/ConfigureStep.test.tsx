@@ -287,6 +287,44 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
+  it('preserves manual endpoints while saving credentials', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        authUrl: 'https://idp.example/authorize',
+        tokenUrl: 'https://idp.example/token',
+        userInfoUrl: 'https://idp.example/userinfo',
+      },
+    };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    const clientId = await screen.findByRole('textbox', { name: 'Client ID' });
+    const clientSecret = screen.getByLabelText('Client secret');
+    await userEvent.type(clientId, 'client_123');
+    await userEvent.type(clientSecret, 'secret_456');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenLastCalledWith('ent_123', {
+        oidc: {
+          clientId: 'client_123',
+          clientSecret: 'secret_456',
+          authUrl: 'https://idp.example/authorize',
+          tokenUrl: 'https://idp.example/token',
+          userInfoUrl: 'https://idp.example/userinfo',
+        },
+      });
+    });
+  });
+
   it('displays credential API errors on their matching fields', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };

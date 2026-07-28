@@ -11,15 +11,21 @@ import { Step } from '../../../../elements/Step';
 import { useWizard } from '../../../../elements/Wizard';
 import { InnerStepCounter } from '../../../../elements/Wizard/InnerStepCounter';
 import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
+import type { OidcIdpConfigurationMode } from '../../shared/IdentityProviderConfigurationModes';
 
-export const OidcCredentialsStep = (): JSX.Element => {
+interface OidcCredentialsStepProps {
+  mode: OidcIdpConfigurationMode;
+}
+
+export const OidcCredentialsStep = ({ mode }: OidcCredentialsStepProps): JSX.Element => {
   const card = useCardState();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const {
     enterpriseConnection,
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
-  const clientIdField = useFormControl('clientId', enterpriseConnection?.oauthConfig?.clientId ?? '', {
+  const oauthConfig = enterpriseConnection?.oauthConfig;
+  const clientIdField = useFormControl('clientId', oauthConfig?.clientId ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.placeholder'),
@@ -48,6 +54,14 @@ export const OidcCredentialsStep = (): JSX.Element => {
         oidc: {
           clientId: clientIdField.value.trim(),
           clientSecret: clientSecretField.value.trim(),
+          ...(mode === 'discoveryUrl' && oauthConfig?.discoveryUrl !== undefined
+            ? { discoveryUrl: oauthConfig.discoveryUrl }
+            : {}),
+          ...(mode === 'manual' && oauthConfig?.authUrl !== undefined ? { authUrl: oauthConfig.authUrl } : {}),
+          ...(mode === 'manual' && oauthConfig?.tokenUrl !== undefined ? { tokenUrl: oauthConfig.tokenUrl } : {}),
+          ...(mode === 'manual' && oauthConfig?.userInfoUrl !== undefined
+            ? { userInfoUrl: oauthConfig.userInfoUrl }
+            : {}),
         },
       });
       void goNext();

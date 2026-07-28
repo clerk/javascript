@@ -34,7 +34,7 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
       </Wizard.Match>
 
       <Wizard.Match id='credentials'>
-        <OidcCredentialsStep />
+        <OidcCredentialsStep mode={endpointMode} />
       </Wizard.Match>
     </Wizard>
   );
