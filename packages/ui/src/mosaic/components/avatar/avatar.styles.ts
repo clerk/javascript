@@ -19,16 +19,6 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
 
-  // shape — square uses a fixed 6px radius for now; circle rounds fully
-  shapeCircle: { borderRadius: radiusVars['--cl-radius-full'] },
-  shapeSquare: { borderRadius: '0.375rem' },
-
-  // size — square box; fallback text scales with the box via inherited font-size
-  sizeXs: { fontSize: '0.625rem', height: space['6'], width: space['6'] },
-  sizeSm: { fontSize: '0.75rem', height: space['8'], width: space['8'] },
-  sizeMd: { fontSize: '0.875rem', height: space['10'], width: space['10'] },
-  sizeLg: { fontSize: '1rem', height: space['12'], width: space['12'] },
-
   // image fills the clipped box
   image: {
     aspectRatio: '1 / 1',
@@ -49,4 +39,18 @@ export const styles = stylex.create({
     height: '100%',
     width: '100%',
   },
+});
+
+// shape — square uses a fixed 6px radius for now; circle rounds fully
+export const shapes = stylex.create({
+  circle: { borderRadius: radiusVars['--cl-radius-full'] },
+  square: { borderRadius: '0.375rem' },
+});
+
+// size — square box; fallback text scales with the box via inherited font-size
+export const sizes = stylex.create({
+  xs: { fontSize: '0.625rem', height: space['6'], width: space['6'] },
+  sm: { fontSize: '0.75rem', height: space['8'], width: space['8'] },
+  md: { fontSize: '0.875rem', height: space['10'], width: space['10'] },
+  lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
 });

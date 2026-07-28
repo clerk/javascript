@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
-import { styles } from './avatar.styles';
+import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -46,13 +46,6 @@ function useImageLoadingStatus(src: string | undefined): ImageLoadingStatus {
   return status;
 }
 
-const sizeStyles = {
-  xs: styles.sizeXs,
-  sm: styles.sizeSm,
-  md: styles.sizeMd,
-  lg: styles.sizeLg,
-} as const;
-
 export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
   shape?: 'circle' | 'square';
   size?: 'lg' | 'md' | 'sm' | 'xs';
@@ -71,7 +64,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
         ref={ref}
         {...mergeStyleProps(
           themeProps('avatar', { shape, size }),
-          stylex.props(styles.base, shape === 'circle' ? styles.shapeCircle : styles.shapeSquare, sizeStyles[size]),
+          stylex.props(styles.base, shapes[shape], sizes[size]),
           className,
           style,
         )}
