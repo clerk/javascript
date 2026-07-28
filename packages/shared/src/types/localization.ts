@@ -1531,9 +1531,15 @@ export type __internal_LocalizationResource = {
           headerSubtitle: LocalizationValue;
           paragraph: LocalizationValue;
           claims: {
-            description: LocalizationValue;
-            optional: LocalizationValue;
-            required: LocalizationValue;
+            optional: {
+              conjunction: LocalizationValue;
+              prefix: LocalizationValue;
+              suffix: LocalizationValue;
+            };
+            required: {
+              prefix: LocalizationValue;
+              suffix: LocalizationValue;
+            };
           };
           redirectUri: {
             label: LocalizationValue;

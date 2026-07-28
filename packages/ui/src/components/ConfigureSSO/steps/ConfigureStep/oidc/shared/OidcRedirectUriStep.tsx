@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 
-import { Badge, Col, Flex, localizationKeys, Text } from '@/customizables';
+import { Col, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
@@ -38,74 +38,72 @@ export const OidcRedirectUriStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.paragraph')}
             />
-            <Col sx={theme => ({ gap: theme.space.$2 })}>
+            <Col sx={theme => ({ gap: theme.space.$1 })}>
               <Text
                 as='p'
                 colorScheme='secondary'
-                localizationKey={localizationKeys(
-                  'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.description',
-                )}
-              />
-              <Flex
-                align='center'
-                wrap='wrap'
-                sx={theme => ({ gap: theme.space.$2 })}
               >
-                <Badge
-                  colorScheme='warning'
+                <Text
+                  as='span'
                   localizationKey={localizationKeys(
-                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required',
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required.prefix',
                   )}
-                />
+                />{' '}
                 <Text
                   as='code'
                   sx={{ fontFamily: 'monospace' }}
                 >
                   sub
                 </Text>
-                <Text
-                  as='span'
-                  colorScheme='secondary'
-                >
-                  ,
-                </Text>
+                ,{' '}
                 <Text
                   as='code'
                   sx={{ fontFamily: 'monospace' }}
                 >
                   email
-                </Text>
-              </Flex>
-              <Flex
-                align='center'
-                wrap='wrap'
-                sx={theme => ({ gap: theme.space.$2 })}
-              >
-                <Badge
-                  colorScheme='primary'
+                </Text>{' '}
+                <Text
+                  as='span'
                   localizationKey={localizationKeys(
-                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional',
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required.suffix',
                   )}
                 />
+              </Text>
+              <Text
+                as='p'
+                colorScheme='secondary'
+              >
+                <Text
+                  as='span'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional.prefix',
+                  )}
+                />{' '}
                 <Text
                   as='code'
                   sx={{ fontFamily: 'monospace' }}
                 >
                   given_name
-                </Text>
+                </Text>{' '}
                 <Text
                   as='span'
-                  colorScheme='secondary'
-                >
-                  ,
-                </Text>
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional.conjunction',
+                  )}
+                />{' '}
                 <Text
                   as='code'
                   sx={{ fontFamily: 'monospace' }}
                 >
                   family_name
-                </Text>
-              </Flex>
+                </Text>{' '}
+                <Text
+                  as='span'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional.suffix',
+                  )}
+                />
+              </Text>
             </Col>
           </Col>
 
