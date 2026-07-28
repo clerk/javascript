@@ -1,6 +1,8 @@
-import { type JSX } from 'react';
+import { type JSX, useState } from 'react';
 
+import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Wizard, type WizardStepConfig } from '../../../elements/Wizard';
+import type { OidcIdpConfigurationMode } from '../shared/IdentityProviderConfigurationModes';
 import { OidcCredentialsStep } from './shared/OidcCredentialsStep';
 import { OidcEndpointsStep } from './shared/OidcEndpointsStep';
 import { OidcRedirectUriStep } from './shared/OidcRedirectUriStep';
@@ -8,6 +10,12 @@ import { OidcRedirectUriStep } from './shared/OidcRedirectUriStep';
 const OIDC_STEPS: WizardStepConfig[] = [{ id: 'redirect-uri' }, { id: 'endpoints' }, { id: 'credentials' }];
 
 export const OidcCustomConfigureSteps = (): JSX.Element => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const oauthConfig = enterpriseConnection?.oauthConfig;
+  const [endpointMode, setEndpointMode] = useState<OidcIdpConfigurationMode>(
+    oauthConfig?.authUrl && !oauthConfig.discoveryUrl ? 'manual' : 'discoveryUrl',
+  );
+
   return (
     <Wizard
       steps={OIDC_STEPS}
@@ -18,7 +26,10 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
       </Wizard.Match>
 
       <Wizard.Match id='endpoints'>
-        <OidcEndpointsStep />
+        <OidcEndpointsStep
+          mode={endpointMode}
+          onModeChange={setEndpointMode}
+        />
       </Wizard.Match>
 
       <Wizard.Match id='credentials'>

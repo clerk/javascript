@@ -1,6 +1,6 @@
 import React, { type JSX } from 'react';
 
-import { descriptors, Flow } from '@/customizables';
+import { descriptors, Flow, localizationKeys } from '@/customizables';
 import { CardStateProvider } from '@/elements/contexts';
 
 import { useConfigureSSO } from '../../ConfigureSSOContext';
@@ -82,8 +82,8 @@ export const ConfigureProviderStep = (): JSX.Element | null => {
         ) : (
           <>
             <Step.Header
-              title='Unsupported provider'
-              description='This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.'
+              title={localizationKeys('configureSSO.configureStep.unsupportedProvider.title')}
+              description={localizationKeys('configureSSO.configureStep.unsupportedProvider.description')}
             />
             <Step.Body />
           </>

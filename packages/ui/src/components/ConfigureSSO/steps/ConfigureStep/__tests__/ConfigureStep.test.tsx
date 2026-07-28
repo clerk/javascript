@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Flow } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -72,6 +72,12 @@ describe('resolveConfigureSteps', () => {
 });
 
 describe('ConfigureProviderStep', () => {
+  beforeEach(() => {
+    contextState.provider = undefined;
+    contextState.enterpriseConnection = undefined;
+    updateConnection.mockReset();
+  });
+
   const renderStep = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
     render(
       <Flow.Root flow='configureSSO'>
@@ -95,29 +101,22 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     expect(await screen.findAllByText(/create a new oidc application/i)).not.toHaveLength(0);
-    const [redirectUri] = screen.getAllByRole('textbox') as HTMLInputElement[];
+    const redirectUri = screen.getByRole('textbox', { name: 'Authorized redirect URI' });
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
-    expect(
-      document.querySelector(
-        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.description"]',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Ensure your ID token includes the following claims:')).toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(5);
     expect(screen.getByText('sub')).toBeInTheDocument();
     expect(screen.getByText('email')).toBeInTheDocument();
-    expect(
-      document.querySelector(
-        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.table.columns.claim"]',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'ID token claim' })).toBeInTheDocument();
     expect(screen.getByText('given_name')).toBeInTheDocument();
     expect(screen.getByText('family_name')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-    const [discoveryMode, manualMode] = await screen.findAllByRole('radio');
+    const discoveryMode = await screen.findByRole('radio', { name: 'Add via discovery endpoint' });
+    const manualMode = screen.getByRole('radio', { name: 'Configure manually' });
     expect(discoveryMode).toBeChecked();
     expect(screen.getAllByRole('textbox')).toHaveLength(1);
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
@@ -137,7 +136,10 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Discovery endpoint' }),
+      'https://idp.example/.well-known/openid-configuration',
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
     await vi.waitFor(() => {
@@ -157,10 +159,12 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    const [, manualMode] = await screen.findAllByRole('radio');
+    const manualMode = await screen.findByRole('radio', { name: 'Configure manually' });
     await userEvent.click(manualMode);
 
-    const [authUrl, tokenUrl, userInfoUrl] = screen.getAllByRole('textbox');
+    const authUrl = screen.getByRole('textbox', { name: 'Authorization URL' });
+    const tokenUrl = screen.getByRole('textbox', { name: 'Token URL' });
+    const userInfoUrl = screen.getByRole('textbox', { name: 'User Info URL' });
     await userEvent.type(authUrl, 'https://idp.example/authorize');
     await userEvent.type(tokenUrl, 'https://idp.example/token');
     await userEvent.type(userInfoUrl, 'https://idp.example/userinfo');
@@ -177,6 +181,36 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
+  it('saves manual endpoints without a user info URL', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    const manualMode = await screen.findByRole('radio', { name: 'Configure manually' });
+    await userEvent.click(manualMode);
+
+    const authUrl = screen.getByRole('textbox', { name: 'Authorization URL' });
+    const tokenUrl = screen.getByRole('textbox', { name: 'Token URL' });
+    await userEvent.type(authUrl, 'https://idp.example/authorize');
+    await userEvent.type(tokenUrl, 'https://idp.example/token');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await vi.waitFor(() => {
+      expect(updateConnection).toHaveBeenCalledWith('ent_123', {
+        oidc: {
+          authUrl: 'https://idp.example/authorize',
+          tokenUrl: 'https://idp.example/token',
+          userInfoUrl: '',
+        },
+      });
+    });
+  });
+
   it('saves credentials before advancing', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
@@ -187,15 +221,14 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Discovery endpoint' }),
+      'https://idp.example/.well-known/openid-configuration',
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-    await vi.waitFor(() => {
-      expect(document.querySelector('input[name="clientId"]')).not.toBeNull();
-    });
-
-    const clientId = document.querySelector('input[name="clientId"]') as HTMLInputElement;
-    const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
+    const clientId = await screen.findByRole('textbox', { name: 'Client ID' });
+    const clientSecret = screen.getByLabelText('Client secret');
     await userEvent.type(clientId, 'client_123');
     await userEvent.type(clientSecret, 'secret_456');
 
@@ -224,10 +257,11 @@ describe('ConfigureProviderStep', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
 
-    const [discoveryMode, manualMode] = await screen.findAllByRole('radio');
+    const discoveryMode = await screen.findByRole('radio', { name: 'Add via discovery endpoint' });
+    const manualMode = screen.getByRole('radio', { name: 'Configure manually' });
     expect(discoveryMode).not.toBeChecked();
     expect(manualMode).toBeChecked();
-    expect(document.querySelector('input[name="authUrl"]')).toHaveValue('https://idp.example/authorize');
+    expect(screen.getByRole('textbox', { name: 'Authorization URL' })).toHaveValue('https://idp.example/authorize');
   });
 
   it('populates manual endpoints resolved from discovery', async () => {
@@ -246,12 +280,40 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    const [, manualMode] = await screen.findAllByRole('radio');
+    const manualMode = await screen.findByRole('radio', { name: 'Configure manually' });
     await userEvent.click(manualMode);
 
-    expect(document.querySelector('input[name="authUrl"]')).toHaveValue('https://idp.example/authorize');
-    expect(document.querySelector('input[name="tokenUrl"]')).toHaveValue('https://idp.example/token');
-    expect(document.querySelector('input[name="userInfoUrl"]')).toHaveValue('https://idp.example/userinfo');
+    expect(screen.getByRole('textbox', { name: 'Authorization URL' })).toHaveValue('https://idp.example/authorize');
+    expect(screen.getByRole('textbox', { name: 'Token URL' })).toHaveValue('https://idp.example/token');
+    expect(screen.getByRole('textbox', { name: 'User Info URL' })).toHaveValue('https://idp.example/userinfo');
+  });
+
+  it('retains manual mode when returning from credentials with a stale discovery URL', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = {
+      id: 'ent_123',
+      oauthConfig: {
+        discoveryUrl: 'https://idp.example/.well-known/openid-configuration',
+        authUrl: 'https://idp.example/authorize',
+        tokenUrl: 'https://idp.example/token',
+        userInfoUrl: 'https://idp.example/userinfo',
+      },
+    };
+    updateConnection.mockResolvedValue({});
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    const manualMode = await screen.findByRole('radio', { name: 'Configure manually' });
+    await userEvent.click(manualMode);
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await screen.findByRole('textbox', { name: 'Client ID' });
+    await userEvent.click(screen.getByRole('button', { name: 'Previous' }));
+
+    expect(await screen.findByRole('radio', { name: 'Configure manually' })).toBeChecked();
+    expect(screen.getByRole('textbox', { name: 'Authorization URL' })).toHaveValue('https://idp.example/authorize');
   });
 
   it('degrades to the unsupported-provider state for a provider the SDK does not recognize', async () => {

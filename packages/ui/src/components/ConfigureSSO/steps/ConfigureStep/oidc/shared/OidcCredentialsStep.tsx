@@ -19,13 +19,13 @@ export const OidcCredentialsStep = (): JSX.Element => {
     enterpriseConnection,
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
-  const clientIdField = useFormControl('clientId', enterpriseConnection?.oauthConfig?.clientId ?? '', {
+  const clientIdField = useFormControl('oidcClientId', enterpriseConnection?.oauthConfig?.clientId ?? '', {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientId.placeholder'),
     isRequired: true,
   });
-  const clientSecretField = useFormControl('clientSecret', '', {
+  const clientSecretField = useFormControl('oidcClientSecret', '', {
     type: 'password',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientSecret.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.clientSecret.placeholder'),

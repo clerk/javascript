@@ -112,7 +112,7 @@ export const OidcRedirectUriStep = (): JSX.Element => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
   const { enterpriseConnection } = useConfigureSSO();
   const redirectUri = enterpriseConnection?.oauthConfig?.redirectUri ?? '';
-  const redirectUriField = useFormControl('redirectUri', redirectUri, {
+  const redirectUriField = useFormControl('oidcRedirectUri', redirectUri, {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.redirectUri.label'),
     isRequired: false,

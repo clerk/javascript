@@ -9,6 +9,7 @@ import { useConfigureSSO } from '../../../../ConfigureSSOContext';
 import { Step } from '../../../../elements/Step';
 import { useWizard } from '../../../../elements/Wizard';
 import { InnerStepCounter } from '../../../../elements/Wizard/InnerStepCounter';
+import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
 import {
   IdentityProviderConfigurationModes,
   type OidcIdpConfigurationMode,
@@ -20,17 +21,19 @@ import {
 
 const OIDC_ENDPOINT_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly OidcIdpConfigurationMode[];
 
-export const OidcEndpointsStep = (): JSX.Element => {
+interface OidcEndpointsStepProps {
+  mode: OidcIdpConfigurationMode;
+  onModeChange: (mode: OidcIdpConfigurationMode) => void;
+}
+
+export const OidcEndpointsStep = ({ mode, onModeChange }: OidcEndpointsStepProps): JSX.Element => {
   const card = useCardState();
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
+  const { goNext, goPrev, isFirstStep } = useWizard();
   const {
     enterpriseConnection,
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const oauthConfig = enterpriseConnection?.oauthConfig;
-  const [mode, setMode] = React.useState<OidcIdpConfigurationMode>(
-    oauthConfig?.authUrl && !oauthConfig.discoveryUrl ? 'manual' : 'discoveryUrl',
-  );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const discoveryUrlField = useFormControl('discoveryUrl', oauthConfig?.discoveryUrl ?? '', {
@@ -55,15 +58,12 @@ export const OidcEndpointsStep = (): JSX.Element => {
     type: 'text',
     label: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.label'),
     placeholder: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.manual.userInfoUrl.placeholder'),
-    isRequired: true,
   });
 
   const isValid =
     mode === 'discoveryUrl'
       ? discoveryUrlField.value.trim().length > 0
-      : authUrlField.value.trim().length > 0 &&
-        tokenUrlField.value.trim().length > 0 &&
-        userInfoUrlField.value.trim().length > 0;
+      : authUrlField.value.trim().length > 0 && tokenUrlField.value.trim().length > 0;
 
   const canSubmit = isValid && !isSubmitting;
 
@@ -135,7 +135,7 @@ export const OidcEndpointsStep = (): JSX.Element => {
           <IdentityProviderConfigurationModes
             modes={OIDC_ENDPOINT_MODES}
             value={mode}
-            onChange={setMode}
+            onChange={onModeChange}
             labels={{
               ariaLabel: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.ariaLabel'),
               discoveryUrl: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.discoveryUrl'),
@@ -144,6 +144,7 @@ export const OidcEndpointsStep = (): JSX.Element => {
           />
 
           <OidcEndpointsConfigurationForm {...formProps} />
+          <ActiveConnectionAlert />
         </Step.Section>
       </Step.Body>
 
@@ -156,7 +157,7 @@ export const OidcEndpointsStep = (): JSX.Element => {
         <Step.Footer.Continue
           onClick={handleContinue}
           isLoading={isSubmitting}
-          isDisabled={!canSubmit || isLastStep}
+          isDisabled={!canSubmit}
         />
       </Step.Footer>
     </>
