@@ -17,3 +17,20 @@ Clerk's JavaScript SDK and library monorepo.
 - For the Mosaic design system (tokens, CVA utility, `MosaicProvider`, migration from existing system), see `references/mosaic-architecture.md`.
 - For dev setup, testing, JSDoc/Typedoc, publishing, changesets, and commit conventions, see `docs/CONTRIBUTING.md`.
 - For working in the repo day to day (setup ordering and footguns, the package map, dev-loop recipes, and the breaking-change checklist), the `clerk-monorepo` Claude Code skill in `.claude/skills/clerk-monorepo/` restates these rules in actionable form.
+
+<claude-mem-context>
+# Memory Context
+
+# claude-mem status
+
+This project has no memory yet. The current session will seed it; subsequent sessions will receive auto-injected context for relevant past work.
+
+Memory injection starts on your second session in a project.
+
+`/learn-codebase` is available if the user wants to front-load the entire repo into memory in a single pass (~5 minutes on a typical repo, optional). Otherwise memory builds passively as work happens.
+
+Live activity: http://localhost:37701
+How it works: `/how-it-works`
+
+This message disappears once the first observation lands.
+</claude-mem-context>

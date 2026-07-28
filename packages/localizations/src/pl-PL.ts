@@ -244,18 +244,76 @@ export const plPL: LocalizationResource = {
         },
       },
       oidcCustom: {
-        claimsStep: {
-          headerSubtitle: undefined,
-        },
         credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
           headerSubtitle: undefined,
+          paragraph: undefined,
         },
         endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
           headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
         },
         mainHeaderTitle: undefined,
         redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
           headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {

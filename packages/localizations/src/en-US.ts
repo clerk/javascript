@@ -242,7 +242,6 @@ export const enUS: LocalizationResource = {
       },
       oidcCustom: {
         credentialsStep: {
-          headerSubtitle: 'Add your application credentials',
           clientId: {
             label: 'Client ID',
             placeholder: 'Paste client ID here...',
@@ -251,16 +250,17 @@ export const enUS: LocalizationResource = {
             label: 'Client secret',
             placeholder: 'Paste client secret here...',
           },
+          headerSubtitle: 'Add your application credentials',
           paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
         },
         endpointsStep: {
-          headerSubtitle: 'Add your identity provider’s endpoints',
           discoveryUrl: {
             description:
               'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
             label: 'Discovery endpoint',
             placeholder: 'Paste URL here...',
           },
+          headerSubtitle: 'Add your identity provider’s endpoints',
           manual: {
             authUrl: {
               label: 'Authorization URL',
@@ -284,9 +284,6 @@ export const enUS: LocalizationResource = {
         },
         mainHeaderTitle: 'Configure your identity provider',
         redirectUriStep: {
-          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
-          paragraph:
-            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
           claims: {
             description: 'Ensure your ID token includes the following claims:',
             table: {
@@ -295,13 +292,24 @@ export const enUS: LocalizationResource = {
                 claim: 'ID token claim',
               },
               rows: {
-                email: { attribute: 'Primary email' },
-                firstName: { attribute: 'First name' },
-                lastName: { attribute: 'Last name' },
-                subject: { attribute: 'External user ID' },
+                email: {
+                  attribute: 'Primary email',
+                },
+                firstName: {
+                  attribute: 'First name',
+                },
+                lastName: {
+                  attribute: 'Last name',
+                },
+                subject: {
+                  attribute: 'External user ID',
+                },
               },
             },
           },
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
           redirectUri: {
             label: 'Authorized redirect URI',
           },
