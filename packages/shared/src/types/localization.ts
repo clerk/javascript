@@ -158,6 +158,7 @@ export type __internal_LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__banned: LocalizationValue;
+  badge__deprovisioned: LocalizationValue;
   badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;

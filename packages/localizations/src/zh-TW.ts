@@ -63,6 +63,7 @@ export const zhTW: LocalizationResource = {
   badge__canceledEndsAt: "已取消 • 將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__currentPlan: '目前計劃',
   badge__default: '預設',
+  badge__deprovisioned: undefined,
   badge__endsAt: "將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__expired: '已過期',
   badge__freeTrial: '免費試用',

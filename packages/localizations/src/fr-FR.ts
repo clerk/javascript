@@ -63,6 +63,7 @@ export const frFR: LocalizationResource = {
   badge__canceledEndsAt: "Annulé • Termine le {{ date | shortDate('fr-FR') }}",
   badge__currentPlan: 'Plan actuel',
   badge__default: 'Défaut',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termine le {{ date | shortDate('fr-FR') }}",
   badge__expired: 'Expiré',
   badge__freeTrial: 'Essai gratuit',
