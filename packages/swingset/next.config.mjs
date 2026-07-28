@@ -63,15 +63,16 @@ const nextConfig = {
     // compiled here — otherwise the calls hit the runtime and throw. The unplugin transforms the
     // StyleX *JS only*, keeping SWC intact so `next/font` and the Emotion transform keep working.
     //
-    // CSS strategy forks by env (see `postcss.config.mjs`):
-    // - Prod: `runtimeInjection: false`. Atoms are static class refs; the CSS is extracted
-    //   separately by `@stylexjs/postcss-plugin` into `globals.css` (`useCSSLayers` preserves
-    //   StyleX's `@layer priorityN` precedence). Both share the same babel version/options so
-    //   atom hashes match; the plugin's dev "no CSS asset" warning is expected and harmless.
-    // - Dev: `runtimeInjection: true`. StyleX injects a `<style>` at runtime from the same module
-    //   the JS lives in, so editing a `.styles.ts` file hot-reloads. This is required because Next
-    //   won't re-run the `globals.css` PostCSS extraction on Mosaic-source edits (they're outside
-    //   the CSS import graph), which would otherwise leave the preview stale.
+    // The `@stylexjs/postcss-plugin` (see `postcss.config.mjs`) is what extracts the CSS — the
+    // token `:root { --cl-* }` defaults and the atoms — in both dev and prod. This unplugin only
+    // transforms the StyleX *calls* in the JS. `runtimeInjection` forks by env:
+    // - Prod: `false`. Atoms are static class refs resolved against the extracted sheet.
+    // - Dev: `true`. On top of the extracted sheet, StyleX also injects each atom at runtime under
+    //   its content hash, so editing a `.styles.ts` file hot-reloads a fresh atom (the extracted
+    //   sheet goes stale because Next won't re-run the `globals.css` PostCSS pass on Mosaic-source
+    //   edits). The `:root` token defaults come from the extraction and never change mid-session,
+    //   so they stay correct — `runtimeInjection` can't emit them (`defineVars` is compile-only).
+    // Both passes share the same babel version/options so atom hashes match.
     const isDev = process.env.NODE_ENV !== 'production';
     config.plugins.push(
       stylexPlugin({
