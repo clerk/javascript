@@ -248,6 +248,21 @@ export const isIS: LocalizationResource = {
           required: undefined,
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: undefined,
+        },
+        credentialsStep: {
+          headerSubtitle: undefined,
+        },
+        endpointsStep: {
+          headerSubtitle: undefined,
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          headerSubtitle: undefined,
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
@@ -632,6 +647,10 @@ export const isIS: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Hafðu samband við stjórnanda fyrirtækisins þíns til að uppfæra heimildir þínar.',
@@ -685,6 +704,10 @@ export const isIS: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Sérsniðinn SAML þjónustuaðili',
         google: undefined,

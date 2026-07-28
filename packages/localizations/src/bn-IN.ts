@@ -248,6 +248,21 @@ export const bnIN: LocalizationResource = {
           required: undefined,
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: undefined,
+        },
+        credentialsStep: {
+          headerSubtitle: undefined,
+        },
+        endpointsStep: {
+          headerSubtitle: undefined,
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          headerSubtitle: undefined,
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
@@ -632,6 +647,10 @@ export const bnIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'আপনার অনুমতি আপগ্রেড করতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
@@ -685,6 +704,10 @@ export const bnIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'কাস্টম SAML প্রদানকারী',
         google: undefined,

@@ -247,6 +247,21 @@ export const faIR: LocalizationResource = {
           required: undefined,
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: undefined,
+        },
+        credentialsStep: {
+          headerSubtitle: undefined,
+        },
+        endpointsStep: {
+          headerSubtitle: undefined,
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          headerSubtitle: undefined,
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
@@ -631,6 +646,10 @@ export const faIR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'برای ارتقای مجوزهای خود با مدیر سازمان تماس بگیرید.',
@@ -684,6 +703,10 @@ export const faIR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'ارائه‌دهنده SAML سفارشی',
         google: undefined,

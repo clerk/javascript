@@ -242,6 +242,21 @@ export const trTR: LocalizationResource = {
           required: undefined,
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: undefined,
+        },
+        credentialsStep: {
+          headerSubtitle: undefined,
+        },
+        endpointsStep: {
+          headerSubtitle: undefined,
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          headerSubtitle: undefined,
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
@@ -626,6 +641,10 @@ export const trTR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'İzinlerinizi yükseltmek için organizasyonunuzun yöneticisiyle iletişime geçin.',
@@ -679,6 +698,10 @@ export const trTR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Özel SAML Sağlayıcısı',
         google: undefined,

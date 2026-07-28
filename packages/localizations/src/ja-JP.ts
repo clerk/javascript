@@ -249,6 +249,21 @@ export const jaJP: LocalizationResource = {
           required: undefined,
         },
       },
+      oidcCustom: {
+        claimsStep: {
+          headerSubtitle: undefined,
+        },
+        credentialsStep: {
+          headerSubtitle: undefined,
+        },
+        endpointsStep: {
+          headerSubtitle: undefined,
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          headerSubtitle: undefined,
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
@@ -633,6 +648,10 @@ export const jaJP: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '権限をアップグレードするには、組織の管理者にお問い合わせください。',
@@ -686,6 +705,10 @@ export const jaJP: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'カスタムSAMLプロバイダー',
         google: undefined,

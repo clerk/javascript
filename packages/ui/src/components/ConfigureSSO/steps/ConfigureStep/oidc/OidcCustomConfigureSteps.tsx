@@ -1,5 +1,3 @@
-import { type JSX } from 'react';
-
 import { localizationKeys } from '@/customizables';
 
 import { Step } from '../../../elements/Step';
@@ -13,9 +11,8 @@ const OIDC_STEPS: WizardStepConfig[] = [
   { id: 'credentials' },
 ];
 
-export const OidcCustomConfigureSteps = (): JSX.Element => {
+export const OidcCustomConfigureSteps = () => {
   return (
-    // Linear, guard-less sub-flow: mount on the first step, mirroring the SAML custom inner wizard.
     <Wizard
       steps={OIDC_STEPS}
       initialStepId={OIDC_STEPS[0].id}
@@ -39,7 +36,7 @@ export const OidcCustomConfigureSteps = (): JSX.Element => {
   );
 };
 
-const OidcRedirectUriStep = (): JSX.Element => {
+const OidcRedirectUriStep = () => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
@@ -68,7 +65,7 @@ const OidcRedirectUriStep = (): JSX.Element => {
   );
 };
 
-const OidcClaimsStep = (): JSX.Element => {
+const OidcClaimsStep = () => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
@@ -97,7 +94,7 @@ const OidcClaimsStep = (): JSX.Element => {
   );
 };
 
-const OidcEndpointsStep = (): JSX.Element => {
+const OidcEndpointsStep = () => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
@@ -126,7 +123,7 @@ const OidcEndpointsStep = (): JSX.Element => {
   );
 };
 
-const OidcCredentialsStep = (): JSX.Element => {
+const OidcCredentialsStep = () => {
   const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
 
   return (
@@ -146,7 +143,6 @@ const OidcCredentialsStep = (): JSX.Element => {
           onClick={() => goPrev()}
           isDisabled={isFirstStep}
         />
-        {/* Terminal step: the connection submit lands with the credentials step ticket; disabled as a placeholder. */}
         <Step.Footer.Continue
           onClick={() => goNext()}
           isDisabled={isLastStep}

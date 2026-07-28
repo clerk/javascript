@@ -1540,6 +1540,10 @@ export type __internal_LocalizationResource = {
           headerSubtitle: LocalizationValue;
         };
       };
+      unsupportedProvider: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+      };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;
         createAppStep: {
