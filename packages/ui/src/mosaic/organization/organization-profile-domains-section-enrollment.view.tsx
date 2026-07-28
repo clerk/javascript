@@ -53,8 +53,8 @@ export function OrganizationProfileDomainsSectionEnrollmentView({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title render={({ color: _color, ...p }) => <Heading {...p} />}>Update {domainName}</Dialog.Title>
-            <Dialog.Description render={({ color: _color, ...p }) => <Text {...p} />}>
+            <Dialog.Title render={<Heading />}>Update {domainName}</Dialog.Title>
+            <Dialog.Description render={<Text />}>
               Choose how users from this domain can join the organization.
             </Dialog.Description>
 

@@ -1,4 +1,4 @@
-import type { RenderProp } from '@clerk/headless/utils';
+import type { RenderPropOrElement } from '@clerk/headless/utils';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -9,12 +9,11 @@ import type { TypographyColor, TypographySize } from '../typography.styles';
 import { colors, sizes } from '../typography.styles';
 import { styles } from './heading.styles';
 
-// `color` replaces the legacy HTML `color` attribute (`string`), which would otherwise
-// widen the variant and break callers spreading slot props in.
+// `color` replaces the legacy HTML `color` attribute, whose `string` type would widen the variant.
 export interface HeadingProps extends Omit<React.ComponentPropsWithRef<'h2'>, 'color'> {
   size?: TypographySize;
   color?: TypographyColor;
-  render?: RenderProp<React.ComponentPropsWithRef<'h2'>> | React.ReactElement;
+  render?: RenderPropOrElement<'h2'>;
 }
 
 export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(null);

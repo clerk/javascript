@@ -1,4 +1,4 @@
-import type { RenderProp } from '@clerk/headless/utils';
+import type { RenderPropOrElement } from '@clerk/headless/utils';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -8,12 +8,11 @@ import { useContextProps } from '../../utils/context';
 import type { TypographyColor, TypographySize } from '../typography.styles';
 import { colors, sizes } from '../typography.styles';
 
-// `color` replaces the legacy HTML `color` attribute (`string`), which would otherwise
-// widen the variant and break callers spreading slot props in.
+// `color` replaces the legacy HTML `color` attribute, whose `string` type would widen the variant.
 export interface TextProps extends Omit<React.ComponentPropsWithRef<'p'>, 'color'> {
   size?: TypographySize;
   color?: TypographyColor;
-  render?: RenderProp<React.ComponentPropsWithRef<'p'>> | React.ReactElement;
+  render?: RenderPropOrElement<'p'>;
 }
 
 export const TextContext = React.createContext<Partial<TextProps> | null>(null);

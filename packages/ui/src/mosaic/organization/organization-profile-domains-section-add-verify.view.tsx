@@ -55,7 +55,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title render={({ color: _color, ...p }) => <Heading {...p} />}>{title}</Dialog.Title>
+            <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
 
             {error && (
               <Box
@@ -154,7 +154,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                   })
                 }
               >
-                <Dialog.Description render={({ color: _color, ...p }) => <Text {...p} />}>
+                <Dialog.Description render={<Text />}>
                   Enter the verification code sent to {draftEmail}@{domainName}.
                 </Dialog.Description>
                 <Box
@@ -208,7 +208,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                   })
                 }
               >
-                <Dialog.Description render={({ color: _color, ...p }) => <Text {...p} />}>
+                <Dialog.Description render={<Text />}>
                   Choose how users from this domain can join the organization.
                 </Dialog.Description>
                 <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>

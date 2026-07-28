@@ -35,8 +35,8 @@ export function OrganizationProfileDomainsSectionRemoveView({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title render={({ color: _color, ...p }) => <Heading {...p} />}>Remove domain</Dialog.Title>
-            <Dialog.Description render={({ color: _color, ...p }) => <Text {...p} />}>
+            <Dialog.Title render={<Heading />}>Remove domain</Dialog.Title>
+            <Dialog.Description render={<Text />}>
               The domain &quot;{domainName}&quot; and its enrollment settings will be removed. Members already in the
               organization keep their access.
             </Dialog.Description>

@@ -43,6 +43,14 @@ describe('Mosaic Heading', () => {
     expect(heading).toHaveAttribute('data-size', 'base');
   });
 
+  it('clones an element passed to the render prop, keeping the slot props', () => {
+    render(<Heading render={<h3 lang='en' />}>Title</Heading>);
+    const heading = screen.getByRole('heading', { level: 3, name: 'Title' });
+    expect(heading).toHaveClass('cl-heading');
+    expect(heading).toHaveAttribute('data-size', 'base');
+    expect(heading).toHaveAttribute('lang', 'en');
+  });
+
   it('reads defaults from HeadingContext, with own props winning', () => {
     render(
       <HeadingContext.Provider value={{ size: 'xl', color: 'neutral' }}>

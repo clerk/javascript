@@ -93,7 +93,7 @@ export function OrganizationProfileProfileSectionView({
             </Button>
           )}
         >
-          <Dialog.Title render={({ color: _color, ...p }) => <Heading {...p} />}>Update profile</Dialog.Title>
+          <Dialog.Title render={<Heading />}>Update profile</Dialog.Title>
           {error && (
             <Box
               role='alert'
