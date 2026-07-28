@@ -21,31 +21,6 @@ function useAvatarContext(part: string): AvatarContextValue {
   return context;
 }
 
-/** Preload `src` and report its load status, so the fallback shows until the image resolves. */
-function useImageLoadingStatus(src: string | undefined): ImageLoadingStatus {
-  const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
-
-  React.useEffect(() => {
-    if (!src) {
-      setStatus('error');
-      return;
-    }
-
-    let active = true;
-    const image = new window.Image();
-    setStatus('loading');
-    image.onload = () => active && setStatus('loaded');
-    image.onerror = () => active && setStatus('error');
-    image.src = src;
-
-    return () => {
-      active = false;
-    };
-  }, [src]);
-
-  return status;
-}
-
 export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
   shape?: 'circle' | 'square';
   size?: 'lg' | 'md' | 'sm' | 'xs';
@@ -82,12 +57,26 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
   { src, alt = '', className, style, ...rest },
   ref,
 ) {
-  const { onStatusChange } = useAvatarContext('Avatar.Image');
-  const status = useImageLoadingStatus(src);
+  const { status, onStatusChange } = useAvatarContext('Avatar.Image');
 
+  // Preload `src` and report status to the root, so the fallback shows until the image resolves.
   React.useEffect(() => {
-    onStatusChange(status);
-  }, [onStatusChange, status]);
+    if (!src) {
+      onStatusChange('error');
+      return;
+    }
+
+    let active = true;
+    const image = new window.Image();
+    onStatusChange('loading');
+    image.onload = () => active && onStatusChange('loaded');
+    image.onerror = () => active && onStatusChange('error');
+    image.src = src;
+
+    return () => {
+      active = false;
+    };
+  }, [src, onStatusChange]);
 
   if (status !== 'loaded') {
     return null;
