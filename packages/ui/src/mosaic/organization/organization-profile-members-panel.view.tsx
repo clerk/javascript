@@ -6,6 +6,7 @@ import { Input } from '../components/input';
 import { Skeleton } from '../components/skeleton';
 import { Text } from '../components/text';
 import type { Snapshot } from '../machine/types';
+import { fontWeightVars } from '../tokens.stylex';
 import type { MemberRow } from './organization-profile-members-panel.controller';
 import type {
   OrganizationProfileMembersPanelContext,
@@ -233,7 +234,7 @@ export function OrganizationProfileMembersPanelView({
                       <Box sx={t => ({ display: 'flex', alignItems: 'center', gap: t.spacing(1.5) })}>
                         <Text
                           size='sm'
-                          style={{ fontWeight: 500 }}
+                          style={{ fontWeight: fontWeightVars['--cl-font-medium'] }}
                         >
                           {row.name}
                         </Text>
