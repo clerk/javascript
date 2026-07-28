@@ -354,7 +354,7 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          MAESTRO_DRIVER: uiautomator2
+          MAESTRO_DRIVER: devicelab
           MAESTRO_PLATFORM: android
         with:
           api-level: 34
