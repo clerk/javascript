@@ -12,6 +12,26 @@ export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
   fullWidth?: boolean;
 }
 
+/**
+ * A clickable action styled by the Mosaic recipe. Renders a `button` and forwards its
+ * ref; `intent`, `variant`, `size`, and `shape` compose to cover the full set of styles.
+ *
+ * @example
+ * // Default (primary, filled, md)
+ * <Button>Save</Button>
+ *
+ * @example
+ * // Destructive intent with a non-filled variant
+ * <Button intent='destructive' variant='outline'>Delete</Button>
+ *
+ * @example
+ * // Icon-only, circular, small
+ * <Button shape='circle' size='sm' aria-label='Close'><CloseIcon /></Button>
+ *
+ * @example
+ * // Full-width ghost button
+ * <Button variant='ghost' fullWidth>Continue</Button>
+ */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
     intent = 'primary',

@@ -64,6 +64,7 @@ export const taIN: LocalizationResource = {
   badge__canceledEndsAt: "ரத்து செய்யப்பட்டது • முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__currentPlan: 'தற்போதைய திட்டம்',
   badge__default: 'இயல்புநிலை',
+  badge__deprovisioned: undefined,
   badge__endsAt: "முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__expired: 'காலாவதியானது',
   badge__freeTrial: 'இலவச சோதனை',

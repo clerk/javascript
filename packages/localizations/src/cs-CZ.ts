@@ -63,6 +63,7 @@ export const csCZ: LocalizationResource = {
   badge__canceledEndsAt: "Zrušeno • Končí {{ date | shortDate('cs-CZ') }}",
   badge__currentPlan: 'Aktuální plán',
   badge__default: 'Výchozí',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Končí {{ date | shortDate('cs-CZ') }}",
   badge__expired: 'Vypršelo',
   badge__freeTrial: undefined,

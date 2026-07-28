@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.25.10
+
+### Patch Changes
+
+- Prevent overlapping verification preparations from triggering duplicate verification sends during sign-in, sign-up, and when verifying an email address, phone number, or web3 wallet from the user profile. ([#9225](https://github.com/clerk/javascript/pull/9225)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 6.25.9
 
 ### Patch Changes
