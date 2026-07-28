@@ -58,7 +58,10 @@ export const isEnterpriseConnectionConfigured = (
     return false;
   }
   if (isOidcProvider(connection.provider)) {
-    return Boolean(connection.oauthConfig?.clientId);
+    const oauthConfig = connection.oauthConfig;
+    return Boolean(
+      oauthConfig?.clientId && (oauthConfig.discoveryUrl || (oauthConfig.authUrl && oauthConfig.tokenUrl)),
+    );
   }
   return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
 };

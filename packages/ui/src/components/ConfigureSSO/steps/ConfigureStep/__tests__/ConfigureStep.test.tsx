@@ -1,9 +1,10 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Flow } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
-import { CardStateProvider } from '@/ui/elements/contexts';
+import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 
 import type { EnterpriseConnectionProviderType } from '../../../types';
 
@@ -12,6 +13,7 @@ import type { EnterpriseConnectionProviderType } from '../../../types';
 // left undefined so that footer self-hides in this isolated render.
 const contextState = vi.hoisted(() => ({
   provider: undefined as string | undefined,
+  isOIDCFlowEnabled: true,
   enterpriseConnection: undefined as
     | {
         id: string;
@@ -27,6 +29,12 @@ const contextState = vi.hoisted(() => ({
 }));
 const updateConnection = vi.hoisted(() => vi.fn());
 
+const CardErrorProbe = () => {
+  const { error } = useCardState();
+
+  return error ? <div>{error}</div> : null;
+};
+
 vi.mock('../../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
     enterpriseConnection: contextState.enterpriseConnection,
@@ -36,6 +44,7 @@ vi.mock('../../../ConfigureSSOContext', () => ({
       provider: contextState.provider,
       hasConnection: true,
     },
+    isOIDCFlowEnabled: contextState.isOIDCFlowEnabled,
   }),
 }));
 
@@ -52,28 +61,34 @@ const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 describe('resolveConfigureSteps', () => {
   it('dispatches custom and legacy OIDC provider keys to the OIDC sub-flow', () => {
-    expect(resolveConfigureSteps('oauth_custom_clerk_dev')).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_clerk_dev')).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_ghe_acme')).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_gitlab_ent_acme')).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_custom')).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oauth_custom_clerk_dev', true)).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_clerk_dev', true)).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_ghe_acme', true)).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_gitlab_ent_acme', true)).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_custom', true)).toBe(OidcCustomConfigureSteps);
+  });
+
+  it('does not dispatch OIDC providers while the experimental flow is disabled', () => {
+    expect(resolveConfigureSteps('oauth_custom_clerk_dev', false)).toBeUndefined();
+    expect(resolveConfigureSteps('oidc_clerk_dev', false)).toBeUndefined();
   });
 
   it('dispatches SAML providers by exact literal', () => {
-    expect(resolveConfigureSteps('saml_okta')).toBe(SamlOktaConfigureSteps);
-    expect(resolveConfigureSteps('saml_custom')).toBe(SamlCustomConfigureSteps);
-    expect(resolveConfigureSteps('saml_google')).toBe(SamlGoogleConfigureSteps);
-    expect(resolveConfigureSteps('saml_microsoft')).toBe(SamlMicrosoftConfigureSteps);
+    expect(resolveConfigureSteps('saml_okta', false)).toBe(SamlOktaConfigureSteps);
+    expect(resolveConfigureSteps('saml_custom', false)).toBe(SamlCustomConfigureSteps);
+    expect(resolveConfigureSteps('saml_google', false)).toBe(SamlGoogleConfigureSteps);
+    expect(resolveConfigureSteps('saml_microsoft', false)).toBe(SamlMicrosoftConfigureSteps);
   });
 
   it('returns undefined for an unrecognized provider so the caller can degrade', () => {
-    expect(resolveConfigureSteps('ldap_enterprise' as EnterpriseConnectionProviderType)).toBeUndefined();
+    expect(resolveConfigureSteps('ldap_enterprise' as EnterpriseConnectionProviderType, true)).toBeUndefined();
   });
 });
 
 describe('ConfigureProviderStep', () => {
   beforeEach(() => {
     contextState.provider = undefined;
+    contextState.isOIDCFlowEnabled = true;
     contextState.enterpriseConnection = undefined;
     updateConnection.mockReset();
   });
@@ -83,6 +98,7 @@ describe('ConfigureProviderStep', () => {
       <Flow.Root flow='configureSSO'>
         <CardStateProvider>
           <ConfigureProviderStep />
+          <CardErrorProbe />
         </CardStateProvider>
       </Flow.Root>,
       { wrapper },
@@ -211,6 +227,36 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
+  it('clears endpoint API errors when switching configuration modes', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'form_param_invalid',
+            long_message: 'The endpoint configuration is invalid.',
+            message: 'The endpoint configuration is invalid.',
+          },
+        ],
+        status: 422,
+      }),
+    );
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.type(screen.getByRole('textbox', { name: 'Discovery endpoint' }), 'https://idp.example/discovery');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('The endpoint configuration is invalid.')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Configure manually' }));
+
+    expect(screen.queryByText('The endpoint configuration is invalid.')).not.toBeInTheDocument();
+  });
+
   it('saves credentials before advancing', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
@@ -239,6 +285,53 @@ describe('ConfigureProviderStep', () => {
         oidc: { clientId: 'client_123', clientSecret: 'secret_456' },
       });
     });
+  });
+
+  it('displays credential API errors on their matching fields', async () => {
+    contextState.provider = 'oidc_clerk_dev';
+    contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
+    updateConnection.mockReset();
+    updateConnection.mockResolvedValueOnce({});
+    updateConnection.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'form_param_invalid',
+            long_message: 'Client ID is invalid.',
+            message: 'Client ID is invalid.',
+            meta: { param_name: 'client_id' },
+          },
+          {
+            code: 'form_param_invalid',
+            long_message: 'Client secret is invalid.',
+            message: 'Client secret is invalid.',
+            meta: { param_name: 'client_secret' },
+          },
+        ],
+        status: 422,
+      }),
+    );
+    const { wrapper } = await createFixtures();
+
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Discovery endpoint' }),
+      'https://idp.example/.well-known/openid-configuration',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    const clientId = await screen.findByRole('textbox', { name: 'Client ID' });
+    const clientSecret = screen.getByLabelText('Client secret');
+    await userEvent.type(clientId, 'client_123');
+    await userEvent.type(clientSecret, 'secret_456');
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Client ID is invalid.')).toBeInTheDocument();
+    expect(await screen.findByText('Client secret is invalid.')).toBeInTheDocument();
+    expect(clientId).toHaveAttribute('aria-describedby', 'error-clientId');
+    expect(clientSecret).toHaveAttribute('aria-describedby', 'error-clientSecret');
   });
 
   it('selects manual mode when an existing connection has manual endpoints without a discovery URL', async () => {
@@ -323,5 +416,16 @@ describe('ConfigureProviderStep', () => {
     renderStep(wrapper);
 
     expect(await screen.findByText(/unsupported provider/i)).toBeInTheDocument();
+  });
+
+  it('degrades to the unsupported-provider state for an existing OIDC connection when the flag is off', async () => {
+    contextState.provider = 'oauth_custom_clerk_dev';
+    contextState.isOIDCFlowEnabled = false;
+    const { wrapper } = await createFixtures();
+
+    renderStep(wrapper);
+
+    expect(await screen.findByText(/unsupported provider/i)).toBeInTheDocument();
+    expect(screen.queryByText(/create a new oidc application/i)).not.toBeInTheDocument();
   });
 });

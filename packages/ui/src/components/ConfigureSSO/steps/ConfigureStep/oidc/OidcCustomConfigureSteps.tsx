@@ -12,6 +12,7 @@ const OIDC_STEPS: WizardStepConfig[] = [{ id: 'redirect-uri' }, { id: 'endpoints
 export const OidcCustomConfigureSteps = (): JSX.Element => {
   const { enterpriseConnection } = useConfigureSSO();
   const oauthConfig = enterpriseConnection?.oauthConfig;
+  // Keep mode outside the step so it persists across wizard navigation.
   const [endpointMode, setEndpointMode] = useState<OidcIdpConfigurationMode>(
     oauthConfig?.authUrl && !oauthConfig.discoveryUrl ? 'manual' : 'discoveryUrl',
   );

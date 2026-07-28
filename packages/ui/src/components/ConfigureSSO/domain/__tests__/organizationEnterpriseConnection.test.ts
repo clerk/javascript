@@ -58,7 +58,10 @@ const fullyConfiguredSaml = makeSamlConnection({
   idpMetadataUrl: 'https://idp.example.com/metadata',
 });
 
-const configuredOidc = makeOauthConfig({ clientId: 'client_abc' });
+const configuredOidc = makeOauthConfig({
+  clientId: 'client_abc',
+  discoveryUrl: 'https://idp.example.com/.well-known/openid-configuration',
+});
 
 const makeOidcConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
   makeConnection({ provider: 'oauth_custom_acme', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
@@ -141,8 +144,27 @@ describe('organizationEnterpriseConnection', () => {
         }).hasMinimumConfiguration,
       ).toBe(false);
     });
-    it('oidc client id present → true', () => {
+    it('oidc client id and discovery URL present → true', () => {
       expect(derive({ connection: makeOidcConnection() }).hasMinimumConfiguration).toBe(true);
+    });
+    it('oidc client id without endpoints → false', () => {
+      expect(
+        derive({ connection: makeOidcConnection({ oauthConfig: makeOauthConfig({ clientId: 'client_abc' }) }) })
+          .hasMinimumConfiguration,
+      ).toBe(false);
+    });
+    it('oidc client id with manual authorization and token URLs → true', () => {
+      expect(
+        derive({
+          connection: makeOidcConnection({
+            oauthConfig: makeOauthConfig({
+              clientId: 'client_abc',
+              authUrl: 'https://idp.example.com/authorize',
+              tokenUrl: 'https://idp.example.com/token',
+            }),
+          }),
+        }).hasMinimumConfiguration,
+      ).toBe(true);
     });
     it('oidc without oauth config → false', () => {
       expect(derive({ connection: makeOidcConnection({ oauthConfig: null }) }).hasMinimumConfiguration).toBe(false);
@@ -294,8 +316,28 @@ describe('isEnterpriseConnectionConfigured', () => {
   it('oidc with empty client id → false', () => {
     expect(isEnterpriseConnectionConfigured(makeOidcConnection({ oauthConfig: makeOauthConfig() }))).toBe(false);
   });
-  it('oidc with client id present → true', () => {
+  it('oidc with client id and discovery URL present → true', () => {
     expect(isEnterpriseConnectionConfigured(makeOidcConnection())).toBe(true);
+  });
+  it('oidc with client id but no endpoints → false', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeOidcConnection({ oauthConfig: makeOauthConfig({ clientId: 'client_abc' }) }),
+      ),
+    ).toBe(false);
+  });
+  it('oidc with client id and manual authorization and token URLs → true', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeOidcConnection({
+          oauthConfig: makeOauthConfig({
+            clientId: 'client_abc',
+            authUrl: 'https://idp.example.com/authorize',
+            tokenUrl: 'https://idp.example.com/token',
+          }),
+        }),
+      ),
+    ).toBe(true);
   });
   it('branches on provider: an oidc connection is not satisfied by saml fields', () => {
     expect(

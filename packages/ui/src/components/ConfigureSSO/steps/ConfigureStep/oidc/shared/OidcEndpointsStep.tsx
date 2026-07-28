@@ -135,7 +135,10 @@ export const OidcEndpointsStep = ({ mode, onModeChange }: OidcEndpointsStepProps
           <IdentityProviderConfigurationModes
             modes={OIDC_ENDPOINT_MODES}
             value={mode}
-            onChange={onModeChange}
+            onChange={nextMode => {
+              card.setError(undefined);
+              onModeChange(nextMode);
+            }}
             labels={{
               ariaLabel: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.ariaLabel'),
               discoveryUrl: localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.modes.discoveryUrl'),
