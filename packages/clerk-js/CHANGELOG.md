@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.25.10
+
+### Patch Changes
+
+- Prevent overlapping verification preparations from triggering duplicate verification sends during sign-in, sign-up, and when verifying an email address, phone number, or web3 wallet from the user profile. ([#9225](https://github.com/clerk/javascript/pull/9225)) by [@tmilewski](https://github.com/tmilewski)
+
+## 6.25.9
+
+### Patch Changes
+
+- Fix the standalone `<APIKeys />` component failing to render when an organization is active and user API keys are disabled but organization API keys are enabled. The component now correctly checks the user API keys setting only when no organization is active. ([#9247](https://github.com/clerk/javascript/pull/9247)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bias proactive session token refresh ownership toward the focused browser tab and poll more often while focused in multi-tab apps. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- When running in a browser context, session token requests now include a `tab_state` parameter (`focused`, `visible`, or `hidden`) so the backend can distinguish foreground from background token refreshes. The parameter is omitted in environments without a document, such as extension service workers. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 6.25.8
 
 ### Patch Changes

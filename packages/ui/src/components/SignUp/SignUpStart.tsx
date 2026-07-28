@@ -1,7 +1,7 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
-import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
@@ -170,8 +170,6 @@ function SignUpStartInternal(): JSX.Element {
           protectCheckPath: 'protect-check',
           continuePath: 'continue',
           handleComplete: () => {
-            removeClerkQueryParam('__clerk_ticket');
-            removeClerkQueryParam('__clerk_invitation_token');
             return setActive({
               session: signUp.createdSessionId,
               navigate: async ({ session, decorateUrl }) => {

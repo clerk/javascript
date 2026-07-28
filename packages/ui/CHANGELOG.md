@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.26.1
+
+### Patch Changes
+
+- Fix an issue where Clerk's ticket query parameters were not removed from the URL when completing a sign-up that was missing requirements. ([#9255](https://github.com/clerk/javascript/pull/9255)) by [@dstaley](https://github.com/dstaley)
+
 ## 1.26.0
 
 ### Minor Changes
