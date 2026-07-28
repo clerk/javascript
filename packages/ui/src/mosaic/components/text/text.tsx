@@ -5,12 +5,14 @@ import React from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { useContextProps } from '../../utils/context';
-import type { TypographyIntent, TypographySize } from '../typography.styles';
-import { intents, sizes } from '../typography.styles';
+import type { TypographyColor, TypographySize } from '../typography.styles';
+import { colors, sizes } from '../typography.styles';
 
-export interface TextProps extends React.ComponentPropsWithRef<'p'> {
+// `color` replaces the legacy HTML `color` attribute (`string`), which would otherwise
+// widen the variant and break callers spreading slot props in.
+export interface TextProps extends Omit<React.ComponentPropsWithRef<'p'>, 'color'> {
   size?: TypographySize;
-  intent?: TypographyIntent;
+  color?: TypographyColor;
   render?: RenderProp<React.ComponentPropsWithRef<'p'>> | React.ReactElement;
 }
 
@@ -18,18 +20,13 @@ export const TextContext = React.createContext<Partial<TextProps> | null>(null);
 
 /**
  * Themeable body copy. Renders a `<p>` by default, forwards refs, and supports
- * `size` and `intent` variants. Pass `render` for inline copy (`<span>`).
+ * `size` and `color` variants. Pass `render` for inline copy (`<span>`).
  */
 export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function MosaicText(rawProps, ref) {
-  const { size = 'sm', intent = 'primary', render, className, style, ...rest } = useContextProps(rawProps, TextContext);
+  const { size = 'sm', color = 'primary', render, className, style, ...rest } = useContextProps(rawProps, TextContext);
 
   const props = {
-    ...mergeStyleProps(
-      themeProps('text', { size, intent }),
-      stylex.props(sizes[size], intents[intent]),
-      className,
-      style,
-    ),
+    ...mergeStyleProps(themeProps('text', { size, color }), stylex.props(sizes[size], colors[color]), className, style),
     ...rest,
   };
 

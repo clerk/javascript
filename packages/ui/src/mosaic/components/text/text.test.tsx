@@ -16,14 +16,14 @@ describe('Mosaic Text', () => {
     const text = screen.getByText('Body copy');
     expect(text).toHaveClass('cl-text');
     expect(text).toHaveAttribute('data-size', 'sm');
-    expect(text).toHaveAttribute('data-intent', 'primary');
+    expect(text).toHaveAttribute('data-color', 'primary');
   });
 
   it('wires variant props and consumer className/style through to the element', () => {
     render(
       <Text
         size='lg'
-        intent='mutedForeground'
+        color='neutral'
         className='my-text'
         style={{ marginTop: '8px' }}
       >
@@ -32,7 +32,7 @@ describe('Mosaic Text', () => {
     );
     const text = screen.getByText('Body copy');
     expect(text).toHaveAttribute('data-size', 'lg');
-    expect(text).toHaveAttribute('data-intent', 'mutedForeground');
+    expect(text).toHaveAttribute('data-color', 'neutral');
     expect(text).toHaveClass('cl-text', 'my-text');
     expect(text).toHaveStyle({ marginTop: '8px' });
   });
@@ -47,12 +47,12 @@ describe('Mosaic Text', () => {
 
   it('reads defaults from TextContext, with own props winning', () => {
     render(
-      <TextContext.Provider value={{ intent: 'mutedForeground', size: 'xs' }}>
+      <TextContext.Provider value={{ color: 'neutral', size: 'xs' }}>
         <Text size='base'>Body copy</Text>
       </TextContext.Provider>,
     );
     const text = screen.getByText('Body copy');
-    expect(text).toHaveAttribute('data-intent', 'mutedForeground');
+    expect(text).toHaveAttribute('data-color', 'neutral');
     expect(text).toHaveAttribute('data-size', 'base');
   });
 

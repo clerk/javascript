@@ -82,7 +82,7 @@ const Header = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'
   const variantProps = React.useContext(CardVariantContext);
   const { header } = useRecipe(cardRecipe, { variants: variantProps });
   return (
-    <TextContext.Provider value={{ intent: 'mutedForeground' }}>
+    <TextContext.Provider value={{ color: 'neutral' }}>
       <div
         ref={ref}
         {...header}

@@ -16,18 +16,11 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
-      intent: {
-        primary: {},
-        primaryForeground: {},
-        destructive: {},
-        destructiveForeground: {},
-        muted: {},
-        mutedForeground: {},
-      },
+      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
     },
     _defaultVariants: {
       size: 'base',
-      intent: 'primary',
+      color: 'primary',
     },
   },
 };
@@ -85,26 +78,38 @@ export function Sizes(props: Record<string, unknown>) {
   );
 }
 
-export function Intents(props: Record<string, unknown>) {
+export function Colors(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Heading
         {...knobsAsProps(props)}
-        intent='primary'
+        color='primary'
       >
         Primary heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        intent='mutedForeground'
+        color='neutral'
       >
-        Muted foreground heading
+        Neutral heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        intent='destructive'
+        color='warning'
       >
-        Destructive heading
+        Warning heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='negative'
+      >
+        Negative heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='positive'
+      >
+        Positive heading
       </Heading>
     </div>
   );

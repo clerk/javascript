@@ -4,13 +4,7 @@ import { colorVars, typeScaleVars } from '../tokens.stylex';
 
 export type TypographySize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 
-export type TypographyIntent =
-  | 'primary'
-  | 'primaryForeground'
-  | 'destructive'
-  | 'destructiveForeground'
-  | 'muted'
-  | 'mutedForeground';
+export type TypographyColor = 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
 
 export const sizes = stylex.create({
   xs: {
@@ -39,11 +33,13 @@ export const sizes = stylex.create({
   },
 });
 
-export const intents = stylex.create({
+// Text has no fill to sit on, so each color resolves to the readable token of its
+// pair: the saturated one for warning/negative/positive, `-foreground` for neutral
+// (`--cl-color-neutral` is a surface fill).
+export const colors = stylex.create({
   primary: { color: colorVars['--cl-color-primary'] },
-  primaryForeground: { color: colorVars['--cl-color-primary-foreground'] },
-  destructive: { color: colorVars['--cl-color-destructive'] },
-  destructiveForeground: { color: colorVars['--cl-color-destructive-foreground'] },
-  muted: { color: colorVars['--cl-color-muted'] },
-  mutedForeground: { color: colorVars['--cl-color-muted-foreground'] },
+  neutral: { color: colorVars['--cl-color-neutral-foreground'] },
+  warning: { color: colorVars['--cl-color-warning'] },
+  negative: { color: colorVars['--cl-color-negative'] },
+  positive: { color: colorVars['--cl-color-positive'] },
 });

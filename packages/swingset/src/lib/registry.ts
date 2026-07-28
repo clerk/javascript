@@ -28,7 +28,7 @@ import { meta as drawerMeta } from '../stories/drawer.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Default as HeadingDefault,
-  Intents as HeadingIntents,
+  Colors as HeadingColors,
   meta as headingMeta,
   Sizes as HeadingSizes,
 } from '../stories/heading.stories';
@@ -86,7 +86,7 @@ import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../s
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Default as TextDefault,
-  Intents as TextIntents,
+  Colors as TextColors,
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
@@ -153,12 +153,12 @@ const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
   Sizes: HeadingSizes,
-  Intents: HeadingIntents,
+  Colors: HeadingColors,
 };
 
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
-const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const iconModule: StoryModule = {
   meta: iconMeta,

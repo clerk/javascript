@@ -159,7 +159,7 @@ export function OrganizationProfileMembersPanelView({
 
       {snapshot.context.error ? (
         <Text
-          intent='destructive'
+          color='negative'
           size='sm'
           role='alert'
           style={{ marginBlockEnd: 'calc(var(--cl-spacing) * 3)' }}
@@ -243,7 +243,7 @@ export function OrganizationProfileMembersPanelView({
                       {row.identifier && row.identifier !== row.name ? (
                         <Text
                           size='xs'
-                          intent='mutedForeground'
+                          color='neutral'
                         >
                           {row.identifier}
                         </Text>
@@ -253,7 +253,7 @@ export function OrganizationProfileMembersPanelView({
                   <Cell>
                     <Text
                       size='sm'
-                      intent='mutedForeground'
+                      color='neutral'
                     >
                       {row.joinedAt}
                     </Text>
@@ -293,7 +293,7 @@ export function OrganizationProfileMembersPanelView({
         >
           <Text
             size='xs'
-            intent='mutedForeground'
+            color='neutral'
           >
             Page {page} of {pageCount}
           </Text>

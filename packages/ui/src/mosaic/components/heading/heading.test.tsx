@@ -15,14 +15,14 @@ describe('Mosaic Heading', () => {
     const heading = screen.getByRole('heading');
     expect(heading).toHaveClass('cl-heading');
     expect(heading).toHaveAttribute('data-size', 'base');
-    expect(heading).toHaveAttribute('data-intent', 'primary');
+    expect(heading).toHaveAttribute('data-color', 'primary');
   });
 
   it('wires variant props and consumer className/style through to the element', () => {
     render(
       <Heading
         size='2xl'
-        intent='destructive'
+        color='negative'
         className='my-heading'
         style={{ marginTop: '8px' }}
       >
@@ -31,7 +31,7 @@ describe('Mosaic Heading', () => {
     );
     const heading = screen.getByRole('heading');
     expect(heading).toHaveAttribute('data-size', '2xl');
-    expect(heading).toHaveAttribute('data-intent', 'destructive');
+    expect(heading).toHaveAttribute('data-color', 'negative');
     expect(heading).toHaveClass('cl-heading', 'my-heading');
     expect(heading).toHaveStyle({ marginTop: '8px' });
   });
@@ -45,13 +45,13 @@ describe('Mosaic Heading', () => {
 
   it('reads defaults from HeadingContext, with own props winning', () => {
     render(
-      <HeadingContext.Provider value={{ size: 'xl', intent: 'mutedForeground' }}>
-        <Heading intent='destructive'>Title</Heading>
+      <HeadingContext.Provider value={{ size: 'xl', color: 'neutral' }}>
+        <Heading color='negative'>Title</Heading>
       </HeadingContext.Provider>,
     );
     const heading = screen.getByRole('heading');
     expect(heading).toHaveAttribute('data-size', 'xl');
-    expect(heading).toHaveAttribute('data-intent', 'destructive');
+    expect(heading).toHaveAttribute('data-color', 'negative');
   });
 
   it('forwards arbitrary props and the ref', () => {

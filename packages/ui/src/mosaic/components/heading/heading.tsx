@@ -5,13 +5,15 @@ import React from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { useContextProps } from '../../utils/context';
-import type { TypographyIntent, TypographySize } from '../typography.styles';
-import { intents, sizes } from '../typography.styles';
+import type { TypographyColor, TypographySize } from '../typography.styles';
+import { colors, sizes } from '../typography.styles';
 import { styles } from './heading.styles';
 
-export interface HeadingProps extends React.ComponentPropsWithRef<'h2'> {
+// `color` replaces the legacy HTML `color` attribute (`string`), which would otherwise
+// widen the variant and break callers spreading slot props in.
+export interface HeadingProps extends Omit<React.ComponentPropsWithRef<'h2'>, 'color'> {
   size?: TypographySize;
-  intent?: TypographyIntent;
+  color?: TypographyColor;
   render?: RenderProp<React.ComponentPropsWithRef<'h2'>> | React.ReactElement;
 }
 
@@ -19,12 +21,12 @@ export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(
 
 /**
  * Themeable heading. Renders an `<h2>` by default, forwards refs, and supports
- * `size` and `intent` variants. Pass `render` for a different heading level.
+ * `size` and `color` variants. Pass `render` for a different heading level.
  */
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(rawProps, ref) {
   const {
     size = 'base',
-    intent = 'primary',
+    color = 'primary',
     render,
     className,
     style,
@@ -33,8 +35,8 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(functi
 
   const props = {
     ...mergeStyleProps(
-      themeProps('heading', { size, intent }),
-      stylex.props(styles.base, sizes[size], intents[intent]),
+      themeProps('heading', { size, color }),
+      stylex.props(styles.base, sizes[size], colors[color]),
       className,
       style,
     ),
