@@ -27,7 +27,7 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.6.1'
+  MAESTRO_RUNNER_VERSION: '1.1.21'
 
 jobs:
   native-build:
@@ -214,34 +214,33 @@ jobs:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
-      - name: Cache Maestro
+      - name: Cache maestro-runner
         if: steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.maestro
-          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
+          path: ~/.maestro-runner
+          key: maestro-runner-${{ runner.os }}-${{ runner.arch }}-${{ env.MAESTRO_RUNNER_VERSION }}
 
-      - name: Install Maestro
+      - name: Install maestro-runner
         if: steps.keys.outputs.pk != ''
-        # pipefail + binary check so a curl flake doesn't leave a missing
-        # binary that only surfaces later as exit-code-127.
         run: |
           set -o pipefail
-          if [ -x "$HOME/.maestro/bin/maestro" ]; then
-            echo "Using cached Maestro"
+          if [ -x "$HOME/.maestro-runner/bin/maestro-runner" ]; then
+            echo "Using cached maestro-runner"
           else
             installed=0
             for i in 1 2 3; do
-              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
+              if curl -fsSL --retry 3 --retry-delay 5 "https://open.devicelab.dev/install/maestro-runner" |
+                bash -s -- --version "$MAESTRO_RUNNER_VERSION"; then
+                if [ -x "$HOME/.maestro-runner/bin/maestro-runner" ]; then installed=1; break; fi
               fi
-              echo "Maestro install attempt $i failed (or binary missing); retrying"
+              echo "maestro-runner install attempt $i failed (or binary missing); retrying"
               sleep 5
             done
-            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
+            [ "$installed" = 1 ] || { echo "::error::maestro-runner install failed after 3 attempts"; exit 1; }
           fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro/bin/maestro" --version
+          echo "$HOME/.maestro-runner/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro-runner/bin/maestro-runner" --version
 
       - name: Boot iOS simulator
         id: sim
@@ -289,6 +288,9 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          MAESTRO_DEVICE: ${{ steps.sim.outputs.udid }}
+          MAESTRO_DRIVER: wda
+          MAESTRO_PLATFORM: ios
           SIM_UDID: ${{ steps.sim.outputs.udid }}
         run: |
           echo "Using simulator $SIM_UDID"
@@ -352,6 +354,8 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          MAESTRO_DRIVER: uiautomator2
+          MAESTRO_PLATFORM: android
         with:
           api-level: 34
           target: google_apis
@@ -377,9 +381,9 @@ jobs:
           curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
-      # Maestro debug files record flow env (and typed input) in plaintext;
+      # Test reports record flow env (and typed input) in plaintext;
       # add-mask only covers step logs, not artifact contents.
-      - name: Scrub test credentials from Maestro debug output
+      - name: Scrub test credentials from maestro-runner reports
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
@@ -388,10 +392,10 @@ jobs:
           [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
           # shellcheck disable=SC2016
           find "$RUNNER_TEMP/maestro-debug" -type f \
-            \( -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.yaml' \) \
+            \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts on e2e failure
+      - name: Upload maestro-runner artifacts on e2e failure
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

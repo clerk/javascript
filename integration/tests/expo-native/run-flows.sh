@@ -15,8 +15,8 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-command -v maestro >/dev/null 2>&1 || {
-  echo "maestro CLI is required: https://docs.maestro.dev/getting-started/installing-maestro"
+command -v maestro-runner >/dev/null 2>&1 || {
+  echo "maestro-runner is required: https://devicelab.dev/open-source/maestro-runner/docs/getting-started"
   exit 1
 }
 
@@ -25,10 +25,17 @@ command -v maestro >/dev/null 2>&1 || {
 
 force_stop() { if [ "$#" -gt 0 ]; then "$@" >/dev/null 2>&1 || true; fi; }
 
-debug_args=()
-if [ -n "${MAESTRO_DEBUG_OUTPUT:-}" ]; then
-  debug_args=(--debug-output "$MAESTRO_DEBUG_OUTPUT" --flatten-debug-output)
-fi
+run_flow() {
+  local output_name=$1
+  shift
+  local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
+
+  maestro-runner test \
+    --output "$output_root/$output_name" \
+    --flatten \
+    --artifacts on-failure \
+    "$@"
+}
 
 record_result() {
   local flow=$1
@@ -54,7 +61,7 @@ fi
 warmup_started=$SECONDS
 warmup_result=failed
 for warmup_attempt in 1 2; do
-  if maestro test ${debug_args+"${debug_args[@]}"} flows/subflows/_warmup.yaml; then
+  if run_flow "warmup-attempt-$warmup_attempt" flows/subflows/_warmup.yaml; then
     warmup_result=passed
     break
   fi
@@ -82,10 +89,9 @@ for flow in flows/*.yaml; do
   flow_started=$SECONDS
   flow_result=failed
   for attempt in 1 2; do
-    if maestro test \
+    if run_flow "${flow##*/}-attempt-$attempt" \
       --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
       --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-      ${debug_args+"${debug_args[@]}"} \
       "$flow"; then
       flow_result=passed
       break
