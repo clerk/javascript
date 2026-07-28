@@ -21,7 +21,7 @@ export const styles = stylex.create({
 
   // shape — square uses a fixed 6px radius for now; circle rounds fully
   shapeCircle: { borderRadius: radiusVars['--cl-radius-full'] },
-  shapeSquare: { borderRadius: '6px' },
+  shapeSquare: { borderRadius: '0.375rem' },
 
   // size — square box; fallback text scales with the box via inherited font-size
   sizeXs: { fontSize: '0.625rem', height: space['6'], width: space['6'] },
