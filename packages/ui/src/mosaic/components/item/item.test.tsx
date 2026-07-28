@@ -10,20 +10,16 @@ describe('Mosaic Item', () => {
     expect(screen.getByText('Hi')).toBeInTheDocument();
   });
 
-  it('applies default variants when none are passed', () => {
+  it('applies its base class and is not interactive by default', () => {
     render(<Item>Hi</Item>);
     const item = screen.getByText('Hi');
     expect(item).toHaveClass('cl-item');
-    expect(item).toHaveAttribute('data-variant', 'default');
-    expect(item).toHaveAttribute('data-size', 'default');
     expect(item).not.toHaveAttribute('data-interactive');
   });
 
-  it('wires variant props and consumer className/style through to the element', () => {
+  it('wires consumer className/style through to the element', () => {
     render(
       <Item
-        variant='outline'
-        size='sm'
         className='my-item'
         style={{ marginTop: '8px' }}
       >
@@ -31,8 +27,6 @@ describe('Mosaic Item', () => {
       </Item>,
     );
     const item = screen.getByText('Hi');
-    expect(item).toHaveAttribute('data-variant', 'outline');
-    expect(item).toHaveAttribute('data-size', 'sm');
     expect(item).toHaveClass('cl-item', 'my-item');
     expect(item).toHaveStyle({ marginTop: '8px' });
   });
@@ -60,15 +54,14 @@ describe('Mosaic Item', () => {
     expect(link).toHaveAttribute('href', '/settings');
   });
 
-  it('renders the media variants', () => {
+  it('renders media with its stable class', () => {
     render(
-      <Item.Media variant='icon'>
+      <Item.Media>
         <span>icon</span>
       </Item.Media>,
     );
     const media = screen.getByText('icon').parentElement;
     expect(media).toHaveClass('cl-item-media');
-    expect(media).toHaveAttribute('data-variant', 'icon');
   });
 
   it('renders the composed slots with their stable classes', () => {

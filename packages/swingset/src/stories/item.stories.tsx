@@ -14,20 +14,26 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/item/item.tsx',
 };
 
-function BuildingIcon() {
+// A square org/account avatar sized for the media slot (36px). Since `Item.Media`
+// fits its child, the avatar's own dimensions drive the slot width.
+function Avatar({ initial }: { initial: string }) {
   return (
-    <svg
-      width='16'
-      height='16'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '2.25rem',
+        height: '2.25rem',
+        borderRadius: 'var(--cl-radius-inner)',
+        backgroundColor: 'var(--cl-color-primary)',
+        color: 'var(--cl-color-primary-foreground)',
+        fontSize: '0.875rem',
+        fontWeight: 600,
+      }}
     >
-      <path d='M3 21h18M6 21V4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v17M9 7h.01M9 11h.01M9 15h.01' />
-    </svg>
+      {initial}
+    </span>
   );
 }
 
@@ -51,8 +57,8 @@ function ArrowIcon() {
 export function Default() {
   return (
     <Item>
-      <Item.Media variant='icon'>
-        <BuildingIcon />
+      <Item.Media>
+        <Avatar initial='T' />
       </Item.Media>
       <Item.Content>
         <Item.Title>Test Organization</Item.Title>
@@ -62,31 +68,6 @@ export function Default() {
         <Button variant='outline'>Manage</Button>
       </Item.Actions>
     </Item>
-  );
-}
-
-export function Variants() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <Item variant='default'>
-        <Item.Content>
-          <Item.Title>Default</Item.Title>
-          <Item.Description>Transparent background, no border</Item.Description>
-        </Item.Content>
-      </Item>
-      <Item variant='outline'>
-        <Item.Content>
-          <Item.Title>Outline</Item.Title>
-          <Item.Description>Bordered container</Item.Description>
-        </Item.Content>
-      </Item>
-      <Item variant='muted'>
-        <Item.Content>
-          <Item.Title>Muted</Item.Title>
-          <Item.Description>Subtle filled background</Item.Description>
-        </Item.Content>
-      </Item>
-    </div>
   );
 }
 
@@ -102,14 +83,14 @@ export function Interactive() {
         </a>
       )}
     >
-      <Item.Media variant='icon'>
-        <BuildingIcon />
+      <Item.Media>
+        <Avatar initial='T' />
       </Item.Media>
       <Item.Content>
         <Item.Title>Test Organization</Item.Title>
         <Item.Description>Member</Item.Description>
       </Item.Content>
-      <Item.Media>
+      <Item.Media style={{ width: '1.75rem' }}>
         <ArrowIcon />
       </Item.Media>
     </Item>
@@ -129,6 +110,9 @@ export function Group() {
           </a>
         )}
       >
+        <Item.Media>
+          <Avatar initial='C' />
+        </Item.Media>
         <Item.Content>
           <Item.Title>Clerk</Item.Title>
         </Item.Content>
@@ -144,6 +128,9 @@ export function Group() {
           </a>
         )}
       >
+        <Item.Media>
+          <Avatar initial='C' />
+        </Item.Media>
         <Item.Content>
           <Item.Title>Clerk Cloud</Item.Title>
         </Item.Content>

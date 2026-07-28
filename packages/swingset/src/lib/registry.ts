@@ -51,7 +51,6 @@ import {
   Group as ItemGroup,
   Interactive as ItemInteractive,
   meta as itemMeta,
-  Variants as ItemVariants,
 } from '../stories/item.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
@@ -159,7 +158,6 @@ const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default:
 const itemModule: StoryModule = {
   meta: itemMeta,
   Default: ItemDefault,
-  Variants: ItemVariants,
   Interactive: ItemInteractive,
   Group: ItemGroup,
 };

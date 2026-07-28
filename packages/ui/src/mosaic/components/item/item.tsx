@@ -6,14 +6,12 @@ import { mergeStyleProps, themeProps } from '../../props';
 import * as slots from './item.styles';
 
 export type ItemProps = Omit<ComponentProps<'div'>, 'render'> & {
-  variant?: 'default' | 'outline' | 'muted';
-  size?: 'default' | 'sm';
   /** Render a custom element (e.g. a link or button) in place of the default `div`. */
   render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
 };
 
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { variant = 'default', size = 'default', render, className, style, ...rest },
+  { render, className, style, ...rest },
   ref,
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
@@ -24,15 +22,8 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item', { variant, size, interactive }),
-        stylex.props(
-          slots.item.base,
-          variant === 'outline' && slots.item.variantOutline,
-          variant === 'muted' && slots.item.variantMuted,
-          variant === 'default' && slots.item.variantDefault,
-          size === 'sm' ? slots.item.sizeSm : slots.item.sizeMd,
-          interactive && slots.item.interactive,
-        ),
+        themeProps('item', { interactive }),
+        stylex.props(slots.item.base, interactive && slots.item.interactive),
         className,
         style,
       ),
@@ -41,12 +32,8 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
   });
 });
 
-export type ItemMediaProps = ComponentProps<'div'> & {
-  variant?: 'default' | 'icon' | 'image';
-};
-
-const Media = React.forwardRef<HTMLDivElement, ItemMediaProps>(function MosaicItemMedia(
-  { variant = 'default', render, className, style, ...rest },
+const Media = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemMedia(
+  { render, className, style, ...rest },
   ref,
 ) {
   return useRender({
@@ -54,16 +41,7 @@ const Media = React.forwardRef<HTMLDivElement, ItemMediaProps>(function MosaicIt
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('item-media', { variant }),
-        stylex.props(
-          slots.media.base,
-          variant === 'icon' && slots.media.icon,
-          variant === 'image' && slots.media.image,
-        ),
-        className,
-        style,
-      ),
+      ...mergeStyleProps(themeProps('item-media'), stylex.props(slots.media.base), className, style),
       ...rest,
     },
   });
@@ -129,21 +107,6 @@ const Actions = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function
   });
 });
 
-const Footer = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemFooter(
-  { render, className, style, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('item-footer'), stylex.props(slots.band.base), className, style),
-      ...rest,
-    },
-  });
-});
-
 const Group = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemGroup(
   { render, className, style, ...rest },
   ref,
@@ -178,7 +141,7 @@ const Separator = React.forwardRef<HTMLHRElement, ComponentProps<'hr'>>(function
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
  * Composed via dot syntax: `Item.Media`, `Item.Content`, `Item.Title`,
- * `Item.Description`, `Item.Actions`, `Item.Footer`, `Item.Group`,
+ * `Item.Description`, `Item.Actions`, `Item.Group`,
  * `Item.Separator`.
  */
 export const Item = Object.assign(Root, {
@@ -187,7 +150,6 @@ export const Item = Object.assign(Root, {
   Title,
   Description,
   Actions,
-  Footer,
   Group,
   Separator,
 });

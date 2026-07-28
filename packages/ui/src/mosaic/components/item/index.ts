@@ -1,2 +1,2 @@
 export { Item } from './item';
-export type { ItemMediaProps, ItemProps } from './item';
+export type { ItemProps } from './item';
