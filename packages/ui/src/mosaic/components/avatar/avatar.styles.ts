@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // root — clips its parts to the shape/size; fill comes from the image or fallback
@@ -11,7 +11,7 @@ export const styles = stylex.create({
     display: 'inline-flex',
     flexShrink: 0,
     fontFamily: 'inherit',
-    fontWeight: typeScaleVars['--cl-text-label-weight'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     lineHeight: 1,
     position: 'relative',
