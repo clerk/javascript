@@ -59,7 +59,10 @@ Migrate my Nuxt project away from Clerk's removed `createRouteMatcher` API.
 4. Remove the `createRouteMatcher` imports and calls. Keep `clerkMiddleware()`
    itself. Middleware logic unrelated to auth protection (headers, locale
    redirects, etc.) may stay, using plain `getRequestURL(event).pathname`
-   checks.
+   checks. Plain pathname checks do not normalize percent-encoding
+   (`/api/%61dmin` will not match a check for `/api/admin`), so never use
+   them for auth or security decisions. Those belong on the resource itself,
+   as in steps 2 and 3.
 5. Make sure every route previously covered by a matcher pattern (including
    glob patterns like `/dashboard(.*)`) now has its own check, then verify the
    project builds.
