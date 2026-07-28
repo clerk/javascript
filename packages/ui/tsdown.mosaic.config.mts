@@ -37,7 +37,7 @@ export default defineConfig({
   minify: false,
   // Use the standard React JSX runtime, not Emotion's — the Mosaic build must be Emotion-free.
   tsconfig: './tsconfig.mosaic.json',
-  external: ['react', 'react-dom', '@stylexjs/stylex'],
+  external: ['react', 'react-dom', '@stylexjs/stylex', '@clerk/headless', '@clerk/headless/utils'],
   plugins: [
     stylexPlugin({
       fileName: 'styles.css',
