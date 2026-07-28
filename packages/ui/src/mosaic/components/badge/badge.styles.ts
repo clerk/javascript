@@ -20,7 +20,9 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
     height: space['5'],
   },
+});
 
+export const colors = stylex.create({
   primary: {
     backgroundColor: colorVars['--cl-color-primary'],
     color: colorVars['--cl-color-primary-foreground'],
