@@ -7,6 +7,7 @@ import { render, screen } from '@/test/utils';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 
 import type { EnterpriseConnectionProviderType } from '../../../types';
+import { Wizard } from '../../../elements/Wizard';
 
 // The dispatch reads `organizationEnterpriseConnection.provider`. The nested
 // sub-flows also read `enterpriseConnection` (via `Step.Footer.Reset`), which is
@@ -50,6 +51,7 @@ vi.mock('../../../ConfigureSSOContext', () => ({
 
 import { ConfigureProviderStep, resolveConfigureSteps } from '../index';
 import { OidcCustomConfigureSteps } from '../oidc';
+import { OidcCredentialsStep } from '../oidc/shared/OidcCredentialsStep';
 import {
   SamlCustomConfigureSteps,
   SamlGoogleConfigureSteps,
@@ -99,6 +101,23 @@ describe('ConfigureProviderStep', () => {
         <CardStateProvider>
           <ConfigureProviderStep />
           <CardErrorProbe />
+        </CardStateProvider>
+      </Flow.Root>,
+      { wrapper },
+    );
+
+  const renderCredentialsStep = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
+    render(
+      <Flow.Root flow='configureSSO'>
+        <CardStateProvider>
+          <Wizard
+            steps={[{ id: 'credentials' }]}
+            initialStepId='credentials'
+          >
+            <Wizard.Match id='credentials'>
+              <OidcCredentialsStep mode='discoveryUrl' />
+            </Wizard.Match>
+          </Wizard>
         </CardStateProvider>
       </Flow.Root>,
       { wrapper },
@@ -329,8 +348,7 @@ describe('ConfigureProviderStep', () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
     updateConnection.mockReset();
-    updateConnection.mockResolvedValueOnce({});
-    updateConnection.mockRejectedValueOnce(
+    updateConnection.mockRejectedValue(
       new ClerkAPIResponseError('Error', {
         data: [
           {
@@ -351,25 +369,21 @@ describe('ConfigureProviderStep', () => {
     );
     const { wrapper } = await createFixtures();
 
-    const { userEvent } = renderStep(wrapper);
+    const { userEvent } = renderCredentialsStep(wrapper);
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.type(
-      screen.getByRole('textbox', { name: 'Discovery endpoint' }),
-      'https://idp.example/.well-known/openid-configuration',
-    );
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
-
-    const clientId = await screen.findByRole('textbox', { name: 'Client ID' });
-    const clientSecret = screen.getByLabelText('Client secret');
+    const clientId = screen.getByRole('textbox');
+    const clientSecret = document.querySelector<HTMLInputElement>('input[name="clientSecret"]');
+    expect(clientSecret).not.toBeNull();
     await userEvent.type(clientId, 'client_123');
-    await userEvent.type(clientSecret, 'secret_456');
+    await userEvent.type(clientSecret!, 'secret_456');
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-    expect(await screen.findByText('Client ID is invalid.')).toBeInTheDocument();
-    expect(await screen.findByText('Client secret is invalid.')).toBeInTheDocument();
-    expect(clientId).toHaveAttribute('aria-describedby', 'error-clientId');
-    expect(clientSecret).toHaveAttribute('aria-describedby', 'error-clientSecret');
+    await vi.waitFor(() => {
+      expect(document.getElementById('error-clientId')).toHaveTextContent('Client ID is invalid.');
+      expect(document.getElementById('error-clientSecret')).toHaveTextContent('Client secret is invalid.');
+      expect(clientId).toHaveAttribute('aria-describedby', 'error-clientId');
+      expect(clientSecret).toHaveAttribute('aria-describedby', 'error-clientSecret');
+    });
   });
 
   it('selects manual mode when an existing connection has manual endpoints without a discovery URL', async () => {
