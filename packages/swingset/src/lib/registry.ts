@@ -2,6 +2,13 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
+  Fallback as AvatarFallbackStory,
+  meta as avatarMeta,
+  Primary as AvatarPrimary,
+  Shapes as AvatarShapes,
+  Sizes as AvatarSizes,
+} from '../stories/avatar.stories';
+import {
   Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
@@ -121,6 +128,14 @@ const organizationProfileMembersPanelModule: StoryModule = {
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
+const avatarModule: StoryModule = {
+  meta: avatarMeta,
+  Primary: AvatarPrimary,
+  Fallback: AvatarFallbackStory,
+  Sizes: AvatarSizes,
+  Shapes: AvatarShapes,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -184,6 +199,7 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
+  avatarModule,
   badgeModule,
   buttonModule,
   cardComponentModule,
