@@ -95,6 +95,7 @@ for flow in flows/*.yaml; do
     if [ "$attempt" -eq 2 ]; then
       echo "::error::Flow $flow failed after 2 attempts"
       status=1
+      force_stop "$@"
       break
     fi
     echo "::warning::Flow $flow failed attempt $attempt, retrying after 10s..."
