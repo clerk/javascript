@@ -38,13 +38,13 @@ export const styles = stylex.create({
   },
   filledDestructive: {
     backgroundColor: {
-      default: colorVars['--cl-color-destructive'],
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 24%)`,
+      default: colorVars['--cl-color-negative'],
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 24%)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-destructive']}, ${colorVars['--cl-color-destructive-foreground']} 12%)`,
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`,
       },
     },
-    color: colorVars['--cl-color-destructive-foreground'],
+    color: colorVars['--cl-color-negative-foreground'],
   },
   outlinePrimary: {
     borderColor: colorVars['--cl-color-border'],
@@ -54,7 +54,7 @@ export const styles = stylex.create({
   outlineDestructive: {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-destructive'],
+    color: colorVars['--cl-color-negative'],
   },
   ghostPrimary: {
     backgroundColor: 'transparent',
@@ -62,7 +62,7 @@ export const styles = stylex.create({
   },
   ghostDestructive: {
     backgroundColor: 'transparent',
-    color: colorVars['--cl-color-destructive'],
+    color: colorVars['--cl-color-negative'],
   },
 
   // size — height-driven; padding sets only the inline axis

@@ -15,11 +15,13 @@ interface ExtraProp {
 interface PropTableProps {
   meta: StoryMeta;
   extra?: ExtraProp[];
+  /** Append the `sx` row. StyleX components (e.g. Badge) don't take `sx`, so pass `false`. */
+  sx?: boolean;
 }
 
 const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
 
-export function PropTable({ meta, extra = [] }: PropTableProps) {
+export function PropTable({ meta, extra = [], sx = true }: PropTableProps) {
   const playground = usePlayground();
   const variants = meta.styles?._variants ?? {};
   const defaults = meta.styles?._defaultVariants ?? {};
@@ -35,7 +37,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    SX_ROW,
+    ...(sx ? [SX_ROW] : []),
   ];
 
   return (

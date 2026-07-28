@@ -61,15 +61,23 @@ const nextConfig = {
 
     // Swingset consumes Mosaic from source, so StyleX (`defineVars`/`create`/`props`) must be
     // compiled here — otherwise the calls hit the runtime and throw. The unplugin transforms the
-    // StyleX *JS only* (calls → static atom references), keeping SWC intact so `next/font` and the
-    // Emotion transform keep working. The CSS is emitted separately by `@stylexjs/postcss-plugin`
-    // (`@stylex` in `globals.css`), so this runs in extraction mode (no `runtimeInjection`); both
-    // share the same StyleX babel version/options so the atom hashes match, and the plugin's dev
-    // "no CSS asset" warning is expected and harmless. `useCSSLayers: true` matches the published
-    // build so atoms carry StyleX's `@layer priorityN` precedence.
+    // StyleX *JS only*, keeping SWC intact so `next/font` and the Emotion transform keep working.
+    //
+    // The `@stylexjs/postcss-plugin` (see `postcss.config.mjs`) is what extracts the CSS — the
+    // token `:root { --cl-* }` defaults and the atoms — in both dev and prod. This unplugin only
+    // transforms the StyleX *calls* in the JS. `runtimeInjection` forks by env:
+    // - Prod: `false`. Atoms are static class refs resolved against the extracted sheet.
+    // - Dev: `true`. On top of the extracted sheet, StyleX also injects each atom at runtime under
+    //   its content hash, so editing a `.styles.ts` file hot-reloads a fresh atom (the extracted
+    //   sheet goes stale because Next won't re-run the `globals.css` PostCSS pass on Mosaic-source
+    //   edits). The `:root` token defaults come from the extraction and never change mid-session,
+    //   so they stay correct — `runtimeInjection` can't emit them (`defineVars` is compile-only).
+    // Both passes share the same babel version/options so atom hashes match.
+    const isDev = process.env.NODE_ENV !== 'production';
     config.plugins.push(
       stylexPlugin({
-        dev: process.env.NODE_ENV !== 'production',
+        dev: isDev,
+        runtimeInjection: isDev,
         unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
         useCSSLayers: true,
       }),

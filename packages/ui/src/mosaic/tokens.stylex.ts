@@ -26,10 +26,23 @@ import * as stylex from '@stylexjs/stylex';
 const colorDefaults = {
   '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
   '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
-  '--cl-color-destructive': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
-  '--cl-color-destructive-foreground': 'oklch(0.985 0 0)',
-  '--cl-color-muted': 'light-dark(oklch(0.97 0 0), oklch(0.269 0 0))',
-  '--cl-color-muted-foreground': 'light-dark(oklch(0.556 0 0), oklch(0.708 0 0))',
+  '--cl-color-primary-faded': 'light-dark(oklch(0.9583 0.0214 291.74), oklch(0.3097 0.1008 285.05))',
+
+  '--cl-color-neutral': 'light-dark(oklch(0.97 0 0), oklch(0.32 0 0))',
+  '--cl-color-neutral-foreground': 'light-dark(oklch(0.24 0 0), oklch(0.96 0 0))',
+
+  '--cl-color-negative': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
+  '--cl-color-negative-foreground': 'oklch(0.985 0 0)',
+  '--cl-color-negative-faded': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+
+  '--cl-color-positive': 'light-dark(oklch(0.548 0.153 152.535), oklch(0.696 0.17 162.48))',
+  '--cl-color-positive-foreground': 'oklch(0.985 0 0)',
+  '--cl-color-positive-faded': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+
+  '--cl-color-warning': 'light-dark(oklch(0.646 0.222 41.116), oklch(0.75 0.183 55.934))',
+  '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
+  '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
   '--cl-color-border': 'light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%))',
@@ -63,13 +76,15 @@ const spacingDefaults = {
 
 export const spacingVars = stylex.defineVars(spacingDefaults);
 
-// The scale is `defineConsts`, not `defineVars`: each step is inlined at build
-// time as `calc(var(--cl-spacing) * n)`, so it carries no custom property of its
-// own. `space['2']` reads like Tailwind's `space-2` and stays a shared token
-// (StyleX inlines it cross-module; a plain helper function cannot be).
+// The scale is `defineVars` (like astryx's `spacingVars`): each step is a StyleX
+// var whose default is `calc(var(--cl-spacing) * n)`, so overriding `--cl-spacing`
+// still rescales the whole scale. `defineConsts` was tried here but emits no CSS
+// across module boundaries — consumers got dangling `var(--hash)` refs. StyleX
+// hashes these var names (they aren't `--cl-*`), so only `--cl-spacing` stays a
+// stable, targetable custom property. `space['2']` reads like Tailwind's `space-2`.
 const step = (multiple: number): string => `calc(var(--cl-spacing) * ${multiple})`;
 
-export const space = stylex.defineConsts({
+export const space = stylex.defineVars({
   '0': '0px',
   '0.5': step(0.5),
   '1': step(1),
