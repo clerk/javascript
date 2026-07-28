@@ -5,4 +5,4 @@
 '@clerk/ui': patch
 ---
 
-Add the four setup steps to the experimental OIDC self-serve SSO configuration flow, including copyable authorized redirect URI, ID-token claims, endpoint configuration, application credentials, and optional scopes. OIDC connections now expose their callback, authorization, token, and user-info endpoints.
+Add three setup steps to the experimental OIDC self-serve SSO configuration flow, including a copyable authorized redirect URI, ID-token claim requirements, endpoint configuration, and application credentials. OIDC connections now expose their callback, authorization, token, and user-info endpoints.

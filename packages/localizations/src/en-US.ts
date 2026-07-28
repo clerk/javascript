@@ -240,34 +240,6 @@ export const enUS: LocalizationResource = {
         },
       },
       oidcCustom: {
-        claimsStep: {
-          attributeMappingTable: {
-            columns: {
-              attributeName: 'Attribute Name',
-              userAttribute: 'User Attribute',
-            },
-            rows: {
-              subject: {
-                attributeName: 'External user ID',
-                userAttribute: 'sub',
-              },
-              email: {
-                attributeName: 'Primary email',
-                userAttribute: 'email',
-              },
-              firstName: {
-                attributeName: 'First name',
-                userAttribute: 'given_name',
-              },
-              lastName: {
-                attributeName: 'Last name',
-                userAttribute: 'family_name',
-              },
-            },
-          },
-          headerSubtitle: 'Set the claims your identity provider includes in the ID token',
-          paragraph: 'Your user ID token must include the following claims:',
-        },
         credentialsStep: {
           headerSubtitle: 'Add your application credentials',
           clientId: {
@@ -314,6 +286,8 @@ export const enUS: LocalizationResource = {
           headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
           paragraph:
             'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          claims:
+            'Ensure the ID token includes the required sub and email claims. The given_name and family_name claims are optional.',
           redirectUri: {
             label: 'Authorized redirect URI',
           },

@@ -98,12 +98,9 @@ describe('ConfigureProviderStep', () => {
     const [redirectUri] = screen.getAllByRole('textbox') as HTMLInputElement[];
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
-
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
-
-    expect(await screen.findByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(5);
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(
+      document.querySelector('[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims"]'),
+    ).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
@@ -127,7 +124,6 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
     await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
@@ -148,7 +144,6 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
     const [, manualMode] = await screen.findAllByRole('radio');
     await userEvent.click(manualMode);
 
@@ -169,7 +164,7 @@ describe('ConfigureProviderStep', () => {
     });
   });
 
-  it('saves OIDC credentials', async () => {
+  it('saves credentials before advancing', async () => {
     contextState.provider = 'oidc_clerk_dev';
     contextState.enterpriseConnection = { id: 'ent_123', oauthConfig: null };
     updateConnection.mockReset();
@@ -179,7 +174,6 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
     await userEvent.type(screen.getByRole('textbox'), 'https://idp.example/.well-known/openid-configuration');
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
@@ -189,6 +183,7 @@ describe('ConfigureProviderStep', () => {
 
     const clientId = document.querySelector('input[name="clientId"]') as HTMLInputElement;
     const clientSecret = document.querySelector('input[name="clientSecret"]') as HTMLInputElement;
+    expect(document.querySelector('input[name="scopes"]')).toBeNull();
     await userEvent.type(clientId, 'client_123');
     await userEvent.type(clientSecret, 'secret_456');
 
@@ -217,7 +212,6 @@ describe('ConfigureProviderStep', () => {
     const { userEvent } = renderStep(wrapper);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Continue' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
     const [, manualMode] = await screen.findAllByRole('radio');
     await userEvent.click(manualMode);
 

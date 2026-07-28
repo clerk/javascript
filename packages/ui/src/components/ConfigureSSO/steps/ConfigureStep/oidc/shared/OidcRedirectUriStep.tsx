@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 
 import { Col, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
@@ -37,6 +37,11 @@ export const OidcRedirectUriStep = (): JSX.Element => {
               as='p'
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.paragraph')}
+            />
+            <Text
+              as='p'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.claims')}
             />
           </Col>
 
