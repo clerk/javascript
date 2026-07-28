@@ -7,10 +7,6 @@ import type {
 
 import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
 
-/**
- * Custom OIDC uses `oauth_custom_<slug>`, while GitHub Enterprise and GitLab
- * retain their `oidc_*` keys. SAML providers stay exact literals.
- */
 export const isOidcProvider = (provider: string): provider is OidcProviderType =>
   provider.startsWith('oidc_') || provider.startsWith('oauth_custom_');
 

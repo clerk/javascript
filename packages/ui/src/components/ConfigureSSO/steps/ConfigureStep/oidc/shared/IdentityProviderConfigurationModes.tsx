@@ -3,13 +3,6 @@ import { type JSX } from 'react';
 import { type LocalizationKey, useLocalizations } from '@/customizables';
 import { SegmentedControl } from '@/elements/SegmentedControl';
 
-/**
- * The possible modes for the OIDC identity provider configuration
- *
- * metadataUrl: Fetch IdP configuration via metadata URL
- * metadataFile: Upload IdP configuration via metadata file
- * manual: Configure manually each field, such as sign on URL, issuer, and signing certificate
- */
 export type IdpConfigurationMode = 'discoveryUrl' | 'manual';
 
 type ModeLocalizationKeys = Partial<Record<IdpConfigurationMode, LocalizationKey>>;
