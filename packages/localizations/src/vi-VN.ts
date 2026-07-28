@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__canceledEndsAt: "Đã hủy • Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__currentPlan: 'Gói hiện tại',
   badge__default: 'Mặc định',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__expired: 'Đã hết hạn',
   badge__freeTrial: 'Dùng thử miễn phí',

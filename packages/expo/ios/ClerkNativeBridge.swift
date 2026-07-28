@@ -16,6 +16,32 @@ extension Notification.Name {
   static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
 }
 
+@Observable
+final class ClerkInlineAuthLogoState {
+  struct Content {
+    let view: UIView
+    let size: CGSize
+  }
+
+  private(set) var content: Content?
+
+  func setView(_ view: UIView) {
+    content = Content(view: view, size: view.bounds.size)
+  }
+
+  func updateSize(for view: UIView) {
+    guard content?.view === view else { return }
+    let currentSize = view.bounds.size
+    guard content?.size != currentSize else { return }
+    content = Content(view: view, size: currentSize)
+  }
+
+  func removeView(_ view: UIView) {
+    guard content?.view === view else { return }
+    content = nil
+  }
+}
+
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 
@@ -243,6 +269,7 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -254,6 +281,7 @@ final class ClerkNativeBridge {
         dismissible: dismissible,
         lightTheme: lightTheme,
         darkTheme: darkTheme,
+        logoState: logoState,
         logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
@@ -505,6 +533,7 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoState: ClerkInlineAuthLogoState
   let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
@@ -521,7 +550,12 @@ struct ClerkInlineAuthWrapperView: View {
       }
     }
 
-    if let logoMaxHeight {
+    if let logo = logoState.content {
+      themedView.clerkAppIconView {
+        ClerkReactLogoView(view: logo.view)
+          .frame(width: logo.size.width, height: logo.size.height)
+      }
+    } else if let logoMaxHeight {
       themedView.clerkAppIcon(maxHeight: logoMaxHeight)
     } else {
       themedView
@@ -530,6 +564,45 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     themedAuthView
+  }
+}
+
+private struct ClerkReactLogoView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
+    return ClerkReactLogoContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+    uiView.setContentView(view)
+  }
+}
+
+private final class ClerkReactLogoContainerView: UIView {
+  private var contentView: UIView?
+
+  init(contentView: UIView) {
+    super.init(frame: .zero)
+    setContentView(contentView)
+  }
+
+  required init?(coder: NSCoder) {
+    return nil
+  }
+
+  func setContentView(_ view: UIView) {
+    guard contentView !== view else { return }
+    contentView?.removeFromSuperview()
+    view.removeFromSuperview()
+    contentView = view
+    addSubview(view)
+    setNeedsLayout()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    contentView?.frame = bounds
   }
 }
 

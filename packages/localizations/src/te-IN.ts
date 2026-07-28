@@ -63,6 +63,7 @@ export const teIN: LocalizationResource = {
   badge__canceledEndsAt: "రద్దు చేయబడింది • ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__currentPlan: 'ప్రస్తుత ప్లాన్',
   badge__default: 'డిఫాల్ట్',
+  badge__deprovisioned: undefined,
   badge__endsAt: "ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__expired: 'గడువు ముగిసింది',
   badge__freeTrial: 'ఉచిత ట్రయల్',

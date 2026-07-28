@@ -1,5 +1,5 @@
-import type { ComponentProps } from '@clerk/headless/utils';
-import { renderElement } from '@clerk/headless/utils';
+import type { ComponentProps, RenderProp } from '@clerk/headless/utils';
+import { useRender } from '@clerk/headless/utils';
 import React from 'react';
 
 import type { RecipeVariantProps } from '../slot-recipe';
@@ -44,7 +44,9 @@ declare module '../registry' {
 }
 
 /** Props for the Heading component combining h2 attributes with recipe variants. */
-export type HeadingProps = ComponentProps<'h2'> & RecipeVariantProps<typeof headingRecipe>;
+export type HeadingProps = Omit<ComponentProps<'h2'>, 'render'> & {
+  render?: RenderProp<React.ComponentPropsWithRef<'h2'>> | React.ReactElement;
+} & RecipeVariantProps<typeof headingRecipe>;
 
 export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(null);
 
@@ -56,11 +58,19 @@ export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(rawProps, ref) {
   const { size, intent, sx, render, ...rest } = useContextProps(rawProps, HeadingContext);
   const { root } = useRecipe(headingRecipe, { variants: { size, intent }, sx });
-  if (render) {
-    // renderElement handles the cast; Emotion processes `css` inside the callback's own JSX.
-    return renderElement({ defaultTagName: 'h2', render, props: { ref, ...root, ...rest } as Record<string, unknown> });
+  // useRender only runs for `render` (function or element); Emotion processes `css`
+  // inside the consumer's own JSX there. The no-render fallback must stay JSX —
+  // React.createElement bypasses Emotion's factory, leaking css to the DOM.
+  const element = useRender({
+    defaultTagName: 'h2',
+    render,
+    ref,
+    enabled: Boolean(render),
+    props: { ...root, ...rest },
+  });
+  if (element) {
+    return element;
   }
-  // Fallback must be JSX — React.createElement bypasses Emotion's factory, leaking css to the DOM.
   return (
     <h2
       ref={ref}

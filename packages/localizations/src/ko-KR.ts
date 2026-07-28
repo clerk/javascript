@@ -63,6 +63,7 @@ export const koKR: LocalizationResource = {
   badge__canceledEndsAt: "취소됨 • {{ date | shortDate('ko-KR') }}에 종료",
   badge__currentPlan: '현재 플랜',
   badge__default: '기본값',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ko-KR') }}에 종료",
   badge__expired: '만료됨',
   badge__freeTrial: '무료 체험',
