@@ -822,12 +822,26 @@ describe('ClerkProvider native client sync', () => {
     // compare against values captured before the refresh, not a reference that mutated underneath.
     const client: Record<string, any> = {
       id: 'client_1',
-      signedInSessions: [signedInSession],
+      sessions: [signedInSession],
       lastActiveSessionId: 'session_1',
+      get signedInSessions() {
+        return this.sessions;
+      },
     };
+    client.__internal_toSnapshot = vi.fn(() => ({
+      id: client.id,
+      sessions: client.sessions,
+      last_active_session_id: client.lastActiveSessionId,
+    }));
+    client.fromJSON = vi.fn(snapshot => {
+      client.id = snapshot.id;
+      client.sessions = snapshot.sessions;
+      client.lastActiveSessionId = snapshot.last_active_session_id;
+      return client;
+    });
     client.fetch = vi.fn().mockImplementation(() => {
       client.id = 'client_2';
-      client.signedInSessions = [];
+      client.sessions = [];
       client.lastActiveSessionId = null;
       return Promise.resolve(client);
     });
@@ -864,12 +878,14 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(client.fetch).toHaveBeenCalled();
+      expect(client.fromJSON).toHaveBeenCalled();
     });
 
-    // The refreshed client belongs to a different client id and carries no signed-in sessions, so
-    // it must be discarded rather than applied over the session JS already has.
-    expect(originalUpdateClient).not.toHaveBeenCalled();
+    expect(client.id).toBe('client_1');
+    expect(client.sessions).toEqual([signedInSession]);
+    expect(client.signedInSessions).toEqual([signedInSession]);
+    expect(client.lastActiveSessionId).toBe('session_1');
+    expect(originalUpdateClient).toHaveBeenCalledWith(client);
     expect(mocks.clerkInstance.session).toBe(signedInSession);
   });
 
