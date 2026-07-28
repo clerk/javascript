@@ -100,14 +100,16 @@ describe('ConfigureProviderStep', () => {
     expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
     expect(
       document.querySelector(
-        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required.prefix"]',
+        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.description"]',
       ),
     ).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(5);
     expect(screen.getByText('sub')).toBeInTheDocument();
     expect(screen.getByText('email')).toBeInTheDocument();
     expect(
       document.querySelector(
-        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional.prefix"]',
+        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.table.columns.claim"]',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('given_name')).toBeInTheDocument();

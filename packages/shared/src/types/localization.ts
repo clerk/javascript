@@ -1531,14 +1531,18 @@ export type __internal_LocalizationResource = {
           headerSubtitle: LocalizationValue;
           paragraph: LocalizationValue;
           claims: {
-            optional: {
-              conjunction: LocalizationValue;
-              prefix: LocalizationValue;
-              suffix: LocalizationValue;
-            };
-            required: {
-              prefix: LocalizationValue;
-              suffix: LocalizationValue;
+            description: LocalizationValue;
+            table: {
+              columns: {
+                attribute: LocalizationValue;
+                claim: LocalizationValue;
+              };
+              rows: {
+                email: { attribute: LocalizationValue };
+                firstName: { attribute: LocalizationValue };
+                lastName: { attribute: LocalizationValue };
+                subject: { attribute: LocalizationValue };
+              };
             };
           };
           redirectUri: {
