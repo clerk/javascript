@@ -157,7 +157,9 @@ Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
 4. Verify locally: `pnpm build`, `pnpm test` (or the filtered forms above), `pnpm lint`,
    `pnpm format:check`.
 5. Open the PR; the title must be a valid conventional commit (it becomes the squash commit). Fill in
-   the PR template.
+   the PR template and add nothing beyond its sections — in particular, never write a "Testing" /
+   "Test plan" / "How to test" section listing the tests added or the checks run. The Checklist
+   covers that and reviewers read the diff. Describe the change, not the work done on it.
 
 Release _policy_ (when/how things ship, canary, snapshot, backports) is in `docs/PUBLISH.md`. This
 skill stops at opening the PR.

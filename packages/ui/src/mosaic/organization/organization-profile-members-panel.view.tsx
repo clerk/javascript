@@ -6,6 +6,7 @@ import { Input } from '../components/input';
 import { Skeleton } from '../components/skeleton';
 import { Text } from '../components/text';
 import type { Snapshot } from '../machine/types';
+import { fontWeightVars } from '../tokens.stylex';
 import type { MemberRow } from './organization-profile-members-panel.controller';
 import type {
   OrganizationProfileMembersPanelContext,
@@ -159,10 +160,10 @@ export function OrganizationProfileMembersPanelView({
 
       {snapshot.context.error ? (
         <Text
-          intent='destructive'
+          color='negative'
           size='sm'
           role='alert'
-          sx={t => ({ marginBlockEnd: t.spacing(3) })}
+          style={{ marginBlockEnd: 'calc(var(--cl-spacing) * 3)' }}
         >
           {snapshot.context.error}
         </Text>
@@ -233,7 +234,7 @@ export function OrganizationProfileMembersPanelView({
                       <Box sx={t => ({ display: 'flex', alignItems: 'center', gap: t.spacing(1.5) })}>
                         <Text
                           size='sm'
-                          sx={t => ({ fontWeight: t.font.medium })}
+                          style={{ fontWeight: fontWeightVars['--cl-font-medium'] }}
                         >
                           {row.name}
                         </Text>
@@ -243,7 +244,7 @@ export function OrganizationProfileMembersPanelView({
                       {row.identifier && row.identifier !== row.name ? (
                         <Text
                           size='xs'
-                          intent='mutedForeground'
+                          color='neutral'
                         >
                           {row.identifier}
                         </Text>
@@ -253,7 +254,7 @@ export function OrganizationProfileMembersPanelView({
                   <Cell>
                     <Text
                       size='sm'
-                      intent='mutedForeground'
+                      color='neutral'
                     >
                       {row.joinedAt}
                     </Text>
@@ -293,7 +294,7 @@ export function OrganizationProfileMembersPanelView({
         >
           <Text
             size='xs'
-            intent='mutedForeground'
+            color='neutral'
           >
             Page {page} of {pageCount}
           </Text>

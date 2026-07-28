@@ -8,12 +8,11 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './button.stories?raw';
 
-// StyleX has no runtime recipe to derive knobs from, so the variant surface is described
-// here to drive the playground + prop table. Keys mirror `ButtonProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Button',
   source: 'packages/ui/src/mosaic/components/button/button.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       intent: { primary: {}, destructive: {} },
