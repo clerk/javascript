@@ -527,6 +527,13 @@ To migrate a component from the old system to Mosaic:
 6. Update token references — e.g. `theme.colors.$primary500` → `theme.color.primary`.
 7. Ensure the component is inside a `MosaicProvider` in the tree.
 
+The steps above cover the **styling** migration (recipes + tokens). For **flow**
+components — where the legacy component also fuses data-fetching and flow logic —
+splitting that logic into the machine/controller/view layers and verifying no
+implicit behavior is dropped is its own end-to-end workflow. See the `mosaic`
+Claude Code skill (`.claude/skills/mosaic/`), in particular its
+`references/migration.md`.
+
 ## Files
 
 | File                                              | Purpose                                                                     |
@@ -540,9 +547,9 @@ To migrate a component from the old system to Mosaic:
 | `src/mosaic/resolveSlot.ts`                       | Pure per-slot appearance-layer resolver (`resolveSlotCss`)                  |
 | `src/mosaic/conditions.ts`                        | Condition vocabulary (`_hover`, …) + `expandConditions`                     |
 | `src/mosaic/machine/`                             | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
-| `src/mosaic/sections/*-machine.ts`                | Pure flow rules for Mosaic sections                                         |
-| `src/mosaic/sections/*-controller.tsx`            | Clerk/mock data adapters and actor wiring for Mosaic sections               |
-| `src/mosaic/sections/*-view.tsx`                  | Clerk-free view modules that render snapshots and send events               |
+| `src/mosaic/<feature>/*-machine.ts`               | Pure flow rules for a Mosaic feature (e.g. `organization/`)                 |
+| `src/mosaic/<feature>/*-controller.tsx`           | Clerk/mock data adapters and actor wiring for a Mosaic feature              |
+| `src/mosaic/<feature>/*-view.tsx`                 | Clerk-free view modules that render snapshots and send events               |
 | `src/mosaic/__tests__/slot-recipe.test.ts`        | Recipe resolution, attrs, conditions, `useSlot`/`slot` specs                |
 | `src/mosaic/__tests__/resolveSlot.test.ts`        | Appearance-layer resolution specs                                           |
 | `src/mosaic/__tests__/MosaicProvider.test.tsx`    | Appearance/scope parsing + theme-from-variables specs                       |

@@ -6,6 +6,8 @@ import { AbstractAPI } from './AbstractApi';
 export type CreateSignInTokensParams = {
   /** The ID of the user to create the sign-in token for. */
   userId: string;
+  /** The ID of the organization to activate when the user signs in. Organizations must be enabled for the instance, and the user must be a member of the organization. */
+  orgId?: string;
   /** The number of seconds until the sign-in token expires. By default, the duration is `2592000` (30 days). */
   expiresInSeconds: number;
 };

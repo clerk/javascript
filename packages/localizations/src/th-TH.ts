@@ -63,6 +63,7 @@ export const thTH: LocalizationResource = {
   badge__canceledEndsAt: "ถูกยกเลิก • สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__currentPlan: 'แผนปัจจุบัน',
   badge__default: 'ค่าเริ่มต้น',
+  badge__deprovisioned: undefined,
   badge__endsAt: "สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__expired: 'หมดอายุ',
   badge__freeTrial: 'ทดลองใช้ฟรี',

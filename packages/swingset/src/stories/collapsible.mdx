@@ -5,7 +5,7 @@ import * as CollapsibleStories from './collapsible.stories';
 A single show/hide panel toggled by a button, from `@clerk/headless`. It is a
 **headless** primitive: it supplies behavior, state, ARIA wiring, and the
 expand/collapse animation lifecycle, but ships **no styles** — you bring your own
-CSS by targeting the `data-cl-*` attributes each part emits.
+CSS by targeting the `data-*` attributes each part emits.
 
 ## Example
 
@@ -69,26 +69,25 @@ standard HTML attributes for their default element.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute          | Applies To           | Description                      |
-| ------------------ | -------------------- | -------------------------------- |
-| `data-cl-slot`     | All parts            | Part identifier                  |
-| `data-cl-open`     | Root, Trigger, Panel | Present when the panel is open   |
-| `data-cl-closed`   | Root, Trigger, Panel | Present when the panel is closed |
-| `data-cl-disabled` | Root, Trigger        | Present when disabled            |
+| Attribute       | Applies To           | Description                      |
+| --------------- | -------------------- | -------------------------------- |
+| `data-open`     | Root, Trigger, Panel | Present when the panel is open   |
+| `data-closed`   | Root, Trigger, Panel | Present when the panel is closed |
+| `data-disabled` | Root, Trigger        | Present when disabled            |
 
 `Collapsible.Panel` also exposes `--collapsible-panel-height` /
 `--collapsible-panel-width` (its measured dimensions) for height/width-based
 animations:
 
 ```css
-[data-cl-slot='collapsible-panel'] {
+.cl-collapsible-panel {
   overflow: hidden;
   height: var(--collapsible-panel-height);
   transition: height 200ms ease;
 }
-[data-cl-slot='collapsible-panel'][data-cl-closed] {
+.cl-collapsible-panel[data-closed] {
   height: 0;
 }
 ```

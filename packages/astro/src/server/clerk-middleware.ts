@@ -15,8 +15,10 @@ import {
   signedOutAuthObject,
   TokenType,
 } from '@clerk/backend/internal';
+import { htmlSafeJson } from '@clerk/shared/htmlSafeJson';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
@@ -82,7 +84,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     await initCloudflareEnv();
 
-    const clerkRequest = createClerkRequest(context.request);
+    const patchedRequest = patchRequest(context.request);
+    const clerkRequest = createClerkRequest(patchedRequest);
 
     // Resolve keyless URLs per-request in development
     let keylessClaimUrl: string | undefined;
@@ -382,10 +385,10 @@ function decorateRequest(locals: APIContext['locals'], res: Response): Response 
     const encoder = new TextEncoder();
     const closingHeadTag = encoder.encode('</head>');
     const clerkAstroData = encoder.encode(
-      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
+      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${htmlSafeJson(locals.auth())}</script>\n`,
     );
     const clerkSafeEnvVariables = encoder.encode(
-      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
+      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${htmlSafeJson(getClientSafeEnv(locals))}</script>\n`,
     );
     const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 

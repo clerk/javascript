@@ -1,8 +1,8 @@
-import { createApp, createError, eventHandler, setResponseHeader, toWebHandler } from 'h3';
+import { normalizePath } from '@clerk/shared/pathMatcher';
+import { createApp, createError, eventHandler, getRequestURL, setResponseHeader, toWebHandler } from 'h3';
 import { describe, expect, test, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
-import { createRouteMatcher } from '../routeMatcher';
 
 const SESSION_AUTH_RESPONSE = {
   userId: 'user_2jZSstSbxtTndD9P7q4kDl0VVZa',
@@ -66,13 +66,12 @@ vi.mock('../clerkClient', () => {
 });
 
 describe('clerkMiddleware(params)', () => {
-  test('returns 400 when createRouteMatcher encounters malformed percent-encoding', async () => {
-    const isProtectedRoute = createRouteMatcher(['/api/admin(.*)']);
+  test('returns 400 when the handler encounters malformed percent-encoding while matching paths', async () => {
     const app = createApp();
     const handler = toWebHandler(app);
     app.use(
       clerkMiddleware(event => {
-        if (isProtectedRoute(event)) {
+        if (normalizePath(getRequestURL(event).pathname).startsWith('/api/admin')) {
           throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
         }
       }),

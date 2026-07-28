@@ -1,7 +1,7 @@
 import type { RedirectUrlJSON } from './JSON';
 
 /**
- * Redirect URLs are whitelisted URLs that facilitate secure authentication flows in native applications (e.g. React Native, Expo). In these contexts, Clerk ensures that security-critical nonces are passed only to the whitelisted URLs.
+ * Redirect URLs are whitelisted URLs that facilitate secure authentication flows in native applications (e.g., React Native, Expo). In these contexts, Clerk ensures that security-critical nonces are passed only to the whitelisted URLs.
 
 The Backend `RedirectUrl` object represents a redirect URL in your application. This object is used in the Backend API.
  */

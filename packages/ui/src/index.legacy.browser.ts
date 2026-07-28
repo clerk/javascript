@@ -1,6 +1,6 @@
 // It's crucial this is the first import,
 // otherwise chunk loading will not work
-// eslint-disable-next-line
+
 import './utils/setWebpackChunkPublicPath';
 
 import { ClerkUI } from './ClerkUI';

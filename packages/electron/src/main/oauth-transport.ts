@@ -2,6 +2,7 @@ import { app, ipcMain, shell } from 'electron';
 
 import { OAUTH_TRANSPORT_CHANNELS } from '../shared/ipc';
 import type { RendererSchemeOptions } from '../shared/types';
+import { isMainFrameEvent } from './validate-sender';
 
 const CALLBACK_TIMEOUT_MS = 3 * 60 * 1000;
 
@@ -91,11 +92,18 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
   app.on('open-url', openUrlListener);
   app.on('second-instance', secondInstanceListener);
 
-  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, () => {
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, event => {
+    if (!isMainFrameEvent(event)) {
+      throw new Error("Clerk: OAuth request did not originate from a window's main frame.");
+    }
     return redirectUrl;
   });
 
-  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.open, async (_event, url: string) => {
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.open, async (event, url: string) => {
+    if (!isMainFrameEvent(event)) {
+      throw new Error("Clerk: OAuth request did not originate from a window's main frame.");
+    }
+
     if (pendingOAuthFlow) {
       throw new Error('Clerk: an OAuth flow is already pending.');
     }

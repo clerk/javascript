@@ -41,7 +41,7 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                              |
 | `@clerk/swingset`             | tooling         |     | Component explorer for `@clerk/ui`'s Mosaic design system. Private (not published).                                                                                            |
 | `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                 |
-| `@clerk/eslint-plugin`        | tooling         |     | ESLint plugin enforcing Clerk patterns across JavaScript frameworks (lint rules shipped to apps). Published.                                                                  |
+| `@clerk/eslint-plugin`        | tooling         |     | ESLint plugin enforcing Clerk patterns across JavaScript frameworks (lint rules shipped to apps). Published.                                                                   |
 
 Tests: `pnpm turbo test --filter=@clerk/<name>` (or `pnpm --filter @clerk/<name> test` after a
 build). Most packages use vitest; `@clerk/backend` runs a multi-runtime suite (node + edge +

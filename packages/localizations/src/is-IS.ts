@@ -63,6 +63,7 @@ export const isIS: LocalizationResource = {
   badge__canceledEndsAt: "Aflýst • Lýkur {{ date | shortDate('is-IS') }}",
   badge__currentPlan: 'Núverandi áskrift',
   badge__default: 'Sjálfgefið',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lýkur {{ date | shortDate('is-IS') }}",
   badge__expired: 'Útrunnið',
   badge__freeTrial: 'Ókeypis prufuáskrift',

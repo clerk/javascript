@@ -63,6 +63,7 @@ export const jaJP: LocalizationResource = {
   badge__canceledEndsAt: "キャンセル済み • {{ date | shortDate('ja-JP') }}に終了",
   badge__currentPlan: '現在のプラン',
   badge__default: 'デフォルト',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ja-JP') }}に終了",
   badge__expired: '期限切れ',
   badge__freeTrial: '無料トライアル',

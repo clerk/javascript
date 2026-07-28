@@ -21,8 +21,8 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * Native Google Authentication is only available on iOS and Android.
  * For web platforms, use the OAuth-based Google Sign-In flow instead via useSSO.
  *
- * In the next major version, apps using native Google Sign-In will need to install
- * `@clerk/expo-google-signin` alongside `@clerk/expo` and add its Expo config plugin.
+ * On iOS and Android, native Google Sign-In requires the `@clerk/expo-google-signin`
+ * package to be installed and its Expo config plugin added.
  *
  * @example
  * ```tsx

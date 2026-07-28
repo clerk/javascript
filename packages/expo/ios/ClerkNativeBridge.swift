@@ -16,6 +16,32 @@ extension Notification.Name {
   static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
 }
 
+@Observable
+final class ClerkInlineAuthLogoState {
+  struct Content {
+    let view: UIView
+    let size: CGSize
+  }
+
+  private(set) var content: Content?
+
+  func setView(_ view: UIView) {
+    content = Content(view: view, size: view.bounds.size)
+  }
+
+  func updateSize(for view: UIView) {
+    guard content?.view === view else { return }
+    let currentSize = view.bounds.size
+    guard content?.size != currentSize else { return }
+    content = Content(view: view, size: currentSize)
+  }
+
+  func removeView(_ view: UIView) {
+    guard content?.view === view else { return }
+    content = nil
+  }
+}
+
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 
@@ -48,6 +74,8 @@ final class ClerkNativeBridge {
 
   private var clientObservationGeneration = 0
   private var lastObservedClientState: ClientStateSnapshot?
+  private var configurationDepth = 0
+  private var jsOriginatedClientSyncDepth = 0
 
   private init() {}
 
@@ -74,6 +102,12 @@ final class ClerkNativeBridge {
 
   @MainActor
   func configure(publishableKey: String, bearerToken: String? = nil) async throws {
+    configurationDepth += 1
+    defer {
+      lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
+      configurationDepth = max(0, configurationDepth - 1)
+    }
+
     loadThemes()
 
     if Self.shouldReconfigure(for: publishableKey) {
@@ -84,16 +118,21 @@ final class ClerkNativeBridge {
 
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-      Self.emitClientChangedIfReceivedToken(bearerToken)
       Self.postConfiguredNotification()
       return
     }
 
     if Self.clerkConfigured {
       startClientObserver()
-      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-      Self.emitClientChangedIfReceivedToken(bearerToken)
+      let didUpdateDeviceToken = try await Self.syncTokenState(bearerToken: bearerToken)
+      if didUpdateDeviceToken {
+        await Self.waitForLoadedClient()
+      } else if let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
+        // A remounted JS runtime can have the same token while native client
+        // state is stale, so preserve one refresh in that case.
+        _ = try await Clerk.shared.refreshClient()
+        await Self.waitForLoadedClient()
+      }
       return
     }
 
@@ -104,14 +143,7 @@ final class ClerkNativeBridge {
 
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-    Self.emitClientChangedIfReceivedToken(bearerToken)
     Self.postConfiguredNotification()
-  }
-
-  @MainActor
-  private static func emitClientChangedIfReceivedToken(_ bearerToken: String?) {
-    guard let token = bearerToken, !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-    Self.emitClientChanged(Self.clientChangedPayload(changes: .init(client: false, deviceToken: true)))
   }
 
   @MainActor
@@ -139,13 +171,15 @@ final class ClerkNativeBridge {
         let newClientState = Self.clientStateSnapshot()
         if let previousClientState = self.lastObservedClientState, newClientState != previousClientState {
           self.lastObservedClientState = newClientState
-          let payload = Self.clientChangedPayload(
-            changes: .init(
-              client: newClientState.client != previousClientState.client,
-              deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+          if self.configurationDepth == 0, self.jsOriginatedClientSyncDepth == 0 {
+            let payload = Self.clientChangedPayload(
+              changes: .init(
+                client: newClientState.client != previousClientState.client,
+                deviceToken: newClientState.deviceToken != previousClientState.deviceToken
+              )
             )
-          )
-          Self.emitClientChanged(payload)
+            Self.emitClientChanged(payload)
+          }
         }
 
         self.observeClient(generation: generation)
@@ -180,8 +214,14 @@ final class ClerkNativeBridge {
 
   @MainActor
   private static func syncTokenState(bearerToken: String?) async throws -> Bool {
-    guard let token = bearerToken, !token.isEmpty else {
-      return Clerk.shared.deviceToken != nil
+    await waitForLoadedClient()
+
+    guard let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
+    else {
+      return false
+    }
+    guard Clerk.shared.deviceToken != token || Clerk.shared.client == nil else {
+      return false
     }
     _ = try await Clerk.shared.updateDeviceToken(token)
     return true
@@ -229,6 +269,8 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoState: ClerkInlineAuthLogoState,
+    logoMaxHeight: CGFloat?,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -238,7 +280,9 @@ final class ClerkNativeBridge {
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        logoState: logoState,
+        logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
@@ -281,15 +325,38 @@ final class ClerkNativeBridge {
     guard Self.clerkConfigured else { return }
 
     let previousClientState = Self.clientStateSnapshot()
+    var completedSuccessfully = false
+    jsOriginatedClientSyncDepth += 1
+    defer {
+      let finalClientState = Self.clientStateSnapshot()
+      lastObservedClientState = finalClientState
+      jsOriginatedClientSyncDepth = max(0, jsOriginatedClientSyncDepth - 1)
 
-    if didChangeDeviceToken, let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
-      if Clerk.shared.deviceToken != token {
-        _ = try await Clerk.shared.updateDeviceToken(token)
-        await Self.waitForLoadedClient()
+      if !completedSuccessfully, finalClientState != previousClientState {
+        Self.emitClientChanged(
+          Self.clientChangedPayload(
+            changes: .init(
+              client: finalClientState.client != previousClientState.client,
+              deviceToken: finalClientState.deviceToken != previousClientState.deviceToken
+            )
+          )
+        )
       }
     }
 
-    if didChangeClient || didChangeDeviceToken {
+    var refreshedClientWhileUpdatingToken = false
+
+    if didChangeDeviceToken,
+      let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
+    {
+      if Clerk.shared.deviceToken != token {
+        _ = try await Clerk.shared.updateDeviceToken(token)
+        await Self.waitForLoadedClient()
+        refreshedClientWhileUpdatingToken = true
+      }
+    }
+
+    if !refreshedClientWhileUpdatingToken, didChangeClient || didChangeDeviceToken {
       _ = try await Clerk.shared.refreshClient()
       await Self.waitForLoadedClient()
     }
@@ -305,6 +372,7 @@ final class ClerkNativeBridge {
         )
       )
     )
+    completedSuccessfully = true
   }
 
   private static func postConfiguredNotification() {
@@ -465,24 +533,76 @@ struct ClerkInlineAuthWrapperView: View {
   let dismissible: Bool
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoState: ClerkInlineAuthLogoState
+  let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
 
-  private var themedAuthView: some View {
+  @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
-    return Group {
+    let themedView = Group {
       if let theme {
         view.environment(\.clerkTheme, theme)
       } else {
         view
       }
     }
+
+    if let logo = logoState.content {
+      themedView.clerkAppIconView {
+        ClerkReactLogoView(view: logo.view)
+          .frame(width: logo.size.width, height: logo.size.height)
+      }
+    } else if let logoMaxHeight {
+      themedView.clerkAppIcon(maxHeight: logoMaxHeight)
+    } else {
+      themedView
+    }
   }
 
   var body: some View {
     themedAuthView
+  }
+}
+
+private struct ClerkReactLogoView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
+    return ClerkReactLogoContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+    uiView.setContentView(view)
+  }
+}
+
+private final class ClerkReactLogoContainerView: UIView {
+  private var contentView: UIView?
+
+  init(contentView: UIView) {
+    super.init(frame: .zero)
+    setContentView(contentView)
+  }
+
+  required init?(coder: NSCoder) {
+    return nil
+  }
+
+  func setContentView(_ view: UIView) {
+    guard contentView !== view else { return }
+    contentView?.removeFromSuperview()
+    view.removeFromSuperview()
+    contentView = view
+    addSubview(view)
+    setNeedsLayout()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    contentView?.frame = bounds
   }
 }
 

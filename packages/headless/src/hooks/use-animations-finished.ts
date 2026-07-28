@@ -10,7 +10,7 @@ import { flushSync } from 'react-dom';
  * Uses the Web Animations API (`element.getAnimations()` + `animation.finished`)
  * so we're duration-agnostic — CSS owns all timing.
  *
- * When `open` is true, waits for `[data-cl-starting-style]` to be removed
+ * When `open` is true, waits for `[data-starting-style]` to be removed
  * before polling animations. This avoids a race where `getAnimations()` returns
  * an empty array before the enter transition has been registered.
  *
@@ -75,16 +75,16 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
           });
       };
 
-      if (open && element.hasAttribute('data-cl-starting-style')) {
+      if (open && element.hasAttribute('data-starting-style')) {
         const observer = new MutationObserver(() => {
-          if (!element.hasAttribute('data-cl-starting-style')) {
+          if (!element.hasAttribute('data-starting-style')) {
             observer.disconnect();
             runCheck();
           }
         });
         observer.observe(element, {
           attributes: true,
-          attributeFilter: ['data-cl-starting-style'],
+          attributeFilter: ['data-starting-style'],
         });
         signal.addEventListener('abort', () => observer.disconnect());
         return;

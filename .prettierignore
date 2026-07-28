@@ -13,6 +13,7 @@
 build
 coverage
 dist
+dist-mosaic
 /packages/nextjs/examples
 node_modules
 package-lock.json

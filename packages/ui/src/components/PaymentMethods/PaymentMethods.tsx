@@ -11,7 +11,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { RemoveResourceForm } from '../../common';
 import { DevOnly } from '../../common/DevOnly';
 import { usePaymentMethods, useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { Box, localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import * as AddPaymentMethod from './AddPaymentMethod';
@@ -142,7 +142,9 @@ export const PaymentMethods = withCardStateProvider(() => {
           disableAnimation
         >
           {isLoading ? (
-            <FullHeightLoader />
+            <Box sx={t => ({ height: t.space.$16 })}>
+              <FullHeightLoader />
+            </Box>
           ) : (
             <>
               {sortedPaymentMethods.map(paymentMethod => (

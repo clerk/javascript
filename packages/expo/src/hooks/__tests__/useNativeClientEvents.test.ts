@@ -67,6 +67,22 @@ describe('useNativeClientEvents', () => {
     unmount();
   });
 
+  test('subscribes only while native client events are enabled', () => {
+    const { rerender, unmount } = renderHook(({ enabled }) => useNativeClientEvents(enabled), {
+      initialProps: { enabled: false },
+    });
+
+    expect(mocks.moduleAddListener).not.toHaveBeenCalled();
+
+    rerender({ enabled: true });
+    expect(mocks.moduleAddListener).toHaveBeenCalledTimes(1);
+
+    rerender({ enabled: false });
+    expect(mocks.remove).toHaveBeenCalledTimes(1);
+
+    unmount();
+  });
+
   test('does not subscribe modules without an Expo event emitter', () => {
     mocks.nativeModule = {
       configure: vi.fn(),

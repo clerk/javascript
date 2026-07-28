@@ -54,6 +54,7 @@ import type {
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureSubmitProtectCheckParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
   SignInFutureWeb3Params,
@@ -274,6 +275,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
+      coalesce: true,
     });
   };
 
@@ -364,6 +366,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
+      coalesce: true,
     });
   };
 
@@ -859,7 +862,7 @@ class SignInFuture implements SignInFutureResource {
    * @param params.proofToken - The proof token produced by the Protect challenge SDK.
    * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
    */
-  async submitProtectCheck(params: { proofToken: string }): Promise<{ error: ClerkError | null }> {
+  async submitProtectCheck(params: SignInFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePatch({
         action: 'protect_check',
@@ -891,6 +894,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'reset_password_email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -934,6 +938,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'reset_password_phone_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1091,6 +1096,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId: emailCodeFactor.emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1143,6 +1149,7 @@ class SignInFuture implements SignInFutureResource {
           strategy: 'email_link',
         },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1194,6 +1201,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId: phoneCodeFactor.phoneNumberId, strategy: 'phone_code', channel },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1259,6 +1267,7 @@ class SignInFuture implements SignInFutureResource {
             strategy: 'enterprise_sso',
           },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1326,6 +1335,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
 
       const { message } = this.firstFactorVerification;
@@ -1397,6 +1407,7 @@ class SignInFuture implements SignInFutureResource {
         await this.#resource.__internal_basePost({
           body: { strategy: 'passkey' },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1449,6 +1460,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'phone_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
@@ -1475,6 +1487,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'email_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }

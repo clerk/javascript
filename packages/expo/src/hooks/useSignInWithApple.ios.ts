@@ -1,4 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/react/legacy';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
@@ -99,40 +100,68 @@ export function useSignInWithApple() {
         nonce,
       });
 
-      // Extract the identity token from the credential
-      const { identityToken } = credential;
+      // Apple only returns the name on first authorization, so capture it now before it's lost.
+      const { identityToken, fullName } = credential;
 
       if (!identityToken) {
         return errorThrower.throw('No identity token received from Apple Sign-In.');
       }
 
-      // Create a SignIn with the Apple ID token strategy
-      await signIn.create({
-        strategy: 'oauth_token_apple',
-        token: identityToken,
-      });
-
-      // Check if we need to transfer to SignUp (user doesn't exist yet)
-      const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
-
-      if (userNeedsToBeCreated) {
-        // User doesn't exist - create a new SignUp with transfer
+      try {
+        // Sign-up first so a new user's name is recorded; an existing account resolves as transferable below.
         await signUp.create({
-          transfer: true,
+          strategy: 'oauth_token_apple',
+          token: identityToken,
+          firstName: fullName?.givenName ?? undefined,
+          lastName: fullName?.familyName ?? undefined,
           unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
+        });
+      } catch (signUpError: unknown) {
+        // Restricted/waitlist instances reject sign-up before the account-exists check, so existing users sign in.
+        if (
+          isClerkAPIResponseError(signUpError) &&
+          signUpError.errors?.some(
+            err => err.code === 'sign_up_mode_restricted' || err.code === 'sign_up_restricted_waitlist',
+          )
+        ) {
+          await signIn.create({
+            strategy: 'oauth_token_apple',
+            token: identityToken,
+          });
+
+          // A transferable sign-in means the user doesn't exist; surface the original restriction error.
+          if (signIn.firstFactorVerification.status === 'transferable') {
+            throw signUpError;
+          }
+
+          return {
+            createdSessionId: signIn.createdSessionId,
+            setActive,
+            signIn,
+            signUp,
+          };
+        }
+
+        throw signUpError;
+      }
+
+      const accountAlreadyExists = signUp.verifications.externalAccount.status === 'transferable';
+
+      if (accountAlreadyExists) {
+        await signIn.create({
+          transfer: true,
         });
 
         return {
-          createdSessionId: signUp.createdSessionId,
+          createdSessionId: signIn.createdSessionId,
           setActive,
           signIn,
           signUp,
         };
       }
 
-      // User exists - return the SignIn session
       return {
-        createdSessionId: signIn.createdSessionId,
+        createdSessionId: signUp.createdSessionId,
         setActive,
         signIn,
         signUp,
