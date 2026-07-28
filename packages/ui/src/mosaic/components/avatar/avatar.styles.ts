@@ -41,8 +41,8 @@ export const styles = stylex.create({
   // fallback fills the box, centering its content and inheriting the sized font
   fallback: {
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-muted'],
-    color: colorVars['--cl-color-muted-foreground'],
+    backgroundColor: colorVars['--cl-color-neutral'],
+    color: colorVars['--cl-color-neutral-foreground'],
     display: 'flex',
     fontSize: 'inherit',
     justifyContent: 'center',
