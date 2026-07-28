@@ -61,15 +61,22 @@ const nextConfig = {
 
     // Swingset consumes Mosaic from source, so StyleX (`defineVars`/`create`/`props`) must be
     // compiled here — otherwise the calls hit the runtime and throw. The unplugin transforms the
-    // StyleX *JS only* (calls → static atom references), keeping SWC intact so `next/font` and the
-    // Emotion transform keep working. The CSS is emitted separately by `@stylexjs/postcss-plugin`
-    // (`@stylex` in `globals.css`), so this runs in extraction mode (no `runtimeInjection`); both
-    // share the same StyleX babel version/options so the atom hashes match, and the plugin's dev
-    // "no CSS asset" warning is expected and harmless. `useCSSLayers: true` matches the published
-    // build so atoms carry StyleX's `@layer priorityN` precedence.
+    // StyleX *JS only*, keeping SWC intact so `next/font` and the Emotion transform keep working.
+    //
+    // CSS strategy forks by env (see `postcss.config.mjs`):
+    // - Prod: `runtimeInjection: false`. Atoms are static class refs; the CSS is extracted
+    //   separately by `@stylexjs/postcss-plugin` into `globals.css` (`useCSSLayers` preserves
+    //   StyleX's `@layer priorityN` precedence). Both share the same babel version/options so
+    //   atom hashes match; the plugin's dev "no CSS asset" warning is expected and harmless.
+    // - Dev: `runtimeInjection: true`. StyleX injects a `<style>` at runtime from the same module
+    //   the JS lives in, so editing a `.styles.ts` file hot-reloads. This is required because Next
+    //   won't re-run the `globals.css` PostCSS extraction on Mosaic-source edits (they're outside
+    //   the CSS import graph), which would otherwise leave the preview stale.
+    const isDev = process.env.NODE_ENV !== 'production';
     config.plugins.push(
       stylexPlugin({
-        dev: process.env.NODE_ENV !== 'production',
+        dev: isDev,
+        runtimeInjection: isDev,
         unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
         useCSSLayers: true,
       }),
