@@ -27,8 +27,8 @@ import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
-  Default as HeadingDefault,
   Colors as HeadingColors,
+  Default as HeadingDefault,
   meta as headingMeta,
   Sizes as HeadingSizes,
 } from '../stories/heading.stories';
@@ -85,8 +85,8 @@ import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
-  Default as TextDefault,
   Colors as TextColors,
+  Default as TextDefault,
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
