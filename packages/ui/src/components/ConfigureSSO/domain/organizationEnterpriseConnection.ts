@@ -7,7 +7,8 @@ import type {
 
 import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
 
-export const isOidcProvider = (provider: string): provider is OidcProviderType => provider.startsWith('oidc_');
+export const isOidcProvider = (provider: string): provider is OidcProviderType =>
+  provider.startsWith('oidc_') || provider.startsWith('oauth_custom_');
 
 /**
  * The email whose domain backs the connection: the user's primary address if
@@ -56,7 +57,6 @@ export const isEnterpriseConnectionConfigured = (
   if (!connection) {
     return false;
   }
-  // OIDC exposes only the client ID on the resource; the secret and manual endpoints are write-only.
   if (isOidcProvider(connection.provider)) {
     return Boolean(connection.oauthConfig?.clientId);
   }

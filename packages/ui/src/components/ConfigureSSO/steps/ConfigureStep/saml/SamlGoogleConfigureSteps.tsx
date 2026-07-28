@@ -13,15 +13,15 @@ import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
+  IdentityProviderConfigurationModes,
+  type SamlIdpConfigurationMode,
+} from '../shared/IdentityProviderConfigurationModes';
+import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
   IdentityProviderConfigurationForm,
   type IdentityProviderConfigurationFormProps,
 } from './shared/IdentityProviderConfigurationForm';
-import {
-  IdentityProviderConfigurationModes,
-  type IdpConfigurationMode,
-} from './shared/IdentityProviderConfigurationModes';
 
 const GOOGLE_STEPS: WizardStepConfig[] = [
   { id: 'create-app' },
@@ -143,7 +143,7 @@ const SamlGoogleCreateAppStep = (): JSX.Element => {
   );
 };
 
-const GOOGLE_IDP_MODES = ['metadataFile', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+const GOOGLE_IDP_MODES = ['metadataFile', 'manual'] as const satisfies readonly SamlIdpConfigurationMode[];
 
 const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
@@ -160,7 +160,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const existingCertPresent = Boolean(samlConnection?.idpCertificate);
   const existingMetadataPresent = Boolean(samlConnection?.idpMetadata);
 
-  const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingManualConfig ? 'manual' : 'metadataFile');
+  const [mode, setMode] = React.useState<SamlIdpConfigurationMode>(hasExistingManualConfig ? 'manual' : 'metadataFile');
   const [metadataFile, setMetadataFile] = React.useState<File | null>(null);
   const [certFile, setCertFile] = React.useState<File | null>(null);
   // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the

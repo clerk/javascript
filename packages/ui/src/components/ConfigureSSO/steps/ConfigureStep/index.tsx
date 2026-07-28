@@ -62,10 +62,9 @@ export const ConfigureStep = (): JSX.Element => {
   );
 };
 
-const ConfigureProviderStep = (): JSX.Element | null => {
+export const ConfigureProviderStep = (): JSX.Element | null => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
-  // Type guard: the provider should be defined by the time we reach configure.
   if (!c.provider) {
     return null;
   }

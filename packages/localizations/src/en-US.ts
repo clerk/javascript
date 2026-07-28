@@ -241,18 +241,70 @@ export const enUS: LocalizationResource = {
         },
       },
       oidcCustom: {
-        claimsStep: {
-          headerSubtitle: 'Set the claims your identity provider includes in the ID token',
-        },
         credentialsStep: {
           headerSubtitle: 'Add your application credentials',
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
         },
         endpointsStep: {
           headerSubtitle: 'Add your identity provider’s endpoints',
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
         },
         mainHeaderTitle: 'Configure your identity provider',
         redirectUriStep: {
           headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          claims: {
+            description: 'Ensure your ID token includes the following claims:',
+            table: {
+              columns: {
+                attribute: 'Clerk attribute',
+                claim: 'ID token claim',
+              },
+              rows: {
+                email: { attribute: 'Primary email' },
+                firstName: { attribute: 'First name' },
+                lastName: { attribute: 'Last name' },
+                subject: { attribute: 'External user ID' },
+              },
+            },
+          },
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {

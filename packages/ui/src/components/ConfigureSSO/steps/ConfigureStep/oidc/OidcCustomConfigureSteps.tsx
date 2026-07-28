@@ -1,17 +1,21 @@
-import { localizationKeys } from '@/customizables';
+import { type JSX, useState } from 'react';
 
-import { Step } from '../../../elements/Step';
-import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
-import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { useConfigureSSO } from '../../../ConfigureSSOContext';
+import { Wizard, type WizardStepConfig } from '../../../elements/Wizard';
+import type { OidcIdpConfigurationMode } from '../shared/IdentityProviderConfigurationModes';
+import { OidcCredentialsStep } from './shared/OidcCredentialsStep';
+import { OidcEndpointsStep } from './shared/OidcEndpointsStep';
+import { OidcRedirectUriStep } from './shared/OidcRedirectUriStep';
 
-const OIDC_STEPS: WizardStepConfig[] = [
-  { id: 'redirect-uri' },
-  { id: 'claims' },
-  { id: 'endpoints' },
-  { id: 'credentials' },
-];
+const OIDC_STEPS: WizardStepConfig[] = [{ id: 'redirect-uri' }, { id: 'endpoints' }, { id: 'credentials' }];
 
-export const OidcCustomConfigureSteps = () => {
+export const OidcCustomConfigureSteps = (): JSX.Element => {
+  const { enterpriseConnection } = useConfigureSSO();
+  const oauthConfig = enterpriseConnection?.oauthConfig;
+  const [endpointMode, setEndpointMode] = useState<OidcIdpConfigurationMode>(
+    oauthConfig?.authUrl && !oauthConfig.discoveryUrl ? 'manual' : 'discoveryUrl',
+  );
+
   return (
     <Wizard
       steps={OIDC_STEPS}
@@ -21,133 +25,16 @@ export const OidcCustomConfigureSteps = () => {
         <OidcRedirectUriStep />
       </Wizard.Match>
 
-      <Wizard.Match id='claims'>
-        <OidcClaimsStep />
-      </Wizard.Match>
-
       <Wizard.Match id='endpoints'>
-        <OidcEndpointsStep />
+        <OidcEndpointsStep
+          mode={endpointMode}
+          onModeChange={setEndpointMode}
+        />
       </Wizard.Match>
 
       <Wizard.Match id='credentials'>
         <OidcCredentialsStep />
       </Wizard.Match>
     </Wizard>
-  );
-};
-
-const OidcRedirectUriStep = () => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-
-  return (
-    <>
-      <Step.Header
-        title={localizationKeys('configureSSO.configureStep.oidcCustom.mainHeaderTitle')}
-        description={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.headerSubtitle')}
-      >
-        <InnerStepCounter />
-      </Step.Header>
-
-      <Step.Body />
-
-      <Step.Footer>
-        <Step.Footer.Reset />
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep}
-        />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
-        />
-      </Step.Footer>
-    </>
-  );
-};
-
-const OidcClaimsStep = () => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-
-  return (
-    <>
-      <Step.Header
-        title={localizationKeys('configureSSO.configureStep.oidcCustom.mainHeaderTitle')}
-        description={localizationKeys('configureSSO.configureStep.oidcCustom.claimsStep.headerSubtitle')}
-      >
-        <InnerStepCounter />
-      </Step.Header>
-
-      <Step.Body />
-
-      <Step.Footer>
-        <Step.Footer.Reset />
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep}
-        />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
-        />
-      </Step.Footer>
-    </>
-  );
-};
-
-const OidcEndpointsStep = () => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-
-  return (
-    <>
-      <Step.Header
-        title={localizationKeys('configureSSO.configureStep.oidcCustom.mainHeaderTitle')}
-        description={localizationKeys('configureSSO.configureStep.oidcCustom.endpointsStep.headerSubtitle')}
-      >
-        <InnerStepCounter />
-      </Step.Header>
-
-      <Step.Body />
-
-      <Step.Footer>
-        <Step.Footer.Reset />
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep}
-        />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
-        />
-      </Step.Footer>
-    </>
-  );
-};
-
-const OidcCredentialsStep = () => {
-  const { goNext, goPrev, isFirstStep, isLastStep } = useWizard();
-
-  return (
-    <>
-      <Step.Header
-        title={localizationKeys('configureSSO.configureStep.oidcCustom.mainHeaderTitle')}
-        description={localizationKeys('configureSSO.configureStep.oidcCustom.credentialsStep.headerSubtitle')}
-      >
-        <InnerStepCounter />
-      </Step.Header>
-
-      <Step.Body />
-
-      <Step.Footer>
-        <Step.Footer.Reset />
-        <Step.Footer.Previous
-          onClick={() => goPrev()}
-          isDisabled={isFirstStep}
-        />
-        <Step.Footer.Continue
-          onClick={() => goNext()}
-          isDisabled={isLastStep}
-        />
-      </Step.Footer>
-    </>
   );
 };

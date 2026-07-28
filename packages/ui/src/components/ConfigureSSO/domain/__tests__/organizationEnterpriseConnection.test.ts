@@ -12,7 +12,6 @@ import {
   areAllOrganizationDomainsVerified,
   connectionBackingEmail,
   isEnterpriseConnectionConfigured,
-  isOidcProvider,
   organizationEnterpriseConnection,
 } from '../organizationEnterpriseConnection';
 
@@ -62,7 +61,7 @@ const fullyConfiguredSaml = makeSamlConnection({
 const configuredOidc = makeOauthConfig({ clientId: 'client_abc' });
 
 const makeOidcConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
-  makeConnection({ provider: 'oidc_custom', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
+  makeConnection({ provider: 'oauth_custom_acme', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
 
 // Builds the entity with sensible defaults; each test overrides what it cares
 // about.
@@ -75,18 +74,6 @@ const derive = (overrides: Partial<Parameters<typeof organizationEnterpriseConne
   });
 
 describe('organizationEnterpriseConnection', () => {
-  describe('isOidcProvider', () => {
-    it('recognizes OIDC provider keys with the oidc_ prefix', () => {
-      expect(isOidcProvider('oidc_custom')).toBe(true);
-      expect(isOidcProvider('oidc_clerk_dev')).toBe(true);
-    });
-
-    it('rejects malformed OIDC provider keys', () => {
-      expect(isOidcProvider('oidc')).toBe(false);
-      expect(isOidcProvider('oidcfoo')).toBe(false);
-    });
-  });
-
   describe('hasConnection', () => {
     it('undefined connection → false', () => {
       expect(derive({ connection: undefined }).hasConnection).toBe(false);
@@ -106,8 +93,10 @@ describe('organizationEnterpriseConnection', () => {
     it('connection → its provider', () => {
       expect(derive({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
     });
-    it('carries a derived OIDC key verbatim', () => {
-      expect(derive({ connection: makeConnection({ provider: 'oidc_clerk_dev' }) }).provider).toBe('oidc_clerk_dev');
+    it('carries a custom OIDC key verbatim', () => {
+      expect(derive({ connection: makeConnection({ provider: 'oauth_custom_clerk_dev' }) }).provider).toBe(
+        'oauth_custom_clerk_dev',
+      );
     });
   });
 
