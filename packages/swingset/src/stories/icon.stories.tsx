@@ -87,9 +87,9 @@ export function Override() {
     <MosaicProvider
       appearance={{
         // Overrides are elements, not render functions: Mosaic injects its sizing className and
-        // `data-size` into the element via cloneElement, so the replacement only needs its viewBox
-        // + paths. Passing an element (vs a function) also lets overrides be supplied from a Server
-        // Component, since elements serialize across the RSC boundary.
+        // `data-size` into the element via cloneElement, so the replacement only supplies its own
+        // content and need not be an `svg`. Passing an element (vs a function) also lets overrides
+        // be supplied from a Server Component, since elements serialize across the RSC boundary.
         icons: {
           'chevron-right': (
             <svg

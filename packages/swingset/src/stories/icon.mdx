@@ -51,7 +51,7 @@ Set `placement` when the icon sits beside text inside a container. It adds no st
 
 ### Overriding a glyph
 
-Pass `appearance.icons` to `MosaicProvider` to replace a glyph by name. The override is a plain element; Mosaic clones it with the resolved sizing `className` and `data-size`, keeping any class the element already had. The replacement only supplies its `viewBox` and paths.
+Pass `appearance.icons` to `MosaicProvider` to replace a glyph by name. The override is a plain element of any type, not just an `svg`; Mosaic clones it with the resolved sizing `className` and `data-size`, keeping any class the element already had. The replacement only supplies its own content.
 
 <Story
   name='Override'
