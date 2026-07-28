@@ -1321,15 +1321,20 @@ describe('Clerk singleton', () => {
           destroy: mockClientDestroy,
           removeSessions: mockClientRemoveSessions,
           isEligibleForTouch: () => true,
-          buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) =>
-            `https://clerk.example.com/v1/client/touch?redirect_url=${redirectUrl.toString()}`,
+          // Encodes the nested URL the way the real Client.buildTouchUrl() does, so a
+          // destination carrying its own query or hash survives the round trip.
+          buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) => {
+            const touchUrl = new URL('https://clerk.example.com/v1/client/touch');
+            touchUrl.searchParams.set('redirect_url', redirectUrl.toString());
+            return touchUrl.toString();
+          },
         }),
       );
 
       const sut = new Clerk(productionPublishableKey);
       sut.navigate = vi.fn();
       await sut.load();
-      await sut.signOut({ redirectUrl: '/after-sign-out' });
+      await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
 
       await waitFor(() => {
         expect(mockClientRemoveSessions).toHaveBeenCalled();
@@ -1337,7 +1342,7 @@ describe('Clerk singleton', () => {
         expect(navigatedTo.pathname).toEqual('/v1/client/touch');
         // The user still lands on the original destination, via the touch redirect.
         expect(navigatedTo.searchParams.get('redirect_url')).toEqual(
-          new URL('/after-sign-out', mockWindowLocation.href).toString(),
+          new URL('/after-sign-out?tab=security#settings', mockWindowLocation.href).toString(),
         );
       });
     });
