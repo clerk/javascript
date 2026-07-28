@@ -64,6 +64,12 @@ export const OidcRedirectUriStep = (): JSX.Element => {
                   sub
                 </Text>
                 <Text
+                  as='span'
+                  colorScheme='secondary'
+                >
+                  ,
+                </Text>
+                <Text
                   as='code'
                   sx={{ fontFamily: 'monospace' }}
                 >
@@ -86,6 +92,12 @@ export const OidcRedirectUriStep = (): JSX.Element => {
                   sx={{ fontFamily: 'monospace' }}
                 >
                   given_name
+                </Text>
+                <Text
+                  as='span'
+                  colorScheme='secondary'
+                >
+                  ,
                 </Text>
                 <Text
                   as='code'
