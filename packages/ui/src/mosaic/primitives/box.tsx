@@ -1,4 +1,4 @@
-import { type ComponentProps, type RenderProp, renderElement } from '@clerk/headless/utils';
+import { type ComponentProps, renderElement, type RenderProp } from '@clerk/headless/utils';
 import React from 'react';
 
 /**

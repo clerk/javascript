@@ -1,5 +1,5 @@
 import type { FieldId } from '@clerk/shared/types';
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 
 import { type LocalizationKey, Text } from '@/customizables';
 import { Form } from '@/elements/Form';

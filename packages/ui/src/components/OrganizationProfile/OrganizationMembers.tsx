@@ -185,8 +185,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
             sx={theme => ({
               position: 'absolute',
               bottom: 0,
-              left: 0,
-              right: 0,
+              insetInline: 0,
               backgroundColor: theme.colors.$colorBackground,
               borderTop: `1px solid ${theme.colors.$borderAlpha100}`,
               paddingInline: theme.space.$4,

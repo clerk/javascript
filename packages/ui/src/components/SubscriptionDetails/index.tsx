@@ -19,9 +19,9 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
+import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 import { handleError } from '@/ui/utils/errorHandler';
-import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';

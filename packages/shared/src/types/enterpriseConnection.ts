@@ -28,7 +28,7 @@ export interface EnterpriseConnectionResource extends ClerkResource {
   name: string;
   /** Whether the enterprise connection is active. */
   active: boolean;
-  /** The identity provider the connection uses (e.g. `saml_okta`, `oidc_custom`). */
+  /** The identity provider the connection uses (e.g., `saml_okta`, `oidc_custom`). */
   provider: string;
   /** The public URL of the identity provider's logo, or `null` when none is set. */
   logoPublicUrl: string | null;

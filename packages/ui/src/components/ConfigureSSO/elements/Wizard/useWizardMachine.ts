@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {
-  isStepReachable,
   initialState,
+  isStepReachable,
   reduce,
   type WizardConfig,
   type WizardEvent,

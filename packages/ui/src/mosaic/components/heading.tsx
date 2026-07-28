@@ -1,7 +1,6 @@
-import React from 'react';
-
 import type { ComponentProps } from '@clerk/headless/utils';
 import { renderElement } from '@clerk/headless/utils';
+import React from 'react';
 
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';

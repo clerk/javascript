@@ -706,6 +706,11 @@ export const enUS: LocalizationResource = {
         },
         mainHeaderTitle: 'Configure Okta Workforce',
       },
+      unsupportedProvider: {
+        description:
+          'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
+        title: 'Unsupported provider',
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",

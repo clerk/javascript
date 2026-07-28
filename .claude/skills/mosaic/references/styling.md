@@ -1,5 +1,12 @@
 # Styling a component with slot recipes
 
+> **Migration in progress:** Mosaic styling is moving off this Emotion slot-recipe
+> engine onto **StyleX** (compile-time atomic CSS). New/migrated components are
+> authored with StyleX — see **`references/stylex.md`**. This file documents the
+> recipe system that StyleX is replacing; both coexist until the migration lands.
+> The public `--cl-*` / `.cl-<slot>` / `data-<axis>` contract is identical across
+> both, so it is preserved regardless of the internal engine.
+
 A styled Mosaic component is authored with one **slot recipe**. The recipe owns
 everything about how the part looks and is targeted: its slot identity
 (`data-cl-slot`), base styles, variants, and the appearance cascade.

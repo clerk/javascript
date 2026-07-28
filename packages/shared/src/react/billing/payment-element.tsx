@@ -307,7 +307,7 @@ export type UsePaymentElementReturn = {
         name: 'stripe';
       };
       /**
-       * Indicates whether the underlying payment provider (e.g. Stripe) has been fully initialized.
+       * Indicates whether the underlying payment provider (e.g., Stripe) has been fully initialized.
        */
       isProviderReady: true;
     }

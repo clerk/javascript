@@ -183,6 +183,7 @@ export type ElementsConfig = {
 
   logoGroup: WithOptions;
   logoGroupItem: WithOptions;
+  logoGroupItemContainer: WithOptions;
   logoGroupIcon: WithOptions;
   logoGroupSeparator: WithOptions;
 

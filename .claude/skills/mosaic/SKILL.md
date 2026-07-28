@@ -42,15 +42,16 @@ this skill is the _how-to_.
 
 ## Which reference to read
 
-| You are…                                                           | Read                                                   |
-| ------------------------------------------------------------------ | ------------------------------------------------------ |
-| Styling a component (slot recipes, `useRecipe`, variants, slots)   | `references/styling.md`                                |
-| Authoring or debugging a state machine, or wiring one to React     | `references/machines.md` → in-tree `machine/README.md` |
-| Writing the controller (Clerk adapter, permissions, revalidate)    | `references/controllers.md`                            |
-| Writing the view (rendering a snapshot, sending events)            | `references/views.md`                                  |
-| Testing a machine, controller, or view                             | `references/testing.md`                                |
-| Migrating a legacy component into Mosaic (the end-to-end workflow) | `references/migration.md`                              |
-| Running the parity audit that guards a migration                   | `references/parity-audit.md`                           |
+| You are…                                                             | Read                                                   |
+| -------------------------------------------------------------------- | ------------------------------------------------------ |
+| Styling a component with StyleX (tokens, `stylex.create`, CSS build) | `references/stylex.md`                                 |
+| Styling a component the legacy way (slot recipes, `useRecipe`)       | `references/styling.md`                                |
+| Authoring or debugging a state machine, or wiring one to React       | `references/machines.md` → in-tree `machine/README.md` |
+| Writing the controller (Clerk adapter, permissions, revalidate)      | `references/controllers.md`                            |
+| Writing the view (rendering a snapshot, sending events)              | `references/views.md`                                  |
+| Testing a machine, controller, or view                               | `references/testing.md`                                |
+| Migrating a legacy component into Mosaic (the end-to-end workflow)   | `references/migration.md`                              |
+| Running the parity audit that guards a migration                     | `references/parity-audit.md`                           |
 
 The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the machine,

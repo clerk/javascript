@@ -70,7 +70,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g., `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */
@@ -1589,6 +1589,10 @@ export type __internal_LocalizationResource = {
           };
           paragraph: LocalizationValue;
         };
+      };
+      unsupportedProvider: {
+        title: LocalizationValue;
+        description: LocalizationValue;
       };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;

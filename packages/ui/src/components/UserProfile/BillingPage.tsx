@@ -7,11 +7,11 @@ import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
+import { AccountCredits } from '../AccountCredits';
 import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
-import { AccountCredits } from '../AccountCredits';
 
 const tabMap = {
   0: 'subscriptions',

@@ -121,7 +121,7 @@ export class InvitationAPI extends AbstractAPI {
    *
    * Revoking an invitation makes the invitation email link unusable. However, it doesn't prevent the user from signing up if they follow the sign up flow.
    *
-   * Only active (i.e. non-revoked) invitations can be revoked.
+   * Only active (i.e., non-revoked) invitations can be revoked.
    * @param invitationId - The ID of the invitation to revoke.
    * @returns The revoked [`Invitation`](https://clerk.com/docs/reference/backend/types/backend-invitation).
    */

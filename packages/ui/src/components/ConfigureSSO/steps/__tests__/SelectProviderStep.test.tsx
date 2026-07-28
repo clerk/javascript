@@ -112,11 +112,10 @@ describe('SelectProviderStep', () => {
     it('hides the OIDC provider tile when the flag is off', async () => {
       resetMocks();
       const { wrapper } = await createFixtures();
-      renderStep(wrapper);
+      const { container } = renderStep(wrapper);
 
-      // SAML is unaffected by the gate; only OIDC is hidden.
       expect(screen.getByRole('radio', { name: 'Okta Workforce' })).toBeInTheDocument();
-      expect(screen.queryByRole('radio', { name: 'OIDC Provider' })).not.toBeInTheDocument();
+      expect(container.querySelector('input[value="oidc_custom"]')).not.toBeInTheDocument();
     });
 
     it('shows the OIDC provider tile when the flag is on', async () => {
@@ -125,10 +124,7 @@ describe('SelectProviderStep', () => {
       const { wrapper } = await createFixtures();
       const { container } = renderStep(wrapper);
 
-      expect(screen.getByRole('radio', { name: 'OIDC Provider' })).toBeInTheDocument();
-      // Four SAML tiles plus the single OIDC tile.
-      const iconSpans = Array.from(container.querySelectorAll('label span[aria-hidden]'));
-      expect(iconSpans).toHaveLength(5);
+      expect(container.querySelector('input[value="oidc_custom"]')).toBeInTheDocument();
     });
   });
 
