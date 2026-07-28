@@ -817,34 +817,34 @@ describe('ClerkProvider native client sync', () => {
     };
     const originalUpdateClient = mocks.clerkInstance.updateClient;
 
-    // Clerk JS mutates the client resource in place and resolves with that same object, so the
-    // refreshed client must not be modelled as a distinct object: the foreign-client guard has to
-    // compare against values captured before the refresh, not a reference that mutated underneath.
-    const client: Record<string, any> = {
+    const client = {
       id: 'client_1',
       sessions: [signedInSession],
-      lastActiveSessionId: 'session_1',
+      lastActiveSessionId: 'session_1' as string | null,
       get signedInSessions() {
         return this.sessions;
       },
+      __internal_toSnapshot() {
+        return {
+          id: this.id,
+          sessions: this.sessions,
+          last_active_session_id: this.lastActiveSessionId,
+        };
+      },
+      fromJSON(snapshot: { id: string; sessions: (typeof signedInSession)[]; last_active_session_id: string | null }) {
+        this.id = snapshot.id;
+        this.sessions = snapshot.sessions;
+        this.lastActiveSessionId = snapshot.last_active_session_id;
+        return this;
+      },
+      fetch() {
+        this.id = 'client_2';
+        this.sessions = [];
+        this.lastActiveSessionId = null;
+        return Promise.resolve(this);
+      },
     };
-    client.__internal_toSnapshot = vi.fn(() => ({
-      id: client.id,
-      sessions: client.sessions,
-      last_active_session_id: client.lastActiveSessionId,
-    }));
-    client.fromJSON = vi.fn(snapshot => {
-      client.id = snapshot.id;
-      client.sessions = snapshot.sessions;
-      client.lastActiveSessionId = snapshot.last_active_session_id;
-      return client;
-    });
-    client.fetch = vi.fn().mockImplementation(() => {
-      client.id = 'client_2';
-      client.sessions = [];
-      client.lastActiveSessionId = null;
-      return Promise.resolve(client);
-    });
+    const restoreClient = vi.spyOn(client, 'fromJSON');
 
     mocks.clerkInstance.client = client;
     mocks.clerkInstance.session = signedInSession;
@@ -878,7 +878,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(client.fromJSON).toHaveBeenCalled();
+      expect(restoreClient).toHaveBeenCalled();
     });
 
     expect(client.id).toBe('client_1');

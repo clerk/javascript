@@ -2,11 +2,6 @@ import { useSignIn } from '@clerk/expo';
 import { useState } from 'react';
 import { Button, StyleSheet, TextInput } from 'react-native';
 
-/**
- * Headless JS-runtime sign-in so the JS client owns the session, which the
- * native-token-divergence flow requires (the native AuthView would create the
- * session on the native client instead).
- */
 export function JsSignInForm({ onStatus }: { onStatus: (status: string) => void }) {
   const { signIn } = useSignIn();
   const [identifier, setIdentifier] = useState('');

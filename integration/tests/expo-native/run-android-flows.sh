@@ -12,14 +12,8 @@ adb install -r "$apk_path"
 
 logcat_pid=
 stop_logcat() {
-  local running_pid
   [ -n "$logcat_pid" ] || return 0
-  for running_pid in $(jobs -pr); do
-    if [ "$running_pid" = "$logcat_pid" ]; then
-      kill "$logcat_pid" >/dev/null 2>&1 || true
-      break
-    fi
-  done
+  kill "$logcat_pid" >/dev/null 2>&1 || true
   wait "$logcat_pid" 2>/dev/null || true
 }
 trap stop_logcat EXIT

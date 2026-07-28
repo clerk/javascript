@@ -226,32 +226,27 @@ function fetchRefreshedJsClient(clerkInstance: SyncableClerkInstance): Promise<C
 type ClientStateSnapshot = {
   id: string | null;
   hasSignedInSession: boolean;
-  resource: RefreshableClientResource | null;
-  state: ClientJSONSnapshot | null;
+  restore: (() => ClientResource) | null;
 };
 
 function snapshotClientState(client: ClientResource | null | undefined): ClientStateSnapshot {
   const resource = client as RefreshableClientResource | undefined;
-  const canRestore = resource && typeof resource.fromJSON === 'function';
+  const fromJSON = resource?.fromJSON?.bind(resource);
+  let restore: ClientStateSnapshot['restore'] = null;
+
+  if (resource && fromJSON) {
+    const state = resource.__internal_toSnapshot();
+    restore = () => fromJSON(state);
+  }
 
   return {
     id: client?.id ?? null,
     hasSignedInSession: Boolean(client && getDefaultSignedInSession(client)),
-    resource: canRestore ? resource : null,
-    state: canRestore ? resource.__internal_toSnapshot() : null,
+    restore,
   };
 }
 
-function restoreClientSnapshot(snapshot: ClientStateSnapshot): ClientResource | null {
-  if (!snapshot.resource || !snapshot.state || typeof snapshot.resource.fromJSON !== 'function') {
-    return null;
-  }
-
-  return snapshot.resource.fromJSON(snapshot.state);
-}
-
-// Refreshing mutates the client in place and resolves with that same object, so this compares
-// against values captured before the refresh rather than a reference that mutated underneath.
+// Client.fetch mutates the resource, so compare against pre-fetch values.
 function isForeignSessionlessClient(previousSnapshot: ClientStateSnapshot, refreshedClient: ClientResource): boolean {
   if (!previousSnapshot.id || !refreshedClient.id || previousSnapshot.id === refreshedClient.id) {
     return false;
@@ -308,7 +303,7 @@ async function refreshJsClientFromNativeState({
   if (refreshedClient) {
     if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClientSnapshot, refreshedClient)) {
       await restorePreviousDeviceToken();
-      const restoredClient = restoreClientSnapshot(previousClientSnapshot);
+      const restoredClient = previousClientSnapshot.restore?.();
       if (restoredClient) {
         clerkInstance.updateClient?.(restoredClient);
         await reconcileJsActiveSessionFromClient({

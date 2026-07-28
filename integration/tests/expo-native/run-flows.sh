@@ -50,9 +50,7 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   } >> "$GITHUB_STEP_SUMMARY"
 fi
 
-# Warmup: parse the JS bundle + populate the a11y tree once so the first real
-# flow doesn't flake on cold-start. A repeated failure means the app is not
-# runnable, so abort instead of timing out and retrying every real flow.
+# Warm up the JS bundle and accessibility tree before running the flows.
 warmup_started=$SECONDS
 warmup_result=failed
 for warmup_attempt in 1 2; do
