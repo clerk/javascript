@@ -817,20 +817,34 @@ describe('ClerkProvider native client sync', () => {
     };
     const originalUpdateClient = mocks.clerkInstance.updateClient;
 
-    // Clerk JS mutates the client resource in place and resolves with that same object, so the
-    // refreshed client must not be modelled as a distinct object: the foreign-client guard has to
-    // compare against values captured before the refresh, not a reference that mutated underneath.
-    const client: Record<string, any> = {
+    const client = {
       id: 'client_1',
-      signedInSessions: [signedInSession],
-      lastActiveSessionId: 'session_1',
+      sessions: [signedInSession],
+      lastActiveSessionId: 'session_1' as string | null,
+      get signedInSessions() {
+        return this.sessions;
+      },
+      __internal_toSnapshot() {
+        return {
+          id: this.id,
+          sessions: this.sessions,
+          last_active_session_id: this.lastActiveSessionId,
+        };
+      },
+      fromJSON(snapshot: { id: string; sessions: (typeof signedInSession)[]; last_active_session_id: string | null }) {
+        this.id = snapshot.id;
+        this.sessions = snapshot.sessions;
+        this.lastActiveSessionId = snapshot.last_active_session_id;
+        return this;
+      },
+      fetch() {
+        this.id = 'client_2';
+        this.sessions = [];
+        this.lastActiveSessionId = null;
+        return Promise.resolve(this);
+      },
     };
-    client.fetch = vi.fn().mockImplementation(() => {
-      client.id = 'client_2';
-      client.signedInSessions = [];
-      client.lastActiveSessionId = null;
-      return Promise.resolve(client);
-    });
+    const restoreClient = vi.spyOn(client, 'fromJSON');
 
     mocks.clerkInstance.client = client;
     mocks.clerkInstance.session = signedInSession;
@@ -864,12 +878,14 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(client.fetch).toHaveBeenCalled();
+      expect(restoreClient).toHaveBeenCalled();
     });
 
-    // The refreshed client belongs to a different client id and carries no signed-in sessions, so
-    // it must be discarded rather than applied over the session JS already has.
-    expect(originalUpdateClient).not.toHaveBeenCalled();
+    expect(client.id).toBe('client_1');
+    expect(client.sessions).toEqual([signedInSession]);
+    expect(client.signedInSessions).toEqual([signedInSession]);
+    expect(client.lastActiveSessionId).toBe('session_1');
+    expect(originalUpdateClient).toHaveBeenCalledWith(client);
     expect(mocks.clerkInstance.session).toBe(signedInSession);
   });
 

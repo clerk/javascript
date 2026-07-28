@@ -1,4 +1,4 @@
-import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
+import type { ClientJSONSnapshot, ClientResource, SignedInSessionResource } from '@clerk/shared/types';
 import { type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
@@ -31,6 +31,7 @@ export type SyncableClerkInstance = {
 
 type RefreshableClientResource = ClientResource & {
   fetch?: (options?: { fetchMaxTries?: number }) => Promise<ClientResource>;
+  fromJSON?: (data: ClientJSONSnapshot) => ClientResource;
 };
 
 type NativeRefreshFromJsOptions = {
@@ -222,24 +223,31 @@ function fetchRefreshedJsClient(clerkInstance: SyncableClerkInstance): Promise<C
   return client.fetch({ fetchMaxTries: 1 });
 }
 
-type ClientIdentitySnapshot = {
+type ClientStateSnapshot = {
   id: string | null;
   hasSignedInSession: boolean;
+  restore: (() => ClientResource) | null;
 };
 
-function snapshotClientIdentity(client: ClientResource | null | undefined): ClientIdentitySnapshot {
+function snapshotClientState(client: ClientResource | null | undefined): ClientStateSnapshot {
+  const resource = client as RefreshableClientResource | undefined;
+  const fromJSON = resource?.fromJSON?.bind(resource);
+  let restore: ClientStateSnapshot['restore'] = null;
+
+  if (resource && fromJSON) {
+    const state = resource.__internal_toSnapshot();
+    restore = () => fromJSON(state);
+  }
+
   return {
     id: client?.id ?? null,
     hasSignedInSession: Boolean(client && getDefaultSignedInSession(client)),
+    restore,
   };
 }
 
-// Refreshing mutates the client in place and resolves with that same object, so this compares
-// against values captured before the refresh rather than a reference that mutated underneath.
-function isForeignSessionlessClient(
-  previousSnapshot: ClientIdentitySnapshot,
-  refreshedClient: ClientResource,
-): boolean {
+// Client.fetch mutates the resource, so compare against pre-fetch values.
+function isForeignSessionlessClient(previousSnapshot: ClientStateSnapshot, refreshedClient: ClientResource): boolean {
   if (!previousSnapshot.id || !refreshedClient.id || previousSnapshot.id === refreshedClient.id) {
     return false;
   }
@@ -266,7 +274,7 @@ async function refreshJsClientFromNativeState({
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
-  const previousClientSnapshot = snapshotClientIdentity(clerkInstance.client);
+  const previousClientSnapshot = snapshotClientState(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
     if (!rejectForeignSessionlessClient || !shouldSyncDeviceToken || previousDeviceToken === undefined) {
@@ -295,6 +303,13 @@ async function refreshJsClientFromNativeState({
   if (refreshedClient) {
     if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClientSnapshot, refreshedClient)) {
       await restorePreviousDeviceToken();
+      const restoredClient = previousClientSnapshot.restore?.();
+      if (restoredClient) {
+        clerkInstance.updateClient?.(restoredClient);
+        await reconcileJsActiveSessionFromClient({
+          clerkInstance,
+        });
+      }
       return true;
     }
 
