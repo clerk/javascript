@@ -286,8 +286,11 @@ export const enUS: LocalizationResource = {
           headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
           paragraph:
             'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
-          claims:
-            'Ensure the ID token includes the required sub and email claims. The given_name and family_name claims are optional.',
+          claims: {
+            description: 'Ensure your ID token includes:',
+            optional: 'Optional',
+            required: 'Required',
+          },
           redirectUri: {
             label: 'Authorized redirect URI',
           },

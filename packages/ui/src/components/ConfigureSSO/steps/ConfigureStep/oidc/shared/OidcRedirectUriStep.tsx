@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 
-import { Col, localizationKeys, Text } from '@/customizables';
+import { Badge, Col, Flex, localizationKeys, Text } from '@/customizables';
 import { ClipboardInput } from '@/elements/ClipboardInput';
 import { Form } from '@/elements/Form';
 import { Checkmark, Clipboard } from '@/icons';
@@ -38,11 +38,63 @@ export const OidcRedirectUriStep = (): JSX.Element => {
               colorScheme='secondary'
               localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.paragraph')}
             />
-            <Text
-              as='p'
-              colorScheme='secondary'
-              localizationKey={localizationKeys('configureSSO.configureStep.oidcCustom.redirectUriStep.claims')}
-            />
+            <Col sx={theme => ({ gap: theme.space.$2 })}>
+              <Text
+                as='p'
+                colorScheme='secondary'
+                localizationKey={localizationKeys(
+                  'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.description',
+                )}
+              />
+              <Flex
+                align='center'
+                wrap='wrap'
+                sx={theme => ({ gap: theme.space.$2 })}
+              >
+                <Badge
+                  colorScheme='warning'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required',
+                  )}
+                />
+                <Text
+                  as='code'
+                  sx={{ fontFamily: 'monospace' }}
+                >
+                  sub
+                </Text>
+                <Text
+                  as='code'
+                  sx={{ fontFamily: 'monospace' }}
+                >
+                  email
+                </Text>
+              </Flex>
+              <Flex
+                align='center'
+                wrap='wrap'
+                sx={theme => ({ gap: theme.space.$2 })}
+              >
+                <Badge
+                  colorScheme='primary'
+                  localizationKey={localizationKeys(
+                    'configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional',
+                  )}
+                />
+                <Text
+                  as='code'
+                  sx={{ fontFamily: 'monospace' }}
+                >
+                  given_name
+                </Text>
+                <Text
+                  as='code'
+                  sx={{ fontFamily: 'monospace' }}
+                >
+                  family_name
+                </Text>
+              </Flex>
+            </Col>
           </Col>
 
           <Form.ControlRow elementId={redirectUriField.id}>

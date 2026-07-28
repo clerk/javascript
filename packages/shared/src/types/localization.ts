@@ -1530,7 +1530,11 @@ export type __internal_LocalizationResource = {
         redirectUriStep: {
           headerSubtitle: LocalizationValue;
           paragraph: LocalizationValue;
-          claims: LocalizationValue;
+          claims: {
+            description: LocalizationValue;
+            optional: LocalizationValue;
+            required: LocalizationValue;
+          };
           redirectUri: {
             label: LocalizationValue;
           };

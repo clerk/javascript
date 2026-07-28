@@ -99,8 +99,19 @@ describe('ConfigureProviderStep', () => {
     expect(redirectUri).toHaveAttribute('readonly');
     expect(redirectUri).toHaveValue('https://instance.example/v1/oauth_callback');
     expect(
-      document.querySelector('[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims"]'),
+      document.querySelector(
+        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.required"]',
+      ),
     ).toBeInTheDocument();
+    expect(screen.getByText('sub')).toBeInTheDocument();
+    expect(screen.getByText('email')).toBeInTheDocument();
+    expect(
+      document.querySelector(
+        '[data-localization-key="configureSSO.configureStep.oidcCustom.redirectUriStep.claims.optional"]',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText('given_name')).toBeInTheDocument();
+    expect(screen.getByText('family_name')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
