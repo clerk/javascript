@@ -132,9 +132,11 @@ export const useSignInContext = (): SignInContextType => {
   // `signUpIfMissing` on sign-in create) and the factor-one cards (which handle the resulting
   // `transferable` verification status). Per-attempt conditions (identifier type, password use)
   // stay at the call sites.
+  // `attackProtection` is optional-chained because it is introduced alongside this flow: an app
+  // pinned to an older clerk-js runtime builds a `UserSettings` resource without the field.
   const signUpIfMissingEnabled =
     isCombinedFlow &&
-    userSettings.attackProtection.enumeration_protection.enabled &&
+    Boolean(userSettings.attackProtection?.enumeration_protection?.enabled) &&
     signUpMode === SIGN_UP_MODES.PUBLIC;
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
