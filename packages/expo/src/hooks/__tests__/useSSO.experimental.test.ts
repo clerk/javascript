@@ -44,7 +44,9 @@ describe('experimental useSSO', () => {
   };
   const mockSignIn = {
     create: vi.fn(),
+    finalize: vi.fn(),
     createdSessionId: null as string | null,
+    existingSession: null as { sessionId: string } | null,
     firstFactorVerification: {
       externalVerificationRedirectURL: new URL('https://accounts.example.com/sso'),
       status: 'unverified' as string | null,
@@ -52,7 +54,9 @@ describe('experimental useSSO', () => {
   };
   const mockSignUp = {
     create: vi.fn(),
+    finalize: vi.fn(),
     createdSessionId: null as string | null,
+    existingSession: null as { sessionId: string } | null,
   };
 
   beforeEach(() => {
@@ -73,9 +77,11 @@ describe('experimental useSSO', () => {
     });
 
     mockSignIn.createdSessionId = null;
+    mockSignIn.existingSession = null;
     mockSignIn.firstFactorVerification.externalVerificationRedirectURL = new URL('https://accounts.example.com/sso');
     mockSignIn.firstFactorVerification.status = 'unverified';
     mockSignIn.create.mockResolvedValue({ error: null });
+    mockSignIn.finalize.mockResolvedValue({ error: null });
     mockClientSignIn.reload.mockImplementation(({ rotatingTokenNonce }) => {
       if (rotatingTokenNonce === 'nonce_123') {
         mockSignIn.firstFactorVerification.status = 'verified';
@@ -86,7 +92,9 @@ describe('experimental useSSO', () => {
     });
 
     mockSignUp.createdSessionId = null;
+    mockSignUp.existingSession = null;
     mockSignUp.create.mockResolvedValue({ error: null });
+    mockSignUp.finalize.mockResolvedValue({ error: null });
 
     mocks.useClerk.mockReturnValue({
       loaded: true,
@@ -137,9 +145,9 @@ describe('experimental useSSO', () => {
     expect(mockSignIn.create).not.toHaveBeenCalled();
     expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBe(null);
-    expect(response.setActive).toBe(mockSetActive);
     expect(response.signIn).toBe(mockSignIn);
     expect(response.signUp).toBe(mockSignUp);
+    expect(response).not.toHaveProperty('setActive');
   });
 
   test('starts OAuth SSO with future sign-in hooks and reloads the underlying client with the callback nonce', async () => {
@@ -160,16 +168,17 @@ describe('experimental useSSO', () => {
       { showInRecents: true },
     );
     expect(mockClientSignIn.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'nonce_123' });
+    expect(mockSignIn.finalize).toHaveBeenCalledOnce();
     expect(response).toMatchObject({
       createdSessionId: 'sess_123',
       authSessionResult: {
         type: 'success',
         url: 'myapp://sso-callback?rotating_token_nonce=nonce_123',
       },
-      setActive: mockSetActive,
       signIn: mockSignIn,
       signUp: mockSignUp,
     });
+    expect(response).not.toHaveProperty('setActive');
   });
 
   test('passes an enterprise SSO identifier to sign-in creation', async () => {
@@ -209,7 +218,24 @@ describe('experimental useSSO', () => {
       transfer: true,
       unsafeMetadata,
     });
+    expect(mockSignUp.finalize).toHaveBeenCalledOnce();
     expect(response.createdSessionId).toBe('sess_signup');
+  });
+
+  test('activates an existing session without finalizing a future resource', async () => {
+    mockClientSignIn.reload.mockImplementation(() => {
+      mockSignIn.existingSession = { sessionId: 'sess_existing' };
+      return Promise.resolve();
+    });
+
+    const { result } = renderHook(() => useSSO());
+
+    const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
+
+    expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_existing' });
+    expect(mockSignIn.finalize).not.toHaveBeenCalled();
+    expect(mockSignUp.finalize).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBe(null);
   });
 
   test('returns without reloading when the browser auth session is dismissed', async () => {
@@ -222,16 +248,22 @@ describe('experimental useSSO', () => {
     const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
 
     expect(mockClientSignIn.reload).not.toHaveBeenCalled();
+    expect(mockSignIn.finalize).not.toHaveBeenCalled();
+    expect(mockSignUp.finalize).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBe(null);
     expect(response.authSessionResult).toEqual({ type: 'dismiss' });
   });
 
-  test('surfaces future sign-in create errors', async () => {
-    mockSignIn.create.mockResolvedValue({ error: new Error('sign-in failed') });
+  test('preserves structured future sign-in create errors', async () => {
+    const clerkError = Object.assign(new Error('sign-in failed'), {
+      code: 'form_identifier_not_found',
+      errors: [{ code: 'form_identifier_not_found' }],
+    });
+    mockSignIn.create.mockResolvedValue({ error: clerkError });
 
     const { result } = renderHook(() => useSSO());
 
-    await expect(result.current.startSSOFlow({ strategy: 'oauth_google' })).rejects.toThrow('sign-in failed');
+    await expect(result.current.startSSOFlow({ strategy: 'oauth_google' })).rejects.toBe(clerkError);
     expect(mocks.openAuthSessionAsync).not.toHaveBeenCalled();
   });
 

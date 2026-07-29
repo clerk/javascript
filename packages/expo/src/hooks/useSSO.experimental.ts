@@ -2,7 +2,6 @@ import { useClerk, useSignIn, useSignUp } from '@clerk/react';
 import type {
   EnterpriseSSOStrategy,
   OAuthStrategy,
-  SetActive,
   SignInFutureResource,
   SignUpFutureResource,
 } from '@clerk/shared/types';
@@ -11,54 +10,99 @@ import type * as WebBrowser from 'expo-web-browser';
 import { errorThrower } from '../utils/errors';
 import { loadSSODependencies } from './ssoDependencies';
 
+/**
+ * Options for starting an OAuth or enterprise SSO flow.
+ */
 export type StartSSOFlowParams = {
+  /**
+   * Native URL that Clerk redirects to after the browser authentication session completes.
+   * Defaults to an Expo AuthSession URL with the `sso-callback` path.
+   */
   redirectUrl?: string;
+  /**
+   * Metadata to attach to the user when the SSO flow creates a new account.
+   */
   unsafeMetadata?: SignUpUnsafeMetadata;
+  /**
+   * Options forwarded to `expo-web-browser` when opening the authentication session.
+   */
   authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
 } & (
   | {
+      /**
+       * OAuth strategy to use for the SSO flow.
+       */
       strategy: OAuthStrategy;
     }
   | {
+      /**
+       * Enterprise SSO strategy.
+       */
       strategy: EnterpriseSSOStrategy;
+      /**
+       * Identifier used to discover the enterprise connection.
+       */
       identifier: string;
     }
 );
 
+/**
+ * Result returned after an SSO attempt finishes.
+ */
 export type StartSSOFlowReturnType = {
+  /**
+   * ID of the newly created session, or `null` when no new session was created.
+   */
   createdSessionId: string | null;
+  /**
+   * Result returned by the browser authentication session, or `null` when the flow did not start.
+   */
   authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
-  setActive?: SetActive;
+  /**
+   * Current future sign-in resource.
+   */
   signIn?: SignInFutureResource | null;
+  /**
+   * Current future sign-up resource.
+   */
   signUp?: SignUpFutureResource | null;
 };
 
-function getSSOErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
+/**
+ * Helpers returned by {@link useSSO}.
+ */
+export type UseSSOReturn = {
+  /**
+   * Starts an OAuth or enterprise SSO flow and activates the completed session.
+   *
+   * @param params - Options for the SSO flow.
+   * @returns The SSO result and current future resources.
+   * @throws A structured Clerk error when a future resource operation fails.
+   */
+  startSSOFlow: (params: StartSSOFlowParams) => Promise<StartSSOFlowReturnType>;
+};
 
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
-    return error.message;
-  }
-
-  return 'An unknown SSO error occurred';
-}
-
-function assertNoSSOError(result: { error: unknown }): void {
-  if (result.error) {
-    return errorThrower.throw(getSSOErrorMessage(result.error));
-  }
-}
-
-export function useSSO() {
-  const { client, loaded, setActive } = useClerk();
-  const { signIn, fetchStatus: signInFetchStatus } = useSignIn();
-  const { signUp, fetchStatus: signUpFetchStatus } = useSignUp();
+/**
+ * Returns a helper for authenticating users with OAuth or enterprise SSO in an Expo app.
+ *
+ * @returns An object containing `startSSOFlow`.
+ * @throws The returned `startSSOFlow` function throws when an SSO dependency cannot be loaded, the redirect response
+ * is invalid, or a Clerk future resource operation fails.
+ *
+ * @example
+ * ### Start a Google OAuth flow
+ *
+ * ```tsx
+ * const { startSSOFlow } = useSSO();
+ * const { createdSessionId } = await startSSOFlow({
+ *   strategy: 'oauth_google',
+ * });
+ * ```
+ */
+export function useSSO(): UseSSOReturn {
+  const { client, setActive } = useClerk();
+  const { signIn } = useSignIn();
+  const { signUp } = useSignUp();
 
   async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams): Promise<StartSSOFlowReturnType> {
     if (!client || !signIn || !signUp) {
@@ -67,7 +111,6 @@ export function useSSO() {
         authSessionResult: null,
         signIn,
         signUp,
-        setActive,
       };
     }
 
@@ -87,13 +130,14 @@ export function useSSO() {
         path: 'sso-callback',
       });
 
-    assertNoSSOError(
-      await signIn.create({
-        strategy,
-        redirectUrl,
-        ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
-      }),
-    );
+    const { error: signInError } = await signIn.create({
+      strategy,
+      redirectUrl,
+      ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
+    });
+    if (signInError) {
+      throw signInError;
+    }
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
     if (!externalVerificationRedirectURL) {
@@ -108,7 +152,6 @@ export function useSSO() {
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         createdSessionId: null,
-        setActive,
         signIn,
         signUp,
         authSessionResult,
@@ -121,17 +164,35 @@ export function useSSO() {
 
     const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
     if (userNeedsToBeCreated) {
-      assertNoSSOError(
-        await signUp.create({
-          transfer: true,
-          unsafeMetadata,
-        }),
-      );
+      const { error: signUpError } = await signUp.create({
+        transfer: true,
+        unsafeMetadata,
+      });
+      if (signUpError) {
+        throw signUpError;
+      }
+    }
+
+    const createdSessionId = signUp.createdSessionId ?? signIn.createdSessionId;
+    if (signUp.createdSessionId) {
+      const { error } = await signUp.finalize();
+      if (error) {
+        throw error;
+      }
+    } else if (signIn.createdSessionId) {
+      const { error } = await signIn.finalize();
+      if (error) {
+        throw error;
+      }
+    } else {
+      const existingSessionId = signIn.existingSession?.sessionId ?? signUp.existingSession?.sessionId;
+      if (existingSessionId) {
+        await setActive({ session: existingSessionId });
+      }
     }
 
     return {
-      createdSessionId: signUp.createdSessionId ?? signIn.createdSessionId,
-      setActive,
+      createdSessionId,
       signIn,
       signUp,
       authSessionResult,
