@@ -8,9 +8,9 @@ Protect API routes inside the event handler itself:
 
 ```ts
 export default defineEventHandler(event => {
-  const { userId } = event.context.auth();
+  const { isAuthenticated, userId } = event.context.auth();
 
-  if (!userId) {
+  if (!isAuthenticated) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
   }
 
@@ -48,8 +48,8 @@ Migrate my Nuxt project away from Clerk's removed `createRouteMatcher` API.
    `@clerk/nuxt/server`) or in Nuxt route middleware (auto-imported).
 2. For every API route those matchers protected, move the auth check into the
    event handler itself:
-   const { userId } = event.context.auth();
-   if (!userId) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+   const { isAuthenticated } = event.context.auth();
+   if (!isAuthenticated) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
    Keep any role or permission checks (`event.context.auth().has(...)`) with
    the resource as well.
 3. For every page those matchers protected, create a named route middleware in
