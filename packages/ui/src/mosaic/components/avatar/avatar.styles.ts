@@ -21,7 +21,7 @@ export const styles = stylex.create({
 
   // image fills the clipped box
   image: {
-    aspectRatio: '1 / 1',
+    aspectRatio: '1',
     display: 'block',
     objectFit: 'cover',
     height: '100%',
