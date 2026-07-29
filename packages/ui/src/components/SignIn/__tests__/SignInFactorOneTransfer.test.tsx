@@ -28,7 +28,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
-          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          data: [{ code: 'sign_up_if_missing_transfer', long_message: '', message: '' }],
           status: 404,
         }),
       );
@@ -66,7 +66,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
-          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          data: [{ code: 'sign_up_if_missing_transfer', long_message: '', message: '' }],
           status: 404,
         }),
       );
@@ -102,7 +102,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
-          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          data: [{ code: 'sign_up_if_missing_transfer', long_message: '', message: '' }],
           status: 404,
         }),
       );
@@ -129,7 +129,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
-          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          data: [{ code: 'sign_up_if_missing_transfer', long_message: '', message: '' }],
           status: 404,
         }),
       );
@@ -223,7 +223,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
       return Promise.reject(
         new ClerkAPIResponseError('Error', {
-          data: [{ code: 'form_identifier_not_found', long_message: '', message: '' }],
+          data: [{ code: 'sign_up_if_missing_transfer', long_message: '', message: '' }],
           status: 404,
         }),
       );
