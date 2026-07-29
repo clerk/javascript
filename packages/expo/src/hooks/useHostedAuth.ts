@@ -5,6 +5,7 @@ import type * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
 import { getClerkInstance } from '../provider/singleton';
+import { getAuthSessionCallbackParam } from '../utils/authSessionCallback';
 import { errorThrower } from '../utils/errors';
 import type { HostedAuthClerkInstance, HostedAuthMode } from '../utils/hostedAuth';
 import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
@@ -159,17 +160,16 @@ export function useHostedAuth(): {
       return errorThrower.throw('Hosted auth callback URL did not match the initiated redirect URL.');
     }
 
-    const callbackParams = callbackUrl.searchParams;
-    if (callbackParams.get('state') !== state) {
+    if (getAuthSessionCallbackParam(authSessionResult.url, 'state') !== state) {
       return errorThrower.throw('Hosted auth callback state did not match the initiated state.');
     }
 
-    const rotatingTokenNonce = callbackParams.get('rotating_token_nonce') ?? '';
+    const rotatingTokenNonce = getAuthSessionCallbackParam(authSessionResult.url, 'rotating_token_nonce') ?? '';
     if (!rotatingTokenNonce) {
       return errorThrower.throw('Hosted auth callback did not include a rotating token nonce.');
     }
 
-    const createdSessionId = callbackParams.get('created_session_id');
+    const createdSessionId = getAuthSessionCallbackParam(authSessionResult.url, 'created_session_id');
     if (!createdSessionId) {
       return errorThrower.throw('Hosted auth callback did not include the created session.');
     }

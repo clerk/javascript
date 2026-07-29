@@ -2,6 +2,7 @@ import { useSignIn, useSignUp } from '@clerk/react/legacy';
 import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 import type * as WebBrowser from 'expo-web-browser';
 
+import { getAuthSessionCallbackParam } from '../utils/authSessionCallback';
 import { errorThrower } from '../utils/errors';
 
 export type UseOAuthFlowParams = {
@@ -98,9 +99,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       };
     }
 
-    const params = new URL(url).searchParams;
-
-    const rotatingTokenNonce = params.get('rotating_token_nonce') || '';
+    const rotatingTokenNonce = getAuthSessionCallbackParam(url, 'rotating_token_nonce') || '';
     await signIn.reload({ rotatingTokenNonce });
 
     const { status, firstFactorVerification } = signIn;
