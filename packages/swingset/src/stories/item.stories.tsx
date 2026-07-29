@@ -164,7 +164,10 @@ export function Group() {
       <Item.Group>
         <Item.Root>
           <Item.Media>
-            <Avatar.Root shape='circle'>
+            <Avatar.Root
+              size='fit'
+              shape='circle'
+            >
               <Avatar.Fallback>C</Avatar.Fallback>
             </Avatar.Root>
           </Item.Media>
@@ -190,7 +193,10 @@ export function Group() {
         </Item.Header>
         <Item.Root>
           <Item.Media>
-            <Avatar.Root shape='square'>
+            <Avatar.Root
+              size='fit'
+              shape='square'
+            >
               <Avatar.Image
                 src='https://github.com/clerk.png'
                 alt='Clerk Cloud'
@@ -215,7 +221,10 @@ export function Group() {
           )}
         >
           <Item.Media>
-            <Avatar.Root shape='square'>
+            <Avatar.Root
+              size='fit'
+              shape='square'
+            >
               <Avatar.Image
                 src='https://github.com/clerk.png'
                 alt='Clerk Cloud'
@@ -242,7 +251,10 @@ export function Group() {
           )}
         >
           <Item.Media>
-            <Avatar.Root shape='square'>
+            <Avatar.Root
+              size='fit'
+              shape='square'
+            >
               <Avatar.Fallback>D</Avatar.Fallback>
             </Avatar.Root>
           </Item.Media>

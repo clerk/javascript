@@ -7,6 +7,7 @@ export const styles = stylex.create({
   base: {
     overflow: 'hidden',
     alignItems: 'center',
+    aspectRatio: '1 / 1',
     boxSizing: 'border-box',
     display: 'inline-flex',
     flexShrink: 0,
@@ -21,9 +22,10 @@ export const styles = stylex.create({
 
   // image fills the clipped box
   image: {
-    aspectRatio: '1',
+    aspectRatio: '1 / 1',
     display: 'block',
     objectFit: 'cover',
+    position: 'absolute',
     height: '100%',
     width: '100%',
   },
@@ -53,4 +55,5 @@ export const sizes = stylex.create({
   sm: { fontSize: '0.75rem', height: space['7'], width: space['7'] },
   md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
   lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
+  fit: { fontSize: '0.75rem', height: '100%', width: '100%' },
 });
