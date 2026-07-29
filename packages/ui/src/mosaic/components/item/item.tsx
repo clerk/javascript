@@ -1,11 +1,12 @@
-import { type ComponentProps, type RenderProp, useRender } from '@clerk/headless/utils';
+import { type RenderProp, useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import * as slots from './item.styles';
 
-export type ItemProps = Omit<ComponentProps<'div'>, 'render'> & {
+export type ItemProps = Omit<MosaicComponentProps<'div'>, 'render'> & {
   /** Render a custom element (e.g. a link or button) in place of the default `div`. */
   render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
 };
@@ -32,7 +33,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
   });
 });
 
-const Media = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemMedia(
+const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -47,7 +48,7 @@ const Media = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function M
   });
 });
 
-const Content = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemContent(
+const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemContent(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -62,7 +63,7 @@ const Content = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function
   });
 });
 
-const Title = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemTitle(
+const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemTitle(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -77,7 +78,7 @@ const Title = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function M
   });
 });
 
-const Description = React.forwardRef<HTMLParagraphElement, ComponentProps<'p'>>(function MosaicItemDescription(
+const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function MosaicItemDescription(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -92,7 +93,7 @@ const Description = React.forwardRef<HTMLParagraphElement, ComponentProps<'p'>>(
   });
 });
 
-const Actions = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemActions(
+const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemActions(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -107,7 +108,7 @@ const Actions = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function
   });
 });
 
-const Group = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function MosaicItemGroup(
+const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -123,7 +124,7 @@ const Group = React.forwardRef<HTMLDivElement, ComponentProps<'div'>>(function M
   });
 });
 
-const Separator = React.forwardRef<HTMLHRElement, ComponentProps<'hr'>>(function MosaicItemSeparator(
+const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(function MosaicItemSeparator(
   { render, className, style, ...rest },
   ref,
 ) {
