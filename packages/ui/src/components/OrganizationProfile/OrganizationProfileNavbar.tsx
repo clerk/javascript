@@ -9,6 +9,9 @@ import { useOrganizationProfileContext } from '../../contexts';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
+// PROTOTYPE ONLY: keep the Security tab visible without the entconns permission.
+const FORCE_SECURITY_TAB = true;
+
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
@@ -29,7 +32,8 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
-  const allowSecurityRoute = useProtect(has => has({ permission: 'org:sys_entconns:manage' }));
+  // PROTOTYPE ONLY: any member sees the Security tab so the Directory Sync prototype is reachable.
+  const allowSecurityRoute = useProtect(has => has({ permission: 'org:sys_entconns:manage' })) || FORCE_SECURITY_TAB;
 
   const routes = pages.routes
     .filter(

@@ -118,7 +118,8 @@ const createCustomPages = (
     apiKeys: organization
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
-    security: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
+    // PROTOTYPE ONLY: `&&` relaxed to `||` so the forced Security tab survives disabledSelfServeSSOFeature.
+    security: organization ? shouldShowSelfServeSSO || !disabledSelfServeSSOFeature(clerk, environment) : false,
   });
 
   if (isDevelopmentSDK(clerk)) {

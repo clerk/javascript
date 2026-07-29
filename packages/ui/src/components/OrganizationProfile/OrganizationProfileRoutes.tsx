@@ -166,7 +166,8 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
           </Protect>
         )}
         {shouldShowSelfServeSSO ? (
-          <Protect condition={has => has({ permission: 'org:sys_entconns:manage' })}>
+          // PROTOTYPE ONLY: permission check bypassed so the Directory Sync prototype is reachable.
+          <Protect condition={() => true}>
             <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
               <Switch>
                 <Route index>

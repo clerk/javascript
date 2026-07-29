@@ -32,6 +32,10 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
 
+// PROTOTYPE ONLY: force the Security tab on so the Directory Sync prototype is reachable
+// regardless of the dev instance's self-serve SSO settings. Remove before any real work.
+const FORCE_SELF_SERVE_SSO_TAB = true;
+
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
   const context = useContext(OrganizationProfileContext);
   const { navigate } = useRouter();
@@ -60,7 +64,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     Boolean(statements.data.length > 0);
 
   const shouldShowSelfServeSSO =
-    environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
+    FORCE_SELF_SERVE_SSO_TAB ||
+    (environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled);
 
   const pages = useMemo(
     () =>
