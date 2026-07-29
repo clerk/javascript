@@ -1,13 +1,13 @@
-import { type ComponentProps, type RenderProp, useRender } from '@clerk/headless/utils';
+import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { colors, styles } from './badge.styles';
 
-export type BadgeProps = Omit<ComponentProps<'span'>, 'render'> & {
+export type BadgeProps = MosaicComponentProps<'span'> & {
   color?: 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
-  render?: RenderProp<React.ComponentPropsWithRef<'span'>> | React.ReactElement;
 };
 
 /**
