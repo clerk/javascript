@@ -8,6 +8,7 @@ import type {
 } from '@clerk/shared/types';
 import type * as WebBrowser from 'expo-web-browser';
 
+import { getAuthSessionCallbackParam } from '../utils/authSessionCallback';
 import { errorThrower } from '../utils/errors';
 
 export type StartSSOFlowParams = {
@@ -106,8 +107,7 @@ export function useSSO() {
       };
     }
 
-    const params = new URL(authSessionResult.url).searchParams;
-    const rotatingTokenNonce = params.get('rotating_token_nonce') ?? '';
+    const rotatingTokenNonce = getAuthSessionCallbackParam(authSessionResult.url, 'rotating_token_nonce') ?? '';
     await signIn.reload({ rotatingTokenNonce });
 
     const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
