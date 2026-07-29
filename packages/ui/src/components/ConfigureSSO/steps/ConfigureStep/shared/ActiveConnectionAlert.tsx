@@ -3,7 +3,7 @@ import React, { type JSX } from 'react';
 import { localizationKeys } from '@/customizables';
 import { Alert } from '@/elements/Alert';
 
-import { useConfigureSSO } from '../../../../ConfigureSSOContext';
+import { useConfigureSSO } from '../../../ConfigureSSOContext';
 
 export const ActiveConnectionAlert = (): JSX.Element | null => {
   const { enterpriseConnection } = useConfigureSSO();
