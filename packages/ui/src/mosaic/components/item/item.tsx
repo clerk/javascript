@@ -185,7 +185,7 @@ const HeaderActions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div
   });
 });
 
-/** Vertical list wrapper (`role="list"`) around a set of rows. */
+/** Vertical wrapper around a set of rows. Layout only; the rows carry their own semantics. */
 const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
   { render, className, style, ...rest },
   ref,
@@ -195,7 +195,6 @@ const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     render,
     ref,
     props: {
-      role: 'list',
       ...mergeStyleProps(themeProps('item-group'), stylex.props(slots.group.base), className, style),
       ...rest,
     },

@@ -88,15 +88,17 @@ describe('Mosaic Item', () => {
     expect(screen.getByRole('button', { name: 'Manage' }).parentElement).toHaveClass('cl-item-actions');
   });
 
-  it('renders a group as a list and a separator', () => {
+  it('renders a group and a separator without imposing a role', () => {
     render(
-      <Item.Group>
+      <Item.Group data-testid='group'>
         <Item.Root>One</Item.Root>
         <Item.Separator data-testid='sep' />
         <Item.Root>Two</Item.Root>
       </Item.Group>,
     );
-    expect(screen.getByRole('list')).toHaveClass('cl-item-group');
+    const group = screen.getByTestId('group');
+    expect(group).toHaveClass('cl-item-group');
+    expect(group).not.toHaveAttribute('role');
     expect(screen.getByTestId('sep')).toHaveClass('cl-item-separator');
   });
 
