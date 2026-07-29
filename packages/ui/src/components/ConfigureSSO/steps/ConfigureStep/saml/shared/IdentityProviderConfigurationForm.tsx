@@ -21,8 +21,8 @@ import { ArrowUpTray, Close } from '@/icons';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
-import { ActiveConnectionAlert } from './ActiveConnectionAlert';
-import type { IdpConfigurationMode } from './IdentityProviderConfigurationModes';
+import { ActiveConnectionAlert } from '../../shared/ActiveConnectionAlert';
+import type { SamlIdpConfigurationMode } from '../../shared/IdentityProviderConfigurationModes';
 
 type CardState = ReturnType<typeof useCardState>;
 type FormControl = FormControlState<FieldId>;
@@ -180,7 +180,7 @@ const ManualPanel = ({ form, labels }: ManualPanelProps): JSX.Element => (
 );
 
 type BuildSamlPayloadParams = {
-  mode: IdpConfigurationMode;
+  mode: SamlIdpConfigurationMode;
   metadataUrl?: { value: string };
   metadataFile?: { file: File | null };
   manual?: {

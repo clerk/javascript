@@ -1,4 +1,20 @@
+import type { RenderPropOrElement } from '@clerk/headless/utils';
 import type React from 'react';
+
+/**
+ * The base props every Mosaic component accepts: the native props for its default
+ * tag, plus the `render` escape hatch that swaps the rendered element.
+ *
+ * `color` is omitted because it is a non-standard HTML attribute typed `string`,
+ * which would widen any component that exposes `color` as a variant. Omitting it
+ * here rather than per component means a new component inherits the narrowing.
+ */
+export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
+  React.ComponentPropsWithRef<Tag>,
+  'color'
+> & {
+  render?: RenderPropOrElement<Tag>;
+};
 
 // The public styling contract, emitted onto a component's root element:
 //   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)

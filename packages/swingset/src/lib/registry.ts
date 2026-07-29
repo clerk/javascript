@@ -2,6 +2,13 @@
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
+  Fallback as AvatarFallbackStory,
+  meta as avatarMeta,
+  Primary as AvatarPrimary,
+  Shapes as AvatarShapes,
+  Sizes as AvatarSizes,
+} from '../stories/avatar.stories';
+import {
   Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
@@ -20,8 +27,8 @@ import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
+  Colors as HeadingColors,
   Default as HeadingDefault,
-  Intents as HeadingIntents,
   meta as headingMeta,
   Sizes as HeadingSizes,
 } from '../stories/heading.stories';
@@ -78,8 +85,8 @@ import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
+  Colors as TextColors,
   Default as TextDefault,
-  Intents as TextIntents,
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
@@ -121,6 +128,14 @@ const organizationProfileMembersPanelModule: StoryModule = {
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
+const avatarModule: StoryModule = {
+  meta: avatarMeta,
+  Primary: AvatarPrimary,
+  Fallback: AvatarFallbackStory,
+  Sizes: AvatarSizes,
+  Shapes: AvatarShapes,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -138,12 +153,12 @@ const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
   Sizes: HeadingSizes,
-  Intents: HeadingIntents,
+  Colors: HeadingColors,
 };
 
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
-const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const iconModule: StoryModule = {
   meta: iconMeta,
@@ -184,6 +199,7 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
+  avatarModule,
   badgeModule,
   buttonModule,
   cardComponentModule,

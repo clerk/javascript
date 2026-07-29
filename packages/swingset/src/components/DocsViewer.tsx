@@ -28,6 +28,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
