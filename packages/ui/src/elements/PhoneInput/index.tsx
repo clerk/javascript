@@ -48,8 +48,12 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
   useEffect(callOnChangeProp, [numberWithCode]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const inputValue = e.clipboardData?.getData('text');
+    if (inputValue === undefined) {
+      return;
+    }
+
     e.preventDefault();
-    const inputValue = e.clipboardData.getData('text');
     if (inputValue.includes('+')) {
       setNumberAndIso(inputValue);
     } else {
