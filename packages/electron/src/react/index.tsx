@@ -119,4 +119,7 @@ export function ClerkProvider({
   );
 }
 
+export { useHostedAuth } from './use-hosted-auth';
+export type { HostedAuthMode, StartHostedAuthParams, StartHostedAuthReturnType } from './use-hosted-auth';
+
 export * from '@clerk/react';

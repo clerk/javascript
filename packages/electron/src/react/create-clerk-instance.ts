@@ -10,6 +10,11 @@ type ClerkInstance = InstanceType<typeof Clerk>;
 
 let cached: { instance: ClerkInstance; publishableKey: string } | null = null;
 
+// `useClerk()` returns the IsomorphicClerk proxy, which does not forward internals like `getFapiClient`.
+export function getClerkInstance(): ClerkInstance | null {
+  return cached?.instance ?? null;
+}
+
 function attachPasskeys(clerk: ClerkInstance, passkeys: PasskeySupport): void {
   clerk.__internal_createPublicCredentials = passkeys.create;
   clerk.__internal_getPublicCredentials = passkeys.get;
