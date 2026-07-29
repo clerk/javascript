@@ -61,14 +61,7 @@ export function useSSO() {
   const { signUp, fetchStatus: signUpFetchStatus } = useSignUp();
 
   async function startSSOFlow(startSSOFlowParams: StartSSOFlowParams): Promise<StartSSOFlowReturnType> {
-    if (
-      !loaded ||
-      !client ||
-      !signIn ||
-      !signUp ||
-      signInFetchStatus === 'fetching' ||
-      signUpFetchStatus === 'fetching'
-    ) {
+    if (!client || !signIn || !signUp) {
       return {
         createdSessionId: null,
         authSessionResult: null,
