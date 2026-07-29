@@ -117,19 +117,29 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     };
 
     // Temporary sandbox shortcut for checking checkout layering over the standalone invite-members modal.
-    const checkoutSubscriptionItem = subscriptionItems.find(
-      subscriptionItem => subscriptionItem.status === 'active' || subscriptionItem.status === 'past_due',
-    );
-    if (window.location.pathname === '/open-invite-members' && checkoutSubscriptionItem) {
-      const currentSeats =
-        checkoutSubscriptionItem.seats?.quantity ?? organization.membersCount + organization.pendingInvitationsCount;
+    if (window.location.pathname === '/open-invite-members') {
+      const seatsQuantity =
+        organization.membersCount + organization.pendingInvitationsCount + inviteMembersParams.emailAddresses.length;
+      const { data: plans } = await clerk.billing.getPlans({
+        for: 'organization',
+        orgId: organization.id,
+        minSeats: seatsQuantity,
+        pageSize: 500,
+      });
+      const checkoutSubscriptionItem = subscriptionItems.find(
+        subscriptionItem => subscriptionItem.status === 'active' || subscriptionItem.status === 'past_due',
+      );
+      const checkoutPlan =
+        plans.find(plan => plan.id === checkoutSubscriptionItem?.plan.id) ??
+        plans.find(plan => !plan.isDefault) ??
+        plans[0];
 
-      handleSelectPlan({
-        mode: 'modal',
-        plan: checkoutSubscriptionItem.plan,
-        planPeriod: checkoutSubscriptionItem.planPeriod,
-        seatsQuantity: currentSeats + inviteMembersParams.emailAddresses.length,
-        priceId: checkoutSubscriptionItem.priceId,
+      clerk.__internal_openCheckout({
+        for: 'organization',
+        planId: checkoutPlan?.id,
+        planPeriod: checkoutSubscriptionItem?.planPeriod ?? (checkoutPlan?.fee ? 'month' : 'annual'),
+        seatsQuantity,
+        priceId: checkoutSubscriptionItem?.priceId,
         portalRoot,
       });
       return;
