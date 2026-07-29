@@ -4,13 +4,13 @@ import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../
 
 export const item = stylex.create({
   base: {
-    padding: space['2'],
     borderRadius: radiusVars['--cl-radius-element'],
     gap: space['3'],
     outline: {
       default: 'none',
       ':focus-visible': `2px solid color-mix(in oklab, ${colorVars['--cl-color-primary']} 50%, transparent)`,
     },
+    paddingInline: space['2'],
     alignItems: 'center',
     boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
@@ -21,8 +21,6 @@ export const item = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     outlineOffset: '2px',
     textAlign: 'start',
-    transitionDuration: '150ms',
-    transitionProperty: 'background-color, color',
     width: '100%',
   },
 
@@ -30,17 +28,24 @@ export const item = stylex.create({
   interactive: {
     backgroundColor: {
       default: null,
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 70%, transparent)`,
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 50%, transparent)`,
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     cursor: 'pointer',
   },
+
+  // vertical density; horizontal padding is shared by the base
+  md: {
+    paddingBlock: space['2'],
+  },
+  flush: {
+    paddingBlock: space['0'],
+  },
 });
 
 export const media = stylex.create({
-  // sizes to its child; height follows the row (taller on a 2-line item, shorter on a button).
   base: {
     gap: space['2'],
     alignItems: 'center',
@@ -63,23 +68,16 @@ export const content = stylex.create({
 
 export const title = stylex.create({
   base: {
-    gap: space['2'],
-    alignItems: 'center',
     color: colorVars['--cl-color-card-foreground'],
-    display: 'flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    width: 'fit-content',
   },
 });
 
 export const description = stylex.create({
   base: {
-    overflow: 'hidden',
-    WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: 2,
-    color: colorVars['--cl-color-neutral-foreground'],
+    color: colorVars['--cl-color-neutral-faded'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],

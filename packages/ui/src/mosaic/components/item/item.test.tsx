@@ -6,25 +6,32 @@ import { Item } from './item';
 
 describe('Mosaic Item', () => {
   it('renders a div with its children', () => {
-    render(<Item>Hi</Item>);
+    render(<Item.Root>Hi</Item.Root>);
     expect(screen.getByText('Hi')).toBeInTheDocument();
   });
 
   it('applies its base class and is not interactive by default', () => {
-    render(<Item>Hi</Item>);
+    render(<Item.Root>Hi</Item.Root>);
     const item = screen.getByText('Hi');
     expect(item).toHaveClass('cl-item');
     expect(item).not.toHaveAttribute('data-interactive');
   });
 
+  it('reflects the size prop as a data attribute, defaulting to md', () => {
+    const { rerender } = render(<Item.Root>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'md');
+    rerender(<Item.Root size='flush'>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'flush');
+  });
+
   it('wires consumer className/style through to the element', () => {
     render(
-      <Item
+      <Item.Root
         className='my-item'
         style={{ marginTop: '8px' }}
       >
         Hi
-      </Item>,
+      </Item.Root>,
     );
     const item = screen.getByText('Hi');
     expect(item).toHaveClass('cl-item', 'my-item');
@@ -33,7 +40,7 @@ describe('Mosaic Item', () => {
 
   it('renders a custom element via render and marks it interactive', () => {
     render(
-      <Item
+      <Item.Root
         render={({ children, ...props }) => (
           <a
             {...props}
@@ -46,7 +53,7 @@ describe('Mosaic Item', () => {
         <Item.Content>
           <Item.Title>Settings</Item.Title>
         </Item.Content>
-      </Item>,
+      </Item.Root>,
     );
     const link = screen.getByRole('link', { name: 'Settings' });
     expect(link).toHaveClass('cl-item');
@@ -66,7 +73,7 @@ describe('Mosaic Item', () => {
 
   it('renders the composed slots with their stable classes', () => {
     render(
-      <Item>
+      <Item.Root>
         <Item.Content>
           <Item.Title>Test Organization</Item.Title>
           <Item.Description>Member</Item.Description>
@@ -74,7 +81,7 @@ describe('Mosaic Item', () => {
         <Item.Actions>
           <button type='button'>Manage</button>
         </Item.Actions>
-      </Item>,
+      </Item.Root>,
     );
     expect(screen.getByText('Test Organization')).toHaveClass('cl-item-title');
     expect(screen.getByText('Member')).toHaveClass('cl-item-description');
@@ -84,9 +91,9 @@ describe('Mosaic Item', () => {
   it('renders a group as a list and a separator', () => {
     render(
       <Item.Group>
-        <Item>One</Item>
+        <Item.Root>One</Item.Root>
         <Item.Separator data-testid='sep' />
-        <Item>Two</Item>
+        <Item.Root>Two</Item.Root>
       </Item.Group>,
     );
     expect(screen.getByRole('list')).toHaveClass('cl-item-group');
@@ -95,7 +102,7 @@ describe('Mosaic Item', () => {
 
   it('forwards the ref to the root element', () => {
     const ref = React.createRef<HTMLDivElement>();
-    render(<Item ref={ref}>Hi</Item>);
+    render(<Item.Root ref={ref}>Hi</Item.Root>);
     expect(ref.current).toBe(screen.getByText('Hi'));
   });
 });

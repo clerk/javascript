@@ -7,12 +7,14 @@ import { mergeStyleProps, themeProps } from '../../props';
 import * as slots from './item.styles';
 
 export type ItemProps = Omit<MosaicComponentProps<'div'>, 'render'> & {
+  /** Vertical density of the row. `flush` removes the block padding. */
+  size?: 'flush' | 'md';
   /** Render a custom element (e.g. a link or button) in place of the default `div`. */
   render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
 };
 
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { render, className, style, ...rest },
+  { size = 'md', render, className, style, ...rest },
   ref,
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
@@ -23,8 +25,8 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item', { interactive }),
-        stylex.props(slots.item.base, interactive && slots.item.interactive),
+        themeProps('item', { interactive, size }),
+        stylex.props(slots.item.base, slots.item[size], interactive && slots.item.interactive),
         className,
         style,
       ),
@@ -141,11 +143,12 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
 
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
- * Composed via dot syntax: `Item.Media`, `Item.Content`, `Item.Title`,
- * `Item.Description`, `Item.Actions`, `Item.Group`,
+ * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
+ * `Item.Title`, `Item.Description`, `Item.Actions`, `Item.Group`,
  * `Item.Separator`.
  */
-export const Item = Object.assign(Root, {
+export const Item = {
+  Root,
   Media,
   Content,
   Title,
@@ -153,4 +156,4 @@ export const Item = Object.assign(Root, {
   Actions,
   Group,
   Separator,
-});
+};

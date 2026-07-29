@@ -2,7 +2,7 @@ import * as ItemStories from './item.stories';
 
 # Item
 
-Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Media`, `Item.Content`, `Item.Title`, …) and renders as a `<div>` by default. Pass a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
+Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Title`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
 
 ## Example
 
@@ -28,12 +28,16 @@ Item is a flexible row for lists of accounts, organizations, and settings in Mos
 ## Usage
 
 ```tsx
+import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Item } from '@clerk/ui/mosaic/components/item';
 
 <Item.Group>
-  <Item render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
+  <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
     <Item.Media>
-      <img src={org.imageUrl} alt='' width={36} height={36} />
+      <Avatar.Root shape='square' size='md'>
+        <Avatar.Image src={org.imageUrl} alt='' />
+        <Avatar.Fallback>{org.name[0]}</Avatar.Fallback>
+      </Avatar.Root>
     </Item.Media>
     <Item.Content>
       <Item.Title>Test Organization</Item.Title>
@@ -42,7 +46,7 @@ import { Item } from '@clerk/ui/mosaic/components/item';
     <Item.Actions>
       <Button variant='outline'>Manage</Button>
     </Item.Actions>
-  </Item>
+  </Item.Root>
 </Item.Group>;
 ```
 
@@ -50,7 +54,7 @@ import { Item } from '@clerk/ui/mosaic/components/item';
 
 | Part               | Class                 | Description                                                          |
 | ------------------ | --------------------- | -------------------------------------------------------------------- |
-| `Item`             | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
 | `Item.Media`       | `cl-item-media`       | Leading (or trailing) media: icon, image, or avatar.                 |
 | `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions. |
 | `Item.Title`       | `cl-item-title`       | Primary label.                                                       |
@@ -67,6 +71,7 @@ The root reflects its state as `data-*` attributes on `.cl-item`, so consumers c
 
 | Prop     | Attribute          | Values                              | Default |
 | -------- | ------------------ | ----------------------------------- | ------- |
+| `size`   | `data-size`        | `flush` \| `md`                     | `md`    |
 | `render` | `data-interactive` | present when a `render` is provided | —       |
 
 ```css
@@ -76,4 +81,4 @@ The root reflects its state as `data-*` attributes on `.cl-item`, so consumers c
 }
 ```
 
-`Item.Media` sizes to its child and centers it; its height follows the row. Bring your own icon, avatar, or image at whatever dimensions you need (the examples use a 36px avatar and a 28px trailing icon), then size the slot by sizing that child. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).
+`Item.Media` sizes to its child and centers it; its height follows the row. Bring your own icon, avatar, or image at whatever dimensions you need (the examples use a 40px Mosaic `Avatar` and a 28px trailing icon), then size the slot by sizing that child. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).
