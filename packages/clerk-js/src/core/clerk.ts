@@ -2288,9 +2288,9 @@ export class Clerk implements ClerkInterface {
     } else if (verificationStatus === 'client_mismatch') {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.ClientMismatch);
     } else if (verificationStatus === 'transferable') {
-      // signUpIfMissing flow: the email was verified but the user doesn't exist.
-      // The polling tab handles the actual sign-up transfer, so treat this
-      // the same as verified-on-other-device for the link-click tab.
+      // signUpIfMissing flow: the email was verified but the user doesn't exist, so there is
+      // no session to complete here. The sign-up transfer is banked on the client that owns
+      // the sign-in; consuming it is left to the caller, which knows where to route next.
       if (typeof params.onVerifiedOnOtherDevice === 'function') {
         params.onVerifiedOnOtherDevice();
       }

@@ -13,7 +13,7 @@ const signInLocalizationKeys = {
     subtitle: localizationKeys('signIn.emailLink.verifiedSwitchTab.subtitle'),
   },
   // signUpIfMissing transfer: the email verified but no user exists yet, so
-  // "Successfully signed in" would be wrong - the original tab continues as a sign-up.
+  // "Successfully signed in" would be wrong - the flow continues as a sign-up.
   transferable: {
     title: localizationKeys('signIn.emailLink.verifiedTransferable.title'),
     subtitle: localizationKeys('signIn.emailLink.verifiedTransferable.subtitle'),

@@ -10,9 +10,9 @@ import { ArrowLeftRight, ExclamationTriangle, ShieldCheck } from '../icons';
 import type { InternalTheme } from '../styledSystem';
 import { animations } from '../styledSystem';
 
-// `transferable` renders in the link-click tab of a `signUpIfMissing` flow: the
-// email was verified but no user exists, and the original (polling) tab carries
-// the flow forward as a sign-up, so this tab only tells the user to return there.
+// `transferable` renders in a `signUpIfMissing` flow: the email was verified but no user
+// exists, so the tab holding the sign-in's client carries the flow forward as a sign-up
+// and this card tells the user to switch to whichever tab that is.
 export type EmailLinkUIStatus = VerifyTokenStatus | 'verified_switch_tab' | 'loading';
 
 type EmailLinkStatusCardProps = React.PropsWithChildren<{

@@ -22,9 +22,9 @@ type ClerkQueryParam = (typeof _ClerkQueryParams)[number];
 /**
  * Possible values of `__clerk_status` returned from the email link verify
  * endpoint. `transferable` belongs to the `signUpIfMissing` flow - the
- * verification succeeded but the user does not exist, so the originating
- * (polling) tab performs a sign-up transfer while the link-click tab renders
- * a "return to the original tab" card; see `EmailLinkUIStatus`.
+ * verification succeeded but the user does not exist, so a sign-up transfer is
+ * banked on the client that owns the sign-in and whichever tab shares that
+ * client performs it; see `EmailLinkUIStatus`.
  */
 export type VerifyTokenStatus =
   | 'verified'

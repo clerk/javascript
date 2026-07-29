@@ -167,6 +167,42 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     });
   });
 
+  it('defers to the newly opened tab when a transferable email link was verified from the same client', async () => {
+    const email = 'test@clerk.com';
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withPassword();
+      f.withPreferredSignInStrategy({ strategy: 'password' });
+      f.withEnumerationProtection();
+      f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
+    });
+    props.setProps({ withSignUp: true });
+
+    // The account transfer is banked once on the shared client, so the tab that opened the
+    // link consumes it and this one must not race for it.
+    fixtures.signIn.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow: vi.fn().mockResolvedValue({
+        status: 'needs_first_factor',
+        firstFactorVerification: {
+          status: 'transferable',
+          verifiedFromTheSameClient: () => true,
+        },
+      }),
+      cancelEmailLinkFlow: vi.fn(),
+    } as any);
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+    await userEvent.click(await screen.findByText('Use another method'));
+    await userEvent.click(await screen.findByText(`Email link to ${email}`));
+
+    await waitFor(() => {
+      screen.getByText('Email verified');
+      screen.getByText(/newly opened tab/i);
+    });
+    expect(fixtures.signUp.create).not.toHaveBeenCalled();
+  });
+
   it('triggers sign-up transfer when email link verification becomes transferable', async () => {
     const email = 'test@clerk.com';
     const { wrapper, fixtures, props } = await createFixtures(f => {
