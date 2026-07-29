@@ -657,25 +657,22 @@ export class Clerk implements ClerkInterface {
   }
 
   /**
-   * Routes the post-sign-out navigation through `/v1/client/touch` when the client
-   * cookie is close to expiring, and returns `redirectUrl` unchanged otherwise.
+   * Routes `url` through `/v1/client/touch` when the client cookie is close to expiring,
+   * and returns it unchanged otherwise.
    *
-   * In practice this only adds a redirect on Safari. Signing out re-issues the client
-   * cookie from a fetch, which ITP caps at 7 days; every other browser gets 400 days
-   * and is never eligible. The cap matters because the client outlives sign-out and is
-   * what Client Trust uses to recognize a known device, so a user returning a week
-   * later would be challenged for a second factor. Touch is a top-level navigation,
-   * which ITP does not cap, so it restores the full lifetime.
+   * In practice this only adds a redirect on Safari. A cookie re-issued from a fetch is
+   * capped at 7 days by ITP; every other browser gets the full 400 days and is never
+   * eligible. Touch is a top-level navigation, which ITP does not cap, so it restores
+   * the full lifetime.
    */
-  #buildSignOutRedirectUrl(redirectUrl: string): string {
-    // In React Native, window exists but window.location does not, so the redirect
-    // cannot be resolved to an absolute URL. ITP does not apply there either.
+  #decorateUrlWithTouch(url: string): string {
+    // In React Native, window exists but window.location does not, so the URL cannot be
+    // resolved to an absolute one. ITP does not apply there either.
     if (!inBrowser() || typeof window.location === 'undefined' || !this.client?.isEligibleForTouch()) {
-      return redirectUrl;
+      return url;
     }
 
-    const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-    return this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }));
+    return this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: new URL(url, window.location.href) }));
   }
 
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
@@ -718,7 +715,9 @@ export class Clerk implements ClerkInterface {
         if (signOutCallback) {
           await signOutCallback();
         } else {
-          await this.navigate(this.#buildSignOutRedirectUrl(redirectUrl));
+          // The client outlives sign-out and is what Client Trust uses to recognize a
+          // returning device, so the re-issued cookie has to keep its full lifetime.
+          await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
         }
       });
 
@@ -1848,21 +1847,9 @@ export class Clerk implements ClerkInterface {
             // Track whether decorateUrl was called for dev-mode warning
             let decorateUrlCalled = false;
 
-            /**
-             * Creates a URL that goes through the /v1/client/touch endpoint when Safari ITP fix is needed.
-             * This allows the session cookie to be refreshed via a full page navigation, bypassing
-             * Safari's 7-day cap on cookies set via fetch/XHR.
-             */
             const decorateUrl = (url: string): string => {
               decorateUrlCalled = true;
-
-              if (!this.client?.isEligibleForTouch()) {
-                return url;
-              }
-
-              const absoluteUrl = new URL(url, window.location.href);
-              const touchUrl = this.client.buildTouchUrl({ redirectUrl: absoluteUrl });
-              return this.buildUrlWithAuth(touchUrl);
+              return this.#decorateUrlWithTouch(url);
             };
 
             await setActiveNavigate({ session: newSession, decorateUrl });
