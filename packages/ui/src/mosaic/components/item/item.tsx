@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { truncationStyles } from '../typography.styles';
 import * as slots from './item.styles';
 
 export type ItemProps = Omit<MosaicComponentProps<'div'>, 'render'> & {
@@ -74,7 +75,12 @@ const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-title'), stylex.props(slots.title.base), className, style),
+      ...mergeStyleProps(
+        themeProps('item-title'),
+        stylex.props(slots.title.base, truncationStyles.singleLine),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
@@ -89,7 +95,12 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-description'), stylex.props(slots.description.base), className, style),
+      ...mergeStyleProps(
+        themeProps('item-description'),
+        stylex.props(slots.description.base, truncationStyles.singleLine),
+        className,
+        style,
+      ),
       ...rest,
     },
   });

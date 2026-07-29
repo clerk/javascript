@@ -15,7 +15,6 @@ export const item = stylex.create({
     boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
-    flexWrap: 'wrap',
     fontFamily: 'inherit',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
