@@ -30,6 +30,10 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
+  ConfigureDirectorySync: () =>
+    import(
+      /* webpackChunkName: "configureDirectorySync" */ '../components/ConfigureDirectorySync/ConfigureDirectorySync'
+    ),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
@@ -125,6 +129,10 @@ export const ConfigureSSO = lazy(() =>
   componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
 );
 
+export const ConfigureDirectorySync = lazy(() =>
+  componentImportPaths.ConfigureDirectorySync().then(module => ({ default: module.ConfigureDirectorySync })),
+);
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const TaskChooseOrganization = lazy(() =>
@@ -186,6 +194,7 @@ export const ClerkComponents = {
   PlanDetails,
   APIKeys,
   ConfigureSSO,
+  ConfigureDirectorySync,
   OAuthConsent,
   SubscriptionDetails,
   TaskChooseOrganization,
