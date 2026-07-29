@@ -6,8 +6,8 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 
-import type { EnterpriseConnectionProviderType } from '../../../types';
 import { Wizard } from '../../../elements/Wizard';
+import type { EnterpriseConnectionProviderType } from '../../../types';
 
 // The dispatch reads `organizationEnterpriseConnection.provider`. The nested
 // sub-flows also read `enterpriseConnection` (via `Step.Footer.Reset`), which is
