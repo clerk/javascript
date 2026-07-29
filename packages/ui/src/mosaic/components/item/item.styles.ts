@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const item = stylex.create({
   base: {
@@ -17,8 +17,8 @@ export const item = stylex.create({
     display: 'flex',
     flexWrap: 'wrap',
     fontFamily: 'inherit',
-    fontSize: typeScaleVars['--cl-text-label-size'],
-    lineHeight: typeScaleVars['--cl-text-label-leading'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     outlineOffset: '2px',
     textAlign: 'start',
     transitionDuration: '150ms',
@@ -30,9 +30,9 @@ export const item = stylex.create({
   interactive: {
     backgroundColor: {
       default: null,
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-muted']} 70%, transparent)`,
+      ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 70%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-muted']} 50%, transparent)`,
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 50%, transparent)`,
       },
     },
     cursor: 'pointer',
@@ -67,9 +67,9 @@ export const title = stylex.create({
     alignItems: 'center',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
-    fontSize: typeScaleVars['--cl-text-label-size'],
-    fontWeight: typeScaleVars['--cl-text-label-weight'],
-    lineHeight: typeScaleVars['--cl-text-label-leading'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     width: 'fit-content',
   },
 });
@@ -79,10 +79,10 @@ export const description = stylex.create({
     overflow: 'hidden',
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 2,
-    color: colorVars['--cl-color-muted-foreground'],
-    fontSize: typeScaleVars['--cl-text-label-sm-size'],
-    fontWeight: 400,
-    lineHeight: typeScaleVars['--cl-text-label-sm-leading'],
+    color: colorVars['--cl-color-neutral-foreground'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 });
 
@@ -97,8 +97,7 @@ export const actions = stylex.create({
 
 export const group = stylex.create({
   base: {
-    display: 'flex',
-    flexDirection: 'column',
+    padding: space['2'],
     width: '100%',
   },
 });
@@ -106,8 +105,6 @@ export const group = stylex.create({
 export const separator = stylex.create({
   base: {
     borderStyle: 'none',
-    marginBlock: space['2'],
-    marginInline: 0,
     backgroundColor: colorVars['--cl-color-border'],
     flexShrink: 0,
     height: '1px',
