@@ -39,9 +39,9 @@
   import type { APIRoute } from 'astro';
 
   export const GET: APIRoute = ({ locals }) => {
-    const { userId } = locals.auth();
+    const { isAuthenticated, userId } = locals.auth();
 
-    if (!userId) {
+    if (!isAuthenticated) {
       return new Response('Unauthorized', { status: 401 });
     }
 
@@ -59,11 +59,11 @@
      logic that uses it (returning 401s, calling `auth().redirectToSignIn()`, etc.).
   2. For every route those matchers protected, move the auth check into the resource itself:
      - In `.astro` pages, add this to the frontmatter:
-       const { userId, redirectToSignIn } = Astro.locals.auth();
-       if (!userId) return redirectToSignIn();
+       const { isAuthenticated, redirectToSignIn } = Astro.locals.auth();
+       if (!isAuthenticated) return redirectToSignIn();
      - In API routes and server handlers, add this at the top of the handler:
-       const { userId } = locals.auth();
-       if (!userId) return new Response('Unauthorized', { status: 401 });
+       const { isAuthenticated } = locals.auth();
+       if (!isAuthenticated) return new Response('Unauthorized', { status: 401 });
      - Keep any role or permission checks (`auth().has(...)`) with the resource as well.
   3. Remove the `createRouteMatcher` import and calls from the middleware. Keep
      `clerkMiddleware()` itself. Middleware logic unrelated to auth protection
