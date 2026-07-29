@@ -114,7 +114,7 @@ export function Default() {
       <Item.Media>
         <Avatar.Root
           shape='square'
-          size='md'
+          size='fit'
         >
           <Avatar.Fallback>T</Avatar.Fallback>
         </Avatar.Root>
@@ -145,7 +145,7 @@ export function Interactive() {
       <Item.Media>
         <Avatar.Root
           shape='square'
-          size='md'
+          size='fit'
         >
           <Avatar.Fallback>T</Avatar.Fallback>
         </Avatar.Root>
