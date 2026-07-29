@@ -91,7 +91,7 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
   ref,
 ) {
   return useRender({
-    defaultTagName: 'p',
+    defaultTagName: 'div',
     render,
     ref,
     props: {
