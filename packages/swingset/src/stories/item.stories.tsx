@@ -16,23 +16,6 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/item/item.tsx',
 };
 
-function ArrowIcon() {
-  return (
-    <svg
-      width='16'
-      height='16'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    >
-      <path d='M5 12h14M13 5l7 7-7 7' />
-    </svg>
-  );
-}
-
 function CheckMarkIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg
