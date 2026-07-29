@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.1.1
+
+### Patch Changes
+
+- Fix JS auth state recovery after rejecting a divergent native client so signed-in sessions can still sign out. ([#9259](https://github.com/clerk/javascript/pull/9259)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.36` to `1.0.37`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.37. ([#9260](https://github.com/clerk/javascript/pull/9260)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.37` to `1.0.38`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.38. ([#9271](https://github.com/clerk/javascript/pull/9271)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.4` to `1.3.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.5. ([#9261](https://github.com/clerk/javascript/pull/9261)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/clerk-js@6.25.11
+  - @clerk/shared@4.25.9
+  - @clerk/react@6.12.9
+
 ## 4.1.0
 
 ### Minor Changes

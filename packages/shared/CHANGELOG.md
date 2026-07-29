@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.25.9
+
+### Patch Changes
+
+- Add support for configuring custom OpenID Connect enterprise connections through the Organization Profile. ([#9200](https://github.com/clerk/javascript/pull/9200)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Expose whether an organization member has been deprovisioned, and mark deprovisioned members as inactive in the Organization Profile. ([#9202](https://github.com/clerk/javascript/pull/9202)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
 ## 4.25.8
 
 ### Patch Changes
