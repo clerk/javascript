@@ -448,6 +448,18 @@ describe('SignInStart', () => {
 
       expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('type', 'tel');
     });
+
+    it('ignores paste events without clipboard data', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+
+      expect(() => fireEvent.paste(input, { clipboardData: null })).not.toThrow();
+    });
   });
 
   describe('initialValues', () => {
