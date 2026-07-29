@@ -12,6 +12,7 @@ import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
+import { warnAboutPasswordInSignInOrUpFlow } from '../../utils/warnAboutPasswordInSignInOrUpFlow';
 import { clerkWindowNavigate } from '../../utils/windowNavigate';
 import { getInitialValuesFromQueryParams } from '../utils';
 
@@ -138,6 +139,13 @@ export const useSignInContext = (): SignInContextType => {
     isCombinedFlow &&
     Boolean(userSettings.attackProtection?.enumeration_protection?.enabled) &&
     signUpMode === SIGN_UP_MODES.PUBLIC;
+
+  if (clerk.instanceType === 'development') {
+    warnAboutPasswordInSignInOrUpFlow({
+      signUpIfMissingEnabled,
+      passwordEnabled: userSettings.instanceIsPasswordBased,
+    });
+  }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
   // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
