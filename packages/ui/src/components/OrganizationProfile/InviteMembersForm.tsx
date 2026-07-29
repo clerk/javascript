@@ -116,6 +116,25 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
       role: submittedData.get('role') as string,
     };
 
+    // Temporary sandbox shortcut for checking checkout layering over the standalone invite-members modal.
+    const checkoutSubscriptionItem = subscriptionItems.find(
+      subscriptionItem => subscriptionItem.status === 'active' || subscriptionItem.status === 'past_due',
+    );
+    if (window.location.pathname === '/open-invite-members' && checkoutSubscriptionItem) {
+      const currentSeats =
+        checkoutSubscriptionItem.seats?.quantity ?? organization.membersCount + organization.pendingInvitationsCount;
+
+      handleSelectPlan({
+        mode: 'modal',
+        plan: checkoutSubscriptionItem.plan,
+        planPeriod: checkoutSubscriptionItem.planPeriod,
+        seatsQuantity: currentSeats + inviteMembersParams.emailAddresses.length,
+        priceId: checkoutSubscriptionItem.priceId,
+        portalRoot,
+      });
+      return;
+    }
+
     try {
       await inviteMembers(inviteMembersParams);
     } catch (err) {
