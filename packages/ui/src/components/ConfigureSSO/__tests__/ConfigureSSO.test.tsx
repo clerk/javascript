@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, waitFor } from '@/test/utils';
+import { act, render, waitFor } from '@/test/utils';
 
 import { ConfigureSSO } from '../ConfigureSSO';
 
@@ -23,10 +23,19 @@ const unverifiedDomain = {
   ownershipVerification: { status: 'unverified', strategy: 'txt' },
 } as any;
 
+const expiredDomain = {
+  ...unverifiedDomain,
+  ownershipVerification: { status: 'expired', strategy: 'txt', expiresAt: new Date('2026-01-01') },
+};
+
 const mockOrganizationDomains = (fixtures: any, domains: any[]) =>
   fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: domains, total_count: domains.length } as any);
 
 describe('ConfigureSSO', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   describe('within an organization', () => {
     it('shows a warning if the active organization membership lacks the manage enterprise connections permission', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -156,6 +165,59 @@ describe('ConfigureSSO', () => {
 
       await findByText(/add and verify ownership of the domains/i);
       expect(queryByText(/select your identity provider/i)).not.toBeInTheDocument();
+    });
+
+    it('shows the verification retry action while domain ownership verification is pending', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [unverifiedDomain]);
+
+      const { findByRole } = render(<ConfigureSSO />, { wrapper });
+
+      await findByRole('button', { name: /verify again/i });
+    });
+
+    it('throttles domain verification retries for five minutes', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [expiredDomain]);
+      fixtures.clerk.organization?.prepareOwnershipVerification.mockResolvedValue({ data: [expiredDomain] } as any);
+
+      const { findByRole } = render(<ConfigureSSO />, { wrapper });
+      const verifyAgainButton = await findByRole('button', { name: /verify again/i });
+
+      vi.useFakeTimers();
+      await act(() => {
+        verifyAgainButton.click();
+        return Promise.resolve();
+      });
+
+      expect(fixtures.clerk.organization?.prepareOwnershipVerification).toHaveBeenCalledWith([expiredDomain.id]);
+      expect(verifyAgainButton).toBeDisabled();
+
+      act(() => {
+        vi.advanceTimersByTime(5 * 60 * 1000);
+      });
+
+      expect(verifyAgainButton).not.toBeDisabled();
     });
 
     it('short-circuits to the activate step for an active connection', async () => {
