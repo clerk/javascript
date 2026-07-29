@@ -19,6 +19,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
+import { useSpinDelay } from '../../hooks';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
@@ -69,7 +70,7 @@ function SignUpProtectCheckInternal({
     }
   }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
 
-  const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignUpResource>({
+  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
     getResource: () => signUp,
     reload: () => signUp.reload(),
@@ -100,6 +101,13 @@ function SignUpProtectCheckInternal({
     },
   });
 
+  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
+  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
+  // The error and widget-visibility gates stay OUTSIDE the delay hook (in the JSX below): its
+  // minimum visible duration must never outrank the handshake's "spinner is gone when the
+  // promise resolves" guarantee, nor keep a spinner next to the retry button.
+  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+
   // Stale/direct visit that never had a check: render nothing while the
   // flow-start redirect scheduled above kicks in, instead of flashing the card
   // shell for one paint. Must stay below every hook call.
@@ -124,21 +132,18 @@ function SignUpProtectCheckInternal({
               ref={containerRef}
               id='clerk-protect-check'
               aria-busy={isRunning}
-              style={{ display: 'block', alignSelf: 'center', minHeight: '60px' }}
+              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
+              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
+              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
-            {isRunning && !hasError ? (
-              <Flex
-                direction='col'
-                center
-                gap={4}
-                aria-live='polite'
-              >
+            {showSpinner && !hasError && !isWidgetVisible ? (
+              <Flex center>
                 <Spinner
                   size='lg'
                   colorScheme='primary'
                   elementDescriptor={descriptors.spinner}
+                  aria-label={t(localizationKeys('signUp.protectCheck.loading'))}
                 />
-                <Box>{t(localizationKeys('signUp.protectCheck.loading'))}</Box>
               </Flex>
             ) : null}
             {hasError ? (

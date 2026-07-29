@@ -62,6 +62,7 @@ export const bgBG: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1219,6 +1220,9 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Use your authenticator app to get the code.',
       title: 'Authenticator App MFA',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

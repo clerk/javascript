@@ -63,6 +63,7 @@ export const isIS: LocalizationResource = {
   badge__canceledEndsAt: "Aflýst • Lýkur {{ date | shortDate('is-IS') }}",
   badge__currentPlan: 'Núverandi áskrift',
   badge__default: 'Sjálfgefið',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lýkur {{ date | shortDate('is-IS') }}",
   badge__expired: 'Útrunnið',
   badge__freeTrial: 'Ókeypis prufuáskrift',
@@ -1229,6 +1230,9 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn kóðann sem auðkennisforritið þitt bjó til til að halda áfram',
       title: 'Staðfesting nauðsynleg',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

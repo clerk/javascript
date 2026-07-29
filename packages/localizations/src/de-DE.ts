@@ -63,6 +63,7 @@ export const deDE: LocalizationResource = {
   badge__canceledEndsAt: "Storniert • Endet am {{ date | shortDate('de-DE') }}",
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Endet am {{ date | shortDate('de-DE') }}",
   badge__expired: 'Abgelaufen',
   badge__freeTrial: 'Kostenlose Testversion',
@@ -1234,6 +1235,9 @@ export const deDE: LocalizationResource = {
       subtitle: 'Verwenden Sie die Authentifikator-App, die Sie eingerichtet haben.',
       title: 'TOTP-Verifizierung (MFA)',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

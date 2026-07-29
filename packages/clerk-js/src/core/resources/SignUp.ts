@@ -33,6 +33,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
+  SignUpFutureSubmitProtectCheckParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
   SignUpFutureVerifications as SignUpFutureVerificationsType,
@@ -187,6 +188,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePost({
       body: params,
       action: 'prepare_verification',
+      coalesce: true,
     });
   };
 
@@ -972,6 +974,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_code' },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -992,6 +995,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -1019,6 +1023,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -1162,6 +1167,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
+        coalesce: true,
       });
 
       const { message } = this.#resource.verifications.web3Wallet;
@@ -1201,7 +1207,7 @@ class SignUpFuture implements SignUpFutureResource {
    * @param params.proofToken - The proof token produced by the Protect challenge SDK.
    * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
    */
-  async submitProtectCheck(params: { proofToken: string }): Promise<{ error: ClerkError | null }> {
+  async submitProtectCheck(params: SignUpFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePatch({
         action: 'protect_check',

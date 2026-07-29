@@ -64,6 +64,7 @@ export const taIN: LocalizationResource = {
   badge__canceledEndsAt: "ரத்து செய்யப்பட்டது • முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__currentPlan: 'தற்போதைய திட்டம்',
   badge__default: 'இயல்புநிலை',
+  badge__deprovisioned: undefined,
   badge__endsAt: "முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__expired: 'காலாவதியானது',
   badge__freeTrial: 'இலவச சோதனை',
@@ -1233,6 +1234,9 @@ export const taIN: LocalizationResource = {
       subtitle: 'தொடர உங்கள் அங்கீகாரி பயன்பாட்டால் உருவாக்கப்பட்ட குறியீட்டை உள்ளிடவும்',
       title: 'சரிபார்ப்பு தேவை',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

@@ -63,12 +63,15 @@ describe('executeProtectCheck', () => {
       expect(result).toBe('proof-token-123');
     });
 
-    it('passes only the spec-defined fields (token, uiHints, signal) — NOT the full resource', async () => {
+    it('passes only the spec-defined fields (token, uiHints, signal, setWidgetVisible) — NOT the full resource', async () => {
       const fn = vi.fn().mockResolvedValue('proof');
       vi.doMock('https://protect.example.com/sdk-args.js', () => ({ default: fn }));
 
       const container = fakeContainer();
       const controller = new AbortController();
+      // The visibility handshake: the script calls this before revealing UI so the host can
+      // drop its own spinner first; the promise resolves once the host has applied the change.
+      const setWidgetVisible = vi.fn().mockResolvedValue(undefined);
       await executeProtectCheck(
         protectCheck({
           sdkUrl: 'https://protect.example.com/sdk-args.js',
@@ -76,13 +79,14 @@ describe('executeProtectCheck', () => {
           uiHints: { reason: 'device_new' },
         }),
         container,
-        { signal: controller.signal },
+        { signal: controller.signal, setWidgetVisible },
       );
 
       expect(fn).toHaveBeenCalledWith(container, {
         token: 'opaque-challenge-token',
         uiHints: { reason: 'device_new' },
         signal: controller.signal,
+        setWidgetVisible,
       });
     });
   });

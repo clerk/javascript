@@ -54,10 +54,15 @@ function isNativeClientSnapshot(snapshot: NativeClientSnapshot | undefined): sna
 /**
  * Listens for native client events that should sync JS client state.
  */
-export function useNativeClientEvents(): UseNativeClientEventsReturn {
+export function useNativeClientEvents(enabled = true): UseNativeClientEventsReturn {
   const [nativeClientEvent, setNativeClientEvent] = useState<NativeClientEvent | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setNativeClientEvent(null);
+      return;
+    }
+
     if (!isNativeSupported || !ClerkExpo) {
       return;
     }
@@ -87,7 +92,7 @@ export function useNativeClientEvents(): UseNativeClientEventsReturn {
     return () => {
       subscription?.remove();
     };
-  }, []);
+  }, [enabled]);
 
   return {
     nativeClientEvent,

@@ -63,6 +63,7 @@ export const bnIN: LocalizationResource = {
   badge__canceledEndsAt: "বাতিল • শেষ {{ date | shortDate('bn-IN') }}",
   badge__currentPlan: 'বর্তমান প্ল্যান',
   badge__default: 'ডিফল্ট',
+  badge__deprovisioned: undefined,
   badge__endsAt: "শেষ {{ date | shortDate('bn-IN') }}",
   badge__expired: 'মেয়াদ শেষ',
   badge__freeTrial: 'বিনামূল্যের ট্রায়াল',
@@ -1227,6 +1228,9 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যেতে আপনার অথেনটিকেটর অ্যাপ দ্বারা উৎপন্ন কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

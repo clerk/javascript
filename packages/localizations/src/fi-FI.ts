@@ -63,6 +63,7 @@ export const fiFI: LocalizationResource = {
   badge__canceledEndsAt: "Peruutettu • Päättyy {{ date | shortDate('fi-FI') }}",
   badge__currentPlan: 'Nykyinen paketti',
   badge__default: 'Oletus',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Päättyy {{ date | shortDate('fi-FI') }}",
   badge__expired: 'Vanhentunut',
   badge__freeTrial: 'Ilmainen kokeilu',
@@ -1229,6 +1230,9 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä todennussovelluksesi luoma koodi jatkaaksesi',
       title: 'Vahvistus vaaditaan',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

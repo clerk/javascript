@@ -63,6 +63,7 @@ export const huHU: LocalizationResource = {
   badge__canceledEndsAt: "Lemondva • Lejár: {{ date | shortDate('hu-HU') }}",
   badge__currentPlan: 'Jelenlegi csomag',
   badge__default: 'Alapértelmezett',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lejár: {{ date | shortDate('hu-HU') }}",
   badge__expired: 'Lejárt',
   badge__freeTrial: 'Ingyenes próbaverzió',
@@ -1230,6 +1231,9 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a hitelesítő alkalmazás által generált kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

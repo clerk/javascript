@@ -63,6 +63,7 @@ export const koKR: LocalizationResource = {
   badge__canceledEndsAt: "취소됨 • {{ date | shortDate('ko-KR') }}에 종료",
   badge__currentPlan: '현재 플랜',
   badge__default: '기본값',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ko-KR') }}에 종료",
   badge__expired: '만료됨',
   badge__freeTrial: '무료 체험',
@@ -1216,6 +1217,9 @@ export const koKR: LocalizationResource = {
       subtitle: '인증 앱에서 생성된 코드를 입력해 주세요',
       title: '인증이 필요해요',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

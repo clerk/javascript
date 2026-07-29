@@ -132,6 +132,14 @@ export interface SignInFutureEmailCodeVerifyParams {
 }
 
 /** @generateWithEmptyComment */
+export interface SignInFutureSubmitProtectCheckParams {
+  /**
+   * The proof token produced by the Protect challenge SDK.
+   */
+  proofToken: string;
+}
+
+/** @generateWithEmptyComment */
 export interface SignInFutureResetPasswordSubmitParams {
   /**
    * The new password for the user.
@@ -569,10 +577,9 @@ export interface SignInFutureResource {
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain
-   * another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
    */
-  submitProtectCheck: (params: { proofToken: string }) => Promise<{ error: ClerkError | null }>;
+  submitProtectCheck: (params: SignInFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Converts a sign-in with `status === 'complete'` into an active session. Will cause anything observing the session state (such as the [`useUser()`](https://clerk.com/docs/reference/hooks/use-user) hook) to update automatically.

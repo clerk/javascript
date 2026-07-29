@@ -63,6 +63,7 @@ export const frFR: LocalizationResource = {
   badge__canceledEndsAt: "Annulé • Termine le {{ date | shortDate('fr-FR') }}",
   badge__currentPlan: 'Plan actuel',
   badge__default: 'Défaut',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termine le {{ date | shortDate('fr-FR') }}",
   badge__expired: 'Expiré',
   badge__freeTrial: 'Essai gratuit',
@@ -1235,6 +1236,9 @@ export const frFR: LocalizationResource = {
       subtitle: "Entrez le code généré par votre application d'authentification.",
       title: 'Vérification par application d’authentification',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

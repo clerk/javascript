@@ -63,6 +63,7 @@ export const thTH: LocalizationResource = {
   badge__canceledEndsAt: "ถูกยกเลิก • สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__currentPlan: 'แผนปัจจุบัน',
   badge__default: 'ค่าเริ่มต้น',
+  badge__deprovisioned: undefined,
   badge__endsAt: "สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__expired: 'หมดอายุ',
   badge__freeTrial: 'ทดลองใช้ฟรี',
@@ -1219,6 +1220,9 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสที่สร้างโดยแอป Authenticator ของคุณเพื่อดำเนินการต่อ',
       title: 'ต้องการการยืนยัน',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

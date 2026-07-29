@@ -1,11 +1,10 @@
 'use client';
 
-import { useMergeRefs } from '@floating-ui/react';
 import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react';
 
 import { useAnimationsFinished } from '../../hooks/use-animations-finished';
 import { useTransition } from '../../hooks/use-transition';
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { resetLayoutStyles } from '../../utils/reset-layout-styles';
 import { useAccordionItemContext } from './accordion-context';
 
@@ -17,9 +16,6 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     const { open, triggerId, panelId } = useAccordionItemContext();
 
     const panelRef = useRef<HTMLElement | null>(null);
-    // Merge the consumer ref with the internal panelRef so passing a ref does not
-    // clobber the ref the panel relies on for height measurement.
-    const combinedRef = useMergeRefs([panelRef, ref]);
     const [height, setHeight] = useState<number | undefined>(undefined);
 
     // Track whether open has ever transitioned from true→false.
@@ -98,17 +94,15 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     const effectiveTransitionProps = !hasBeenClosed.current
       ? {
           ...transitionProps,
-          'data-cl-starting-style': undefined,
+          'data-starting-style': undefined,
           style: undefined,
         }
       : transitionProps;
 
     const defaultProps: Record<string, unknown> = {
-      'data-cl-slot': 'accordion-panel',
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
-      ref: combinedRef,
       ...effectiveTransitionProps,
       style: {
         '--cl-accordion-panel-height': height != null ? `${height}px` : undefined,
@@ -121,13 +115,14 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
     // override it, or the trigger/panel aria pairing would silently break.
     merged.id = panelId;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'div',
       render,
       enabled: mounted,
+      ref: [panelRef, ref],
       state,
       stateAttributesMapping: {
-        open: (v: boolean): Record<string, string> | null => (v ? { 'data-cl-open': '' } : { 'data-cl-closed': '' }),
+        open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },
       props: merged,
     });

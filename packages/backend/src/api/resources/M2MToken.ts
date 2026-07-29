@@ -55,11 +55,11 @@ export class M2MToken {
     readonly revocationReason: string | null,
     /** Whether the M2M token has expired. */
     readonly expired: boolean,
-    /** The Unix timestamp when the M2M token expires. */
+    /** The Unix timestamp (in milliseconds) when the M2M token expires. */
     readonly expiration: number | null,
-    /** The Unix timestamp when the M2M token was created. */
+    /** The Unix timestamp (in milliseconds) when the M2M token was created. */
     readonly createdAt: number,
-    /** The Unix timestamp when the M2M token was last updated. */
+    /** The Unix timestamp (in milliseconds) when the M2M token was last updated. */
     readonly updatedAt: number,
     /** The token string. */
     readonly token?: string,

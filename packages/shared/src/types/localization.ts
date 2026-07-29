@@ -70,7 +70,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g., `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */
@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
@@ -154,6 +158,7 @@ export type __internal_LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__banned: LocalizationValue;
+  badge__deprovisioned: LocalizationValue;
   badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;

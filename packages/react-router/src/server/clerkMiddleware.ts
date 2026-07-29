@@ -2,6 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
@@ -10,7 +11,6 @@ import { clerkClient } from './clerkClient';
 import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
-import { patchRequest } from './utils';
 
 type RequestStateContextValue = {
   requestState: RequestState<any>;

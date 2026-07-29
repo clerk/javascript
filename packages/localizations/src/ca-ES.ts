@@ -62,6 +62,7 @@ export const caES: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Per defecte',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1227,6 +1228,9 @@ export const caES: LocalizationResource = {
       subtitle: "Introdueix el codi d'autenticació TOTP per completar la verificació.",
       title: 'Verificació per TOTP (2FA)',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

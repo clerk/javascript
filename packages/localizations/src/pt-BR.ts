@@ -63,6 +63,7 @@ export const ptBR: LocalizationResource = {
   badge__canceledEndsAt: "Cancelado • Termina {{ date | shortDate('pt-BR') }}",
   badge__currentPlan: 'Plano atual',
   badge__default: 'Padrão',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina {{ date | shortDate('pt-BR') }}",
   badge__expired: 'Expirado',
   badge__freeTrial: 'Teste gratuito',
@@ -1229,6 +1230,9 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Digite o código de verificação gerado pelo seu aplicativo de autenticação.',
       title: 'Autenticação TOTP',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

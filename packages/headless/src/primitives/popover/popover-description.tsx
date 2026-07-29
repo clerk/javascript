@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { type ComponentProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, mergeProps, useRender } from '../../utils';
 import { usePopoverContext } from './popover-context';
 
 export type PopoverDescriptionProps = Omit<ComponentProps<'p'>, 'id'>;
@@ -17,11 +17,10 @@ export function PopoverDescription(props: PopoverDescriptionProps) {
   }, [setHasDescription]);
 
   const defaultProps = {
-    'data-cl-slot': 'popover-description',
     id: descriptionId,
   };
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'p',
     render,
     props: mergeProps<'p'>(defaultProps, otherProps),

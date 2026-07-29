@@ -62,6 +62,7 @@ export const skSK: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Aktuálny balík',
   badge__default: 'Predvolené',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1220,6 +1221,9 @@ export const skSK: LocalizationResource = {
       subtitle: 'Vložte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Vyžaduje sa overenie',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

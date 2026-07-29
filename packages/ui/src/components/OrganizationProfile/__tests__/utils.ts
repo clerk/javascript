@@ -21,6 +21,7 @@ type FakeMemberParams = {
   firstName?: string;
   lastName?: string;
   imageUrl?: string;
+  deprovisioned?: boolean;
   createdAt?: Date;
 };
 
@@ -41,6 +42,7 @@ export const createFakeMember = (params: FakeMemberParams): OrganizationMembersh
       firstName: params?.firstName || 'test_firstName',
       lastName: params?.lastName || 'test_lastName',
       imageUrl: params?.imageUrl || '',
+      deprovisioned: params.deprovisioned,
     },
   } as any;
 };

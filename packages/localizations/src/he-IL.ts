@@ -62,6 +62,7 @@ export const heIL: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ברירת מחדל',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1212,6 +1213,9 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
       title: 'אימות דו-שלבי',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

@@ -158,7 +158,7 @@ export const DomainList = withProtect(
             sx={[
               t => ({
                 width: '100%',
-                height: t.space.$10,
+                height: t.space.$8,
                 position: 'relative',
               }),
             ]}

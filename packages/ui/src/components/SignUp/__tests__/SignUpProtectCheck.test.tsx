@@ -1,6 +1,6 @@
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { SignUpResource } from '@clerk/shared/types';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -236,6 +236,73 @@ describe('SignUpProtectCheck', () => {
     await waitFor(() => {
       expect(reloadMock).toHaveBeenCalled();
       expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    });
+  });
+
+  describe('challenge widget visibility', () => {
+    // Visibility is driven by the script, not observed from the DOM: executeProtectCheck hands
+    // the script a `setWidgetVisible` callback in its init payload, and the script calls it
+    // right before revealing UI in the container (and with `false` once the widget is done).
+    const renderWithPendingChallenge = async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      let container: HTMLDivElement | undefined;
+      let setWidgetVisible: ((visible: boolean) => Promise<void>) | undefined;
+      mockExecute.mockImplementation((_protectCheck, el, opts) => {
+        container = el as HTMLDivElement;
+        setWidgetVisible = opts?.setWidgetVisible;
+        return new Promise(() => {}); // never resolves; the check stays running
+      });
+      const utils = render(<SignUpProtectCheck />, { wrapper });
+      await waitFor(() => expect(mockExecute).toHaveBeenCalled());
+      return { ...utils, container: container!, setWidgetVisible: setWidgetVisible! };
+    };
+
+    it('waits a beat before showing the spinner so near-instant checks never flash it', async () => {
+      const { queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
+
+      expect(queryByLabelText(/loading/i)).not.toBeInTheDocument();
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+    });
+
+    it('hides the spinner while the script signals a visible widget and restores it on the counter-signal', async () => {
+      const { setWidgetVisible, queryByText, queryByLabelText, findByLabelText } = await renderWithPendingChallenge();
+
+      // Invisible phase (SDK loading / executing): the spinner is the progress indicator.
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+      // The label lives on the spinner itself — no visible "Loading" text (design-system
+      // consistency; see the dogfooding thread).
+      expect(queryByText(/loading/i)).not.toBeInTheDocument();
+
+      // The script announces its widget. By the time the promise resolves, the spinner must
+      // ALREADY be out of the DOM — that's the contract that lets the script reveal its UI
+      // without a frame of overlap.
+      let spinnerGoneAtResolve = false;
+      await act(async () => {
+        await setWidgetVisible(true);
+        spinnerGoneAtResolve = queryByLabelText(/loading/i) === null;
+      });
+      expect(spinnerGoneAtResolve).toBe(true);
+
+      // Widget done (e.g. solved, proof verification in flight): spinner takes back over.
+      await act(async () => {
+        await setWidgetVisible(false);
+      });
+      expect(await findByLabelText(/loading/i)).toBeInTheDocument();
+    });
+
+    it('keeps the empty challenge container out of the layout until the script signals visibility', async () => {
+      const { container, setWidgetVisible } = await renderWithPendingChallenge();
+
+      // No reserved height and no flex-gap slot while there is nothing to show.
+      expect(container.style.minHeight).toBe('');
+      expect(container.style.position).toBe('absolute');
+
+      await act(async () => {
+        await setWidgetVisible(true);
+      });
+      expect(container.style.position).toBe('static');
     });
   });
 

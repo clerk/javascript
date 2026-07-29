@@ -6,7 +6,7 @@ A set of stacked sections where each is toggled by its own heading button, from
 `@clerk/headless`. It is a **headless** primitive: it supplies behavior, single/multiple
 open state, roving-focus keyboard navigation, ARIA wiring, and the expand/collapse
 animation lifecycle, but ships **no styles** — you bring your own CSS by targeting the
-`data-cl-*` attributes each part emits.
+`data-*` attributes each part emits.
 
 ## Example
 
@@ -97,27 +97,26 @@ props beyond standard HTML attributes for their default element.
 
 ## Styling
 
-Each part emits `data-cl-*` attributes you can target with any CSS solution:
+Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute                | Applies To           | Description                                         |
-| ------------------------ | -------------------- | --------------------------------------------------- |
-| `data-cl-slot`           | All parts            | Part identifier                                     |
-| `data-cl-open`           | Item, Trigger, Panel | Present when the item is open                       |
-| `data-cl-closed`         | Item, Trigger, Panel | Present when the item is closed                     |
-| `data-cl-disabled`       | Item, Trigger        | Present when the item is disabled                   |
-| `data-cl-starting-style` | Panel                | Present on the entering frame of the open animation |
-| `data-cl-ending-style`   | Panel                | Present during the exit animation before unmount    |
+| Attribute             | Applies To           | Description                                         |
+| --------------------- | -------------------- | --------------------------------------------------- |
+| `data-open`           | Item, Trigger, Panel | Present when the item is open                       |
+| `data-closed`         | Item, Trigger, Panel | Present when the item is closed                     |
+| `data-disabled`       | Item, Trigger        | Present when the item is disabled                   |
+| `data-starting-style` | Panel                | Present on the entering frame of the open animation |
+| `data-ending-style`   | Panel                | Present during the exit animation before unmount    |
 
 `Accordion.Panel` exposes `--cl-accordion-panel-height` (its measured content height)
 for height-based animations:
 
 ```css
-[data-cl-slot='accordion-panel'] {
+.cl-accordion-panel {
   overflow: hidden;
   height: var(--cl-accordion-panel-height);
   transition: height 200ms ease;
 }
-[data-cl-slot='accordion-panel'][data-cl-closed] {
+.cl-accordion-panel[data-closed] {
   height: 0;
 }
 ```

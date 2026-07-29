@@ -63,6 +63,7 @@ export const jaJP: LocalizationResource = {
   badge__canceledEndsAt: "キャンセル済み • {{ date | shortDate('ja-JP') }}に終了",
   badge__currentPlan: '現在のプラン',
   badge__default: 'デフォルト',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ja-JP') }}に終了",
   badge__expired: '期限切れ',
   badge__freeTrial: '無料トライアル',
@@ -1228,6 +1229,9 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するには、認証アプリで生成されたコードを入力してください',
       title: '確認が必要です',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

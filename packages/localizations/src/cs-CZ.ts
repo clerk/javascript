@@ -63,6 +63,7 @@ export const csCZ: LocalizationResource = {
   badge__canceledEndsAt: "Zrušeno • Končí {{ date | shortDate('cs-CZ') }}",
   badge__currentPlan: 'Aktuální plán',
   badge__default: 'Výchozí',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Končí {{ date | shortDate('cs-CZ') }}",
   badge__expired: 'Vypršelo',
   badge__freeTrial: undefined,
@@ -1225,6 +1226,9 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte kód vygenerovaný vaší aplikací pro ověřování pro pokračování',
       title: 'Vyžadováno ověření',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

@@ -62,8 +62,8 @@ export function Destructive({
     >
       {({ close }) => (
         <>
-          <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
-          <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
+          <Dialog.Description render={<Text />}>{description}</Dialog.Description>
           {error && (
             <Box
               role='alert'

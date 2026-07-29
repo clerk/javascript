@@ -1,5 +1,109 @@
 # Change Log
 
+## 3.13.2
+
+### Patch Changes
+
+- Correct two Dashboard labels referenced in the instance restrictions documentation. `blockDisposableEmailDomains` bolded "Block sign-ups that use disposable email domains", but the toggle in the Clerk Dashboard is "Block sign-ups that use disposable email addresses". `ignoreDotsForGmailAddresses` bolded "Ignore dots for Gmail addresses" as a Dashboard toggle, but no such control exists — the wording now matches the equivalent comment on `UpdateRestrictionsParams`. Property names are unchanged. ([#9253](https://github.com/clerk/javascript/pull/9253)) by [@manovotny](https://github.com/manovotny)
+
+## 3.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+
+## 3.13.0
+
+### Minor Changes
+
+- Add an `fapiUrl` option to Frontend API proxy helpers so requests can target a custom Clerk Frontend API URL. ([#9223](https://github.com/clerk/javascript/pull/9223)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
+## 3.12.0
+
+### Minor Changes
+
+- Fix a cross-origin handshake bypass where `isKnownClerkReferrer()` trusted overly broad referrer hosts as Clerk-owned: any `accounts.*` host (e.g. `accounts.attacker.com`), plus dev account-portal domains (`*.accounts.dev` and legacy suffixes) on production instances. These let unrelated origins skip the handshake and its session-freshness check. The referrer is now trusted only for the accounts portal derived from the instance's frontend API, plus dev account-portal domains on non-production instances. ([#9145](https://github.com/clerk/javascript/pull/9145)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Add an optional `orgId` parameter to `createSignInToken()` for activating an Organization when the token is redeemed. ([#9192](https://github.com/clerk/javascript/pull/9192)) by [@swolfand](https://github.com/swolfand)
+
+### Patch Changes
+
+- Standardize JSDoc punctuation to always follow `e.g.` and `i.e.` with a comma (`e.g.,` / `i.e.,`), matching the docs style guide. Comment-only change; no runtime behavior is affected. This keeps the generated Typedoc reference output consistent. ([#9201](https://github.com/clerk/javascript/pull/9201)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add the required `provider` field to `CreateEnterpriseConnectionParams`. The Backend API has always required `provider` when creating an enterprise connection, so calls to `createEnterpriseConnection()` without it type-checked but failed at runtime. The field is typed to the supported provider values (`'saml_custom'`, `'saml_okta'`, `'saml_google'`, `'saml_microsoft'`, `'oidc_custom'`, `'oidc_github_enterprise'`, `'oidc_gitlab'`), so unsupported values are also caught at compile time. ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+
+- Add the remaining optional enterprise connection parameters supported by the Backend API. `CreateEnterpriseConnectionParams` and `UpdateEnterpriseConnectionParams` now accept `allowOrganizationAccountLinking`, `customAttributes`, `authenticatable`, and `disableJitProvisioning` (update also accepts `disableAdditionalIdentifications`), and SAML params accept `loginHint` for configuring the `login_hint` sent to the IdP. ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+
+- Align `CreateEnterpriseConnectionParams` and `UpdateEnterpriseConnectionParams` with the Backend API contract: ([#9155](https://github.com/clerk/javascript/pull/9155)) by [@manovotny](https://github.com/manovotny)
+  - `name` and `domains` are now required on `CreateEnterpriseConnectionParams`. The Backend API already rejected requests missing either of them, so calls that omitted these fields failed at runtime; the types now surface this at compile time.
+  - Deprecated `syncUserAttributes` on `CreateEnterpriseConnectionParams`. The Backend API ignores this parameter on create; use `updateEnterpriseConnection()` to set it.
+  - Deprecated `provider` on `UpdateEnterpriseConnectionParams`. The Backend API ignores this parameter on update; the provider cannot be changed after creation.
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+
+## 3.11.7
+
+### Patch Changes
+
+- Reject machine tokens (M2M and OAuth JWTs) presented in the `__session` cookie. Previously such a token could pass session verification and produce a signed-in state with the machine identity as `userId`, defeating `if (userId)` authorization checks. The cookie path now mirrors the existing header-path guard and returns a signed-out state for these tokens. ([#9168](https://github.com/clerk/javascript/pull/9168)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+
+## 3.11.6
+
+### Patch Changes
+
+- Add `CLERK_DISABLE_AUTO_PROXY=true` to opt out of automatic Frontend API proxying on Vercel production deployments. ([#9159](https://github.com/clerk/javascript/pull/9159)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+
+## 3.11.5
+
+### Patch Changes
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+
+## 3.11.4
+
+### Patch Changes
+
+- Clarify in the `M2MToken`, `APIKey`, and `IdPOAuthAccessToken` JSDoc that the timestamp properties (`expiration`, `lastUsedAt`, `createdAt`, and `updatedAt`) are Unix timestamps in milliseconds (not seconds). ([#9122](https://github.com/clerk/javascript/pull/9122)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 3.11.3
+
+### Patch Changes
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+
+## 3.11.2
+
+### Patch Changes
+
+- Improve satellite-domain redirect loop diagnostics. ([#8636](https://github.com/clerk/javascript/pull/8636)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+
+## 3.11.1
+
+### Patch Changes
+
+- Enforce the `azp` (authorized party) claim when `authorizedParties` is configured. Previously, a session token that was missing the `azp` claim was accepted even when `authorizedParties` was set, allowing the authorized-parties check to be bypassed by omitting the claim. Now, when `authorizedParties` is configured, a token with a missing or empty `azp` claim is rejected. Tokens without `azp` continue to be accepted when no `authorizedParties` are configured. ([#8877](https://github.com/clerk/javascript/pull/8877)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+
 ## 3.11.0
 
 ### Minor Changes

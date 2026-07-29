@@ -62,6 +62,7 @@ export const idID: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Default',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1221,6 +1222,9 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan kode yang dihasilkan oleh aplikasi autentikator Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

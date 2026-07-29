@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__canceledEndsAt: "Đã hủy • Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__currentPlan: 'Gói hiện tại',
   badge__default: 'Mặc định',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__expired: 'Đã hết hạn',
   badge__freeTrial: 'Dùng thử miễn phí',
@@ -1227,6 +1228,9 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập mã đã được tạo bởi ứng dụng xác thực của bạn để tiếp tục',
       title: 'Xác minh yêu cầu',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

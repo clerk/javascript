@@ -16,11 +16,19 @@ type StripTrailingSlash<T extends string> = T extends '/'
 /**
  * Suggests the `:path*` subtree form (e.g. `/dashboard/:path*`), which matches on
  * path-segment boundaries. `/` is special-cased to `/:path*` to avoid a malformed `//:path*`.
+ *
+ * @deprecated Will be removed in the next major version together with {@link createPathMatcher}.
  */
 export type WithPathSegmentWildcard<T = string> = T extends '/'
   ? '/:path*'
   : `${StripTrailingSlash<T & string>}/:path*`;
+/**
+ * @deprecated Will be removed in the next major version together with {@link createPathMatcher}.
+ */
 export type PathPattern = Autocomplete<WithPathSegmentWildcard>;
+/**
+ * @deprecated Will be removed in the next major version together with {@link createPathMatcher}.
+ */
 export type PathMatcherParam = Array<RegExp | PathPattern> | RegExp | PathPattern;
 
 export class MalformedURLError extends Error {
@@ -70,6 +78,10 @@ export const normalizePath = (pathname: string): string => {
  *
  * @param patterns - A string, RegExp, or array of patterns to match against
  * @returns A function that takes a pathname and returns true if it matches any of the patterns
+ *
+ * @deprecated This function will be removed in the next major version. Pattern-based path matching
+ * can diverge from how frameworks route requests; use your framework's native routing primitives
+ * to decide which paths to protect instead.
  */
 export const createPathMatcher = (patterns: PathMatcherParam) => {
   const routePatterns = [patterns || ''].flat().filter(Boolean);

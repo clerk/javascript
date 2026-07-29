@@ -62,6 +62,7 @@ export const nlBE: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standaard',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1221,6 +1222,9 @@ export const nlBE: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Tweestapsverificatie',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

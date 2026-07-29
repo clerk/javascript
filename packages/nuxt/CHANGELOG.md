@@ -1,5 +1,118 @@
 # @clerk/nuxt
 
+## 2.6.23
+
+### Patch Changes
+
+- Updated dependencies [[`6f5fde9`](https://github.com/clerk/javascript/commit/6f5fde9005ca4e90dc59a8b5a04b5742aa540173)]:
+  - @clerk/backend@3.13.2
+  - @clerk/vue@2.4.20
+
+## 2.6.22
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/vue@2.4.20
+  - @clerk/backend@3.13.1
+
+## 2.6.21
+
+### Patch Changes
+
+- Updated dependencies [[`848eefe`](https://github.com/clerk/javascript/commit/848eefe6dcc23cbad617a5c6ccb582eaae2a9bac), [`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/backend@3.13.0
+  - @clerk/shared@4.25.7
+  - @clerk/vue@2.4.19
+
+## 2.6.20
+
+### Patch Changes
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a), [`ff5d991`](https://github.com/clerk/javascript/commit/ff5d991a2cb4de15c45e9666815fdfddf7bec862), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a), [`26530ce`](https://github.com/clerk/javascript/commit/26530ce5cff5f644e1656fdd418b343fb3773bec), [`a009d91`](https://github.com/clerk/javascript/commit/a009d919b32a08fac7b2695bedfa840fd047e88a)]:
+  - @clerk/backend@3.12.0
+  - @clerk/shared@4.25.6
+  - @clerk/vue@2.4.18
+
+## 2.6.19
+
+### Patch Changes
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716), [`e657d99`](https://github.com/clerk/javascript/commit/e657d994d938194cfa02da329707bf012873c01b)]:
+  - @clerk/shared@4.25.5
+  - @clerk/backend@3.11.7
+  - @clerk/vue@2.4.17
+
+## 2.6.18
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/backend@3.11.6
+  - @clerk/shared@4.25.4
+  - @clerk/vue@2.4.16
+
+## 2.6.17
+
+### Patch Changes
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+  - @clerk/backend@3.11.5
+  - @clerk/vue@2.4.15
+
+## 2.6.16
+
+### Patch Changes
+
+- Updated dependencies [[`1a19409`](https://github.com/clerk/javascript/commit/1a1940975b51749dbf066344a8be305cc45ea928)]:
+  - @clerk/backend@3.11.4
+
+## 2.6.15
+
+### Patch Changes
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+  - @clerk/backend@3.11.3
+  - @clerk/vue@2.4.14
+
+## 2.6.14
+
+### Patch Changes
+
+- Updated dependencies [[`08ba540`](https://github.com/clerk/javascript/commit/08ba5401c45c5c6e60d320c66493b6b58b446403), [`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/backend@3.11.2
+  - @clerk/shared@4.25.1
+  - @clerk/vue@2.4.13
+
+## 2.6.13
+
+### Patch Changes
+
+- Deprecate `createRouteMatcher()` in favor of Nuxt's native route matching. ([#9092](https://github.com/clerk/javascript/pull/9092)) by [@jacekradko](https://github.com/jacekradko)
+
+  To protect API routes, match paths natively inside `clerkMiddleware()`:
+
+  ```ts
+  export default clerkMiddleware(event => {
+    const { isAuthenticated } = event.context.auth();
+    const { pathname } = getRequestURL(event);
+
+    if (!isAuthenticated && pathname.startsWith('/api/admin')) {
+      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+    }
+  });
+  ```
+
+  To protect pages, use Nuxt's built-in route middleware with `definePageMeta({ middleware: 'auth' })`.
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1), [`80afb69`](https://github.com/clerk/javascript/commit/80afb69ecf2d1a3525e46a919952a47ff1fe924b)]:
+  - @clerk/shared@4.25.0
+  - @clerk/backend@3.11.1
+  - @clerk/vue@2.4.12
+
 ## 2.6.12
 
 ### Patch Changes

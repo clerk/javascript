@@ -62,6 +62,7 @@ export const esCR: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Plan actual',
   badge__default: 'Por defecto',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina {{ date | shortDate('en-ES') }}",
   badge__expired: 'Caducado',
   badge__freeTrial: undefined,
@@ -1223,6 +1224,9 @@ export const esCR: LocalizationResource = {
       subtitle: 'Ingresa el código generado por la aplicación de autenticación para continuar',
       title: 'Verificación requerida',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

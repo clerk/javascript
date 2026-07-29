@@ -62,6 +62,7 @@ export const elGR: LocalizationResource = {
   badge__canceledEndsAt: 'Ακυρώθηκε, λήγει {{date | timeString("el-GR")}}',
   badge__currentPlan: 'Τρέχον πλάνο',
   badge__default: 'Προεπιλογή',
+  badge__deprovisioned: undefined,
   badge__endsAt: 'Λήγει {{date | timeString("el-GR")}}',
   badge__expired: 'Έληξε',
   badge__freeTrial: 'Δωρεάν δοκιμή',
@@ -1225,6 +1226,9 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε',
       title: 'Επαλήθευση δύο παραγόντων',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

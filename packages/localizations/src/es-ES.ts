@@ -62,6 +62,7 @@ export const esES: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Por defecto',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1228,6 +1229,9 @@ export const esES: LocalizationResource = {
       subtitle: 'Introduce el código de autenticación TOTP para completar la verificación.',
       title: 'Verificación por TOTP (2FA)',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

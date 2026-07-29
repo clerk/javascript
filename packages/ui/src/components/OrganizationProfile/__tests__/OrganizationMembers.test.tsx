@@ -220,6 +220,52 @@ describe('OrganizationMembers', () => {
     expect(queryByText('Member')).toBeInTheDocument();
   });
 
+  it('marks deprovisioned members as disabled', async () => {
+    const membersList: OrganizationMembershipResource[] = [
+      createFakeMember({
+        id: '1',
+        orgId: '1',
+        role: 'admin',
+        identifier: 'deprovisioned_user',
+        deprovisioned: true,
+      }),
+    ];
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', id: '1' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockResolvedValue({ data: membersList, total_count: 1 });
+    fixtures.clerk.organization?.getRoles.mockResolvedValue({
+      total_count: 1,
+      data: [
+        {
+          pathRoot: '',
+          reload: vi.fn(),
+          id: 'admin',
+          key: 'admin',
+          name: 'Admin',
+          description: '',
+          permissions: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+
+    const { container, getByText, getByRole } = render(<OrganizationMembers />, { wrapper });
+
+    await waitForLoadingCompleted(container);
+
+    expect(container.querySelector('[data-localization-key="badge__deprovisioned"]')).toBeInTheDocument();
+    expect(getByText('deprovisioned_user').closest('tr')).toHaveAttribute('aria-disabled', 'true');
+    expect(getByRole('button', { name: 'Admin' })).toBeDisabled();
+  });
+
   it('display pagination counts for 2 pages', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

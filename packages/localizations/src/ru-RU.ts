@@ -62,6 +62,7 @@ export const ruRU: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1226,6 +1227,9 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Чтобы продолжить, введите верификационный код, сгенерированный вашим приложением-аутентификатором',
       title: 'Двухфакторная верификация',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

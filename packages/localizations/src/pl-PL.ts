@@ -62,6 +62,7 @@ export const plPL: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Domyślny',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1219,6 +1220,9 @@ export const plPL: LocalizationResource = {
       subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez swoją aplikację uwierzytelniającą',
       title: 'Wymagana weryfikacja',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

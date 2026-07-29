@@ -18,6 +18,7 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
+import { useSpinDelay } from '../../hooks';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 
@@ -63,7 +64,7 @@ function SignInProtectCheckInternal(): JSX.Element {
   const { setActive } = useClerk();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
 
-  const { containerRef, isRunning, hasError, retry } = useProtectCheckRunner<SignInResource>({
+  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignInResource>({
     getProtectCheck: () => signIn.protectCheck,
     getResource: () => signIn,
     reload: () => signIn.reload(),
@@ -88,6 +89,13 @@ function SignInProtectCheckInternal(): JSX.Element {
     },
   });
 
+  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
+  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
+  // The error and widget-visibility gates stay OUTSIDE the delay hook below: its minimum
+  // visible duration must never outrank the handshake's "spinner is gone when the promise
+  // resolves" guarantee, nor keep a spinner next to the retry button.
+  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+
   return (
     <Flow.Part part='protectCheck'>
       <Card.Root>
@@ -105,21 +113,18 @@ function SignInProtectCheckInternal(): JSX.Element {
               ref={containerRef}
               id='clerk-protect-check'
               aria-busy={isRunning}
-              style={{ display: 'block', alignSelf: 'center', minHeight: '60px' }}
+              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
+              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
+              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
-            {isRunning && !hasError ? (
-              <Flex
-                direction='col'
-                center
-                gap={4}
-                aria-live='polite'
-              >
+            {showSpinner && !hasError && !isWidgetVisible ? (
+              <Flex center>
                 <Spinner
                   size='lg'
                   colorScheme='primary'
                   elementDescriptor={descriptors.spinner}
+                  aria-label={t(localizationKeys('signIn.protectCheck.loading'))}
                 />
-                <Box>{t(localizationKeys('signIn.protectCheck.loading'))}</Box>
               </Flex>
             ) : null}
             {hasError ? (

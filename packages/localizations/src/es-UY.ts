@@ -62,6 +62,7 @@ export const esUY: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Predeterminado',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -1222,6 +1223,9 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá el código generado por tu aplicación autenticadora para continuar',
       title: 'Verificación requerida',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

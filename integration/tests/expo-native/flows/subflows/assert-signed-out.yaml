@@ -1,0 +1,6 @@
+# Subflow: assert the JS layer is signed out.
+appId: com.clerk.exponativebuildfixture
+---
+- extendedWaitUntil:
+    visible: 'signed out'
+    timeout: 20000

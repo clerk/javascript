@@ -63,6 +63,7 @@ export const faIR: LocalizationResource = {
   badge__canceledEndsAt: "لغو شد • پایان می‌یابد {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'طرح فعلی',
   badge__default: 'پیش فرض',
+  badge__deprovisioned: undefined,
   badge__endsAt: "به پایان می رسد {{ date | shortDate('en-US') }}",
   badge__expired: 'مننقضی شده',
   badge__freeTrial: undefined,
@@ -1227,6 +1228,9 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه، کد تولید شده توسط برنامه تأیید هویت خود را وارد کنید',
       title: 'تایید هویت الزامی است',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {

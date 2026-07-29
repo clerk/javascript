@@ -63,6 +63,7 @@ export const msMY: LocalizationResource = {
   badge__canceledEndsAt: "Dibatalkan • Tamat {{ date | shortDate('ms-MY') }}",
   badge__currentPlan: 'Pelan Semasa',
   badge__default: 'Lalai',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Tamat {{ date | shortDate('ms-MY') }}",
   badge__expired: 'Tamat tempoh',
   badge__freeTrial: 'Percubaan percuma',
@@ -1231,6 +1232,9 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kod yang dijana oleh aplikasi pengesah anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
