@@ -171,9 +171,6 @@ export function Interactive() {
         <Item.Title>Test Organization</Item.Title>
         <Item.Description>Member</Item.Description>
       </Item.Content>
-      <Item.Media style={{ width: '1.75rem' }}>
-        <ArrowIcon />
-      </Item.Media>
     </Item.Root>
   );
 }
@@ -198,20 +195,16 @@ export function Group() {
       </Item.Group>
       <Item.Separator />
       <Item.Group>
-        <Item.Root size='flush'>
-          <Item.Content>
-            <Item.Description>cameron@clerk.com</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <Button
-              size='sm'
-              shape='square'
-              variant='ghost'
-            >
-              <EllipsisIcon />
-            </Button>
-          </Item.Actions>
-        </Item.Root>
+        <Item.Header>
+          <Item.HeaderTitle>cameron@clerk.com</Item.HeaderTitle>
+          <Button
+            size='sm'
+            shape='square'
+            variant='ghost'
+          >
+            <EllipsisIcon />
+          </Button>
+        </Item.Header>
         <Item.Root>
           <Item.Media>
             <Avatar.Root shape='square'>
@@ -226,9 +219,7 @@ export function Group() {
             <Item.Title>Clerk</Item.Title>
             <Item.Description>24 members &bull; Basic</Item.Description>
           </Item.Content>
-          <Item.Media>
-            <CheckMarkIcon width='28px' />
-          </Item.Media>
+          <CheckMarkIcon width='28px' />
         </Item.Root>
         <Item.Root
           render={({ children, ...props }) => (
@@ -281,6 +272,7 @@ export function Group() {
       <Item.Separator />
       <Item.Group>
         <Item.Root
+          variant='action'
           render={({ children, ...props }) => (
             <a
               {...props}
@@ -301,13 +293,14 @@ export function Group() {
       <Item.Separator />
       <Item.Group>
         <Item.Root
+          variant='action'
           render={({ children, ...props }) => (
-            <a
+            <button
+              type='button'
               {...props}
-              href='#two'
             >
               {children}
-            </a>
+            </button>
           )}
         >
           <Item.Media>

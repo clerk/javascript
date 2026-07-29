@@ -52,16 +52,19 @@ import { Item } from '@clerk/ui/mosaic/components/item';
 
 ## Parts
 
-| Part               | Class                 | Description                                                          |
-| ------------------ | --------------------- | -------------------------------------------------------------------- |
-| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
-| `Item.Media`       | `cl-item-media`       | Leading (or trailing) media: icon, image, or avatar.                 |
-| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions. |
-| `Item.Title`       | `cl-item-title`       | Primary label.                                                       |
-| `Item.Description` | `cl-item-description` | Secondary text. Renders a `<p>`.                                     |
-| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                 |
-| `Item.Group`       | `cl-item-group`       | Vertical list wrapper (`role="list"`).                               |
-| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                  |
+| Part                 | Class                    | Description                                                          |
+| -------------------- | ------------------------ | -------------------------------------------------------------------- |
+| `Item.Root`          | `cl-item`                | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Media`         | `cl-item-media`          | Leading (or trailing) media: icon, image, or avatar.                 |
+| `Item.Content`       | `cl-item-content`        | Vertical stack that grows to fill the row between media and actions. |
+| `Item.Title`         | `cl-item-title`          | Primary label.                                                       |
+| `Item.Description`   | `cl-item-description`    | Secondary text. Renders a `<p>`.                                     |
+| `Item.Actions`       | `cl-item-actions`        | Trailing controls (buttons, badges).                                 |
+| `Item.Header`        | `cl-item-header`         | Header row above a group: a label with optional actions.             |
+| `Item.HeaderTitle`   | `cl-item-header-title`   | Label text within an `Item.Header`.                                  |
+| `Item.HeaderActions` | `cl-item-header-actions` | Trailing controls within an `Item.Header`.                           |
+| `Item.Group`         | `cl-item-group`          | Vertical list wrapper (`role="list"`).                               |
+| `Item.Separator`     | `cl-item-separator`      | Thin divider (`<hr>`) between rows.                                  |
 
 Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
@@ -69,10 +72,12 @@ Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
 The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
 
-| Prop     | Attribute          | Values                              | Default |
-| -------- | ------------------ | ----------------------------------- | ------- |
-| `size`   | `data-size`        | `flush` \| `md`                     | `md`    |
-| `render` | `data-interactive` | present when a `render` is provided | —       |
+| Prop      | Attribute          | Values                              | Default  |
+| --------- | ------------------ | ----------------------------------- | -------- |
+| `variant` | `data-variant`     | `entity` \| `action`                | `entity` |
+| `render`  | `data-interactive` | present when a `render` is provided | —        |
+
+`variant` sets the row's vertical density (`entity` is standard, `action` is denser) and, on interactive rows, promotes the title color.
 
 ```css
 /* Re-theme interactive rows */

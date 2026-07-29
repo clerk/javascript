@@ -17,11 +17,11 @@ describe('Mosaic Item', () => {
     expect(item).not.toHaveAttribute('data-interactive');
   });
 
-  it('reflects the size prop as a data attribute, defaulting to md', () => {
+  it('reflects the variant prop as a data attribute, defaulting to entity', () => {
     const { rerender } = render(<Item.Root>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'md');
-    rerender(<Item.Root size='flush'>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'flush');
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'entity');
+    rerender(<Item.Root variant='action'>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'action');
   });
 
   it('wires consumer className/style through to the element', () => {

@@ -4,6 +4,8 @@ import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../
 
 export const item = stylex.create({
   base: {
+    margin: 0,
+    padding: 0,
     borderRadius: radiusVars['--cl-radius-element'],
     gap: space['3'],
     outline: {
@@ -35,23 +37,22 @@ export const item = stylex.create({
     cursor: 'pointer',
   },
 
-  // vertical density; horizontal padding is shared by the base
-  md: {
+  // vertical density derived from the variant; horizontal padding is shared by the base
+  entity: {
     paddingBlock: space['2'],
   },
-  flush: {
-    paddingBlock: space['0'],
+  action: {
+    paddingBlock: space['2.5'],
   },
 });
 
 export const media = stylex.create({
   base: {
-    gap: space['2'],
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    width: 'fit-content',
+    width: space['9'],
   },
 });
 
@@ -67,7 +68,14 @@ export const content = stylex.create({
 
 export const title = stylex.create({
   base: {
-    color: colorVars['--cl-color-card-foreground'],
+    // Non-action rows inherit the row's foreground. Only `action` rows start faded and
+    // darken to neutral on hover. Both overrides are scoped to the marker that item.tsx
+    // sets exclusively on interactive `action` rows, so no other row's title is touched.
+    color: {
+      default: null,
+      [stylex.when.ancestor(':not(:hover)')]: colorVars['--cl-color-neutral-faded'],
+      [stylex.when.ancestor(':hover')]: colorVars['--cl-color-neutral'],
+    },
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
@@ -92,6 +100,31 @@ export const actions = stylex.create({
   },
 });
 
+export const header = stylex.create({
+  base: {
+    paddingInline: space['2'],
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+});
+
+export const headerTitle = stylex.create({
+  base: {
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+});
+
+export const headerActions = stylex.create({
+  base: {
+    width: space['7'],
+  },
+});
+
 export const group = stylex.create({
   base: {
     padding: space['2'],
@@ -102,7 +135,7 @@ export const group = stylex.create({
 export const separator = stylex.create({
   base: {
     borderStyle: 'none',
-    backgroundColor: colorVars['--cl-color-border'],
+    backgroundColor: colorVars['--cl-color-border-faded'],
     flexShrink: 0,
     height: '1px',
     width: '100%',

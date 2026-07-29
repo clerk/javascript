@@ -8,14 +8,19 @@ import { truncationStyles } from '../typography.styles';
 import * as slots from './item.styles';
 
 export type ItemProps = Omit<MosaicComponentProps<'div'>, 'render'> & {
-  /** Vertical density of the row. `flush` removes the block padding. */
-  size?: 'flush' | 'md';
+  /**
+   * Visual treatment, which also sets the row's vertical density. `entity` (default)
+   * is a standard row; `action` is a denser row whose title color is promoted on
+   * interactive rows.
+   */
+  variant?: 'entity' | 'action';
   /** Render a custom element (e.g. a link or button) in place of the default `div`. */
   render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
 };
 
+/** Root row. Renders a `<div>`, or a custom element (link/button) via `render`. */
 const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { size = 'md', render, className, style, ...rest },
+  { variant = 'entity', render, className, style, ...rest },
   ref,
 ) {
   // A custom render (link/button row) opts into hover + cursor affordances.
@@ -26,8 +31,14 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item', { interactive, size }),
-        stylex.props(slots.item.base, slots.item[size], interactive && slots.item.interactive),
+        themeProps('item', { interactive, variant }),
+        stylex.props(
+          slots.item.base,
+          slots.item[variant],
+          interactive && slots.item.interactive,
+          // Marks action rows so `Item.Title` can react to their hover via `when.ancestor`.
+          interactive && variant === 'action' && stylex.defaultMarker(),
+        ),
         className,
         style,
       ),
@@ -36,6 +47,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
   });
 });
 
+/** Fixed-width leading i that centers its media (icon, image, or avatar). */
 const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
   { render, className, style, ...rest },
   ref,
@@ -51,6 +63,7 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
+/** Vertical stack (title + description) that grows to fill the row between media and actions. */
 const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemContent(
   { render, className, style, ...rest },
   ref,
@@ -66,6 +79,7 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
+/** Primary label. On interactive `action` rows its color darkens on hover. */
 const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemTitle(
   { render, className, style, ...rest },
   ref,
@@ -86,6 +100,7 @@ const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
+/** Secondary text beneath the title. */
 const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function MosaicItemDescription(
   { render, className, style, ...rest },
   ref,
@@ -106,6 +121,7 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
   });
 });
 
+/** Trailing controls (buttons, badges). */
 const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemActions(
   { render, className, style, ...rest },
   ref,
@@ -121,6 +137,55 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
+/** Header row above a group: a label (`Item.HeaderTitle`) with optional `Item.HeaderActions`. */
+const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemHeader(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('item-header'), stylex.props(slots.header.base), className, style),
+      ...rest,
+    },
+  });
+});
+
+/** Label text within an `Item.Header`. */
+const HeaderTitle = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemHeaderTitle(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('item-header-title'), stylex.props(slots.headerTitle.base), className, style),
+      ...rest,
+    },
+  });
+});
+
+/** Trailing controls within an `Item.Header`. */
+const HeaderActions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemHeaderActions(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('item-header-actions'), stylex.props(slots.headerActions.base), className, style),
+      ...rest,
+    },
+  });
+});
+
+/** Vertical list wrapper (`role="list"`) around a set of rows. */
 const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
   { render, className, style, ...rest },
   ref,
@@ -137,6 +202,7 @@ const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
+/** Thin divider (`<hr>`) between rows or groups. */
 const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(function MosaicItemSeparator(
   { render, className, style, ...rest },
   ref,
@@ -155,8 +221,8 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
  * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
- * `Item.Title`, `Item.Description`, `Item.Actions`, `Item.Group`,
- * `Item.Separator`.
+ * `Item.Title`, `Item.Description`, `Item.Actions`, `Item.Header`,
+ * `Item.HeaderTitle`, `Item.HeaderActions`, `Item.Group`, `Item.Separator`.
  */
 export const Item = {
   Root,
@@ -165,6 +231,9 @@ export const Item = {
   Title,
   Description,
   Actions,
+  Header,
+  HeaderTitle,
+  HeaderActions,
   Group,
   Separator,
 };
