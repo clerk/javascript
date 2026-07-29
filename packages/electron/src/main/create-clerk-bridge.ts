@@ -48,6 +48,15 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
     );
   }
 
+  if (options.renderer) {
+    assertValidRendererOriginConfig(options.renderer);
+
+    if (!app.requestSingleInstanceLock()) {
+      app.quit();
+      return { cleanup() {} };
+    }
+  }
+
   const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
   let cleanupOAuthTransport: (() => void) | undefined;
   const passkeys = options.passkeys ? setupPasskeysMain() : null;
@@ -57,8 +66,6 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
   }
 
   if (options.renderer) {
-    assertValidRendererOriginConfig(options.renderer);
-
     protocol.registerSchemesAsPrivileged([
       {
         scheme: options.renderer.scheme,

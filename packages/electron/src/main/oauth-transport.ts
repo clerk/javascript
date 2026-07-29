@@ -35,6 +35,10 @@ function isMatchingCallbackUrl(url: string, redirectUrl: string): boolean {
   }
 }
 
+function findMatchingCallbackUrl(argv: string[], redirectUrl: string): string | undefined {
+  return argv.find(url => isMatchingCallbackUrl(url, redirectUrl));
+}
+
 function assertExternalOAuthUrl(url: string): void {
   const parsedUrl = new URL(url);
 
@@ -45,6 +49,7 @@ function assertExternalOAuthUrl(url: string): void {
 
 export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): () => void {
   const redirectUrl = buildRedirectUrl(options);
+  let initialCallbackUrl = findMatchingCallbackUrl(process.argv, redirectUrl);
   let pendingOAuthFlow: PendingOAuthFlow | null = null;
 
   const disposePendingOAuthFlow = (reason?: Error): void => {
@@ -81,7 +86,7 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
   };
 
   const secondInstanceListener = (_event: Electron.Event, argv: string[]): void => {
-    const callbackUrl = argv.find(url => isMatchingCallbackUrl(url, redirectUrl));
+    const callbackUrl = findMatchingCallbackUrl(argv, redirectUrl);
 
     if (callbackUrl) {
       handleCallbackUrl(callbackUrl);
@@ -118,6 +123,13 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
 
       pendingOAuthFlow = { resolve, reject, timeout };
     });
+
+    if (initialCallbackUrl) {
+      const callbackUrl = initialCallbackUrl;
+      initialCallbackUrl = undefined;
+      handleCallbackUrl(callbackUrl);
+      return callbackPromise;
+    }
 
     try {
       await shell.openExternal(url);

@@ -74,6 +74,11 @@ app.whenReady().then(() => {
 });
 ```
 
+When a renderer scheme is configured, `createClerkBridge` acquires Electron's single-instance lock so
+OAuth deep links opened on Windows or Linux are forwarded to the primary process. Call it before
+`app.whenReady()`. Secondary processes are quit after forwarding their command-line arguments, and a
+matching callback from a cold-start launch is retained until the OAuth transport is ready.
+
 In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, `my-app://renderer` is the origin, and `/sign-in` is the path. If your renderer uses path-based routing, serve every route from the same origin and fall back to your renderer entrypoint as needed.
 
 ```ts
