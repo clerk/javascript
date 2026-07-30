@@ -85,7 +85,7 @@ export const styles = stylex.create({
     width: '100%',
   },
 
-  itemDestructive: {
+  itemNegative: {
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
@@ -94,26 +94,6 @@ export const styles = stylex.create({
       },
     },
     color: colorVars['--cl-color-negative'],
-  },
-
-  itemIcon: {
-    alignItems: 'center',
-    color: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 60%, transparent)`,
-    display: 'inline-flex',
-    flexShrink: 0,
-    justifyContent: 'center',
-    height: space['4'],
-    width: space['4'],
-  },
-
-  itemIconDestructive: {
-    color: colorVars['--cl-color-negative'],
-  },
-
-  itemLabel: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
   },
 
   separator: {

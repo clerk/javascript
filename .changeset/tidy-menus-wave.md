@@ -2,4 +2,4 @@
 '@clerk/ui': patch
 ---
 
-Expand the Mosaic spacing scale with quarter steps and add destructive intent styling to Mosaic menu items.
+Add negative color styling to Mosaic menu items.
