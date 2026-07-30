@@ -10,10 +10,10 @@ function renderMenu(props?: { onSignOut?: () => void }) {
     <Menu.Root>
       <Menu.Trigger />
       <Menu.Content>
-        <Menu.Item
-          label='Add workspace'
-          icon={<svg data-testid='add-icon' />}
-        />
+        <Menu.Item label='Add workspace'>
+          <svg data-testid='add-icon' />
+          Add workspace
+        </Menu.Item>
         <Menu.Separator />
         <Menu.Item
           label='Sign out'
@@ -68,7 +68,7 @@ describe('Mosaic Menu', () => {
     // `role="menu"` sits on the positioner (floating-ui owns it); the popup is the surface inside.
     expect(screen.getByRole('menu')).toHaveClass('cl-menu-positioner');
     expect(screen.getByRole('menu').querySelector('.cl-menu-popup')).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Add workspace' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Add workspace' })).toHaveAttribute('data-color', 'neutral');
     expect(screen.getByRole('separator')).toHaveClass('cl-menu-separator');
     expect(screen.getByTestId('add-icon')).toBeInTheDocument();
   });
@@ -106,6 +106,26 @@ describe('Mosaic Menu', () => {
 
     await user.click(item);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('reflects negative color on the item', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item
+            label='Delete user'
+            color='negative'
+          >
+            <svg data-testid='delete-icon' />
+            Delete user
+          </Menu.Item>
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    expect(screen.getByRole('menuitem', { name: 'Delete user' })).toHaveAttribute('data-color', 'negative');
+    expect(screen.getByTestId('delete-icon').parentElement).toHaveClass('cl-menu-item');
   });
 
   it('merges consumer className and style onto the popup and items', async () => {

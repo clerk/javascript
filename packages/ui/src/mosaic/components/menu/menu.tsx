@@ -75,28 +75,28 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(fu
 });
 
 export interface MenuItemProps extends PrimitiveMenuItemProps {
-  /** Leading glyph, sized and tinted by the item. */
-  icon?: React.ReactNode;
+  /** Semantic color of the action. */
+  color?: 'neutral' | 'negative';
 }
 
 /** A single menu action. `label` drives typeahead and, unless `children` is given, the visible text. */
 export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(function MosaicMenuItem(
-  { icon, label, className, style, children, ...rest },
+  { color = 'neutral', label, className, style, children, ...rest },
   ref,
 ) {
   return (
     <Primitive.Item
       ref={ref}
       label={label}
-      {...mergeStyleProps(themeProps('menu-item'), stylex.props(styles.item), className, style)}
+      {...mergeStyleProps(
+        themeProps('menu-item', { color }),
+        stylex.props(styles.item, color === 'negative' && styles.itemNegative),
+        className,
+        style,
+      )}
       {...rest}
     >
-      {icon ? (
-        <span {...mergeStyleProps(themeProps('menu-item-icon'), stylex.props(styles.itemIcon))}>{icon}</span>
-      ) : null}
-      <span {...mergeStyleProps(themeProps('menu-item-label'), stylex.props(styles.itemLabel))}>
-        {children ?? label}
-      </span>
+      {children ?? label}
     </Primitive.Item>
   );
 });

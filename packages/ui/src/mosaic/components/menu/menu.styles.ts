@@ -11,20 +11,20 @@ export const styles = stylex.create({
   },
 
   popup: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-container'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
+    borderRadius: radiusVars['--cl-radius-element'],
     outline: 'none',
-    paddingBlock: space['1'],
-    paddingInline: space['1'],
+    paddingBlock: space['0.5'],
+    paddingInline: space['0.5'],
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 10px 24px color-mix(in oklab, oklch(0 0 0) 8%, transparent),
-                0 2px 6px color-mix(in oklab, oklch(0 0 0) 4%, transparent)`,
+    boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
+                0 24px 24px -10px oklch(0.2046 0 0 / 4%),
+                0 0 0 1px oklch(0.2046 0 0 / 4%)`,
+
     boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    gap: space['0.5'],
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -45,14 +45,14 @@ export const styles = stylex.create({
     transitionProperty: 'opacity, scale',
     transitionTimingFunction: 'ease-out',
     maxHeight: 'var(--cl-available-height)',
-    minWidth: '11rem',
+    minWidth: '12.5rem',
     overflowY: 'auto',
   },
 
   item: {
-    borderRadius: radiusVars['--cl-radius-inner'],
+    borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['2'],
+    gap: space['1'],
     outline: 'none',
     paddingBlock: space['1'],
     paddingInline: space['2'],
@@ -73,36 +73,38 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
+    position: 'relative',
     textAlign: 'start',
     transitionDuration: {
       default: '150ms',
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    minHeight: space['8'],
+    height: space['7'],
     width: '100%',
+    '::before': {
+      content: '""',
+      position: 'absolute',
+      insetBlock: `calc(-1 * ${space['0.5']})`,
+      insetInline: `calc(-1 * ${space['0.5']})`,
+    },
   },
 
-  itemIcon: {
-    alignItems: 'center',
-    color: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 60%, transparent)`,
-    display: 'inline-flex',
-    flexShrink: 0,
-    justifyContent: 'center',
-    height: space['4'],
-    width: space['4'],
-  },
-
-  itemLabel: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+  itemNegative: {
+    backgroundColor: {
+      default: 'transparent',
+      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      '@media (hover: hover)': {
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      },
+    },
+    color: colorVars['--cl-color-negative'],
   },
 
   separator: {
     // Full-bleed across the popup: cancel the popup's inline padding.
-    marginBlock: space['1'],
-    marginInline: `calc(-1 * ${space['1']})`,
+    marginBlock: space['0.5'],
+    marginInline: `calc(-1 * ${space['0.5']})`,
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
   },
