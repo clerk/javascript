@@ -20,7 +20,7 @@ export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
 export { Popover } from '../components/popover';
-export type { PopoverProps } from '../components/popover';
+export type { PopoverPopupProps, PopoverProps, PopoverSize } from '../components/popover';
 
 import {
   colorVars,
