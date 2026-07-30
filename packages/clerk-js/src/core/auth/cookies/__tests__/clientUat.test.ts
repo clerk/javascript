@@ -219,8 +219,8 @@ describe('createClientUatCookie', () => {
         },
       ],
     ]);
-    expect(Math.max(...mockRemove.mock.invocationCallOrder)).toBeLessThan(
-      Math.min(...mockSet.mock.invocationCallOrder),
+    expect([...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder]).toEqual(
+      [...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder].toSorted((a, b) => a - b),
     );
   });
 });
