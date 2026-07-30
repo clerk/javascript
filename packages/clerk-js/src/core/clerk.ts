@@ -656,6 +656,25 @@ export class Clerk implements ClerkInterface {
     return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
   }
 
+  /**
+   * Routes `url` through `/v1/client/touch` when the client cookie is close to expiring,
+   * and returns it unchanged otherwise.
+   *
+   * In practice this only adds a redirect on Safari. A cookie re-issued from a fetch is
+   * capped at 7 days by ITP; every other browser gets the full 400 days and is never
+   * eligible. Touch is a top-level navigation, which ITP does not cap, so it restores
+   * the full lifetime.
+   */
+  #decorateUrlWithTouch(url: string): string {
+    // In React Native, window exists but window.location does not, so the URL cannot be
+    // resolved to an absolute one. ITP does not apply there either.
+    if (!inBrowser() || typeof window.location === 'undefined' || !this.client?.isEligibleForTouch()) {
+      return url;
+    }
+
+    return this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: new URL(url, window.location.href) }));
+  }
+
   public signOut: SignOut = async (callbackOrOptions?: SignOutCallback | SignOutOptions, options?: SignOutOptions) => {
     if (!this.client || this.client.sessions.length === 0) {
       return;
@@ -696,7 +715,9 @@ export class Clerk implements ClerkInterface {
         if (signOutCallback) {
           await signOutCallback();
         } else {
-          await this.navigate(redirectUrl);
+          // The client outlives sign-out and is what Client Trust uses to recognize a
+          // returning device, so the re-issued cookie has to keep its full lifetime.
+          await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
         }
       });
 
@@ -1826,21 +1847,9 @@ export class Clerk implements ClerkInterface {
             // Track whether decorateUrl was called for dev-mode warning
             let decorateUrlCalled = false;
 
-            /**
-             * Creates a URL that goes through the /v1/client/touch endpoint when Safari ITP fix is needed.
-             * This allows the session cookie to be refreshed via a full page navigation, bypassing
-             * Safari's 7-day cap on cookies set via fetch/XHR.
-             */
             const decorateUrl = (url: string): string => {
               decorateUrlCalled = true;
-
-              if (!this.client?.isEligibleForTouch()) {
-                return url;
-              }
-
-              const absoluteUrl = new URL(url, window.location.href);
-              const touchUrl = this.client.buildTouchUrl({ redirectUrl: absoluteUrl });
-              return this.buildUrlWithAuth(touchUrl);
+              return this.#decorateUrlWithTouch(url);
             };
 
             await setActiveNavigate({ session: newSession, decorateUrl });

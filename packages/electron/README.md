@@ -47,7 +47,7 @@ import { storage } from '@clerk/electron/storage';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-createClerkBridge({
+const clerk = createClerkBridge({
   storage: storage(),
   renderer: {
     scheme: 'my-app',
@@ -56,22 +56,58 @@ createClerkBridge({
   passkeys: true,
 });
 
-app.whenReady().then(() => {
-  protocol.handle('my-app', request => {
-    const url = new URL(request.url);
-    const file = url.pathname === '/' ? 'index.html' : url.pathname;
+if (clerk.isPrimaryInstance) {
+  app.whenReady().then(() => {
+    protocol.handle('my-app', request => {
+      const url = new URL(request.url);
+      const file = url.pathname === '/' ? 'index.html' : url.pathname;
 
-    return net.fetch(pathToFileURL(join(__dirname, '../renderer', file)).toString());
+      return net.fetch(pathToFileURL(join(__dirname, '../renderer', file)).toString());
+    });
+
+    const win = new BrowserWindow({
+      webPreferences: {
+        preload: join(__dirname, '../preload/index.js'),
+      },
+    });
+
+    win.loadURL('my-app://renderer/');
   });
+}
+```
 
-  const win = new BrowserWindow({
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-    },
+On Windows and Linux, a deep link starts a second copy of the app, so the callback only reaches the
+running process through Electron's single-instance lock. When a renderer scheme is configured,
+`createClerkBridge` acquires that lock by default and quits secondary processes once their
+command-line arguments have been forwarded. Call it before `app.whenReady()`, and stop your own
+bootstrap when `isPrimaryInstance` is `false` — `app.quit()` is asynchronous, so `whenReady` can
+still fire in a process that is on its way out. The lock is released by `cleanup()` unless it was
+already owned by the application. macOS is unaffected: deep links arrive through `open-url`, so no
+lock is taken and `isPrimaryInstance` is always `true`.
+
+If the application manages the lock, acquire it before creating the bridge and disable Clerk's lock
+management:
+
+```ts
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  createClerkBridge({
+    storage: storage(),
+    renderer: { scheme: 'my-app', host: 'renderer' },
+    manageSingleInstanceLock: false,
   });
+}
+```
 
-  win.loadURL('my-app://renderer/');
-});
+Linux packages must also register the renderer scheme in their `.desktop` entry so the browser can
+launch the app:
+
+```ini
+Exec=/path/to/my-app %U
+MimeType=x-scheme-handler/my-app;
 ```
 
 In `my-app://renderer/sign-in`, `my-app` is the scheme, `renderer` is the host, `my-app://renderer` is the origin, and `/sign-in` is the path. If your renderer uses path-based routing, serve every route from the same origin and fall back to your renderer entrypoint as needed.

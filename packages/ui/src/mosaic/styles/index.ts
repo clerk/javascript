@@ -14,6 +14,8 @@ export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export { Item } from '../components/item';
+export type { ItemProps } from '../components/item';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
