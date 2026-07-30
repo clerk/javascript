@@ -295,6 +295,28 @@ device, while touch devices look correct.
   then grep `dist-mosaic/styles.css` for the two selectors and compare their
   specificity.
 
+- **A button that opens something takes the pressed fill while open**, so a
+  disclosure trigger stays visibly engaged for as long as its surface is. Disclosure
+  primitives already set `data-open` on the trigger (`popover-trigger.tsx` and
+  friends), so this is styling-only — no headless change. It needs the _same_
+  exclusion as `:active`, or hovering an open trigger lifts it back to the lighter
+  hover step:
+
+  ```ts
+  backgroundColor: {
+    default: 'transparent',
+    ':enabled:active': neutralStep1,
+    ':enabled[data-open]': neutralStep1,
+    '@media (hover: hover)': {
+      default: null,
+      ':enabled:hover:not(:active):not([data-open])': neutralStep0,
+    },
+  },
+  ```
+
+  Worked example: `button.styles.ts`, applied across every filled/outline/ghost cell
+  (`link` opts out — it reads as text, not a control).
+
 Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
 
 - **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
@@ -340,6 +362,12 @@ Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
   already perceptually non-uniform, so an ease on top only makes the midpoint
   drag, and an overshoot extrapolates past the target color for nothing. A
   transform at `--cl-duration-fast` still wants the curve.
+
+- **DON'T** reuse `--cl-ease-default` for something **leaving**. It is an arrival
+  curve; run backwards it stalls for most of its duration and its overshoot
+  becomes a wobble past the target. Departures take `easingVars['--cl-ease-exit']`
+  at a shorter duration. See `motion.md` — enter/exit asymmetry has its own
+  reference, with the measurements behind these rules.
 
 - **DO** gate transitions/animations of **motion-bearing** properties on reduced
   motion — `transform`, `translate`, `scale`, `rotate`, positional insets — in the
@@ -494,9 +522,20 @@ _whose_ attribute you're reading:
   ```ts
   popup: {
     opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
-    transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.98)' },
-    transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'none' },
-    transitionDuration: '150ms',
+    transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.94)' },
+    // Reduced motion drops `transform` and keeps the fade — the gate belongs on the
+    // moving property, not the whole transition.
+    transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity' },
+    // Positional against `transitionProperty`, and branched by direction: the exit is
+    // shorter and takes the departure curve. See `motion.md`.
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionTimingFunction: {
+      default: `linear, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+    },
   },
   ```
 
