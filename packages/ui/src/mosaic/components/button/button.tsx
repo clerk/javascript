@@ -3,6 +3,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { truncationStyles } from '../typography.styles';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
 export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'render'> {
@@ -40,7 +41,7 @@ export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'rende
 function withTruncatableLabel(children: React.ReactNode) {
   return React.Children.map(children, child =>
     typeof child === 'string' || typeof child === 'number' ? (
-      <span {...stylex.props(styles.label)}>{child}</span>
+      <span {...stylex.props(truncationStyles.singleLine, styles.label)}>{child}</span>
     ) : (
       child
     ),

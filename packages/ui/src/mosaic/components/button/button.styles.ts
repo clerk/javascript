@@ -20,24 +20,23 @@ import { iconScope } from '../icon/icon.markers.stylex';
 // The steps are opacities of a fully-tilted black/white scrim over `transparent`, not
 // opaque values, so the fill composites against whatever it sits on. Deliberately not
 // `--cl-color-neutral`: that token is a 900 (sRGB 43,43,52), so a percentage of it lands
-// lighter than the same percentage of black — 8% neutral is 0.01 L short of 8% black — and
-// the shortfall shifts with the backdrop, which would make the step numbers stop describing
-// what they render. `item` and `avatar` still mix from `--cl-color-neutral`; unifying the
+// lighter than the same percentage of black, and the shortfall shifts with the backdrop,
+// which would make the step numbers stop describing what they render. `item` and `avatar` still mix from `--cl-color-neutral`; unifying the
 // two on a shared overlay token is a separate, palette-wide change.
 //
 // StyleX inlines these, so no variable is emitted. They must be local bindings; an
 // imported one fails to compile.
-const neutralStep0 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 8%, transparent)`;
+const neutralStep0 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
 const neutralStep1 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
-const neutralStep2 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 16%, transparent)`;
+const neutralStep2 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 18%, transparent)`;
 
-// The two opaque filled fills blend toward their own on-fill instead: 12%/20% for primary,
-// 8%/16% for negative. Neutral can't — it has no fill of its own to blend from, so it rides
+// The two opaque filled fills blend toward their own on-fill instead, 12%/18% each.
+// Neutral can't — it has no fill of its own to blend from, so it rides
 // the opacity ramp above.
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
-const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 20%)`;
-const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 8%)`;
-const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 16%)`;
+const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 18%)`;
+const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
+const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
 // A disabled button keeps its resting fill and only dims, so every interactive state is
 // gated on `:enabled`. The native `disabled` attribute blocks activation but not matching:
@@ -97,13 +96,11 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
 
-  // The label's own box, so an over-long one ends in an ellipsis instead of a hard cut.
-  // It can't ride on `base`: `text-overflow` doesn't inherit, and a bare text child is laid
-  // out in an anonymous flex item that no selector can reach. `minWidth` releases the
-  // flex-item floor at `auto` (min-content), without which the box never shrinks to clip.
+  // The ellipsis itself comes from `truncationStyles.singleLine`; this adds the one part
+  // that's specific to sitting in the button's row. `minWidth` releases the flex-item floor
+  // at `auto` (min-content), without which the box never shrinks to clip. `item` doesn't
+  // need it — it releases the floor on the parent, and its text sits in a column.
   label: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     minWidth: 0,
   },
 
