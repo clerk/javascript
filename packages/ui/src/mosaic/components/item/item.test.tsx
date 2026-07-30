@@ -17,11 +17,31 @@ describe('Mosaic Item', () => {
     expect(item).not.toHaveAttribute('data-interactive');
   });
 
-  it('reflects the variant prop as a data attribute, defaulting to entity', () => {
+  it('reflects the size prop as a data attribute, defaulting to md', () => {
     const { rerender } = render(<Item.Root>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'entity');
-    rerender(<Item.Root variant='action'>Hi</Item.Root>);
-    expect(screen.getByText('Hi')).toHaveAttribute('data-variant', 'action');
+    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'md');
+    rerender(<Item.Root size='xs'>Hi</Item.Root>);
+    expect(screen.getByText('Hi')).toHaveAttribute('data-size', 'xs');
+  });
+
+  it('reads the size from the root in media', () => {
+    const { rerender } = render(
+      <Item.Root size='xs'>
+        <Item.Media data-testid='media' />
+      </Item.Root>,
+    );
+    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'xs');
+    rerender(
+      <Item.Root size='md'>
+        <Item.Media data-testid='media' />
+      </Item.Root>,
+    );
+    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
+  });
+
+  it('falls back to the default size when media renders outside a root', () => {
+    render(<Item.Media data-testid='media' />);
+    expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
   });
 
   it('wires consumer className/style through to the element', () => {
