@@ -1,3 +1,5 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
 package expo.modules.clerk
 
 import android.content.Context
@@ -17,6 +19,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
 import com.clerk.ui.auth.AuthMode

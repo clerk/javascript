@@ -1,3 +1,5 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
 package expo.modules.clerk
 
 import android.content.Context
@@ -8,6 +10,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.ui.navigation.ClerkEmbeddedNavigation
 import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
