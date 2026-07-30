@@ -18,16 +18,9 @@ describe('createSessionCookie', () => {
   const mockToken = 'test-token';
   const mockExpires = new Date('2024-12-31');
   const defaultOptions = { usePartitionedCookies: () => false };
-  const mockSet = vi.fn();
-  const mockRemove = vi.fn();
+  const mockSet = vi.fn<(name: string, value: string, attributes?: object) => void>();
+  const mockRemove = vi.fn<(name: string, attributes?: object) => void>();
   const mockGet = vi.fn();
-  type CookieCall = {
-    type: 'set' | 'remove';
-    name: string;
-    value?: string;
-    attributes?: object;
-  };
-  const mockCookieCall = vi.fn<(call: CookieCall) => void>();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -38,12 +31,10 @@ describe('createSessionCookie', () => {
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
     (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
       set: (value: string, attributes?: object) => {
-        mockSet(value, attributes);
-        mockCookieCall({ type: 'set', name, value, attributes });
+        mockSet(name, value, attributes);
       },
       remove: (attributes?: object) => {
-        mockRemove(attributes);
-        mockCookieCall({ type: 'remove', name, attributes });
+        mockRemove(name, attributes);
       },
       get: mockGet,
     }));
@@ -61,7 +52,7 @@ describe('createSessionCookie', () => {
     cookieHandler.set(mockToken);
 
     expect(mockSet).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'Lax',
       secure: true,
@@ -74,7 +65,7 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
@@ -100,17 +91,17 @@ describe('createSessionCookie', () => {
       partitioned: false,
     };
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'Lax',
       secure: true,
       partitioned: false,
     });
 
-    expect(mockRemove).toHaveBeenCalledWith(expectedAttributes);
+    expect(mockRemove).toHaveBeenCalledWith('__session', expectedAttributes);
     expect(mockRemove).toHaveBeenCalledTimes(2);
-    expect(mockRemove).toHaveBeenNthCalledWith(1, expectedAttributes);
-    expect(mockRemove).toHaveBeenNthCalledWith(2, expectedAttributes);
+    expect(mockRemove).toHaveBeenNthCalledWith(1, '__session', expectedAttributes);
+    expect(mockRemove).toHaveBeenNthCalledWith(2, '__session_test-suffix', expectedAttributes);
   });
 
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
@@ -136,7 +127,7 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
@@ -149,7 +140,7 @@ describe('createSessionCookie', () => {
     cookieHandler.set(mockToken);
 
     expect(mockRemove).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
@@ -165,34 +156,38 @@ describe('createSessionCookie', () => {
 
     cookieHandler.set('non-partitioned-token');
     usePartitionedCookies = true;
-    mockCookieCall.mockClear();
+    mockSet.mockClear();
+    mockRemove.mockClear();
     cookieHandler.set('partitioned-token');
 
-    expect(mockCookieCall.mock.calls.map(([call]) => call)).toEqual([
-      { type: 'remove', name: '__session', attributes: undefined },
-      { type: 'remove', name: '__session_test-suffix', attributes: undefined },
-      {
-        type: 'set',
-        name: '__session',
-        value: 'partitioned-token',
-        attributes: {
-          expires: mockExpires,
-          sameSite: 'None',
-          secure: true,
-          partitioned: true,
-        },
-      },
-      {
-        type: 'set',
-        name: '__session_test-suffix',
-        value: 'partitioned-token',
-        attributes: {
-          expires: mockExpires,
-          sameSite: 'None',
-          secure: true,
-          partitioned: true,
-        },
-      },
+    expect(mockRemove.mock.calls).toEqual([
+      ['__session', undefined],
+      ['__session_test-suffix', undefined],
     ]);
+    expect(mockSet.mock.calls).toEqual([
+      [
+        '__session',
+        'partitioned-token',
+        {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+      [
+        '__session_test-suffix',
+        'partitioned-token',
+        {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+    ]);
+    expect(Math.max(...mockRemove.mock.invocationCallOrder)).toBeLessThan(
+      Math.min(...mockSet.mock.invocationCallOrder),
+    );
   });
 });
