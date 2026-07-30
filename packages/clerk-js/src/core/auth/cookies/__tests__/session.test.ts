@@ -186,8 +186,8 @@ describe('createSessionCookie', () => {
         },
       ],
     ]);
-    expect([...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder]).toEqual(
-      [...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder].toSorted((a, b) => a - b),
-    );
+    const firstInvocationOrder = mockRemove.mock.invocationCallOrder[0];
+    expect(mockRemove.mock.invocationCallOrder).toEqual([firstInvocationOrder, firstInvocationOrder + 1]);
+    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 2, firstInvocationOrder + 3]);
   });
 });

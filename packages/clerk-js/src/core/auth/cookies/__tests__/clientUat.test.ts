@@ -219,8 +219,15 @@ describe('createClientUatCookie', () => {
         },
       ],
     ]);
-    expect([...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder]).toEqual(
-      [...mockRemove.mock.invocationCallOrder, ...mockSet.mock.invocationCallOrder].toSorted((a, b) => a - b),
-    );
+    const firstInvocationOrder = mockRemove.mock.invocationCallOrder[0];
+    expect(mockRemove.mock.invocationCallOrder).toEqual([
+      firstInvocationOrder,
+      firstInvocationOrder + 1,
+      firstInvocationOrder + 4,
+      firstInvocationOrder + 5,
+      firstInvocationOrder + 6,
+      firstInvocationOrder + 7,
+    ]);
+    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 8, firstInvocationOrder + 9]);
   });
 });
