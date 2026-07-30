@@ -1,68 +1,23 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
-
-export const styles = stylex.create({
-  // Floating wrapper. Positioning styles are applied inline by the headless
-  // positioner; this only owns stacking and clears the focus outline the
-  // FloatingFocusManager places here.
-  positioner: {
-    outline: 'none',
-    zIndex: 50,
+// The popover's floating box is `floating.popup` unchanged — chrome-free by design,
+// since the surface comes from whatever is rendered inside (usually a `Card`). Only
+// the width scale is popover-specific.
+//
+// `md` reproduces the width the legacy `PopoverCard` uses (`theme.sizes.$94`), so
+// popovers migrating onto Mosaic keep their current footprint.
+// Kept out of `floating.styles.ts` on purpose: this is a content decision, not a
+// floating one. A popover holds prose — an email, an org slug, an API key — and a
+// long unbroken string would otherwise push past the width clamp. A menu wants the
+// opposite for its labels, so it does not inherit this.
+export const popup = stylex.create({
+  base: {
+    overflowWrap: 'anywhere',
   },
+});
 
-  // The popup card: the flexible container that holds content + footer.
-  popup: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-container'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    outline: 'none',
-    overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12)',
-    color: colorVars['--cl-color-card-foreground'],
-    display: 'flex',
-    flexDirection: 'column',
-    opacity: {
-      default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
-    },
-    transform: {
-      default: 'scale(1)',
-      ':where([data-starting-style], [data-ending-style])': 'scale(0.98)',
-    },
-    transitionDuration: '150ms',
-    // Enter/exit transition. The headless popup sets `data-starting-style` on the
-    // entering frame and `data-ending-style` while exiting — both are the element's
-    // OWN attributes. A bare `[data-*]` key is rejected by StyleX (conditional keys
-    // must start with `:` or `@`), so wrap it in `:where(...)`, a valid pseudo-class
-    // string that targets the same element. `stylex.when.*` covers ancestor/sibling
-    // state; this covers self-state.
-    transitionProperty: {
-      default: 'opacity, transform',
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    transitionTimingFunction: 'ease-out',
-    maxWidth: 'calc(100vw - 2rem)',
-    minWidth: '18rem',
-  },
-
-  // Flexible inner content region. Scrolls on overflow so tall content never
-  // pushes the footer out of view.
-  content: {
-    padding: space['4'],
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: 0,
-    overflowY: 'auto',
-  },
-
-  // Footer region, visually separated from content by a top border.
-  footer: {
-    padding: space['4'],
-    borderTopColor: colorVars['--cl-color-border'],
-    borderTopStyle: 'solid',
-    borderTopWidth: '1px',
-  },
+export const sizes = stylex.create({
+  sm: { width: 'min(18rem, calc(100vw - 2rem))' },
+  md: { width: 'min(23.5rem, calc(100vw - 2rem))' },
+  lg: { width: 'min(26rem, calc(100vw - 2rem))' },
 });
