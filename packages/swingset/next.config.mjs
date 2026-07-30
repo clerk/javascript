@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
+import { mosaicLightningCssTargets } from '../ui/stylex-lightningcss.config.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -80,6 +81,7 @@ const nextConfig = {
         runtimeInjection: isDev,
         unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
         useCSSLayers: true,
+        lightningcssOptions: { targets: mosaicLightningCssTargets },
       }),
     );
 
