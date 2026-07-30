@@ -13,16 +13,27 @@ import { iconScope } from '../icon/icon.markers.stylex';
 
 // Every neutral-ish fill in the matrix is one of three steps up the same gray ramp, so
 // the neutral family shares one set of values no matter which variant renders it:
-//   step 0 — `--cl-color-neutral`: `filled-neutral` at rest, `outline-*`/`ghost-*` hover
+//   step 0 — `filled-neutral` at rest, `outline-*`/`ghost-*` hover
 //   step 1 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
 //   step 2 — `filled-neutral` pressed
+//
+// The steps are opacities of a fully-tilted black/white scrim over `transparent`, not
+// opaque values, so the fill composites against whatever it sits on. Deliberately not
+// `--cl-color-neutral`: that token is a 900 (sRGB 43,43,52), so a percentage of it lands
+// lighter than the same percentage of black — 8% neutral is 0.01 L short of 8% black — and
+// the shortfall shifts with the backdrop, which would make the step numbers stop describing
+// what they render. `item` and `avatar` still mix from `--cl-color-neutral`; unifying the
+// two on a shared overlay token is a separate, palette-wide change.
+//
 // StyleX inlines these, so no variable is emitted. They must be local bindings; an
 // imported one fails to compile.
-const neutralStep1 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']}, ${colorVars['--cl-color-neutral-foreground']} 8%)`;
-const neutralStep2 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']}, ${colorVars['--cl-color-neutral-foreground']} 16%)`;
+const neutralStep0 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 8%, transparent)`;
+const neutralStep1 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
+const neutralStep2 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 16%, transparent)`;
 
-// Each filled fill blends toward its own on-fill: 12%/24% for primary, 8%/16% for
-// negative and for neutral, whose foreground is dark rather than light.
+// The two opaque filled fills blend toward their own on-fill instead: 12%/20% for primary,
+// 8%/16% for negative. Neutral can't — it has no fill of its own to blend from, so it rides
+// the opacity ramp above.
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
 const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 20%)`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 8%)`;
@@ -146,7 +157,7 @@ export const variants = stylex.create({
   },
   'filled-neutral': {
     backgroundColor: {
-      default: colorVars['--cl-color-neutral'],
+      default: neutralStep0,
       ':enabled:active': neutralStep2,
       '@media (hover: hover)': {
         default: null,
@@ -170,8 +181,8 @@ export const variants = stylex.create({
   // The border is `--cl-color-border` in every state — it never transitions, the fill
   // just rises underneath it. That keeps the border opaque throughout, so it can't
   // alpha-fade against an incoming fill, and leaves the border independently themeable.
-  // It sits one step darker than the hover fill, and lands within 0.01 L of the pressed
-  // fill, so a pressed outline button still reads as one shape.
+  // The fill steps are translucent, so how close the two read depends on the backdrop
+  // rather than on a fixed lightness gap between them.
   'outline-primary': {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
@@ -179,7 +190,7 @@ export const variants = stylex.create({
       ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': neutralStep0,
       },
     },
     color: colorVars['--cl-color-primary'],
@@ -191,7 +202,7 @@ export const variants = stylex.create({
       ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': neutralStep0,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
@@ -203,7 +214,7 @@ export const variants = stylex.create({
       ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': neutralStep0,
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -215,7 +226,7 @@ export const variants = stylex.create({
       ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': neutralStep0,
       },
     },
     color: colorVars['--cl-color-primary'],
@@ -226,7 +237,7 @@ export const variants = stylex.create({
       ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': neutralStep0,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
