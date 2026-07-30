@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.27.1
+
+### Patch Changes
+
+- Prevent phone number and multi-email fields from crashing when they receive paste events without clipboard data. ([#9274](https://github.com/clerk/javascript/pull/9274)) by [@brkalow](https://github.com/brkalow)
+
 ## 1.27.0
 
 ### Minor Changes
