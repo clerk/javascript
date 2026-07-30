@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const item = stylex.create({
   base: {
@@ -30,11 +30,24 @@ export const item = stylex.create({
     backgroundColor: {
       default: null,
       ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+      // Hover excludes `:active` explicitly — StyleX doubles the class inside an at-rule, so a
+      // `@media (hover: hover)` `:hover` outranks the bare `:active` and wins while pressing.
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        default: null,
+        ':hover:not(:active)': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     cursor: 'pointer',
+    // The press reads as contact, not a fade, so it lands instantly; release falls back to `fast`.
+    // Bare `:active`, not `:enabled:active` as on `button` — the row renders as a `div` or an `a`,
+    // and `:enabled` only ever matches form controls.
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      ':active': durationVars['--cl-duration-instant'],
+    },
+    transitionProperty: 'background-color',
+    // Linear, not `--cl-ease-default`: nothing here moves.
+    transitionTimingFunction: 'linear',
   },
 
   // vertical density derived from the variant; horizontal padding is shared by the base
@@ -79,6 +92,12 @@ export const title = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    // Matches the row's background fade so the two settle together. No `:active` branch: the row
+    // still matches `:hover` while pressed, so the title's color doesn't change on press.
+    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionProperty: 'color',
+    // Linear, not `--cl-ease-default`: nothing here moves.
+    transitionTimingFunction: 'linear',
   },
 });
 
