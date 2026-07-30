@@ -43,3 +43,20 @@ export const colors = stylex.create({
   negative: { color: colorVars['--cl-color-negative'] },
   positive: { color: colorVars['--cl-color-positive'] },
 });
+
+// Text truncation, composed by any component that clamps copy.
+export const truncationStyles = stylex.create({
+  // Single-line ellipsis.
+  singleLine: {
+    overflow: 'hidden',
+    display: 'block',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  // Multi-line clamp base; the caller sets `-webkit-line-clamp` via inline style.
+  multiLine: {
+    overflow: 'hidden',
+    WebkitBoxOrient: 'vertical',
+    display: '-webkit-box',
+  },
+});
