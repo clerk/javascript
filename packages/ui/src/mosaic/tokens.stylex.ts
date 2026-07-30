@@ -74,6 +74,20 @@ const radiusDefaults = {
 export const radiusVars = stylex.defineVars(radiusDefaults);
 
 // =============================================================================
+// Target Size Tokens
+// =============================================================================
+// The floor a control's hit area drops to under a coarse pointer — a fingertip is
+// roughly 44px across regardless of how dense the rest of the UI is. Deliberately
+// off the `--cl-spacing` scale for that reason: a consumer rescaling density must
+// not shrink a touch target with it.
+
+const targetDefaults = {
+  '--cl-target-coarse': '2.75rem',
+} as const;
+
+export const targetVars = stylex.defineVars(targetDefaults);
+
+// =============================================================================
 // Spacing Tokens
 // =============================================================================
 // `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's

@@ -34,6 +34,19 @@ export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'rende
  * // Full-width ghost button
  * <Button variant='ghost' fullWidth>Continue</Button>
  */
+// Wrap the text children so they have a box of their own to truncate against — a bare text
+// child is laid out in an anonymous flex item that no selector can reach. Element children
+// (icons) pass through untouched, so they stay direct flex items and `gap` still applies.
+function withTruncatableLabel(children: React.ReactNode) {
+  return React.Children.map(children, child =>
+    typeof child === 'string' || typeof child === 'number' ? (
+      <span {...stylex.props(styles.label)}>{child}</span>
+    ) : (
+      child
+    ),
+  );
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
     color = 'primary',
@@ -64,6 +77,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
           shape === 'square' && styles.shapeSquare,
           shape === 'circle' && styles.shapeCircle,
           isIconShape && iconSizes[size],
+          variant !== 'link' && styles.touchTarget,
+          variant !== 'link' && isIconShape && styles.touchTargetIcon,
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
         ),
@@ -72,7 +87,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       )}
       {...rest}
     >
-      {children}
+      {withTruncatableLabel(children)}
     </button>
   );
 });

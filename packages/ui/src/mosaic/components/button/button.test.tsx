@@ -60,6 +60,27 @@ describe('Mosaic Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
   });
 
+  it('gives a text child its own box to truncate against', () => {
+    render(<Button>Hi</Button>);
+    const label = screen.getByRole('button').firstElementChild;
+    expect(label?.tagName).toBe('SPAN');
+    expect(label).toHaveTextContent('Hi');
+  });
+
+  it('leaves element children as direct children so the gap still applies', () => {
+    render(
+      <Button>
+        <svg data-testid='icon' />
+        Hi
+      </Button>,
+    );
+    const button = screen.getByRole('button');
+    expect(button.children).toHaveLength(2);
+    expect(button.firstElementChild).toBe(screen.getByTestId('icon'));
+    expect(button.lastElementChild?.tagName).toBe('SPAN');
+    expect(button).toHaveAccessibleName('Hi');
+  });
+
   it('reflects disabled as both the native attribute and data-disabled', () => {
     render(<Button disabled>Hi</Button>);
     const button = screen.getByRole('button');

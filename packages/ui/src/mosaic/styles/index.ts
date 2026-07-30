@@ -27,10 +27,21 @@ import {
   radiusVars,
   space,
   spacingVars,
+  targetVars,
   typeScaleVars,
 } from '../tokens.stylex';
 
-export { colorVars, durationVars, easingVars, fontWeightVars, radiusVars, space, spacingVars, typeScaleVars };
+export {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  spacingVars,
+  targetVars,
+  typeScaleVars,
+};
 
 // Derived here, not in `tokens.stylex.ts`: `@stylexjs/enforce-extension` requires a
 // `.stylex.ts` file to export nothing but its `defineVars` results. The vars are keyed
@@ -41,5 +52,6 @@ export type EasingVarName = keyof typeof easingVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type SpacingVarName = keyof typeof spacingVars;
+export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';

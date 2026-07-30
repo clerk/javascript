@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  targetVars,
+  typeScaleVars,
+} from '../../tokens.stylex';
 import { iconScope } from '../icon/icon.markers.stylex';
 
 // Every neutral-ish fill in the matrix is one of three steps up the same gray ramp, so
@@ -20,6 +28,18 @@ const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, $
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 8%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 16%)`;
 
+// A disabled button keeps its resting fill and only dims, so every interactive state is
+// gated on `:enabled`. The native `disabled` attribute blocks activation but not matching:
+// `:hover` and `:active` still apply to a disabled button, and the button stays hit-testable
+// so `cursor: not-allowed` renders and a wrapping tooltip still receives the pointer.
+//
+// Hover also excludes `:active` rather than relying on the cascade. StyleX gives at-rules
+// extra priority, so a `@media (hover: hover)` `:hover` outranks a bare `:active` and would
+// win while pressing; `:not(:active)` stops it matching instead, which no longer depends on
+// how StyleX orders equal-specificity rules. Both selectors stay written out per cell rather
+// than hoisted to a const — `@stylexjs/sort-keys` reads a computed key as its identifier name
+// and fails the ordering it can no longer see through.
+
 export const styles = stylex.create({
   base: {
     borderColor: 'transparent',
@@ -31,10 +51,18 @@ export const styles = stylex.create({
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
+    // The size axis fixes the height, so content that outgrows it is clipped at the edge
+    // rather than spilling past the button's own box.
+    overflow: 'hidden',
     alignItems: 'center',
+    // Strips the UA's own control styling — background, border, and the platform focus ring —
+    // so what's below is the whole appearance rather than an override of it.
+    appearance: 'none',
     boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
+    // A button is sized by its own axis, not by whatever row it lands in.
+    flexShrink: 0,
     fontFamily: 'inherit',
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
@@ -44,13 +72,28 @@ export const styles = stylex.create({
     // matching the moment the color starts heading back — an instant press, a soft settle.
     transitionDuration: {
       default: durationVars['--cl-duration-fast'],
-      ':active': durationVars['--cl-duration-instant'],
+      ':enabled:active': durationVars['--cl-duration-instant'],
     },
     transitionProperty: 'background-color, border-color, color, opacity',
     // Linear, not `--cl-ease-default`: nothing here moves. Color interpolation is already
     // perceptually non-uniform, so an ease on top only makes the midpoint drag, and the
     // house curve's overshoot would extrapolate past the target color for no gain.
     transitionTimingFunction: 'linear',
+    // A double-click on a button is a double-click, not a text selection.
+    userSelect: 'none',
+    // A wrapped label would grow past the fixed height, so the label stays on one line and
+    // truncates instead (see `label`).
+    whiteSpace: 'nowrap',
+  },
+
+  // The label's own box, so an over-long one ends in an ellipsis instead of a hard cut.
+  // It can't ride on `base`: `text-overflow` doesn't inherit, and a bare text child is laid
+  // out in an anonymous flex item that no selector can reach. `minWidth` releases the
+  // flex-item floor at `auto` (min-content), without which the box never shrinks to clip.
+  label: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
   },
 
   // shape — icon buttons zero their inline padding; width tracks the height. Longhands because
@@ -66,27 +109,37 @@ export const styles = stylex.create({
     paddingInlineStart: 0,
   },
 
+  // A fingertip needs more than the visual sizes give it, so under a coarse pointer the
+  // control floors at the target size. Its own atom rather than a per-size override: the
+  // floor is one physical constant, and `link` — which is text, not a control — opts out
+  // by not receiving it. `minHeight` leaves the fixed height in charge everywhere else.
+  touchTarget: {
+    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+  },
+  // Icon buttons are square, so the floor has to reach the inline axis too or the target
+  // ends up tall and narrow.
+  touchTargetIcon: {
+    minWidth: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+  },
+
   // state / modifiers
   fullWidth: { width: '100%' },
-  disabled: { cursor: 'not-allowed', opacity: 0.5, pointerEvents: 'none' },
+  disabled: { cursor: 'not-allowed', opacity: 0.5 },
 });
 
 // variant × color, one entry per cell of the design matrix. Each is self-contained
 // so a cell can be read — and tuned — against the spec without tracing shared parts.
 // Keys are `<variant>-<color>` so the component can index them directly.
 export const variants = stylex.create({
-  // Hover excludes `:active` rather than relying on the cascade. StyleX gives at-rules
-  // extra priority, so a `@media (hover: hover)` `:hover` outranks a bare `:active` and
-  // would win while pressing; `:not(:active)` stops it matching instead, which no longer
-  // depends on how StyleX orders equal-specificity rules. `:active` stays outside the
-  // media query so no-hover devices, which never match it, still get a pressed state.
+  // The pressed state stays outside the hover media query so no-hover devices, which never
+  // match it, still get one.
   'filled-primary': {
     backgroundColor: {
       default: colorVars['--cl-color-primary'],
-      ':active': primaryActive,
+      ':enabled:active': primaryActive,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': primaryHover,
+        ':enabled:hover:not(:active)': primaryHover,
       },
     },
     color: colorVars['--cl-color-primary-foreground'],
@@ -94,10 +147,10 @@ export const variants = stylex.create({
   'filled-neutral': {
     backgroundColor: {
       default: colorVars['--cl-color-neutral'],
-      ':active': neutralStep2,
+      ':enabled:active': neutralStep2,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': neutralStep1,
+        ':enabled:hover:not(:active)': neutralStep1,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
@@ -105,10 +158,10 @@ export const variants = stylex.create({
   'filled-negative': {
     backgroundColor: {
       default: colorVars['--cl-color-negative'],
-      ':active': negativeActive,
+      ':enabled:active': negativeActive,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': negativeHover,
+        ':enabled:hover:not(:active)': negativeHover,
       },
     },
     color: colorVars['--cl-color-negative-foreground'],
@@ -123,10 +176,10 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':active': neutralStep1,
+      ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
       },
     },
     color: colorVars['--cl-color-primary'],
@@ -135,10 +188,10 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':active': neutralStep1,
+      ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
@@ -147,10 +200,10 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':active': neutralStep1,
+      ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -159,10 +212,10 @@ export const variants = stylex.create({
   'ghost-primary': {
     backgroundColor: {
       default: 'transparent',
-      ':active': neutralStep1,
+      ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
       },
     },
     color: colorVars['--cl-color-primary'],
@@ -170,10 +223,10 @@ export const variants = stylex.create({
   'ghost-neutral': {
     backgroundColor: {
       default: 'transparent',
-      ':active': neutralStep1,
+      ':enabled:active': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-neutral'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-neutral'],
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
@@ -183,10 +236,10 @@ export const variants = stylex.create({
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':enabled:active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active)': colorVars['--cl-color-negative-faded'],
+        ':enabled:hover:not(:active)': colorVars['--cl-color-negative-faded'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -199,7 +252,7 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-primary'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':hover': 'underline' },
+    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -208,7 +261,7 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-neutral-foreground'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':hover': 'underline' },
+    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -217,7 +270,7 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':hover': 'underline' },
+    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
     textUnderlineOffset: '2px',
     height: 'auto',
   },
