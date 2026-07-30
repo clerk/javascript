@@ -1,21 +1,6 @@
 import stylexPlugin from '@stylexjs/rollup-plugin';
 import { defineConfig } from 'tsdown';
-
-// lightningcss encodes browser versions as (major << 16) | (minor << 8) | patch.
-const version = (major: number, minor = 0) => (major << 16) | (minor << 8);
-
-// Pin targets to browsers that natively support `light-dark()` and `oklch()`
-// (the token color model). Without this, the plugin defaults to a broad
-// browserslist and lightningcss down-levels `light-dark()` into an incomplete
-// `--lightningcss-*` polyfill (no prefers-color-scheme toggle rules), producing
-// invalid two-token color values. These targets keep the tokens verbatim.
-const targets = {
-  chrome: version(123),
-  edge: version(123),
-  firefox: version(120),
-  safari: version(17, 5),
-  ios_saf: version(17, 5),
-};
+import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
 // Isolated Mosaic build: compiles ONLY the StyleX barrel (`src/mosaic/styles`)
 // with the StyleX rollup plugin, emitting transformed ESM + a single static
@@ -45,7 +30,7 @@ export default defineConfig({
     stylexPlugin({
       fileName: 'styles.css',
       useCSSLayers: true,
-      lightningcssOptions: { targets },
+      lightningcssOptions: { targets: mosaicLightningCssTargets },
     }),
   ],
 });
