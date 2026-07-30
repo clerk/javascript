@@ -78,11 +78,29 @@ export const colorVars = stylex.defineVars(colorDefaults);
 - **DO** name internal, non-contract vars with a `--_cl-*` prefix (e.g. a value a
   parent writes for a child to read). They still emit verbatim but the `_` marks
   them "not a contract, don't override."
+- **DO** name a radius by **what the surface is**, not by size, so the steps nest:
+  `--cl-radius-inner` for a mark inside a control, `--cl-radius-control` for the
+  control itself (button, avatar square), `--cl-radius-container` for anything
+  wrapping controls. A role name survives a value change; `--cl-radius-md` doesn't.
 - **DO** compute tints at the call site with `color-mix()`, not as their own
   tokens. `color-mix(in oklab, ${primary}, ${fg} 12%)` beats minting
   `--cl-color-primary-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
+- **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
+  wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
+  black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
+
+  ```ts
+  const step = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
+  ```
+
+  A gray token like `--cl-color-neutral` is a 900, not black, so the same percentage of
+  it lands lighter than the percentage of black — and by an amount that shifts with
+  whatever the control sits on, so the step numbers stop describing what they render.
+  The scrim composites, so one ramp reads consistently on every surface. This applies
+  to overlay fills only: a fill with a color of its own (`filled-primary`) still blends
+  from that color toward its own on-fill.
 
 **Spacing is one exposed var plus a `defineConsts` scale.** Only `--cl-spacing`
 is a custom property; every step is inlined at build as `calc(var(--cl-spacing) *
@@ -207,7 +225,7 @@ instead of 12, with each axis staying independent. **Don't.**
   inlines it at build, so the duplication leaves the source without emitting a var:
 
   ```ts
-  const neutralHover = `color-mix(in oklab, ${colorVars['--cl-color-neutral']}, ${colorVars['--cl-color-neutral-foreground']} 8%)`;
+  const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
   ```
 
   Same-file is required — an imported one fails static evaluation ("Atoms" above).
@@ -334,6 +352,28 @@ Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
     '@media (prefers-reduced-motion: reduce)': '0.01ms',
   },
   ```
+
+- **DO** floor an interactive control's hit area at `targetVars['--cl-target-coarse']`
+  under `@media (pointer: coarse)`. Use `minHeight`/`minWidth` so the size axis stays
+  in charge otherwise, and give it its own atom rather than writing it into every
+  size — the floor is one physical constant, and a part that isn't really a control
+  (a `link` variant, which reads as text) opts out by not receiving the atom:
+
+  ```ts
+  touchTarget: {
+    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+  },
+  ```
+
+  Square controls need the floor on **both** axes, or the target grows tall and narrow.
+  `--cl-target-coarse` is deliberately off the `--cl-spacing` scale: a consumer
+  rescaling density must not shrink a touch target with it.
+
+- **DON'T** suppress interaction with `pointer-events: none` on a disabled control.
+  An element that isn't hit-tested supplies no cursor, so `cursor: not-allowed` never
+  renders, and a wrapping tooltip never gets the pointer to explain the disabled
+  state. Gate the interactive states on `:enabled` instead — `:hover`/`:active` still
+  match a disabled element, so every one of them needs the gate.
 
 - **DO** reflect runtime conditions the component owns (disabled, selected,
   invalid) as `data-<axis>` attrs via `themeProps`, in addition to the atom, so
