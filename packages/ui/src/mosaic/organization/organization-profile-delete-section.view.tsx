@@ -59,8 +59,8 @@ export function OrganizationProfileDeleteSectionView({
         <Destructive
           trigger={props => (
             <Button
-              intent='destructive'
               {...props}
+              color='negative'
               style={{ flexShrink: 0 }}
               type='button'
             >

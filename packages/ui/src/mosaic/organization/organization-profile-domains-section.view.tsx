@@ -138,7 +138,7 @@ function DomainRow({ domain, canManage, onManage, onVerify, onRemove }: DomainRo
           <Button
             variant='ghost'
             size='sm'
-            intent='destructive'
+            color='negative'
             type='button'
             onClick={() => onRemove(domain)}
           >

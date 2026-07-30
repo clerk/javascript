@@ -14,7 +14,7 @@ describe('Mosaic Button', () => {
     render(<Button>Hi</Button>);
     const button = screen.getByRole('button');
     expect(button).toHaveClass('cl-button');
-    expect(button).toHaveAttribute('data-intent', 'primary');
+    expect(button).toHaveAttribute('data-color', 'primary');
     expect(button).toHaveAttribute('data-variant', 'filled');
     expect(button).toHaveAttribute('data-size', 'md');
     expect(button).toHaveAttribute('data-shape', 'default');
@@ -24,7 +24,7 @@ describe('Mosaic Button', () => {
   it('wires variant props and consumer className/style through to the element', () => {
     render(
       <Button
-        intent='destructive'
+        color='negative'
         variant='outline'
         size='sm'
         shape='circle'
@@ -36,13 +36,28 @@ describe('Mosaic Button', () => {
       </Button>,
     );
     const button = screen.getByRole('button');
-    expect(button).toHaveAttribute('data-intent', 'destructive');
+    expect(button).toHaveAttribute('data-color', 'negative');
     expect(button).toHaveAttribute('data-variant', 'outline');
     expect(button).toHaveAttribute('data-size', 'sm');
     expect(button).toHaveAttribute('data-shape', 'circle');
     expect(button).toHaveAttribute('data-full-width', '');
     expect(button).toHaveClass('cl-button', 'my-button');
     expect(button).toHaveStyle({ marginTop: '8px' });
+  });
+
+  it.each(['primary', 'neutral', 'negative'] as const)('reflects the %s color', color => {
+    render(<Button color={color}>Hi</Button>);
+    expect(screen.getByRole('button')).toHaveAttribute('data-color', color);
+  });
+
+  it.each(['filled', 'outline', 'ghost', 'link'] as const)('reflects the %s variant', variant => {
+    render(<Button variant={variant}>Hi</Button>);
+    expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant);
+  });
+
+  it.each(['sm', 'md', 'lg'] as const)('reflects the %s size', size => {
+    render(<Button size={size}>Hi</Button>);
+    expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
   });
 
   it('reflects disabled as both the native attribute and data-disabled', () => {

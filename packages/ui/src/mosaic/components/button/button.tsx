@@ -1,28 +1,30 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { styles } from './button.styles';
+import { iconSizes, sizes, styles, variants } from './button.styles';
 
-export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
-  intent?: 'primary' | 'destructive';
-  variant?: 'filled' | 'outline' | 'ghost';
-  size?: 'sm' | 'md';
+export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'render'> {
+  color?: 'primary' | 'neutral' | 'negative';
+  variant?: 'filled' | 'outline' | 'ghost' | 'link';
+  size?: 'sm' | 'md' | 'lg';
   shape?: 'default' | 'square' | 'circle';
   fullWidth?: boolean;
 }
 
 /**
  * A clickable action styled by the Mosaic recipe. Renders a `button` and forwards its
- * ref; `intent`, `variant`, `size`, and `shape` compose to cover the full set of styles.
+ * ref; `color`, `variant`, and `size` are independent axes, with `shape` and `fullWidth`
+ * as orthogonal modifiers.
  *
  * @example
  * // Default (primary, filled, md)
  * <Button>Save</Button>
  *
  * @example
- * // Destructive intent with a non-filled variant
- * <Button intent='destructive' variant='outline'>Delete</Button>
+ * // Negative color with a non-filled variant
+ * <Button color='negative' variant='outline'>Delete</Button>
  *
  * @example
  * // Icon-only, circular, small
@@ -34,7 +36,7 @@ export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
-    intent = 'primary',
+    color = 'primary',
     variant = 'filled',
     size = 'md',
     shape = 'default',
@@ -54,19 +56,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       type='button'
       disabled={disabled}
       {...mergeStyleProps(
-        themeProps('button', { intent, variant, size, shape, fullWidth, disabled }),
+        themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
           styles.base,
-          variant === 'filled' && intent === 'primary' && styles.filledPrimary,
-          variant === 'filled' && intent === 'destructive' && styles.filledDestructive,
-          variant === 'outline' && intent === 'primary' && styles.outlinePrimary,
-          variant === 'outline' && intent === 'destructive' && styles.outlineDestructive,
-          variant === 'ghost' && intent === 'primary' && styles.ghostPrimary,
-          variant === 'ghost' && intent === 'destructive' && styles.ghostDestructive,
-          size === 'sm' ? styles.sizeSm : styles.sizeMd,
+          sizes[size],
+          variants[`${variant}-${color}`],
           shape === 'square' && styles.shapeSquare,
           shape === 'circle' && styles.shapeCircle,
-          isIconShape && (size === 'sm' ? styles.iconSizeSm : styles.iconSizeMd),
+          isIconShape && iconSizes[size],
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
         ),
