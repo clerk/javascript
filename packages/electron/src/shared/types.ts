@@ -18,6 +18,13 @@ export type CreateClerkBridgeOptions = {
    */
   renderer?: RendererSchemeOptions;
   /**
+   * Whether Clerk should acquire and release Electron's process-wide single-instance lock for OAuth
+   * deep links. Set this to `false` when the application manages the lock itself.
+   *
+   * @default true
+   */
+  manageSingleInstanceLock?: boolean;
+  /**
    * Registers the IPC handlers for native passkey ceremonies. Native support also requires
    * the optional `@clerk/electron-passkeys` package and `exposeClerkBridge({ passkeys: true })`.
    */

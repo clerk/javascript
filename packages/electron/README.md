@@ -74,10 +74,27 @@ app.whenReady().then(() => {
 });
 ```
 
-When a renderer scheme is configured, `createClerkBridge` acquires Electron's single-instance lock so
-OAuth deep links opened on Windows or Linux are forwarded to the primary process. Call it before
-`app.whenReady()`. Secondary processes are quit after forwarding their command-line arguments. The
-lock is released by `cleanup()` unless it was already owned by the application.
+When a renderer scheme is configured, `createClerkBridge` acquires Electron's single-instance lock by
+default so OAuth deep links opened on Windows or Linux are forwarded to the primary process. Call it
+before `app.whenReady()`. Secondary processes are quit after forwarding their command-line arguments.
+The lock is released by `cleanup()` unless it was already owned by the application.
+
+If the application manages the lock, acquire it before creating the bridge and disable Clerk's lock
+management:
+
+```ts
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  createClerkBridge({
+    storage: storage(),
+    renderer: { scheme: 'my-app', host: 'renderer' },
+    manageSingleInstanceLock: false,
+  });
+}
+```
 
 Linux packages must also register the renderer scheme in their `.desktop` entry so the browser can
 launch the app:

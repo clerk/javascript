@@ -295,6 +295,23 @@ describe('createClerkBridge', () => {
     expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
   });
 
+  it('does not manage the single-instance lock when disabled', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      manageSingleInstanceLock: false,
+    });
+    clerk.cleanup();
+
+    expect(app.hasSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+  });
+
   it('releases the single-instance lock acquired by the bridge during cleanup', () => {
     const clerk = createClerkBridge({
       storage,

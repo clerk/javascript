@@ -52,7 +52,9 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
+  }
 
+  if (options.renderer && options.manageSingleInstanceLock !== false) {
     if (!app.hasSingleInstanceLock()) {
       if (!app.requestSingleInstanceLock()) {
         app.quit();
