@@ -384,6 +384,84 @@ describe('request', () => {
     });
   });
 
+  describe('protect params', () => {
+    const protectParams = {
+      __clerk_protect_token: 'v1.payload.mac',
+      __clerk_protect_status: 'ok',
+      __clerk_protect_cid: `1-${'a'.repeat(26)}-${'b'.repeat(26)}`,
+    };
+
+    let getProtectParams: Mock;
+    let clientWithProtect: ReturnType<typeof createFapiClient>;
+
+    beforeEach(() => {
+      getProtectParams = vi.fn().mockResolvedValue(protectParams);
+      clientWithProtect = createFapiClient({ ...baseFapiClientOptions, getProtectParams });
+    });
+
+    const bodyOf = () => (fetch as Mock).mock.calls[0][1].body as string;
+
+    it.each(['/client/sign_ins', '/client/sign_ups', '/client/sign_ins/sia_123/attempt_first_factor'])(
+      'merges them into the form-encoded body of %s',
+      async path => {
+        await clientWithProtect.request({ path, method: 'POST', body: { identifier: 'nick@clerk.dev' } as any });
+
+        expect(bodyOf()).toBe(
+          `identifier=nick%40clerk.dev&__clerk_protect_token=v1.payload.mac&__clerk_protect_status=ok&__clerk_protect_cid=${protectParams.__clerk_protect_cid}`,
+        );
+        // A signed credential must never land in the URL, which is logged all along the path.
+        expect((fetch as Mock).mock.calls[0][0].toString()).not.toContain('__clerk_protect');
+      },
+    );
+
+    it('adds no request headers', async () => {
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: {} as any });
+
+      const headers = (fetch as Mock).mock.calls[0][1].headers as Headers;
+      expect([...headers.keys()]).toEqual(['content-type']);
+    });
+
+    it('populates the body even when the request had none', async () => {
+      await clientWithProtect.request({ path: '/client/sign_ups', method: 'POST' });
+
+      expect(bodyOf()).toContain('__clerk_protect_status=ok');
+    });
+
+    it.each(['/client', '/client/sessions', '/environment', '/client/sign_insomething'])(
+      'leaves %s alone',
+      async path => {
+        await clientWithProtect.request({ path, method: 'POST', body: { foo: 'bar' } as any });
+
+        expect(bodyOf()).toBe('foo=bar');
+        expect(getProtectParams).not.toHaveBeenCalled();
+      },
+    );
+
+    it('leaves GET requests alone', async () => {
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'GET' });
+
+      expect(getProtectParams).not.toHaveBeenCalled();
+    });
+
+    it('leaves a FormData body alone', async () => {
+      const formData = new FormData();
+      formData.append('identifier', 'nick@clerk.dev');
+
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: formData });
+
+      expect((fetch as Mock).mock.calls[0][1].body).toBe(formData);
+      expect(getProtectParams).not.toHaveBeenCalled();
+    });
+
+    it('sends nothing extra when the instance does not participate', async () => {
+      getProtectParams.mockResolvedValue(undefined);
+
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: { foo: 'bar' } as any });
+
+      expect(bodyOf()).toBe('foo=bar');
+    });
+  });
+
   describe('retry logic', () => {
     it('does not send retry query parameter on initial request', async () => {
       await fapiClient.request({

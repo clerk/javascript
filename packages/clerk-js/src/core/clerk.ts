@@ -513,6 +513,9 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      getProtectParams: () => {
+        return this.#protect?.getRequestParams() ?? Promise.resolve(undefined);
+      },
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
