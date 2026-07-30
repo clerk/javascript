@@ -231,13 +231,22 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Hack to reset fva
+        // startVerification no longer resets fva server-side, so age the signed-in factor past afterMinutes
         await u.po.expect.toBeSignedIn();
-        await page.evaluate(async () => {
-          return window.Clerk.session.startVerification({
-            level: 'first_factor',
-          });
-        });
+        await expect
+          .poll(
+            () =>
+              page.evaluate(async () => {
+                const token = await window.Clerk.session?.getToken({ skipCache: true });
+                if (!token) {
+                  return -1;
+                }
+                const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(atob(payload)).fva?.[0] ?? -1;
+              }),
+            { intervals: [5_000], timeout: 120_000 },
+          )
+          .toBeGreaterThanOrEqual(1);
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
@@ -248,6 +257,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       });
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
+        test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
@@ -263,13 +273,22 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Hack to reset fva
+        // startVerification no longer resets fva server-side, so age the signed-in factor past afterMinutes
         await u.po.expect.toBeSignedIn();
-        await page.evaluate(async () => {
-          return window.Clerk.session.startVerification({
-            level: 'first_factor',
-          });
-        });
+        await expect
+          .poll(
+            () =>
+              page.evaluate(async () => {
+                const token = await window.Clerk.session?.getToken({ skipCache: true });
+                if (!token) {
+                  return -1;
+                }
+                const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(atob(payload)).fva?.[0] ?? -1;
+              }),
+            { intervals: [5_000], timeout: 120_000 },
+          )
+          .toBeGreaterThanOrEqual(1);
 
         await u.page.goToRelative(`/action-with-use-reverification`);
         await u.po.expect.toBeSignedIn();
