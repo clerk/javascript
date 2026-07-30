@@ -8,7 +8,9 @@ import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../au
 import {
   authenticatedMachineObject,
   getAuthObjectForAcceptedToken,
+  invalidTokenAuthObject,
   makeAuthObjectSerializable,
+  rehydrateMachineAuthObject,
   signedInAuthObject,
   signedOutAuthObject,
   unauthenticatedMachineObject,
@@ -27,6 +29,20 @@ describe('makeAuthObjectSerializable', () => {
       // @ts-expect-error - Testing
       expect(typeof serializableAuthObject[key]).not.toBe('function');
     }
+  });
+});
+
+describe('rehydrateMachineAuthObject', () => {
+  it('leaves session auth objects unchanged', () => {
+    const authObject = signedOutAuthObject();
+
+    expect(rehydrateMachineAuthObject(authObject)).toBe(authObject);
+  });
+
+  it('leaves invalid-token auth objects unchanged', () => {
+    const authObject = invalidTokenAuthObject();
+
+    expect(rehydrateMachineAuthObject(authObject)).toBe(authObject);
   });
 });
 
@@ -96,6 +112,7 @@ describe('signedInAuthObject', () => {
       expect(authObject.has({ permission: 'f1:read' })).toBe(false);
       expect(authObject.has({ feature: 'org:reservations' })).toBe(false);
       expect(authObject.has({ feature: 'org:impersonation' })).toBe(false);
+      expect(authObject.has({ scope: 'read:foo' } as any)).toBe(false);
     });
 
     it('has() for orgs', () => {
@@ -358,9 +375,48 @@ describe('authenticatedMachineObject', () => {
       expect(retrievedToken).toBe(token);
     });
 
-    it('has() always returns false', () => {
+    it('checks granted scopes and mapped permissions', () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
-      expect(authObject.has({})).toBe(false);
+
+      expect(authObject.has({ scope: 'read:foo' })).toBe(true);
+      expect(authObject.has({ scope: 'admin' })).toBe(false);
+      expect(authObject.has({ permission: 'things:read' })).toBe(true);
+      expect(authObject.has({ permission: 'things:delete' })).toBe(false);
+      expect(authObject.has({ permission: 'read:foo' })).toBe(false);
+      expect(authObject.has({} as any)).toBe(false);
+      expect(authObject.has({ role: 'org:admin' } as any)).toBe(false);
+      expect(authObject.has({ feature: 'user:things' } as any)).toBe(false);
+      expect(authObject.has({ plan: 'user:pro' } as any)).toBe(false);
+      expect(authObject.has({ scope: 'read:foo', permission: 'things:read' } as any)).toBe(false);
+      expect(authObject.has({ scope: 'read:foo', role: 'org:admin' } as any)).toBe(false);
+      expect(authObject.has({ permission: 'things:read', extra: true } as any)).toBe(false);
+      expect(authObject.has(Object.create({ scope: 'read:foo' }))).toBe(false);
+    });
+
+    it('keeps scope checks available when no permissions are mapped', () => {
+      const authObject = authenticatedMachineObject(
+        'oauth_token',
+        token,
+        { ...verificationResult, permissions: [] },
+        debugData,
+      );
+
+      expect(authObject.has({ scope: 'read:foo' })).toBe(true);
+      expect(authObject.has({ permission: 'things:read' })).toBe(false);
+    });
+
+    it('fails permission checks closed when the verification result omits permissions', () => {
+      const { permissions: _, ...verificationResultWithoutPermissions } = verificationResult;
+      const authObject = authenticatedMachineObject(
+        'oauth_token',
+        token,
+        verificationResultWithoutPermissions as any,
+        debugData,
+      );
+
+      expect(authObject.permissions).toEqual([]);
+      expect(authObject.has({ scope: 'read:foo' })).toBe(true);
+      expect(authObject.has({ permission: 'things:read' })).toBe(false);
     });
 
     it('properly initializes properties', () => {
@@ -369,6 +425,7 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.permissions).toEqual(['things:read', 'things:write']);
       expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
     });
@@ -419,6 +476,14 @@ describe('unauthenticatedMachineObject', () => {
     const authObject = unauthenticatedMachineObject('m2m_token');
     const retrievedToken = await authObject.getToken();
     expect(retrievedToken).toBeNull();
+  });
+
+  it('fails OAuth scope and permission checks closed', () => {
+    const authObject = unauthenticatedMachineObject('oauth_token');
+
+    expect(authObject.permissions).toBeNull();
+    expect(authObject.has({ scope: 'read:foo' })).toBe(false);
+    expect(authObject.has({ permission: 'things:read' })).toBe(false);
   });
 });
 

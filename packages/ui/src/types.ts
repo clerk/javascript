@@ -9,6 +9,7 @@ import type {
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
+  OAuthConsentScopeJSON,
   OAuthConsentProps,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -189,11 +190,7 @@ export type OAuthConsentCtx = {
    * Pre-fetched scopes (accounts portal path). Snake-cased to match the
    * legacy FAPI response shape.
    */
-  scopes?: {
-    scope: string;
-    description: string | null;
-    requires_consent: boolean;
-  }[];
+  scopes?: OAuthConsentScopeJSON[];
   /**
    * Pre-fetched OAuth application name (accounts portal path).
    */

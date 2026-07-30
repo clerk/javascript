@@ -948,6 +948,7 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   type: string;
   subject: string;
   scopes: string[];
+  permissions?: string[];
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;

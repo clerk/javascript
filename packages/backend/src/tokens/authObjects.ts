@@ -1,7 +1,9 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { createCheckAuthorization, createOAuthAccessTokenAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
+  CheckAuthorizationFromOAuthAccessToken,
   CheckAuthorizationFromSessionClaims,
+  CustomPermissionKey,
   Jwt,
   JwtPayload,
   PendingSessionOptions,
@@ -30,6 +32,10 @@ type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
 
 type Claims = Record<string, any>;
+
+type CheckAuthorizationFromMachineToken<T extends MachineTokenType> = T extends 'oauth_token'
+  ? CheckAuthorizationFromOAuthAccessToken
+  : CheckAuthorizationFromSessionClaims;
 
 /**
  * @internal
@@ -102,6 +108,7 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
   oauth_token: {
     userId: TAuthenticated extends true ? string : null;
     clientId: TAuthenticated extends true ? string : null;
+    permissions: TAuthenticated extends true ? CustomPermissionKey[] : null;
   };
 };
 
@@ -119,7 +126,7 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
       subject: string;
       scopes: string[];
       getToken: () => Promise<string>;
-      has: CheckAuthorizationFromSessionClaims;
+      has: CheckAuthorizationFromMachineToken<T>;
       debug: AuthObjectDebug;
       tokenType: T;
       isAuthenticated: true;
@@ -140,7 +147,7 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
       subject: null;
       scopes: null;
       getToken: () => Promise<null>;
-      has: CheckAuthorizationFromSessionClaims;
+      has: CheckAuthorizationFromMachineToken<T>;
       debug: AuthObjectDebug;
       tokenType: T;
       isAuthenticated: false;
@@ -304,10 +311,16 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
     }
     case TokenType.OAuthToken: {
       const result = verificationResult as IdPOAuthAccessToken;
+      const permissions = result.permissions ?? [];
       return {
         ...baseObject,
         tokenType,
         scopes: result.scopes,
+        permissions,
+        has: createOAuthAccessTokenAuthorization({
+          scopes: result.scopes,
+          permissions,
+        }),
         userId: result.subject,
         clientId: result.clientId,
       } as unknown as AuthenticatedMachineObject<T>;
@@ -315,6 +328,36 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
   }
+}
+
+/**
+ * Restores methods stripped while a machine auth object crosses a serialized
+ * framework boundary. Missing OAuth permissions fail closed during deploy
+ * skew with older middleware.
+ *
+ * @internal
+ */
+export function rehydrateMachineAuthObject<T extends AuthObject>(authObject: T): T {
+  if (authObject.tokenType === TokenType.SessionToken || authObject.tokenType === null) {
+    return authObject;
+  }
+
+  if (authObject.tokenType === TokenType.OAuthToken && authObject.isAuthenticated) {
+    const permissions = authObject.permissions ?? [];
+    return {
+      ...authObject,
+      permissions,
+      has: createOAuthAccessTokenAuthorization({
+        scopes: authObject.scopes,
+        permissions,
+      }),
+    } as T;
+  }
+
+  return {
+    ...authObject,
+    has: () => false,
+  } as T;
 }
 
 /**
@@ -360,6 +403,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         ...baseObject,
         tokenType,
         scopes: null,
+        permissions: null,
         userId: null,
         clientId: null,
       } as unknown as UnauthenticatedMachineObject<T>;

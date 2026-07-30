@@ -1,3 +1,4 @@
+import type { CustomPermissionKey, OrganizationCustomPermissionKey } from '@clerk/shared/types';
 import { describe, expectTypeOf, test } from 'vitest';
 
 import type { RedirectFun } from '../../createRedirect';
@@ -47,6 +48,32 @@ describe('getAuth() or auth() with request parameter', () => {
     } else if (auth.tokenType === 'oauth_token') {
       expectTypeOf(auth).toExtend<MachineAuthObject<'oauth_token'>>();
     }
+  });
+
+  test('exposes OAuth-specific scope and permission checks without changing session checks', () => {
+    const request = new Request('https://example.com');
+    const oauthAuth = getAuth(request, { acceptsToken: 'oauth_token' });
+    const sessionAuth = getAuth(request, { acceptsToken: 'session_token' });
+
+    oauthAuth.has({ scope: 'read:foo' });
+    oauthAuth.has({ permission: 'things:read' });
+    // @ts-expect-error - OAuth tokens do not carry Organization roles
+    oauthAuth.has({ role: 'org:admin' });
+    // @ts-expect-error - OAuth tokens do not carry Billing features
+    oauthAuth.has({ feature: 'user:things' });
+    // @ts-expect-error - OAuth tokens do not carry Billing plans
+    oauthAuth.has({ plan: 'user:pro' });
+    // @ts-expect-error - OAuth checks require one authorization dimension
+    oauthAuth.has({});
+    expectTypeOf(oauthAuth.permissions).toEqualTypeOf<CustomPermissionKey[] | null>();
+    expectTypeOf<CustomPermissionKey>().toEqualTypeOf<OrganizationCustomPermissionKey>();
+
+    // @ts-expect-error - OAuth checks accept exactly one authorization dimension
+    oauthAuth.has({ scope: 'read:foo', permission: 'things:read' });
+    // @ts-expect-error - OAuth scope checks do not accept legacy authorization dimensions
+    oauthAuth.has({ scope: 'read:foo', role: 'org:admin' });
+    // @ts-expect-error - Session tokens do not carry delegated OAuth scopes
+    sessionAuth.has({ scope: 'read:foo' });
   });
 });
 

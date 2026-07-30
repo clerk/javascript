@@ -20,7 +20,7 @@ import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
-import type { OAuthApplicationNamespace } from './oauthApplication';
+import type { OAuthApplicationNamespace, OAuthConsentScopeJSON } from './oauthApplication';
 import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
@@ -2632,11 +2632,7 @@ export type OAuthConsentProps = {
    *
    * @deprecated Used by the accounts portal. Pass `client_id` and `redirect_uri` as URL parameters instead.
    */
-  scopes?: {
-    scope: string;
-    description: string | null;
-    requires_consent: boolean;
-  }[];
+  scopes?: OAuthConsentScopeJSON[];
   /**
    * Full URL or path to navigate to after the user allows or denies access.
    *

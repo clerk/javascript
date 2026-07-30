@@ -1,6 +1,8 @@
 import type {
   ActClaim,
+  CheckAuthorizationFromOAuthAccessToken,
   CheckAuthorizationWithCustomPermissions,
+  CustomPermissionKey,
   GetToken,
   JwtPayload,
   OrganizationCustomPermissionKey,
@@ -335,6 +337,48 @@ const combine = (results: CheckResult[]): boolean =>
   results.some(r => r === 'pass') && results.every(r => r === 'pass' || r === 'skip');
 
 /**
+ * Creates the authorization check used by OAuth access-token auth objects.
+ * OAuth tokens expose exactly two independent dimensions: the granted wire
+ * scope and the delegated permission snapshot.
+ */
+const createOAuthAccessTokenAuthorization = ({
+  scopes,
+  permissions,
+}: {
+  scopes: readonly string[];
+  permissions: readonly CustomPermissionKey[];
+}): CheckAuthorizationFromOAuthAccessToken => {
+  return (params: unknown): boolean => {
+    if (!params || typeof params !== 'object') {
+      return false;
+    }
+
+    const keys = Reflect.ownKeys(params);
+    if (keys.length !== 1) {
+      return false;
+    }
+
+    const key = keys[0];
+    const descriptor = Object.getOwnPropertyDescriptor(params, key);
+    if (!descriptor || !('value' in descriptor)) {
+      return false;
+    }
+
+    if (key === 'scope') {
+      const scope = descriptor.value;
+      return typeof scope === 'string' && scope.length > 0 && scopes.includes(scope);
+    }
+
+    if (key === 'permission') {
+      const permission = descriptor.value;
+      return typeof permission === 'string' && permission.length > 0 && permissions.includes(permission);
+    }
+
+    return false;
+  };
+};
+
+/**
  * Creates a function for comprehensive user authorization checks.
  * Combines organization, billing, and reverification checks. The returned function
  * authorizes only when every requested dimension passes; any requested dimension
@@ -481,4 +525,10 @@ const resolveAuthState = ({
   }
 };
 
-export { createCheckAuthorization, resolveAuthState, splitByScope, validateReverificationConfig };
+export {
+  createCheckAuthorization,
+  createOAuthAccessTokenAuthorization,
+  resolveAuthState,
+  splitByScope,
+  validateReverificationConfig,
+};

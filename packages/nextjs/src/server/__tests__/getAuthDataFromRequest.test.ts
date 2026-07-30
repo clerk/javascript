@@ -191,6 +191,59 @@ describe('getAuthDataFromRequest', () => {
     expect(auth.isAuthenticated).toBe(true);
   });
 
+  it('rehydrates OAuth scope and permission checks', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'oauth_token',
+      id: 'oat_id123',
+      subject: 'user_12345',
+      clientId: 'client_12345',
+      scopes: ['read:things'],
+      permissions: ['things:read'],
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer oat_secret123',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
+
+    expect(auth.has({ scope: 'read:things' })).toBe(true);
+    expect(auth.has({ scope: 'write:things' })).toBe(false);
+    expect(auth.has({ permission: 'things:read' })).toBe(true);
+    expect(auth.has({ permission: 'things:write' })).toBe(false);
+  });
+
+  it('fails closed when a legacy OAuth auth object omits permissions', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'oauth_token',
+      id: 'oat_id123',
+      subject: 'user_12345',
+      clientId: 'client_12345',
+      scopes: ['read:things'],
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer oat_secret123',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
+    const oauthAuth = auth as AuthenticatedMachineObject<'oauth_token'>;
+
+    expect(oauthAuth.permissions).toEqual([]);
+    expect(oauthAuth.has({ scope: 'read:things' })).toBe(true);
+    expect(oauthAuth.has({ permission: 'things:read' })).toBe(false);
+  });
+
   it.each([
     {
       tokenType: 'api_key' as const,

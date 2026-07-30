@@ -32,6 +32,7 @@ export {
   signedOutAuthObject,
   signedInAuthObject,
   authenticatedMachineObject,
+  rehydrateMachineAuthObject,
   unauthenticatedMachineObject,
   invalidTokenAuthObject,
   getAuthObjectFromJwt,

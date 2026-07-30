@@ -63,6 +63,7 @@ function _OAuthConsent() {
   // Hook returns camelCase `requiresConsent`; the render logic uses snake_case.
   const mappedHookScopes = data?.scopes?.map(s => ({
     scope: s.scope,
+    label: s.label,
     description: s.description,
     requires_consent: s.requiresConsent,
   }));
@@ -263,11 +264,26 @@ function _OAuthConsent() {
                 />
               </ListGroupHeader>
               <ListGroupContent>
-                {displayedScopes.map(item => (
-                  <ListGroupItem key={item.scope}>
-                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
-                  </ListGroupItem>
-                ))}
+                {displayedScopes.map(item => {
+                  const primaryText = item.label || item.description || item.scope || '';
+                  const supportingText = item.description && item.description !== primaryText ? item.description : null;
+
+                  return (
+                    <ListGroupItem key={item.scope}>
+                      <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.space.$0x5 })}>
+                        <ListGroupItemLabel>{primaryText}</ListGroupItemLabel>
+                        {supportingText && (
+                          <Text
+                            colorScheme='secondary'
+                            variant='caption'
+                          >
+                            {supportingText}
+                          </Text>
+                        )}
+                      </Box>
+                    </ListGroupItem>
+                  );
+                })}
               </ListGroupContent>
             </ListGroup>
             <Alert colorScheme='warning'>

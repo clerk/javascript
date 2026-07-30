@@ -29,6 +29,7 @@ export const mockVerificationResults = {
     name: 'GitHub OAuth',
     subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['read:foo', 'write:bar'],
+    permissions: ['things:read', 'things:write'],
     revoked: false,
     revocationReason: null,
     expired: false,

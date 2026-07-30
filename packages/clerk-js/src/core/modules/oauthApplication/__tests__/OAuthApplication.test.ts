@@ -17,7 +17,7 @@ const consentPayload: OAuthConsentInfoJSON = {
   oauth_application_url: 'https://app.example',
   client_id: 'client_abc',
   state: 'st',
-  scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
+  scopes: [{ scope: 'openid', label: 'View your profile', description: 'OpenID', requires_consent: true }],
 };
 
 describe('OAuthApplication', () => {
@@ -78,7 +78,7 @@ describe('OAuthApplication', () => {
         oauthApplicationUrl: 'https://app.example',
         clientId: 'client_abc',
         state: 'st',
-        scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
+        scopes: [{ scope: 'openid', label: 'View your profile', description: 'OpenID', requiresConsent: true }],
       });
     });
 
@@ -95,8 +95,22 @@ describe('OAuthApplication', () => {
         oauthApplicationUrl: 'https://app.example',
         clientId: 'client_abc',
         state: 'st',
-        scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
+        scopes: [{ scope: 'openid', label: 'View your profile', description: 'OpenID', requiresConsent: true }],
       });
+    });
+
+    it('maps a missing legacy scope label to null', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
+        response: {
+          ...consentPayload,
+          scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
+        },
+      } as any);
+
+      BaseResource.clerk = {} as any;
+
+      const info = await oauthApp.getConsentInfo({ oauthClientId: 'client_abc' });
+      expect(info.scopes).toEqual([{ scope: 'openid', label: null, description: 'OpenID', requiresConsent: true }]);
     });
 
     it('defaults scopes to [] when absent', async () => {

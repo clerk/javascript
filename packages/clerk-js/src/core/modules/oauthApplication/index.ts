@@ -39,6 +39,7 @@ export class OAuthApplication implements OAuthApplicationNamespace {
       scopes:
         data.scopes?.map(s => ({
           scope: s.scope,
+          label: s.label ?? null,
           description: s.description,
           requiresConsent: s.requires_consent,
         })) ?? [],

@@ -15,8 +15,8 @@ const fakeConsentInfo = {
   state: 'abc',
   redirectDomain: 'example.com',
   scopes: [
-    { scope: 'openid', description: 'View your identity', requiresConsent: true },
-    { scope: 'email', description: 'Access your email address', requiresConsent: true },
+    { scope: 'openid', label: 'View your profile', description: 'View your identity', requiresConsent: true },
+    { scope: 'email', label: 'View your email', description: 'Access your email address', requiresConsent: true },
   ],
 };
 
@@ -89,6 +89,8 @@ describe('OAuthConsent', () => {
 
     await waitFor(() => {
       expect(getByText('Clerk CLI')).toBeVisible();
+      expect(getByText('View your profile')).toBeVisible();
+      expect(getByText('View your email')).toBeVisible();
       expect(getByText('View your identity')).toBeVisible();
       expect(getByText('Access your email address')).toBeVisible();
     });
@@ -96,6 +98,53 @@ describe('OAuthConsent', () => {
     expect(getConsentInfo).toHaveBeenCalledWith({
       oauthClientId: 'client_test',
       redirectUri: 'https://app.example/callback',
+    });
+  });
+
+  it('renders scope labels with descriptions and preserves legacy fallbacks without duplicate text', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({
+        ...fakeConsentInfo,
+        scopes: [
+          {
+            scope: 'profile:read',
+            label: 'View your profile',
+            description: 'Read your profile details',
+            requiresConsent: true,
+          },
+          {
+            scope: 'email:read',
+            label: 'View your email',
+            description: 'View your email',
+            requiresConsent: true,
+          },
+          {
+            scope: 'legacy:described',
+            description: 'Legacy scope description',
+            requiresConsent: true,
+          },
+          {
+            scope: 'legacy:raw',
+            description: null,
+            requiresConsent: true,
+          },
+        ],
+      }),
+    });
+
+    const { getByText, queryAllByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('View your profile')).toHaveClass('cl-listGroupItemLabel');
+      expect(getByText('Read your profile details')).toBeVisible();
+      expect(queryAllByText('View your email')).toHaveLength(1);
+      expect(getByText('Legacy scope description')).toHaveClass('cl-listGroupItemLabel');
+      expect(getByText('legacy:raw')).toHaveClass('cl-listGroupItemLabel');
     });
   });
 

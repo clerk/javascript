@@ -13,6 +13,7 @@ import {
   invalidTokenAuthObject,
   isMachineToken,
   isTokenTypeAccepted,
+  rehydrateMachineAuthObject,
   signedOutAuthObject,
   TokenType,
 } from '@clerk/backend/internal';
@@ -161,17 +162,18 @@ const handleMachineToken = (
     (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
 
   if (hasMachineToken && rawAuthObject && !acceptsOnlySessionToken) {
-    const authObject = getAuthObjectForAcceptedToken({
-      authObject: {
-        ...rawAuthObject,
-        debug: () => options,
-      },
-      acceptsToken,
-    });
+    const authObject = rehydrateMachineAuthObject(
+      getAuthObjectForAcceptedToken({
+        authObject: {
+          ...rawAuthObject,
+          debug: () => options,
+        },
+        acceptsToken,
+      }),
+    );
     return {
       ...authObject,
       getToken: () => (authObject.isAuthenticated ? Promise.resolve(bearerToken) : Promise.resolve(null)),
-      has: () => false,
     } as MachineAuthObject<MachineTokenType>;
   }
 

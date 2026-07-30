@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCheckAuthorization, splitByScope } from '../authorization';
+import { createCheckAuthorization, createOAuthAccessTokenAuthorization, splitByScope } from '../authorization';
 
 describe('createCheckAuthorization', () => {
   it('correctly parses features', () => {
@@ -374,6 +374,27 @@ describe('createCheckAuthorization', () => {
       factorVerificationAge: [-1, -1],
     });
     expect(has({ permission: 'org:sys_memberships:read', reverification: 'strict' })).toBe(false);
+  });
+});
+
+describe('createOAuthAccessTokenAuthorization', () => {
+  const has = createOAuthAccessTokenAuthorization({
+    scopes: ['documents.read'],
+    permissions: ['documents:read'],
+  });
+
+  it('checks exact granted scopes and delegated permissions', () => {
+    expect(has({ scope: 'documents.read' })).toBe(true);
+    expect(has({ scope: 'documents.write' })).toBe(false);
+    expect(has({ permission: 'documents:read' })).toBe(true);
+    expect(has({ permission: 'documents:write' })).toBe(false);
+  });
+
+  it('fails closed for missing, combined, inherited, and unknown dimensions', () => {
+    expect(has({} as any)).toBe(false);
+    expect(has({ scope: 'documents.read', permission: 'documents:read' } as any)).toBe(false);
+    expect(has(Object.create({ scope: 'documents.read' }))).toBe(false);
+    expect(has({ role: 'org:admin' } as any)).toBe(false);
   });
 });
 

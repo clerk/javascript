@@ -1,6 +1,29 @@
-import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
+import type {
+  CustomPermissionKey,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+} from './organizationMembership';
 import type { CheckAuthorizationWithCustomPermissions, PendingSessionOptions } from './session';
 import type { Autocomplete } from './utils';
+
+/** @inline */
+export type CheckAuthorizationFromOAuthAccessToken = (params: CheckAuthorizationParamsFromOAuthAccessToken) => boolean;
+
+export type CheckAuthorizationParamsFromOAuthAccessToken =
+  | {
+      /**
+       * The OAuth scope granted to the access token.
+       */
+      scope: string;
+      /**
+       * The Permission granted to the access token through its scopes.
+       */
+      permission?: never;
+    }
+  | {
+      scope?: never;
+      permission: CustomPermissionKey;
+    };
 
 type RoleProtectParams = {
   condition?: never;

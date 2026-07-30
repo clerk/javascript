@@ -1,0 +1,9 @@
+{
+  "extends": "../../packages/backend/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "../..",
+    "types": ["node"]
+  },
+  "include": ["./oauth-authorization.ts", "../../packages/backend/src/global.d.ts"]
+}

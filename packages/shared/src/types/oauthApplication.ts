@@ -5,6 +5,7 @@ import type { ClerkResourceJSON } from './json';
  */
 export type OAuthConsentScopeJSON = {
   scope: string;
+  label?: string | null;
   description: string | null;
   requires_consent: boolean;
 };
@@ -33,6 +34,11 @@ export type OAuthConsentScope = {
    * The name of the scope, as defined by the OAuth application.
    */
   scope: string;
+  /**
+   * The display label for the scope. This is `null` when a legacy payload did
+   * not provide one.
+   */
+  label: string | null;
   /**
    * The description of the scope, which can be shown to users on the consent screen. This may be `null` if no description is available.
    */

@@ -97,15 +97,22 @@ export interface OrganizationMembershipResource extends ClerkResource {
 }
 
 /**
- * `OrganizationCustomPermissionKey` is a type that represents a custom [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) in an Organization. It will be `string` unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/development/override-clerk-types-interfaces#example-custom-roles-and-permissions).
+ * `CustomPermissionKey` represents an application-defined permission. It will be `string` unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/development/override-clerk-types-interfaces#example-custom-roles-and-permissions).
  *
  * @interface
  */
-export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder
+export type CustomPermissionKey = ClerkAuthorization extends Placeholder
   ? ClerkAuthorization['permission'] extends string
     ? ClerkAuthorization['permission']
     : Base['permission']
   : Base['permission'];
+
+/**
+ * `OrganizationCustomPermissionKey` is a type that represents a custom [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) in an Organization.
+ *
+ * @interface
+ */
+export type OrganizationCustomPermissionKey = CustomPermissionKey;
 
 /**
  * `OrganizationCustomRoleKey` is a type that represents the user's Role in an Organization. It will be string unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/development/override-clerk-types-interfaces#example-custom-roles-and-permissions).
