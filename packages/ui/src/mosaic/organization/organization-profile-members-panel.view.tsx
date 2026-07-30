@@ -265,7 +265,7 @@ export function OrganizationProfileMembersPanelView({
                   {canManage ? (
                     <Cell align='end'>
                       <Button
-                        intent='destructive'
+                        color='negative'
                         variant='ghost'
                         size='sm'
                         disabled={row.isCurrentUser || isRemovingRow}

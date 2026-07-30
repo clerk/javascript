@@ -35,10 +35,78 @@ Button is the primary action element in Mosaic, used for form submissions and di
   storyModule={ButtonStories}
 />
 
+`size` sets the height, and under a coarse pointer every size floors at 44px instead — a
+fingertip is the same width whatever density the surrounding UI runs at, so the floor is a fixed
+`--cl-target-coarse` rather than a step on the spacing scale a consumer can rescale. Icon buttons
+take the floor on both axes, so a square button stays square rather than growing tall and narrow.
+`link` opts out entirely: it reads as text, not a control. None of this is visible on a mouse —
+it applies at `@media (pointer: coarse)`.
+
+### Variants
+
+<Story
+  name='Variants'
+  storyModule={ButtonStories}
+/>
+
+### Colors
+
+`color` and `variant` are independent: `color` picks the palette, `variant` decides how much of
+it to show. Every combination below is the same two props.
+
+Hover and focus are part of the matrix — hover a cell, or tab through it, to see them. `filled`
+shifts its fill and `link` underlines. `outline` and `ghost` share the same neutral hover fill,
+except `ghost` under `negative`, which is the one cell that tints by color. The focus ring is
+the same for every cell.
+
+<Story
+  name='Colors'
+  storyModule={ButtonStories}
+/>
+
 ### Shapes
 
 <Story
   name='Shapes'
+  storyModule={ButtonStories}
+/>
+
+### Icons
+
+An icon is a child, not a prop. Give it a `placement` and `Icon` reflects that as `data-icon`,
+which the button selects on to tighten the padding on that edge — pass icons on either side, or
+both, with nothing to declare on the button itself.
+
+<Story
+  name='Icons'
+  storyModule={ButtonStories}
+/>
+
+The tightened value isn't chosen by eye. An icon is centered in the button, so it already has
+`(height − icon size) / 2` of space above and below it; matching the inline side to that puts it
+in a square cell — 8px at every size, against 12px of text padding at `md` and `lg`, 10px at `sm`.
+The text side keeps the larger inset, since a run of text ends in a stem where an icon trails off.
+The middle button in each row below carries no icon, for comparison.
+
+<Story
+  name='IconSizes'
+  storyModule={ButtonStories}
+/>
+
+### Truncation
+
+A button sizes to its own content and doesn't shrink, so most of the time there's nothing to
+truncate. When its width _is_ constrained — `fullWidth` in a narrow container, or an explicit
+width — the label can't wrap to cope, because `size` fixes the height and a second line would
+grow out of the button. It stays on one line and ends in an ellipsis instead.
+
+Only text children truncate. Button wraps a text child in a span of its own to run the ellipsis
+against, since a bare text node is laid out in an anonymous box no selector can reach. Element
+children pass through as direct flex items, so an icon keeps its size and its padding while the
+label gives way around it.
+
+<Story
+  name='Truncation'
   storyModule={ButtonStories}
 />
 
@@ -48,3 +116,9 @@ Button is the primary action element in Mosaic, used for form submissions and di
   name='Disabled'
   storyModule={ButtonStories}
 />
+
+A disabled button keeps its resting fill and dims — it doesn't fall back to a gray of its own, so
+which color and variant it is stays legible while it's unavailable. Hover and press are suppressed
+by the styles, not by `pointer-events`: the button stays hit-testable, which is what makes
+`cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
+That tooltip is worth adding — a disabled control with no explanation is a dead end.
