@@ -15,6 +15,7 @@ import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
   ConfigureDirectorySyncContext,
+  ConfigureIdentityProviderContext,
   ConfigureSSOContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
@@ -128,6 +129,12 @@ export function ComponentContextProvider({
         <ConfigureDirectorySyncContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
           {children}
         </ConfigureDirectorySyncContext.Provider>
+      );
+    case 'ConfigureIdentityProvider':
+      return (
+        <ConfigureIdentityProviderContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+          {children}
+        </ConfigureIdentityProviderContext.Provider>
       );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into

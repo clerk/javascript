@@ -7,8 +7,8 @@ import { withCardStateProvider } from '@/elements/contexts';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { Route, Switch } from '@/router';
 
+import { SetupFlowNavbar } from '../ConfigureIdentityProvider/SetupFlowNavbar';
 import { ConfigureDirectorySyncWizard } from './ConfigureDirectorySyncWizard';
-import { DirectorySyncNavbar } from './DirectorySyncNavbar';
 
 /**
  * PROTOTYPE ONLY — standalone host for the Directory Sync onboarding wizard,
@@ -34,9 +34,12 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
-      <DirectorySyncNavbar contentRef={contentRef}>
+      <SetupFlowNavbar
+        title='Configure Directory Sync'
+        contentRef={contentRef}
+      >
         <ConfigureDirectorySyncWizard />
-      </DirectorySyncNavbar>
+      </SetupFlowNavbar>
     </ProfileCard.Root>
   );
 });

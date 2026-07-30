@@ -9,7 +9,7 @@ import { Col, Flex, SimpleButton, Text } from '@/customizables';
  */
 
 export type PrototypeIdpProvider = 'okta' | 'entra' | 'google' | 'custom';
-export type PrototypeSsoStatus = 'active' | 'inactive' | 'none';
+export type PrototypeSetupStatus = 'complete' | 'incomplete';
 export type PrototypeSyncLogState = 'empty' | 'streaming' | 'failure';
 export type PrototypeDeprovisionBehavior = 'suspend' | 'delete';
 
@@ -62,8 +62,8 @@ export const PROTOTYPE_PROVIDERS: Record<PrototypeIdpProvider, PrototypeProvider
 export interface PrototypeState {
   provider: PrototypeIdpProvider;
   setProvider: (p: PrototypeIdpProvider) => void;
-  ssoStatus: PrototypeSsoStatus;
-  setSsoStatus: (s: PrototypeSsoStatus) => void;
+  setupStatus: PrototypeSetupStatus;
+  setSetupStatus: (s: PrototypeSetupStatus) => void;
   syncLog: PrototypeSyncLogState;
   setSyncLog: (s: PrototypeSyncLogState) => void;
   deprovisionBehavior: PrototypeDeprovisionBehavior;
@@ -73,8 +73,8 @@ export interface PrototypeState {
   tokenGeneration: number;
   regenerateToken: () => void;
   providerMeta: PrototypeProviderMeta;
-  /** SSO exists in some form (active or inactive) — the wizard's entry precondition. */
-  hasSsoConnection: boolean;
+  /** The identity-provider setup flow (domains + IdP) is complete — the wizard's entry precondition. */
+  isSetupComplete: boolean;
 }
 
 const PrototypeContext = React.createContext<PrototypeState | null>(null);
@@ -82,7 +82,7 @@ PrototypeContext.displayName = 'DirectorySyncPrototypeContext';
 
 export const PrototypeStateProvider = ({ children }: PropsWithChildren): JSX.Element => {
   const [provider, setProvider] = React.useState<PrototypeIdpProvider>('okta');
-  const [ssoStatus, setSsoStatus] = React.useState<PrototypeSsoStatus>('active');
+  const [setupStatus, setSetupStatus] = React.useState<PrototypeSetupStatus>('complete');
   const [syncLog, setSyncLog] = React.useState<PrototypeSyncLogState>('empty');
   const [deprovisionBehavior, setDeprovisionBehavior] = React.useState<PrototypeDeprovisionBehavior>('suspend');
   const [isDirectorySyncActive, setIsDirectorySyncActive] = React.useState(false);
@@ -92,8 +92,8 @@ export const PrototypeStateProvider = ({ children }: PropsWithChildren): JSX.Ele
     () => ({
       provider,
       setProvider,
-      ssoStatus,
-      setSsoStatus,
+      setupStatus,
+      setSetupStatus,
       syncLog,
       setSyncLog,
       deprovisionBehavior,
@@ -103,9 +103,9 @@ export const PrototypeStateProvider = ({ children }: PropsWithChildren): JSX.Ele
       tokenGeneration,
       regenerateToken: () => setTokenGeneration(g => g + 1),
       providerMeta: PROTOTYPE_PROVIDERS[provider],
-      hasSsoConnection: ssoStatus !== 'none',
+      isSetupComplete: setupStatus === 'complete',
     }),
-    [provider, ssoStatus, syncLog, deprovisionBehavior, isDirectorySyncActive, tokenGeneration],
+    [provider, setupStatus, syncLog, deprovisionBehavior, isDirectorySyncActive, tokenGeneration],
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;
@@ -224,13 +224,12 @@ export const PrototypeControlsPanel = (): JSX.Element => {
             ]}
           />
           <PanelRow
-            label='SSO connection'
-            value={p.ssoStatus}
-            onChange={p.setSsoStatus}
+            label='IdP setup'
+            value={p.setupStatus}
+            onChange={p.setSetupStatus}
             options={[
-              { id: 'active', label: 'Active' },
-              { id: 'inactive', label: 'Inactive' },
-              { id: 'none', label: 'Not configured' },
+              { id: 'complete', label: 'Complete' },
+              { id: 'incomplete', label: 'Incomplete' },
             ]}
           />
           <PanelRow

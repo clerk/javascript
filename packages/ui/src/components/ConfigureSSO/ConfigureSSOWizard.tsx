@@ -4,33 +4,25 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
-import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
-import { ActivateStep, ConfigureStep, OrganizationDomainsStep, TestConfigurationStep } from './steps';
+import { ActivateStep, TestConfigurationStep } from './steps';
 
 export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
   title?: React.ReactNode;
   forceInitialStep?: boolean;
 };
 
+// PROTOTYPE ONLY: the verify-domain and configure steps moved into the
+// ConfigureIdentityProvider prerequisite flow; this wizard now assumes a
+// verified-domain, configured connection and only tests + activates it.
 export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
-  const { organizationEnterpriseConnection: c, organizationDomains } = props;
-
-  const allDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
+  const { organizationEnterpriseConnection: c } = props;
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
-      {
-        id: 'configure',
-        label: 'Connection',
-        isReachable: () => allDomainsVerified || c.hasConnection,
-        isComplete: () => c.hasMinimumConfiguration || c.isActive,
-      },
       {
         id: 'test',
         label: 'Test',
-        isReachable: () => c.hasMinimumConfiguration || c.isActive,
         isComplete: () => c.hasSuccessfulTestRun || c.isActive,
       },
       {
@@ -40,7 +32,7 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
         isComplete: () => c.isActive,
       },
     ],
-    [c, allDomainsVerified],
+    [c],
   );
 
   const initialStepId = forceInitialStep ? steps[0].id : undefined;
@@ -52,18 +44,6 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
         initialStepId={initialStepId}
       >
         <ConfigureSSOHeader title={title} />
-
-        <Wizard.Match id='verify-domain'>
-          <CardStateProvider>
-            <OrganizationDomainsStep />
-          </CardStateProvider>
-        </Wizard.Match>
-
-        <Wizard.Match id='configure'>
-          <CardStateProvider>
-            <ConfigureStep />
-          </CardStateProvider>
-        </Wizard.Match>
 
         <Wizard.Match id='test'>
           <CardStateProvider>

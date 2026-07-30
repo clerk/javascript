@@ -1,6 +1,7 @@
 export * from './APIKeys';
 export * from './Checkout';
 export * from './ConfigureDirectorySync';
+export * from './ConfigureIdentityProvider';
 export * from './ConfigureSSO';
 export * from './CreateOrganization';
 export * from './GoogleOneTap';

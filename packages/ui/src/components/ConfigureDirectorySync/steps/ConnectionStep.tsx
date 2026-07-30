@@ -9,24 +9,24 @@ const FAKE_DOMAINS = ['acme.com', 'acme.dev'];
 
 export const ConnectionStep = (): JSX.Element => {
   const { goNext } = useWizard();
-  const { providerMeta, ssoStatus, hasSsoConnection } = usePrototype();
+  const { providerMeta, isSetupComplete } = usePrototype();
 
   return (
     <>
       <Step.Header
-        title='Linked SSO connection'
-        description='Directory Sync provisions organization members through your existing SSO connection.'
+        title='Identity provider'
+        description='Directory Sync provisions organization members through the identity provider configured in setup.'
       />
 
       <Step.Body>
         <Step.Section sx={t => ({ gap: t.space.$5 })}>
-          {hasSsoConnection ? (
+          {isSetupComplete ? (
             <>
               <Text
                 as='p'
                 colorScheme='secondary'
               >
-                Your identity provider and verified domains are inherited from the SSO connection — you won&apos;t be
+                Your identity provider and verified domains come from the identity provider setup — you won&apos;t be
                 asked for them again.
               </Text>
 
@@ -50,9 +50,7 @@ export const ConnectionStep = (): JSX.Element => {
                   >
                     {providerMeta.name}
                   </Text>
-                  <Badge colorScheme={ssoStatus === 'active' ? 'success' : 'danger'}>
-                    {ssoStatus === 'active' ? 'Active' : 'Inactive'}
-                  </Badge>
+                  <Badge colorScheme='success'>Setup complete</Badge>
                 </Flex>
 
                 <Flex
@@ -73,18 +71,20 @@ export const ConnectionStep = (): JSX.Element => {
                 </Flex>
               </Col>
 
-              {ssoStatus === 'inactive' && (
-                <Alert
-                  variant='warning'
-                  title='Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.'
-                />
-              )}
+              <Text
+                as='p'
+                colorScheme='secondary'
+                sx={t => ({ fontSize: t.fontSizes.$sm })}
+              >
+                Directory Sync does not require Single Sign-On to be active — provisioning and sign-in are configured
+                independently.
+              </Text>
             </>
           ) : (
             <Alert
               variant='warning'
-              title='Single Sign-On is not configured yet'
-              subtitle='Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.'
+              title='Identity provider setup is not complete'
+              subtitle='Directory Sync requires the identity provider setup flow: verify at least one domain and connect your identity provider, then return here.'
             />
           )}
         </Step.Section>
@@ -93,7 +93,7 @@ export const ConnectionStep = (): JSX.Element => {
       <Step.Footer>
         <Step.Footer.Continue
           onClick={() => goNext()}
-          isDisabled={!hasSsoConnection}
+          isDisabled={!isSetupComplete}
         />
       </Step.Footer>
     </>

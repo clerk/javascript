@@ -6,15 +6,18 @@ import { Box, Col, descriptors, Flex, Heading, Icon, Text, useAppearance } from 
 import { ApplicationLogo } from '@/elements/ApplicationLogo';
 import { BoxIcon } from '@/icons';
 
-type DirectorySyncNavbarProps = React.PropsWithChildren<{
+type SetupFlowNavbarProps = React.PropsWithChildren<{
+  title: string;
   contentRef: React.RefObject<HTMLDivElement>;
 }>;
 
 /**
  * PROTOTYPE ONLY — simplified copy of ConfigureSSONavbar (no NavBar/mobile
- * handling) so the prototype can carry its own title without a localization key.
+ * handling) so prototype flows can carry their own title without a
+ * localization key. Shared by the identity-provider setup and Directory Sync
+ * standalone hosts.
  */
-export const DirectorySyncNavbar = ({ children, contentRef }: DirectorySyncNavbarProps): JSX.Element => {
+export const SetupFlowNavbar = ({ title, children, contentRef }: SetupFlowNavbarProps): JSX.Element => {
   const { parsedOptions } = useAppearance();
   const {
     organizationSettings,
@@ -78,7 +81,7 @@ export const DirectorySyncNavbar = ({ children, contentRef }: DirectorySyncNavba
           as='h3'
           sx={t => ({ fontSize: t.fontSizes.$lg, padding: `${t.space.$none} ${t.space.$3}` })}
         >
-          Configure Directory Sync
+          {title}
         </Heading>
       </Col>
 

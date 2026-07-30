@@ -35,6 +35,7 @@ const AVAILABLE_COMPONENTS = [
   'apiKeys',
   'configureSSO',
   'configureDirectorySync',
+  'configureIdentityProvider',
   'oauthConsent',
   'taskChooseOrganization',
   'taskResetPassword',
@@ -155,6 +156,7 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
   configureDirectorySync: buildComponentControls('configureDirectorySync'),
+  configureIdentityProvider: buildComponentControls('configureIdentityProvider'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
@@ -430,6 +432,10 @@ void (async () => {
     '/configure-directory-sync': {
       mount: '__internal_mountConfigureDirectorySync',
       component: 'configureDirectorySync',
+    },
+    '/configure-identity-provider': {
+      mount: '__internal_mountConfigureIdentityProvider',
+      component: 'configureIdentityProvider',
     },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',

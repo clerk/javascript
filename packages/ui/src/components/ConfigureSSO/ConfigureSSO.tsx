@@ -13,6 +13,7 @@ import { Route, Switch } from '@/router';
 import { ConfigureSSONavbar } from './ConfigureSSONavbar';
 import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
 import { ConfigureSSOWizard } from './ConfigureSSOWizard';
+import { areAllOrganizationDomainsVerified } from './domain/organizationEnterpriseConnection';
 import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
 import { Step } from './elements/Step';
 import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
@@ -58,6 +59,20 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     return <ConfigureSSOSkeleton />;
   }
 
+  // PROTOTYPE ONLY: SSO now requires the identity-provider setup flow
+  // (verified domains + configured connection) to be completed first.
+  const isIdentityProviderSetupComplete =
+    areAllOrganizationDomainsVerified(organizationDomains) &&
+    (organizationEnterpriseConnection.hasMinimumConfiguration || organizationEnterpriseConnection.isActive);
+
+  if (!isIdentityProviderSetupComplete) {
+    return (
+      <ConfigureSSOProtect>
+        <MissingIdentityProviderSetup />
+      </ConfigureSSOProtect>
+    );
+  }
+
   return (
     <ConfigureSSOProtect>
       <ConfigureSSOWizard
@@ -87,6 +102,54 @@ export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode })
 
   return children;
 };
+
+// PROTOTYPE ONLY: shown when the prerequisite identity-provider setup flow
+// has not been completed yet (no verified domain or unconfigured connection).
+const MissingIdentityProviderSetup = () => (
+  <>
+    <ProfileCardHeader />
+
+    <Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, padding: t.space.$8 })}
+        >
+          <Col
+            align='center'
+            sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+            />
+            <Heading
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
+            >
+              Identity provider setup required
+            </Heading>
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              sx={{ textWrap: 'balance' }}
+            >
+              Verify at least one domain and configure your identity provider before setting up Single Sign-On.
+            </Text>
+          </Col>
+        </Flex>
+      </Step.Section>
+    </Step.Body>
+
+    <ProfileCardFooter />
+  </>
+);
 
 const MissingManageEnterpriseConnectionsPermission = () => (
   <>

@@ -158,6 +158,12 @@ export type ConfigureDirectorySyncCtx = ConfigureSSOProps & {
   mode?: ComponentMode;
 };
 
+// PROTOTYPE ONLY — identity-provider setup prerequisite flow; reuses ConfigureSSOProps.
+export type ConfigureIdentityProviderCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureIdentityProvider';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
@@ -259,6 +265,7 @@ export type AvailableComponentCtx =
   | APIKeysCtx
   | ConfigureSSOCtx
   | ConfigureDirectorySyncCtx
+  | ConfigureIdentityProviderCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx

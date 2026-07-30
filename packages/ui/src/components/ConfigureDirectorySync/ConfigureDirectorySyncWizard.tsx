@@ -30,23 +30,23 @@ export const ConfigureDirectorySyncWizard = (props: ConfigureDirectorySyncWizard
 );
 
 const WizardInternal = ({ title, onExit }: ConfigureDirectorySyncWizardProps): JSX.Element => {
-  const { hasSsoConnection, isDirectorySyncActive } = usePrototype();
+  const { isSetupComplete, isDirectorySyncActive } = usePrototype();
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'connection', label: 'Connection', isComplete: () => hasSsoConnection },
-      { id: 'endpoint', label: 'Endpoint', isReachable: () => hasSsoConnection },
-      { id: 'attributes', label: 'Attributes', isReachable: () => hasSsoConnection },
-      { id: 'test', label: 'Test', isReachable: () => hasSsoConnection },
-      { id: 'groups', label: 'Groups', isReachable: () => hasSsoConnection },
+      { id: 'connection', label: 'Connection', isComplete: () => isSetupComplete },
+      { id: 'endpoint', label: 'Endpoint', isReachable: () => isSetupComplete },
+      { id: 'attributes', label: 'Attributes', isReachable: () => isSetupComplete },
+      { id: 'test', label: 'Test', isReachable: () => isSetupComplete },
+      { id: 'groups', label: 'Groups', isReachable: () => isSetupComplete },
       {
         id: 'activate',
         label: 'Activate',
-        isReachable: () => hasSsoConnection,
+        isReachable: () => isSetupComplete,
         isComplete: () => isDirectorySyncActive,
       },
     ],
-    [hasSsoConnection, isDirectorySyncActive],
+    [isSetupComplete, isDirectorySyncActive],
   );
 
   return (
