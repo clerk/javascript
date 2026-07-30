@@ -48,15 +48,10 @@ describe('UserProfileView', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  test('calls onHostBack when the root back button is tapped', () => {
+  test('shows the root back button and calls onHostBack when it is tapped', () => {
     const onHostBack = vi.fn();
 
-    render(
-      <UserProfileView
-        hostBackButton
-        onHostBack={onHostBack}
-      />,
-    );
+    render(<UserProfileView onHostBack={onHostBack} />);
 
     const props = lastNativeProps();
     expect(props.hostBackButton).toBe(true);
@@ -65,8 +60,8 @@ describe('UserProfileView', () => {
     expect(onHostBack).toHaveBeenCalledTimes(1);
   });
 
-  test('does not request a host back button by default', () => {
-    render(<UserProfileView onHostBack={vi.fn()} />);
+  test('does not show a root back button without onHostBack', () => {
+    render(<UserProfileView />);
 
     const props = lastNativeProps();
     expect(props.hostBackButton).toBe(false);

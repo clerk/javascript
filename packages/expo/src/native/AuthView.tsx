@@ -19,9 +19,8 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
  *
- * To push the auth flow onto your own navigation stack with a single header, enable
- * `hostBackButton` so Clerk's own chrome takes over — or, with
- * expo-router, use the prewired screen from `@clerk/expo/native/router`.
+ * To push the auth flow onto your own navigation stack, hide the route's header and
+ * pass `onHostBack` so Clerk's own chrome takes over.
  *
  * @example
  * ```tsx
@@ -46,7 +45,6 @@ export function AuthView({
   mode = 'signInOrUp',
   isDismissible = true,
   logoMaxHeight,
-  hostBackButton = false,
   onDismiss,
   onHostBack,
 }: AuthViewProps) {
@@ -77,9 +75,9 @@ export function AuthView({
       mode={mode}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
-      hostBackButton={hostBackButton}
+      hostBackButton={!!onHostBack}
       onAuthEvent={handleAuthEvent}
-      onHostBack={hostBackButton && onHostBack ? () => onHostBack() : undefined}
+      onHostBack={onHostBack ? () => onHostBack() : undefined}
     >
       {logo ? (
         <View

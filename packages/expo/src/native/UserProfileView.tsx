@@ -41,8 +41,7 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  * To present the profile, render it inside your own `Modal`, sheet, or route.
  *
  * To push the profile onto your own navigation stack, hide the route's header and
- * enable `hostBackButton` so Clerk's own chrome takes over — or, with expo-router,
- * use the prewired screen from `@clerk/expo/native/router`.
+ * pass `onHostBack` so Clerk's own chrome takes over.
  *
  * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
  * `useEffect` to react to sign-out.
@@ -65,13 +64,7 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({
-  isDismissible = true,
-  hostBackButton = false,
-  style,
-  onDismiss,
-  onHostBack,
-}: UserProfileViewProps) {
+export function UserProfileView({ isDismissible = true, style, onDismiss, onHostBack }: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -97,9 +90,9 @@ export function UserProfileView({
     <NativeClerkUserProfileView
       style={[styles.container, style]}
       isDismissible={isDismissible}
-      hostBackButton={hostBackButton}
+      hostBackButton={!!onHostBack}
       onProfileEvent={handleProfileEvent}
-      onHostBack={hostBackButton && onHostBack ? () => onHostBack() : undefined}
+      onHostBack={onHostBack ? () => onHostBack() : undefined}
     />
   );
 }
