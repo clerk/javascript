@@ -271,7 +271,7 @@ final class ClerkNativeBridge {
     dismissible: Bool,
     logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
-    embeddedNavigation: ClerkExpoEmbeddedNavigation? = nil,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -280,7 +280,7 @@ final class ClerkNativeBridge {
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
-        embeddedNavigation: embeddedNavigation,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
@@ -292,7 +292,7 @@ final class ClerkNativeBridge {
 
   func makeUserProfileViewController(
     dismissible: Bool,
-    embeddedNavigation: ClerkExpoEmbeddedNavigation? = nil,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -300,7 +300,7 @@ final class ClerkNativeBridge {
     return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
-        embeddedNavigation: embeddedNavigation,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme
       ),
@@ -536,29 +536,12 @@ struct ClerkInlineUserButtonWrapperView: View {
 /// and pop commands flow through the ClerkKitUI embedded-navigation SPI handle, which
 /// also hides Clerk's navigation bars when placed in the SwiftUI environment.
 @MainActor
-final class ClerkExpoEmbeddedNavigation {
-  let handle = ClerkEmbeddedNavigation()
-
-  var onDepthChange: ((Int) -> Void)? {
-    get { handle.onDepthChange }
-    set { handle.onDepthChange = newValue }
-  }
-
-  func goBack() {
-    handle.pop()
-  }
-
-  func popToRoot() {
-    handle.popToRoot()
-  }
-}
-
 // MARK: - Inline Auth View Wrapper (for embedded rendering)
 
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissible: Bool
-  let embeddedNavigation: ClerkExpoEmbeddedNavigation?
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
@@ -569,7 +552,7 @@ struct ClerkInlineAuthWrapperView: View {
   @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
-      .environment(\.clerkEmbeddedNavigation, embeddedNavigation?.handle)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -664,7 +647,7 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 
 struct ClerkInlineProfileWrapperView: View {
   let dismissible: Bool
-  let embeddedNavigation: ClerkExpoEmbeddedNavigation?
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
 
@@ -673,7 +656,7 @@ struct ClerkInlineProfileWrapperView: View {
   var body: some View {
     let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
-      .environment(\.clerkEmbeddedNavigation, embeddedNavigation?.handle)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {

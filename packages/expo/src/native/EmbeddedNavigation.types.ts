@@ -1,64 +1,26 @@
 /**
- * The embedded component's internal navigation state, reported through
- * `onNavigationChange` while `hideHeader` is enabled.
- */
-export interface EmbeddedNavigationState {
-  /**
-   * The number of screens pushed above the component's root screen.
-   */
-  depth: number;
-
-  /**
-   * Whether the component's internal stack has screens to pop.
-   *
-   * While `true`, route back actions (header back button, gestures, Android
-   * hardware back) should call `goBack()` on the component ref instead of
-   * popping the route.
-   */
-  canGoBack: boolean;
-}
-
-/**
- * Props shared by native components that support embedding inside the host
- * app's own navigation (`UserProfileView`, `AuthView`).
+ * Props shared by native components that can be embedded in the host app's own
+ * navigation (`UserProfileView`, `AuthView`).
  */
 export interface EmbeddedNavigationProps {
   /**
-   * Hides the component's built-in navigation header so it can be pushed onto
-   * the host app's own navigation stack without a double header.
+   * Shows a back button on the component's root screen that fires
+   * {@link EmbeddedNavigationProps.onHostBack}.
    *
-   * The host owns all header chrome, including back affordances: render your
-   * own back button and call `goBack()` on the component ref while
-   * `onNavigationChange` reports `canGoBack: true`.
+   * The component keeps its own navigation chrome, so screen titles, back
+   * buttons, swipe-back, and transitions inside the component stay native.
+   * Use this when the component fills a route whose own header is hidden.
    *
    * With expo-router, prefer the prewired screens from
    * `@clerk/expo/native/router` over wiring this manually.
    *
    * @default false
    */
-  hideHeader?: boolean;
+  hostBackButton?: boolean;
 
   /**
-   * Called when the component's internal navigation stack changes.
-   *
-   * Only fires while `hideHeader` is enabled.
+   * Called when the user taps the root back button shown by
+   * {@link EmbeddedNavigationProps.hostBackButton}. Pop the host route in response.
    */
-  onNavigationChange?: (state: EmbeddedNavigationState) => void;
-}
-
-/**
- * Imperative handle exposed by native components that support embedding
- * inside the host app's own navigation.
- */
-export interface EmbeddedNavigationRef {
-  /**
-   * Pops one screen off the component's internal navigation stack.
-   * No-op at the component's root.
-   */
-  goBack: () => Promise<void>;
-
-  /**
-   * Pops the component's internal navigation stack back to its root screen.
-   */
-  popToRoot: () => Promise<void>;
+  onHostBack?: () => void;
 }

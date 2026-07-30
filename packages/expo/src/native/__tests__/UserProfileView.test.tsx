@@ -1,26 +1,21 @@
 import { render } from '@testing-library/react';
-import React, { createRef } from 'react';
+import React from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
-import type { UserProfileViewRef } from '../UserProfileView';
 import { UserProfileView } from '../UserProfileView';
 
 const mocks = vi.hoisted(() => {
   return {
     nativeProps: vi.fn(),
-    goBack: vi.fn(() => Promise.resolve()),
-    popToRoot: vi.fn(() => Promise.resolve()),
   };
 });
 
-vi.mock('../../specs/NativeClerkUserProfileView', async () => {
-  const { forwardRef, useImperativeHandle } = await import('react');
+vi.mock('../../specs/NativeClerkUserProfileView', () => {
   return {
-    default: forwardRef((props: Record<string, unknown>, ref) => {
+    default: (props: Record<string, unknown>) => {
       mocks.nativeProps(props);
-      useImperativeHandle(ref, () => ({ goBack: mocks.goBack, popToRoot: mocks.popToRoot }));
       return null;
-    }),
+    },
   };
 });
 
@@ -53,45 +48,28 @@ describe('UserProfileView', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  test('unwraps navigation change events when hideHeader is enabled', () => {
-    const onNavigationChange = vi.fn();
+  test('calls onHostBack when the root back button is tapped', () => {
+    const onHostBack = vi.fn();
 
     render(
       <UserProfileView
-        hideHeader
-        onNavigationChange={onNavigationChange}
+        hostBackButton
+        onHostBack={onHostBack}
       />,
     );
 
     const props = lastNativeProps();
-    expect(props.hideHeader).toBe(true);
-    props.onNavigationChange({ nativeEvent: { depth: 2, canGoBack: true } });
+    expect(props.hostBackButton).toBe(true);
+    props.onHostBack();
 
-    expect(onNavigationChange).toHaveBeenCalledWith({ depth: 2, canGoBack: true });
+    expect(onHostBack).toHaveBeenCalledTimes(1);
   });
 
-  test('does not subscribe to navigation changes without hideHeader', () => {
-    render(<UserProfileView onNavigationChange={vi.fn()} />);
+  test('does not request a host back button by default', () => {
+    render(<UserProfileView onHostBack={vi.fn()} />);
 
     const props = lastNativeProps();
-    expect(props.hideHeader).toBe(false);
-    expect(props.onNavigationChange).toBeUndefined();
-  });
-
-  test('forwards goBack and popToRoot through the ref', async () => {
-    const ref = createRef<UserProfileViewRef>();
-
-    render(
-      <UserProfileView
-        ref={ref}
-        hideHeader
-      />,
-    );
-
-    await ref.current?.goBack();
-    await ref.current?.popToRoot();
-
-    expect(mocks.goBack).toHaveBeenCalledTimes(1);
-    expect(mocks.popToRoot).toHaveBeenCalledTimes(1);
+    expect(props.hostBackButton).toBe(false);
+    expect(props.onHostBack).toBeUndefined();
   });
 });

@@ -1,15 +1,10 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
-import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
+import { useCallback } from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { NativeClerkUserProfileViewRef } from '../specs/NativeClerkUserProfileView';
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 import { isNativeSupported } from '../utils/native-module';
-import type {
-  EmbeddedNavigationProps,
-  EmbeddedNavigationRef,
-  EmbeddedNavigationState,
-} from './EmbeddedNavigation.types';
+import type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
 
 /**
  * Props for the UserProfileView component.
@@ -37,11 +32,6 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
 }
 
 /**
- * Imperative handle exposed by {@link UserProfileView}.
- */
-export type UserProfileViewRef = EmbeddedNavigationRef;
-
-/**
  * A pre-built native component for managing the user's profile and account settings.
  *
  * `UserProfileView` renders inline within your React Native view hierarchy, powered by:
@@ -50,9 +40,9 @@ export type UserProfileViewRef = EmbeddedNavigationRef;
  *
  * To present the profile, render it inside your own `Modal`, sheet, or route.
  *
- * To push the profile onto your own navigation stack with a single header, enable
- * `hideHeader` and drive back navigation through the component ref — or, with
- * expo-router, use the prewired screen from `@clerk/expo/native/router`.
+ * To push the profile onto your own navigation stack, hide the route's header and
+ * enable `hostBackButton` so Clerk's own chrome takes over — or, with expo-router,
+ * use the prewired screen from `@clerk/expo/native/router`.
  *
  * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
  * `useEffect` to react to sign-out.
@@ -75,21 +65,13 @@ export type UserProfileViewRef = EmbeddedNavigationRef;
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export const UserProfileView = forwardRef<UserProfileViewRef, UserProfileViewProps>(function UserProfileView(
-  { isDismissible = true, hideHeader = false, style, onDismiss, onNavigationChange },
-  ref,
-) {
-  const nativeRef = useRef<NativeClerkUserProfileViewRef>(null);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      goBack: () => nativeRef.current?.goBack() ?? Promise.resolve(),
-      popToRoot: () => nativeRef.current?.popToRoot() ?? Promise.resolve(),
-    }),
-    [],
-  );
-
+export function UserProfileView({
+  isDismissible = true,
+  hostBackButton = false,
+  style,
+  onDismiss,
+  onHostBack,
+}: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -97,14 +79,6 @@ export const UserProfileView = forwardRef<UserProfileViewRef, UserProfileViewPro
       }
     },
     [onDismiss],
-  );
-
-  const handleNavigationChange = useCallback(
-    (event: NativeSyntheticEvent<EmbeddedNavigationState>) => {
-      const { depth, canGoBack } = event.nativeEvent;
-      onNavigationChange?.({ depth, canGoBack });
-    },
-    [onNavigationChange],
   );
 
   if (!isNativeSupported || !NativeClerkUserProfileView) {
@@ -121,15 +95,14 @@ export const UserProfileView = forwardRef<UserProfileViewRef, UserProfileViewPro
 
   return (
     <NativeClerkUserProfileView
-      ref={nativeRef}
       style={[styles.container, style]}
       isDismissible={isDismissible}
-      hideHeader={hideHeader}
+      hostBackButton={hostBackButton}
       onProfileEvent={handleProfileEvent}
-      onNavigationChange={hideHeader ? handleNavigationChange : undefined}
+      onHostBack={hostBackButton && onHostBack ? () => onHostBack() : undefined}
     />
   );
-});
+}
 
 const styles = StyleSheet.create({
   container: {

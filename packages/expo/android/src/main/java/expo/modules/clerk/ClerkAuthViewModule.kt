@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -24,7 +22,7 @@ import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
 import com.clerk.ui.auth.AuthMode
 import com.clerk.ui.auth.AuthView
-import com.clerk.ui.navigation.ClerkEmbeddedNavigation
+import com.clerk.ui.navigation.ClerkHostBackActionProvider
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -44,7 +42,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   var mode: String? = null
   var logoView: View? = null
     private set
-  var hideHeader: Boolean = false
+  var hostBackButton: Boolean = false
 
   private var logoWidth = 0
   private var logoHeight = 0
@@ -60,8 +58,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
     }
 
   private val onAuthEvent by EventDispatcher()
-  private val onNavigationChange by EventDispatcher()
-  private val embeddedNavigation = ClerkEmbeddedNavigation()
+  private val onHostBack by EventDispatcher()
 
   init {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -90,27 +87,19 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
     dismissalEventSent = false
   }
 
-  fun goBack() {
-    embeddedNavigation.pop()
-  }
+  @Composable
+  override fun Content() {
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, hostBackButton: $hostBackButton, activity: $activity")
 
-  fun popToRoot() {
-    embeddedNavigation.popToRoot()
+    if (hostBackButton) {
+      ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { AuthContent() }
+    } else {
+      AuthContent()
+    }
   }
 
   @Composable
-  override fun Content() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, hideHeader: $hideHeader, activity: $activity")
-
-    val embedded = if (hideHeader) embeddedNavigation else null
-    if (embedded != null) {
-      LaunchedEffect(embedded) {
-        snapshotFlow { embedded.depth }.collect { depth ->
-          onNavigationChange(mapOf("depth" to depth, "canGoBack" to (depth > 0)))
-        }
-      }
-    }
-
+  private fun AuthContent() {
     AuthView(
       modifier = Modifier.fillMaxSize(),
       clerkTheme = authTheme(),
@@ -123,7 +112,6 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
       onAuthComplete = {
         sendDismissEvent()
       },
-      embeddedNavigation = embedded,
     )
   }
 
@@ -194,7 +182,7 @@ class ClerkAuthViewModule : Module() {
     Name("ClerkAuthView")
 
     View(ClerkAuthNativeView::class) {
-      Events("onAuthEvent", "onNavigationChange")
+      Events("onAuthEvent", "onHostBack")
 
       GroupView<ClerkAuthNativeView> {
         AddChildView<View> { parent, child, _ ->
@@ -228,16 +216,8 @@ class ClerkAuthViewModule : Module() {
         view.logoMaxHeight = logoMaxHeight
       }
 
-      Prop("hideHeader") { view: ClerkAuthNativeView, hideHeader: Boolean ->
-        view.hideHeader = hideHeader
-      }
-
-      AsyncFunction("goBack") { view: ClerkAuthNativeView ->
-        view.goBack()
-      }
-
-      AsyncFunction("popToRoot") { view: ClerkAuthNativeView ->
-        view.popToRoot()
+      Prop("hostBackButton") { view: ClerkAuthNativeView, hostBackButton: Boolean ->
+        view.hostBackButton = hostBackButton
       }
 
       OnViewDidUpdateProps { view: ClerkAuthNativeView ->

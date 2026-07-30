@@ -3,12 +3,11 @@ import UIKit
 
 public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
-  private var currentHideHeader: Bool = false
+  private var currentHostBackButton: Bool = false
   private var didSendDismiss = false
-  private var embeddedNavigation: ClerkExpoEmbeddedNavigation?
 
   let onProfileEvent = EventDispatcher()
-  let onNavigationChange = EventDispatcher()
+  let onHostBack = EventDispatcher()
 
   func setDismissible(_ isDismissible: Bool?) {
     let newDismissible = isDismissible ?? true
@@ -17,19 +16,11 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
     setNeedsHostedViewUpdate()
   }
 
-  func setHideHeader(_ hideHeader: Bool?) {
-    let newHideHeader = hideHeader ?? false
-    guard newHideHeader != currentHideHeader else { return }
-    currentHideHeader = newHideHeader
+  func setHostBackButton(_ hostBackButton: Bool?) {
+    let newHostBackButton = hostBackButton ?? false
+    guard newHostBackButton != currentHostBackButton else { return }
+    currentHostBackButton = newHostBackButton
     setNeedsHostedViewUpdate()
-  }
-
-  func goBack() {
-    embeddedNavigation?.goBack()
-  }
-
-  func popToRoot() {
-    embeddedNavigation?.popToRoot()
   }
 
   private func sendProfileEvent(type: ClerkNativeViewEvent) {
@@ -52,21 +43,13 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    let hosted: ClerkExpoEmbeddedNavigation?
-    if currentHideHeader {
-      let navigation = ClerkExpoEmbeddedNavigation()
-      navigation.onDepthChange = { [weak self] depth in
-        self?.onNavigationChange(["depth": depth, "canGoBack": depth > 0])
-      }
-      hosted = navigation
-    } else {
-      hosted = nil
-    }
-    embeddedNavigation = hosted
+    let hostBackAction: (() -> Void)? = currentHostBackButton
+      ? { [weak self] in self?.onHostBack([:]) }
+      : nil
 
     return ClerkNativeBridge.shared.makeUserProfileViewController(
       dismissible: currentDismissible,
-      embeddedNavigation: hosted,
+      hostBackAction: hostBackAction,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()
@@ -81,22 +64,14 @@ public class ClerkUserProfileViewModule: Module {
     Name("ClerkUserProfileView")
 
     View(ClerkUserProfileNativeView.self) {
-      Events("onProfileEvent", "onNavigationChange")
+      Events("onProfileEvent", "onHostBack")
 
       Prop("isDismissible") { (view: ClerkUserProfileNativeView, isDismissible: Bool?) in
         view.setDismissible(isDismissible)
       }
 
-      Prop("hideHeader") { (view: ClerkUserProfileNativeView, hideHeader: Bool?) in
-        view.setHideHeader(hideHeader)
-      }
-
-      AsyncFunction("goBack") { (view: ClerkUserProfileNativeView) in
-        view.goBack()
-      }
-
-      AsyncFunction("popToRoot") { (view: ClerkUserProfileNativeView) in
-        view.popToRoot()
+      Prop("hostBackButton") { (view: ClerkUserProfileNativeView, hostBackButton: Bool?) in
+        view.setHostBackButton(hostBackButton)
       }
     }
   }

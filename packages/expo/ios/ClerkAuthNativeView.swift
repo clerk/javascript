@@ -7,12 +7,11 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentLogoMaxHeight: CGFloat?
   private let logoState = ClerkInlineAuthLogoState()
   private var logoBoundsObservation: NSKeyValueObservation?
-  private var currentHideHeader: Bool = false
+  private var currentHostBackButton: Bool = false
   private var didSendDismiss = false
-  private var embeddedNavigation: ClerkExpoEmbeddedNavigation?
 
   let onAuthEvent = EventDispatcher()
-  let onNavigationChange = EventDispatcher()
+  let onHostBack = EventDispatcher()
 
   func setMode(_ mode: String?) {
     let newMode = mode ?? "signInOrUp"
@@ -34,19 +33,11 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     setNeedsHostedViewUpdate()
   }
 
-  func setHideHeader(_ hideHeader: Bool?) {
-    let newHideHeader = hideHeader ?? false
-    guard newHideHeader != currentHideHeader else { return }
-    currentHideHeader = newHideHeader
+  func setHostBackButton(_ hostBackButton: Bool?) {
+    let newHostBackButton = hostBackButton ?? false
+    guard newHostBackButton != currentHostBackButton else { return }
+    currentHostBackButton = newHostBackButton
     setNeedsHostedViewUpdate()
-  }
-
-  func goBack() {
-    embeddedNavigation?.goBack()
-  }
-
-  func popToRoot() {
-    embeddedNavigation?.popToRoot()
   }
 
   private func sendAuthEvent(type: ClerkNativeViewEvent) {
@@ -116,24 +107,16 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    let hosted: ClerkExpoEmbeddedNavigation?
-    if currentHideHeader {
-      let navigation = ClerkExpoEmbeddedNavigation()
-      navigation.onDepthChange = { [weak self] depth in
-        self?.onNavigationChange(["depth": depth, "canGoBack": depth > 0])
-      }
-      hosted = navigation
-    } else {
-      hosted = nil
-    }
-    embeddedNavigation = hosted
+    let hostBackAction: (() -> Void)? = currentHostBackButton
+      ? { [weak self] in self?.onHostBack([:]) }
+      : nil
 
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
       logoState: logoState,
       logoMaxHeight: currentLogoMaxHeight,
-      embeddedNavigation: hosted,
+      hostBackAction: hostBackAction,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()
@@ -148,7 +131,7 @@ public class ClerkAuthViewModule: Module {
     Name("ClerkAuthView")
 
     View(ClerkAuthNativeView.self) {
-      Events("onAuthEvent", "onNavigationChange")
+      Events("onAuthEvent", "onHostBack")
 
       Prop("mode") { (view: ClerkAuthNativeView, mode: String?) in
         view.setMode(mode)
@@ -162,17 +145,10 @@ public class ClerkAuthViewModule: Module {
         view.setLogoMaxHeight(logoMaxHeight)
       }
 
-      Prop("hideHeader") { (view: ClerkAuthNativeView, hideHeader: Bool?) in
-        view.setHideHeader(hideHeader)
+      Prop("hostBackButton") { (view: ClerkAuthNativeView, hostBackButton: Bool?) in
+        view.setHostBackButton(hostBackButton)
       }
 
-      AsyncFunction("goBack") { (view: ClerkAuthNativeView) in
-        view.goBack()
-      }
-
-      AsyncFunction("popToRoot") { (view: ClerkAuthNativeView) in
-        view.popToRoot()
-      }
     }
   }
 }

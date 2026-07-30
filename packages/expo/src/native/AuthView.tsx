@@ -1,19 +1,12 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import { useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
-import type { NativeClerkAuthViewRef } from '../specs/NativeClerkAuthView';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
-import type { EmbeddedNavigationRef, EmbeddedNavigationState } from './EmbeddedNavigation.types';
 
 type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
-
-/**
- * Imperative handle exposed by {@link AuthView}.
- */
-export type AuthViewRef = EmbeddedNavigationRef;
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -27,7 +20,7 @@ export type AuthViewRef = EmbeddedNavigationRef;
  * state changes.
  *
  * To push the auth flow onto your own navigation stack with a single header, enable
- * `hideHeader` and drive back navigation through the component ref — or, with
+ * `hostBackButton` so Clerk's own chrome takes over — or, with
  * expo-router, use the prewired screen from `@clerk/expo/native/router`.
  *
  * @example
@@ -48,20 +41,15 @@ export type AuthViewRef = EmbeddedNavigationRef;
  *
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
-export const AuthView = forwardRef<AuthViewRef, AuthViewProps>(function AuthView(
-  { logo, mode = 'signInOrUp', isDismissible = true, logoMaxHeight, hideHeader = false, onDismiss, onNavigationChange },
-  ref,
-) {
-  const nativeRef = useRef<NativeClerkAuthViewRef>(null);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      goBack: () => nativeRef.current?.goBack() ?? Promise.resolve(),
-      popToRoot: () => nativeRef.current?.popToRoot() ?? Promise.resolve(),
-    }),
-    [],
-  );
+export function AuthView({
+  logo,
+  mode = 'signInOrUp',
+  isDismissible = true,
+  logoMaxHeight,
+  hostBackButton = false,
+  onDismiss,
+  onHostBack,
+}: AuthViewProps) {
   const handleAuthEvent = useCallback(
     (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -69,14 +57,6 @@ export const AuthView = forwardRef<AuthViewRef, AuthViewProps>(function AuthView
       }
     },
     [onDismiss],
-  );
-
-  const handleNavigationChange = useCallback(
-    (event: NativeSyntheticEvent<EmbeddedNavigationState>) => {
-      const { depth, canGoBack } = event.nativeEvent;
-      onNavigationChange?.({ depth, canGoBack });
-    },
-    [onNavigationChange],
   );
 
   if (!isNativeSupported || !NativeClerkAuthView) {
@@ -93,14 +73,13 @@ export const AuthView = forwardRef<AuthViewRef, AuthViewProps>(function AuthView
 
   return (
     <NativeClerkAuthView
-      ref={nativeRef}
       style={{ flex: 1 }}
       mode={mode}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
-      hideHeader={hideHeader}
+      hostBackButton={hostBackButton}
       onAuthEvent={handleAuthEvent}
-      onNavigationChange={hideHeader ? handleNavigationChange : undefined}
+      onHostBack={hostBackButton && onHostBack ? () => onHostBack() : undefined}
     >
       {logo ? (
         <View
@@ -112,4 +91,4 @@ export const AuthView = forwardRef<AuthViewRef, AuthViewProps>(function AuthView
       ) : null}
     </NativeClerkAuthView>
   );
-});
+}

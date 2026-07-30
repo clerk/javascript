@@ -5,13 +5,11 @@ package expo.modules.clerk
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
 import com.clerk.api.FrameworkIntegrationApi
-import com.clerk.ui.navigation.ClerkEmbeddedNavigation
+import com.clerk.ui.navigation.ClerkHostBackActionProvider
 import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
@@ -29,10 +27,9 @@ private fun debugLog(tag: String, message: String) {
 class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
   // clerk-android UserProfileView dismissibility is controlled by its onDismiss callback.
   var isDismissible: Boolean = true
-  var hideHeader: Boolean = false
+  var hostBackButton: Boolean = false
   private val onProfileEvent by EventDispatcher()
-  private val onNavigationChange by EventDispatcher()
-  private val embeddedNavigation = ClerkEmbeddedNavigation()
+  private val onHostBack by EventDispatcher()
 
   private val viewModelStoreOwner = object : ViewModelStoreOwner {
     private val store = ViewModelStore()
@@ -45,27 +42,19 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
     viewModelStoreOwner.viewModelStore.clear()
   }
 
-  fun goBack() {
-    embeddedNavigation.pop()
-  }
+  @Composable
+  override fun Content() {
+    debugLog(TAG, "setupView - isDismissible: $isDismissible, hostBackButton: $hostBackButton")
 
-  fun popToRoot() {
-    embeddedNavigation.popToRoot()
+    if (hostBackButton) {
+      ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { ProfileView() }
+    } else {
+      ProfileView()
+    }
   }
 
   @Composable
-  override fun Content() {
-    debugLog(TAG, "setupView - isDismissible: $isDismissible, hideHeader: $hideHeader")
-
-    val embedded = if (hideHeader) embeddedNavigation else null
-    if (embedded != null) {
-      LaunchedEffect(embedded) {
-        snapshotFlow { embedded.depth }.collect { depth ->
-          onNavigationChange(mapOf("depth" to depth, "canGoBack" to (depth > 0)))
-        }
-      }
-    }
-
+  private fun ProfileView() {
     UserProfileView(
       clerkTheme = Clerk.customTheme,
       isDismissible = isDismissible,
@@ -73,7 +62,6 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
         debugLog(TAG, "Profile dismissed")
         sendEvent("dismissed")
       },
-      embeddedNavigation = embedded,
     )
   }
 
@@ -87,22 +75,14 @@ class ClerkUserProfileViewModule : Module() {
     Name("ClerkUserProfileView")
 
     View(ClerkUserProfileNativeView::class) {
-      Events("onProfileEvent", "onNavigationChange")
+      Events("onProfileEvent", "onHostBack")
 
       Prop("isDismissible") { view: ClerkUserProfileNativeView, isDismissible: Boolean ->
         view.isDismissible = isDismissible
       }
 
-      Prop("hideHeader") { view: ClerkUserProfileNativeView, hideHeader: Boolean ->
-        view.hideHeader = hideHeader
-      }
-
-      AsyncFunction("goBack") { view: ClerkUserProfileNativeView ->
-        view.goBack()
-      }
-
-      AsyncFunction("popToRoot") { view: ClerkUserProfileNativeView ->
-        view.popToRoot()
+      Prop("hostBackButton") { view: ClerkUserProfileNativeView, hostBackButton: Boolean ->
+        view.hostBackButton = hostBackButton
       }
 
       OnViewDidUpdateProps { view: ClerkUserProfileNativeView ->
