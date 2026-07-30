@@ -50,9 +50,26 @@ function loadExpoRouter(): ExpoRouterModule {
 }
 
 function loadHeaderBackButton(): NavigationElementsModule['HeaderBackButton'] {
-  // @react-navigation/elements is a dependency of expo-router's native stack.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('@react-navigation/elements') as NavigationElementsModule).HeaderBackButton;
+  // Newer expo-router versions re-export the header elements; older setups resolve
+  // @react-navigation/elements directly (it ships with expo-router's native stack).
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const reexport = require('expo-router/react-navigation') as Partial<NavigationElementsModule>;
+    if (reexport.HeaderBackButton) {
+      return reexport.HeaderBackButton;
+    }
+  } catch {
+    // Fall through to @react-navigation/elements.
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return (require('@react-navigation/elements') as NavigationElementsModule).HeaderBackButton;
+  } catch {
+    throw new Error(
+      '@clerk/expo/native/router could not resolve HeaderBackButton from expo-router/react-navigation ' +
+        'or @react-navigation/elements. Ensure expo-router is installed.',
+    );
+  }
 }
 
 interface EmbeddedScreenState {
@@ -73,7 +90,8 @@ function useEmbeddedScreen(
   const componentRef = useRef<EmbeddedNavigationRef>(null);
   const isFocused = useRef(false);
   const [navigationState, setNavigationState] = useState<EmbeddedNavigationState>({ depth: 0, canGoBack: false });
-  const HeaderBackButton = useRef(loadHeaderBackButton()).current;
+  // Lazy initializer: resolve once, not on every render.
+  const [HeaderBackButton] = useState(() => loadHeaderBackButton());
 
   // Pop the route when the flow ends, but only while this screen is focused —
   // the same event also fires when the native view unmounts after a route pop.
