@@ -1,32 +1,21 @@
-import { Button, Col, Heading, Icon, Text } from '@/customizables';
+import { Badge, Button, Col, Flex, Heading, Icon, Text } from '@/customizables';
 import { DuotoneShieldCheck } from '@/icons';
 
 import { useConfigureSSO } from '../ConfigureSSO/ConfigureSSOContext';
 import { Step } from '../ConfigureSSO/elements/Step';
 import { useWizard } from '../ConfigureSSO/elements/Wizard';
 
-const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
-  saml_okta: 'Okta Workforce',
-  saml_microsoft: 'Microsoft Entra ID',
-  saml_google: 'Google Workspace',
-  saml_custom: 'Custom SAML provider',
-  oidc_custom: 'OIDC provider',
-};
-
-export const providerDisplayName = (provider: string | undefined): string => {
-  if (!provider) {
-    return 'your identity provider';
-  }
-  return PROVIDER_DISPLAY_NAMES[provider] ?? 'your identity provider';
-};
-
 /**
- * PROTOTYPE ONLY — terminal summary of the identity-provider selection flow,
- * pointing the admin at the SSO / Directory Sync flows this selection unlocks.
+ * PROTOTYPE ONLY — terminal summary of the domain setup flow, pointing the
+ * admin at identity-provider selection next.
  */
-export const SetupCompleteStep = (): JSX.Element => {
+export const DomainsCompleteStep = (): JSX.Element => {
   const { goPrev } = useWizard();
-  const { organizationEnterpriseConnection: c, onExit } = useConfigureSSO();
+  const { organizationDomains, onExit } = useConfigureSSO();
+
+  const verifiedDomains = (organizationDomains ?? []).filter(
+    domain => domain.ownershipVerification?.status === 'verified',
+  );
 
   return (
     <>
@@ -50,15 +39,33 @@ export const SetupCompleteStep = (): JSX.Element => {
               align='center'
               gap={2}
             >
-              <Heading textVariant='h2'>Identity provider selected</Heading>
+              <Heading textVariant='h2'>Domains verified</Heading>
               <Text
                 as='p'
                 colorScheme='secondary'
               >
-                {providerDisplayName(c.provider)} is your organization&apos;s identity provider. You can now configure
-                Single Sign-On or Directory Sync from the Security page — each is set up independently.
+                Ownership of your organization&apos;s domains is verified. Next, select your identity provider from the
+                Security page.
               </Text>
             </Col>
+
+            {verifiedDomains.length > 0 && (
+              <Flex
+                align='center'
+                justify='center'
+                wrap='wrap'
+                sx={t => ({ gap: t.space.$1x5 })}
+              >
+                {verifiedDomains.map(domain => (
+                  <Badge
+                    key={domain.id}
+                    colorScheme='success'
+                  >
+                    {domain.name}
+                  </Badge>
+                ))}
+              </Flex>
+            )}
           </Col>
 
           <Button

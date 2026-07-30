@@ -6,23 +6,31 @@ import { ConfigureSSOProvider } from './ConfigureSSOContext';
 import { ConfigureSSOHeader } from './ConfigureSSOHeader';
 import { Wizard, type WizardStepConfig } from './elements/Wizard';
 import { ActivateStep, TestConfigurationStep } from './steps';
+import { ConfigureProviderStep } from './steps/ConfigureStep';
 
 export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
   title?: React.ReactNode;
   forceInitialStep?: boolean;
 };
 
-// PROTOTYPE ONLY: the verify-domain and configure steps moved into the
-// ConfigureIdentityProvider prerequisite flow; this wizard now assumes a
-// verified-domain, configured connection and only tests + activates it.
+// PROTOTYPE ONLY: domains and provider SELECTION moved into their own
+// prerequisite flows (ConfigureDomains, ConfigureIdentityProvider). This
+// wizard assumes a selected provider and covers the SSO-specific work:
+// provider connection configuration, test, activate.
 export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
   const { organizationEnterpriseConnection: c } = props;
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
       {
+        id: 'configure',
+        label: 'Connection',
+        isComplete: () => c.hasMinimumConfiguration || c.isActive,
+      },
+      {
         id: 'test',
         label: 'Test',
+        isReachable: () => c.hasMinimumConfiguration || c.isActive,
         isComplete: () => c.hasSuccessfulTestRun || c.isActive,
       },
       {
@@ -44,6 +52,12 @@ export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: Config
         initialStepId={initialStepId}
       >
         <ConfigureSSOHeader title={title} />
+
+        <Wizard.Match id='configure'>
+          <CardStateProvider>
+            <ConfigureProviderStep />
+          </CardStateProvider>
+        </Wizard.Match>
 
         <Wizard.Match id='test'>
           <CardStateProvider>

@@ -59,11 +59,10 @@ export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObjec
     return <ConfigureSSOSkeleton />;
   }
 
-  // PROTOTYPE ONLY: SSO now requires the identity-provider setup flow
-  // (verified domains + configured connection) to be completed first.
+  // PROTOTYPE ONLY: SSO now requires the domain setup and identity-provider
+  // selection flows (verified domains + a selected provider) to be completed.
   const isIdentityProviderSetupComplete =
-    areAllOrganizationDomainsVerified(organizationDomains) &&
-    (organizationEnterpriseConnection.hasMinimumConfiguration || organizationEnterpriseConnection.isActive);
+    areAllOrganizationDomainsVerified(organizationDomains) && organizationEnterpriseConnection.hasConnection;
 
   if (!isIdentityProviderSetupComplete) {
     return (
@@ -140,7 +139,7 @@ const MissingIdentityProviderSetup = () => (
               colorScheme='secondary'
               sx={{ textWrap: 'balance' }}
             >
-              Verify at least one domain and configure your identity provider before setting up Single Sign-On.
+              Verify at least one domain and select your identity provider before setting up Single Sign-On.
             </Text>
           </Col>
         </Flex>

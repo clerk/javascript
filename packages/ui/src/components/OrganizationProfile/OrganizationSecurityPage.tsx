@@ -18,12 +18,12 @@ import {
 import { ChevronLeft } from '../../icons';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
+import { ConfigureDomainsWizard } from '../ConfigureDomains/ConfigureDomainsWizard';
+import { SecurityDomainsSection } from '../ConfigureDomains/SecurityDomainsSection';
 import { ConfigureIdentityProviderWizard } from '../ConfigureIdentityProvider/ConfigureIdentityProviderWizard';
-import {
-  isIdentityProviderSetupComplete,
-  SecurityIdentityProviderSection,
-} from '../ConfigureIdentityProvider/SecurityIdentityProviderSection';
+import { SecurityIdentityProviderSection } from '../ConfigureIdentityProvider/SecurityIdentityProviderSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
+import { areAllOrganizationDomainsVerified } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { SecuritySsoSection } from './SecuritySsoSection';
 
@@ -54,7 +54,7 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     organizationDomainMutations,
   } = useOrganizationEnterpriseConnection();
 
-  const [view, setView] = useState<'overview' | 'wizard' | 'directorySync' | 'idpSetup'>('overview');
+  const [view, setView] = useState<'overview' | 'wizard' | 'directorySync' | 'domains' | 'idpSelect'>('overview');
   const [forceFirstStep, setForceFirstStep] = useState(false);
 
   const exitWizard = () => setView('overview');
@@ -118,34 +118,49 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     );
   }
 
-  if (view === 'idpSetup') {
-    return (
-      <ConfigureIdentityProviderWizard
-        organizationEnterpriseConnection={organizationEnterpriseConnection}
-        testRuns={testRuns}
-        enterpriseConnection={enterpriseConnection}
-        contentRef={contentRef}
-        enterpriseConnectionMutations={enterpriseConnectionMutations}
-        organizationDomainMutations={organizationDomainMutations}
-        organizationDomains={organizationDomains}
-        title={backControl}
-        onExit={exitWizard}
-      />
-    );
+  const wizardHostProps = {
+    organizationEnterpriseConnection,
+    testRuns,
+    enterpriseConnection,
+    contentRef,
+    enterpriseConnectionMutations,
+    organizationDomainMutations,
+    organizationDomains,
+    title: backControl,
+    onExit: exitWizard,
+  };
+
+  if (view === 'domains') {
+    return <ConfigureDomainsWizard {...wizardHostProps} />;
   }
 
-  // PROTOTYPE ONLY: SSO and Directory Sync are gated on the identity-provider
-  // setup flow (verified domains + configured connection) being completed.
-  const setupComplete = isIdentityProviderSetupComplete(organizationEnterpriseConnection, organizationDomains);
+  if (view === 'idpSelect') {
+    return <ConfigureIdentityProviderWizard {...wizardHostProps} />;
+  }
+
+  // PROTOTYPE ONLY: the restructured IA — domains → provider selection →
+  // {SSO, Directory Sync}. Each later section is gated on the one before it.
+  const domainsReady = areAllOrganizationDomainsVerified(organizationDomains);
+  const providerSelected = organizationEnterpriseConnection.hasConnection;
 
   return view === 'overview' ? (
     <SecurityPageOverview>
-      <SecurityIdentityProviderSection
-        connection={organizationEnterpriseConnection}
+      <SecurityDomainsSection
         organizationDomains={organizationDomains}
-        onConfigure={() => setView('idpSetup')}
+        onConfigure={() => setView('domains')}
       />
-      {setupComplete ? (
+      {domainsReady ? (
+        <SecurityIdentityProviderSection
+          connection={organizationEnterpriseConnection}
+          onConfigure={() => setView('idpSelect')}
+        />
+      ) : (
+        <GatedSecuritySection
+          title='Identity provider'
+          hint='Verify at least one domain to select your identity provider.'
+        />
+      )}
+      {providerSelected ? (
         <SecuritySsoSection
           connection={organizationEnterpriseConnection}
           enterpriseConnection={enterpriseConnection}
@@ -158,15 +173,15 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
       ) : (
         <GatedSecuritySection
           title='Single sign-on'
-          hint='Complete identity provider setup to configure Single Sign-On.'
+          hint='Select an identity provider to configure Single Sign-On.'
         />
       )}
-      {setupComplete ? (
+      {providerSelected ? (
         <SecurityDirectorySyncSection onConfigure={() => setView('directorySync')} />
       ) : (
         <GatedSecuritySection
           title='Directory Sync'
-          hint='Complete identity provider setup to configure Directory Sync.'
+          hint='Select an identity provider to configure Directory Sync.'
         />
       )}
     </SecurityPageOverview>

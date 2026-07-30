@@ -73,7 +73,7 @@ export interface PrototypeState {
   tokenGeneration: number;
   regenerateToken: () => void;
   providerMeta: PrototypeProviderMeta;
-  /** The identity-provider setup flow (domains + IdP) is complete — the wizard's entry precondition. */
+  /** An identity provider has been selected (the selection flow ran) — the wizard's entry precondition. */
   isSetupComplete: boolean;
 }
 
@@ -224,12 +224,12 @@ export const PrototypeControlsPanel = (): JSX.Element => {
             ]}
           />
           <PanelRow
-            label='IdP setup'
+            label='IdP selection'
             value={p.setupStatus}
             onChange={p.setSetupStatus}
             options={[
-              { id: 'complete', label: 'Complete' },
-              { id: 'incomplete', label: 'Incomplete' },
+              { id: 'complete', label: 'Selected' },
+              { id: 'incomplete', label: 'Not selected' },
             ]}
           />
           <PanelRow

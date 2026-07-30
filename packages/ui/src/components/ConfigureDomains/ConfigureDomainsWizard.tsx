@@ -4,40 +4,41 @@ import { CardStateProvider } from '@/elements/contexts';
 
 import { ConfigureSSOProvider } from '../ConfigureSSO/ConfigureSSOContext';
 import { ConfigureSSOHeader } from '../ConfigureSSO/ConfigureSSOHeader';
+import { areAllOrganizationDomainsVerified } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { Step } from '../ConfigureSSO/elements/Step';
 import { Wizard, type WizardStepConfig } from '../ConfigureSSO/elements/Wizard';
-import { SelectProviderStep } from '../ConfigureSSO/steps';
-import { SetupCompleteStep } from './SetupCompleteStep';
+import { OrganizationDomainsStep } from '../ConfigureSSO/steps';
+import { DomainsCompleteStep } from './DomainsCompleteStep';
 
-export type ConfigureIdentityProviderWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
+export type ConfigureDomainsWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
   title?: React.ReactNode;
   forceInitialStep?: boolean;
 };
 
 /**
- * PROTOTYPE ONLY — the identity-provider SELECTION flow in the restructured
- * IA: pick the provider, nothing more. Provider-specific connection
- * configuration lives in the SSO flow; provisioning in Directory Sync — both
- * depend on this selection. Reuses the real SelectProviderStep wholesale.
+ * PROTOTYPE ONLY — the standalone domain setup + verification flow, the first
+ * prerequisite in the restructured IA. Reuses the real domains step wholesale.
  */
-export const ConfigureIdentityProviderWizard = ({
+export const ConfigureDomainsWizard = ({
   title,
   forceInitialStep,
   ...props
-}: ConfigureIdentityProviderWizardProps): JSX.Element => {
-  const { organizationEnterpriseConnection: c } = props;
+}: ConfigureDomainsWizardProps): JSX.Element => {
+  const { organizationDomains } = props;
+
+  const allDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
 
   const steps = React.useMemo<WizardStepConfig[]>(
     () => [
-      { id: 'select-provider', label: 'Identity provider', isComplete: () => c.hasConnection },
+      { id: 'verify-domain', label: 'Domains', isComplete: () => allDomainsVerified },
       {
         id: 'complete',
         label: 'Finish',
-        isReachable: () => c.hasConnection,
-        isComplete: () => c.hasConnection,
+        isReachable: () => allDomainsVerified,
+        isComplete: () => allDomainsVerified,
       },
     ],
-    [c],
+    [allDomainsVerified],
   );
 
   const initialStepId = forceInitialStep ? steps[0].id : undefined;
@@ -50,16 +51,16 @@ export const ConfigureIdentityProviderWizard = ({
       >
         <ConfigureSSOHeader title={title} />
 
-        <Wizard.Match id='select-provider'>
+        <Wizard.Match id='verify-domain'>
           <CardStateProvider>
-            <SelectProviderStep />
+            <OrganizationDomainsStep />
           </CardStateProvider>
         </Wizard.Match>
 
         <Wizard.Match id='complete'>
           <CardStateProvider>
             <Step>
-              <SetupCompleteStep />
+              <DomainsCompleteStep />
             </Step>
           </CardStateProvider>
         </Wizard.Match>

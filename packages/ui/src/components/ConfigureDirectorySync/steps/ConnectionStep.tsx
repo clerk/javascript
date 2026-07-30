@@ -15,7 +15,7 @@ export const ConnectionStep = (): JSX.Element => {
     <>
       <Step.Header
         title='Identity provider'
-        description='Directory Sync provisions organization members through the identity provider configured in setup.'
+        description='Directory Sync provisions organization members through the identity provider you selected.'
       />
 
       <Step.Body>
@@ -26,8 +26,8 @@ export const ConnectionStep = (): JSX.Element => {
                 as='p'
                 colorScheme='secondary'
               >
-                Your identity provider and verified domains come from the identity provider setup — you won&apos;t be
-                asked for them again.
+                Your verified domains and selected identity provider come from the setup flows — you won&apos;t be asked
+                for them again.
               </Text>
 
               <Col
@@ -50,7 +50,7 @@ export const ConnectionStep = (): JSX.Element => {
                   >
                     {providerMeta.name}
                   </Text>
-                  <Badge colorScheme='success'>Setup complete</Badge>
+                  <Badge colorScheme='success'>Selected</Badge>
                 </Flex>
 
                 <Flex
@@ -83,8 +83,8 @@ export const ConnectionStep = (): JSX.Element => {
           ) : (
             <Alert
               variant='warning'
-              title='Identity provider setup is not complete'
-              subtitle='Directory Sync requires the identity provider setup flow: verify at least one domain and connect your identity provider, then return here.'
+              title='No identity provider selected'
+              subtitle='Directory Sync requires a selected identity provider. Verify your domains and select a provider from the Security page, then return here.'
             />
           )}
         </Step.Section>

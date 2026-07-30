@@ -15,6 +15,7 @@ import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
   ConfigureDirectorySyncContext,
+  ConfigureDomainsContext,
   ConfigureIdentityProviderContext,
   ConfigureSSOContext,
   CreateOrganizationContext,
@@ -135,6 +136,12 @@ export function ComponentContextProvider({
         <ConfigureIdentityProviderContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
           {children}
         </ConfigureIdentityProviderContext.Provider>
+      );
+    case 'ConfigureDomains':
+      return (
+        <ConfigureDomainsContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+          {children}
+        </ConfigureDomainsContext.Provider>
       );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into

@@ -1645,6 +1645,35 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
+  /**
+   * PROTOTYPE ONLY — mounts the domain setup + verification prerequisite flow.
+   *
+   * @hidden
+   */
+  public __internal_mountConfigureDomains = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureDomains';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureSSO',
+          node,
+          props,
+        }),
+      );
+  };
+
+  /**
+   * PROTOTYPE ONLY — unmounts the domain setup + verification prerequisite flow.
+   *
+   * @hidden
+   */
+  public __internal_unmountConfigureDomains = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
     const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',

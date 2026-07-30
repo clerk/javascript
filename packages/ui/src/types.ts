@@ -158,9 +158,15 @@ export type ConfigureDirectorySyncCtx = ConfigureSSOProps & {
   mode?: ComponentMode;
 };
 
-// PROTOTYPE ONLY — identity-provider setup prerequisite flow; reuses ConfigureSSOProps.
+// PROTOTYPE ONLY — identity-provider selection prerequisite flow; reuses ConfigureSSOProps.
 export type ConfigureIdentityProviderCtx = ConfigureSSOProps & {
   componentName: 'ConfigureIdentityProvider';
+  mode?: ComponentMode;
+};
+
+// PROTOTYPE ONLY — domain setup + verification prerequisite flow; reuses ConfigureSSOProps.
+export type ConfigureDomainsCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureDomains';
   mode?: ComponentMode;
 };
 
@@ -266,6 +272,7 @@ export type AvailableComponentCtx =
   | ConfigureSSOCtx
   | ConfigureDirectorySyncCtx
   | ConfigureIdentityProviderCtx
+  | ConfigureDomainsCtx
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx

@@ -38,6 +38,8 @@ const componentImportPaths = {
     import(
       /* webpackChunkName: "configureIdentityProvider" */ '../components/ConfigureIdentityProvider/ConfigureIdentityProvider'
     ),
+  ConfigureDomains: () =>
+    import(/* webpackChunkName: "configureDomains" */ '../components/ConfigureDomains/ConfigureDomains'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
@@ -141,6 +143,10 @@ export const ConfigureIdentityProvider = lazy(() =>
   componentImportPaths.ConfigureIdentityProvider().then(module => ({ default: module.ConfigureIdentityProvider })),
 );
 
+export const ConfigureDomains = lazy(() =>
+  componentImportPaths.ConfigureDomains().then(module => ({ default: module.ConfigureDomains })),
+);
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const TaskChooseOrganization = lazy(() =>
@@ -204,6 +210,7 @@ export const ClerkComponents = {
   ConfigureSSO,
   ConfigureDirectorySync,
   ConfigureIdentityProvider,
+  ConfigureDomains,
   OAuthConsent,
   SubscriptionDetails,
   TaskChooseOrganization,
