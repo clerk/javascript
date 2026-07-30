@@ -145,6 +145,50 @@ out entirely no matter how wide it is. The one bad case is a **wide trigger with
 much narrower `-start`/`-end` popup**; matching the popup's width to the trigger
 puts the origin back on its center.
 
+### Hold the travel constant, not the scale
+
+**~6px of travel is the target.** It reads as emerging from the trigger without
+becoming a visible arc. The popover hits it at `0.94` because its origin sits
+~103px from the popup's center.
+
+Scale is the dial, not the constant. Because travel is `(1 − s) × d`, a taller
+popup pushes its own center further from the trigger, `d` grows, and the same
+`0.94` overshoots the target — a large surface swinging 15px reads as
+overexaggerated. Solve for the scale instead:
+
+```
+s = 1 − (6 / d)      d = distance from --cl-anchor-origin to the element's center
+```
+
+| `d`   | scale  |
+| ----- | ------ |
+| 60px  | `0.90` |
+| 100px | `0.94` |
+| 150px | `0.96` |
+| 200px | `0.97` |
+| 300px | `0.98` |
+
+Two effects push the same way, which is convenient: the absolute size change is
+`(1 − s) ×` the element's own dimensions, so a big surface at a fixed scale is
+already shrinking by more px than a small one. Scaling toward 1 as things grow
+fixes both at once.
+
+Three limits on the rule:
+
+- **Floor the scale around `0.90`.** For an element whose center is very close to
+  its origin, the formula demands an aggressive scale to manufacture 6px — at
+  `d = 30px` it asks for `0.80`, which reads as a zoom, not an emergence. Accept
+  less travel rather than a scale that draws attention to itself.
+- **Travel is measured at the element's center, by convention.** Scaling about a
+  point moves every other point in proportion to _its own_ distance from that
+  origin, so the far edge always travels further than the center and the near edge
+  barely moves. Keep the center as the yardstick so numbers stay comparable.
+- **Content-driven height makes this an estimate.** A popover's width comes from
+  its `size` variant but its height comes from whatever is inside it, so `d` is
+  only known at runtime. Pick the scale for the typical height of that surface and
+  accept the spread; a component whose height genuinely varies by multiples wants
+  a scale per size variant, not one constant.
+
 ## Reduced motion
 
 Gate the **moving property**, not the duration — the signal is about vestibular
