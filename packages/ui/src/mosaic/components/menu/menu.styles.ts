@@ -12,15 +12,17 @@ export const styles = stylex.create({
 
   popup: {
     borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-container'],
-    borderStyle: 'solid',
+    borderRadius: radiusVars['--cl-radius-element'],
+    borderStyle: 'none',
     borderWidth: '1px',
     outline: 'none',
-    paddingBlock: space['1'],
-    paddingInline: space['1'],
+    paddingBlock: space['0.5'],
+    paddingInline: space['0.5'],
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 10px 24px color-mix(in oklab, oklch(0 0 0) 8%, transparent),
-                0 2px 6px color-mix(in oklab, oklch(0 0 0) 4%, transparent)`,
+    boxShadow: `0 0 0 1px color-mix(in oklab, oklch(0 0 0) 4%, transparent),
+                0 24px 24px -10px color-mix(in oklab, oklch(0 0 0) 4%, transparent),
+                0 12px 12px -7px color-mix(in oklab, oklch(0 0 0) 12%, transparent)`,
+
     boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
@@ -50,11 +52,11 @@ export const styles = stylex.create({
   },
 
   item: {
-    borderRadius: radiusVars['--cl-radius-inner'],
+    borderRadius: '0.375rem',
     borderStyle: 'none',
     gap: space['2'],
     outline: 'none',
-    paddingBlock: space['1'],
+    paddingBlock: space['0.75'],
     paddingInline: space['2'],
     alignItems: 'center',
     backgroundColor: {
@@ -101,8 +103,8 @@ export const styles = stylex.create({
 
   separator: {
     // Full-bleed across the popup: cancel the popup's inline padding.
-    marginBlock: space['1'],
-    marginInline: `calc(-1 * ${space['1']})`,
+    marginBlock: space['0.5'],
+    marginInline: `calc(-1 * ${space['0.5']})`,
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
   },
