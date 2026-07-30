@@ -16,6 +16,8 @@ export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
+export { Menu } from '../components/menu';
+export type { MenuItemProps, MenuProps } from '../components/menu';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
