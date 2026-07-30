@@ -231,13 +231,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Hack to reset fva
+        // FAPI no longer resets fva when a verification starts (USER-5572), so wait
+        // for the signed-in factor to age past the action's afterMinutes threshold.
         await u.po.expect.toBeSignedIn();
-        await page.evaluate(async () => {
-          return window.Clerk.session.startVerification({
-            level: 'first_factor',
-          });
-        });
+        await page.waitForFunction(
+          async () => {
+            const token = await window.Clerk.session?.getToken({ skipCache: true });
+            if (!token) {
+              return false;
+            }
+            const { fva } = JSON.parse(atob(token.split('.')[1]));
+            return Array.isArray(fva) && fva[0] >= 1;
+          },
+          null,
+          { polling: 5_000, timeout: 120_000 },
+        );
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
@@ -248,6 +256,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       });
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
+        test.setTimeout(270_000);
         const u = createTestUtils({ app, page, context });
 
         await u.po.signIn.goTo();
@@ -263,13 +272,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Hack to reset fva
+        // FAPI no longer resets fva when a verification starts (USER-5572), so wait
+        // for the signed-in factor to age past the action's afterMinutes threshold.
         await u.po.expect.toBeSignedIn();
-        await page.evaluate(async () => {
-          return window.Clerk.session.startVerification({
-            level: 'first_factor',
-          });
-        });
+        await page.waitForFunction(
+          async () => {
+            const token = await window.Clerk.session?.getToken({ skipCache: true });
+            if (!token) {
+              return false;
+            }
+            const { fva } = JSON.parse(atob(token.split('.')[1]));
+            return Array.isArray(fva) && fva[0] >= 1;
+          },
+          null,
+          { polling: 5_000, timeout: 120_000 },
+        );
 
         await u.page.goToRelative(`/action-with-use-reverification`);
         await u.po.expect.toBeSignedIn();
