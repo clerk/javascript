@@ -23,7 +23,7 @@ function useAvatarContext(part: string): AvatarContextValue {
 
 export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
   shape?: 'circle' | 'square';
-  size?: 'lg' | 'md' | 'sm' | 'xs';
+  size?: 'fit' | 'lg' | 'md' | 'sm' | 'xs';
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(

@@ -46,6 +46,12 @@ import {
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as ItemDefault,
+  Group as ItemGroup,
+  Interactive as ItemInteractive,
+  meta as itemMeta,
+} from '../stories/item.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
@@ -152,6 +158,13 @@ const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default:
 
 const popoverComponentModule: StoryModule = { meta: popoverComponentMeta, Default: PopoverComponentDefault };
 
+const itemModule: StoryModule = {
+  meta: itemMeta,
+  Default: ItemDefault,
+  Interactive: ItemInteractive,
+  Group: ItemGroup,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -207,6 +220,7 @@ export const registry: StoryModule[] = [
   buttonModule,
   cardComponentModule,
   inputModule,
+  itemModule,
   dialogComponentModule,
   headingModule,
   iconModule,
