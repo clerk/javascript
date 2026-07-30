@@ -36,16 +36,42 @@ export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'rende
  * <Button variant='ghost' fullWidth>Continue</Button>
  */
 // Wrap the text children so they have a box of their own to truncate against — a bare text
-// child is laid out in an anonymous flex item that no selector can reach. Element children
-// (icons) pass through untouched, so they stay direct flex items and `gap` still applies.
-function withTruncatableLabel(children: React.ReactNode) {
-  return React.Children.map(children, child =>
-    typeof child === 'string' || typeof child === 'number' ? (
-      <span {...stylex.props(truncationStyles.singleLine, styles.label)}>{child}</span>
-    ) : (
-      child
-    ),
-  );
+// child is laid out in an anonymous flex item that no selector can reach. A whole run of
+// adjacent text shares one box, or `Delete {name}` would split into two flex items with the
+// button's `gap` opening up mid-sentence. Element children (icons) pass through untouched,
+// so they stay direct flex items and `gap` still applies.
+function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
+  const result: React.ReactNode[] = [];
+  let run: React.ReactNode[] = [];
+
+  const flushRun = () => {
+    if (run.length === 0) {
+      return;
+    }
+    result.push(
+      <span
+        key={`label-${result.length}`}
+        {...stylex.props(truncationStyles.singleLine, styles.label)}
+      >
+        {run}
+      </span>,
+    );
+    run = [];
+  };
+
+  // `toArray` rather than `forEach` so the elements it passes through carry the keys it
+  // assigns, and the array this returns doesn't warn about missing ones.
+  for (const child of React.Children.toArray(children)) {
+    if (typeof child === 'string' || typeof child === 'number') {
+      run.push(child);
+    } else {
+      flushRun();
+      result.push(child);
+    }
+  }
+  flushRun();
+
+  return result;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(

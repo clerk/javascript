@@ -11,44 +11,39 @@ import {
 } from '../../tokens.stylex';
 import { iconScope } from '../icon/icon.markers.stylex';
 
-// Every neutral-ish fill in the matrix is one of three steps up the same gray ramp, so
-// the neutral family shares one set of values no matter which variant renders it:
-//   step 0 — `filled-neutral` at rest, `outline-*`/`ghost-*` hover
+// Neutral fills are three steps up one gray ramp, shared across variants:
+//   step 0 — `filled-neutral` rest, `outline-*`/`ghost-*` hover
 //   step 1 — `filled-neutral` hover, `outline-*`/`ghost-*` pressed
 //   step 2 — `filled-neutral` pressed
 //
-// The steps are opacities of a fully-tilted black/white scrim over `transparent`, not
-// opaque values, so the fill composites against whatever it sits on. Deliberately not
-// `--cl-color-neutral`: that token is a 900 (sRGB 43,43,52), so a percentage of it lands
-// lighter than the same percentage of black, and the shortfall shifts with the backdrop,
-// which would make the step numbers stop describing what they render. `item` and `avatar` still mix from `--cl-color-neutral`; unifying the
-// two on a shared overlay token is a separate, palette-wide change.
+// Scrim opacities over `transparent`, so they composite against any backdrop. Not
+// `--cl-color-neutral`: it's a 900, so a percentage of it lands lighter than the same
+// percentage of black by an amount that shifts with the backdrop.
 //
-// StyleX inlines these, so no variable is emitted. They must be local bindings; an
-// imported one fails to compile.
+// TODO: codify this %-mix scale as shared tokens once more components adopt these
+// shades — `item` and `avatar` still mix from `--cl-color-neutral`, and unifying them
+// is a palette-wide change.
+//
+// Must be local bindings — StyleX inlines them; an imported one fails to compile.
 const neutralStep0 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
 const neutralStep1 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
 const neutralStep2 = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 18%, transparent)`;
 
-// The two opaque filled fills blend toward their own on-fill instead, 12%/18% each.
-// Neutral can't — it has no fill of its own to blend from, so it rides
-// the opacity ramp above.
+// Opaque fills blend toward their own on-fill at the same 12%/18%. Neutral has no fill
+// to blend from, so it rides the opacity ramp above.
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
 const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 18%)`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
-// A disabled button keeps its resting fill and only dims, so every interactive state is
-// gated on `:enabled`. The native `disabled` attribute blocks activation but not matching:
-// `:hover` and `:active` still apply to a disabled button, and the button stays hit-testable
-// so `cursor: not-allowed` renders and a wrapping tooltip still receives the pointer.
+// Interactive states are gated on `:enabled`: the `disabled` attribute blocks activation but
+// not matching, and the button stays hit-testable so `cursor: not-allowed` renders and a
+// wrapping tooltip still gets the pointer. Disabled keeps its resting fill and only dims.
 //
-// Hover also excludes `:active` rather than relying on the cascade. StyleX gives at-rules
-// extra priority, so a `@media (hover: hover)` `:hover` outranks a bare `:active` and would
-// win while pressing; `:not(:active)` stops it matching instead, which no longer depends on
-// how StyleX orders equal-specificity rules. Both selectors stay written out per cell rather
-// than hoisted to a const — `@stylexjs/sort-keys` reads a computed key as its identifier name
-// and fails the ordering it can no longer see through.
+// Hover also excludes `:active` explicitly — StyleX gives at-rules extra priority, so a
+// `@media (hover: hover)` `:hover` would outrank a bare `:active` and win while pressing.
+// Both selectors are written out per cell rather than hoisted to a const: `@stylexjs/sort-keys`
+// reads a computed key as its identifier name and fails the ordering.
 
 export const styles = stylex.create({
   base: {
@@ -61,12 +56,10 @@ export const styles = stylex.create({
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
-    // The size axis fixes the height, so content that outgrows it is clipped at the edge
-    // rather than spilling past the button's own box.
+    // The size axis fixes the height, so overflowing content clips instead of spilling out.
     overflow: 'hidden',
     alignItems: 'center',
-    // Strips the UA's own control styling — background, border, and the platform focus ring —
-    // so what's below is the whole appearance rather than an override of it.
+    // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
     boxSizing: 'border-box',
     cursor: 'pointer',
@@ -77,29 +70,26 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',
-    // The press is the one state that has to read as contact rather than a fade, so it
-    // lands with no duration at all. Releasing falls back to `fast`, since `:active` stops
-    // matching the moment the color starts heading back — an instant press, a soft settle.
+    // The press reads as contact, not a fade, so it lands instantly. Release falls back to
+    // `fast` — `:active` stops matching as the color heads back. Instant press, soft settle.
     transitionDuration: {
       default: durationVars['--cl-duration-fast'],
       ':enabled:active': durationVars['--cl-duration-instant'],
     },
     transitionProperty: 'background-color, border-color, color, opacity',
-    // Linear, not `--cl-ease-default`: nothing here moves. Color interpolation is already
-    // perceptually non-uniform, so an ease on top only makes the midpoint drag, and the
-    // house curve's overshoot would extrapolate past the target color for no gain.
+    // Linear, not `--cl-ease-default`: nothing here moves. An ease on already non-uniform
+    // color interpolation just drags the midpoint, and the house curve's overshoot would
+    // extrapolate past the target color.
     transitionTimingFunction: 'linear',
     // A double-click on a button is a double-click, not a text selection.
     userSelect: 'none',
-    // A wrapped label would grow past the fixed height, so the label stays on one line and
-    // truncates instead (see `label`).
+    // A wrapped label would outgrow the fixed height, so it truncates instead (see `label`).
     whiteSpace: 'nowrap',
   },
 
-  // The ellipsis itself comes from `truncationStyles.singleLine`; this adds the one part
-  // that's specific to sitting in the button's row. `minWidth` releases the flex-item floor
-  // at `auto` (min-content), without which the box never shrinks to clip. `item` doesn't
-  // need it — it releases the floor on the parent, and its text sits in a column.
+  // The ellipsis comes from `truncationStyles.singleLine`; this adds the part specific to
+  // sitting in the button's row — releasing the flex-item min-width floor, without which
+  // the box never shrinks enough to clip. `item` releases the floor on the parent instead.
   label: {
     minWidth: 0,
   },
@@ -117,10 +107,9 @@ export const styles = stylex.create({
     paddingInlineStart: 0,
   },
 
-  // A fingertip needs more than the visual sizes give it, so under a coarse pointer the
-  // control floors at the target size. Its own atom rather than a per-size override: the
-  // floor is one physical constant, and `link` — which is text, not a control — opts out
-  // by not receiving it. `minHeight` leaves the fixed height in charge everywhere else.
+  // Under a coarse pointer the control floors at the target size. Its own atom rather than a
+  // per-size override: the floor is one physical constant, and `link` — text, not a control —
+  // opts out by not receiving it. `minHeight` leaves the fixed height in charge otherwise.
   touchTarget: {
     minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
   },
@@ -135,12 +124,11 @@ export const styles = stylex.create({
   disabled: { cursor: 'not-allowed', opacity: 0.5 },
 });
 
-// variant × color, one entry per cell of the design matrix. Each is self-contained
-// so a cell can be read — and tuned — against the spec without tracing shared parts.
-// Keys are `<variant>-<color>` so the component can index them directly.
+// variant × color, one entry per cell of the design matrix, keyed `<variant>-<color>` so the
+// component can index directly. Each cell is self-contained so it reads — and tunes — against
+// the spec without tracing shared parts.
 export const variants = stylex.create({
-  // The pressed state stays outside the hover media query so no-hover devices, which never
-  // match it, still get one.
+  // The pressed state stays outside the hover media query so no-hover devices still get one.
   'filled-primary': {
     backgroundColor: {
       default: colorVars['--cl-color-primary'],
@@ -175,11 +163,9 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-negative-foreground'],
   },
 
-  // The border is `--cl-color-border` in every state — it never transitions, the fill
-  // just rises underneath it. That keeps the border opaque throughout, so it can't
-  // alpha-fade against an incoming fill, and leaves the border independently themeable.
-  // The fill steps are translucent, so how close the two read depends on the backdrop
-  // rather than on a fixed lightness gap between them.
+  // The border is `--cl-color-border` in every state — it never transitions, the fill just
+  // rises underneath it. Keeps the border opaque so it can't alpha-fade against an incoming
+  // fill, and leaves it independently themeable.
   'outline-primary': {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
@@ -239,8 +225,8 @@ export const variants = stylex.create({
     },
     color: colorVars['--cl-color-neutral-foreground'],
   },
-  // negative is the one ghost that tints instead of graying, so its pressed step walks
-  // its own faded fill toward the negative it carries rather than joining the gray ramp.
+  // The one ghost that tints instead of graying, so its pressed step walks its own faded
+  // fill toward the negative it carries rather than joining the gray ramp.
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',

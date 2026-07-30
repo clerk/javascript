@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from './button';
 
@@ -19,6 +20,14 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('data-size', 'md');
     expect(button).toHaveAttribute('data-shape', 'default');
     expect(button).toHaveAttribute('type', 'button');
+  });
+
+  it('omits the boolean modifiers when they are off', () => {
+    render(<Button>Hi</Button>);
+    const button = screen.getByRole('button');
+    expect(button).not.toHaveAttribute('data-full-width');
+    expect(button).not.toHaveAttribute('data-disabled');
+    expect(button).toBeEnabled();
   });
 
   it('wires variant props and consumer className/style through to the element', () => {
@@ -60,11 +69,39 @@ describe('Mosaic Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
   });
 
+  it.each(['default', 'square', 'circle'] as const)('reflects the %s shape', shape => {
+    render(<Button shape={shape}>Hi</Button>);
+    expect(screen.getByRole('button')).toHaveAttribute('data-shape', shape);
+  });
+
   it('gives a text child its own box to truncate against', () => {
     render(<Button>Hi</Button>);
     const label = screen.getByRole('button').firstElementChild;
     expect(label?.tagName).toBe('SPAN');
     expect(label).toHaveTextContent('Hi');
+  });
+
+  it('keeps a run of adjacent text in one box so the gap stays out of the sentence', () => {
+    render(<Button>Delete {'Alice'}</Button>);
+    const button = screen.getByRole('button');
+    expect(button.children).toHaveLength(1);
+    expect(button.firstElementChild?.tagName).toBe('SPAN');
+    expect(button).toHaveAccessibleName('Delete Alice');
+  });
+
+  it('splits the label runs around an element child', () => {
+    render(
+      <Button>
+        Delete
+        <svg data-testid='icon' />
+        {'Alice'}
+      </Button>,
+    );
+    const button = screen.getByRole('button');
+    expect(button.children).toHaveLength(3);
+    expect(button.children[0]).toHaveTextContent('Delete');
+    expect(button.children[1]).toBe(screen.getByTestId('icon'));
+    expect(button.children[2]).toHaveTextContent('Alice');
   });
 
   it('leaves element children as direct children so the gap still applies', () => {
@@ -79,6 +116,48 @@ describe('Mosaic Button', () => {
     expect(button.firstElementChild).toBe(screen.getByTestId('icon'));
     expect(button.lastElementChild?.tagName).toBe('SPAN');
     expect(button).toHaveAccessibleName('Hi');
+  });
+
+  it('boxes a numeric child the same as text', () => {
+    render(<Button>{3}</Button>);
+    const button = screen.getByRole('button');
+    expect(button.children).toHaveLength(1);
+    expect(button.firstElementChild?.tagName).toBe('SPAN');
+    expect(button).toHaveAccessibleName('3');
+  });
+
+  it('opens no label box for children that render nothing', () => {
+    render(
+      <Button aria-label='Close'>
+        {null}
+        <svg data-testid='icon' />
+        {false}
+      </Button>,
+    );
+    const button = screen.getByRole('button');
+    expect(button.children).toHaveLength(1);
+    expect(button.firstElementChild).toBe(screen.getByTestId('icon'));
+  });
+
+  it('calls onClick when pressed', async () => {
+    const onClick = vi.fn();
+    render(<Button onClick={onClick}>Hi</Button>);
+    await userEvent.click(screen.getByRole('button'));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not call onClick while disabled', async () => {
+    const onClick = vi.fn();
+    render(
+      <Button
+        disabled
+        onClick={onClick}
+      >
+        Hi
+      </Button>,
+    );
+    await userEvent.click(screen.getByRole('button'));
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('reflects disabled as both the native attribute and data-disabled', () => {
