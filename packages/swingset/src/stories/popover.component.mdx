@@ -3,9 +3,10 @@ import * as PopoverStories from './popover.component.stories';
 # Popover
 
 The Mosaic `Popover` — the styled Mosaic component composed from the `@clerk/headless` popover
-primitive and themed with StyleX. It is a reusable floating card anchored to a trigger: drop any
-inner content into `Popover.Content` and an optional `Popover.Footer`. It inherits the primitive's
-positioning, focus management, and ARIA wiring.
+primitive and themed with StyleX. It owns only what it means to float: trigger wiring, ARIA, focus
+management, positioning, stacking, viewport clamps, and the enter/exit transition. It paints **no
+surface of its own** — background, border, radius, shadow and padding come from whatever you render
+inside it, usually a `Card`. Keeping the two apart means only one element ever draws the border.
 
 ## Example
 
@@ -16,25 +17,52 @@ positioning, focus management, and ARIA wiring.
 
 ## Usage
 
+Compose the surface inside the popover. `size` sets the width of the floating box; everything you
+see comes from the `Card`.
+
 ```tsx
 import { Button } from '@clerk/ui/mosaic/components/button';
+import { Card } from '@clerk/ui/mosaic/components/card';
 import { Popover } from '@clerk/ui/mosaic/components/popover';
 
-<Popover trigger={props => <Button {...props}>Open popover</Button>}>
-  <Popover.Content>Flexible inner content.</Popover.Content>
-  <Popover.Footer>
-    <Button
-      intent='destructive'
-      fullWidth
-    >
-      Sign out of all accounts
-    </Button>
-  </Popover.Footer>
+<Popover
+  aria-label='Account'
+  trigger={props => <Button {...props}>Open popover</Button>}
+>
+  <Card>
+    <Card.Content>Flexible inner content.</Card.Content>
+    <Card.Footer>
+      <Button
+        color='negative'
+        fullWidth
+      >
+        Sign out of all accounts
+      </Button>
+    </Card.Footer>
+  </Card>
 </Popover>;
 ```
 
-The `trigger` render prop receives the interaction props (ARIA attributes, click handler) from the
-headless layer and should spread them onto whatever element opens the popover.
+The `trigger` render prop receives the interaction props (ARIA attributes, click handler, and the
+`data-open` / `data-closed` state attributes) from the headless layer and should spread them onto
+whatever element opens the popover.
+
+### Accessible name
+
+The popup is a `role="dialog"`, so it needs a name. Either pass `aria-label`, or render a
+`Popover.Title` inside it — the title wires `aria-labelledby` for you. A popover with neither logs a
+development warning.
+
+```tsx
+<Popover
+  aria-label='Account'
+  trigger={props => <Button {...props}>Open</Button>}
+>
+  <Card>
+    <Card.Content>Flexible inner content.</Card.Content>
+  </Card>
+</Popover>;
+```
 
 ### Controlled
 
@@ -46,14 +74,52 @@ const [open, setOpen] = useState(false);
   onOpenChange={setOpen}
   trigger={props => <Button {...props}>Open</Button>}
 >
-  <Popover.Content>Flexible inner content.</Popover.Content>
+  <Card>
+    <Card.Content>Flexible inner content.</Card.Content>
+  </Card>
+</Popover>;
+```
+
+### Size
+
+`size` sets the width of the floating box: `sm` (18rem), `md` (23.5rem, the default), or `lg`
+(26rem). Each clamps to `calc(100vw - 2rem)` on narrow viewports. The popup also caps its height at
+`min(80dvh, 36rem)` — for taller content, give the surface inside a scrolling region.
+
+```tsx
+<Popover
+  size='lg'
+  trigger={props => <Button {...props}>Open</Button>}
+>
+  <Card>
+    <Card.Content>A wider panel.</Card.Content>
+  </Card>
 </Popover>;
 ```
 
 ### Placement
 
-`placement` sets the preferred side and alignment; `sideOffset` sets the gap from the trigger. The
-popup flips and shifts automatically to stay in view.
+`placement` sets the preferred side: `top`, `right`, `bottom` (the default), or `left`. `sideOffset`
+sets the gap from the trigger.
+
+<Story
+  name='Placement'
+  storyModule={PopoverStories}
+/>
+
+Placement is a preference, not a guarantee — the popup flips to the opposite side when it would
+overflow, and shifts along the cross axis to stay in view. `data-side` on the positioner always
+reports the side actually used.
+
+### Alignment
+
+Append `-start` or `-end` to a placement to align the popup with that edge of the trigger instead of
+centering on it.
+
+<Story
+  name='Alignment'
+  storyModule={PopoverStories}
+/>
 
 ```tsx
 <Popover
@@ -61,28 +127,33 @@ popup flips and shifts automatically to stay in view.
   sideOffset={8}
   trigger={props => <Button {...props}>Open</Button>}
 >
-  <Popover.Content>Aligned to the trigger's end edge.</Popover.Content>
+  <Card>
+    <Card.Content>Aligned to the trigger's end edge.</Card.Content>
+  </Card>
 </Popover>;
 ```
+
+Cross-axis flipping is only enabled for aligned placements, so `bottom-start` may become
+`bottom-end` near a viewport edge while a plain `bottom` will not.
 
 ## Parts
 
 The convenience `Popover` composes the trigger and a portalled, positioned popup. For custom
 layouts, compose the compound parts directly.
 
-| Part                  | Slot                 | Description                                                    |
-| --------------------- | -------------------- | -------------------------------------------------------------- |
-| `Popover.Root`        | —                    | State provider; owns open/close and placement.                 |
-| `Popover.Trigger`     | —                    | Anchor element; accepts a `render` prop.                       |
-| `Popover.Portal`      | —                    | Portals the popup out to the document body.                    |
-| `Popover.Positioner`  | `popover-positioner` | Floating wrapper; owns positioning, stacking, `data-side`.     |
-| `Popover.Popup`       | `popover-popup`      | The card surface; holds content + footer, runs the enter/exit. |
-| `Popover.Content`     | `popover-content`    | Flexible inner content region; scrolls on overflow.            |
-| `Popover.Footer`      | `popover-footer`     | Footer region, separated from content by a top border.         |
-| `Popover.Close`       | —                    | Dismisses the popover; accepts a `render` prop.                |
-| `Popover.Title`       | —                    | Heading; wired to the popup's `aria-labelledby`.               |
-| `Popover.Description` | —                    | Description; wired to the popup's `aria-describedby`.          |
-| `Popover.Arrow`       | —                    | Optional arrow pointing at the trigger.                        |
+| Part                  | Slot                 | Description                                                             |
+| --------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `Popover.Root`        | —                    | State provider; owns open/close and placement.                          |
+| `Popover.Trigger`     | —                    | Anchor element; accepts a `render` prop.                                |
+| `Popover.Portal`      | —                    | Portals the popup out to the document body.                             |
+| `Popover.Positioner`  | `popover-positioner` | Floating wrapper; owns positioning, stacking, `data-side`.              |
+| `Popover.Popup`       | `popover-popup`      | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
+| `Popover.Close`       | —                    | Dismisses the popover; accepts a `render` prop.                         |
+| `Popover.Title`       | —                    | Heading; wired to the popup's `aria-labelledby`.                        |
+| `Popover.Description` | —                    | Description; wired to the popup's `aria-describedby`.                   |
+
+`Popover.Title` and `Popover.Description` are unstyled passthroughs from the headless layer — render
+them through your own typography (`Heading`, `Text`) inside the surface.
 
 ## Styling
 
@@ -95,11 +166,14 @@ CSS layer that wins over `@clerk/ui/styles.css`:
 @import '@clerk/ui/styles.css' layer(components);
 
 @layer overrides {
-  .cl-popover-popup {
-    border-radius: 20px;
+  .cl-popover-popup[data-size='lg'] {
+    width: 30rem;
   }
 }
 ```
+
+The popup is intentionally transparent. To restyle the panel's background, border, radius or
+shadow, style the surface you render inside it (e.g. `.cl-card-root`) rather than the popup.
 
 State attributes from the headless layer are available for CSS targeting:
 
@@ -110,6 +184,12 @@ State attributes from the headless layer are available for CSS targeting:
 | `data-starting-style` | Popup          | Present on the entering frame                       |
 | `data-ending-style`   | Popup          | Present during the exit animation                   |
 | `data-side`           | Positioner     | Resolved side (`top` / `bottom` / `left` / `right`) |
+| `data-size`           | Popup          | Resolved size (`sm` / `md` / `lg`)                  |
 
-The popup's default enter/exit transition (opacity + scale) is driven off `data-starting-style` /
-`data-ending-style` and is disabled under `prefers-reduced-motion: reduce`.
+The popup's enter/exit transition (opacity + scale) is driven off `data-starting-style` /
+`data-ending-style`, runs for `--cl-duration-base`, and eases per property: `linear` for the fade,
+`--cl-ease-default` for the scale. Under `prefers-reduced-motion: reduce` only `transform` drops out
+of the transition — the fade still runs, since the vestibular concern is the movement.
+
+`data-open` on the trigger is what a trigger component styles to hold a pressed/active look while
+the popover is open.
