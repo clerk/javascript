@@ -24,6 +24,7 @@ import {
   type OrganizationEnterpriseConnection,
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
+import { applyPrototypeDomainVerification, usePrototypeDomainVerification } from '../prototypeDomainVerification';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
 
@@ -215,14 +216,34 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     onOwnershipVerified: handleDomainOwnershipVerified,
   });
 
+  // PROTOTYPE ONLY: on instances without the self-serve SSO flag, FAPI creates
+  // the domain row but rejects the follow-up prepare_ownership_verification
+  // call, so the whole mutation throws AFTER the domain exists and before the
+  // list revalidates. Swallow exactly that error and revalidate so the new
+  // domain shows up immediately instead of only after a page revisit.
+  const createDomainTolerant = useCallback<OrganizationDomainMutations['createDomain']>(
+    async name => {
+      try {
+        return await createDomain(name);
+      } catch (err) {
+        if (isSelfServeSsoDisabledError(err)) {
+          await revalidateDomains();
+          return undefined;
+        }
+        throw err;
+      }
+    },
+    [createDomain, revalidateDomains],
+  );
+
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
-      createDomain,
+      createDomain: createDomainTolerant,
       prepareOwnershipVerification,
       attemptOwnershipVerification,
       revalidate: revalidateDomains,
     }),
-    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidateDomains],
+    [createDomainTolerant, prepareOwnershipVerification, attemptOwnershipVerification, revalidateDomains],
   );
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
@@ -324,6 +345,15 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     [enterpriseConnection, hasSuccessfulTestRun],
   );
 
+  // PROTOTYPE ONLY: overlay client-side fake verification (the "Mark verified"
+  // demo button) onto the fetched domains so every downstream guard reacts.
+  const prototypeVerificationVersion = usePrototypeDomainVerification();
+  const organizationDomainsWithOverrides = useMemo(
+    () => applyPrototypeDomainVerification(organizationDomains),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- prototypeVerificationVersion invalidates the overlay
+    [organizationDomains, prototypeVerificationVersion],
+  );
+
   return {
     user,
     session,
@@ -338,7 +368,28 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,
     testRuns,
-    organizationDomains,
+    organizationDomains: organizationDomainsWithOverrides,
     organizationDomainMutations,
   };
+};
+
+// PROTOTYPE ONLY: match the FAPI rejection produced when the organization
+// lacks the self-serve SSO flag, without depending on a specific error code.
+const isSelfServeSsoDisabledError = (err: unknown): boolean => {
+  const parts: string[] = [];
+  if (err && typeof err === 'object') {
+    const anyErr = err as { message?: unknown; errors?: Array<{ message?: unknown; longMessage?: unknown }> };
+    if (typeof anyErr.message === 'string') {
+      parts.push(anyErr.message);
+    }
+    for (const inner of anyErr.errors ?? []) {
+      if (typeof inner?.message === 'string') {
+        parts.push(inner.message);
+      }
+      if (typeof inner?.longMessage === 'string') {
+        parts.push(inner.longMessage);
+      }
+    }
+  }
+  return parts.join(' ').toLowerCase().includes('self-serve sso is not enabled');
 };

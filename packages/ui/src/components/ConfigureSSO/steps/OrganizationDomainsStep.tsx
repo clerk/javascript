@@ -34,6 +34,7 @@ import { useConfigureSSO } from '../ConfigureSSOContext';
 import { areAllOrganizationDomainsVerified } from '../domain/organizationEnterpriseConnection';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
+import { markDomainVerifiedForPrototype } from '../prototypeDomainVerification';
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
 
 export const OrganizationDomainsStep = (): JSX.Element => {
@@ -485,10 +486,23 @@ const DomainCard = ({
               sx={t => ({ padding: t.space.$4, paddingTop: 0 })}
             />
           ) : (
-            <TxtRecord
-              key='unverified'
-              ownershipVerification={ownershipVerification}
-            />
+            <Col key='unverified'>
+              <TxtRecord ownershipVerification={ownershipVerification} />
+              {/* PROTOTYPE ONLY: skip DNS while demoing — overlays a client-side verified status. */}
+              <Button
+                variant='ghost'
+                size='xs'
+                onClick={() => markDomainVerifiedForPrototype(domain.id)}
+                sx={t => ({
+                  alignSelf: 'flex-start',
+                  marginInline: t.space.$4,
+                  marginBottom: t.space.$3,
+                  color: t.colors.$warning500,
+                })}
+              >
+                Mark verified (prototype)
+              </Button>
+            </Col>
           )}
         </Animated>
       </Box>
