@@ -19,7 +19,8 @@ export type CreateClerkBridgeOptions = {
   renderer?: RendererSchemeOptions;
   /**
    * Whether Clerk should acquire and release Electron's process-wide single-instance lock for OAuth
-   * deep links. Set this to `false` when the application manages the lock itself.
+   * deep links. Set this to `false` when the application manages the lock itself. Ignored on macOS,
+   * where deep links reach the running instance through `open-url`.
    *
    * @default true
    */
@@ -50,6 +51,13 @@ export type ClerkBridge = {
    * Removes IPC handlers and listeners registered by `createClerkBridge`.
    */
   cleanup: () => void;
+  /**
+   * Whether this process is the one the application should keep booting. `false` only when Clerk
+   * detected a secondary instance, forwarded its deep-link arguments to the primary, and called
+   * `app.quit()`. Because `app.quit()` is asynchronous, skip window creation and the rest of the
+   * bootstrap when this is `false`.
+   */
+  isPrimaryInstance: boolean;
 };
 
 export type RendererSchemeOptions = CustomScheme & {

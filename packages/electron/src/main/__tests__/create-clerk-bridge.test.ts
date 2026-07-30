@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, protocol, shell } from 'electron';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { OAUTH_TRANSPORT_CHANNELS, PASSKEY_CHANNELS } from '../../shared/ipc';
+import { OAUTH_TRANSPORT_CHANNELS, PASSKEY_CHANNELS, TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
 import type { TokenStorage } from '../../shared/types';
 import { createClerkBridge } from '../create-clerk-bridge';
 
@@ -41,6 +41,11 @@ vi.mock('@clerk/electron-passkeys', () => ({
   },
 }));
 
+const originalPlatform = process.platform;
+const setPlatform = (platform: NodeJS.Platform) => {
+  Object.defineProperty(process, 'platform', { value: platform, configurable: true });
+};
+
 const createRendererWindow = () => ({
   isDestroyed: vi.fn(() => false),
   isMinimized: vi.fn(() => false),
@@ -63,6 +68,8 @@ describe('createClerkBridge', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // The single-instance lock is only used where `second-instance` delivers the callback.
+    setPlatform('linux');
     vi.mocked(app.hasSingleInstanceLock).mockReturnValue(false);
     vi.mocked(app.requestSingleInstanceLock).mockReturnValue(true);
     vi.mocked(BrowserWindow.fromWebContents).mockReturnValue(null);
@@ -72,6 +79,7 @@ describe('createClerkBridge', () => {
   });
 
   afterEach(() => {
+    setPlatform(originalPlatform);
     vi.restoreAllMocks();
   });
 
@@ -282,7 +290,7 @@ describe('createClerkBridge', () => {
   it('quits a secondary instance before registering IPC handlers', () => {
     vi.mocked(app.requestSingleInstanceLock).mockReturnValue(false);
 
-    createClerkBridge({
+    const clerk = createClerkBridge({
       storage,
       renderer: {
         host: 'renderer',
@@ -290,9 +298,56 @@ describe('createClerkBridge', () => {
       },
     });
 
+    expect(clerk.isPrimaryInstance).toBe(false);
     expect(app.quit).toHaveBeenCalledOnce();
     expect(ipcMain.handle).not.toHaveBeenCalled();
     expect(app.setAsDefaultProtocolClient).not.toHaveBeenCalled();
+  });
+
+  it('reports the primary instance when the bridge finishes setup', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(clerk.isPrimaryInstance).toBe(true);
+  });
+
+  it('does not touch the single-instance lock on macOS', () => {
+    setPlatform('darwin');
+
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+    clerk.cleanup();
+
+    expect(clerk.isPrimaryInstance).toBe(true);
+    expect(app.hasSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+  });
+
+  it('does not warn about disabled lock management on macOS', () => {
+    setPlatform('darwin');
+
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      manageSingleInstanceLock: false,
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
   });
 
   it('reuses a single-instance lock acquired by the application', () => {
@@ -361,6 +416,49 @@ describe('createClerkBridge', () => {
   it('releases the single-instance lock when initialization throws', () => {
     vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
       throw new Error('Scheme was already registered');
+    });
+
+    expect(() =>
+      createClerkBridge({
+        storage,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('Scheme was already registered');
+
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('tears down handlers registered before initialization throws', () => {
+    vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
+      throw new Error('Scheme was already registered');
+    });
+
+    expect(() =>
+      createClerkBridge({
+        storage,
+        passkeys: true,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('Scheme was already registered');
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(PASSKEY_CHANNELS.create);
+  });
+
+  it('surfaces the initialization error when a teardown also throws', () => {
+    vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
+      throw new Error('Scheme was already registered');
+    });
+    vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
+      throw new Error('Handler was already removed');
     });
 
     expect(() =>
