@@ -21,16 +21,16 @@ describe('createSessionCookie', () => {
   const mockSet = vi.fn();
   const mockRemove = vi.fn();
   const mockGet = vi.fn();
-  const mockCookieCalls: Array<{
+  type CookieCall = {
     type: 'set' | 'remove';
     name: string;
     value?: string;
     attributes?: object;
-  }> = [];
+  };
+  const mockCookieCall = vi.fn<(call: CookieCall) => void>();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCookieCalls.length = 0;
     mockGet.mockReset();
     (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
@@ -39,11 +39,11 @@ describe('createSessionCookie', () => {
     (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
       set: (value: string, attributes?: object) => {
         mockSet(value, attributes);
-        mockCookieCalls.push({ type: 'set', name, value, attributes });
+        mockCookieCall({ type: 'set', name, value, attributes });
       },
       remove: (attributes?: object) => {
         mockRemove(attributes);
-        mockCookieCalls.push({ type: 'remove', name, attributes });
+        mockCookieCall({ type: 'remove', name, attributes });
       },
       get: mockGet,
     }));
@@ -165,10 +165,10 @@ describe('createSessionCookie', () => {
 
     cookieHandler.set('non-partitioned-token');
     usePartitionedCookies = true;
-    mockCookieCalls.length = 0;
+    mockCookieCall.mockClear();
     cookieHandler.set('partitioned-token');
 
-    expect(mockCookieCalls).toEqual([
+    expect(mockCookieCall.mock.calls.map(([call]) => call)).toEqual([
       { type: 'remove', name: '__session', attributes: undefined },
       { type: 'remove', name: '__session_test-suffix', attributes: undefined },
       {
