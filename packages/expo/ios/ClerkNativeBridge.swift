@@ -530,12 +530,6 @@ struct ClerkInlineUserButtonWrapperView: View {
   }
 }
 
-// MARK: - Embedded Navigation (in host-owned navigation)
-
-/// Drives `UserProfileView` and `AuthView` when the JS side hides Clerk's header: depth
-/// and pop commands flow through the ClerkKitUI embedded-navigation SPI handle, which
-/// also hides Clerk's navigation bars when placed in the SwiftUI environment.
-@MainActor
 // MARK: - Inline Auth View Wrapper (for embedded rendering)
 
 struct ClerkInlineAuthWrapperView: View {
