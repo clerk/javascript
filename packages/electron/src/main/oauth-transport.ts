@@ -49,7 +49,6 @@ function assertExternalOAuthUrl(url: string): void {
 
 export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): () => void {
   const redirectUrl = buildRedirectUrl(options);
-  let initialCallbackUrl = findMatchingCallbackUrl(process.argv, redirectUrl);
   let pendingOAuthFlow: PendingOAuthFlow | null = null;
 
   const disposePendingOAuthFlow = (reason?: Error): void => {
@@ -123,13 +122,6 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
 
       pendingOAuthFlow = { resolve, reject, timeout };
     });
-
-    if (initialCallbackUrl) {
-      const callbackUrl = initialCallbackUrl;
-      initialCallbackUrl = undefined;
-      handleCallbackUrl(callbackUrl);
-      return callbackPromise;
-    }
 
     try {
       await shell.openExternal(url);

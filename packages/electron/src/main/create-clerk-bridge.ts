@@ -48,12 +48,18 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
     );
   }
 
+  let ownsSingleInstanceLock = false;
+
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
 
-    if (!app.requestSingleInstanceLock()) {
-      app.quit();
-      return { cleanup() {} };
+    if (!app.hasSingleInstanceLock()) {
+      if (!app.requestSingleInstanceLock()) {
+        app.quit();
+        return { cleanup() {} };
+      }
+
+      ownsSingleInstanceLock = true;
     }
   }
 
@@ -90,6 +96,10 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
       cleanupTokenPersistence();
       cleanupOAuthTransport?.();
       passkeys?.cleanup();
+
+      if (ownsSingleInstanceLock) {
+        app.releaseSingleInstanceLock();
+      }
     },
   };
 }
