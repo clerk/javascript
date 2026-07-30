@@ -21,17 +21,30 @@ describe('createSessionCookie', () => {
   const mockSet = vi.fn();
   const mockRemove = vi.fn();
   const mockGet = vi.fn();
+  const mockCookieCalls: Array<{
+    type: 'set' | 'remove';
+    name: string;
+    value?: string;
+    attributes?: object;
+  }> = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCookieCalls.length = 0;
     mockGet.mockReset();
     (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      set: mockSet,
-      remove: mockRemove,
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
+      set: (value: string, attributes?: object) => {
+        mockSet(value, attributes);
+        mockCookieCalls.push({ type: 'set', name, value, attributes });
+      },
+      remove: (attributes?: object) => {
+        mockRemove(attributes);
+        mockCookieCalls.push({ type: 'remove', name, attributes });
+      },
       get: mockGet,
     }));
   });
@@ -142,5 +155,44 @@ describe('createSessionCookie', () => {
       secure: true,
       partitioned: true,
     });
+  });
+
+  it('clears non-partitioned variants before writing partitioned cookies after the environment changes', () => {
+    let usePartitionedCookies = false;
+    const cookieHandler = createSessionCookie(mockCookieSuffix, {
+      usePartitionedCookies: () => usePartitionedCookies,
+    });
+
+    cookieHandler.set('non-partitioned-token');
+    usePartitionedCookies = true;
+    mockCookieCalls.length = 0;
+    cookieHandler.set('partitioned-token');
+
+    expect(mockCookieCalls).toEqual([
+      { type: 'remove', name: '__session', attributes: undefined },
+      { type: 'remove', name: '__session_test-suffix', attributes: undefined },
+      {
+        type: 'set',
+        name: '__session',
+        value: 'partitioned-token',
+        attributes: {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+      {
+        type: 'set',
+        name: '__session_test-suffix',
+        value: 'partitioned-token',
+        attributes: {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+    ]);
   });
 });

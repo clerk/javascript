@@ -23,18 +23,31 @@ describe('createClientUatCookie', () => {
   const mockSet = vi.fn();
   const mockRemove = vi.fn();
   const mockGet = vi.fn();
+  const mockCookieCalls: Array<{
+    type: 'set' | 'remove';
+    name: string;
+    value?: string;
+    attributes?: object;
+  }> = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCookieCalls.length = 0;
     mockGet.mockReset();
     (addYears as ReturnType<typeof vi.fn>).mockReturnValue(mockExpires);
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getCookieDomain as ReturnType<typeof vi.fn>).mockReturnValue(mockDomain);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      set: mockSet,
-      remove: mockRemove,
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
+      set: (value: string, attributes?: object) => {
+        mockSet(value, attributes);
+        mockCookieCalls.push({ type: 'set', name, value, attributes });
+      },
+      remove: (attributes?: object) => {
+        mockRemove(attributes);
+        mockCookieCalls.push({ type: 'remove', name, attributes });
+      },
       get: mockGet,
     }));
   });
@@ -163,5 +176,71 @@ describe('createClientUatCookie', () => {
       secure: true,
       partitioned: true,
     });
+  });
+
+  it('clears non-partitioned domain variants before writing partitioned cookies', () => {
+    let usePartitionedCookies = false;
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, {
+      usePartitionedCookies: () => usePartitionedCookies,
+    });
+    const client = {
+      id: 'test-client',
+      updatedAt: new Date('2024-01-01'),
+      signedInSessions: ['session1'],
+    };
+
+    cookieHandler.set(client);
+    usePartitionedCookies = true;
+    mockCookieCalls.length = 0;
+    cookieHandler.set(client);
+
+    expect(mockCookieCalls).toEqual([
+      { type: 'remove', name: '__client_uat_test-suffix', attributes: undefined },
+      { type: 'remove', name: '__client_uat', attributes: undefined },
+      {
+        type: 'remove',
+        name: '__client_uat_test-suffix',
+        attributes: { domain: mockDomain, sameSite: 'Strict', secure: true, partitioned: false },
+      },
+      {
+        type: 'remove',
+        name: '__client_uat',
+        attributes: { domain: mockDomain, sameSite: 'Strict', secure: true, partitioned: false },
+      },
+      {
+        type: 'remove',
+        name: '__client_uat_test-suffix',
+        attributes: { domain: mockDomain, sameSite: 'None', secure: true, partitioned: false },
+      },
+      {
+        type: 'remove',
+        name: '__client_uat',
+        attributes: { domain: mockDomain, sameSite: 'None', secure: true, partitioned: false },
+      },
+      {
+        type: 'set',
+        name: '__client_uat_test-suffix',
+        value: '1704067200',
+        attributes: {
+          domain: mockDomain,
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+      {
+        type: 'set',
+        name: '__client_uat',
+        value: '1704067200',
+        attributes: {
+          domain: mockDomain,
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+    ]);
   });
 });

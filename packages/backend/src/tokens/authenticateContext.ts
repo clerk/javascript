@@ -109,8 +109,8 @@ class AuthenticateContext implements AuthenticateContext {
   public usesSuffixedCookies(): boolean {
     const suffixedClientUat = this.getSuffixedCookie(constants.Cookies.ClientUat);
     const clientUat = this.getCookie(constants.Cookies.ClientUat);
-    const suffixedSession = this.getSuffixedCookie(constants.Cookies.Session) || '';
-    const session = this.getCookie(constants.Cookies.Session) || '';
+    const suffixedSession = this.getSuffixedSessionCookie() || '';
+    const session = this.getSessionCookie(constants.Cookies.Session) || '';
 
     // In the case of malformed session cookies (eg missing the iss claim), we should
     // use the un-suffixed cookies to return signed-out state instead of triggering
@@ -130,9 +130,9 @@ class AuthenticateContext implements AuthenticateContext {
       return false;
     }
 
-    const { data: sessionData } = decodeJwt(session);
+    const sessionData = this.decodeSessionToken(session);
     const sessionIat = sessionData?.payload.iat || 0;
-    const { data: suffixedSessionData } = decodeJwt(suffixedSession);
+    const suffixedSessionData = this.decodeSessionToken(suffixedSession);
     const suffixedSessionIat = suffixedSessionData?.payload.iat || 0;
 
     // Both indicate signed in, but un-suffixed is newer
@@ -309,7 +309,7 @@ class AuthenticateContext implements AuthenticateContext {
 
   private initCookieValues() {
     // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
-    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
+    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedSessionCookie();
     this.refreshTokenInCookie = this.getSuffixedCookie(constants.Cookies.Refresh);
     this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
   }
@@ -342,11 +342,81 @@ class AuthenticateContext implements AuthenticateContext {
     return this.getCookie(getSuffixedCookieName(name, this.cookieSuffix)) || undefined;
   }
 
+  private getSuffixedSessionCookie() {
+    return this.getSessionCookie(getSuffixedCookieName(constants.Cookies.Session, this.cookieSuffix));
+  }
+
   private getSuffixedOrUnSuffixedCookie(cookieName: string) {
     if (this.usesSuffixedCookies()) {
       return this.getSuffixedCookie(cookieName);
     }
     return this.getCookie(cookieName);
+  }
+
+  private getSuffixedOrUnSuffixedSessionCookie() {
+    if (this.usesSuffixedCookies()) {
+      return this.getSuffixedSessionCookie();
+    }
+    return this.getSessionCookie(constants.Cookies.Session);
+  }
+
+  private getSessionCookie(name: string) {
+    const tokens = this.getCookieValues(name);
+
+    if (tokens.length === 0) {
+      return undefined;
+    }
+
+    return this.selectBestSessionToken(tokens);
+  }
+
+  private getCookieValues(name: string) {
+    const values = this.clerkRequest.cookies.getAll?.(name);
+    if (values?.length) {
+      return values;
+    }
+
+    const value = this.clerkRequest.cookies.get(name);
+    return value ? [value] : [];
+  }
+
+  private selectBestSessionToken(tokens: string[]) {
+    const fallbackToken = tokens[0];
+    const usableCandidates: Array<{ token: string; data: Jwt }> = [];
+
+    for (const token of tokens) {
+      const data = this.decodeSessionToken(token);
+
+      if (data && this.sessionTokenUsable(data)) {
+        usableCandidates.push({ token, data });
+      }
+    }
+
+    const candidatesForInstance = usableCandidates.filter(candidate =>
+      this.sessionTokenBelongsToInstance(candidate.data),
+    );
+    const candidates = candidatesForInstance.length ? candidatesForInstance : usableCandidates;
+    const freshestCandidate = candidates.reduce<(typeof candidates)[number] | undefined>(
+      (freshest, candidate) =>
+        !freshest || candidate.data.payload.iat > freshest.data.payload.iat ? candidate : freshest,
+      undefined,
+    );
+
+    return freshestCandidate?.token || fallbackToken;
+  }
+
+  private decodeSessionToken(token: string): Jwt | undefined {
+    try {
+      const { data, errors } = decodeJwt(token);
+
+      if (errors) {
+        return undefined;
+      }
+
+      return data;
+    } catch {
+      return undefined;
+    }
   }
 
   private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
@@ -370,11 +440,8 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private tokenHasIssuer(token: string): boolean {
-    const { data, errors } = decodeJwt(token);
-    if (errors) {
-      return false;
-    }
-    return !!data.payload.iss;
+    const data = this.decodeSessionToken(token);
+    return !!data?.payload.iss;
   }
 
   private tokenBelongsToInstance(token: string): boolean {
@@ -382,11 +449,23 @@ class AuthenticateContext implements AuthenticateContext {
       return false;
     }
 
-    const { data, errors } = decodeJwt(token);
-    if (errors) {
+    const data = this.decodeSessionToken(token);
+    if (!data) {
       return false;
     }
-    const tokenIssuer = data.payload.iss.replace(/https?:\/\//gi, '');
+    return this.sessionTokenBelongsToInstance(data);
+  }
+
+  private sessionTokenUsable(jwt: Jwt): boolean {
+    return !!jwt.payload.iss && typeof jwt.payload.exp === 'number' && !this.sessionExpired(jwt);
+  }
+
+  private sessionTokenBelongsToInstance(jwt: Jwt): boolean {
+    if (!jwt.payload.iss) {
+      return false;
+    }
+
+    const tokenIssuer = jwt.payload.iss.replace(/https?:\/\//gi, '');
     // Use original frontend API for token validation since tokens are issued by the actual Clerk API, not proxy
     return this.originalFrontendApi === tokenIssuer;
   }

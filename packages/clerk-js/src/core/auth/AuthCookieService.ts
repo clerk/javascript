@@ -83,11 +83,15 @@ export class AuthCookieService {
 
     eventBus.on(events.UserSignOut, () => this.handleSignOut());
 
-    // After Environment resolves, re-write dev browser cookies with correct
-    // partitioned attributes. Dev browser cookies are initially written before
-    // Environment is fetched, so they may have stale attributes.
+    // Environment can resolve after auth cookies are first written.
     eventBus.on(events.EnvironmentUpdate, () => {
       this.devBrowser.refreshCookies();
+      if (Environment.getInstance().partitionedCookies) {
+        void this.refreshSessionToken({ updateCookieImmediately: true });
+        if (this.clerk.client) {
+          this.setClientUatCookieForDevelopmentInstances();
+        }
+      }
     });
 
     this.refreshTokenOnFocus();
