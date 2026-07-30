@@ -231,21 +231,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // FAPI no longer resets fva when a verification starts (USER-5572), so wait
-        // for the signed-in factor to age past the action's afterMinutes threshold.
+        // Starting a verification no longer resets fva server-side, so wait for the
+        // signed-in factor to age past the action's afterMinutes threshold.
         await u.po.expect.toBeSignedIn();
-        await page.waitForFunction(
-          async () => {
-            const token = await window.Clerk.session?.getToken({ skipCache: true });
-            if (!token) {
-              return false;
-            }
-            const { fva } = JSON.parse(atob(token.split('.')[1]));
-            return Array.isArray(fva) && fva[0] >= 1;
-          },
-          null,
-          { polling: 5_000, timeout: 120_000 },
-        );
+        await expect
+          .poll(
+            () =>
+              page.evaluate(async () => {
+                const token = await window.Clerk.session?.getToken({ skipCache: true });
+                if (!token) {
+                  return -1;
+                }
+                const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                const { fva } = JSON.parse(atob(payload));
+                return Array.isArray(fva) ? fva[0] : -1;
+              }),
+            { intervals: [5_000], timeout: 120_000 },
+          )
+          .toBeGreaterThanOrEqual(1);
         await u.page.goToRelative(`/requires-re-verification`);
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(
@@ -272,21 +275,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // FAPI no longer resets fva when a verification starts (USER-5572), so wait
-        // for the signed-in factor to age past the action's afterMinutes threshold.
+        // Starting a verification no longer resets fva server-side, so wait for the
+        // signed-in factor to age past the action's afterMinutes threshold.
         await u.po.expect.toBeSignedIn();
-        await page.waitForFunction(
-          async () => {
-            const token = await window.Clerk.session?.getToken({ skipCache: true });
-            if (!token) {
-              return false;
-            }
-            const { fva } = JSON.parse(atob(token.split('.')[1]));
-            return Array.isArray(fva) && fva[0] >= 1;
-          },
-          null,
-          { polling: 5_000, timeout: 120_000 },
-        );
+        await expect
+          .poll(
+            () =>
+              page.evaluate(async () => {
+                const token = await window.Clerk.session?.getToken({ skipCache: true });
+                if (!token) {
+                  return -1;
+                }
+                const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                const { fva } = JSON.parse(atob(payload));
+                return Array.isArray(fva) ? fva[0] : -1;
+              }),
+            { intervals: [5_000], timeout: 120_000 },
+          )
+          .toBeGreaterThanOrEqual(1);
 
         await u.page.goToRelative(`/action-with-use-reverification`);
         await u.po.expect.toBeSignedIn();
