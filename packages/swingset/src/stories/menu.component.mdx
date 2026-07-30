@@ -1,0 +1,137 @@
+import * as MenuStories from './menu.component.stories';
+
+# Menu
+
+The Mosaic `Menu` — the styled Mosaic component composed from the `@clerk/headless` menu primitive
+and themed with StyleX. It inherits the primitive's roving focus, typeahead, nested submenus, and
+`role="menu"` / `role="menuitem"` wiring, and adds the surface and row styling.
+
+Reach for `Menu` when the content is a list of actions. Reach for [`Popover`](/components/popover)
+when it is arbitrary content — a popover is a `role="dialog"` and has none of the list semantics.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={MenuStories}
+/>
+
+## Usage
+
+`label` is required on every item: it drives typeahead matching. When an item has no children it
+renders its `label`, so the common case stays a single prop.
+
+```tsx
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Menu } from '@clerk/ui/mosaic/components/menu';
+
+<Menu trigger={props => <Button {...props}>Actions</Button>}>
+  <Menu.Item
+    label='Edit'
+    onClick={handleEdit}
+  />
+  <Menu.Item
+    label='Duplicate'
+    onClick={handleDuplicate}
+  />
+  <Menu.Separator />
+  <Menu.Item
+    label='Delete'
+    onClick={handleDelete}
+  />
+</Menu>;
+```
+
+### Disabled items
+
+Disabled items keep `role="menuitem"` and stay focusable — they use `aria-disabled`, not the
+`disabled` attribute, so keyboard users can still reach and read them. They are excluded from
+typeahead and their `onClick` never fires.
+
+<Story
+  name='Disabled'
+  storyModule={MenuStories}
+/>
+
+### Submenus
+
+Nest a `Menu.Root` inside a popup and open it with `Menu.SubTrigger`. Submenus open on hover with a
+safe-polygon pointer zone, and `ArrowRight` / `ArrowLeft` move in and out of them.
+
+Use `Menu.SubTrigger` rather than wrapping a `Menu.Item` in a nested `Menu.Trigger` — the trigger
+already registers itself as a `menuitem` in the parent list, so nesting an `Item` inside it would
+register a second entry and desync arrow-key navigation from what is on screen.
+
+<Story
+  name='Submenu'
+  storyModule={MenuStories}
+/>
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Menu
+  open={open}
+  onOpenChange={setOpen}
+  trigger={props => <Button {...props}>Actions</Button>}
+>
+  <Menu.Item label='Edit' />
+</Menu>;
+```
+
+## Parts
+
+The convenience `Menu` composes the trigger and a portalled, positioned popup. For submenus, compose
+the compound parts directly.
+
+| Part              | Slot               | Description                                                |
+| ----------------- | ------------------ | ---------------------------------------------------------- |
+| `Menu.Root`       | —                  | State provider; owns open/close and placement.             |
+| `Menu.Trigger`    | —                  | Anchor element; accepts a `render` prop.                   |
+| `Menu.Portal`     | —                  | Portals the popup out to the document body.                |
+| `Menu.Positioner` | `menu-positioner`  | Floating wrapper; owns positioning, stacking, `data-side`. |
+| `Menu.Popup`      | `menu-popup`       | The menu surface; `role="menu"`.                           |
+| `Menu.Item`       | `menu-item`        | A single action; `role="menuitem"`. `label` is required.   |
+| `Menu.SubTrigger` | `menu-sub-trigger` | Row that opens a nested submenu.                           |
+| `Menu.Separator`  | `menu-separator`   | Divider between groups of items; `role="separator"`.       |
+
+## Styling
+
+The Mosaic menu is themed with **StyleX**. Each styled part carries a stable `.cl-<slot>` class
+alongside the StyleX atoms. Consumers never target the hashed atomic classes — override by targeting
+the `.cl-*` slot from a CSS layer that wins over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-menu-popup {
+    min-width: 16rem;
+  }
+}
+```
+
+Unlike the popover — whose popup is transparent so the content inside supplies the surface — a
+menu's popup **is** its surface, so it owns the background, border, radius, shadow, and inset
+padding. The two components share only the floating box: stacking, viewport clamps, and the
+enter/exit transition (`mosaic/components/floating.styles.ts`).
+
+Rows reuse the `Item` geometry, so a menu row and a list row are the same shape.
+
+State attributes from the headless layer are available for CSS targeting:
+
+| Attribute             | Applies To          | Description                                         |
+| --------------------- | ------------------- | --------------------------------------------------- |
+| `data-open`           | Trigger, SubTrigger | Present when the menu it controls is open           |
+| `data-closed`         | Trigger, SubTrigger | Present when closed                                 |
+| `data-active`         | Item                | The roving-focus position, moved by the arrow keys  |
+| `data-disabled`       | Item                | Present on disabled items                           |
+| `data-starting-style` | Popup               | Present on the entering frame                       |
+| `data-ending-style`   | Popup               | Present during the exit animation                   |
+| `data-side`           | Positioner          | Resolved side (`top` / `bottom` / `left` / `right`) |
+
+Rows highlight on `data-active` as well as on hover, so keyboard and pointer navigation look the
+same. The popup's enter/exit transition (opacity + scale) is driven off `data-starting-style` /
+`data-ending-style` and is disabled under `prefers-reduced-motion: reduce`.

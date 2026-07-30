@@ -52,6 +52,12 @@ import {
   Interactive as ItemInteractive,
   meta as itemMeta,
 } from '../stories/item.stories';
+import {
+  Default as MenuComponentDefault,
+  Disabled as MenuComponentDisabled,
+  meta as menuComponentMeta,
+  Submenu as MenuComponentSubmenu,
+} from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
@@ -86,7 +92,12 @@ import {
   meta as organizationProfileProfileSectionMeta,
 } from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
-import { Default as PopoverComponentDefault, meta as popoverComponentMeta } from '../stories/popover.component.stories';
+import {
+  Alignment as PopoverComponentAlignment,
+  Default as PopoverComponentDefault,
+  meta as popoverComponentMeta,
+  Placement as PopoverComponentPlacement,
+} from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -156,7 +167,19 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
-const popoverComponentModule: StoryModule = { meta: popoverComponentMeta, Default: PopoverComponentDefault };
+const menuComponentModule: StoryModule = {
+  meta: menuComponentMeta,
+  Default: MenuComponentDefault,
+  Disabled: MenuComponentDisabled,
+  Submenu: MenuComponentSubmenu,
+};
+
+const popoverComponentModule: StoryModule = {
+  meta: popoverComponentMeta,
+  Default: PopoverComponentDefault,
+  Placement: PopoverComponentPlacement,
+  Alignment: PopoverComponentAlignment,
+};
 
 const itemModule: StoryModule = {
   meta: itemMeta,
@@ -224,6 +247,7 @@ export const registry: StoryModule[] = [
   dialogComponentModule,
   headingModule,
   iconModule,
+  menuComponentModule,
   popoverComponentModule,
   tabsComponentModule,
   textModule,
