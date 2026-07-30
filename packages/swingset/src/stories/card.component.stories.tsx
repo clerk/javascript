@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { Button } from '@clerk/ui/mosaic/components/button';
 import type { CardProps } from '@clerk/ui/mosaic/components/card';
-import { Card, cardRecipe } from '@clerk/ui/mosaic/components/card';
+import { Card } from '@clerk/ui/mosaic/components/card';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Text } from '@clerk/ui/mosaic/components/text';
 
@@ -14,8 +14,15 @@ export { default as __source } from './card.component.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Card',
-  source: 'packages/ui/src/mosaic/components/card.tsx',
-  styles: cardRecipe,
+  source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  styles: {
+    _variants: {
+      alignment: { start: {}, center: {} },
+    },
+    _defaultVariants: {
+      alignment: 'start',
+    },
+  },
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
