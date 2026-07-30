@@ -491,6 +491,30 @@ describe('createClerkBridge', () => {
     expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
   });
 
+  it('runs the remaining teardowns when one throws during cleanup', () => {
+    const clerk = createClerkBridge({
+      storage,
+      passkeys: true,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    // Teardowns drain in reverse, so this aborts the OAuth transport cleanup first.
+    vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
+      throw new Error('Handler was already removed');
+    });
+
+    expect(() => clerk.cleanup()).toThrow('Handler was already removed');
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(PASSKEY_CHANNELS.create);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken);
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
   it('derives the OAuth callback URL from the renderer origin', () => {
     createClerkBridge({
       storage,

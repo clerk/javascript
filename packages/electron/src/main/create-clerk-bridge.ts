@@ -80,8 +80,18 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
 
   const teardowns: Array<() => void> = [];
   const runTeardowns = (): void => {
+    const errors: unknown[] = [];
+
     while (teardowns.length > 0) {
-      teardowns.pop()?.();
+      try {
+        teardowns.pop()?.();
+      } catch (err) {
+        errors.push(err);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw errors[0];
     }
   };
 
