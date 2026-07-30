@@ -188,6 +188,37 @@ export function Group() {
       <Item.Separator />
       <Item.Group>
         <Item.Root size='xs'>
+          <Item.Content>
+            <Item.Description>cameron.walker@gmail.com</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <Button
+              variant='ghost'
+              color='neutral'
+              size='sm'
+              shape='square'
+            >
+              <svg
+                width='16'
+                viewBox='0 0 16 16'
+              >
+                <path
+                  d='M2.75 8.01978V8.01001C2.75 7.31965 3.30964 6.76001 4 6.76001C4.69036 6.76001 5.25 7.31965 5.25 8.01001V8.01978C5.25 8.71013 4.69036 9.26978 4 9.26978C3.30964 9.26978 2.75 8.71013 2.75 8.01978Z'
+                  fill='currentColor'
+                />
+                <path
+                  d='M6.75 8.00977V8C6.75 7.30964 7.30964 6.75 8 6.75C8.69036 6.75 9.25 7.30964 9.25 8V8.00977C9.25 8.70012 8.69036 9.25977 8 9.25977C7.30964 9.25977 6.75 8.70012 6.75 8.00977Z'
+                  fill='currentColor'
+                />
+                <path
+                  d='M10.75 8.00977V8C10.75 7.30964 11.3096 6.75 12 6.75C12.6904 6.75 13.25 7.30964 13.25 8V8.00977C13.25 8.70012 12.6904 9.25977 12 9.25977C11.3096 9.25977 10.75 8.70012 10.75 8.00977Z'
+                  fill='currentColor'
+                />
+              </svg>
+            </Button>
+          </Item.Actions>
+        </Item.Root>
+        <Item.Root size='xs'>
           <Item.Media>
             <Avatar.Root
               size='fit'
