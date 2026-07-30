@@ -27,6 +27,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    gap: space['0.5'],
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -56,14 +57,13 @@ export const styles = stylex.create({
     borderStyle: 'none',
     gap: space['2'],
     outline: 'none',
-    paddingBlock: space['0.75'],
     paddingInline: space['2'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': colorVars['--cl-color-neutral'],
+      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral'],
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     boxSizing: 'border-box',
@@ -81,7 +81,7 @@ export const styles = stylex.create({
       '@media (prefers-reduced-motion: reduce)': '0.01ms',
     },
     transitionProperty: 'background-color',
-    minHeight: space['8'],
+    height: space['7'],
     width: '100%',
   },
 
