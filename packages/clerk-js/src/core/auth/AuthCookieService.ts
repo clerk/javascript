@@ -86,12 +86,8 @@ export class AuthCookieService {
     // Environment can resolve after auth cookies are first written.
     eventBus.on(events.EnvironmentUpdate, () => {
       this.devBrowser.refreshCookies();
-      if (Environment.getInstance().partitionedCookies) {
-        void this.refreshSessionToken({ updateCookieImmediately: true });
-        if (this.clerk.client) {
-          this.setClientUatCookieForDevelopmentInstances();
-        }
-      }
+      void this.refreshSessionToken({ updateCookieImmediately: true });
+      this.setClientUatCookieForDevelopmentInstances();
     });
 
     this.refreshTokenOnFocus();
@@ -270,6 +266,9 @@ export class AuthCookieService {
   }
 
   public setClientUatCookieForDevelopmentInstances() {
+    if (!this.clerk.client) {
+      return;
+    }
     if (this.instanceType !== 'production' && this.inCustomDevelopmentDomain()) {
       this.clientUat.set(this.clerk.client);
     }
