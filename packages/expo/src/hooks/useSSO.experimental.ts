@@ -160,9 +160,10 @@ export function useSSO(): UseSSOReturn {
 
     const params = new URL(authSessionResult.url).searchParams;
     const rotatingTokenNonce = params.get('rotating_token_nonce') ?? '';
-    await client.signIn.reload({ rotatingTokenNonce });
+    const reloadedSignIn = await client.signIn.reload({ rotatingTokenNonce });
+    const currentSignIn = reloadedSignIn.__internal_future;
 
-    const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
+    const userNeedsToBeCreated = currentSignIn.firstFactorVerification.status === 'transferable';
     if (userNeedsToBeCreated) {
       const { error: signUpError } = await signUp.create({
         transfer: true,
@@ -173,27 +174,20 @@ export function useSSO(): UseSSOReturn {
       }
     }
 
-    const createdSessionId = signUp.createdSessionId ?? signIn.createdSessionId;
-    if (signUp.createdSessionId) {
-      const { error } = await signUp.finalize();
+    const ssoResource = userNeedsToBeCreated ? signUp : currentSignIn;
+    const createdSessionId = ssoResource.createdSessionId;
+    if (createdSessionId) {
+      const { error } = await ssoResource.finalize();
       if (error) {
         throw error;
       }
-    } else if (signIn.createdSessionId) {
-      const { error } = await signIn.finalize();
-      if (error) {
-        throw error;
-      }
-    } else {
-      const existingSessionId = signIn.existingSession?.sessionId ?? signUp.existingSession?.sessionId;
-      if (existingSessionId) {
-        await setActive({ session: existingSessionId });
-      }
+    } else if (ssoResource.existingSession) {
+      await setActive({ session: ssoResource.existingSession.sessionId });
     }
 
     return {
       createdSessionId,
-      signIn,
+      signIn: currentSignIn,
       signUp,
       authSessionResult,
     };

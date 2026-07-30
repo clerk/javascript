@@ -88,7 +88,7 @@ describe('experimental useSSO', () => {
         mockSignIn.createdSessionId = 'sess_123';
       }
 
-      return Promise.resolve();
+      return Promise.resolve({ __internal_future: mockSignIn });
     });
 
     mockSignUp.createdSessionId = null;
@@ -181,6 +181,38 @@ describe('experimental useSSO', () => {
     expect(response).not.toHaveProperty('setActive');
   });
 
+  test('uses the reloaded sign-in future for callback state and finalization', async () => {
+    const reloadedSignIn = {
+      ...mockSignIn,
+      createdSessionId: 'sess_reloaded',
+      firstFactorVerification: {
+        ...mockSignIn.firstFactorVerification,
+        status: 'verified',
+      },
+      finalize: vi.fn().mockResolvedValue({ error: null }),
+    };
+    mockClientSignIn.reload.mockResolvedValue({ __internal_future: reloadedSignIn });
+    const { result } = renderHook(() => useSSO());
+
+    const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
+
+    expect(reloadedSignIn.finalize).toHaveBeenCalledOnce();
+    expect(mockSignIn.finalize).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBe('sess_reloaded');
+    expect(response.signIn).toBe(reloadedSignIn);
+  });
+
+  test('ignores a session retained by an unrelated sign-up resource', async () => {
+    mockSignUp.createdSessionId = 'sess_stale_signup';
+    const { result } = renderHook(() => useSSO());
+
+    const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
+
+    expect(mockSignIn.finalize).toHaveBeenCalledOnce();
+    expect(mockSignUp.finalize).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBe('sess_123');
+  });
+
   test('passes an enterprise SSO identifier to sign-in creation', async () => {
     const { result } = renderHook(() => useSSO());
 
@@ -197,10 +229,14 @@ describe('experimental useSSO', () => {
   });
 
   test('creates a transfer sign-up with unsafe metadata when sign-in is transferable', async () => {
-    mockClientSignIn.reload.mockImplementation(() => {
-      mockSignIn.firstFactorVerification.status = 'transferable';
-      return Promise.resolve();
-    });
+    const reloadedSignIn = {
+      ...mockSignIn,
+      firstFactorVerification: {
+        ...mockSignIn.firstFactorVerification,
+        status: 'transferable',
+      },
+    };
+    mockClientSignIn.reload.mockResolvedValue({ __internal_future: reloadedSignIn });
     mockSignUp.create.mockImplementation(() => {
       mockSignUp.createdSessionId = 'sess_signup';
       return Promise.resolve({ error: null });
@@ -220,19 +256,35 @@ describe('experimental useSSO', () => {
     });
     expect(mockSignUp.finalize).toHaveBeenCalledOnce();
     expect(response.createdSessionId).toBe('sess_signup');
+    expect(response.signIn).toBe(reloadedSignIn);
   });
 
   test('activates an existing session without finalizing a future resource', async () => {
-    mockClientSignIn.reload.mockImplementation(() => {
-      mockSignIn.existingSession = { sessionId: 'sess_existing' };
-      return Promise.resolve();
-    });
+    const reloadedSignIn = {
+      ...mockSignIn,
+      existingSession: { sessionId: 'sess_existing' },
+    };
+    mockClientSignIn.reload.mockResolvedValue({ __internal_future: reloadedSignIn });
 
     const { result } = renderHook(() => useSSO());
 
     const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
 
     expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_existing' });
+    expect(mockSignIn.finalize).not.toHaveBeenCalled();
+    expect(mockSignUp.finalize).not.toHaveBeenCalled();
+    expect(response.createdSessionId).toBe(null);
+    expect(response.signIn).toBe(reloadedSignIn);
+  });
+
+  test('does not activate an existing session retained by an unrelated sign-up resource', async () => {
+    mockClientSignIn.reload.mockResolvedValue({ __internal_future: mockSignIn });
+    mockSignUp.existingSession = { sessionId: 'sess_stale_signup' };
+    const { result } = renderHook(() => useSSO());
+
+    const response = await result.current.startSSOFlow({ strategy: 'oauth_google' });
+
+    expect(mockSetActive).not.toHaveBeenCalled();
     expect(mockSignIn.finalize).not.toHaveBeenCalled();
     expect(mockSignUp.finalize).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBe(null);
