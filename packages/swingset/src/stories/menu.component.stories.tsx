@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Menu } from '@clerk/ui/mosaic/components/menu';
-import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,9 +14,6 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/components/menu/menu.tsx',
 };
 
-const PlusIcon = iconRegistry.plus;
-const LogOutIcon = iconRegistry['log-out'];
-
 export function Default() {
   return (
     <Menu.Root>
@@ -24,12 +21,16 @@ export function Default() {
       <Menu.Content>
         <Menu.Item
           label='Add workspace'
-          icon={<PlusIcon />}
+          icon={<Icon name='plus' />}
         />
-        <Menu.Separator />
         <Menu.Item
           label='Sign out'
-          icon={<LogOutIcon />}
+          icon={<Icon name='log-out' />}
+        />
+        <Menu.Item
+          label='Delete user'
+          icon={<Icon name='close' />}
+          intent='destructive'
         />
       </Menu.Content>
     </Menu.Root>

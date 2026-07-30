@@ -18,6 +18,7 @@ Click the trigger, then use the arrow keys or type to move between items.
 ## Usage
 
 ```tsx
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Menu } from '@clerk/ui/mosaic/components/menu';
 
 <Menu.Root>
@@ -25,12 +26,18 @@ import { Menu } from '@clerk/ui/mosaic/components/menu';
   <Menu.Content>
     <Menu.Item
       label='Add workspace'
-      icon={<PlusIcon />}
+      icon={<Icon name='plus' />}
     />
-    <Menu.Separator />
     <Menu.Item
       label='Sign out'
+      icon={<Icon name='log-out' />}
       onClick={signOut}
+    />
+    <Menu.Item
+      label='Delete user'
+      icon={<Icon name='close' />}
+      intent='destructive'
+      onClick={deleteUser}
     />
   </Menu.Content>
 </Menu.Root>;
@@ -53,14 +60,16 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 ### Items
 
 `label` drives typeahead and, unless `children` is given, the visible text. `icon` renders a leading
-glyph sized and tinted by the item. `disabled` items are skipped by keyboard navigation and their
-`onClick` never fires. Activating an item closes the menu; pass `closeOnClick={false}` to keep it
-open.
+glyph sized and tinted by the item. Use `intent='destructive'` for destructive actions; it applies
+the negative color to both the label and icon. `disabled` items are skipped by keyboard navigation
+and their `onClick` never fires. Activating an item closes the menu; pass `closeOnClick={false}` to
+keep it open.
 
 ```tsx
 <Menu.Item
   label='Delete'
-  disabled
+  icon={<Icon name='close' />}
+  intent='destructive'
 />
 ```
 
