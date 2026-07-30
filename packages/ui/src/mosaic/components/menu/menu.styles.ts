@@ -59,9 +59,9 @@ export const styles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': colorVars['--cl-color-neutral'],
+      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral'],
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     boxSizing: 'border-box',
