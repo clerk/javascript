@@ -299,6 +299,38 @@ export function IconSizes(props: Record<string, unknown>) {
   );
 }
 
+// `fullWidth` in a narrow container is what constrains the width — a button sizes to its own
+// content otherwise (`flex-shrink: 0`), so there'd be nothing to truncate against. The icon
+// keeps its size and only the label gives way.
+export function Truncation(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: 200 }}>
+      <Button
+        {...knobsAsProps(props)}
+        fullWidth
+      >
+        Save
+      </Button>
+      <Button
+        {...knobsAsProps(props)}
+        fullWidth
+      >
+        Save this organization&rsquo;s billing details
+      </Button>
+      <Button
+        {...knobsAsProps(props)}
+        fullWidth
+      >
+        <Icon
+          name='check'
+          placement='inline-start'
+        />
+        Save this organization&rsquo;s billing details
+      </Button>
+    </div>
+  );
+}
+
 export function Disabled(props: Record<string, unknown>) {
   return (
     <Button

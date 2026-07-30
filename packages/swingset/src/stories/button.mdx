@@ -35,6 +35,13 @@ Button is the primary action element in Mosaic, used for form submissions and di
   storyModule={ButtonStories}
 />
 
+`size` sets the height, and under a coarse pointer every size floors at 44px instead — a
+fingertip is the same width whatever density the surrounding UI runs at, so the floor is a fixed
+`--cl-target-coarse` rather than a step on the spacing scale a consumer can rescale. Icon buttons
+take the floor on both axes, so a square button stays square rather than growing tall and narrow.
+`link` opts out entirely: it reads as text, not a control. None of this is visible on a mouse —
+it applies at `@media (pointer: coarse)`.
+
 ### Variants
 
 <Story
@@ -86,9 +93,32 @@ The middle button in each row below carries no icon, for comparison.
   storyModule={ButtonStories}
 />
 
+### Truncation
+
+A button sizes to its own content and doesn't shrink, so most of the time there's nothing to
+truncate. When its width _is_ constrained — `fullWidth` in a narrow container, or an explicit
+width — the label can't wrap to cope, because `size` fixes the height and a second line would
+grow out of the button. It stays on one line and ends in an ellipsis instead.
+
+Only text children truncate. Button wraps a text child in a span of its own to run the ellipsis
+against, since a bare text node is laid out in an anonymous box no selector can reach. Element
+children pass through as direct flex items, so an icon keeps its size and its padding while the
+label gives way around it.
+
+<Story
+  name='Truncation'
+  storyModule={ButtonStories}
+/>
+
 ### Disabled
 
 <Story
   name='Disabled'
   storyModule={ButtonStories}
 />
+
+A disabled button keeps its resting fill and dims — it doesn't fall back to a gray of its own, so
+which color and variant it is stays legible while it's unavailable. Hover and press are suppressed
+by the styles, not by `pointer-events`: the button stays hit-testable, which is what makes
+`cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
+That tooltip is worth adding — a disabled control with no explanation is a dead end.
