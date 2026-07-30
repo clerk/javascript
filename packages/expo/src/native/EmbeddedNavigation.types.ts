@@ -2,7 +2,7 @@
  * The embedded component's internal navigation state, reported through
  * `onNavigationChange` while `hideHeader` is enabled.
  */
-export interface HostedNavigationState {
+export interface EmbeddedNavigationState {
   /**
    * The number of screens pushed above the component's root screen.
    */
@@ -22,7 +22,7 @@ export interface HostedNavigationState {
  * Props shared by native components that support embedding inside the host
  * app's own navigation (`UserProfileView`, `AuthView`).
  */
-export interface HostedNavigationProps {
+export interface EmbeddedNavigationProps {
   /**
    * Hides the component's built-in navigation header so it can be pushed onto
    * the host app's own navigation stack without a double header.
@@ -43,14 +43,14 @@ export interface HostedNavigationProps {
    *
    * Only fires while `hideHeader` is enabled.
    */
-  onNavigationChange?: (state: HostedNavigationState) => void;
+  onNavigationChange?: (state: EmbeddedNavigationState) => void;
 }
 
 /**
  * Imperative handle exposed by native components that support embedding
  * inside the host app's own navigation.
  */
-export interface HostedNavigationRef {
+export interface EmbeddedNavigationRef {
   /**
    * Pops one screen off the component's internal navigation stack.
    * No-op at the component's root.

@@ -8,7 +8,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
-import com.clerk.ui.navigation.ClerkHostedNavigation
+import com.clerk.ui.navigation.ClerkEmbeddedNavigation
 import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
@@ -29,7 +29,7 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   var hideHeader: Boolean = false
   private val onProfileEvent by EventDispatcher()
   private val onNavigationChange by EventDispatcher()
-  private val hostedNavigation = ClerkHostedNavigation()
+  private val embeddedNavigation = ClerkEmbeddedNavigation()
 
   private val viewModelStoreOwner = object : ViewModelStoreOwner {
     private val store = ViewModelStore()
@@ -43,21 +43,21 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   }
 
   fun goBack() {
-    hostedNavigation.pop()
+    embeddedNavigation.pop()
   }
 
   fun popToRoot() {
-    hostedNavigation.popToRoot()
+    embeddedNavigation.popToRoot()
   }
 
   @Composable
   override fun Content() {
     debugLog(TAG, "setupView - isDismissible: $isDismissible, hideHeader: $hideHeader")
 
-    val hosted = if (hideHeader) hostedNavigation else null
-    if (hosted != null) {
-      LaunchedEffect(hosted) {
-        snapshotFlow { hosted.depth }.collect { depth ->
+    val embedded = if (hideHeader) embeddedNavigation else null
+    if (embedded != null) {
+      LaunchedEffect(embedded) {
+        snapshotFlow { embedded.depth }.collect { depth ->
           onNavigationChange(mapOf("depth" to depth, "canGoBack" to (depth > 0)))
         }
       }
@@ -70,7 +70,7 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
         debugLog(TAG, "Profile dismissed")
         sendEvent("dismissed")
       },
-      hostedNavigation = hosted,
+      embeddedNavigation = embedded,
     )
   }
 

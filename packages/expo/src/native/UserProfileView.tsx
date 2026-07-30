@@ -5,12 +5,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { NativeClerkUserProfileViewRef } from '../specs/NativeClerkUserProfileView';
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 import { isNativeSupported } from '../utils/native-module';
-import type { HostedNavigationProps, HostedNavigationRef, HostedNavigationState } from './HostedNavigation.types';
+import type {
+  EmbeddedNavigationProps,
+  EmbeddedNavigationRef,
+  EmbeddedNavigationState,
+} from './EmbeddedNavigation.types';
 
 /**
  * Props for the UserProfileView component.
  */
-export interface UserProfileViewProps extends HostedNavigationProps {
+export interface UserProfileViewProps extends EmbeddedNavigationProps {
   /**
    * Whether the inline profile view shows a dismiss button.
    *
@@ -35,7 +39,7 @@ export interface UserProfileViewProps extends HostedNavigationProps {
 /**
  * Imperative handle exposed by {@link UserProfileView}.
  */
-export type UserProfileViewRef = HostedNavigationRef;
+export type UserProfileViewRef = EmbeddedNavigationRef;
 
 /**
  * A pre-built native component for managing the user's profile and account settings.
@@ -96,7 +100,7 @@ export const UserProfileView = forwardRef<UserProfileViewRef, UserProfileViewPro
   );
 
   const handleNavigationChange = useCallback(
-    (event: NativeSyntheticEvent<HostedNavigationState>) => {
+    (event: NativeSyntheticEvent<EmbeddedNavigationState>) => {
       const { depth, canGoBack } = event.nativeEvent;
       onNavigationChange?.({ depth, canGoBack });
     },

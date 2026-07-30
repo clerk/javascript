@@ -1,7 +1,7 @@
 /**
  * Prewired expo-router screens for Clerk's native components.
  *
- * These wrap {@link UserProfileView} and {@link AuthView} in hosted-navigation mode so they
+ * These wrap {@link UserProfileView} and {@link AuthView} in embedded-navigation mode so they
  * can be pushed onto an expo-router stack with a single header: the route header shows a
  * working back button while the user is inside Clerk's internal screens, the iOS back
  * gesture and Android hardware/predictive back do the right thing, and the route pops
@@ -19,7 +19,7 @@ import { BackHandler } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { AuthView } from './AuthView';
 import type { AuthViewProps } from './AuthView.types';
-import type { HostedNavigationRef, HostedNavigationState } from './HostedNavigation.types';
+import type { EmbeddedNavigationRef, EmbeddedNavigationState } from './EmbeddedNavigation.types';
 import type { UserProfileViewProps } from './UserProfileView';
 import { UserProfileView } from './UserProfileView';
 
@@ -55,24 +55,24 @@ function loadHeaderBackButton(): NavigationElementsModule['HeaderBackButton'] {
   return (require('@react-navigation/elements') as NavigationElementsModule).HeaderBackButton;
 }
 
-interface HostedScreenState {
-  navigationState: HostedNavigationState;
-  onNavigationChange: (state: HostedNavigationState) => void;
-  componentRef: React.RefObject<HostedNavigationRef>;
+interface EmbeddedScreenState {
+  navigationState: EmbeddedNavigationState;
+  onNavigationChange: (state: EmbeddedNavigationState) => void;
+  componentRef: React.RefObject<EmbeddedNavigationRef>;
   screenOptions: Record<string, unknown>;
   handleDismiss: () => void;
 }
 
-function useHostedScreen(
+function useEmbeddedScreen(
   router: ExpoRouterModule,
   onDismiss: (() => void) | undefined,
   extraOptions: Record<string, unknown> | undefined,
-): HostedScreenState {
+): EmbeddedScreenState {
   const { useRouter, useFocusEffect } = router;
   const routerHandle = useRouter();
-  const componentRef = useRef<HostedNavigationRef>(null);
+  const componentRef = useRef<EmbeddedNavigationRef>(null);
   const isFocused = useRef(false);
-  const [navigationState, setNavigationState] = useState<HostedNavigationState>({ depth: 0, canGoBack: false });
+  const [navigationState, setNavigationState] = useState<EmbeddedNavigationState>({ depth: 0, canGoBack: false });
   const HeaderBackButton = useRef(loadHeaderBackButton()).current;
 
   // Pop the route when the flow ends, but only while this screen is focused —
@@ -144,7 +144,7 @@ export interface UserProfileScreenProps extends Pick<UserProfileViewProps, 'onDi
 export function UserProfileScreen({ onDismiss, style, options }: UserProfileScreenProps): ReactElement {
   const router = useRef(loadExpoRouter()).current;
   const { Stack } = router;
-  const { onNavigationChange, componentRef, screenOptions, handleDismiss } = useHostedScreen(
+  const { onNavigationChange, componentRef, screenOptions, handleDismiss } = useEmbeddedScreen(
     router,
     onDismiss,
     options,
@@ -201,7 +201,7 @@ export interface AuthScreenProps extends Pick<AuthViewProps, 'mode' | 'onDismiss
 export function AuthScreen({ mode, onDismiss, options }: AuthScreenProps): ReactElement {
   const router = useRef(loadExpoRouter()).current;
   const { Stack } = router;
-  const { onNavigationChange, componentRef, screenOptions, handleDismiss } = useHostedScreen(
+  const { onNavigationChange, componentRef, screenOptions, handleDismiss } = useEmbeddedScreen(
     router,
     onDismiss,
     options,

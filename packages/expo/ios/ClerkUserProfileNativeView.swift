@@ -5,7 +5,7 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   private var currentDismissible: Bool = true
   private var currentHideHeader: Bool = false
   private var didSendDismiss = false
-  private var hostedNavigation: ClerkExpoHostedProfileNavigation?
+  private var embeddedNavigation: ClerkExpoEmbeddedNavigation?
 
   let onProfileEvent = EventDispatcher()
   let onNavigationChange = EventDispatcher()
@@ -25,11 +25,11 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 
   func goBack() {
-    hostedNavigation?.goBack()
+    embeddedNavigation?.goBack()
   }
 
   func popToRoot() {
-    hostedNavigation?.popToRoot()
+    embeddedNavigation?.popToRoot()
   }
 
   private func sendProfileEvent(type: ClerkNativeViewEvent) {
@@ -52,9 +52,9 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    let hosted: ClerkExpoHostedProfileNavigation?
+    let hosted: ClerkExpoEmbeddedNavigation?
     if currentHideHeader {
-      let navigation = ClerkExpoHostedProfileNavigation()
+      let navigation = ClerkExpoEmbeddedNavigation()
       navigation.onDepthChange = { [weak self] depth in
         self?.onNavigationChange(["depth": depth, "canGoBack": depth > 0])
       }
@@ -62,11 +62,11 @@ public class ClerkUserProfileNativeView: ClerkNativeViewHost {
     } else {
       hosted = nil
     }
-    hostedNavigation = hosted
+    embeddedNavigation = hosted
 
     return ClerkNativeBridge.shared.makeUserProfileViewController(
       dismissible: currentDismissible,
-      hostedNavigation: hosted,
+      embeddedNavigation: hosted,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()

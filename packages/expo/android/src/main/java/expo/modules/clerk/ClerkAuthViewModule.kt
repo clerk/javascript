@@ -21,7 +21,7 @@ import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
 import com.clerk.ui.auth.AuthMode
 import com.clerk.ui.auth.AuthView
-import com.clerk.ui.navigation.ClerkHostedNavigation
+import com.clerk.ui.navigation.ClerkEmbeddedNavigation
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -58,7 +58,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
   private val onAuthEvent by EventDispatcher()
   private val onNavigationChange by EventDispatcher()
-  private val hostedNavigation = ClerkHostedNavigation()
+  private val embeddedNavigation = ClerkEmbeddedNavigation()
 
   init {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -88,21 +88,21 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   }
 
   fun goBack() {
-    hostedNavigation.pop()
+    embeddedNavigation.pop()
   }
 
   fun popToRoot() {
-    hostedNavigation.popToRoot()
+    embeddedNavigation.popToRoot()
   }
 
   @Composable
   override fun Content() {
     debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, hideHeader: $hideHeader, activity: $activity")
 
-    val hosted = if (hideHeader) hostedNavigation else null
-    if (hosted != null) {
-      LaunchedEffect(hosted) {
-        snapshotFlow { hosted.depth }.collect { depth ->
+    val embedded = if (hideHeader) embeddedNavigation else null
+    if (embedded != null) {
+      LaunchedEffect(embedded) {
+        snapshotFlow { embedded.depth }.collect { depth ->
           onNavigationChange(mapOf("depth" to depth, "canGoBack" to (depth > 0)))
         }
       }
@@ -120,7 +120,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
       onAuthComplete = {
         sendDismissEvent()
       },
-      hostedNavigation = hosted,
+      embeddedNavigation = embedded,
     )
   }
 

@@ -9,7 +9,7 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var logoBoundsObservation: NSKeyValueObservation?
   private var currentHideHeader: Bool = false
   private var didSendDismiss = false
-  private var hostedNavigation: ClerkExpoHostedAuthNavigation?
+  private var embeddedNavigation: ClerkExpoEmbeddedNavigation?
 
   let onAuthEvent = EventDispatcher()
   let onNavigationChange = EventDispatcher()
@@ -42,11 +42,11 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   func goBack() {
-    hostedNavigation?.goBack()
+    embeddedNavigation?.goBack()
   }
 
   func popToRoot() {
-    hostedNavigation?.popToRoot()
+    embeddedNavigation?.popToRoot()
   }
 
   private func sendAuthEvent(type: ClerkNativeViewEvent) {
@@ -116,9 +116,9 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
-    let hosted: ClerkExpoHostedAuthNavigation?
+    let hosted: ClerkExpoEmbeddedNavigation?
     if currentHideHeader {
-      let navigation = ClerkExpoHostedAuthNavigation()
+      let navigation = ClerkExpoEmbeddedNavigation()
       navigation.onDepthChange = { [weak self] depth in
         self?.onNavigationChange(["depth": depth, "canGoBack": depth > 0])
       }
@@ -126,14 +126,14 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     } else {
       hosted = nil
     }
-    hostedNavigation = hosted
+    embeddedNavigation = hosted
 
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
       logoState: logoState,
       logoMaxHeight: currentLogoMaxHeight,
-      hostedNavigation: hosted,
+      embeddedNavigation: hosted,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()

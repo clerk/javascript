@@ -271,7 +271,7 @@ final class ClerkNativeBridge {
     dismissible: Bool,
     logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
-    hostedNavigation: ClerkExpoHostedAuthNavigation? = nil,
+    embeddedNavigation: ClerkExpoEmbeddedNavigation? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -280,7 +280,7 @@ final class ClerkNativeBridge {
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
-        hostedNavigation: hostedNavigation,
+        embeddedNavigation: embeddedNavigation,
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
@@ -292,7 +292,7 @@ final class ClerkNativeBridge {
 
   func makeUserProfileViewController(
     dismissible: Bool,
-    hostedNavigation: ClerkExpoHostedProfileNavigation? = nil,
+    embeddedNavigation: ClerkExpoEmbeddedNavigation? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -300,7 +300,7 @@ final class ClerkNativeBridge {
     return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
-        hostedNavigation: hostedNavigation,
+        embeddedNavigation: embeddedNavigation,
         lightTheme: lightTheme,
         darkTheme: darkTheme
       ),
@@ -530,47 +530,26 @@ struct ClerkInlineUserButtonWrapperView: View {
   }
 }
 
-// MARK: - Hosted Navigation (embedded in host-owned navigation)
+// MARK: - Embedded Navigation (in host-owned navigation)
 
-/// Drives `UserProfileView` when the JS side hides Clerk's header: this pod owns the
-/// `NavigationStack` and its path, so depth and pop commands act on the path directly.
+/// Drives `UserProfileView` and `AuthView` when the JS side hides Clerk's header: depth
+/// and pop commands flow through the ClerkKitUI embedded-navigation SPI handle, which
+/// also hides Clerk's navigation bars when placed in the SwiftUI environment.
 @MainActor
-@Observable
-final class ClerkExpoHostedProfileNavigation {
-  var path = NavigationPath()
-
-  /// Placing this in the SwiftUI environment hides Clerk's navigation bars.
-  @ObservationIgnored let barsHidden = ClerkHostedNavigation()
-
-  @ObservationIgnored var onDepthChange: ((Int) -> Void)?
-
-  func goBack() {
-    guard !path.isEmpty else { return }
-    path.removeLast()
-  }
-
-  func popToRoot() {
-    path = NavigationPath()
-  }
-}
-
-/// Drives `AuthView` when the JS side hides Clerk's header: `AuthView` owns its internal
-/// stack, so depth and pop commands flow through the ClerkKitUI hosted-navigation SPI.
-@MainActor
-final class ClerkExpoHostedAuthNavigation {
-  let hostedNavigation = ClerkHostedNavigation()
+final class ClerkExpoEmbeddedNavigation {
+  let handle = ClerkEmbeddedNavigation()
 
   var onDepthChange: ((Int) -> Void)? {
-    get { hostedNavigation.onDepthChange }
-    set { hostedNavigation.onDepthChange = newValue }
+    get { handle.onDepthChange }
+    set { handle.onDepthChange = newValue }
   }
 
   func goBack() {
-    hostedNavigation.pop()
+    handle.pop()
   }
 
   func popToRoot() {
-    hostedNavigation.popToRoot()
+    handle.popToRoot()
   }
 }
 
@@ -579,7 +558,7 @@ final class ClerkExpoHostedAuthNavigation {
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissible: Bool
-  let hostedNavigation: ClerkExpoHostedAuthNavigation?
+  let embeddedNavigation: ClerkExpoEmbeddedNavigation?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
@@ -590,7 +569,7 @@ struct ClerkInlineAuthWrapperView: View {
   @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
-      .environment(\.clerkHostedNavigation, hostedNavigation?.hostedNavigation)
+      .environment(\.clerkEmbeddedNavigation, embeddedNavigation?.handle)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -685,15 +664,16 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 
 struct ClerkInlineProfileWrapperView: View {
   let dismissible: Bool
-  let hostedNavigation: ClerkExpoHostedProfileNavigation?
+  let embeddedNavigation: ClerkExpoEmbeddedNavigation?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
 
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
-    let view = profileView
+    let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
+      .environment(\.clerkEmbeddedNavigation, embeddedNavigation?.handle)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -703,25 +683,5 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
-  }
-
-  @ViewBuilder
-  private var profileView: some View {
-    if let hostedNavigation {
-      hostedProfileView(hostedNavigation)
-    } else {
-      UserProfileView(isDismissible: dismissible)
-    }
-  }
-
-  private func hostedProfileView(_ navigation: ClerkExpoHostedProfileNavigation) -> some View {
-    @Bindable var navigation = navigation
-    return NavigationStack(path: $navigation.path) {
-      UserProfileView(isDismissible: dismissible, navigationPath: $navigation.path)
-    }
-    .environment(\.clerkHostedNavigation, navigation.barsHidden)
-    .onChange(of: navigation.path.count) { _, newCount in
-      navigation.onDepthChange?(newCount)
-    }
   }
 }

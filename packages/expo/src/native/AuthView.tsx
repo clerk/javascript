@@ -6,14 +6,14 @@ import type { NativeClerkAuthViewRef } from '../specs/NativeClerkAuthView';
 import NativeClerkAuthView from '../specs/NativeClerkAuthView';
 import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
-import type { HostedNavigationRef, HostedNavigationState } from './HostedNavigation.types';
+import type { EmbeddedNavigationRef, EmbeddedNavigationState } from './EmbeddedNavigation.types';
 
 type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
 
 /**
  * Imperative handle exposed by {@link AuthView}.
  */
-export type AuthViewRef = HostedNavigationRef;
+export type AuthViewRef = EmbeddedNavigationRef;
 
 /**
  * A pre-built native authentication component that handles sign-in and sign-up flows.
@@ -72,7 +72,7 @@ export const AuthView = forwardRef<AuthViewRef, AuthViewProps>(function AuthView
   );
 
   const handleNavigationChange = useCallback(
-    (event: NativeSyntheticEvent<HostedNavigationState>) => {
+    (event: NativeSyntheticEvent<EmbeddedNavigationState>) => {
       const { depth, canGoBack } = event.nativeEvent;
       onNavigationChange?.({ depth, canGoBack });
     },
