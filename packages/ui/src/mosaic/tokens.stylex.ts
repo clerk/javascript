@@ -192,8 +192,8 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // =============================================================================
 // Motion Tokens — easing
 // =============================================================================
-// One curve, named for its role rather than its shape so a consumer can retarget
-// it without the name going stale. The default is Swift Out
+// Curves are named for their role rather than their shape so a consumer can
+// retarget one without the name going stale. The default is Swift Out
 // (https://www.easing.dev/swift-out, from Lochie Axon's Easing Graphs):
 // front-loaded, so a change departs fast, and carrying its endpoint ~2% past
 // target around 85% through before settling.
@@ -205,9 +205,19 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // non-uniform, so an ease on top only makes the midpoint drag, and an overshoot
 // extrapolates past the target color for no gain. That is a rule about the property,
 // not the duration — a transform at `fast` still wants this curve.
+//
+// `--cl-ease-exit` is its counterpart for things LEAVING, In Quad
+// (https://www.easing.dev/in-quad). Swift Out run backwards spends 90% of its travel
+// in the first three frames and then crawls, and its overshoot inverts into a wobble
+// past the target — a departure has nothing to settle into, so it wants to accelerate
+// away instead. Deliberately the gentlest of the in-family: an exit moves a small
+// distance over few frames, so a sharper curve (In Quart, In Circ) leaves half of them
+// below the threshold of visible change and reads as a stall followed by a lurch.
+// Pair it with a shorter duration than the matching entrance.
 
 const easingDefaults = {
   '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+  '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);
