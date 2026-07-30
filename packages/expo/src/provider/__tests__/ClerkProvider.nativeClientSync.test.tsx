@@ -1151,12 +1151,15 @@ describe('ClerkProvider native client sync', () => {
       user: { id: 'user_1' },
     };
     const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    let reentersUnauthenticated = false;
 
     mocks.clerkInstance.client = {
       signedInSessions: [removedSession],
       lastActiveSessionId: 'session_1',
       fetch: vi.fn().mockImplementation(async () => {
-        await mocks.clerkInstance.handleUnauthenticated();
+        if (reentersUnauthenticated) {
+          await mocks.clerkInstance.handleUnauthenticated();
+        }
         throw new Error('stale session 401');
       }),
     };
@@ -1177,6 +1180,7 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
     });
 
+    reentersUnauthenticated = true;
     await act(async () => {
       await mocks.clerkInstance.handleUnauthenticated();
     });
@@ -1229,6 +1233,99 @@ describe('ClerkProvider native client sync', () => {
 
     expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
     expect(originalHandleUnauthenticated).toHaveBeenCalled();
+  });
+
+  test('runs native recovery once for a burst of unauthenticated responses', async () => {
+    const removedSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn().mockResolvedValue(null);
+
+    mocks.clerkInstance.client = {
+      signedInSessions: [removedSession],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    mocks.clerkInstance.session = removedSession;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+    expect(originalHandleUnauthenticated).toHaveBeenCalledTimes(2);
+  });
+
+  test('recovers again inside the cooldown window once native pushes a new device token', async () => {
+    const session = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn();
+    const client = {
+      id: 'client_1',
+      signedInSessions: [session],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    fetchClient.mockResolvedValue(client);
+
+    mocks.clerkInstance.client = client;
+    mocks.clerkInstance.session = session;
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    // Drop the client fetches the bootstrap already made; only the 401 handling matters here.
+    fetchClient.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'rotated-native-client-token');
+    });
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(fetchClient).toHaveBeenCalledTimes(2);
+    expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
   });
 
   test('refreshes native from the server after the JS client changes', async () => {

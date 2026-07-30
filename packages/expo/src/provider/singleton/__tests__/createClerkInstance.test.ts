@@ -2,6 +2,7 @@ import type { Clerk } from '@clerk/clerk-js';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { DUMMY_CLERK_CLIENT_RESOURCE } from '../../../cache';
 import type { TokenCache } from '../../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
 
@@ -41,6 +42,12 @@ class MockClerk {
 
 const createUnavailableResourceCache = () => ({
   get: () => Promise.resolve(null),
+  set: () => Promise.resolve(),
+});
+
+const createEnvironmentOnlyResourceCache = (environment: unknown) => () => ({
+  get: (key: string) =>
+    Promise.resolve(key.startsWith('__clerk_cache_environment') ? JSON.stringify(environment) : null),
   set: () => Promise.resolve(),
 });
 
@@ -481,6 +488,32 @@ describe('createClerkInstance', () => {
         await vi.advanceTimersByTimeAsync(retryDelay);
         expect(mocks.requestInitialResources).toHaveBeenCalledTimes(index + 2);
       }
+    });
+
+    test('keeps a cached environment when the client cache is empty', async () => {
+      mocks.requestInitialResources.mockImplementation(() => new Promise(() => {}));
+
+      const cachedEnvironment = {
+        object: 'environment',
+        id: 'env_cached',
+        auth_config: { object: 'auth_config', id: 'aac_cached', session_minter: true },
+      };
+
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        __experimental_resourceCache: createEnvironmentOnlyResourceCache(cachedEnvironment),
+      }) as unknown as MockClerk;
+
+      const resources = await clerk.__internal_getCachedResources?.();
+
+      expect(resources?.environment).toEqual(cachedEnvironment);
+      expect(resources?.client).toMatchObject({ id: DUMMY_CLERK_CLIENT_RESOURCE.id });
+
+      // The client is still missing, so recovery is still scheduled.
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
     });
 
     test('stops recovering after the initial resources load', async () => {

@@ -12,6 +12,7 @@ const tokenCacheReadTimeoutMs = 1_000;
 const nativeDeviceTokenPollIntervalMs = 100;
 const nativeDeviceTokenAvailabilityTimeoutMs = 3_000;
 const nativeClientSyncSourceIdPrefix = 'clerk-expo-js-sync';
+const unauthenticatedRecoveryCooldownMs = 5_000;
 
 export type SyncableClerkInstance = {
   addListener?: (listener: () => void, options?: { skipInitialEmit?: boolean }) => () => void;
@@ -570,6 +571,7 @@ export function NativeClientSync({
   const pendingNativeRefreshRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const pendingNativeRefreshBeforeReadyRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const nativeRefreshGenerationRef = useRef(0);
+  const lastUnauthenticatedRecoveryRef = useRef<number | undefined>(undefined);
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
 
@@ -743,6 +745,9 @@ export function NativeClientSync({
 
   useEffect(() => {
     const listener: DeviceTokenCacheListener = deviceToken => {
+      // A rotated device token is new input for recovery, so it reopens the unauthenticated cooldown.
+      lastUnauthenticatedRecoveryRef.current = undefined;
+
       const options = {
         deviceToken,
         didChangeClient: false,
@@ -784,6 +789,14 @@ export function NativeClientSync({
 
       isHandlingUnauthenticated = true;
       try {
+        // Re-reading native state and refetching the client for every response in a 401 burst only amplifies it.
+        const now = Date.now();
+        const lastRecovery = lastUnauthenticatedRecoveryRef.current;
+        if (lastRecovery !== undefined && now - lastRecovery < unauthenticatedRecoveryCooldownMs) {
+          return await originalHandleUnauthenticated(options);
+        }
+        lastUnauthenticatedRecoveryRef.current = now;
+
         return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
           try {
             const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });

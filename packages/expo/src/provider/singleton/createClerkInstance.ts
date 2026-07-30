@@ -260,14 +260,16 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             client: ClientJSONSnapshot | null;
             environment: EnvironmentJSONSnapshot | null;
           }> => {
-            let environment = await EnvironmentResourceCache.load();
-            let client = await ClientResourceCache.load();
+            const environment = await EnvironmentResourceCache.load();
+            const client = await ClientResourceCache.load();
             if (!environment || !client) {
-              environment = DUMMY_CLERK_ENVIRONMENT_RESOURCE;
-              client = DUMMY_CLERK_CLIENT_RESOURCE;
               scheduleResourceRetry(3000);
             }
-            return { client, environment };
+            // Substitute only what is missing: a dummy environment drops instance settings for the whole app run.
+            return {
+              client: client ?? DUMMY_CLERK_CLIENT_RESOURCE,
+              environment: environment ?? DUMMY_CLERK_ENVIRONMENT_RESOURCE,
+            };
           };
         }
       }

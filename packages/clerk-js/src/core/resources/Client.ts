@@ -141,7 +141,13 @@ export class Client extends BaseResource implements ClientResource {
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
-      this.sessions = (data.sessions || []).map(s => new Session(s));
+      // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
+      const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
+      this.sessions = (data.sessions || []).map(s => {
+        const session = new Session(s);
+        session.__internal_keepFreshestLastActiveToken(previousTokens.get(session.id));
+        return session;
+      });
 
       if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
         this.signUp.__internal_updateFromJSON(data.sign_up);
