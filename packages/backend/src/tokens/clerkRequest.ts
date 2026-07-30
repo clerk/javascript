@@ -4,26 +4,6 @@ import { constants } from '../constants';
 import type { ClerkUrl } from './clerkUrl';
 import { createClerkUrl } from './clerkUrl';
 
-export type ClerkRequestCookieMap = Map<string, string | undefined> & {
-  getAll(name: string): string[];
-};
-
-class CookieMap extends Map<string, string | undefined> implements ClerkRequestCookieMap {
-  private readonly valuesByName = new Map<string, string[]>();
-
-  public append(name: string, value: string) {
-    if (!this.has(name)) {
-      this.set(name, value);
-    }
-
-    this.valuesByName.set(name, [...(this.valuesByName.get(name) || []), value]);
-  }
-
-  public getAll(name: string): string[] {
-    return this.valuesByName.get(name) || [];
-  }
-}
-
 /**
  * A class that extends the native Request class,
  * adds cookies helpers and a normalised clerkUrl that is constructed by using the values found
@@ -31,7 +11,7 @@ class CookieMap extends Map<string, string | undefined> implements ClerkRequestC
  */
 class ClerkRequest extends Request {
   readonly clerkUrl: ClerkUrl;
-  readonly cookies: ClerkRequestCookieMap;
+  readonly cookies: Map<string, string | undefined>;
 
   public constructor(input: ClerkRequest | Request | RequestInfo, init?: RequestInit) {
     // The usual way to duplicate a request object is to
@@ -114,41 +94,8 @@ class ClerkRequest extends Request {
   }
 
   private parseCookies(req: Request) {
-    const cookieHeader = this.decodeCookieValue(req.headers.get('cookie') || '');
-    const cookiesRecord = parse(cookieHeader);
-    const cookies = new CookieMap();
-
-    for (const [name, value] of Object.entries(cookiesRecord)) {
-      cookies.set(name, value);
-    }
-
-    for (const [name, value] of this.parseCookiePairs(cookieHeader)) {
-      cookies.append(name, value);
-    }
-
-    return cookies;
-  }
-
-  private parseCookiePairs(cookieHeader: string) {
-    if (!cookieHeader) {
-      return [];
-    }
-
-    return cookieHeader
-      .split(';')
-      .map(pair => {
-        const separatorIndex = pair.indexOf('=');
-
-        if (separatorIndex === -1) {
-          return undefined;
-        }
-
-        const name = pair.slice(0, separatorIndex).trim();
-        const value = pair.slice(separatorIndex + 1).trim();
-
-        return name ? ([name, value] as const) : undefined;
-      })
-      .filter((pair): pair is readonly [string, string] => !!pair);
+    const cookiesRecord = parse(this.decodeCookieValue(req.headers.get('cookie') || ''));
+    return new Map(Object.entries(cookiesRecord));
   }
 
   private decodeCookieValue(str: string) {

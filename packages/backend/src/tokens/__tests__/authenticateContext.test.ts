@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../runtime', () => ({ runtime: { crypto: globalThis.crypto } }));
-
 import { createCookieHeader, createJwt, mockJwtPayload, pkLive, pkTest } from '../../fixtures';
 import { runtime } from '../../runtime';
 import { getCookieSuffix } from '../../util/shared';
@@ -15,15 +13,6 @@ describe('AuthenticateContext', () => {
   const session = createJwt();
   const sessionWithInvalidIssuer = createJwt({ payload: { iss: 'http:whatever' } });
   const newSession = createJwt({ payload: { iat: nowTimestampInSec + 60 } });
-  const expiredSession = createJwt({
-    payload: { exp: nowTimestampInSec - 60, iat: nowTimestampInSec - 120 },
-  });
-  const staleSession = createJwt({
-    payload: { exp: nowTimestampInSec + 60, iat: nowTimestampInSec - 60 },
-  });
-  const freshSession = createJwt({
-    payload: { exp: nowTimestampInSec + 300, iat: nowTimestampInSec },
-  });
   const clientUat = '1717490192';
   const suffixedClientUat = '1717490193';
 
@@ -221,56 +210,6 @@ describe('AuthenticateContext', () => {
         expect(context.usesSuffixedCookies()).toBe(true);
         expect(context.sessionTokenInCookie).toBeUndefined();
         expect(context.clientUat.toString()).toBe('0');
-      });
-    });
-
-    describe('duplicate session cookies', () => {
-      it('uses a later unexpired duplicate when an expired cookie appears first', async () => {
-        const headers = new Headers({
-          cookie: [`__client_uat=${clientUat}`, `__session=${expiredSession}`, `__session=${freshSession}`].join('; '),
-        });
-        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
-        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
-
-        expect(context.usesSuffixedCookies()).toBe(false);
-        expect(context.sessionTokenInCookie).toBe(freshSession);
-      });
-
-      it('uses the freshest valid duplicate for the selected cookie name', async () => {
-        const headers = new Headers({
-          cookie: [`__client_uat=${clientUat}`, `__session=${staleSession}`, `__session=${freshSession}`].join('; '),
-        });
-        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
-        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
-
-        expect(context.sessionTokenInCookie).toBe(freshSession);
-      });
-
-      it('uses the fresh duplicate for suffixed cookies', async () => {
-        const headers = new Headers({
-          cookie: [
-            `__client_uat=${clientUat}`,
-            `__client_uat_MqCvchyS=${suffixedClientUat}`,
-            `__session=${session}`,
-            `__session_MqCvchyS=${expiredSession}`,
-            `__session_MqCvchyS=${freshSession}`,
-          ].join('; '),
-        });
-        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
-        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
-
-        expect(context.usesSuffixedCookies()).toBe(true);
-        expect(context.sessionTokenInCookie).toBe(freshSession);
-      });
-
-      it('keeps the first malformed duplicate when no usable session token exists', async () => {
-        const headers = new Headers({
-          cookie: [`__client_uat=${clientUat}`, '__session=not-a-jwt', '__session=also-not-a-jwt'].join('; '),
-        });
-        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
-        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
-
-        expect(context.sessionTokenInCookie).toBe('not-a-jwt');
       });
     });
   });

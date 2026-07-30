@@ -97,21 +97,6 @@ describe('createClerkRequest', () => {
       expect(req.cookies.get('baz')).toBe('qux');
     });
 
-    it('preserves duplicate cookie values in request order', () => {
-      const req = createClerkRequest(
-        new Request('http://localhost:3000', {
-          headers: new Headers({
-            cookie: '__session=stale; __session=fresh; __session_suffix=stale-suffix; __session_suffix=fresh-suffix',
-          }),
-        }),
-      );
-
-      expect(req.cookies.get('__session')).toBe('stale');
-      expect(req.cookies.getAll('__session')).toEqual(['stale', 'fresh']);
-      expect(req.cookies.get('__session_suffix')).toBe('stale-suffix');
-      expect(req.cookies.getAll('__session_suffix')).toEqual(['stale-suffix', 'fresh-suffix']);
-    });
-
     it('should parse and return cookies even if no cookie header exists', () => {
       const req = createClerkRequest(new Request('http://localhost:3000', { headers: new Headers() }));
       expect(req.cookies.get('foo')).toBeUndefined();
