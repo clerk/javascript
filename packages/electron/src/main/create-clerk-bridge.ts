@@ -52,56 +52,72 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
-  }
 
-  if (options.renderer && options.manageSingleInstanceLock !== false) {
     if (!app.hasSingleInstanceLock()) {
-      if (!app.requestSingleInstanceLock()) {
+      if (options.manageSingleInstanceLock === false) {
+        console.warn(
+          "Clerk: manageSingleInstanceLock is false but the application does not hold Electron's single-instance lock. OAuth deep-link callbacks cannot be delivered on Windows or Linux until it is acquired.",
+        );
+      } else if (!app.requestSingleInstanceLock()) {
         app.quit();
         return { cleanup() {} };
+      } else {
+        ownsSingleInstanceLock = true;
       }
-
-      ownsSingleInstanceLock = true;
     }
   }
 
-  const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
-  let cleanupOAuthTransport: (() => void) | undefined;
-  const passkeys = options.passkeys ? setupPasskeysMain() : null;
+  const releaseSingleInstanceLock = (): void => {
+    if (!ownsSingleInstanceLock) {
+      return;
+    }
 
-  if (options.userAgent) {
-    app.userAgentFallback = buildUserAgentFallback(app.userAgentFallback, options.userAgent);
-  }
-
-  if (options.renderer) {
-    protocol.registerSchemesAsPrivileged([
-      {
-        scheme: options.renderer.scheme,
-        privileges: {
-          standard: true,
-          secure: true,
-          supportFetchAPI: true,
-          corsEnabled: true,
-          stream: true,
-          ...options.renderer.privileges,
-        },
-      },
-    ]);
-
-    cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
-      renderer: options.renderer,
-    });
-  }
-
-  return {
-    cleanup() {
-      cleanupTokenPersistence();
-      cleanupOAuthTransport?.();
-      passkeys?.cleanup();
-
-      if (ownsSingleInstanceLock) {
-        app.releaseSingleInstanceLock();
-      }
-    },
+    ownsSingleInstanceLock = false;
+    app.releaseSingleInstanceLock();
   };
+
+  try {
+    const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
+    let cleanupOAuthTransport: (() => void) | undefined;
+    const passkeys = options.passkeys ? setupPasskeysMain() : null;
+
+    if (options.userAgent) {
+      app.userAgentFallback = buildUserAgentFallback(app.userAgentFallback, options.userAgent);
+    }
+
+    if (options.renderer) {
+      protocol.registerSchemesAsPrivileged([
+        {
+          scheme: options.renderer.scheme,
+          privileges: {
+            standard: true,
+            secure: true,
+            supportFetchAPI: true,
+            corsEnabled: true,
+            stream: true,
+            ...options.renderer.privileges,
+          },
+        },
+      ]);
+
+      cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
+        renderer: options.renderer,
+      });
+    }
+
+    return {
+      cleanup() {
+        try {
+          cleanupTokenPersistence();
+          cleanupOAuthTransport?.();
+          passkeys?.cleanup();
+        } finally {
+          releaseSingleInstanceLock();
+        }
+      },
+    };
+  } catch (err) {
+    releaseSingleInstanceLock();
+    throw err;
+  }
 }
