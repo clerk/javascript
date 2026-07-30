@@ -28,8 +28,9 @@ const colorDefaults = {
   '--cl-color-primary-foreground': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
   '--cl-color-primary-faded': 'light-dark(oklch(0.9583 0.0214 291.74), oklch(0.3097 0.1008 285.05))',
 
-  '--cl-color-neutral': 'light-dark(oklch(0.97 0 0), oklch(0.32 0 0))',
+  '--cl-color-neutral': 'light-dark(oklch(0.2928 0.0163 285.35), oklch(0.9854 0.0013 286.38))',
   '--cl-color-neutral-foreground': 'light-dark(oklch(0.24 0 0), oklch(0.96 0 0))',
+  '--cl-color-neutral-faded': 'light-dark(oklch(0.5697 0.0246 279.94), oklch(0.6953 0.0261 285.7))',
 
   '--cl-color-negative': 'light-dark(oklch(0.577 0.245 27.325), oklch(0.637 0.237 25.331))',
   '--cl-color-negative-foreground': 'oklch(0.985 0 0)',
@@ -45,7 +46,9 @@ const colorDefaults = {
 
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
-  '--cl-color-border': 'light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%))',
+
+  '--cl-color-border': 'light-dark(oklch(0.9475 0.0067 286.27), oklch(0.3321 0.014 285.61))',
+  '--cl-color-border-faded': 'light-dark(oklch(0.9587 0.0027 286.35), oklch(0.296 0.0126 285.61))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
