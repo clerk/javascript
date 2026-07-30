@@ -48,15 +48,16 @@ export const styles = stylex.create({
     transitionProperty: 'opacity, scale',
     transitionTimingFunction: 'ease-out',
     maxHeight: 'var(--cl-available-height)',
-    minWidth: '11rem',
+    minWidth: '12.5rem',
     overflowY: 'auto',
   },
 
   item: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['2'],
+    gap: space['1'],
     outline: 'none',
+    paddingBlock: space['1'],
     paddingInline: space['2'],
     alignItems: 'center',
     backgroundColor: {
