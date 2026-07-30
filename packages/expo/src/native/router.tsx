@@ -31,10 +31,6 @@ interface ExpoRouterModule {
   useFocusEffect: (effect: () => undefined | (() => void)) => void;
 }
 
-interface NavigationElementsModule {
-  HeaderBackButton: ComponentType<{ onPress?: () => void }>;
-}
-
 function loadExpoRouter(): ExpoRouterModule {
   try {
     // Load via synchronous require() so expo-router stays an optional peer:
@@ -49,25 +45,29 @@ function loadExpoRouter(): ExpoRouterModule {
   }
 }
 
-function loadHeaderBackButton(): NavigationElementsModule['HeaderBackButton'] {
-  // Newer expo-router versions re-export the header elements; older setups resolve
-  // @react-navigation/elements directly (it ships with expo-router's native stack).
+interface ReactNavigationModule {
+  usePreventRemove: (preventRemove: boolean, callback: () => void) => void;
+}
+
+function loadReactNavigation(): ReactNavigationModule {
+  // Newer expo-router versions vendor react-navigation; older setups resolve
+  // @react-navigation/native directly (it ships with expo-router's stack).
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const reexport = require('expo-router/react-navigation') as Partial<NavigationElementsModule>;
-    if (reexport.HeaderBackButton) {
-      return reexport.HeaderBackButton;
+    const vendored = require('expo-router/react-navigation') as Partial<ReactNavigationModule>;
+    if (vendored.usePreventRemove) {
+      return vendored as ReactNavigationModule;
     }
   } catch {
-    // Fall through to @react-navigation/elements.
+    // Fall through to @react-navigation/native.
   }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return (require('@react-navigation/elements') as NavigationElementsModule).HeaderBackButton;
+    return require('@react-navigation/native') as ReactNavigationModule;
   } catch {
     throw new Error(
-      '@clerk/expo/native/router could not resolve HeaderBackButton from expo-router/react-navigation ' +
-        'or @react-navigation/elements. Ensure expo-router is installed.',
+      '@clerk/expo/native/router could not resolve usePreventRemove from expo-router/react-navigation ' +
+        'or @react-navigation/native. Ensure expo-router is installed.',
     );
   }
 }
@@ -86,26 +86,50 @@ function useEmbeddedScreen(
   extraOptions: Record<string, unknown> | undefined,
 ): EmbeddedScreenState {
   const { useRouter, useFocusEffect } = router;
+  const { usePreventRemove } = useRef(loadReactNavigation()).current;
   const routerHandle = useRouter();
   const componentRef = useRef<EmbeddedNavigationRef>(null);
   const isFocused = useRef(false);
+  const hasDismissed = useRef(false);
+  const [isDismissing, setIsDismissing] = useState(false);
   const [navigationState, setNavigationState] = useState<EmbeddedNavigationState>({ depth: 0, canGoBack: false });
-  // Lazy initializer: resolve once, not on every render.
-  const [HeaderBackButton] = useState(() => loadHeaderBackButton());
 
   // Pop the route when the flow ends, but only while this screen is focused —
   // the same event also fires when the native view unmounts after a route pop.
+  // Flow-end can be reported by more than one source (native event, auth-state
+  // change); the ref makes sure the route is only popped once. The pop itself
+  // is deferred a frame so removal interception is disarmed before it runs.
   const handleDismiss = useCallback(() => {
-    if (!isFocused.current) {
+    if (!isFocused.current || hasDismissed.current) {
       return;
     }
-    routerHandle.back();
-    onDismiss?.();
+    hasDismissed.current = true;
+    setIsDismissing(true);
+    setTimeout(() => {
+      routerHandle.back();
+      onDismiss?.();
+    }, 300);
   }, [onDismiss, routerHandle]);
+
+  const onNavigationChange = useCallback((state: EmbeddedNavigationState) => {
+    if (hasDismissed.current) {
+      return;
+    }
+    setNavigationState(state);
+  }, []);
+
+  // The route keeps its regular native back button at every depth. While the
+  // user is inside Clerk's internal screens, removal (back press, gesture,
+  // hardware back) is intercepted and pops Clerk's stack instead.
+  usePreventRemove(navigationState.canGoBack && !isDismissing, () => {
+    void componentRef.current?.goBack();
+  });
 
   useFocusEffect(
     useCallback(() => {
       isFocused.current = true;
+      hasDismissed.current = false;
+      setIsDismissing(false);
       const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
         if (navigationState.canGoBack) {
           void componentRef.current?.goBack();
@@ -120,18 +144,9 @@ function useEmbeddedScreen(
     }, [navigationState.canGoBack]),
   );
 
-  const screenOptions: Record<string, unknown> = {
-    // At the component's root, the route's own back button and gestures behave
-    // normally. Deeper in, back must pop Clerk's internal stack first.
-    headerBackVisible: !navigationState.canGoBack,
-    gestureEnabled: !navigationState.canGoBack,
-    headerLeft: navigationState.canGoBack
-      ? () => <HeaderBackButton onPress={() => void componentRef.current?.goBack()} />
-      : undefined,
-    ...extraOptions,
-  };
+  const screenOptions: Record<string, unknown> = { ...extraOptions };
 
-  return { navigationState, onNavigationChange: setNavigationState, componentRef, screenOptions, handleDismiss };
+  return { navigationState, onNavigationChange, componentRef, screenOptions, handleDismiss };
 }
 
 /**
@@ -140,8 +155,6 @@ function useEmbeddedScreen(
 export interface UserProfileScreenProps extends Pick<UserProfileViewProps, 'onDismiss' | 'style'> {
   /**
    * Extra options merged into the screen's `Stack.Screen` options (e.g. `title`).
-   * Keys managed by the screen (`headerBackVisible`, `gestureEnabled`, `headerLeft`)
-   * are overridden at your own risk.
    */
   options?: Record<string, unknown>;
 }
@@ -197,8 +210,6 @@ export function UserProfileScreen({ onDismiss, style, options }: UserProfileScre
 export interface AuthScreenProps extends Pick<AuthViewProps, 'mode' | 'onDismiss'> {
   /**
    * Extra options merged into the screen's `Stack.Screen` options (e.g. `title`).
-   * Keys managed by the screen (`headerBackVisible`, `gestureEnabled`, `headerLeft`)
-   * are overridden at your own risk.
    */
   options?: Record<string, unknown>;
 }
@@ -224,6 +235,17 @@ export function AuthScreen({ mode, onDismiss, options }: AuthScreenProps): React
     onDismiss,
     options,
   );
+
+  // The native view only reports dismissal for dismissible presentations, so
+  // completion is detected from auth state: a session becoming active (or the
+  // active session changing, for add-account flows) means the flow finished.
+  const { sessionId } = useAuth();
+  const initialSessionId = useRef(sessionId);
+  useEffect(() => {
+    if (sessionId && sessionId !== initialSessionId.current) {
+      handleDismiss();
+    }
+  }, [sessionId, handleDismiss]);
 
   return (
     <>
