@@ -25,6 +25,16 @@ import {
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import { applyPrototypeDomainVerification, usePrototypeDomainVerification } from '../prototypeDomainVerification';
+import {
+  createPrototypeConnection,
+  deletePrototypeConnection,
+  getPrototypeConnection,
+  hasPrototypeTestRunSucceeded,
+  isPrototypeConnectionId,
+  markPrototypeTestRunSucceeded,
+  updatePrototypeConnection,
+  usePrototypeEnterpriseConnection,
+} from '../prototypeEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
 
@@ -137,7 +147,14 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   } = __internal_useOrganizationEnterpriseConnections({ enabled: true });
 
   // FAPI currently supports a single enterprise connection per organization.
-  const enterpriseConnection = enterpriseConnections?.[0];
+  const realEnterpriseConnection = enterpriseConnections?.[0];
+
+  // PROTOTYPE ONLY: when FAPI refuses connection writes ("Self-serve SSO is
+  // not enabled..."), mutations below fall back to an in-memory connection so
+  // the flows stay demoable. The subscription re-renders on store changes.
+  usePrototypeEnterpriseConnection();
+  const enterpriseConnection = realEnterpriseConnection ?? getPrototypeConnection() ?? undefined;
+  const isPrototypeConnection = !realEnterpriseConnection && Boolean(getPrototypeConnection());
 
   // Whether a connection already existed the first time the source query
   // settled. Captured during render (not in an effect) the first time the query
@@ -166,8 +183,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   //
   // Computed from the raw connection (not the built entity, which depends on the
   // test-run probe below — reading it here would be circular).
+  // PROTOTYPE ONLY: a fake connection keeps the test-runs source dormant —
+  // FAPI does not know its id, so fetching/polling would only produce errors.
   const testRunsActive =
-    isEnterpriseConnectionConfigured(enterpriseConnection) || Boolean(enterpriseConnection?.active);
+    !isPrototypeConnection &&
+    (isEnterpriseConnectionConfigured(enterpriseConnection) || Boolean(enterpriseConnection?.active));
 
   const {
     hasSuccessfulTestRun,
@@ -196,6 +216,11 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       const domains = Array.from(new Set([...(enterpriseConnection.domains ?? []), ...verifiedDomainNames]));
       const hasNewDomains = domains.length !== (enterpriseConnection.domains?.length ?? 0);
       if (!hasNewDomains) {
+        return;
+      }
+
+      if (isPrototypeConnectionId(enterpriseConnection.id)) {
+        updatePrototypeConnection({ domains });
         return;
       }
 
@@ -247,8 +272,21 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   );
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
+    // PROTOTYPE ONLY: try FAPI first; when it refuses because the org lacks the
+    // self-serve SSO flag, serve the create from the in-memory fake connection.
+    const createWithFallback = async (params: Parameters<typeof createEnterpriseConnection>[0]) => {
+      try {
+        return await createEnterpriseConnection(params);
+      } catch (err) {
+        if (isSelfServeSsoDisabledError(err)) {
+          return createPrototypeConnection(params);
+        }
+        throw err;
+      }
+    };
+
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
-      return createEnterpriseConnection({
+      return createWithFallback({
         provider,
         domains: organizationDomains?.map(domain => domain.name),
       });
@@ -261,26 +299,46 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       // until the user retries. Recovery is by design — the next render revalidates
       // the now-deleted connection away, so a retry is just a plain create.
       if (enterpriseConnection) {
-        await deleteEnterpriseConnection(enterpriseConnection.id);
+        if (isPrototypeConnectionId(enterpriseConnection.id)) {
+          deletePrototypeConnection();
+        } else {
+          await deleteEnterpriseConnection(enterpriseConnection.id);
+        }
       }
 
       const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
 
-      return createEnterpriseConnection({
+      return createWithFallback({
         provider,
         domains,
       });
     };
 
     const updateConnection: EnterpriseConnectionMutations['updateConnection'] = (id, params) =>
-      updateEnterpriseConnection(id, params);
+      isPrototypeConnectionId(id)
+        ? Promise.resolve(updatePrototypeConnection(params))
+        : updateEnterpriseConnection(id, params);
 
     const setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'] = (id, active) =>
-      updateEnterpriseConnection(id, { active });
+      updateConnection(id, { active });
 
-    const deleteConnection: EnterpriseConnectionMutations['deleteConnection'] = id => deleteEnterpriseConnection(id);
+    const deleteConnection: EnterpriseConnectionMutations['deleteConnection'] = id => {
+      if (isPrototypeConnectionId(id)) {
+        deletePrototypeConnection();
+        return Promise.resolve({ object: 'enterprise_connection', id, deleted: true } as unknown as Awaited<
+          ReturnType<EnterpriseConnectionMutations['deleteConnection']>
+        >);
+      }
+      return deleteEnterpriseConnection(id);
+    };
 
     const createTestRun: EnterpriseConnectionMutations['createTestRun'] = id => {
+      if (isPrototypeConnectionId(id)) {
+        // No server-side run exists; flip the fake success flag so the Test
+        // step's Continue gate opens, and hand back an inert URL to open.
+        markPrototypeTestRunSucceeded();
+        return Promise.resolve({ url: 'about:blank' });
+      }
       // The flow never reaches the test step without an active organization;
       // guard so the fetcher stays well-typed without leaking an `undefined`
       // organization.
@@ -334,15 +392,20 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     ],
   );
 
+  // PROTOTYPE ONLY: the fake connection has no server-side test runs; its
+  // success flag comes from the prototype store (flipped by createTestRun).
+  const effectiveHasSuccessfulTestRun =
+    hasSuccessfulTestRun || (isPrototypeConnection && hasPrototypeTestRunSucceeded());
+
   // The single domain entity everything downstream reads decisions from, keyed
   // on the raw inputs so it is only rebuilt when one of them changes.
   const organizationEnterpriseConnection = useMemo<OrganizationEnterpriseConnection>(
     () =>
       buildOrganizationEnterpriseConnection({
         connection: enterpriseConnection,
-        hasSuccessfulTestRun,
+        hasSuccessfulTestRun: effectiveHasSuccessfulTestRun,
       }),
-    [enterpriseConnection, hasSuccessfulTestRun],
+    [enterpriseConnection, effectiveHasSuccessfulTestRun],
   );
 
   // PROTOTYPE ONLY: overlay client-side fake verification (the "Mark verified"
