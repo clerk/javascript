@@ -1,28 +1,31 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { styles } from './button.styles';
+import { truncationStyles } from '../typography.styles';
+import { iconSizes, sizes, styles, variants } from './button.styles';
 
-export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
-  intent?: 'primary' | 'destructive';
-  variant?: 'filled' | 'outline' | 'ghost';
-  size?: 'sm' | 'md';
+export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'render'> {
+  color?: 'primary' | 'neutral' | 'negative';
+  variant?: 'filled' | 'outline' | 'ghost' | 'link';
+  size?: 'sm' | 'md' | 'lg';
   shape?: 'default' | 'square' | 'circle';
   fullWidth?: boolean;
 }
 
 /**
  * A clickable action styled by the Mosaic recipe. Renders a `button` and forwards its
- * ref; `intent`, `variant`, `size`, and `shape` compose to cover the full set of styles.
+ * ref; `color`, `variant`, and `size` are independent axes, with `shape` and `fullWidth`
+ * as orthogonal modifiers.
  *
  * @example
  * // Default (primary, filled, md)
  * <Button>Save</Button>
  *
  * @example
- * // Destructive intent with a non-filled variant
- * <Button intent='destructive' variant='outline'>Delete</Button>
+ * // Negative color with a non-filled variant
+ * <Button color='negative' variant='outline'>Delete</Button>
  *
  * @example
  * // Icon-only, circular, small
@@ -32,9 +35,48 @@ export interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
  * // Full-width ghost button
  * <Button variant='ghost' fullWidth>Continue</Button>
  */
+// Wrap the text children so they have a box of their own to truncate against — a bare text
+// child is laid out in an anonymous flex item that no selector can reach. A whole run of
+// adjacent text shares one box, or `Delete {name}` would split into two flex items with the
+// button's `gap` opening up mid-sentence. Element children (icons) pass through untouched,
+// so they stay direct flex items and `gap` still applies.
+function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
+  const result: React.ReactNode[] = [];
+  let run: React.ReactNode[] = [];
+
+  const flushRun = () => {
+    if (run.length === 0) {
+      return;
+    }
+    result.push(
+      <span
+        key={`label-${result.length}`}
+        {...stylex.props(truncationStyles.singleLine, styles.label)}
+      >
+        {run}
+      </span>,
+    );
+    run = [];
+  };
+
+  // `toArray` rather than `forEach` so the elements it passes through carry the keys it
+  // assigns, and the array this returns doesn't warn about missing ones.
+  for (const child of React.Children.toArray(children)) {
+    if (typeof child === 'string' || typeof child === 'number') {
+      run.push(child);
+    } else {
+      flushRun();
+      result.push(child);
+    }
+  }
+  flushRun();
+
+  return result;
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
-    intent = 'primary',
+    color = 'primary',
     variant = 'filled',
     size = 'md',
     shape = 'default',
@@ -54,19 +96,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       type='button'
       disabled={disabled}
       {...mergeStyleProps(
-        themeProps('button', { intent, variant, size, shape, fullWidth, disabled }),
+        themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
           styles.base,
-          variant === 'filled' && intent === 'primary' && styles.filledPrimary,
-          variant === 'filled' && intent === 'destructive' && styles.filledDestructive,
-          variant === 'outline' && intent === 'primary' && styles.outlinePrimary,
-          variant === 'outline' && intent === 'destructive' && styles.outlineDestructive,
-          variant === 'ghost' && intent === 'primary' && styles.ghostPrimary,
-          variant === 'ghost' && intent === 'destructive' && styles.ghostDestructive,
-          size === 'sm' ? styles.sizeSm : styles.sizeMd,
+          sizes[size],
+          variants[`${variant}-${color}`],
           shape === 'square' && styles.shapeSquare,
           shape === 'circle' && styles.shapeCircle,
-          isIconShape && (size === 'sm' ? styles.iconSizeSm : styles.iconSizeMd),
+          isIconShape && iconSizes[size],
+          variant !== 'link' && styles.touchTarget,
+          variant !== 'link' && isIconShape && styles.touchTargetIcon,
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
         ),
@@ -75,7 +114,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       )}
       {...rest}
     >
-      {children}
+      {withTruncatableLabel(children)}
     </button>
   );
 });

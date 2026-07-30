@@ -78,11 +78,29 @@ export const colorVars = stylex.defineVars(colorDefaults);
 - **DO** name internal, non-contract vars with a `--_cl-*` prefix (e.g. a value a
   parent writes for a child to read). They still emit verbatim but the `_` marks
   them "not a contract, don't override."
+- **DO** name a radius by **what the surface is**, not by size, so the steps nest:
+  `--cl-radius-inner` for a mark inside a control, `--cl-radius-control` for the
+  control itself (button, avatar square), `--cl-radius-container` for anything
+  wrapping controls. A role name survives a value change; `--cl-radius-md` doesn't.
 - **DO** compute tints at the call site with `color-mix()`, not as their own
   tokens. `color-mix(in oklab, ${primary}, ${fg} 12%)` beats minting
   `--cl-color-primary-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
+- **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
+  wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
+  black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
+
+  ```ts
+  const step = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
+  ```
+
+  A gray token like `--cl-color-neutral` is a 900, not black, so the same percentage of
+  it lands lighter than the percentage of black — and by an amount that shifts with
+  whatever the control sits on, so the step numbers stop describing what they render.
+  The scrim composites, so one ramp reads consistently on every surface. This applies
+  to overlay fills only: a fill with a color of its own (`filled-primary`) still blends
+  from that color toward its own on-fill.
 
 **Spacing is one exposed var plus a `defineConsts` scale.** Only `--cl-spacing`
 is a custom property; every step is inlined at build as `calc(var(--cl-spacing) *
@@ -166,6 +184,64 @@ objects and compose them at the call site.
 - A helper that assembles a slot may **return an array** of atoms
   (`[base, direction[x], gap[n]]`) for the caller to spread into `stylex.props`.
 
+### Multiplying axes: flatten, don't plumb vars
+
+When two visual axes multiply (`color` × `variant`), the tempting move is to have
+one axis write custom properties and the other read them — 3 + 4 declarations
+instead of 12, with each axis staying independent. **Don't.**
+
+- **DON'T** declare custom properties inside a component's `stylex.create` to
+  decouple that component's own axes. They emit into the stylesheet and appear on
+  every instance in devtools, which reads as public API nobody agreed to support.
+  A `--cl-*` name is worse still — that prefix is reserved for the overridable
+  contract (see "Tokens").
+- **DON'T** reach for `defineVars` + `createTheme` to dodge that. The names get
+  hashed instead of `--cl-*`, but they still land in the inspector on every element.
+- **DO** flatten the cross product into one variant map keyed `<axis-a>-<axis-b>`,
+  indexed directly. A template-literal key makes an unhandled pair a compile error,
+  with no lookup map to maintain:
+
+  ```ts
+  const variants = stylex.create({
+    'filled-primary': {
+      /*…*/
+    },
+    'filled-negative': {
+      /*…*/
+    },
+    'outline-primary': {
+      /*…*/
+    },
+    // …one entry per cell
+  });
+  // <comp>.tsx — TS resolves the template against the literal keys
+  variants[`${variant}-${color}`];
+  ```
+
+  Each entry is self-contained, so a cell can be read and tuned straight against a
+  design matrix — which is usually the form these specs arrive in.
+
+- **DO** hoist a value shared across cells to a **same-file** `const`. StyleX
+  inlines it at build, so the duplication leaves the source without emitting a var:
+
+  ```ts
+  const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
+  ```
+
+  Same-file is required — an imported one fails static evaluation ("Atoms" above).
+
+**Where a var is still right.** This rule is about a component plumbing values to
+itself. A custom property remains the correct tool when a value must cross an
+element boundary (a parent computes, a descendant reads) or collapse an unbounded
+dynamic value into a single atom — the `--_cl-*` cases in "Tokens" and sub-pattern
+A in "Dynamic styles". Those have no var-free equivalent; decoupling one element's
+own axes does.
+
+Flattening does scale multiplicatively, so for a genuinely large product reach for
+role atoms instead — each color exports the same role names (`solid`, `ink`,
+`tint`) and the variant picks which to apply. Still var-free, at the cost of an
+indirection the flattened map doesn't have.
+
 ### Conditions & state
 
 Use StyleX's conditional-value objects (a `default` plus pseudo / at-rule keys).
@@ -173,16 +249,54 @@ Use StyleX's conditional-value objects (a `default` plus pseudo / at-rule keys).
 ```ts
 backgroundColor: {
   default: colorVars['--cl-color-primary'],
-  ':active': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 24%)`,
+  ':active': primaryActive,
   '@media (hover: hover)': {
-    // only the top-level value needs `default`; the nested block just adds `:hover`
-    ':hover': `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`,
+    // the media block contributes only the pseudo; the top-level `default` still
+    // paints the rest state. `:not(:active)` is load-bearing — see below.
+    default: null,
+    ':hover:not(:active)': primaryHover,
   },
 },
 ```
 
 - **DO** guard `:hover` behind `@media (hover: hover)` so it never sticks on touch;
   leave `:active`, `:focus-visible`, `:disabled` unguarded.
+
+#### A media-wrapped `:hover` outranks a bare `:active`
+
+StyleX encodes precedence by **repeating the class name**, and an at-rule adds
+priority. So a `@media (hover: hover)` `:hover` compiles to a doubled selector while
+a bare `:active` stays single — and the hover wins while the button is pressed:
+
+```css
+.x1ozrsgg:active {
+} /* 0,1,1 — loses */
+@media (hover: hover) {
+  .x1f1bnkq.x1f1bnkq:hover {
+  } /* 0,3,0 — wins during the press */
+}
+```
+
+The symptom is a hovered button that never shows its pressed colour on a mouse
+device, while touch devices look correct.
+
+- **DO** write the hover branch as `':hover:not(:active)'`. It stops the hover rule
+  **matching** during a press, so the fix rests on selector semantics rather than on
+  how StyleX happens to order equal-specificity rules.
+- **DO** keep the bare `':active'` outside the media query. It is the only pressed
+  state a no-hover device ever sees, since such a device never matches
+  `(hover: hover)`.
+- **DON'T** fix it by re-declaring `':active'` _inside_ the `@media` block. It does
+  work — both selectors end up doubled and StyleX emits `:active` after `:hover` —
+  but it depends on StyleX's emission order for the tiebreak and duplicates the
+  value in every cell.
+- Applies to any state pair where one side is inside an at-rule and the other is
+  not. Confirm the output rather than trusting it: `pnpm build:mosaic --filter @clerk/ui`,
+  then grep `dist-mosaic/styles.css` for the two selectors and compare their
+  specificity.
+
+Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
+
 - **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
   **container** that should ring when a child is focused, use
   `:has(:focus-visible)` — **not** `:focus-within`. `:focus-within` matches any
@@ -208,14 +322,58 @@ backgroundColor: {
   outlineOffset: { default: null, ':focus-visible': space['0.5'] },
   ```
 
-- **DO** gate every transition/animation on reduced motion, in the same object:
+- **DO** take durations from `durationVars` (`--cl-duration-instant` / `-fast` /
+  `-base` / `-slow` / `-slower`) rather than a literal, and vary them by state
+  where the feedback should read as more or less direct:
 
   ```ts
   transitionDuration: {
     default: durationVars['--cl-duration-fast'],
+    ':active': durationVars['--cl-duration-instant'],
+  },
+  ```
+
+- **DO** pick the timing function by **what the property does**, not by how long
+  it runs. Properties that move — `transform`, `translate`, `scale`, `rotate`,
+  insets — take `easingVars['--cl-ease-default']`, whose slight overshoot is what
+  sells the motion. Color and opacity take plain `linear`: their interpolation is
+  already perceptually non-uniform, so an ease on top only makes the midpoint
+  drag, and an overshoot extrapolates past the target color for nothing. A
+  transform at `--cl-duration-fast` still wants the curve.
+
+- **DO** gate transitions/animations of **motion-bearing** properties on reduced
+  motion — `transform`, `translate`, `scale`, `rotate`, positional insets — in the
+  same object. `prefers-reduced-motion` is a vestibular-safety signal, so color
+  and opacity transitions do **not** need it:
+
+  ```ts
+  transitionDuration: {
+    default: durationVars['--cl-duration-base'],
     '@media (prefers-reduced-motion: reduce)': '0.01ms',
   },
   ```
+
+- **DO** floor an interactive control's hit area at `targetVars['--cl-target-coarse']`
+  under `@media (pointer: coarse)`. Use `minHeight`/`minWidth` so the size axis stays
+  in charge otherwise, and give it its own atom rather than writing it into every
+  size — the floor is one physical constant, and a part that isn't really a control
+  (a `link` variant, which reads as text) opts out by not receiving the atom:
+
+  ```ts
+  touchTarget: {
+    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+  },
+  ```
+
+  Square controls need the floor on **both** axes, or the target grows tall and narrow.
+  `--cl-target-coarse` is deliberately off the `--cl-spacing` scale: a consumer
+  rescaling density must not shrink a touch target with it.
+
+- **DON'T** suppress interaction with `pointer-events: none` on a disabled control.
+  An element that isn't hit-tested supplies no cursor, so `cursor: not-allowed` never
+  renders, and a wrapping tooltip never gets the pointer to explain the disabled
+  state. Gate the interactive states on `:enabled` instead — `:hover`/`:active` still
+  match a disabled element, so every one of them needs the gate.
 
 - **DO** reflect runtime conditions the component owns (disabled, selected,
   invalid) as `data-<axis>` attrs via `themeProps`, in addition to the atom, so
@@ -364,6 +522,7 @@ token colors aren't down-leveled into an invalid polyfill.
 
 - YES: `var()`, `calc()`, `color-mix()`, `light-dark()`, nested `@media`+pseudo,
   `:hover`/`:active`/`:focus-visible`/`:focus-within`/`:disabled`, `:has()`,
+  `:not()` and compound pseudo keys (`':hover:not(:active)'` compiles and lints),
   `::before`/`::after`/`::backdrop`, `@starting-style` (enter animations),
   `stylex.keyframes(...)`, `anchor-size(width|height)` (popover/menu matching its
   trigger), CSS counters, `@media (hover: hover)` / `(prefers-reduced-motion)` /
