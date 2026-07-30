@@ -108,6 +108,24 @@ describe('Mosaic Menu', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('reflects destructive intent on the item', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Content>
+          <Menu.Item
+            label='Delete user'
+            intent='destructive'
+            icon={<svg data-testid='delete-icon' />}
+          />
+        </Menu.Content>
+      </Menu.Root>,
+    );
+
+    expect(screen.getByRole('menuitem', { name: 'Delete user' })).toHaveAttribute('data-intent', 'destructive');
+    expect(screen.getByTestId('delete-icon').parentElement).toHaveClass('cl-menu-item-icon');
+  });
+
   it('merges consumer className and style onto the popup and items', async () => {
     const user = userEvent.setup();
     render(

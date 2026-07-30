@@ -85,6 +85,17 @@ export const styles = stylex.create({
     width: '100%',
   },
 
+  itemDestructive: {
+    backgroundColor: {
+      default: 'transparent',
+      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      '@media (hover: hover)': {
+        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      },
+    },
+    color: colorVars['--cl-color-negative'],
+  },
+
   itemIcon: {
     alignItems: 'center',
     color: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 60%, transparent)`,
@@ -93,6 +104,10 @@ export const styles = stylex.create({
     justifyContent: 'center',
     height: space['4'],
     width: space['4'],
+  },
+
+  itemIconDestructive: {
+    color: colorVars['--cl-color-negative'],
   },
 
   itemLabel: {
