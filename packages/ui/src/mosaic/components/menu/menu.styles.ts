@@ -73,6 +73,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
+    position: 'relative',
     textAlign: 'start',
     transitionDuration: {
       default: '150ms',
@@ -81,6 +82,12 @@ export const styles = stylex.create({
     transitionProperty: 'background-color',
     height: space['7'],
     width: '100%',
+    '::before': {
+      content: '""',
+      position: 'absolute',
+      insetBlock: `calc(-1 * ${space['0.5']})`,
+      insetInline: `calc(-1 * ${space['0.5']})`,
+    },
   },
 
   itemNegative: {
