@@ -24,21 +24,25 @@ import { Menu } from '@clerk/ui/mosaic/components/menu';
 <Menu.Root>
   <Menu.Trigger />
   <Menu.Content>
-    <Menu.Item
-      label='Add workspace'
-      icon={<Icon name='plus' />}
-    />
+    <Menu.Item label='Add workspace'>
+      <Icon name='plus' />
+      Add workspace
+    </Menu.Item>
     <Menu.Item
       label='Sign out'
-      icon={<Icon name='log-out' />}
       onClick={signOut}
-    />
+    >
+      <Icon name='log-out' />
+      Sign out
+    </Menu.Item>
     <Menu.Item
       label='Delete user'
-      icon={<Icon name='close' />}
-      intent='destructive'
+      color='negative'
       onClick={deleteUser}
-    />
+    >
+      <Icon name='close' />
+      Delete user
+    </Menu.Item>
   </Menu.Content>
 </Menu.Root>;
 ```
@@ -59,18 +63,19 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 
 ### Items
 
-`label` drives typeahead and, unless `children` is given, the visible text. `icon` renders a leading
-glyph sized and tinted by the item. Use `intent='destructive'` for destructive actions; it applies
-the negative color to both the label and icon. `disabled` items are skipped by keyboard navigation
-and their `onClick` never fires. Activating an item closes the menu; pass `closeOnClick={false}` to
-keep it open.
+`label` drives typeahead and is used as the visible text when `children` is omitted. Render an icon
+and text together as children. Use `color='negative'` for destructive actions; the color is
+inherited by the children. `disabled` items are skipped by keyboard navigation and their `onClick`
+never fires. Activating an item closes the menu; pass `closeOnClick={false}` to keep it open.
 
 ```tsx
 <Menu.Item
   label='Delete'
-  icon={<Icon name='close' />}
-  intent='destructive'
-/>
+  color='negative'
+>
+  <Icon name='close' />
+  Delete
+</Menu.Item>
 ```
 
 ### Placement
@@ -107,7 +112,7 @@ const [open, setOpen] = useState(false);
 | `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.  |
 | `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis. |
 | `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
-| `Menu.Item`      | `menu-item`                      | A single action. Also emits `menu-item-icon` and `menu-item-label`.   |
+| `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.           |
 | `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
 
 ## Styling

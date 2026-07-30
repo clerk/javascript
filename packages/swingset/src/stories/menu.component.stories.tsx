@@ -19,19 +19,21 @@ export function Default() {
     <Menu.Root>
       <Menu.Trigger />
       <Menu.Content>
-        <Menu.Item
-          label='Add workspace'
-          icon={<Icon name='plus' />}
-        />
-        <Menu.Item
-          label='Sign out'
-          icon={<Icon name='log-out' />}
-        />
+        <Menu.Item label='Add workspace'>
+          <Icon name='plus' />
+          Add workspace
+        </Menu.Item>
+        <Menu.Item label='Sign out'>
+          <Icon name='log-out' />
+          Sign out
+        </Menu.Item>
         <Menu.Item
           label='Delete user'
-          icon={<Icon name='close' />}
-          intent='destructive'
-        />
+          color='negative'
+        >
+          <Icon name='close' />
+          Delete user
+        </Menu.Item>
       </Menu.Content>
     </Menu.Root>
   );
