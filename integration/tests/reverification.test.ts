@@ -231,8 +231,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Starting a verification no longer resets fva server-side, so wait for the
-        // signed-in factor to age past the action's afterMinutes threshold.
+        // startVerification no longer resets fva server-side, so age the signed-in factor past afterMinutes
         await u.po.expect.toBeSignedIn();
         await expect
           .poll(
@@ -243,8 +242,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
                   return -1;
                 }
                 const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-                const { fva } = JSON.parse(atob(payload));
-                return Array.isArray(fva) ? fva[0] : -1;
+                return JSON.parse(atob(payload)).fva?.[0] ?? -1;
               }),
             { intervals: [5_000], timeout: 120_000 },
           )
@@ -275,8 +273,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await expect(u.page.getByText(/\{\s*"userId"\s*:\s*"user_[^"]+"\s*\}/i)).toBeVisible();
 
-        // Starting a verification no longer resets fva server-side, so wait for the
-        // signed-in factor to age past the action's afterMinutes threshold.
+        // startVerification no longer resets fva server-side, so age the signed-in factor past afterMinutes
         await u.po.expect.toBeSignedIn();
         await expect
           .poll(
@@ -287,8 +284,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
                   return -1;
                 }
                 const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-                const { fva } = JSON.parse(atob(payload));
-                return Array.isArray(fva) ? fva[0] : -1;
+                return JSON.parse(atob(payload)).fva?.[0] ?? -1;
               }),
             { intervals: [5_000], timeout: 120_000 },
           )
