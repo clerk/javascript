@@ -139,7 +139,7 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, { usePartitionedCookies: () => true });
     cookieHandler.set(mockToken);
 
-    expect(mockRemove).toHaveBeenCalledTimes(2);
+    expect(mockRemove).toHaveBeenCalledTimes(4);
     expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
@@ -161,8 +161,10 @@ describe('createSessionCookie', () => {
     cookieHandler.set('partitioned-token');
 
     expect(mockRemove.mock.calls).toEqual([
-      ['__session', undefined],
-      ['__session_test-suffix', undefined],
+      ['__session', { sameSite: 'Lax', secure: true, partitioned: false }],
+      ['__session_test-suffix', { sameSite: 'Lax', secure: true, partitioned: false }],
+      ['__session', { sameSite: 'None', secure: true, partitioned: false }],
+      ['__session_test-suffix', { sameSite: 'None', secure: true, partitioned: false }],
     ]);
     expect(mockSet.mock.calls).toEqual([
       [
@@ -187,7 +189,12 @@ describe('createSessionCookie', () => {
       ],
     ]);
     const firstInvocationOrder = mockRemove.mock.invocationCallOrder[0];
-    expect(mockRemove.mock.invocationCallOrder).toEqual([firstInvocationOrder, firstInvocationOrder + 1]);
-    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 2, firstInvocationOrder + 3]);
+    expect(mockRemove.mock.invocationCallOrder).toEqual([
+      firstInvocationOrder,
+      firstInvocationOrder + 1,
+      firstInvocationOrder + 2,
+      firstInvocationOrder + 3,
+    ]);
+    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 4, firstInvocationOrder + 5]);
   });
 });
