@@ -1328,6 +1328,56 @@ describe('ClerkProvider native client sync', () => {
     expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
   });
 
+  test('keeps the cooldown when a failed recovery rolls the device token back', async () => {
+    const session = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn().mockRejectedValue(new Error('stale session 401'));
+
+    mocks.clerkInstance.client = {
+      id: 'client_1',
+      signedInSessions: [session],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    mocks.clerkInstance.session = session;
+    // Cached token A differs from native token B, so the rollback write changes the cached value.
+    mocks.tokenCache.getToken.mockResolvedValue('cached-token-A');
+    mocks.getClientToken.mockResolvedValue('native-token-B');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    fetchClient.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    // The rollback is internal recovery, not an external rotation, so the second 401 delegates to core.
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+    expect(originalHandleUnauthenticated).toHaveBeenCalledTimes(1);
+  });
+
   test('refreshes native from the server after the JS client changes', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
 

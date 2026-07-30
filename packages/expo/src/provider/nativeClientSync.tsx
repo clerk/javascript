@@ -263,6 +263,7 @@ async function refreshJsClientFromNativeState({
   rejectForeignSessionlessClient = false,
   reloadInitialResources,
   shouldSyncDeviceToken = true,
+  suppressDeviceTokenRollbackNotification = false,
   suppressTokenCacheNotificationsRef,
   tokenCache,
 }: {
@@ -272,6 +273,7 @@ async function refreshJsClientFromNativeState({
   rejectForeignSessionlessClient?: boolean;
   reloadInitialResources: boolean;
   shouldSyncDeviceToken?: boolean;
+  suppressDeviceTokenRollbackNotification?: boolean;
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
 }): Promise<boolean> {
@@ -279,6 +281,17 @@ async function refreshJsClientFromNativeState({
 
   const restorePreviousDeviceToken = async () => {
     if (!rejectForeignSessionlessClient || !shouldSyncDeviceToken || previousDeviceToken === undefined) {
+      return;
+    }
+
+    // On the 401 path a rollback is part of recovery, not an external rotation, so it must not
+    // reopen the cooldown. The native-event path still notifies so native resyncs the restored token.
+    if (suppressDeviceTokenRollbackNotification) {
+      await syncNativeDeviceTokenToCache({
+        deviceToken: previousDeviceToken,
+        suppressTokenCacheNotificationsRef,
+        tokenCache,
+      });
       return;
     }
 
@@ -810,6 +823,7 @@ export function NativeClientSync({
               previousDeviceToken,
               rejectForeignSessionlessClient: true,
               reloadInitialResources: false,
+              suppressDeviceTokenRollbackNotification: true,
               suppressTokenCacheNotificationsRef,
               tokenCache,
             });
