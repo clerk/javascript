@@ -95,6 +95,13 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Default as ScrollAreaDefault,
+  Gutter as ScrollAreaGutter,
+  meta as scrollAreaMeta,
+  NotScrollable as ScrollAreaNotScrollable,
+  ThemedScrollbar as ScrollAreaThemedScrollbar,
+} from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -215,6 +222,14 @@ const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const scrollAreaModule: StoryModule = {
+  meta: scrollAreaMeta,
+  Default: ScrollAreaDefault,
+  NotScrollable: ScrollAreaNotScrollable,
+  Gutter: ScrollAreaGutter,
+  ThemedScrollbar: ScrollAreaThemedScrollbar,
+};
+
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
@@ -256,6 +271,8 @@ export const registry: StoryModule[] = [
   selectModule,
   tabsModule,
   tooltipModule,
+  // Styles — atomic styles that ship as StyleX atoms rather than components.
+  scrollAreaModule,
   // Hooks — alphabetical within the group.
   useDataTableModule,
 ];

@@ -1,0 +1,179 @@
+import * as ScrollAreaStories from './scroll-area.stories';
+
+# Scroll Area
+
+A scrolling surface that fades its content at whichever edge still has something to reveal, and
+paints a scrollbar to match. It ships as **StyleX atoms rather than a component**: everything it
+does is CSS, so a component would only add a DOM node and an API to version. Put the atoms on
+whatever already scrolls — an `Item.Group`, a list, a panel body — and that element keeps its own
+slot class, which stays the hook a theme targets.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ScrollAreaStories}
+/>
+
+## Usage
+
+`scrollAreaViewport()` returns an array, hence the `...` spread. `scrollAreaRoot` goes on a
+positioned ancestor, and is only needed when something has to anchor against the scroll box — an
+overlay replacing the fade, for instance.
+
+```tsx
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import * as stylex from '@stylexjs/stylex';
+
+<div
+  {...stylex.props(scrollAreaRoot)}
+  style={{ height: 260 }}
+>
+  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+</div>;
+```
+
+`stylex.props()` returns a `className`, so a class of your own has to be **merged** with it rather
+than written beside it — whichever comes last in JSX wins outright and silently drops the other:
+
+```tsx
+const root = stylex.props(scrollAreaRoot);
+
+<div
+  {...root}
+  className={`${root.className} w-full`}
+/>;
+```
+
+## Parts
+
+| Export                        | Goes on               | Description                                                                       |
+| ----------------------------- | --------------------- | --------------------------------------------------------------------------------- |
+| `scrollAreaViewport(gutter?)` | the scrolling element | The scroll box itself: overflow, the edge fades, the scrollbar, and a focus ring. |
+| `scrollAreaRoot`              | a positioned ancestor | Only needed when something anchors against the scroll box.                        |
+
+`gutter` is the one argument: `auto` (the default, and CSS's own) takes the scrollbar's space only
+while the content overflows, while `stable` reserves it either way. It is an author-time decision
+rather than a theme one — whether a region needs it depends on whether its content can resize in
+place, which only that surface's author knows.
+
+## Examples
+
+### Nothing to scroll
+
+<Story
+  name='NotScrollable'
+  storyModule={ScrollAreaStories}
+/>
+
+The atoms are unconditional: there is no "is it scrollable" branch to write, and no measurement at
+runtime. A scroll timeline with no scrollable overflow is simply inactive, so both progress vars
+hold at their registered `initial-value: 0` and the mask resolves to fully opaque. Browsers without
+scroll-driven animation support get the same plain scrolling box rather than a broken one.
+
+### Gutter
+
+<Story
+  name='Gutter'
+  storyModule={ScrollAreaStories}
+/>
+
+Neither box above overflows, so only `stable` is holding a lane open — watch the trailing rule,
+which stops 8px short of where `auto` puts it. That 8px is the shift `auto` would produce the moment
+the content grew past the box.
+
+Two conditions must **both** hold for the two to differ at all: space-consuming scrollbars, and
+content that can stop overflowing. Where the platform overlays its scrollbars, they render
+identically.
+
+### Theming the scrollbar
+
+<Story
+  name='ThemedScrollbar'
+  storyModule={ScrollAreaStories}
+/>
+
+## Styling
+
+The fade is driven by two scroll-driven animations — no scroll listener, no measurement, nothing at
+runtime. It is a mask rather than a sticky overlay element, so it is paint-only and cannot shift the
+content.
+
+These tokens are global, so setting them once retunes every scrolling surface in Mosaic:
+
+| Token                         | Default                  | Description                                               |
+| ----------------------------- | ------------------------ | --------------------------------------------------------- |
+| `--cl-scroll-fade-size`       | `1.5rem`                 | Height of the fade band.                                  |
+| `--cl-scroll-fade-range`      | `1.5rem`                 | How far you scroll before the fade reaches full strength. |
+| `--cl-scrollbar-width`        | `8px`                    | Width of the scrollbar lane. `0px` hides it.              |
+| `--cl-scrollbar-thumb-inset`  | `2px`                    | How far the thumb's paint is held inside that lane.       |
+| `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour at rest.                                     |
+| `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb colour while the pointer is over the thumb.         |
+| `--cl-scrollbar-thumb-active` | derived from the above   | Thumb colour while the thumb is being dragged.            |
+
+The two lane sizes are in pixels rather than on the `rem` scale, deliberately: a scrollbar is chrome
+rather than content, so it should stay the same hairline whether or not the surrounding text scales.
+The default is a 4px pill with a 2px track either side.
+
+The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in, so setting
+the base re-derives both — and either state can still be pinned on its own.
+
+`hover` and `active` are the **thumb's own** states, not the region's: the colour changes when the
+pointer is over the thumb itself, not whenever it is somewhere over the scrolling area.
+
+Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
+thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
+it would make the engines that _do_ implement the pseudo-elements ignore them. Firefox implements
+neither and keeps its platform scrollbar. Everything here is gated on `@media (pointer: fine)`, so
+touch platforms keep the native overlay bar they already draw. The gutter is not gated: it is a
+layout decision rather than an appearance one.
+
+One consequence worth knowing before you theme: styling the scrollbar takes macOS out of overlay
+mode, so the bar is always visible and always occupies its lane rather than auto-hiding. That is the
+cross-platform consistency the tokens exist for, but it is a change from the platform default. To
+hide the thumb without giving up the lane, set the rest colour to `transparent` — it then paints
+only while the pointer is on it. Note that this is a precise target to find, so it works best where
+the fade indicators are already carrying the signal that the region scrolls:
+
+```css
+:root {
+  --cl-scrollbar-thumb: transparent;
+}
+```
+
+One layout note: the scrollbar takes its lane **inside** a scroller's own padding, so a padded
+surface reads as padding plus lane at the inline end. Trim the inline-end padding on the scroller if
+you want the scrollbar to sit in the gutter the padding was already holding.
+
+### Replacing the fade
+
+Retire it with `mask-image: none` and read the two per-element vars the animations write —
+`--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each describing how much that
+edge still has to reveal. They live on the element carrying the atoms and inherit downward.
+
+```css
+.cl-item-group {
+  mask-image: none;
+}
+.cl-item-group::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
+  opacity: var(--cl-scroll-area-progress-start);
+}
+```
+
+Position such overlays absolutely rather than with `position: sticky` — a sticky pseudo-element
+takes space in the scroll flow, which is the layout shift the mask approach avoids. And mix the
+scrim from a theme color rather than hardcoding black, which would darken a dark surface and look
+identical to the mask it replaced.
+
+## Accessibility
+
+Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own; **Safari
+does not** (WCAG 2.1.1). `tabindex` isn't a style, so the atoms can't close that gap — set
+`tabIndex={0}` yourself on a scroll surface that holds nothing focusable. A group of interactive
+rows, like the examples above, needs nothing: tabbing into the content already scrolls it.
