@@ -106,8 +106,62 @@ describe('Mosaic ScrollArea', () => {
     });
   });
 
-  it('does not make the viewport focusable on its own', () => {
-    render(<ScrollArea.Viewport data-testid='viewport'>Contents</ScrollArea.Viewport>);
-    expect(screen.getByTestId('viewport')).not.toHaveAttribute('tabindex');
+  describe('keyboard reachability', () => {
+    // jsdom reports every box as zero-sized, so overflow has to be faked. Both values are
+    // stubbed together because the check is a comparison, not a threshold.
+    const setOverflow = (element: HTMLElement, overflowing: boolean) => {
+      Object.defineProperty(element, 'scrollHeight', { configurable: true, value: overflowing ? 400 : 100 });
+      Object.defineProperty(element, 'clientHeight', { configurable: true, value: 100 });
+    };
+
+    // The element has to overflow before the effect's first sync runs, so the stubs are
+    // installed from the callback ref rather than after render.
+    const renderViewport = (overflowing: boolean, children: React.ReactNode) =>
+      render(
+        <ScrollArea.Viewport
+          data-testid='viewport'
+          ref={element => {
+            if (element) {
+              setOverflow(element, overflowing);
+            }
+          }}
+        >
+          {children}
+        </ScrollArea.Viewport>,
+      );
+
+    it('takes a tab stop when it overflows and holds nothing focusable', () => {
+      renderViewport(true, <p>Contents</p>);
+      expect(screen.getByTestId('viewport')).toHaveAttribute('tabindex', '0');
+    });
+
+    it('takes no tab stop when there is nothing to scroll', () => {
+      renderViewport(false, <p>Contents</p>);
+      expect(screen.getByTestId('viewport')).not.toHaveAttribute('tabindex');
+    });
+
+    // Tabbing into the content already scrolls the region, so a stop on the container would be
+    // a redundant one. Chrome and Firefox make the same exclusion.
+    it('takes no tab stop when its content is already reachable', () => {
+      renderViewport(true, <button type='button'>Ada Lovelace</button>);
+      expect(screen.getByTestId('viewport')).not.toHaveAttribute('tabindex');
+    });
+
+    it('lets an explicit tabIndex win over the managed one', () => {
+      render(
+        <ScrollArea.Viewport
+          data-testid='viewport'
+          tabIndex={-1}
+          ref={element => {
+            if (element) {
+              setOverflow(element, true);
+            }
+          }}
+        >
+          <p>Contents</p>
+        </ScrollArea.Viewport>,
+      );
+      expect(screen.getByTestId('viewport')).toHaveAttribute('tabindex', '-1');
+    });
   });
 });

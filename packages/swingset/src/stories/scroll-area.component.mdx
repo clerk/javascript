@@ -7,10 +7,9 @@ still has something to reveal, so the boundary of a list reads as "there's more"
 hard cut.
 
 The fade is **pure CSS**. Two scroll-driven animations write a progress var per edge, and a mask
-reads them. Nothing runs in JavaScript, there is no primitive behind it, and no measurement happens
-at runtime. Because the fade is a mask rather than a sticky overlay element, it is paint-only and
-**cannot shift the content** — the classic sticky-pseudo-element approach takes space in the scroll
-flow, this doesn't.
+reads them — no scroll listener, no measurement, no primitive behind it. Because the fade is a mask
+rather than a sticky overlay element, it is paint-only and **cannot shift the content**; the classic
+sticky-pseudo-element approach takes space in the scroll flow, this doesn't.
 
 ## Example
 
@@ -221,17 +220,30 @@ duration and paint both fades permanently.
 
 ### Keyboard access
 
-Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own; Safari does
-not, so a keyboard-only user cannot scroll it there. `ScrollArea.Viewport` deliberately does **not**
-set `tabIndex` — an always-present tab stop is wrong for a region that is often not scrollable. Pass
-it yourself, with an accessible name, where the content is known to overflow:
+The viewport manages its own `tabIndex`, so this is handled for you.
+
+Chrome and Firefox make an overflowing scroll container keyboard-focusable automatically. Safari
+does not, which leaves a keyboard-only user there unable to scroll the region at all (WCAG 2.1.1).
+The viewport closes that gap by taking a tab stop exactly when those browsers would: when it
+**overflows** _and_ its content contains **nothing focusable**.
+
+The second half matters as much as the first. A list whose rows are buttons or links is already
+reachable — tabbing into the content scrolls it — so a stop on the container would be a redundant
+one. Chrome and Firefox make the same exclusion, which is why applying the rule everywhere rather
+than sniffing for Safari changes nothing in the browsers that already handle it.
+
+Both halves are watched rather than sampled once, so a list that grows past the threshold or rows
+that gain interactivity are picked up after mount.
+
+Pass an explicit `tabIndex` to take the decision back; `-1` opts out entirely.
 
 ```tsx
-<ScrollArea.Viewport
-  tabIndex={0}
-  role='region'
-  aria-label='Members'
->
-  {members}
-</ScrollArea.Viewport>
+// Managed: takes a stop only if it needs one.
+<ScrollArea.Viewport>{plainTextRows}</ScrollArea.Viewport>
+
+// Opted out.
+<ScrollArea.Viewport tabIndex={-1}>{rows}</ScrollArea.Viewport>
 ```
+
+No `role` is added along with the stop, matching what the browsers do natively. Add
+`role='region'` with an `aria-label` if you want the region announced.

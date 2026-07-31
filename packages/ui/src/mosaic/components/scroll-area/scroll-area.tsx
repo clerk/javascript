@@ -4,6 +4,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { gutters, styles } from './scroll-area.styles';
+import { useScrollerFocusable } from './use-scroller-focusable';
 
 export type ScrollAreaGutter = 'stable' | 'auto';
 
@@ -47,12 +48,40 @@ const Root = React.forwardRef<HTMLDivElement, ScrollAreaRootProps>(function Scro
  * The scroll container. Owns the overflow, the scroll timelines, and the mask.
  */
 const Viewport = React.forwardRef<HTMLDivElement, ScrollAreaViewportProps>(function ScrollAreaViewport(
-  { gutter = 'auto', className, style, ...rest },
+  { gutter = 'auto', tabIndex, className, style, ...rest },
   ref,
 ) {
+  const [node, setNode] = React.useState<HTMLDivElement | null>(null);
+
+  // A callback ref so the component can observe the element while still honouring whatever
+  // ref the caller passed. There is no `mergeRefs` helper in the repo to reach for.
+  const setRefs = React.useCallback(
+    (element: HTMLDivElement | null) => {
+      setNode(element);
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        ref.current = element;
+      }
+    },
+    [ref],
+  );
+
+  // An explicit `tabIndex` always wins — a caller who has an opinion about the tab order
+  // shouldn't have it silently overwritten, and passing `-1` is how you opt out entirely.
+  const managed = tabIndex === undefined;
+  const needsTabStop = useScrollerFocusable(node, managed);
+
   return (
     <div
-      ref={ref}
+      ref={setRefs}
+      /*
+        A scrollable region is the documented exception to `no-noninteractive-tabindex`: without
+        a tab stop it is simply unreachable by keyboard in Safari (WCAG 2.1.1). The stop is only
+        taken when the region actually overflows and holds nothing else focusable.
+      */
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- see above
+      tabIndex={managed ? (needsTabStop ? 0 : undefined) : tabIndex}
       {...mergeStyleProps(
         themeProps('scroll-area-viewport', { gutter }),
         stylex.props(styles.viewport, styles.mask, styles.indicators, styles.focusRing, gutters[gutter]),
@@ -69,9 +98,10 @@ const Viewport = React.forwardRef<HTMLDivElement, ScrollAreaViewportProps>(funct
  * edge has more to reveal. Composed via dot syntax: `ScrollArea.Root`, `ScrollArea.Viewport`.
  *
  * The fade is a mask driven by two scroll-driven animations, one per edge, which write
- * `--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`. Nothing about it
- * runs in JavaScript, and nothing about it participates in layout — the mask is paint-only,
- * so it can't shift the content the way sticky shadow elements do.
+ * `--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`. It costs nothing at
+ * runtime — no measurement, no scroll listener — and participates in no layout, since the
+ * mask is paint-only and so can't shift the content the way sticky shadow elements do. The
+ * only JavaScript here is the tab-stop management described below.
  *
  * The indicators are a progressive enhancement. Without scroll-driven animation support the
  * progress vars hold at 0 and the mask resolves to fully opaque, leaving a plain scroll area.
@@ -86,11 +116,13 @@ const Viewport = React.forwardRef<HTMLDivElement, ScrollAreaViewportProps>(funct
  * <ScrollArea.Viewport gutter='stable'>{items}</ScrollArea.Viewport>
  *
  * @remarks
- * Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own;
- * Safari does not, so a keyboard-only user can't scroll it there. `tabIndex` is deliberately
- * not set here — an always-present tab stop is wrong for a region that often isn't
- * scrollable. Pass `tabIndex={0}` (with an `aria-label` or `role='region'`) where the content
- * is known to overflow.
+ * The viewport manages its own `tabIndex`. Chrome and Firefox make an overflowing scroller
+ * keyboard-focusable automatically; Safari does not, so a keyboard-only user there can't
+ * scroll the region at all. The viewport closes that gap by taking a tab stop exactly when
+ * the browsers themselves would: when it overflows **and** its content contains nothing
+ * focusable. A list of buttons or links is already reachable, so a stop on the container
+ * would only add noise. Pass an explicit `tabIndex` to take the decision back — `-1` opts
+ * out completely.
  */
 export const ScrollArea = {
   Root,

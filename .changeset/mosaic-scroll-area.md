@@ -4,7 +4,9 @@
 
 Add `ScrollArea` to Mosaic — a vertically scrolling region that fades its content at whichever edge still has something to reveal. Composed as `ScrollArea.Root` and `ScrollArea.Viewport`.
 
-The indicators are pure CSS, driven by scroll-driven animations, and cost nothing at runtime. Because the fade is a mask rather than a sticky overlay element, it is paint-only and cannot shift the content. Browsers without scroll-driven animation support get a plain scroll area rather than a broken one.
+The indicators are pure CSS, driven by scroll-driven animations — no scroll listener and no measurement. Because the fade is a mask rather than a sticky overlay element, it is paint-only and cannot shift the content. Browsers without scroll-driven animation support get a plain scroll area rather than a broken one.
+
+`ScrollArea.Viewport` manages its own `tabIndex` so consumers don't have to. Chrome and Firefox make an overflowing scroll container keyboard-focusable automatically and Safari does not, leaving a keyboard-only user there unable to scroll the region (WCAG 2.1.1); the viewport takes a tab stop exactly when those browsers would — when it overflows and its content holds nothing focusable — so a list of buttons or links, which is already reachable, doesn't gain a redundant stop. Pass an explicit `tabIndex` to override, or `-1` to opt out.
 
 `ScrollArea.Viewport` takes a `gutter` prop. The default, `auto`, takes the scrollbar's space only while the content overflows. Pass `stable` for a collection that can change height in place — a filterable list, a paginated table — so that crossing the overflow threshold doesn't shift its rows sideways.
 
