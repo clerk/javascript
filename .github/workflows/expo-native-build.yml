@@ -27,7 +27,7 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.6.1'
+  MAESTRO_VERSION: '2.8.0'
 
 jobs:
   native-build:
