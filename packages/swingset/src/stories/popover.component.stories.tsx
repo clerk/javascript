@@ -23,7 +23,7 @@ export function Default() {
     <Popover.Root>
       <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
       <Popover.Popup aria-label='Account'>
-        <Card>
+        <Card.Root>
           <Card.Header>
             <Heading size='sm'>Ada Lovelace</Heading>
             <Text>ada@example.com</Text>
@@ -36,7 +36,7 @@ export function Default() {
               Sign out of all accounts
             </Button>
           </Card.Footer>
-        </Card>
+        </Card.Root>
       </Popover.Popup>
     </Popover.Root>
   );
@@ -48,11 +48,11 @@ export function Default() {
 const labelledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
 
 const panel = (label: string) => (
-  <Card>
+  <Card.Root>
     <Card.Content style={{ paddingBlock: '1rem' }}>
       <Text>{label}</Text>
     </Card.Content>
-  </Card>
+  </Card.Root>
 );
 
 export function Placement() {
