@@ -52,7 +52,7 @@ describe('Mosaic Popover', () => {
     expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('aria-haspopup', 'dialog');
   });
 
-  it('carries the mosaic slot classes on the positioner and popup', () => {
+  it('carries the mosaic slot classes on the trigger, positioner and popup', () => {
     render(
       <Popover.Root defaultOpen>
         <Popover.Trigger>Open</Popover.Trigger>
@@ -60,8 +60,22 @@ describe('Mosaic Popover', () => {
       </Popover.Root>,
     );
 
+    expect(document.querySelector('.cl-popover-trigger')).toBeInTheDocument();
     expect(document.querySelector('.cl-popover-positioner')).toBeInTheDocument();
     expect(document.querySelector('.cl-popover-popup')).toBeInTheDocument();
+  });
+
+  it('keeps a consumer className on the trigger alongside the slot class', () => {
+    render(
+      <Popover.Root>
+        <Popover.Trigger className='mine'>Open</Popover.Trigger>
+        <Popover.Popup>Body</Popover.Popup>
+      </Popover.Root>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Open' });
+    expect(trigger).toHaveClass('cl-popover-trigger');
+    expect(trigger).toHaveClass('mine');
   });
 
   it('defaults the popup to the md size and reflects it as data-size', () => {
