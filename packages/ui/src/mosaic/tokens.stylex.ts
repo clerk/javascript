@@ -99,20 +99,26 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // paths are mutually exclusive (a non-`auto` `scrollbar-width` or `scrollbar-color` makes a
 // UA ignore the pseudo-elements outright), so specifying a length is the honest option and
 // the keyword one is gone. Firefox implements neither pseudo-element and keeps its platform
-// scrollbar. `0.625rem` of lane carrying a `0.1875rem` inset leaves a 4px pill: compact
-// enough for the panels these regions are — a member list in a card or a popover — without
-// shrinking the drag target to a hairline. Set the width to `0px` to hide it outright, which
-// is what the old `none` keyword did.
+// scrollbar. Set the width to `0px` to hide it outright, which is what the old `none` did.
+//
+// Deliberately in PIXELS rather than on the `rem` scale the rest of the tokens use. A scrollbar
+// is chrome, not content: it should stay the same hairline whether or not the surrounding text
+// scales, and 8px of lane carrying a 2px inset — a 4px pill with a 2px track either side — is
+// a specific hairline rather than a ratio of anything. Rounding also matters more here than
+// elsewhere, since the thumb is only a few pixels wide to begin with.
 //
 // The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in,
 // so they resolve at use time: overriding the base re-derives both, while either state stays
-// individually overridable. Mixing toward `--cl-color-card-foreground` deepens the thumb in
-// light mode and lightens it in dark, since that token already carries both.
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
+// which is what keeps a 4px bar reading as a hairline rather than a hard rule; the two states
+// then step back toward `--cl-color-card-foreground`, deepening in light mode and lightening in
+// dark, since that token already carries both.
 //
-// Setting `--cl-scrollbar-thumb: transparent` gives a hover-reveal scrollbar with no feature
-// of ours: the rest state paints nothing and the transition below fades the thumb in when the
-// region is hovered. The lane is still reserved either way — only the thumb's paint is
-// conditional, so nothing moves.
+// Setting `--cl-scrollbar-thumb: transparent` hides the thumb without giving up its lane: the
+// rest state simply paints nothing and the thumb reappears while the pointer is on it. Only the
+// paint is conditional, so nothing moves. Worth knowing that the two states below are the
+// THUMB's, not the region's, which makes that a precise target to find — it works best where
+// the fade indicators are already carrying the signal that the region scrolls.
 //
 // Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
 // no width to apply to, and thinning a target that is already hard to hit would be actively
@@ -123,11 +129,11 @@ export const targetVars = stylex.defineVars(targetDefaults);
 const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 
 const scrollbarDefaults = {
-  '--cl-scrollbar-width': '0.625rem',
-  '--cl-scrollbar-thumb-inset': '0.1875rem',
-  '--cl-scrollbar-thumb': colorVars['--cl-color-neutral-faded'],
-  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 25%)`,
-  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 45%)`,
+  '--cl-scrollbar-width': '8px',
+  '--cl-scrollbar-thumb-inset': '2px',
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 30%)`,
 } as const;
 
 export const scrollbarVars = stylex.defineVars(scrollbarDefaults);

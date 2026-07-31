@@ -55,11 +55,23 @@ import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/
 import * as stylex from '@stylexjs/stylex';
 
 <div
-  style={{ height: 260 }}
   {...stylex.props(scrollAreaRoot)}
+  style={{ height: 260 }}
 >
   <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
 </div>;
+```
+
+`stylex.props()` returns a `className`, so a class of your own has to be **merged** with it rather
+than written beside it — whichever comes last in JSX wins outright and silently drops the other:
+
+```tsx
+const root = stylex.props(scrollAreaRoot);
+
+<div
+  {...root}
+  className={`${root.className} w-full`}
+/>;
 ```
 
 `scrollAreaViewport()` returns an array, hence the `...` spread. Its one argument is the scrollbar
@@ -76,18 +88,25 @@ animation support get a plain scrolling group rather than a broken one.
 
 These tokens apply to every scrolling surface in Mosaic, so setting them once retunes all of them:
 
-| Token                         | Default                    | Description                                               |
-| ----------------------------- | -------------------------- | --------------------------------------------------------- |
-| `--cl-scroll-fade-size`       | `1.5rem`                   | Height of the fade band.                                  |
-| `--cl-scroll-fade-range`      | `1.5rem`                   | How far you scroll before the fade reaches full strength. |
-| `--cl-scrollbar-width`        | `0.625rem`                 | Width of the scrollbar lane. `0px` hides it.              |
-| `--cl-scrollbar-thumb-inset`  | `0.1875rem`                | How far the thumb's paint is held inside that lane.       |
-| `--cl-scrollbar-thumb`        | `--cl-color-neutral-faded` | Thumb colour at rest.                                     |
-| `--cl-scrollbar-thumb-hover`  | derived from the above     | Thumb colour while the region or the thumb is hovered.    |
-| `--cl-scrollbar-thumb-active` | derived from the above     | Thumb colour while the thumb is being dragged.            |
+| Token                         | Default                  | Description                                               |
+| ----------------------------- | ------------------------ | --------------------------------------------------------- |
+| `--cl-scroll-fade-size`       | `1.5rem`                 | Height of the fade band.                                  |
+| `--cl-scroll-fade-range`      | `1.5rem`                 | How far you scroll before the fade reaches full strength. |
+| `--cl-scrollbar-width`        | `8px`                    | Width of the scrollbar lane. `0px` hides it.              |
+| `--cl-scrollbar-thumb-inset`  | `2px`                    | How far the thumb's paint is held inside that lane.       |
+| `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour at rest.                                     |
+| `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb colour while the pointer is over the thumb.         |
+| `--cl-scrollbar-thumb-active` | derived from the above   | Thumb colour while the thumb is being dragged.            |
 
-The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in, so
-setting the base re-derives both — and either state can still be pinned on its own.
+The two lane sizes are in pixels rather than on the `rem` scale, deliberately: a scrollbar is chrome
+rather than content, so it should stay the same hairline whether or not the surrounding text scales.
+The default is a 4px pill with a 2px track either side.
+
+The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in, so setting
+the base re-derives both — and either state can still be pinned on its own.
+
+`hover` and `active` are the **thumb's own** states, not the region's: the colour changes when the
+pointer is over the thumb itself, not whenever it is somewhere over the scrolling area.
 
 Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
 thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
@@ -98,17 +117,20 @@ layout decision rather than an appearance one.
 
 One consequence worth knowing before you theme: styling the scrollbar takes macOS out of overlay
 mode, so the bar is always visible and always occupies its lane rather than auto-hiding. That is the
-cross-platform consistency the tokens exist for, but it is a change from the platform default.
-
-For a scrollbar that appears only on hover, set the rest colour to `transparent`. Nothing else is
-needed — the thumb paints nothing at rest and the existing transition fades it in when you reach the
-region. The lane stays reserved either way, so this changes only what is painted, never the layout:
+cross-platform consistency the tokens exist for, but it is a change from the platform default. To
+hide the thumb without giving up the lane, set the rest colour to `transparent` — it then paints
+only while the pointer is on it. Note that this is a precise target to find, so it works best where
+the fade indicators are already carrying the signal that the region scrolls:
 
 ```css
 :root {
   --cl-scrollbar-thumb: transparent;
 }
 ```
+
+One layout note: the scrollbar takes its lane **inside** a scroller's own padding, so a padded
+surface reads as padding plus lane at the inline end. Trim the inline-end padding on the scroller if
+you want the scrollbar to sit in the gutter the padding was already holding.
 
 To replace the fade entirely, retire it with `mask-image: none` and read the two per-element vars
 the animations write — `--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each

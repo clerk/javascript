@@ -3,6 +3,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import { space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -335,18 +336,43 @@ export function Group() {
   );
 }
 
-const organizations = [
-  'Acme Corporation',
-  'Globex',
-  'Initech',
-  'Umbrella Health',
-  'Stark Industries',
-  'Wayne Enterprises',
-  'Cyberdyne Systems',
-  'Soylent Industries',
-  'Tyrell Corporation',
-  'Weyland-Yutani',
+const accounts = [
+  { email: 'cameron.walker@gmail.com', organizations: ['Clerk', 'Acme Corporation', 'Globex'] },
+  { email: 'cameron@clerk.com', organizations: ['Clerk', 'Initech', 'Umbrella Health'] },
+  { email: 'cam@designcloud.io', organizations: ['Clerk', 'DesignCloud'] },
 ];
+
+function OrganizationRow({ name }: { name: string }) {
+  return (
+    <Item.Root
+      size='xs'
+      render={({ children, ...props }) => (
+        <button
+          {...props}
+          type='button'
+        >
+          {children}
+        </button>
+      )}
+    >
+      <Item.Media>
+        <Avatar.Root
+          size='fit'
+          shape='square'
+        >
+          <Avatar.Image
+            src='https://github.com/clerk.png'
+            alt={name}
+          />
+          <Avatar.Fallback>{name[0]}</Avatar.Fallback>
+        </Avatar.Root>
+      </Item.Media>
+      <Item.Content>
+        <Item.Title>{name}</Item.Title>
+      </Item.Content>
+    </Item.Root>
+  );
+}
 
 // A capped-height group that scrolls, with fade indicators at whichever edge still has
 // something to reveal. The scroll surface is StyleX atoms rather than a component, so it goes
@@ -354,38 +380,43 @@ const organizations = [
 // slot, which stays the hook a theme targets. The outer box only exists to cap the height and
 // to give overlays something to anchor to.
 export function Scrolling() {
+  // `stylex.props()` returns a `className`, so it has to be MERGED with any class of your own
+  // rather than spread beside one — whichever comes last in JSX wins outright.
+  const root = stylex.props(scrollAreaRoot);
+
   return (
     <div
-      className='w-full max-w-sm'
+      {...root}
+      className={`${root.className} w-full`}
       style={{ height: 260 }}
-      {...stylex.props(scrollAreaRoot)}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
-        {organizations.map(name => (
-          <Item.Root
-            key={name}
-            render={({ children, ...props }) => (
-              <button
-                {...props}
-                type='button'
-              >
-                {children}
-              </button>
-            )}
-          >
-            <Item.Media>
-              <Avatar.Root
-                size='fit'
-                shape='circle'
-              >
-                <Avatar.Fallback>{name[0]}</Avatar.Fallback>
-              </Avatar.Root>
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>{name}</Item.Title>
-              <Item.Description>{organizations.indexOf(name) + 3} members</Item.Description>
-            </Item.Content>
-          </Item.Root>
+      {/* The group pads all four sides, and the scrollbar takes its lane INSIDE that padding, so
+          the right edge otherwise reads as padding plus lane. Cutting the inline-end padding to
+          the smallest step lets the scrollbar occupy the gutter the padding was holding, while
+          still keeping the rows off it. */}
+      <Item.Group
+        {...stylex.props(...scrollAreaViewport())}
+        style={{ paddingInlineEnd: space['0.5'] }}
+      >
+        {accounts.map(({ email, organizations }, index) => (
+          <React.Fragment key={email}>
+            {/* The sections above are separate groups, so each one's own padding puts a gap either
+                side of the separator. Here they share one group — the scroller — so the gap has to
+                come from the separator itself. `space['2']` is the group's own padding step, so the
+                two stay in sync if the spacing scale is retuned. */}
+            {index > 0 ? <Item.Separator style={{ marginBlock: space['2'] }} /> : null}
+            <Item.Root size='xs'>
+              <Item.Content>
+                <Item.Description>{email}</Item.Description>
+              </Item.Content>
+            </Item.Root>
+            {organizations.map(name => (
+              <OrganizationRow
+                key={`${email}-${name}`}
+                name={name}
+              />
+            ))}
+          </React.Fragment>
         ))}
       </Item.Group>
     </div>

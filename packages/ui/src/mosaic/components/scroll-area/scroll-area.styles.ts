@@ -75,72 +75,49 @@ const styles = stylex.create({
   },
 
   /**
-   * The thumb's colour, produced on the SCROLLER rather than on the pseudo-element that paints
-   * it. A `::-webkit-scrollbar-thumb` cannot transition anything of its own, so the animating
-   * value is declared here and inherited down into it, which only ever reads it.
-   *
-   * Every scrollbar declaration from here down repeats `{ default: null, '@media (pointer:
-   * fine)': … }`. A touch platform draws an overlay bar there is no width or colour to apply to,
-   * and — the reason the gate has to reach the SHAPE properties too, not just the visible ones —
-   * Blink switches an element to a custom scrollbar the moment ANY `::-webkit-scrollbar*` rule
-   * matches it, which would trade that overlay bar for a permanent one. `null` emits no
-   * declaration at all, so under a coarse pointer the pseudo-elements carry no rules and the
-   * platform keeps its own. Written out each time rather than wrapped in a local helper: the
-   * compiler evaluates a helper fine, but `@stylexjs/valid-styles` can't see through the call and
-   * rejects every value it wraps, trading this repetition for a wall of suppressions.
-   *
-   * Deliberately no `scrollbar-color` / `scrollbar-width` alongside: a non-`auto` value for
-   * either makes a UA ignore the `::-webkit-scrollbar*` family entirely, so keeping them would
-   * leave every rule in `scrollbar` below as dead code in exactly the engines that implement it.
-   * Firefox implements the pseudo-elements not at all and keeps its platform scrollbar. That is
-   * the whole cost of the trade, and it buys per-state thumb colours and a real pixel width,
-   * neither of which the standard properties can express.
-   */
-  thumbColor: {
-    '--_cl-scrollbar-thumb-color': {
-      default: null,
-      '@media (pointer: fine)': {
-        default: scrollbarVars['--cl-scrollbar-thumb'],
-        // Reaching the region at all is what lifts the thumb out of its rest state. This is the
-        // step the browser's own derivation gets BACKWARDS from a specified `scrollbar-color` —
-        // it lightens the thumb on hover — and correcting it is most of why this path exists.
-        ':is(:hover, :focus-within)': scrollbarVars['--cl-scrollbar-thumb-hover'],
-      },
-    },
-    // Longer leaving than arriving, per the duration tokens: hover is direct pointer feedback,
-    // its decay is not. `linear` because this is a colour — an ease on top of an already
-    // perceptually non-uniform interpolation only makes the midpoint drag.
-    transitionDuration: {
-      default: null,
-      '@media (pointer: fine)': {
-        default: durationVars['--cl-duration-base'],
-        ':is(:hover, :focus-within)': durationVars['--cl-duration-fast'],
-      },
-    },
-    transitionProperty: { default: null, '@media (pointer: fine)': '--_cl-scrollbar-thumb-color' },
-    transitionTimingFunction: { default: null, '@media (pointer: fine)': 'linear' },
-  },
-
-  /**
    * The scrollbar's own paint. Only the lane's size and the thumb are styled — the track is left
    * alone, so the thumb reads as floating over the content rather than riding in a rail.
    *
-   * The thumb's two states are COMBINED keys rather than a `:hover` nested inside the
-   * `::-webkit-scrollbar-thumb` block: StyleX emits a nested pseudo-class BEFORE the
-   * pseudo-element (`:hover::-webkit-scrollbar-thumb`), which asks whether the scroller is
-   * hovered — a question already answered on `thumbColor` above. These are the thumb's own
-   * states, and a combined key is the only way to reach them. Their source order is set by the
-   * sort-keys rule and doesn't matter: StyleX prices `:active` above `:hover` either way.
+   * Every declaration here repeats `{ default: null, '@media (pointer: fine)': … }`. A touch
+   * platform draws an overlay bar there is no width or colour to apply to, and — the reason the
+   * gate has to reach the SHAPE properties too, not just the visible ones — Blink switches an
+   * element to a custom scrollbar the moment ANY `::-webkit-scrollbar*` rule matches it, which
+   * would trade that overlay bar for a permanent one. `null` emits no declaration at all, so
+   * under a coarse pointer the pseudo-elements carry no rules and the platform keeps its own.
+   * Written out each time rather than wrapped in a local helper: the compiler evaluates a helper
+   * fine, but `@stylexjs/valid-styles` can't see through the call and rejects every value it
+   * wraps, trading this repetition for a wall of suppressions.
    *
-   * Both snap rather than transition, by design and in common with Polaris: `transition` is not
-   * inherited, so the declaration on the scroller doesn't reach the pseudo-element. A pointer
-   * already on the thumb wants the response to feel like contact anyway.
+   * Deliberately no `scrollbar-color` / `scrollbar-width` on the scroller: a non-`auto` value for
+   * either makes a UA ignore the `::-webkit-scrollbar*` family entirely, so keeping them would
+   * leave every rule here as dead code in exactly the engines that implement it. Firefox
+   * implements the pseudo-elements not at all and keeps its platform scrollbar. That is the whole
+   * cost of the trade, and it buys per-state thumb colours and a real pixel width, neither of
+   * which the standard properties can express.
+   *
+   * The thumb's states are COMBINED keys rather than a `:hover` nested inside the
+   * `::-webkit-scrollbar-thumb` block: StyleX emits a nested pseudo-class BEFORE the
+   * pseudo-element (`:hover::-webkit-scrollbar-thumb`), which asks whether the SCROLLER is
+   * hovered — a much larger target that lights the thumb up whenever the pointer is anywhere over
+   * the region. These are the thumb's own states, and a combined key is the only way to reach
+   * them. Their source order is the sort-keys rule's and doesn't matter: StyleX prices `:active`
+   * above `:hover` either way.
    */
   scrollbar: {
     '::-webkit-scrollbar': {
       width: { default: null, '@media (pointer: fine)': scrollbarWidth },
     },
     '::-webkit-scrollbar-thumb': {
+      // The colour is routed through an `@property`-registered var rather than transitioned as
+      // `background-color` directly, because `background-color` on a scrollbar part is not an
+      // animatable property in Blink — the registered custom property is, and the pseudo-element
+      // reads it. Longer leaving than arriving, per the duration tokens: reaching the thumb is
+      // direct pointer feedback, its decay is not. `linear` because this is a colour — an ease on
+      // top of an already perceptually non-uniform interpolation only makes the midpoint drag.
+      '--_cl-scrollbar-thumb-color': {
+        default: null,
+        '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb'],
+      },
       // A transparent border clipped away is how you inset a pill thumb: the lane keeps its full
       // width for hit-testing while the paint shrinks to the middle of it. Both Polaris and
       // `references/stylex-ui` arrive at this independently — a scrollbar pseudo-element has no
@@ -153,16 +130,18 @@ const styles = stylex.create({
       backgroundColor: {
         default: null,
         '@media (pointer: fine)': {
-          // The pseudo-element only reads; the animating value is produced on `thumbColor` above.
           // eslint-disable-next-line @stylexjs/valid-styles -- valid-styles doesn't resolve a `stylex.types.color()` var to a colour; the compiler does.
           default: thumbColor,
           // No `scrollbar-color: auto` lever survives on this path, so forced colors need their
           // own answer: pin the thumb to a system colour rather than let a themed one lose its
           // contrast guarantee against a palette we no longer control. Declared on
-          // `background-color` rather than on the var so it holds across all four states at once.
+          // `background-color` rather than on the var so it holds across all three states at once.
           '@media (forced-colors: active)': 'ButtonBorder',
         },
       },
+      transitionDuration: { default: null, '@media (pointer: fine)': durationVars['--cl-duration-base'] },
+      transitionProperty: { default: null, '@media (pointer: fine)': '--_cl-scrollbar-thumb-color' },
+      transitionTimingFunction: { default: null, '@media (pointer: fine)': 'linear' },
     },
     // eslint-disable-next-line @stylexjs/valid-styles -- StyleX's pseudo-element allowlist holds the bare selectors only; it compiles the combined form correctly. See the note above.
     '::-webkit-scrollbar-thumb:active': {
@@ -177,6 +156,8 @@ const styles = stylex.create({
         default: null,
         '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb-hover'],
       },
+      // Arriving is direct pointer feedback and reads better a touch quicker than the decay.
+      transitionDuration: { default: null, '@media (pointer: fine)': durationVars['--cl-duration-fast'] },
     },
   },
 
@@ -188,13 +169,20 @@ const styles = stylex.create({
     // Held back from the scrollbar only where we actually paint one, which is the same pair of
     // conditions the rules above run under: a fine pointer, and an engine that implements
     // `::-webkit-scrollbar`. This is not a fallback branch for the scrollbar styling — there
-    // isn't one — it is the mask asking whether there is a lane to keep clear. Firefox answers
-    // no and gets the fade edge to edge rather than an unfaded strip beside a bar we never
-    // styled.
+    // isn't one — it is the mask asking whether there is a lane to keep clear. Gecko answers no
+    // and gets the fade edge to edge, rather than an unfaded strip beside a bar we never styled
+    // and whose width we don't know.
+    //
+    // `not (-moz-appearance: none)` stands in for the question we actually want to ask,
+    // `selector(::-webkit-scrollbar)`, because StyleX 0.19 rewrites the argument of
+    // `@supports selector(…)` with the same `:not(#\#)` specificity bump it applies to real
+    // selectors. That turns the query into `selector(:not(#\#):not(#\#):not(#\#)::-webkit-scrollbar)`,
+    // which every engine reports as false — verified in Chrome, where the honest form returns
+    // true and the rewritten one returns false. Any property-based condition is left alone.
     maskSize: {
       default: '100% 100%, 0px 100%',
       '@media (pointer: fine)': {
-        '@supports selector(::-webkit-scrollbar)': `calc(100% - ${scrollbarWidth}) 100%, ${scrollbarWidth} 100%`,
+        '@supports not (-moz-appearance: none)': `calc(100% - ${scrollbarWidth}) 100%, ${scrollbarWidth} 100%`,
       },
     },
   },
@@ -268,7 +256,6 @@ export type ScrollAreaGutter = keyof typeof gutters;
 export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto') {
   return [
     styles.viewport,
-    styles.thumbColor,
     styles.scrollbar,
     styles.mask,
     styles.indicators,
