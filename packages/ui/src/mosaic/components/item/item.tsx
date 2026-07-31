@@ -1,4 +1,4 @@
-import { useRender } from '@clerk/headless/utils';
+import { type RenderProp, useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -16,7 +16,7 @@ const DEFAULT_SIZE: Size = 'md';
 /** Carries `Item.Root`'s size down to the parts it scales (`Item.Media`). */
 const ItemContext = React.createContext<Size>(DEFAULT_SIZE);
 
-export type ItemProps = MosaicComponentProps<'div'> & {
+export type ItemProps = Omit<MosaicComponentProps<'div'>, 'render'> & {
   /**
    * Row height and gap. Also sizes a nested `Item.Media`, which reads this from
    * context rather than taking its own prop, so a row scales as one unit.
@@ -24,6 +24,14 @@ export type ItemProps = MosaicComponentProps<'div'> & {
    * @default 'md'
    */
   size?: Size;
+  /**
+   * Render a custom element (e.g. a link or button) in place of the default `div`.
+   *
+   * Typed without a `ref`, unlike the inherited `render`: that one pins `ref` to
+   * the default tag's `HTMLDivElement`, which a callback cannot spread onto the
+   * `<a>` or `<button>` this row exists to render.
+   */
+  render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
 };
 
 /**
