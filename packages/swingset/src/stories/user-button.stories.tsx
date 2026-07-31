@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { UserButton, type UserButtonProps } from '@clerk/ui/mosaic/user-button/user-button.view';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -24,7 +25,7 @@ const handlers = {
   onSignOutSession: () => {},
   onSignOutAll: () => {},
   onManageOrganization: () => {},
-  onManageMembers: () => {},
+  onInviteMembers: () => {},
   onManageAccount: () => {},
   onCreateOrganization: () => {},
   onAddAccount: () => {},
@@ -51,81 +52,87 @@ const braden = {
   imageUrl: 'https://avatars.githubusercontent.com/u/64913815?v=4',
 };
 
-export function Default(_args: Record<string, unknown>) {
+const workspaces = {
+  activeOrganizationId: 'org_clerk_app',
+  hasOrganizations: true,
+  memberships: [
+    {
+      kind: 'membership',
+      organizationId: 'org_clerk_app',
+      name: 'Clerk app',
+      membersCount: 24,
+      planLabel: 'Pro plan',
+      imageUrl: clerkLogo,
+    },
+    { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud', imageUrl: clerkLogo },
+  ],
+  suggestions: [
+    {
+      kind: 'suggestion',
+      id: 'sug_labs',
+      organizationId: 'org_clerk_labs',
+      name: 'Clerk Labs',
+      status: 'pending',
+      imageUrl: clerkLogo,
+    },
+  ],
+  invitations: [],
+} satisfies Partial<UserButtonProps>;
+
+export function Combined(_args: Record<string, unknown>) {
   return (
     <UserButton
       {...handlers}
+      {...workspaces}
+      mode='combined'
       status='ready'
       activeSession={colin}
-      activeOrganizationId='org_clerk_app'
-      hasOrganizations
-      memberships={[
-        {
-          kind: 'membership',
-          organizationId: 'org_clerk_app',
-          name: 'Clerk app',
-          membersCount: 24,
-          planLabel: 'Pro plan',
-          upgradeable: true,
-          imageUrl: clerkLogo,
-        },
-        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud', imageUrl: clerkLogo },
-      ]}
-      suggestions={[
-        {
-          kind: 'suggestion',
-          id: 'sug_labs',
-          organizationId: 'org_clerk_labs',
-          name: 'Clerk Labs',
-          status: 'pending',
-          imageUrl: clerkLogo,
-        },
-      ]}
-      invitations={[]}
       additionalSessions={[braden]}
     />
   );
 }
 
-export function Personal(_args: Record<string, unknown>) {
+export function Organizations(_args: Record<string, unknown>) {
   return (
     <UserButton
       {...handlers}
+      {...workspaces}
+      mode='orgs'
       status='ready'
       activeSession={colin}
+      // Present, and deliberately not rendered: an org switcher carries no account rows.
+      additionalSessions={[braden]}
+    />
+  );
+}
+
+const sessions = [colin, braden];
+
+// The one story wired to real state: picking an account makes it the active one and closes the
+// popover, so the switch is visible on the trigger rather than described in prose.
+export function User(_args: Record<string, unknown>) {
+  const [open, setOpen] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
+  const activeSession = sessions.find(session => session.sessionId === activeSessionId) ?? colin;
+
+  return (
+    <UserButton
+      {...handlers}
+      open={open}
+      onOpenChange={setOpen}
+      onSwitchSession={sessionId => {
+        setActiveSessionId(sessionId);
+        setOpen(false);
+      }}
+      mode='user'
+      status='ready'
+      activeSession={activeSession}
       activeOrganizationId={null}
       hasOrganizations={false}
       memberships={[]}
       suggestions={[]}
       invitations={[]}
-      additionalSessions={[braden]}
-    />
-  );
-}
-
-export function MultipleSessions(_args: Record<string, unknown>) {
-  return (
-    <UserButton
-      {...handlers}
-      status='ready'
-      activeSession={colin}
-      activeOrganizationId='org_clerk_app'
-      hasOrganizations
-      memberships={[
-        {
-          kind: 'membership',
-          organizationId: 'org_clerk_app',
-          name: 'Clerk app',
-          membersCount: 24,
-          planLabel: 'Pro plan',
-          upgradeable: true,
-          imageUrl: clerkLogo,
-        },
-        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud', imageUrl: clerkLogo },
-      ]}
-      suggestions={[]}
-      invitations={[]}
-      additionalSessions={[braden]}
+      additionalSessions={sessions.filter(session => session.sessionId !== activeSessionId)}
     />
   );
 }
