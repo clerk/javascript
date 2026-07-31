@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Tabs as Primitive } from '../primitives/tabs';
+import type { MosaicPartProps } from '../props';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
 /**
@@ -98,70 +99,66 @@ declare module '../registry' {
   }
 }
 
-const List = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.List>>(
-  function TabsList(props, ref) {
-    const { list } = useRecipe(tabsRecipe);
-    return (
-      <Primitive.List
-        ref={ref}
-        {...props}
-        {...list}
-      />
-    );
-  },
-);
+export type TabsListProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.List>, 'div'>;
+export type TabsTabProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Tab>, 'button'>;
+export type TabsTriggerProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Trigger>, 'button'>;
+export type TabsPanelProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Panel>, 'div'>;
+export type TabsIndicatorProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Indicator>, 'span'>;
 
-const Tab = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Tab>>(
-  function TabsTab(props, ref) {
-    const { tab } = useRecipe(tabsRecipe);
-    return (
-      <Primitive.Tab
-        ref={ref}
-        {...props}
-        {...tab}
-      />
-    );
-  },
-);
+const List = React.forwardRef<HTMLDivElement, TabsListProps>(function TabsList(props, ref) {
+  const { list } = useRecipe(tabsRecipe);
+  return (
+    <Primitive.List
+      ref={ref}
+      {...props}
+      {...list}
+    />
+  );
+});
 
-const Trigger = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Primitive.Trigger>>(
-  function TabsTrigger(props, ref) {
-    const { trigger } = useRecipe(tabsRecipe);
-    return (
-      <Primitive.Trigger
-        ref={ref}
-        {...props}
-        {...trigger}
-      />
-    );
-  },
-);
+const Tab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function TabsTab(props, ref) {
+  const { tab } = useRecipe(tabsRecipe);
+  return (
+    <Primitive.Tab
+      ref={ref}
+      {...props}
+      {...tab}
+    />
+  );
+});
 
-const Panel = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Panel>>(
-  function TabsPanel(props, ref) {
-    const { panel } = useRecipe(tabsRecipe);
-    return (
-      <Primitive.Panel
-        ref={ref}
-        {...props}
-        {...panel}
-      />
-    );
-  },
-);
+const Trigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(function TabsTrigger(props, ref) {
+  const { trigger } = useRecipe(tabsRecipe);
+  return (
+    <Primitive.Trigger
+      ref={ref}
+      {...props}
+      {...trigger}
+    />
+  );
+});
 
-const Indicator = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<typeof Primitive.Indicator>>(
-  function TabsIndicator(props, ref) {
-    const { indicator } = useRecipe(tabsRecipe);
-    return (
-      <Primitive.Indicator
-        ref={ref}
-        {...props}
-        {...indicator}
-      />
-    );
-  },
-);
+const Panel = React.forwardRef<HTMLDivElement, TabsPanelProps>(function TabsPanel(props, ref) {
+  const { panel } = useRecipe(tabsRecipe);
+  return (
+    <Primitive.Panel
+      ref={ref}
+      {...props}
+      {...panel}
+    />
+  );
+});
+
+const Indicator = React.forwardRef<HTMLSpanElement, TabsIndicatorProps>(function TabsIndicator(props, ref) {
+  const { indicator } = useRecipe(tabsRecipe);
+  return (
+    <Primitive.Indicator
+      ref={ref}
+      {...props}
+      {...indicator}
+    />
+  );
+});
 
 /** Styled mosaic Tabs components built on headless Tabs primitives. */
 export const Tabs: {

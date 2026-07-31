@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Dialog as Primitive } from '../primitives/dialog';
-import type { MosaicComponentProps } from '../props';
+import type { MosaicComponentProps, MosaicPartProps } from '../props';
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
@@ -82,45 +82,43 @@ declare module '../registry' {
   }
 }
 
-const Backdrop = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>>(
-  function DialogBackdrop(props, ref) {
-    const { backdrop } = useRecipe(dialogRecipe);
-    return (
-      <Primitive.Backdrop
-        ref={ref}
-        {...props}
-        {...backdrop}
-      />
-    );
-  },
-);
+export type DialogBackdropProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>, 'div'>;
+export type DialogViewportProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Viewport>, 'div'>;
+export type DialogPopupProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Popup>, 'div'>;
 
-const Viewport = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Viewport>>(
-  function DialogViewport(props, ref) {
-    const { viewport } = useRecipe(dialogRecipe);
-    return (
-      <Primitive.Viewport
-        ref={ref}
-        {...props}
-        {...viewport}
-      />
-    );
-  },
-);
+const Backdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(function DialogBackdrop(props, ref) {
+  const { backdrop } = useRecipe(dialogRecipe);
+  return (
+    <Primitive.Backdrop
+      ref={ref}
+      {...props}
+      {...backdrop}
+    />
+  );
+});
 
-const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof Primitive.Popup>>(
-  function DialogPopup(props, ref) {
-    const variantProps = React.useContext(DialogVariantContext);
-    const { popup } = useRecipe(dialogRecipe, { variants: variantProps });
-    return (
-      <Primitive.Popup
-        ref={ref}
-        {...props}
-        {...popup}
-      />
-    );
-  },
-);
+const Viewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(function DialogViewport(props, ref) {
+  const { viewport } = useRecipe(dialogRecipe);
+  return (
+    <Primitive.Viewport
+      ref={ref}
+      {...props}
+      {...viewport}
+    />
+  );
+});
+
+const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(props, ref) {
+  const variantProps = React.useContext(DialogVariantContext);
+  const { popup } = useRecipe(dialogRecipe, { variants: variantProps });
+  return (
+    <Primitive.Popup
+      ref={ref}
+      {...props}
+      {...popup}
+    />
+  );
+});
 
 interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' | 'onOpenChange' | 'modal'> {
   trigger: MosaicComponentProps<'button'>['render'];

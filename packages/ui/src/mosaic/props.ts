@@ -24,6 +24,15 @@ export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> 
   render?: RenderProp<MosaicElementProps<Tag>> | React.ReactElement;
 };
 
+/**
+ * A headless part's props as Mosaic re-exposes them: the part's own additions
+ * (`value`, `disabled`, …) kept, with `color` and `render` swapped for Mosaic's.
+ * Use this when wrapping a part whose props are more than its tag's — otherwise
+ * `MosaicComponentProps<Tag>` says the same thing more directly.
+ */
+export type MosaicPartProps<Props, Tag extends keyof React.JSX.IntrinsicElements> = Omit<Props, 'color' | 'render'> &
+  Pick<MosaicComponentProps<Tag>, 'render'>;
+
 // The public styling contract, emitted onto a component's root element:
 //   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)
 //   2. `.cl-<slot>` class — from `themeProps` (`.cl-button { … }`)
