@@ -14,7 +14,7 @@ import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
 import type { IconName } from '../icons/registry';
-import { space } from '../tokens.stylex';
+import { fontWeightVars, space } from '../tokens.stylex';
 import { styles, triggerShapes } from './user-button.styles';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
@@ -372,7 +372,13 @@ function AccountRow({ email, actions }: { email: string; actions: AccountAction[
   return (
     <Item.Root size='xs'>
       <Item.Content>
-        <Item.Description>{email}</Item.Description>
+        <Item.Description
+          style={{
+            fontWeight: fontWeightVars['--cl-font-medium'],
+          }}
+        >
+          {email}
+        </Item.Description>
       </Item.Content>
       {actions.length > 0 ? (
         <Item.Actions>
