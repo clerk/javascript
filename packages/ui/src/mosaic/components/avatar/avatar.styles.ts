@@ -20,8 +20,10 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
 
-  // image fills the clipped box
+  // image fills the clipped box. It carries the root's radius rather than leaning on the clip
+  // alone, so a part that paints its own fill rounds off cleanly instead of showing a corner.
   image: {
+    borderRadius: 'inherit',
     aspectRatio: '1 / 1',
     display: 'block',
     objectFit: 'cover',
@@ -32,6 +34,7 @@ export const styles = stylex.create({
 
   // fallback fills the box, centering its content and inheriting the sized font
   fallback: {
+    borderRadius: 'inherit',
     alignItems: 'center',
     backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
     color: colorVars['--cl-color-neutral'],
