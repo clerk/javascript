@@ -7,7 +7,7 @@ export const item = stylex.create({
   base: {
     margin: 0,
     padding: 0,
-    borderRadius: radiusVars['--cl-radius-element'],
+    borderRadius: radiusVars['--cl-radius-lg'],
     outline: {
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
