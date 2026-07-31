@@ -311,9 +311,6 @@ jobs:
       - name: Run iOS e2e (Maestro)
         id: run_e2e_ios
         if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
-        # Burn-in: e2e cannot fail the check yet. Flip to hard-fail in a
-        # follow-up once the suite has proven quiet.
-        continue-on-error: true
         working-directory: ${{ env.FIXTURE_DIR }}
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
@@ -379,7 +376,6 @@ jobs:
       - name: Run Android e2e (Maestro)
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
@@ -445,5 +441,5 @@ jobs:
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
           echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::warning::Maestro e2e failed (burn-in mode: not failing the job). See the maestro-${{ matrix.platform }} artifact."
+            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
           fi
