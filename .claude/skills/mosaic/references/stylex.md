@@ -584,6 +584,39 @@ className left-to-right and merges `style` with the consumer object spread last:
 - **DON'T** call `stylex.props` twice on one element or spread `{...props}` after
   the merge result — fuse everything through the one `mergeStyleProps` call.
 
+### Type every part with `MosaicComponentProps`
+
+`MosaicComponentProps<Tag>` is the native props for `Tag` minus the non-standard HTML
+`color` attribute, plus `render`. It drops `color` from the props **and** from the
+`render` callback's argument, so a callback's props spread straight into a Mosaic
+component whose own `color` is a variant union (`Button`, `Heading`, `Text`).
+
+```tsx
+export interface PopoverPopupProps extends MosaicComponentProps<'div'> { … }
+```
+
+- **DON'T** type a Mosaic part with the headless `ComponentProps<Tag>` (or
+  `React.ComponentPropsWithoutRef<typeof Primitive.X>`). Those keep `color: string`, and
+  every consumer then has to strip it: `props: Omit<React.HTMLAttributes<HTMLElement>, 'color'>`.
+- **DON'T** re-export a headless part straight onto the Mosaic namespace object
+  (`Popover.Trigger = Primitive.Trigger`) — that leaks the wide type. Bridge it:
+
+  ```tsx
+  const Trigger = React.forwardRef<HTMLButtonElement, MosaicComponentProps<'button'>>(
+    function PopoverTrigger(props, ref) {
+      return (
+        <Primitive.Trigger
+          ref={ref}
+          {...props}
+        />
+      );
+    },
+  );
+  ```
+
+- If a consumer needs to annotate a `render` callback, the API is wrong — fix the
+  part's props type instead. Inline callbacks infer with no annotation.
+
 ## Build & CSS delivery (two contexts, same babel)
 
 - **Published** (`build:mosaic` → `@stylexjs/rollup-plugin`): compiles the
