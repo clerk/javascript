@@ -136,4 +136,19 @@ describe('Mosaic Card', () => {
     expect(contentRef.current).toHaveClass('cl-card-content');
     expect(footerRef.current).toHaveClass('cl-card-footer');
   });
+
+  it('supports custom elements through render on every slot', () => {
+    render(
+      <Card.Root render={props => <section {...props} />}>
+        <Card.Header render={props => <header {...props}>Header</header>} />
+        <Card.Content render={props => <main {...props}>Content</main>} />
+        <Card.Footer render={props => <footer {...props}>Footer</footer>} />
+      </Card.Root>,
+    );
+
+    expect(screen.getByText('Header').tagName).toBe('HEADER');
+    expect(screen.getByText('Content').tagName).toBe('MAIN');
+    expect(screen.getByText('Footer').tagName).toBe('FOOTER');
+    expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
+  });
 });
