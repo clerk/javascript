@@ -233,10 +233,14 @@ export type UserPasswordHashingParams = {
 export type CreateUserParams = {
   /** The ID of the user as used in your external systems or your previous authentication solution. Must be unique across your instance. */
   externalId?: string;
-  /** The email address(es) to assign to the user. Must be unique across your instance. The first email address will be set as the users primary email address. */
+  /** The email address(es) to assign to the user. Must be unique across your instance. The first email address will be set as the users primary email address. Created verified by default; see `emailAddressIdentificationStatus` to create them reserved. */
   emailAddress?: string[];
-  /** The phone number(s) to assign to the user. Must be unique across your instance. The first phone number will be set as the users primary phone number. */
+  /** Controls the status each email address is created with. Runs parallel to `emailAddress`: when provided, it must contain exactly one item per email address, applied by position. When omitted or empty, every email address is created `'verified'`. Set an item to `'reserved'` to create the corresponding email address reserved instead (unverified but usable for sign-in and locked so no other user can claim it). */
+  emailAddressIdentificationStatus?: ('verified' | 'reserved')[];
+  /** The phone number(s) to assign to the user. Must be unique across your instance. The first phone number will be set as the users primary phone number. Created verified by default; see `phoneNumberIdentificationStatus` to create them reserved. */
   phoneNumber?: string[];
+  /** Controls the status each phone number is created with. Runs parallel to `phoneNumber`: when provided, it must contain exactly one item per phone number, applied by position. When omitted or empty, every phone number is created `'verified'`. Set an item to `'reserved'` to create the corresponding phone number reserved instead (unverified but usable for sign-in and locked so no other user can claim it). */
+  phoneNumberIdentificationStatus?: ('verified' | 'reserved')[];
   /** The username to assign to the user. Must be unique across your instance. */
   username?: string;
   /** The plaintext password to give the user. Must be at least 8 characters long, and can't be in any list of hacked passwords. */
@@ -453,7 +457,7 @@ export class UserAPI extends AbstractAPI {
    *
    * Your settings in the [Clerk Dashboard](https://dashboard.clerk.com) determine how you should setup your user model. Anything **Required** will need to be provided when creating a user. Trying to add a field that isn't enabled will result in an error.
    *
-   * Any email address and phone number created using this method will be automatically verified.
+   * By default, any email address and phone number created using this method is automatically verified. Use `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` to instead create some or all of them as reserved (unverified but usable for sign-in and locked so no other user can claim them).
    *
    * > [!CAUTION]
    * >
