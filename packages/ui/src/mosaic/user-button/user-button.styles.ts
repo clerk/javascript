@@ -25,7 +25,7 @@ export const styles = stylex.create({
 
   branding: {
     gap: space['2'],
-    paddingBlock: space['2'],
+    paddingBlock: space['3'],
     alignItems: 'center',
     borderBlockStartColor: colorVars['--cl-color-border-faded'],
     borderBlockStartStyle: 'solid',
