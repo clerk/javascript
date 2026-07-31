@@ -14,7 +14,7 @@ describe('Mosaic Input', () => {
     expect(input).toBeEnabled();
   });
 
-  it.each(['sm', 'md'] as const)('reflects the %s size', size => {
+  it.each(['sm', 'md', 'lg'] as const)('reflects the %s size', size => {
     render(
       <Input
         size={size}

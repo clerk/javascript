@@ -7,7 +7,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { sizes, styles } from './input.styles';
 
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(

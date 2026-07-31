@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   styleEngine: 'stylex',
   styles: {
     _variants: {
-      size: { sm: {}, md: {} },
+      size: { sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       size: 'md',
@@ -47,6 +47,11 @@ export function Sizes(props: Record<string, unknown>) {
         {...knobsAsProps(props)}
         size='md'
         placeholder='Medium'
+      />
+      <Input
+        {...knobsAsProps(props)}
+        size='lg'
+        placeholder='Large'
       />
     </div>
   );

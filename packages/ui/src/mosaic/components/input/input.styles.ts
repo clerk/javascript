@@ -2,31 +2,33 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const primary30 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 30%, transparent)`;
 const primary40 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 40%, transparent)`;
-const primary20 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 20%, transparent)`;
-const primary15 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 15%, transparent)`;
 const primary5 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
+const focusRing = '0 0 0 1.5px #fff, 0 0 0 3px #2b2b34';
 
 export const styles = stylex.create({
   base: {
     borderColor: {
-      default: primary30,
-      ':focus-visible': colorVars['--cl-color-primary'],
-      ':where([aria-invalid="true"])': colorVars['--cl-color-primary'],
+      default: colorVars['--cl-color-border'],
+      ':focus-visible': colorVars['--cl-color-border'],
+      ':hover:not(:focus-visible):not([aria-invalid="true"])': '#b7b7b7',
+      ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
     },
-    borderRadius: radiusVars['--cl-radius-element'],
     borderStyle: 'solid',
-    borderWidth: '1px',
+    borderWidth: {
+      default: '1px',
+      ':where([aria-invalid="true"])': '2px',
+    },
     outline: 'none',
     transition: 'color 0.15s, background-color 0.15s, border-color 0.15s',
-    backgroundColor: 'transparent',
+    backgroundColor: colorVars['--cl-color-card'],
     boxShadow: {
       default: null,
-      ':focus-visible': `0 0 0 3px ${primary20}`,
-      ':focus-visible:where([aria-invalid="true"])': `0 0 0 3px ${primary15}`,
-      ':where([aria-invalid="true"])': `0 0 0 3px ${primary15}`,
+      ':focus-visible': focusRing,
+      ':focus-visible:where([aria-invalid="true"])': 'none',
+      ':where([aria-invalid="true"])': 'none',
     },
+    boxSizing: 'border-box',
     color: 'inherit',
     display: 'block',
     fontFamily: 'inherit',
@@ -57,27 +59,24 @@ export const styles = stylex.create({
 
 export const sizes = stylex.create({
   sm: {
-    paddingInline: space['2'],
-    fontSize: {
-      default: typeScaleVars['--cl-text-xs-size'],
-      '@media (min-width: 768px)': typeScaleVars['--cl-text-sm-size'],
-    },
-    lineHeight: {
-      default: typeScaleVars['--cl-text-xs-leading'],
-      '@media (min-width: 768px)': typeScaleVars['--cl-text-sm-leading'],
-    },
+    borderRadius: radiusVars['--cl-radius-control'],
+    paddingInline: space['3'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
     height: space['7'],
   },
   md: {
-    paddingInline: space['2.5'],
-    fontSize: {
-      default: typeScaleVars['--cl-text-base-size'],
-      '@media (min-width: 768px)': typeScaleVars['--cl-text-sm-size'],
-    },
-    lineHeight: {
-      default: typeScaleVars['--cl-text-base-leading'],
-      '@media (min-width: 768px)': typeScaleVars['--cl-text-sm-leading'],
-    },
+    borderRadius: radiusVars['--cl-radius-control'],
+    paddingInline: space['3'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     height: space['8'],
+  },
+  lg: {
+    borderRadius: radiusVars['--cl-radius-element'],
+    paddingInline: space['3'],
+    fontSize: typeScaleVars['--cl-text-base-size'],
+    lineHeight: 1.375,
+    height: space['9'],
   },
 });
