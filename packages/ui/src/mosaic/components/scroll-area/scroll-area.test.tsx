@@ -106,6 +106,29 @@ describe('Mosaic ScrollArea', () => {
     });
   });
 
+  it('renders custom elements via render, keeping the styling contract', () => {
+    render(
+      <ScrollArea.Root
+        data-testid='root'
+        render={<section />}
+      >
+        <ScrollArea.Viewport
+          data-testid='viewport'
+          render={<ul aria-label='Members' />}
+        >
+          <li>Ada Lovelace</li>
+        </ScrollArea.Viewport>
+      </ScrollArea.Root>,
+    );
+    const root = screen.getByTestId('root');
+    const viewport = screen.getByTestId('viewport');
+    expect(root.tagName).toBe('SECTION');
+    expect(root).toHaveClass('cl-scroll-area-root');
+    expect(viewport.tagName).toBe('UL');
+    expect(viewport).toHaveClass('cl-scroll-area-viewport');
+    expect(viewport).toHaveAttribute('data-gutter', 'auto');
+  });
+
   describe('keyboard reachability', () => {
     // jsdom reports every box as zero-sized, so overflow has to be faked. Both values are
     // stubbed together because the check is a comparison, not a threshold.

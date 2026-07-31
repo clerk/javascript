@@ -8,6 +8,8 @@ The indicators are pure CSS, driven by scroll-driven animations — no scroll li
 
 `ScrollArea.Viewport` manages its own `tabIndex` so consumers don't have to. Chrome and Firefox make an overflowing scroll container keyboard-focusable automatically and Safari does not, leaving a keyboard-only user there unable to scroll the region (WCAG 2.1.1); the viewport takes a tab stop exactly when those browsers would — when it overflows and its content holds nothing focusable — so a list of buttons or links, which is already reachable, doesn't gain a redundant stop. Pass an explicit `tabIndex` to override, or `-1` to opt out.
 
+Both parts accept a `render` prop for polymorphism, so the region can carry its own semantics — `<ScrollArea.Viewport render={<ul />}>` for a list, for example. On the viewport the rendered element has to be able to establish a scroll box, since the overflow, mask and scroll timelines all apply to it.
+
 `ScrollArea.Viewport` takes a `gutter` prop. The default, `auto`, takes the scrollbar's space only while the content overflows. Pass `stable` for a collection that can change height in place — a filterable list, a paginated table — so that crossing the overflow threshold doesn't shift its rows sideways.
 
 The treatment is overridable in plain CSS, with no props involved. Set `mask-image: none` on `.cl-scroll-area-viewport` to retire the default fade, and read `--cl-scroll-area-progress-start` / `--cl-scroll-area-progress-end` — per-element values the animations write, describing how much each edge still has to reveal — to drive a shadow or any other indicator.

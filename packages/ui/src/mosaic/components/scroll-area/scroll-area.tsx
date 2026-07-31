@@ -1,3 +1,4 @@
+import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -8,9 +9,9 @@ import { useScrollerFocusable } from './use-scroller-focusable';
 
 export type ScrollAreaGutter = 'stable' | 'auto';
 
-export type ScrollAreaRootProps = Omit<MosaicComponentProps<'div'>, 'render'>;
+export type ScrollAreaRootProps = MosaicComponentProps<'div'>;
 
-export interface ScrollAreaViewportProps extends Omit<MosaicComponentProps<'div'>, 'render'> {
+export interface ScrollAreaViewportProps extends MosaicComponentProps<'div'> {
   /**
    * Whether the scrollbar's space is held open. `auto` (the default) takes the space only
    * while the content overflows. Pass `stable` when the content can change height **in
@@ -29,68 +30,57 @@ export interface ScrollAreaViewportProps extends Omit<MosaicComponentProps<'div'
 
 /**
  * The wrapper. Positioned, so a future scrollbar part can be placed against it; today it
- * only establishes the box the viewport flexes inside.
+ * only establishes the box the viewport flexes inside. Renders a `div`; `render` swaps in
+ * another element.
  */
 const Root = React.forwardRef<HTMLDivElement, ScrollAreaRootProps>(function ScrollAreaRoot(
-  { className, style, ...rest },
+  { render, className, style, ...rest },
   ref,
 ) {
-  return (
-    <div
-      ref={ref}
-      {...mergeStyleProps(themeProps('scroll-area-root'), stylex.props(styles.root), className, style)}
-      {...rest}
-    />
-  );
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('scroll-area-root'), stylex.props(styles.root), className, style),
+      ...rest,
+    },
+  });
 });
 
 /**
- * The scroll container. Owns the overflow, the scroll timelines, and the mask.
+ * The scroll container. Owns the overflow, the scroll timelines, and the mask. Renders a
+ * `div`; `render` swaps in another element, which must be able to establish a scroll box —
+ * the overflow, mask and timelines all apply to whatever is rendered here.
  */
 const Viewport = React.forwardRef<HTMLDivElement, ScrollAreaViewportProps>(function ScrollAreaViewport(
-  { gutter = 'auto', tabIndex, className, style, ...rest },
+  { gutter = 'auto', tabIndex, render, className, style, ...rest },
   ref,
 ) {
-  const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-
-  // A callback ref so the component can observe the element while still honouring whatever
-  // ref the caller passed. There is no `mergeRefs` helper in the repo to reach for.
-  const setRefs = React.useCallback(
-    (element: HTMLDivElement | null) => {
-      setNode(element);
-      if (typeof ref === 'function') {
-        ref(element);
-      } else if (ref) {
-        ref.current = element;
-      }
-    },
-    [ref],
-  );
+  const [node, setNode] = React.useState<HTMLElement | null>(null);
 
   // An explicit `tabIndex` always wins — a caller who has an opinion about the tab order
   // shouldn't have it silently overwritten, and passing `-1` is how you opt out entirely.
   const managed = tabIndex === undefined;
   const needsTabStop = useScrollerFocusable(node, managed);
 
-  return (
-    <div
-      ref={setRefs}
-      /*
-        A scrollable region is the documented exception to `no-noninteractive-tabindex`: without
-        a tab stop it is simply unreachable by keyboard in Safari (WCAG 2.1.1). The stop is only
-        taken when the region actually overflows and holds nothing else focusable.
-      */
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- see above
-      tabIndex={managed ? (needsTabStop ? 0 : undefined) : tabIndex}
-      {...mergeStyleProps(
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    // `useRender` merges an array of refs, so the component can observe the element without
+    // taking the caller's ref away from them.
+    ref: [ref, setNode],
+    props: {
+      tabIndex: managed ? (needsTabStop ? 0 : undefined) : tabIndex,
+      ...mergeStyleProps(
         themeProps('scroll-area-viewport', { gutter }),
         stylex.props(styles.viewport, styles.mask, styles.indicators, styles.focusRing, gutters[gutter]),
         className,
         style,
-      )}
-      {...rest}
-    />
-  );
+      ),
+      ...rest,
+    },
+  });
 });
 
 /**
