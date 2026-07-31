@@ -65,18 +65,6 @@ const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negativ
 
 export const styles = stylex.create({
   base: {
-    // The icon rides at reduced strength until the button is hovered, so it reads as secondary to
-    // the label at rest. Mixed from `currentColor` rather than set per cell: every variant×color
-    // already carries its own foreground, so one declaration covers the whole matrix. `Icon` reads
-    // this var (`icon.styles.ts`); StyleX can't emit a descendant rule, so the value has to cross
-    // the element boundary as a custom property.
-    '--_cl-icon-color': {
-      default: `color-mix(in oklab, currentColor 60%, transparent)`,
-      '@media (hover: hover)': {
-        default: null,
-        ':enabled:hover': 'currentColor',
-      },
-    },
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
