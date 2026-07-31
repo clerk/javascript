@@ -19,6 +19,12 @@ resources is a drop-in follow-up.
 
 ## Example
 
+Every example on this page is a working prototype over the same mock accounts, so try it:
+picking a workspace or an account switches to it and closes the surface, **Join** turns a suggested
+workspace into one you're in, and the trigger updates to whatever is active. The actions that would
+navigate somewhere in a real app — Manage, Invite, Create organization, Add account — have nowhere
+to go here, so they only close the popover.
+
 <Story
   name='Combined'
   storyModule={UserButtonStories}
@@ -85,12 +91,14 @@ Wherever an organization is active it is what the trigger and the header show, w
 so it shows the account's photo even when one is active.
 
 Passing organization data in `user` mode, or extra sessions in `orgs` mode, is not an error — the
-mode decides what renders, so a single set of props can drive any of the three.
+mode decides what renders, so a single set of props can drive any of the three. The two examples
+below prove it: they take exactly the same props as the one above, and differ only by `mode`.
 
 ### Organizations
 
 The org is the header, carrying **Invite** and the gear (**Manage organization**). With no account
-menu to hold it, **Create organization** moves to the foot of the surface.
+menu to hold it, **Create organization** moves to the foot of the surface. The other signed-in
+account is still in the props and is deliberately not rendered.
 
 <Story
   name='Organizations'
@@ -100,8 +108,8 @@ menu to hold it, **Create organization** moves to the foot of the surface.
 ### User
 
 The header is the account with only its gear (**Manage account**) — there is nobody to invite — and
-every other account is a plain row you click to switch to. This example holds real state: picking
-Braden makes him the active account and closes the popover.
+every other account is a plain row you click to switch to. An organization is active here, and this
+mode still shows the account.
 
 <Story
   name='User'
