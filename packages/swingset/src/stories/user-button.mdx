@@ -2,10 +2,10 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher that sits behind the user avatar. The active workspace sits at the
-top — the one large row, carrying a **gear** that manages it and, for an organization, an **Invite**
-button — its organizations (including any **suggested** workspaces you
-can Join) are listed under the account they belong to, and **additional accounts** follow. Clicking any
+The account & organization switcher that sits behind the user avatar. The account you're signed in as
+heads the surface — the one large row, carrying a **gear** that manages it and, where an organization
+is active, an **Invite** button. Its organizations (including any **suggested** workspaces you can
+Join) are listed under the account they belong to, and **additional accounts** follow. Clicking any
 row switches to it; the account's own `⋯` menu carries its per-account actions. The foot of the surface
 exposes **Add account** and **Sign out of all accounts**. `mode` narrows that to just the
 organizations or just the accounts; see [Modes](#modes).
@@ -80,15 +80,20 @@ boundary without forcing the consumer's file to become a client component.
 `mode` picks which switchers the surface carries. It is the only prop that changes the shape of the
 popup; everything else is data.
 
-| Mode                 | Popup                                | Trigger          |
-| -------------------- | ------------------------------------ | ---------------- |
-| `combined` (default) | Organizations and accounts together. | The org's mark   |
-| `orgs`               | Organizations only; no account rows. | The org's mark   |
-| `user`               | Accounts only; never shows an org.   | The user's photo |
+| Mode                 | Popup                                | Trigger          | Header      |
+| -------------------- | ------------------------------------ | ---------------- | ----------- |
+| `combined` (default) | Organizations and accounts together. | The org's mark   | The account |
+| `orgs`               | Organizations only; no account rows. | The org's mark   | The org     |
+| `user`               | Accounts only; never shows an org.   | The user's photo | The account |
 
-Wherever an organization is active it is what the trigger and the header show, which is why
-`combined` and `orgs` both land on the org's mark. `user` mode never resolves to an organization,
-so it shows the account's photo even when one is active.
+The trigger follows whichever organization is active, which is why `combined` and `orgs` both land
+on the org's mark; `user` never resolves to an organization, so it shows the account's photo even
+when one is active.
+
+Only `orgs` is _headed_ by the organization. Everywhere else the account heads the surface, so
+switching organization changes the trigger and the check in the list without changing who the popup
+says you're signed in as. **Invite** still belongs to the active organization wherever there is one,
+which is why it sits next to an account in `combined`; the gear manages whatever the header names.
 
 Passing organization data in `user` mode, or extra sessions in `orgs` mode, is not an error — the
 mode decides what renders, so a single set of props can drive any of the three. The two examples
@@ -107,9 +112,9 @@ account is still in the props and is deliberately not rendered.
 
 ### User
 
-The header is the account with only its gear (**Manage account**) — there is nobody to invite — and
-every other account is a plain row you click to switch to. An organization is active here, and this
-mode still shows the account.
+The header is the account with only its gear (**Manage account**) — there is no organization to
+invite anyone to — and every other account is a plain row you click to switch to. An organization is
+active here, and this mode ignores it entirely, down to the trigger.
 
 <Story
   name='User'
