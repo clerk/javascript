@@ -28,8 +28,8 @@ export type {
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
-export { ScrollArea } from '../components/scroll-area';
-export type { ScrollAreaGutter, ScrollAreaRootProps, ScrollAreaViewportProps } from '../components/scroll-area';
+export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
+export type { ScrollAreaGutter } from '../components/scroll-area';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 

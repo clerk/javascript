@@ -2,14 +2,18 @@ import * as ScrollAreaStories from './scroll-area.component.stories';
 
 # ScrollArea
 
-The Mosaic `ScrollArea` — a vertically scrolling region that fades its content at whichever edge
-still has something to reveal, so the boundary of a list reads as "there's more" rather than as a
-hard cut.
+A scrolling region that fades its content at whichever edge still has something to reveal, so the
+boundary of a list reads as "there's more" rather than as a hard cut.
 
-The fade is **pure CSS**. Two scroll-driven animations write a progress var per edge, and a mask
-reads them — no scroll listener, no measurement, no primitive behind it. Because the fade is a mask
-rather than a sticky overlay element, it is paint-only and **cannot shift the content**; the classic
-sticky-pseudo-element approach takes space in the scroll flow, this doesn't.
+It ships as **StyleX atoms, not a component**. Everything it does is CSS, so a component would only
+add a DOM node and an API to version. Spread the atoms onto an element you already render — an
+`Item.Group`, a list, a panel body — and that element keeps its own slot class, which stays the hook
+a theme targets.
+
+Two scroll-driven animations write a progress var per edge, and a mask reads them: no scroll
+listener, no measurement, nothing at runtime. Because the fade is a mask rather than a sticky
+overlay element it is paint-only and **cannot shift the content**, unlike the classic
+sticky-pseudo-element approach which takes space in the scroll flow.
 
 ## Example
 
@@ -20,17 +24,33 @@ sticky-pseudo-element approach takes space in the scroll flow, this doesn't.
 
 ## Usage
 
-Two parts. `ScrollArea.Root` is the box the region occupies; `ScrollArea.Viewport` is the scroll
-container that owns the overflow, the timelines and the mask. Give the root a height — the viewport
-fills it.
+`scrollAreaViewport()` returns the atoms for the element that scrolls; spread them.
+`scrollAreaRoot` goes on a positioned ancestor, and is only needed when something has to anchor
+against the scroll box — an overlay replacing the mask, for instance. A surface whose parent is
+already positioned can skip it.
 
 ```tsx
-import { ScrollArea } from '@clerk/ui/mosaic/components/scroll-area';
+import { Item } from '@clerk/ui/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import * as stylex from '@stylexjs/stylex';
 
-<ScrollArea.Root style={{ height: 220 }}>
-  <ScrollArea.Viewport>{members.map(m => <MemberRow key={m.id} {...m} />)}</ScrollArea.Viewport>
-</ScrollArea.Root>;
+<div
+  style={{ height: 220 }}
+  {...stylex.props(scrollAreaRoot)}
+>
+  <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows}</Item.Group>
+</div>;
 ```
+
+Note the spread: `scrollAreaViewport()` returns an array, so it goes into `stylex.props` with `...`.
+Consumer styles still win by being passed after it.
+
+### API
+
+| Export                        | Type                                       | Description                                      |
+| ----------------------------- | ------------------------------------------ | ------------------------------------------------ |
+| `scrollAreaViewport(gutter?)` | `(gutter?: 'auto' \| 'stable') => atoms[]` | The scroll surface. `gutter` defaults to `auto`. |
+| `scrollAreaRoot`              | `atom`                                     | Positioned ancestor, for anchoring overlays.     |
 
 ### Nothing to scroll
 
@@ -45,7 +65,7 @@ nothing had to detect that — the resting state is already the hidden one.
 
 ### Gutter
 
-`gutter` on `ScrollArea.Viewport` decides whether the scrollbar's space is held open.
+The `gutter` argument to `scrollAreaViewport()` decides whether the scrollbar's space is held open.
 
 `auto` (the default, and CSS's own) takes the space only while the content overflows. `stable`
 reserves it either way, so a collection that crosses the overflow threshold doesn't shift its rows
@@ -89,26 +109,11 @@ The scrollbar's **size** is not a prop — see `--cl-scrollbar-width` below.
   storyModule={ScrollAreaStories}
 />
 
-## Parts
-
-| Part                  | Slot                   | Description                                                      |
-| --------------------- | ---------------------- | ---------------------------------------------------------------- |
-| `ScrollArea.Root`     | `scroll-area-root`     | The box the region occupies. Positioned, so overlays can anchor. |
-| `ScrollArea.Viewport` | `scroll-area-viewport` | The scroll container; owns overflow, the timelines and the mask. |
-
-### Props
-
-Only `ScrollArea.Viewport` takes a prop of its own; `ScrollArea.Root` is a plain `div`. Both accept
-the usual `className` / `style` escape hatches and forward every other native `div` prop.
-
-| Prop     | Type                 | Default  | Description                                 |
-| -------- | -------------------- | -------- | ------------------------------------------- |
-| `gutter` | `'stable' \| 'auto'` | `'auto'` | Whether the scrollbar's space is held open. |
-
 ## Styling
 
-Themed with **StyleX**. Each part carries a stable `.cl-<slot>` class alongside the StyleX atoms;
-consumers never target the hashed atomic classes.
+The atoms bring no class of their own — the element you applied them to keeps its existing
+`.cl-<slot>` class, and that is what a theme targets. In the examples here the styles ride on an
+`Item.Group`, so every override below is written against `.cl-item-group`.
 
 ### Variables
 
@@ -170,10 +175,10 @@ it.
 ```css
 @import '@clerk/ui/styles.css' layer(components);
 
-.cl-scroll-area-viewport {
+.cl-item-group {
   mask-image: none;
 }
-.cl-scroll-area-viewport::before {
+.cl-item-group::before {
   content: '';
   position: absolute;
   inset: 0 0 auto;
@@ -220,30 +225,22 @@ duration and paint both fades permanently.
 
 ### Keyboard access
 
-The viewport manages its own `tabIndex`, so this is handled for you.
+Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own. **Safari
+does not**, so a keyboard-only user there can't scroll the region at all (WCAG 2.1.1).
 
-Chrome and Firefox make an overflowing scroll container keyboard-focusable automatically. Safari
-does not, which leaves a keyboard-only user there unable to scroll the region at all (WCAG 2.1.1).
-The viewport closes that gap by taking a tab stop exactly when those browsers would: when it
-**overflows** _and_ its content contains **nothing focusable**.
-
-The second half matters as much as the first. A list whose rows are buttons or links is already
-reachable — tabbing into the content scrolls it — so a stop on the container would be a redundant
-one. Chrome and Firefox make the same exclusion, which is why applying the rule everywhere rather
-than sniffing for Safari changes nothing in the browsers that already handle it.
-
-Both halves are watched rather than sampled once, so a list that grows past the threshold or rows
-that gain interactivity are picked up after mount.
-
-Pass an explicit `tabIndex` to take the decision back; `-1` opts out entirely.
+CSS can't express this — `tabindex` isn't a style — so the atoms can't close it for you. Where a
+scroll surface holds nothing focusable, set `tabIndex={0}` on it yourself:
 
 ```tsx
-// Managed: takes a stop only if it needs one.
-<ScrollArea.Viewport>{plainTextRows}</ScrollArea.Viewport>
-
-// Opted out.
-<ScrollArea.Viewport tabIndex={-1}>{rows}</ScrollArea.Viewport>
+<div
+  tabIndex={0}
+  role='region'
+  aria-label='Members'
+  {...stylex.props(...scrollAreaViewport())}
+>
+  {prose}
+</div>
 ```
 
-No `role` is added along with the stop, matching what the browsers do natively. Add
-`role='region'` with an `aria-label` if you want the region announced.
+A surface whose rows are buttons or links needs nothing: tabbing into the content already scrolls
+it, which is why Chrome and Firefox skip those too.

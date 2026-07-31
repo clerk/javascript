@@ -48,9 +48,9 @@ const revealEnd = stylex.keyframes({
 const maskImage = `linear-gradient(to bottom, transparent 0, #000 calc(${progressStart} * ${fadeSize}), #000 calc(100% - ${progressEnd} * ${fadeSize}), transparent 100%), linear-gradient(#000, #000)`;
 
 // Split by concern rather than one object per slot: the sort-keys rule reorders within an
-// object, so a large one ends up interleaving unrelated properties and stranding the
-// comments that explain them.
-export const styles = stylex.create({
+// object, so a large one ends up interleaving unrelated properties and stranding the comments
+// that explain them. `scrollAreaViewport()` recomposes them, so callers spread one thing.
+const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -116,7 +116,7 @@ export const styles = stylex.create({
 // Mosaic has no reason to size scrollbars differently between components. What varies per
 // instance is whether the space is held open, which is a layout decision about the
 // surrounding content rather than an appearance one.
-export const gutters = stylex.create({
+const gutters = stylex.create({
   // The default, and CSS's own. Nothing is reserved until a scrollbar actually appears, which
   // is right whenever the content can't change height while mounted — no shift is possible,
   // so holding space open would only cost width.
@@ -129,3 +129,36 @@ export const gutters = stylex.create({
     scrollbarGutter: 'stable',
   },
 });
+
+export type ScrollAreaGutter = keyof typeof gutters;
+
+/**
+ * The scroll surface, as StyleX atoms to spread onto an element you already render.
+ *
+ * There is no `<ScrollArea>` component: everything here is CSS, so a component would only add
+ * a DOM node and an API to version. Put these on whatever already scrolls — an `Item.Group`,
+ * a list, a panel body — and it keeps its own slot class, which stays the hook a theme
+ * targets.
+ *
+ * ```tsx
+ * <div {...stylex.props(scrollAreaRoot)}>
+ *   <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows}</Item.Group>
+ * </div>
+ * ```
+ *
+ * @param gutter - Whether the scrollbar's space is held open. `auto` (the default, and CSS's
+ * own) takes it only while the content overflows. `stable` reserves it either way, which is
+ * worth it when the content can change height **in place** — a filterable or paginated
+ * collection — so crossing the overflow threshold doesn't shift the rows sideways. Neither
+ * does anything on platforms that overlay their scrollbars.
+ */
+export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto') {
+  return [styles.viewport, styles.mask, styles.indicators, styles.focusRing, gutters[gutter]] as const;
+}
+
+/**
+ * The positioned ancestor. Only needed when something has to anchor against the scroll box —
+ * an overlay replacing the default mask, or a future scrollbar. A scroll surface whose parent
+ * is already positioned doesn't need it.
+ */
+export const scrollAreaRoot = styles.root;
