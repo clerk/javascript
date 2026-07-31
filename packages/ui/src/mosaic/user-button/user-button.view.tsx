@@ -5,6 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import type { AvatarProps } from '../components/avatar';
 import { Avatar } from '../components/avatar';
 import { Button } from '../components/button';
 import { Card } from '../components/card';
@@ -35,6 +36,7 @@ export interface UserButtonMembership {
   imageUrl?: string;
   membersCount?: number;
   planLabel?: string;
+  /** Kept in the contract; the header's Upgrade link is not rendered yet. */
   upgradeable?: boolean;
   membershipRequestCount?: number;
 }
@@ -79,14 +81,22 @@ export interface UserButtonCallbacks {
   onSignOutSession?: (sessionId: string) => void;
   onSignOutAll?: () => void;
   onManageOrganization?: () => void;
-  onManageMembers?: () => void;
+  onInviteMembers?: () => void;
   onManageAccount?: () => void;
   onCreateOrganization?: () => void;
   onAddAccount?: () => void;
+  /** Kept in the contract; nothing renders it yet. */
   onUpgrade?: () => void;
 }
 
-type UserButtonContextValue = UserButtonData & UserButtonCallbacks;
+/**
+ * Which switchers the surface carries. `combined` is both; `orgs` is an organization switcher with
+ * no account rows; `user` is an account switcher that never shows an organization, even when one
+ * is active.
+ */
+export type UserButtonMode = 'combined' | 'orgs' | 'user';
+
+type UserButtonContextValue = UserButtonData & UserButtonCallbacks & { mode: UserButtonMode };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -105,6 +115,31 @@ function activeMembership(data: UserButtonData): UserButtonMembership | undefine
     return undefined;
   }
   return data.memberships.find(m => m.organizationId === data.activeOrganizationId);
+}
+
+interface ActiveWorkspace {
+  name: string;
+  imageUrl?: string;
+  shape: 'circle' | 'square';
+  /** Absent when the personal account is what's active. */
+  organization?: UserButtonMembership;
+}
+
+/**
+ * What the trigger and the header both show. An organization wins wherever one is active, which is
+ * why `combined` defaults to the organization mark; `user` mode never resolves to one.
+ */
+function activeWorkspace(data: UserButtonContextValue): ActiveWorkspace {
+  const organization = data.mode === 'user' ? undefined : activeMembership(data);
+  if (organization) {
+    return { name: organization.name, imageUrl: organization.imageUrl, shape: 'square', organization };
+  }
+  return { name: data.activeSession.name, imageUrl: data.activeSession.imageUrl, shape: 'circle' };
+}
+
+/** `user` mode never lists organizations, and neither does an account without any. */
+function showsOrganizations(data: UserButtonContextValue): boolean {
+  return data.mode !== 'user' && data.hasOrganizations;
 }
 
 function membershipSubtitle(membership: UserButtonMembership): string {
@@ -129,7 +164,7 @@ interface WorkspaceAvatarProps {
   name: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
-  size: 'fit' | 'md';
+  size: AvatarProps['size'];
 }
 
 function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) {
@@ -233,46 +268,31 @@ function ActionRow({ icon, label, onClick }: ActionRowProps) {
 // ─── Sections ───────────────────────────────────────────────────────────────
 
 interface HeaderAction {
-  icon: IconName;
   label: string;
-  /** Icon-only actions label themselves through `aria-label`. */
-  iconOnly: boolean;
+  /** An icon renders a square, icon-only button that labels itself through `aria-label`. */
+  icon?: IconName;
   onClick: () => void;
 }
 
 /** The active workspace: who you are signed in as, and what you can do about it. */
 function Header() {
   const data = useUserButtonContext();
-  const org = activeMembership(data);
-  const isOrg = org !== undefined;
-  const name = isOrg ? org.name : data.activeSession.name;
-  const imageUrl = isOrg ? org.imageUrl : data.activeSession.imageUrl;
-  const subtitle = isOrg ? membershipSubtitle(org) : data.activeSession.email;
+  const { name, imageUrl, shape, organization } = activeWorkspace(data);
+  const subtitle = organization ? membershipSubtitle(organization) : data.activeSession.email;
 
+  // Inviting is the one thing you can do to an organization but not to yourself, so it is the
+  // only action that varies. Signing out is a row in the list below; it does not repeat here.
   const actions: HeaderAction[] = [];
-  if (isOrg) {
+  if (organization) {
+    if (data.onInviteMembers) {
+      actions.push({ label: 'Invite', onClick: data.onInviteMembers });
+    }
     if (data.onManageOrganization) {
-      actions.push({ icon: 'cog', label: 'Manage organization', iconOnly: true, onClick: data.onManageOrganization });
+      actions.push({ label: 'Manage organization', icon: 'cog', onClick: data.onManageOrganization });
     }
-    if (data.onManageMembers) {
-      actions.push({ icon: 'users', label: 'Members', iconOnly: true, onClick: data.onManageMembers });
-    }
-  } else {
-    if (data.onManageAccount) {
-      actions.push({ icon: 'cog', label: 'Manage account', iconOnly: true, onClick: data.onManageAccount });
-    }
-    const signOut = data.onSignOutSession;
-    if (signOut) {
-      actions.push({
-        icon: 'log-out',
-        label: 'Sign out',
-        iconOnly: false,
-        onClick: () => signOut(data.activeSession.sessionId),
-      });
-    }
+  } else if (data.onManageAccount) {
+    actions.push({ label: 'Manage account', icon: 'cog', onClick: data.onManageAccount });
   }
-
-  const showUpgrade = isOrg && org.upgradeable === true && data.onUpgrade !== undefined;
 
   return (
     <Item.Group>
@@ -281,7 +301,7 @@ function Header() {
           <WorkspaceAvatar
             name={name}
             imageUrl={imageUrl}
-            shape={isOrg ? 'square' : 'circle'}
+            shape={shape}
             size='fit'
           />
         </Item.Media>
@@ -290,30 +310,24 @@ function Header() {
           {subtitle ? <Item.Description>{subtitle}</Item.Description> : null}
         </Item.Content>
         <Item.Actions>
-          {showUpgrade ? (
-            <Button
-              variant='link'
-              size='sm'
-              onClick={data.onUpgrade}
-            >
-              Upgrade
-            </Button>
-          ) : null}
           {actions.map(a => (
             <Button
               key={a.label}
               variant='outline'
               color='neutral'
               size='sm'
-              shape={a.iconOnly ? 'square' : 'default'}
-              aria-label={a.iconOnly ? a.label : undefined}
+              shape={a.icon ? 'square' : 'default'}
+              aria-label={a.icon ? a.label : undefined}
               onClick={a.onClick}
             >
-              <Icon
-                name={a.icon}
-                size='sm'
-              />
-              {a.iconOnly ? null : a.label}
+              {a.icon ? (
+                <Icon
+                  name={a.icon}
+                  size='sm'
+                />
+              ) : (
+                a.label
+              )}
             </Button>
           ))}
         </Item.Actions>
@@ -384,10 +398,13 @@ function WorkspaceList() {
 
   return (
     <Item.Group {...stylex.props(styles.scroll)}>
-      <AccountRow
-        email={data.activeSession.email}
-        actions={actions}
-      />
+      {/* An org-only surface has no accounts to label, so the list is bare. */}
+      {data.mode === 'orgs' ? null : (
+        <AccountRow
+          email={data.activeSession.email}
+          actions={actions}
+        />
+      )}
       {data.memberships.map(m => (
         <WorkspaceRow
           key={m.organizationId}
@@ -452,7 +469,7 @@ function AdditionalAccount({ session }: { session: UserButtonSession }) {
   const switchSession = data.onSwitchSession;
   const signOutSession = data.onSignOutSession;
 
-  if (data.hasOrganizations) {
+  if (showsOrganizations(data)) {
     const actions: AccountAction[] = [];
     if (switchSession) {
       actions.push({ label: 'Switch to this account', onClick: () => switchSession(session.sessionId) });
@@ -470,7 +487,7 @@ function AdditionalAccount({ session }: { session: UserButtonSession }) {
 
   return (
     <Item.Root
-      size='md'
+      size='xs'
       render={switchSession ? asButton : undefined}
       onClick={switchSession ? () => switchSession(session.sessionId) : undefined}
     >
@@ -484,7 +501,6 @@ function AdditionalAccount({ session }: { session: UserButtonSession }) {
       </Item.Media>
       <Item.Content>
         <Item.Title>{session.name}</Item.Title>
-        <Item.Description>{session.email}</Item.Description>
       </Item.Content>
     </Item.Root>
   );
@@ -512,33 +528,41 @@ function SessionsSection() {
   );
 }
 
-/** Account-wide actions plus the Clerk attribution. */
+/** The actions that close out the surface, plus the Clerk attribution. */
 function Footer() {
   const data = useUserButtonContext();
 
-  if (!data.onAddAccount && !data.onSignOutAll) {
-    return <div {...stylex.props(styles.branding)}>Secured by Clerk</div>;
+  // An org-only surface has no account menu to carry "Create organization", so it lands here
+  // instead, in the slot the account-wide actions occupy everywhere else.
+  const actions: ActionRowProps[] = [];
+  if (data.mode === 'orgs') {
+    if (data.onCreateOrganization) {
+      actions.push({ icon: 'plus', label: 'Create organization', onClick: data.onCreateOrganization });
+    }
+  } else {
+    if (data.onAddAccount) {
+      actions.push({ icon: 'plus', label: 'Add account', onClick: data.onAddAccount });
+    }
+    if (data.onSignOutAll) {
+      actions.push({ icon: 'log-out', label: 'Sign out of all accounts', onClick: data.onSignOutAll });
+    }
   }
 
   return (
     <>
-      <Item.Separator />
-      <Item.Group>
-        {data.onAddAccount ? (
-          <ActionRow
-            icon='plus'
-            label='Add account'
-            onClick={data.onAddAccount}
-          />
-        ) : null}
-        {data.onSignOutAll ? (
-          <ActionRow
-            icon='log-out'
-            label='Sign out of all accounts'
-            onClick={data.onSignOutAll}
-          />
-        ) : null}
-      </Item.Group>
+      {actions.length > 0 ? (
+        <>
+          <Item.Separator />
+          <Item.Group>
+            {actions.map(action => (
+              <ActionRow
+                key={action.label}
+                {...action}
+              />
+            ))}
+          </Item.Group>
+        </>
+      ) : null}
       <div {...stylex.props(styles.branding)}>Secured by Clerk</div>
     </>
   );
@@ -548,6 +572,8 @@ function Footer() {
 
 export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks {
   children: ReactNode;
+  /** @default 'combined' */
+  mode?: UserButtonMode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -561,7 +587,7 @@ export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks
  * the data through context.
  */
 export function UserButtonRoot(props: UserButtonRootProps) {
-  const { children, open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
+  const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
   return (
     <Popover.Root
       open={open}
@@ -570,7 +596,7 @@ export function UserButtonRoot(props: UserButtonRootProps) {
       placement={placement ?? 'bottom-start'}
       sideOffset={sideOffset}
     >
-      <UserButtonContext.Provider value={data}>{children}</UserButtonContext.Provider>
+      <UserButtonContext.Provider value={{ ...data, mode }}>{children}</UserButtonContext.Provider>
     </Popover.Root>
   );
 }
@@ -578,11 +604,7 @@ export function UserButtonRoot(props: UserButtonRootProps) {
 /** The trigger: the active workspace's avatar, and nothing else. */
 export function UserButtonTrigger() {
   const data = useUserButtonContext();
-  const org = activeMembership(data);
-  const isOrg = org !== undefined;
-  const name = isOrg ? org.name : data.activeSession.name;
-  const imageUrl = isOrg ? org.imageUrl : data.activeSession.imageUrl;
-  const shape = isOrg ? 'square' : 'circle';
+  const { name, imageUrl, shape } = activeWorkspace(data);
 
   return (
     <Popover.Trigger
@@ -593,7 +615,7 @@ export function UserButtonTrigger() {
         name={name}
         imageUrl={imageUrl}
         shape={shape}
-        size='md'
+        size='sm'
       />
     </Popover.Trigger>
   );
@@ -607,13 +629,13 @@ export function UserButtonPopup() {
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
       <Card style={{ rowGap: 0 }}>
         <Header />
-        {data.hasOrganizations ? (
+        {showsOrganizations(data) ? (
           <>
             <Item.Separator />
             <WorkspaceList />
           </>
         ) : null}
-        <SessionsSection />
+        {data.mode === 'orgs' ? null : <SessionsSection />}
         <Footer />
       </Card>
     </Popover.Popup>
