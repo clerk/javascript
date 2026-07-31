@@ -9,6 +9,7 @@ import type { AvatarProps } from '../components/avatar';
 import { Avatar } from '../components/avatar';
 import { Button } from '../components/button';
 import { Card } from '../components/card';
+import { ClerkLogo } from '../components/clerk-logo';
 import { Icon } from '../components/icon';
 import { Item } from '../components/item';
 import { Menu } from '../components/menu';
@@ -629,7 +630,9 @@ function Footer() {
           </Item.Group>
         </>
       ) : null}
-      <div {...stylex.props(styles.branding)}>Secured by Clerk</div>
+      <div {...stylex.props(styles.branding)}>
+        Secured by <ClerkLogo height={14} />
+      </div>
     </>
   );
 }
