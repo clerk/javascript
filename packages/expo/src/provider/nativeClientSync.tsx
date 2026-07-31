@@ -1022,8 +1022,17 @@ export function useNativeClientBootstrap({
                   `To enable native features, add "@clerk/expo" to your app.json plugins array.`,
               );
             }
-          } else if (__DEV__) {
-            console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
+          } else {
+            // Also logged in release builds: a failed native configure silently
+            // disables the native components, which is undiagnosable from device
+            // logs otherwise.
+            const message = error instanceof Error ? error.message : String(error);
+            console.warn(
+              `[ClerkProvider] Failed to configure native Clerk (${Platform.OS}); native components will not work: ${message}`,
+            );
+            if (__DEV__) {
+              console.error(`[ClerkProvider] Failed to configure Clerk ${Platform.OS}:`, error);
+            }
           }
         } finally {
           if (didAttemptConfigure && isCurrentConfiguration()) {

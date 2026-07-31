@@ -365,7 +365,10 @@ jobs:
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
+          # The setprop turns on @clerk/expo + clerk-android debug logging in the
+          # release build so the logcat artifact shows native SDK activity.
           script: >-
+            adb shell setprop log.tag.ClerkExpo DEBUG &&
             cd integration/tests/expo-native &&
             MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
             "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"

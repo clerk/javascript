@@ -19,7 +19,7 @@ import expo.modules.kotlin.viewevent.EventDispatcher
 private const val TAG = "ClerkUserProfileViewModule"
 
 private fun debugLog(tag: String, message: String) {
-  if (BuildConfig.DEBUG) {
+  if (clerkExpoDebugEnabled()) {
     Log.d(tag, message)
   }
 }
