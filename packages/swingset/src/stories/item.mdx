@@ -34,6 +34,90 @@ Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's 
   storyModule={ItemStories}
 />
 
+### Scrolling
+
+A capped-height group that scrolls, fading its content at whichever edge still has something to
+reveal.
+
+<Story
+  name='Scrolling'
+  storyModule={ItemStories}
+/>
+
+The scroll surface is **StyleX atoms, not a component** — everything it does is CSS, so a component
+would only add a DOM node and an API to version. Spread `scrollAreaViewport()` onto the group
+itself; it keeps its own `.cl-item-group` slot, which stays the hook a theme targets. `scrollAreaRoot`
+goes on a positioned ancestor and is only needed when something has to anchor against the scroll
+box — an overlay replacing the fade, for instance.
+
+```tsx
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import * as stylex from '@stylexjs/stylex';
+
+<div
+  style={{ height: 260 }}
+  {...stylex.props(scrollAreaRoot)}
+>
+  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+</div>;
+```
+
+`scrollAreaViewport()` returns an array, hence the `...` spread. Its one argument is the scrollbar
+gutter: `auto` (the default, and CSS's own) takes the space only while the content overflows, while
+`stable` reserves it either way — worth it when the content can change height **in place**, such as
+a filterable list, so crossing the overflow threshold doesn't shift the rows sideways.
+
+The fade is driven by two scroll-driven animations: no scroll listener, no measurement, nothing at
+runtime. It is a mask rather than a sticky overlay element, so it is paint-only and cannot shift the
+content. A group with nothing to scroll shows no indicators, and browsers without scroll-driven
+animation support get a plain scrolling group rather than a broken one.
+
+#### Theming the fade
+
+Four tokens apply to every scrolling surface in Mosaic, so setting them once retunes all of them:
+
+| Token                    | Default  | Description                                                 |
+| ------------------------ | -------- | ----------------------------------------------------------- |
+| `--cl-scroll-fade-size`  | `1.5rem` | Height of the fade band.                                    |
+| `--cl-scroll-fade-range` | `1.5rem` | How far you scroll before the fade reaches full strength.   |
+| `--cl-scroll-fade-inset` | `0px`    | Width at the inline end the fade is held back from.         |
+| `--cl-scrollbar-width`   | `thin`   | `auto`, `thin`, or `none` — keyword-only, per the CSS spec. |
+
+`--cl-scroll-fade-inset` defaults to `0px` because **CSS cannot measure a scrollbar**: the width
+differs per platform and browser, and on macOS it changes at runtime when a mouse is connected. Set
+it only when you know the platform you're targeting. Until then the mask covers the scrollbar, which
+is the one thing this approach can't solve without a custom scrollbar.
+
+To replace the fade entirely, retire it with `mask-image: none` and read the two per-element vars
+the animations write — `--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each
+describing how much that edge still has to reveal. They live on the element carrying the atoms and
+inherit downward.
+
+```css
+.cl-item-group {
+  mask-image: none;
+}
+.cl-item-group::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
+  opacity: var(--cl-scroll-area-progress-start);
+}
+```
+
+Position such overlays absolutely rather than with `position: sticky` — a sticky pseudo-element
+takes space in the scroll flow, which is the layout shift the mask approach avoids. And mix the
+scrim from a theme color rather than hardcoding black, which would darken a dark surface and look
+identical to the mask it replaced.
+
+Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own; **Safari
+does not** (WCAG 2.1.1). `tabindex` isn't a style, so the atoms can't close that gap — set
+`tabIndex={0}` yourself on a scroll surface that holds nothing focusable. A group of interactive
+rows, like the one above, needs nothing: tabbing into the content already scrolls it.
+
 ## Usage
 
 ```tsx
