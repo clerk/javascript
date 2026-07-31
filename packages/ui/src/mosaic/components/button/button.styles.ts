@@ -62,8 +62,6 @@ export const styles = stylex.create({
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
-    // The size axis fixes the height, so overflowing content clips instead of spilling out.
-    overflow: 'hidden',
     alignItems: 'center',
     // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
@@ -113,16 +111,34 @@ export const styles = stylex.create({
     paddingInlineStart: 0,
   },
 
-  // Under a coarse pointer the control floors at the target size. Its own atom rather than a
-  // per-size override: the floor is one physical constant, and `link` — text, not a control —
-  // opts out by not receiving it. `minHeight` leaves the fixed height in charge otherwise.
+  // Under a coarse pointer the hit area floors at the target size — grown by an overlay
+  // rather than by `min-height`, so the button keeps the size its axis gives it and only the
+  // region answering a tap gets bigger. Its own atom rather than a per-size override: the
+  // floor is one physical constant, and `link` — text, not a control — opts out by not
+  // receiving it.
+  //
+  // The insets resolve against the button's own box, so one expression covers every size:
+  // the overlay lands at exactly the target height whatever the shortfall, and clamps to the
+  // button's bounds once the control is already past the floor. `position` is scoped to the
+  // media query too — a fine pointer generates no overlay, so it shouldn't take on the
+  // stacking change either.
   touchTarget: {
-    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+    position: { default: null, '@media (pointer: coarse)': 'relative' },
+    '::after': {
+      insetBlock: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      // Text buttons are already past the floor inline — growing that axis too would only
+      // reach into a neighbor's space for nothing.
+      insetInline: 0,
+      content: { default: null, '@media (pointer: coarse)': '""' },
+      position: 'absolute',
+    },
   },
-  // Icon buttons are square, so the floor has to reach the inline axis too or the target
+  // Icon buttons are square, so the floor has to reach the inline axis as well or the region
   // ends up tall and narrow.
   touchTargetIcon: {
-    minWidth: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+    '::after': {
+      insetInline: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+    },
   },
 
   // state / modifiers
