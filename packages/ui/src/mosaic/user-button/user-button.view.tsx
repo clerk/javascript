@@ -516,18 +516,17 @@ function SessionsSection() {
     return null;
   }
 
+  // No separator: another account heads its own workspaces the same way the active one does, so
+  // it continues the list above rather than starting a new section.
   return (
-    <>
-      <Item.Separator />
-      <Item.Group>
-        {data.additionalSessions.map(a => (
-          <AdditionalAccount
-            key={a.sessionId}
-            session={a}
-          />
-        ))}
-      </Item.Group>
-    </>
+    <Item.Group>
+      {data.additionalSessions.map(a => (
+        <AdditionalAccount
+          key={a.sessionId}
+          session={a}
+        />
+      ))}
+    </Item.Group>
   );
 }
 
