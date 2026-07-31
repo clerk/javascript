@@ -205,11 +205,14 @@ interface WorkspaceRowProps {
 
 /** One selectable workspace: personal account, organization, suggestion, or invitation. */
 function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing }: WorkspaceRowProps) {
+  // Selecting what is already selected does nothing, so the active row is not a button at all.
+  const select = active ? undefined : onSelect;
+
   return (
     <Item.Root
       size='xs'
-      render={onSelect ? asButton : undefined}
-      onClick={onSelect}
+      render={select ? asButton : undefined}
+      onClick={select}
     >
       <Item.Media>
         <WorkspaceAvatar
