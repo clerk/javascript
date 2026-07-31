@@ -24,12 +24,16 @@ export const styles = stylex.create({
   },
 
   branding: {
+    gap: space['2'],
     paddingBlock: space['2'],
+    alignItems: 'center',
     borderBlockStartColor: colorVars['--cl-color-border-faded'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     color: colorVars['--cl-color-neutral-faded'],
+    display: 'flex',
     fontSize: typeScaleVars['--cl-text-xs-size'],
+    justifyContent: 'center',
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     textAlign: 'center',
   },
