@@ -145,19 +145,10 @@ export function Shapes(props: Record<string, unknown>) {
         size='sm'
         aria-label='Add'
       >
-        <svg
-          width='14'
-          height='14'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          style={{ flexShrink: 0 }}
-        >
-          <path d='M12 5v14M5 12h14' />
-        </svg>
+        <Icon
+          name='plus'
+          size='sm'
+        />
       </Button>
       <Button
         {...knobsAsProps(props)}
@@ -165,19 +156,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <svg
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          style={{ flexShrink: 0 }}
-        >
-          <path d='M12 5v14M5 12h14' />
-        </svg>
+        <Icon name='plus' />
       </Button>
       <Button
         {...knobsAsProps(props)}
@@ -185,19 +164,10 @@ export function Shapes(props: Record<string, unknown>) {
         size='sm'
         aria-label='Add'
       >
-        <svg
-          width='14'
-          height='14'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          style={{ flexShrink: 0 }}
-        >
-          <path d='M12 5v14M5 12h14' />
-        </svg>
+        <Icon
+          name='plus'
+          size='sm'
+        />
       </Button>
       <Button
         {...knobsAsProps(props)}
@@ -205,19 +175,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <svg
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          style={{ flexShrink: 0 }}
-        >
-          <path d='M12 5v14M5 12h14' />
-        </svg>
+        <Icon name='plus' />
       </Button>
     </div>
   );
