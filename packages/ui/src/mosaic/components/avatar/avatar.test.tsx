@@ -87,6 +87,30 @@ describe('Mosaic Avatar', () => {
     expect(screen.queryByText('CN')).not.toBeInTheDocument();
   });
 
+  it('renders the image undraggable, and lets a consumer opt back in', async () => {
+    outcomes['https://example.com/a.png'] = 'load';
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+        />
+      </Avatar.Root>,
+    );
+    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'false');
+
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+          draggable
+        />
+      </Avatar.Root>,
+    );
+    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'true');
+  });
+
   it('keeps the fallback when the image errors', async () => {
     outcomes['https://example.com/bad.png'] = 'error';
     render(
