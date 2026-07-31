@@ -4,9 +4,10 @@ import * as UserButtonStories from './user-button.stories';
 
 The account & organization switcher that sits behind the user avatar. The account you're signed in as
 heads the surface — the one large row, carrying a **gear** that manages it and, where an organization
-is active, an **Invite** button. Its organizations (including any **suggested** workspaces you can
-Join) are listed under the account they belong to, and **additional accounts** follow. Clicking any
-row switches to it; the account's own `⋯` menu carries its per-account actions. The foot of the surface
+is active, an **Invite** button. Below it every signed-in account heads its own organizations
+(including any **suggested** workspaces you can Join), so a workspace always sits under the account
+it belongs to. Clicking a workspace makes it _and_ its account active in one go — `onSelectWorkspace`
+takes both — and the account's own `⋯` menu carries its per-account actions. The foot of the surface
 exposes **Add account** and **Sign out of all accounts**. `mode` narrows that to just the
 organizations or just the accounts; see [Modes](#modes).
 
@@ -48,10 +49,14 @@ import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
   ]}
   suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
   invitations={[]}
-  additionalSessions={[{ sessionId: 'sess_braden', userId: 'user_braden', name: 'Braden', email: 'braden@clerk.dev' }]}
-  onSelectOrganization={id => setActive({ organization: id })}
-  onSelectPersonal={() => setActive({ organization: null })}
-  onSwitchSession={sessionId => setActive({ session: sessionId })}
+  additionalAccounts={[
+    {
+      session: { sessionId: 'sess_braden', userId: 'user_braden', name: 'Braden', email: 'braden@clerk.dev' },
+      memberships: [{ kind: 'membership', organizationId: 'org_clerk_marketing', name: 'Clerk Marketing' }],
+    },
+  ]}
+  onSelectWorkspace={(session, organization) => setActive({ session, organization })}
+  onSwitchSession={session => setActive({ session })}
   onSignOutAll={() => signOut()}
 />
 ```

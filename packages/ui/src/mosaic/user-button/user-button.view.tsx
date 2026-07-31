@@ -58,6 +58,12 @@ export interface UserButtonInvitation {
   imageUrl?: string;
 }
 
+/** Another signed-in account, listed with the workspaces it belongs to. */
+export interface UserButtonAccount {
+  session: UserButtonSession;
+  memberships: UserButtonMembership[];
+}
+
 export interface UserButtonData {
   status: 'loading' | 'ready';
   activeSession: UserButtonSession;
@@ -68,13 +74,17 @@ export interface UserButtonData {
   memberships: UserButtonMembership[];
   suggestions: UserButtonSuggestion[];
   invitations: UserButtonInvitation[];
-  additionalSessions: UserButtonSession[];
+  additionalAccounts: UserButtonAccount[];
 }
 
 /** All optional. An unhandled action hides (or de-activates) the affordance it drives. */
 export interface UserButtonCallbacks {
-  onSelectOrganization?: (organizationId: string) => void;
-  onSelectPersonal?: () => void;
+  /**
+   * Make a workspace active. `organizationId` is `null` for the personal workspace, and `sessionId`
+   * names the account it belongs to — picking another account's workspace switches both at once,
+   * the way `setActive({ session, organization })` does.
+   */
+  onSelectWorkspace?: (sessionId: string, organizationId: string | null) => void;
   onAcceptSuggestion?: (suggestionId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onSwitchSession?: (sessionId: string) => void;
@@ -413,25 +423,36 @@ function ActiveAccountRow() {
   );
 }
 
-/** The active account's workspaces: what it belongs to, and what it has been asked to join. */
-function WorkspaceRows() {
+/** The workspaces one account belongs to. Picking one makes it, and the account, active. */
+function MembershipRows({ sessionId, memberships }: { sessionId: string; memberships: UserButtonMembership[] }) {
   const data = useUserButtonContext();
-  const selectOrg = data.onSelectOrganization;
-  const acceptSuggestion = data.onAcceptSuggestion;
-  const acceptInvitation = data.onAcceptInvitation;
+  const selectWorkspace = data.onSelectWorkspace;
+  const isActiveAccount = sessionId === data.activeSession.sessionId;
 
   return (
     <>
-      {data.memberships.map(m => (
+      {memberships.map(m => (
         <WorkspaceRow
           key={m.organizationId}
           shape='square'
           name={m.name}
           imageUrl={m.imageUrl}
-          onSelect={selectOrg ? () => selectOrg(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganizationId}
+          onSelect={selectWorkspace ? () => selectWorkspace(sessionId, m.organizationId) : undefined}
+          active={isActiveAccount && m.organizationId === data.activeOrganizationId}
         />
       ))}
+    </>
+  );
+}
+
+/** What the active account has been asked to join but has not joined yet. */
+function PendingRows() {
+  const data = useUserButtonContext();
+  const acceptSuggestion = data.onAcceptSuggestion;
+  const acceptInvitation = data.onAcceptInvitation;
+
+  return (
+    <>
       {data.suggestions.map(s => (
         <WorkspaceRow
           key={s.id}
@@ -476,13 +497,13 @@ function WorkspaceRows() {
   );
 }
 
-/** The other accounts this browser is signed in to. */
 /**
- * With organizations the list is grouped by account, so another account reads as a heading with
- * its own menu. Without them there is nothing to head, so it is a plain row you click to switch.
+ * With organizations the list is grouped by account, so another account reads as a heading over its
+ * own workspaces. Without them there is nothing to head, so it is a plain row you click to switch.
  */
-function AdditionalAccount({ session }: { session: UserButtonSession }) {
+function AdditionalAccount({ account }: { account: UserButtonAccount }) {
   const data = useUserButtonContext();
+  const { session } = account;
   const switchSession = data.onSwitchSession;
   const signOutSession = data.onSignOutSession;
 
@@ -495,10 +516,16 @@ function AdditionalAccount({ session }: { session: UserButtonSession }) {
       actions.push({ label: 'Sign out', color: 'negative', onClick: () => signOutSession(session.sessionId) });
     }
     return (
-      <AccountRow
-        email={session.email}
-        actions={actions}
-      />
+      <>
+        <AccountRow
+          email={session.email}
+          actions={actions}
+        />
+        <MembershipRows
+          sessionId={session.sessionId}
+          memberships={account.memberships}
+        />
+      </>
     );
   }
 
@@ -528,9 +555,9 @@ function SwitcherList() {
   const data = useUserButtonContext();
   const workspaces = showsOrganizations(data);
   // An org-only surface carries no account rows at all, not even the one it belongs to.
-  const sessions = data.mode === 'orgs' ? [] : data.additionalSessions;
+  const accounts = data.mode === 'orgs' ? [] : data.additionalAccounts;
 
-  if (!workspaces && sessions.length === 0) {
+  if (!workspaces && accounts.length === 0) {
     return null;
   }
 
@@ -543,13 +570,17 @@ function SwitcherList() {
         {workspaces ? (
           <>
             {data.mode === 'orgs' ? null : <ActiveAccountRow />}
-            <WorkspaceRows />
+            <MembershipRows
+              sessionId={data.activeSession.sessionId}
+              memberships={data.memberships}
+            />
+            <PendingRows />
           </>
         ) : null}
-        {sessions.map(a => (
+        {accounts.map(a => (
           <AdditionalAccount
-            key={a.sessionId}
-            session={a}
+            key={a.session.sessionId}
+            account={a}
           />
         ))}
       </Item.Group>
