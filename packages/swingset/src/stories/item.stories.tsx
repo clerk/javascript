@@ -336,7 +336,20 @@ export function Group() {
   );
 }
 
-const organizations = ['Clerk', 'Acme Corporation', 'Globex', 'Initech', 'Umbrella Health', 'DesignCloud'];
+const organizations = [
+  'Clerk',
+  'Acme Corporation',
+  'Globex',
+  'Initech',
+  'Umbrella Health',
+  'DesignCloud',
+  'Stark Industries',
+  'Wayne Enterprises',
+  'Cyberdyne Systems',
+  'Soylent Industries',
+  'Tyrell Corporation',
+  'Weyland-Yutani',
+];
 
 // `Item.Group` is the canonical scroll surface, so this shows the atoms doing the minimum: cap a
 // height, spread them on, and the group fades its own edges. The Scroll Area page under Styles
