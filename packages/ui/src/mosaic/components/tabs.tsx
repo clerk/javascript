@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Tabs as Primitive } from '../primitives/tabs';
-import type { MosaicPartProps } from '../props';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
 /**
@@ -99,11 +98,11 @@ declare module '../registry' {
   }
 }
 
-export type TabsListProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.List>, 'div'>;
-export type TabsTabProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Tab>, 'button'>;
-export type TabsTriggerProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Trigger>, 'button'>;
-export type TabsPanelProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Panel>, 'div'>;
-export type TabsIndicatorProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Indicator>, 'span'>;
+export type TabsListProps = React.ComponentPropsWithoutRef<typeof Primitive.List>;
+export type TabsTabProps = React.ComponentPropsWithoutRef<typeof Primitive.Tab>;
+export type TabsTriggerProps = React.ComponentPropsWithoutRef<typeof Primitive.Trigger>;
+export type TabsPanelProps = React.ComponentPropsWithoutRef<typeof Primitive.Panel>;
+export type TabsIndicatorProps = React.ComponentPropsWithoutRef<typeof Primitive.Indicator>;
 
 const List = React.forwardRef<HTMLDivElement, TabsListProps>(function TabsList(props, ref) {
   const { list } = useRecipe(tabsRecipe);

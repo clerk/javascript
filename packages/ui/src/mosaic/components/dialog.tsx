@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Dialog as Primitive } from '../primitives/dialog';
-import type { MosaicComponentProps, MosaicPartProps } from '../props';
+import type { MosaicComponentProps } from '../props';
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
@@ -82,9 +82,9 @@ declare module '../registry' {
   }
 }
 
-export type DialogBackdropProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>, 'div'>;
-export type DialogViewportProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Viewport>, 'div'>;
-export type DialogPopupProps = MosaicPartProps<React.ComponentPropsWithoutRef<typeof Primitive.Popup>, 'div'>;
+export type DialogBackdropProps = React.ComponentPropsWithoutRef<typeof Primitive.Backdrop>;
+export type DialogViewportProps = React.ComponentPropsWithoutRef<typeof Primitive.Viewport>;
+export type DialogPopupProps = React.ComponentPropsWithoutRef<typeof Primitive.Popup>;
 
 const Backdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(function DialogBackdrop(props, ref) {
   const { backdrop } = useRecipe(dialogRecipe);
