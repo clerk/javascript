@@ -82,7 +82,7 @@ export function OrganizationProfileProfileSectionView({
         <Dialog
           open={isOpen}
           onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
-          trigger={props => (
+          trigger={({ color: _nativeColor, ...props }) => (
             <Button
               variant='outline'
               {...props}

@@ -79,10 +79,21 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   // encode - and _.
 
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
-  const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
-  const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
-
-  const signature = base64url.parse(rawSignature, { loose: true });
+  let header, payload, signature;
+  try {
+    header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
+    payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
+    signature = base64url.parse(rawSignature, { loose: true });
+  } catch {
+    return {
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: `Invalid JWT form. The header, payload, or signature could not be decoded.`,
+        }),
+      ],
+    };
+  }
 
   const data = {
     header,
