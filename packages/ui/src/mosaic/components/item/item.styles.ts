@@ -12,7 +12,6 @@ export const item = stylex.create({
     },
     paddingInline: space['2'],
     alignItems: 'center',
-    color: colorVars['--cl-color-card-foreground'],
     color: colorVars['--cl-color-neutral-faded'],
     display: 'flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
