@@ -22,6 +22,7 @@ export const meta: StoryMeta = {
       size: { sm: {}, md: {}, lg: {} },
       shape: { default: {}, square: {}, circle: {} },
       fullWidth: { true: {}, false: {} },
+      touchTarget: { true: {}, false: {} },
     },
     _defaultVariants: {
       color: 'primary',
@@ -29,6 +30,7 @@ export const meta: StoryMeta = {
       size: 'md',
       shape: 'default',
       fullWidth: false,
+      touchTarget: true,
     },
   },
 };
