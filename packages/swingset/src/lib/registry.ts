@@ -106,10 +106,10 @@ import {
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
-  Default as UserButtonDefault,
+  Combined as UserButtonCombined,
   meta as userButtonMeta,
-  MultipleSessions as UserButtonMultipleAccounts,
-  Personal as UserButtonPersonal,
+  Organizations as UserButtonOrganizations,
+  User as UserButtonUser,
 } from '../stories/user-button.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
@@ -184,9 +184,9 @@ const itemModule: StoryModule = {
 
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
-  Default: UserButtonDefault,
-  Personal: UserButtonPersonal,
-  MultipleSessions: UserButtonMultipleAccounts,
+  Combined: UserButtonCombined,
+  Organizations: UserButtonOrganizations,
+  User: UserButtonUser,
 };
 
 const headingModule: StoryModule = {
