@@ -3,10 +3,12 @@ import * as UserButtonStories from './user-button.stories';
 # UserButton
 
 The account & organization switcher that sits behind the user avatar. The active workspace sits at the
-top with **Manage account / Sign out**, its organizations (including any **suggested** workspaces you
+top — the one large row, carrying a **gear** that manages it and, for an organization, an **Invite**
+button — its organizations (including any **suggested** workspaces you
 can Join) are listed under the account they belong to, and **additional accounts** follow. Clicking any
 row switches to it; the account's own `⋯` menu carries its per-account actions. The foot of the surface
-exposes **Add account** and **Sign out of all accounts**.
+exposes **Add account** and **Sign out of all accounts**. `mode` narrows that to just the
+organizations or just the accounts; see [Modes](#modes).
 
 It is a composition of lower-layer Mosaic components — `Popover` for the floating surface, `Card` for
 the surface itself, `Item` for every row, `Avatar` for the workspace marks, and `Menu` for the
@@ -18,7 +20,7 @@ resources is a drop-in follow-up.
 ## Example
 
 <Story
-  name='Default'
+  name='Combined'
   storyModule={UserButtonStories}
 />
 
@@ -35,7 +37,7 @@ import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
   activeOrganizationId='org_clerk_app'
   hasOrganizations
   memberships={[
-    { kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan', upgradeable: true },
+    { kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' },
     { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud' },
   ]}
   suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
@@ -67,25 +69,42 @@ import {
 The exports are flat (not `UserButton.Trigger`) so each part can declare its own `'use client'`
 boundary without forcing the consumer's file to become a client component.
 
-## States & scenarios
+## Modes
 
-### Personal (no organizations)
+`mode` picks which switchers the surface carries. It is the only prop that changes the shape of the
+popup; everything else is data.
 
-When the active account has no organizations, the header collapses to a personal layout —
-**Manage account / Sign out** — and the organization list is omitted.
+| Mode                 | Popup                                | Trigger          |
+| -------------------- | ------------------------------------ | ---------------- |
+| `combined` (default) | Organizations and accounts together. | The org's mark   |
+| `orgs`               | Organizations only; no account rows. | The org's mark   |
+| `user`               | Accounts only; never shows an org.   | The user's photo |
+
+Wherever an organization is active it is what the trigger and the header show, which is why
+`combined` and `orgs` both land on the org's mark. `user` mode never resolves to an organization,
+so it shows the account's photo even when one is active.
+
+Passing organization data in `user` mode, or extra sessions in `orgs` mode, is not an error — the
+mode decides what renders, so a single set of props can drive any of the three.
+
+### Organizations
+
+The org is the header, carrying **Invite** and the gear (**Manage organization**). With no account
+menu to hold it, **Create organization** moves to the foot of the surface.
 
 <Story
-  name='Personal'
+  name='Organizations'
   storyModule={UserButtonStories}
 />
 
-### Personal & workspace
+### User
 
-One account has workspaces (organizations); an additional account is a personal account (no orgs).
-Switching to it flips the surface to the personal layout.
+The header is the account with only its gear (**Manage account**) — there is nobody to invite — and
+every other account is a plain row you click to switch to. This example holds real state: picking
+Braden makes him the active account and closes the popover.
 
 <Story
-  name='MultipleSessions'
+  name='User'
   storyModule={UserButtonStories}
 />
 
@@ -93,7 +112,7 @@ Switching to it flips the surface to the personal layout.
 
 | Part                | Description                                                                  |
 | ------------------- | ---------------------------------------------------------------------------- |
-| `UserButtonRoot`    | Owns the data + callbacks and forwards popover open state to `Popover.Root`. |
+| `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
 | `UserButtonTrigger` | The trigger: the active workspace's avatar, and nothing else.                |
 | `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
 
