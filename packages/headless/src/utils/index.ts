@@ -1,4 +1,5 @@
 export { cssVars } from './css-vars';
+export { Freeze, type FreezeProps } from './freeze';
 export { resetLayoutStyles } from './reset-layout-styles';
 export {
   type ComponentProps,
