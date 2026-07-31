@@ -4,18 +4,20 @@ import type {
   MenuPortalProps,
   MenuProps,
   MenuSeparatorProps,
-  MenuTriggerProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { styles } from './menu.styles';
 
-export type { MenuProps, MenuSeparatorProps, MenuTriggerProps };
+export type { MenuProps, MenuSeparatorProps };
+
+export type MenuTriggerProps = MosaicComponentProps<'button'>;
 
 /**
  * Opens the menu. Renders a ghost `Button` holding an ellipsis glyph by default;
@@ -25,20 +27,21 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
   { render, className, style, children, ...rest },
   ref,
 ) {
+  const trigger: MenuTriggerProps['render'] =
+    render ??
+    (props => (
+      <Button
+        variant='ghost'
+        size='sm'
+        shape={children ? 'default' : 'square'}
+        {...props}
+      />
+    ));
+
   return (
     <Primitive.Trigger
       ref={ref}
-      render={
-        render ??
-        (({ color: _nativeColor, ...props }) => (
-          <Button
-            variant='ghost'
-            size='sm'
-            shape={children ? 'default' : 'square'}
-            {...props}
-          />
-        ))
-      }
+      render={trigger}
       {...mergeStyleProps(themeProps('menu-trigger'), className, style)}
       {...rest}
     >

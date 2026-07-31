@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog, dialogRecipe } from '@clerk/ui/mosaic/components/dialog';
 
@@ -15,9 +16,7 @@ export const meta: StoryMeta = {
   styles: dialogRecipe,
 };
 
-const dialogTrigger = ({ color: _nativeColor, ...props }: React.HTMLAttributes<HTMLElement>) => (
-  <Button {...props}>Open dialog</Button>
-);
+const dialogTrigger = (props: RenderProps) => <Button {...props}>Open dialog</Button>;
 
 export function Default(args: Record<string, unknown>) {
   const { size } = args as { size?: 'md' | 'lg' };

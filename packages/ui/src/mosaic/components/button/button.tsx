@@ -1,12 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { truncationStyles } from '../typography.styles';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
-export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'render'> {
+export interface ButtonProps extends MosaicElementProps<'button'> {
   color?: 'primary' | 'neutral' | 'negative';
   variant?: 'filled' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg';
