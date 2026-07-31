@@ -19,7 +19,7 @@ export const styles = stylex.create({
                 0 0 0 1px oklch(0.2046 0 0 / 4%)`,
   },
   flush: {
-    borderRadius: 0,
+    borderRadius: radiusVars['--cl-radius-container'],
     overflow: 'visible',
     backgroundColor: 'transparent',
     boxShadow: 'none',
@@ -41,21 +41,15 @@ export const styles = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['6'],
     alignItems: 'center',
+    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 4%, ${colorVars['--cl-color-card']})`,
     boxSizing: 'border-box',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'space-between',
-    width: '100%',
-  },
-  'footer-raised': {
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 4%, ${colorVars['--cl-color-card']})`,
     borderTopColor: colorVars['--cl-color-border'],
     borderTopStyle: 'solid',
     borderTopWidth: '1px',
-  },
-  'footer-flush': {
-    backgroundColor: 'transparent',
-    borderTopWidth: 0,
+    width: '100%',
   },
 });
 

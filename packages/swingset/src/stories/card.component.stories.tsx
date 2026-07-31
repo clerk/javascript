@@ -19,7 +19,7 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       alignment: { start: {}, center: {} },
-      elevation: { raised: {}, flush: {} },
+      elevation: { raised: {}, flush: {}, overlay: {} },
     },
     _defaultVariants: {
       alignment: 'start',

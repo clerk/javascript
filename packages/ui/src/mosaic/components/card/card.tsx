@@ -6,7 +6,7 @@ import { TextContext } from '../text';
 import { headerAlignments, styles } from './card.styles';
 
 type CardAlignment = 'start' | 'center';
-type CardElevation = 'raised' | 'flush';
+type CardElevation = 'raised' | 'flush' | 'overlay';
 
 const CardVariantContext = React.createContext<{ alignment: CardAlignment; elevation: CardElevation }>({
   alignment: 'start',
@@ -28,7 +28,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
         ref={ref}
         {...mergeStyleProps(
           themeProps('card-root', { alignment, elevation }),
-          stylex.props(styles.root, styles[elevation]),
+          stylex.props(styles.root, elevation === 'flush' ? styles.flush : styles.raised),
           className,
           style,
         )}
@@ -82,12 +82,7 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'
   return (
     <div
       ref={ref}
-      {...mergeStyleProps(
-        themeProps('card-footer', { elevation }),
-        stylex.props(styles.footer, styles[`footer-${elevation}`]),
-        className,
-        style,
-      )}
+      {...mergeStyleProps(themeProps('card-footer', { elevation }), stylex.props(styles.footer), className, style)}
       {...props}
     />
   );
