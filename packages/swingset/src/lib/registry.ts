@@ -52,6 +52,7 @@ import {
   Interactive as ItemInteractive,
   meta as itemMeta,
 } from '../stories/item.stories';
+import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
@@ -169,6 +170,8 @@ const headingModule: StoryModule = {
   Colors: HeadingColors,
 };
 
+const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
+
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
@@ -221,6 +224,7 @@ export const registry: StoryModule[] = [
   dialogComponentModule,
   headingModule,
   iconModule,
+  menuComponentModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.
