@@ -32,6 +32,25 @@ export type StartSSOFlowReturnType = {
   signUp?: SignUpResource;
 };
 
+/**
+ * Returns a helper for authenticating users with OAuth or enterprise SSO in an Expo app.
+ *
+ * For Core 3 custom flows, use the experimental `useSSO()` hook from `@clerk/expo/experimental`. It uses future auth
+ * resources and activates completed sessions automatically.
+ *
+ * @example
+ * ### Start a Google OAuth flow using Core 3
+ *
+ * ```tsx
+ * import { useSSO } from '@clerk/expo/experimental';
+ *
+ * const { startSSOFlow } = useSSO();
+ *
+ * await startSSOFlow({
+ *   strategy: 'oauth_google',
+ * });
+ * ```
+ */
 export function useSSO() {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();

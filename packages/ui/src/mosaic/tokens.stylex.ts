@@ -56,16 +56,36 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
+// Named by what a surface is, not by size, so the steps nest: `inner` for a mark
+// sitting inside a control, `control` for the control itself (button, avatar
+// square), `container` for anything wrapping controls. `control` is 6px — a step
+// the 4/8/12 progression doesn't land on, which is why it's its own token rather
+// than a reuse of `inner` or `element`.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
   '--cl-radius-inner': '0.25rem',
+  '--cl-radius-control': '0.375rem',
   '--cl-radius-element': '0.5rem',
   '--cl-radius-container': '0.75rem',
   '--cl-radius-full': 'calc(infinity * 1px)',
 } as const;
 
 export const radiusVars = stylex.defineVars(radiusDefaults);
+
+// =============================================================================
+// Target Size Tokens
+// =============================================================================
+// The floor a control's hit area drops to under a coarse pointer — a fingertip is
+// roughly 44px across regardless of how dense the rest of the UI is. Deliberately
+// off the `--cl-spacing` scale for that reason: a consumer rescaling density must
+// not shrink a touch target with it.
+
+const targetDefaults = {
+  '--cl-target-coarse': '2.75rem',
+} as const;
+
+export const targetVars = stylex.defineVars(targetDefaults);
 
 // =============================================================================
 // Spacing Tokens
@@ -143,3 +163,51 @@ const fontWeightDefaults = {
 } as const;
 
 export const fontWeightVars = stylex.defineVars(fontWeightDefaults);
+
+// =============================================================================
+// Motion Tokens — duration
+// =============================================================================
+// Read as "how direct is this feedback": the more a change is the answer to
+// something the pointer just did, the shorter it runs. `instant` is for the state
+// that has to feel like contact rather than a fade — a press landing, a highlight
+// appearing under the cursor; `fast` for hover and other pointer-driven state;
+// `base` for that state decaying once the pointer leaves, which reads better a
+// little slower than it arrived; `slow`/`slower` for changes the pointer didn't
+// cause directly, like a panel or overlay resolving.
+//
+// Durations are not gated on `prefers-reduced-motion`. That signal is about
+// vestibular safety — transforms, positional change, parallax — so the gate
+// belongs on the moving property at its use site, not on every duration here.
+
+const durationDefaults = {
+  '--cl-duration-instant': '0s',
+  '--cl-duration-fast': '0.1s',
+  '--cl-duration-base': '0.15s',
+  '--cl-duration-slow': '0.25s',
+  '--cl-duration-slower': '0.35s',
+} as const;
+
+export const durationVars = stylex.defineVars(durationDefaults);
+
+// =============================================================================
+// Motion Tokens — easing
+// =============================================================================
+// One curve, named for its role rather than its shape so a consumer can retarget
+// it without the name going stale. The default is Swift Out
+// (https://www.easing.dev/swift-out, from Lochie Axon's Easing Graphs):
+// front-loaded, so a change departs fast, and carrying its endpoint ~2% past
+// target around 85% through before settling.
+//
+// It belongs on properties that MOVE — transform, translate, scale, insets — where
+// the overshoot is what makes motion read as physical rather than mechanical, which
+// in practice means the `slow`/`slower` end of the duration scale. Color and opacity
+// take plain `linear` instead: their interpolation is already perceptually
+// non-uniform, so an ease on top only makes the midpoint drag, and an overshoot
+// extrapolates past the target color for no gain. That is a rule about the property,
+// not the duration — a transform at `fast` still wants this curve.
+
+const easingDefaults = {
+  '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+} as const;
+
+export const easingVars = stylex.defineVars(easingDefaults);

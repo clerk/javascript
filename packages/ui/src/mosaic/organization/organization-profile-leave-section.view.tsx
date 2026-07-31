@@ -59,8 +59,8 @@ export function OrganizationProfileLeaveSectionView({
         <Destructive
           trigger={props => (
             <Button
-              intent='destructive'
               {...props}
+              color='negative'
               style={{ flexShrink: 0 }}
             >
               Leave organization

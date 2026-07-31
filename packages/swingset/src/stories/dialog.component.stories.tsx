@@ -15,7 +15,9 @@ export const meta: StoryMeta = {
   styles: dialogRecipe,
 };
 
-const dialogTrigger = (props: React.HTMLAttributes<HTMLElement>) => <Button {...props}>Open dialog</Button>;
+const dialogTrigger = ({ color: _nativeColor, ...props }: React.HTMLAttributes<HTMLElement>) => (
+  <Button {...props}>Open dialog</Button>
+);
 
 export function Default(args: Record<string, unknown>) {
   const { size } = args as { size?: 'md' | 'lg' };
@@ -29,7 +31,7 @@ export function Default(args: Record<string, unknown>) {
           <Dialog.Title>Confirm action</Dialog.Title>
           <Dialog.Description>Are you sure you want to proceed? This action cannot be undone.</Dialog.Description>
           <Button
-            intent='destructive'
+            color='negative'
             onClick={close}
           >
             Cancel
