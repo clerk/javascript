@@ -2,7 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const primary40 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 40%, transparent)`;
 const primary5 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
 const focusRing = '0 0 0 1.5px #fff, 0 0 0 3px #2b2b34';
 
@@ -46,7 +45,7 @@ export const styles = stylex.create({
       height: space['6'],
     },
     '::placeholder': {
-      color: primary40,
+      color: colorVars['--cl-color-input-placeholder'],
     },
   },
   disabled: {
