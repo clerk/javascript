@@ -72,25 +72,43 @@ runtime. It is a mask rather than a sticky overlay element, so it is paint-only 
 content. A group with nothing to scroll shows no indicators, and browsers without scroll-driven
 animation support get a plain scrolling group rather than a broken one.
 
-#### Theming the fade
+#### Theming the fade and the scrollbar
 
-Four tokens apply to every scrolling surface in Mosaic, so setting them once retunes all of them:
+These tokens apply to every scrolling surface in Mosaic, so setting them once retunes all of them:
 
-| Token                    | Default  | Description                                                 |
-| ------------------------ | -------- | ----------------------------------------------------------- |
-| `--cl-scroll-fade-size`  | `1.5rem` | Height of the fade band.                                    |
-| `--cl-scroll-fade-range` | `1.5rem` | How far you scroll before the fade reaches full strength.   |
-| `--cl-scroll-fade-inset` | `0px`    | Width at the inline end the fade is held back from.         |
-| `--cl-scrollbar-width`   | `thin`   | `auto`, `thin`, or `none` — keyword-only, per the CSS spec. |
+| Token                         | Default                    | Description                                               |
+| ----------------------------- | -------------------------- | --------------------------------------------------------- |
+| `--cl-scroll-fade-size`       | `1.5rem`                   | Height of the fade band.                                  |
+| `--cl-scroll-fade-range`      | `1.5rem`                   | How far you scroll before the fade reaches full strength. |
+| `--cl-scrollbar-width`        | `0.625rem`                 | Width of the scrollbar lane. `0px` hides it.              |
+| `--cl-scrollbar-thumb-inset`  | `0.1875rem`                | How far the thumb's paint is held inside that lane.       |
+| `--cl-scrollbar-thumb`        | `--cl-color-neutral-faded` | Thumb colour at rest.                                     |
+| `--cl-scrollbar-thumb-hover`  | derived from the above     | Thumb colour while the region or the thumb is hovered.    |
+| `--cl-scrollbar-thumb-active` | derived from the above     | Thumb colour while the thumb is being dragged.            |
 
-Scrollbar appearance — colour and width — only applies under `@media (pointer: fine)`, so touch
-platforms keep the native overlay bar they already draw. The gutter is not gated: it is a layout
-decision rather than an appearance one.
+The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in, so
+setting the base re-derives both — and either state can still be pinned on its own.
 
-`--cl-scroll-fade-inset` defaults to `0px` because **CSS cannot measure a scrollbar**: the width
-differs per platform and browser, and on macOS it changes at runtime when a mouse is connected. Set
-it only when you know the platform you're targeting. Until then the mask covers the scrollbar, which
-is the one thing this approach can't solve without a custom scrollbar.
+Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
+thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
+it would make the engines that _do_ implement the pseudo-elements ignore them. Firefox implements
+neither and keeps its platform scrollbar. Everything here is gated on `@media (pointer: fine)`, so
+touch platforms keep the native overlay bar they already draw. The gutter is not gated: it is a
+layout decision rather than an appearance one.
+
+One consequence worth knowing before you theme: styling the scrollbar takes macOS out of overlay
+mode, so the bar is always visible and always occupies its lane rather than auto-hiding. That is the
+cross-platform consistency the tokens exist for, but it is a change from the platform default.
+
+For a scrollbar that appears only on hover, set the rest colour to `transparent`. Nothing else is
+needed — the thumb paints nothing at rest and the existing transition fades it in when you reach the
+region. The lane stays reserved either way, so this changes only what is painted, never the layout:
+
+```css
+:root {
+  --cl-scrollbar-thumb: transparent;
+}
+```
 
 To replace the fade entirely, retire it with `mask-image: none` and read the two per-element vars
 the animations write — `--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each

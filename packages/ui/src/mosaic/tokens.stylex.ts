@@ -91,25 +91,43 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // Scrollbar Tokens
 // =============================================================================
 // One opinion for every scrolling surface in Mosaic, set in one place. Mosaic has no
-// reason to render differently-sized scrollbars in different components, so this is a
-// token rather than a per-component prop — a consumer restyles all of them at once.
+// reason to render differently-sized scrollbars in different components, so these are
+// tokens rather than per-component props — a consumer restyles all of them at once.
 //
-// `thin` rather than `auto`: these scroll regions are compact panels (member lists in a
-// card or a popover), where a platform-default ~17px bar reads heavy, and where
-// `scrollbar-gutter: stable` means the width is content space we give up whether or not
-// anything is scrolling. The tradeoff is a smaller drag target on the platforms whose
-// scrollbars are draggable at all — set `auto` to take it back.
+// The width is a real LENGTH, not the `auto | thin | none` keyword `scrollbar-width` takes.
+// Mosaic paints the scrollbar through `::-webkit-scrollbar`, which takes a length; the two
+// paths are mutually exclusive (a non-`auto` `scrollbar-width` or `scrollbar-color` makes a
+// UA ignore the pseudo-elements outright), so specifying a length is the honest option and
+// the keyword one is gone. Firefox implements neither pseudo-element and keeps its platform
+// scrollbar. `0.625rem` of lane carrying a `0.1875rem` inset leaves a 4px pill: compact
+// enough for the panels these regions are — a member list in a card or a popover — without
+// shrinking the drag target to a hairline. Set the width to `0px` to hide it outright, which
+// is what the old `none` keyword did.
+//
+// The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in,
+// so they resolve at use time: overriding the base re-derives both, while either state stays
+// individually overridable. Mixing toward `--cl-color-card-foreground` deepens the thumb in
+// light mode and lightens it in dark, since that token already carries both.
+//
+// Setting `--cl-scrollbar-thumb: transparent` gives a hover-reveal scrollbar with no feature
+// of ours: the rest state paints nothing and the transition below fades the thumb in when the
+// region is hovered. The lane is still reserved either way — only the thumb's paint is
+// conditional, so nothing moves.
 //
 // Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
 // no width to apply to, and thinning a target that is already hard to hit would be actively
 // worse — Polaris's `s-scroll-box` gates its scrollbar styling the same way.
-//
-// Keyword-only, by the CSS spec: `scrollbar-width` accepts `auto | thin | none` and NOT a
-// length. A real pixel width exists only via `::-webkit-scrollbar`, which Firefox ignores
-// and which Chrome 121+ discards once `scrollbar-color` is set — so there is no honest way
-// to expose this as a length.
+
+// Self-reference by literal name: the group being defined can't read its own exported object,
+// and `--`-prefixed keys are emitted verbatim, so the name is stable enough to write by hand.
+const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
+
 const scrollbarDefaults = {
-  '--cl-scrollbar-width': 'thin',
+  '--cl-scrollbar-width': '0.625rem',
+  '--cl-scrollbar-thumb-inset': '0.1875rem',
+  '--cl-scrollbar-thumb': colorVars['--cl-color-neutral-faded'],
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 25%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 45%)`,
 } as const;
 
 export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
@@ -123,14 +141,15 @@ export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
 // `size` and `range` default to the same value on purpose: the fade reaches full strength
 // after you've scrolled its own height, so it grows in at the rate the content moves.
 //
-// `inset` holds the fade back from a strip at the inline end so a space-consuming scrollbar
-// isn't faded along with the content. It defaults to `0px` because CSS cannot measure a
-// scrollbar — the width differs per platform and browser, and on macOS it changes at runtime
-// when a mouse is connected — so any non-zero default would be wrong more often than right.
+// There is deliberately no `inset` knob for holding the fade back from the scrollbar. It
+// existed only to compensate for a width CSS could not measure; now that `--cl-scrollbar-width`
+// specifies that width, the two can never legitimately differ — a smaller inset lets the fade
+// cover part of the scrollbar, a larger one leaves an unfaded strip beside it — so the mask
+// derives its inset from the scrollbar token instead of exposing a second name for the same
+// number.
 const scrollFadeDefaults = {
   '--cl-scroll-fade-size': '1.5rem',
   '--cl-scroll-fade-range': '1.5rem',
-  '--cl-scroll-fade-inset': '0px',
 } as const;
 
 export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);

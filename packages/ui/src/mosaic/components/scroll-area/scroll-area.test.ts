@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { scrollbarVars, scrollFadeVars } from '../../tokens.stylex';
 import { scrollAreaRoot, scrollAreaViewport } from './scroll-area.styles';
-import { scrollAreaVars } from './scroll-area.vars.stylex';
+import { scrollAreaVars, scrollbarThumbVars } from './scroll-area.vars.stylex';
 
 describe('Mosaic scroll area styles', () => {
   it('composes the viewport atoms into one spreadable set', () => {
-    expect(scrollAreaViewport()).toHaveLength(5);
+    expect(scrollAreaViewport()).toHaveLength(7);
     expect(scrollAreaRoot).toBeDefined();
   });
 
@@ -34,11 +34,25 @@ describe('Mosaic scroll area styles', () => {
   });
 
   it('reads the shared scroll tokens', () => {
-    expect(scrollbarVars).toMatchObject({ '--cl-scrollbar-width': 'var(--cl-scrollbar-width)' });
+    expect(scrollbarVars).toMatchObject({
+      '--cl-scrollbar-width': 'var(--cl-scrollbar-width)',
+      '--cl-scrollbar-thumb-inset': 'var(--cl-scrollbar-thumb-inset)',
+      '--cl-scrollbar-thumb': 'var(--cl-scrollbar-thumb)',
+      '--cl-scrollbar-thumb-hover': 'var(--cl-scrollbar-thumb-hover)',
+      '--cl-scrollbar-thumb-active': 'var(--cl-scrollbar-thumb-active)',
+    });
     expect(scrollFadeVars).toMatchObject({
       '--cl-scroll-fade-size': 'var(--cl-scroll-fade-size)',
       '--cl-scroll-fade-range': 'var(--cl-scroll-fade-range)',
-      '--cl-scroll-fade-inset': 'var(--cl-scroll-fade-inset)',
     });
+  });
+
+  // The counterpart to the assertion above: `--_cl-` is the marker for plumbing, so it must not
+  // drift into the themable `--cl-` namespace the way a rename easily could.
+  it('keeps the thumb colour carrier out of the public token namespace', () => {
+    expect(scrollbarThumbVars).toMatchObject({
+      '--_cl-scrollbar-thumb-color': 'var(--_cl-scrollbar-thumb-color)',
+    });
+    expect(Object.keys(scrollFadeVars)).not.toContain('--cl-scroll-fade-inset');
   });
 });
