@@ -6,7 +6,6 @@ export const styles = stylex.create({
   // The avatar is the trigger, so the button paints nothing of its own.
   trigger: {
     padding: 0,
-    borderRadius: radiusVars['--cl-radius-full'],
     borderStyle: 'none',
     outline: {
       default: 'none',
@@ -34,4 +33,11 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     textAlign: 'center',
   },
+});
+
+// The focus ring traces the avatar, so the trigger takes the avatar's radius. Rounding it
+// fully draws a circle around a square workspace mark.
+export const triggerShapes = stylex.create({
+  circle: { borderRadius: radiusVars['--cl-radius-full'] },
+  square: { borderRadius: radiusVars['--cl-radius-control'] },
 });
