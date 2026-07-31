@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react';
 
+import type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
+
 /**
  * Authentication mode that determines which flows are available to the user.
  *
@@ -16,7 +18,7 @@ export type AuthViewMode = 'signIn' | 'signUp' | 'signInOrUp';
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
  */
-export interface AuthViewProps {
+export interface AuthViewProps extends EmbeddedNavigationProps {
   /**
    * Replaces the dashboard-configured logo with custom React Native content.
    *

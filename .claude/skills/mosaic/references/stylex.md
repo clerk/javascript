@@ -295,6 +295,28 @@ device, while touch devices look correct.
   then grep `dist-mosaic/styles.css` for the two selectors and compare their
   specificity.
 
+- **A button that opens something takes the pressed fill while open**, so a
+  disclosure trigger stays visibly engaged for as long as its surface is. Disclosure
+  primitives already set `data-open` on the trigger (`popover-trigger.tsx` and
+  friends), so this is styling-only — no headless change. It needs the _same_
+  exclusion as `:active`, or hovering an open trigger lifts it back to the lighter
+  hover step:
+
+  ```ts
+  backgroundColor: {
+    default: 'transparent',
+    ':enabled:active': neutralStep1,
+    ':enabled[data-open]': neutralStep1,
+    '@media (hover: hover)': {
+      default: null,
+      ':enabled:hover:not(:active):not([data-open])': neutralStep0,
+    },
+  },
+  ```
+
+  Worked example: `button.styles.ts`, applied across every filled/outline/ghost cell
+  (`link` opts out — it reads as text, not a control).
+
 Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
 
 - **DO** use `:focus-visible` for focus rings (never bare `:focus`). For a
@@ -340,6 +362,12 @@ Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
   already perceptually non-uniform, so an ease on top only makes the midpoint
   drag, and an overshoot extrapolates past the target color for nothing. A
   transform at `--cl-duration-fast` still wants the curve.
+
+- **DON'T** reuse `--cl-ease-default` for something **leaving**. It is an arrival
+  curve; run backwards it stalls for most of its duration and its overshoot
+  becomes a wobble past the target. Departures take `easingVars['--cl-ease-exit']`
+  at a shorter duration. See `motion.md` — enter/exit asymmetry has its own
+  reference, with the measurements behind these rules.
 
 - **DO** gate transitions/animations of **motion-bearing** properties on reduced
   motion — `transform`, `translate`, `scale`, `rotate`, positional insets — in the
@@ -468,6 +496,61 @@ value, sub-pattern A collapses it to a single `--var` atom; reach for a raw inli
 > values, and even then the first move is usually to write a single `--cl`/`--_cl`
 > var rather than a raw inline style.
 
+**Every condition is a value key, never a top-level object.** A pseudo/at-rule
+goes _inside_ the property it modifies (`transitionProperty: { default: …, '@media …': … }`),
+not as a bare key on the style object. A top-level `'@media …': { … }` block is
+legacy syntax and the `@stylexjs/no-legacy-contextual-styles` +
+`@stylexjs/valid-styles` rules reject it (only `::before`/`::after` may sit at the
+top level). Reduced-motion is the common case:
+
+```ts
+transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'none' },
+```
+
+### Reacting to `data-*` state (the headless-transition case)
+
+Headless primitives drive animation off `data-*` attributes — e.g. the popover
+popup carries its own `data-starting-style` (entering frame) and
+`data-ending-style` (exiting). You can style off these in StyleX; it depends on
+_whose_ attribute you're reading:
+
+- **The element's own attribute → wrap in `:where(...)`.** Conditional keys must
+  start with `:` or `@`, so a bare `[data-*]` is rejected — but `:where([data-*])`
+  is a valid pseudo-class string that matches the same element (zero specificity;
+  StyleX self-doubles the atom class so the conditional still wins):
+
+  ```ts
+  popup: {
+    opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
+    transform: { default: 'scale(1)', ':where([data-starting-style], [data-ending-style])': 'scale(0.94)' },
+    // Reduced motion drops `transform` and keeps the fade — the gate belongs on the
+    // moving property, not the whole transition.
+    transitionProperty: { default: 'opacity, transform', '@media (prefers-reduced-motion: reduce)': 'opacity' },
+    // Positional against `transitionProperty`, and branched by direction: the exit is
+    // shorter and takes the departure curve. See `motion.md`.
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionTimingFunction: {
+      default: `linear, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+    },
+  },
+  ```
+
+- **Another element's attribute → `stylex.when.*`.** For relational state use
+  `stylex.when.ancestor(sel)` / `.descendant(sel)` / `.siblingBefore(sel)` /
+  `.siblingAfter(sel)` / `.anySibling(sel)`, each taking a `:${string}` or
+  `[${string}]` selector and returning a valid conditional key
+  (`:where-ancestor(...)` etc.). Use this when a parent/sibling owns the state
+  (e.g. a `[data-open]` container theming its children); use `:where([data-*])`
+  when the element owns it.
+
+So: `:where(...)` for self-state, `stylex.when.*` for relational state. Both
+compile to real attribute selectors in `styles.css`, so animation stays
+CSS-native — no JS state plumbing through the component.
+
 ## Public contract & composition (`props.ts`)
 
 The element carries three things, and nothing else is a contract:
@@ -501,6 +584,39 @@ className left-to-right and merges `style` with the consumer object spread last:
 - **DON'T** call `stylex.props` twice on one element or spread `{...props}` after
   the merge result — fuse everything through the one `mergeStyleProps` call.
 
+### Type every part with `MosaicComponentProps`
+
+`MosaicComponentProps<Tag>` is the native props for `Tag` minus the non-standard HTML
+`color` attribute, plus `render`. It drops `color` from the props **and** from the
+`render` callback's argument, so a callback's props spread straight into a Mosaic
+component whose own `color` is a variant union (`Button`, `Heading`, `Text`).
+
+```tsx
+export interface PopoverPopupProps extends MosaicComponentProps<'div'> { … }
+```
+
+- **DON'T** type a Mosaic part with the headless `ComponentProps<Tag>` (or
+  `React.ComponentPropsWithoutRef<typeof Primitive.X>`). Those keep `color: string`, and
+  every consumer then has to strip it: `props: Omit<React.HTMLAttributes<HTMLElement>, 'color'>`.
+- **DON'T** re-export a headless part straight onto the Mosaic namespace object
+  (`Popover.Trigger = Primitive.Trigger`) — that leaks the wide type. Bridge it:
+
+  ```tsx
+  const Trigger = React.forwardRef<HTMLButtonElement, MosaicComponentProps<'button'>>(
+    function PopoverTrigger(props, ref) {
+      return (
+        <Primitive.Trigger
+          ref={ref}
+          {...props}
+        />
+      );
+    },
+  );
+  ```
+
+- If a consumer needs to annotate a `render` callback, the API is wrong — fix the
+  part's props type instead. Inline callbacks infer with no annotation.
+
 ## Build & CSS delivery (two contexts, same babel)
 
 - **Published** (`build:mosaic` → `@stylexjs/rollup-plugin`): compiles the
@@ -526,7 +642,8 @@ token colors aren't down-leveled into an invalid polyfill.
   `::before`/`::after`/`::backdrop`, `@starting-style` (enter animations),
   `stylex.keyframes(...)`, `anchor-size(width|height)` (popover/menu matching its
   trigger), CSS counters, `@media (hover: hover)` / `(prefers-reduced-motion)` /
-  `(pointer: coarse)`.
+  `(pointer: coarse)`, `data-*` state via `:where([data-*])` (self) or
+  `stylex.when.*` (relational) — see "Reacting to `data-*` state" above.
 - Prefer CSS-native solutions over JS workarounds for anything StyleX supports.
 - Avoid manual `@layer` / `@property` inside `create` (StyleX owns layering;
   `@property` compiles but emits invalid output).
