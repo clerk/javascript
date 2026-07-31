@@ -78,13 +78,45 @@ scroll-driven animation support get the same plain scrolling box rather than a b
   storyModule={ScrollAreaStories}
 />
 
-Neither box above overflows, so only `stable` is holding a lane open — watch the trailing rule,
-which stops 8px short of where `auto` puts it. That 8px is the shift `auto` would produce the moment
-the content grew past the box.
+Add the rows and watch the trailing rules: `auto` jumps its content left by the lane's width as the
+list starts overflowing, while `stable` — which was already holding that lane open — doesn't move.
+That jump is the entire thing `stable` exists to prevent.
 
 Two conditions must **both** hold for the two to differ at all: space-consuming scrollbars, and
 content that can stop overflowing. Where the platform overlays its scrollbars, they render
-identically.
+identically, which is why `auto` is the default.
+
+### Reveal on hover
+
+<Story
+  name='HoverReveal'
+  storyModule={ScrollAreaStories}
+/>
+
+Mosaic's `hover` token is the **thumb's** state, so it can't express this on its own — a thumb you
+can't see isn't a target you can find. Region hover is two lines of your own CSS instead:
+
+```css
+.my-scroller {
+  /* The reveal colour at zero alpha — NOT the `transparent` keyword. */
+  --cl-scrollbar-thumb: oklch(from var(--cl-color-neutral-faded) l c h / 0);
+}
+.my-scroller:hover {
+  --cl-scrollbar-thumb: var(--cl-color-neutral-faded);
+}
+```
+
+This one does fade. The thumb's colour resolves through an `@property`-registered custom property
+that the SCROLLER transitions and the thumb inherits, so retargeting the token from the region is a
+computed-value change the transition picks up. The thumb's own `-hover` / `-active` can't do this —
+see [Styling](#styling). The lane stays reserved throughout — only the
+paint is conditional, so nothing reflows on the way in or out.
+
+Reach for the zero-alpha colour rather than `transparent` in any fade like this one. `transparent`
+is defined as `rgba(0, 0, 0, 0)` — transparent **black** — so interpolating out of it drags the
+thumb through a run of dark, half-transparent greys, and a bar that should be fading in cleanly
+reads as dirty instead. Relative colour syntax (`oklch(from … l c h / 0)`) keeps the token's own
+channels and drops only the alpha, so the transition moves along a single axis.
 
 ### Theming the scrollbar
 
@@ -92,6 +124,12 @@ identically.
   name='ThemedScrollbar'
   storyModule={ScrollAreaStories}
 />
+
+Each state gets a colour of its own here — amber at rest, pink under the pointer, violet while
+dragging — which is far louder than anything you'd ship, but tells the three apart at a glance.
+Hover the thumb, then drag it. Nothing changes while the pointer is merely over the region: these
+are the thumb's own states, and they switch instantly rather than fading, for the reason described
+under [Styling](#styling).
 
 ## Styling
 
@@ -121,6 +159,13 @@ the base re-derives both — and either state can still be pinned on its own.
 `hover` and `active` are the **thumb's own** states, not the region's: the colour changes when the
 pointer is over the thumb itself, not whenever it is somewhere over the scrolling area.
 
+Those two states switch instantly, and can't be made to animate. Blink doesn't run transitions
+declared on `::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb
+inherits the animating value — which means a change made **on the scroller** fades, while a change
+made on the thumb itself can only snap. That's the line to keep in mind when theming: retargeting
+`--cl-scrollbar-thumb` from the region (as [Reveal on hover](#reveal-on-hover) does) transitions;
+`-hover` and `-active` do not.
+
 Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
 thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
 it would make the engines that _do_ implement the pseudo-elements ignore them. Firefox implements
@@ -142,8 +187,10 @@ the fade indicators are already carrying the signal that the region scrolls:
 ```
 
 One layout note: the scrollbar takes its lane **inside** a scroller's own padding, so a padded
-surface reads as padding plus lane at the inline end. Trim the inline-end padding on the scroller if
-you want the scrollbar to sit in the gutter the padding was already holding.
+surface reads as padding plus lane at the inline end. Trimming the scroller's inline-end padding to
+compensate is tempting, but only safe alongside `gutter: 'stable'` — with `auto` the lane is there
+only while the content overflows, so the trimmed padding collapses to nothing the moment it doesn't,
+and the rows sit flush against the edge. Left alone, the extra lane is the safer asymmetry.
 
 ### Replacing the fade
 

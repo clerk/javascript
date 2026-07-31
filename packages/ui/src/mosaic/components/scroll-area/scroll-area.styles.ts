@@ -75,6 +75,31 @@ const styles = stylex.create({
   },
 
   /**
+   * The thumb's colour, produced HERE on the scroller rather than on the pseudo-element that
+   * paints it, because Blink does not run transitions declared on `::-webkit-scrollbar-thumb` —
+   * verified by hand, and the reason Polaris declares its own on the scroller too. A registered
+   * custom property set here animates and inherits into the pseudo-element, which only reads it.
+   *
+   * The consequence is worth stating plainly, because it decides which states can move: a change
+   * made ON THE SCROLLER animates, and a change made on the thumb itself can only snap. So the
+   * thumb's own `:hover` / `:active` below are instant by construction, while anything driven from
+   * the scroller — including a consumer retargeting `--cl-scrollbar-thumb` on the region's
+   * `:hover` to fade the bar in — transitions through this declaration.
+   *
+   * `linear` because this is a colour: an ease on top of an already perceptually non-uniform
+   * interpolation only makes the midpoint drag.
+   */
+  thumbColor: {
+    '--_cl-scrollbar-thumb-color': {
+      default: null,
+      '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb'],
+    },
+    transitionDuration: { default: null, '@media (pointer: fine)': durationVars['--cl-duration-base'] },
+    transitionProperty: { default: null, '@media (pointer: fine)': '--_cl-scrollbar-thumb-color' },
+    transitionTimingFunction: { default: null, '@media (pointer: fine)': 'linear' },
+  },
+
+  /**
    * The scrollbar's own paint. Only the lane's size and the thumb are styled — the track is left
    * alone, so the thumb reads as floating over the content rather than riding in a rail.
    *
@@ -108,16 +133,6 @@ const styles = stylex.create({
       width: { default: null, '@media (pointer: fine)': scrollbarWidth },
     },
     '::-webkit-scrollbar-thumb': {
-      // The colour is routed through an `@property`-registered var rather than transitioned as
-      // `background-color` directly, because `background-color` on a scrollbar part is not an
-      // animatable property in Blink — the registered custom property is, and the pseudo-element
-      // reads it. Longer leaving than arriving, per the duration tokens: reaching the thumb is
-      // direct pointer feedback, its decay is not. `linear` because this is a colour — an ease on
-      // top of an already perceptually non-uniform interpolation only makes the midpoint drag.
-      '--_cl-scrollbar-thumb-color': {
-        default: null,
-        '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb'],
-      },
       // A transparent border clipped away is how you inset a pill thumb: the lane keeps its full
       // width for hit-testing while the paint shrinks to the middle of it. Both Polaris and
       // `references/stylex-ui` arrive at this independently — a scrollbar pseudo-element has no
@@ -139,9 +154,6 @@ const styles = stylex.create({
           '@media (forced-colors: active)': 'ButtonBorder',
         },
       },
-      transitionDuration: { default: null, '@media (pointer: fine)': durationVars['--cl-duration-base'] },
-      transitionProperty: { default: null, '@media (pointer: fine)': '--_cl-scrollbar-thumb-color' },
-      transitionTimingFunction: { default: null, '@media (pointer: fine)': 'linear' },
     },
     // eslint-disable-next-line @stylexjs/valid-styles -- StyleX's pseudo-element allowlist holds the bare selectors only; it compiles the combined form correctly. See the note above.
     '::-webkit-scrollbar-thumb:active': {
@@ -156,8 +168,13 @@ const styles = stylex.create({
         default: null,
         '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb-hover'],
       },
-      // Arriving is direct pointer feedback and reads better a touch quicker than the decay.
-      transitionDuration: { default: null, '@media (pointer: fine)': durationVars['--cl-duration-fast'] },
+    },
+    // Declared transparent rather than left alone. Opting into a custom scrollbar at all means the
+    // track is OURS, and an undeclared one falls back to the UA's own painting for the part —
+    // which shows through the moment the thumb is anything less than opaque, and reads as a dark
+    // rail behind a thumb that was supposed to be invisible. "Unstyled" has to be said out loud.
+    '::-webkit-scrollbar-track': {
+      backgroundColor: { default: null, '@media (pointer: fine)': 'transparent' },
     },
   },
 
@@ -256,6 +273,7 @@ export type ScrollAreaGutter = keyof typeof gutters;
 export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto') {
   return [
     styles.viewport,
+    styles.thumbColor,
     styles.scrollbar,
     styles.mask,
     styles.indicators,

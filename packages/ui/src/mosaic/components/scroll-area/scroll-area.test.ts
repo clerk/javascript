@@ -6,7 +6,7 @@ import { scrollAreaVars, scrollbarThumbVars } from './scroll-area.vars.stylex';
 
 describe('Mosaic scroll area styles', () => {
   it('composes the viewport atoms into one spreadable set', () => {
-    expect(scrollAreaViewport()).toHaveLength(6);
+    expect(scrollAreaViewport()).toHaveLength(7);
     expect(scrollAreaRoot).toBeDefined();
   });
 

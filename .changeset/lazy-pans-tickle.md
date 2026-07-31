@@ -21,3 +21,5 @@ Two breaking notes if you were already theming these:
 - `--cl-scroll-fade-inset` is removed. The mask now derives its inset from `--cl-scrollbar-width`, which closes the gap where the edge fade covered part of the scrollbar.
 
 Firefox implements neither `::-webkit-scrollbar` nor an equivalent, so it keeps its platform scrollbar; touch platforms keep their native overlay bar as before. On macOS, styling the scrollbar takes it out of overlay mode, so the bar is always visible and always occupies its lane.
+
+The thumb's `hover` and `active` colours switch instantly rather than fading. Blink runs no transition declared on `::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb inherits the animating value — meaning a change made on the scroller fades, while one made on the thumb itself can only snap. Retargeting `--cl-scrollbar-thumb` from a region's own `:hover` (to fade a scrollbar in) does transition.

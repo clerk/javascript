@@ -98,6 +98,7 @@ import { meta as popoverMeta } from '../stories/popover.stories';
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
+  HoverReveal as ScrollAreaHoverReveal,
   meta as scrollAreaMeta,
   NotScrollable as ScrollAreaNotScrollable,
   ThemedScrollbar as ScrollAreaThemedScrollbar,
@@ -227,6 +228,7 @@ const scrollAreaModule: StoryModule = {
   Default: ScrollAreaDefault,
   NotScrollable: ScrollAreaNotScrollable,
   Gutter: ScrollAreaGutter,
+  HoverReveal: ScrollAreaHoverReveal,
   ThemedScrollbar: ScrollAreaThemedScrollbar,
 };
 

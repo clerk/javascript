@@ -3,7 +3,6 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -362,15 +361,10 @@ export function Scrolling() {
   return (
     <div
       {...root}
-      className={`${root.className} w-full`}
+      className={`${root.className} border-border w-full rounded-lg border`}
       style={{ height: 200 }}
     >
-      {/* The group pads all four sides and the scrollbar takes its lane INSIDE that padding, so
-          the right edge otherwise reads as padding plus lane. */}
-      <Item.Group
-        {...stylex.props(...scrollAreaViewport())}
-        style={{ paddingInlineEnd: space['0.5'] }}
-      >
+      <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {organizations.map(name => (
           <Item.Root
             key={name}
