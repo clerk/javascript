@@ -122,3 +122,23 @@ which color and variant it is stays legible while it's unavailable. Hover and pr
 by the styles, not by `pointer-events`: the button stays hit-testable, which is what makes
 `cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
 That tooltip is worth adding — a disabled control with no explanation is a dead end.
+
+### Touch target
+
+Every size is shorter than the 44px a fingertip needs, so under `pointer: coarse` the button grows
+its hit area with an invisible overlay — the rendered size doesn't change, and nothing shifts on a
+mouse. Default shape grows on the block axis only; square and circle grow on both, being as narrow
+as they are short. `link` is text, not a control, and never takes one.
+
+Opt out with `touchTarget={false}` where buttons sit close enough for the overlays to overlap — a
+dense icon toolbar, a tight stack. Overlap isn't symmetrical: the later sibling's overlay covers
+the edge of the one before it, so a tap there activates the wrong button.
+
+```tsx
+<Button
+  shape='square'
+  touchTarget={false}
+>
+  ×
+</Button>
+```

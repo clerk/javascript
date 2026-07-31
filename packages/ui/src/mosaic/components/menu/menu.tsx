@@ -9,13 +9,11 @@ import { Menu as Primitive } from '@clerk/headless/menu';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { iconRegistry } from '../../icons/registry';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
+import { Icon } from '../icon';
 import { styles } from './menu.styles';
-
-const EllipsisIcon = iconRegistry.ellipsis;
 
 export type { MenuProps, MenuSeparatorProps };
 
@@ -47,7 +45,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       {...mergeStyleProps(themeProps('menu-trigger'), className, style)}
       {...rest}
     >
-      {children ?? <EllipsisIcon {...stylex.props(styles.triggerIcon)} />}
+      {children ?? <Icon name='ellipsis' />}
     </Primitive.Trigger>
   );
 });

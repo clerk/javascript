@@ -36,6 +36,18 @@ const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, $
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
+// An icon rests a step below its label and comes up to it on hover, so the label leads and the icon
+// reads as supporting. Each is an opaque faded form of the cell's own text color, not an alpha of
+// it: a translucent icon would pick up whatever sits behind the button and drift per surface.
+//
+// The achromatic foregrounds (`primary`, `neutral-foreground`) share the house faded gray. The two
+// that carry hue fade toward the tint that belongs to them, and the light-on-fill pairs fade toward
+// their own fill, which is the only backdrop they can ever sit on.
+const iconFadedNeutral = colorVars['--cl-color-neutral-faded'];
+const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-faded']} 50%)`;
+const iconFadedOnPrimary = `color-mix(in oklab, ${colorVars['--cl-color-primary-foreground']}, ${colorVars['--cl-color-primary']} 40%)`;
+const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative-foreground']}, ${colorVars['--cl-color-negative']} 40%)`;
+
 // Interactive states are gated on `:enabled`: the `disabled` attribute blocks activation but
 // not matching, and the button stays hit-testable so `cursor: not-allowed` renders and a
 // wrapping tooltip still gets the pointer. Disabled keeps its resting fill and only dims.
@@ -44,6 +56,12 @@ const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']},
 // `@media (hover: hover)` `:hover` would outrank a bare `:active` and win while pressing.
 // Both selectors are written out per cell rather than hoisted to a const: `@stylexjs/sort-keys`
 // reads a computed key as its identifier name and fails the ordering.
+//
+// `[data-open]` takes the pressed fill too, so a button acting as a disclosure trigger stays
+// visibly engaged for as long as its surface is open. Disclosure primitives set it on the
+// trigger (`popover-trigger.tsx` and friends); a plain button never carries it. It is excluded
+// from hover for the same reason `:active` is — otherwise moving the pointer over an open
+// trigger would lift it back to the lighter hover step.
 
 export const styles = stylex.create({
   base: {
@@ -56,8 +74,6 @@ export const styles = stylex.create({
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
-    // The size axis fixes the height, so overflowing content clips instead of spilling out.
-    overflow: 'hidden',
     alignItems: 'center',
     // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
@@ -107,16 +123,34 @@ export const styles = stylex.create({
     paddingInlineStart: 0,
   },
 
-  // Under a coarse pointer the control floors at the target size. Its own atom rather than a
-  // per-size override: the floor is one physical constant, and `link` — text, not a control —
-  // opts out by not receiving it. `minHeight` leaves the fixed height in charge otherwise.
+  // Under a coarse pointer the hit area floors at the target size — grown by an overlay
+  // rather than by `min-height`, so the button keeps the size its axis gives it and only the
+  // region answering a tap gets bigger. Its own atom rather than a per-size override: the
+  // floor is one physical constant, and `link` — text, not a control — opts out by not
+  // receiving it.
+  //
+  // The insets resolve against the button's own box, so one expression covers every size:
+  // the overlay lands at exactly the target height whatever the shortfall, and clamps to the
+  // button's bounds once the control is already past the floor. `position` is scoped to the
+  // media query too — a fine pointer generates no overlay, so it shouldn't take on the
+  // stacking change either.
   touchTarget: {
-    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+    position: { default: null, '@media (pointer: coarse)': 'relative' },
+    '::after': {
+      insetBlock: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      // Text buttons are already past the floor inline — growing that axis too would only
+      // reach into a neighbor's space for nothing.
+      insetInline: 0,
+      content: { default: null, '@media (pointer: coarse)': '""' },
+      position: 'absolute',
+    },
   },
-  // Icon buttons are square, so the floor has to reach the inline axis too or the target
+  // Icon buttons are square, so the floor has to reach the inline axis as well or the region
   // ends up tall and narrow.
   touchTargetIcon: {
-    minWidth: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
+    '::after': {
+      insetInline: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+    },
   },
 
   // state / modifiers
@@ -127,37 +161,69 @@ export const styles = stylex.create({
 // variant × color, one entry per cell of the design matrix, keyed `<variant>-<color>` so the
 // component can index directly. Each cell is self-contained so it reads — and tunes — against
 // the spec without tracing shared parts.
+//
+// `--_cl-icon-color` lives per cell rather than once in `base`: StyleX resolves a property to the
+// last style that declares it, so a cell setting it would drop `base`'s hover branch wholesale
+// rather than merge with it. `Icon` reads the var (`icon.styles.ts`) — StyleX can't emit a
+// descendant rule, so the value crosses the element boundary as a custom property.
 export const variants = stylex.create({
   // The pressed state stays outside the hover media query so no-hover devices still get one.
   'filled-primary': {
+    '--_cl-icon-color': {
+      default: iconFadedOnPrimary,
+      ':enabled[data-open]': colorVars['--cl-color-primary-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-primary-foreground'],
+      },
+    },
     backgroundColor: {
       default: colorVars['--cl-color-primary'],
       ':enabled:active': primaryActive,
+      ':enabled[data-open]': primaryActive,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': primaryHover,
+        ':enabled:hover:not(:active):not([data-open])': primaryHover,
       },
     },
     color: colorVars['--cl-color-primary-foreground'],
   },
   'filled-neutral': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      ':enabled[data-open]': colorVars['--cl-color-neutral-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-neutral-foreground'],
+      },
+    },
     backgroundColor: {
       default: neutralStep0,
       ':enabled:active': neutralStep2,
+      ':enabled[data-open]': neutralStep2,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep1,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep1,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
   },
   'filled-negative': {
+    '--_cl-icon-color': {
+      default: iconFadedOnNegative,
+      ':enabled[data-open]': colorVars['--cl-color-negative-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-negative-foreground'],
+      },
+    },
     backgroundColor: {
       default: colorVars['--cl-color-negative'],
       ':enabled:active': negativeActive,
+      ':enabled[data-open]': negativeActive,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': negativeHover,
+        ':enabled:hover:not(:active):not([data-open])': negativeHover,
       },
     },
     color: colorVars['--cl-color-negative-foreground'],
@@ -167,60 +233,105 @@ export const variants = stylex.create({
   // rises underneath it. Keeps the border opaque so it can't alpha-fade against an incoming
   // fill, and leaves it independently themeable.
   'outline-primary': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      ':enabled[data-open]': colorVars['--cl-color-primary'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-primary'],
+      },
+    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': neutralStep1,
+      ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep0,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep0,
       },
     },
     color: colorVars['--cl-color-primary'],
   },
   'outline-neutral': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      ':enabled[data-open]': colorVars['--cl-color-neutral-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-neutral-foreground'],
+      },
+    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': neutralStep1,
+      ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep0,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep0,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
   },
   'outline-negative': {
+    '--_cl-icon-color': {
+      default: iconFadedNegative,
+      ':enabled[data-open]': colorVars['--cl-color-negative'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-negative'],
+      },
+    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': neutralStep1,
+      ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep0,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep0,
       },
     },
     color: colorVars['--cl-color-negative'],
   },
 
   'ghost-primary': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      ':enabled[data-open]': colorVars['--cl-color-primary'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-primary'],
+      },
+    },
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': neutralStep1,
+      ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep0,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep0,
       },
     },
     color: colorVars['--cl-color-primary'],
   },
   'ghost-neutral': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      ':enabled[data-open]': colorVars['--cl-color-neutral-foreground'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-neutral-foreground'],
+      },
+    },
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': neutralStep1,
+      ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': neutralStep0,
+        ':enabled:hover:not(:active):not([data-open])': neutralStep0,
       },
     },
     color: colorVars['--cl-color-neutral-foreground'],
@@ -228,12 +339,21 @@ export const variants = stylex.create({
   // The one ghost that tints instead of graying, so its pressed step walks its own faded
   // fill toward the negative it carries rather than joining the gray ramp.
   'ghost-negative': {
+    '--_cl-icon-color': {
+      default: iconFadedNegative,
+      ':enabled[data-open]': colorVars['--cl-color-negative'],
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-negative'],
+      },
+    },
     backgroundColor: {
       default: 'transparent',
       ':enabled:active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':enabled[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
-        ':enabled:hover:not(:active)': colorVars['--cl-color-negative-faded'],
+        ':enabled:hover:not(:active):not([data-open])': colorVars['--cl-color-negative-faded'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -242,6 +362,13 @@ export const variants = stylex.create({
   // link opts out of the box the size axis sets — it reads as text, not a control. Per-side
   // zeros for the same reason `shapeSquare` uses them.
   'link-primary': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-primary'],
+      },
+    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-primary'],
     paddingInlineEnd: 0,
@@ -251,6 +378,13 @@ export const variants = stylex.create({
     height: 'auto',
   },
   'link-neutral': {
+    '--_cl-icon-color': {
+      default: iconFadedNeutral,
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-neutral-foreground'],
+      },
+    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-neutral-foreground'],
     paddingInlineEnd: 0,
@@ -260,6 +394,13 @@ export const variants = stylex.create({
     height: 'auto',
   },
   'link-negative': {
+    '--_cl-icon-color': {
+      default: iconFadedNegative,
+      '@media (hover: hover)': {
+        default: null,
+        ':enabled:hover': colorVars['--cl-color-negative'],
+      },
+    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,

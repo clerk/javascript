@@ -1,0 +1,35 @@
+# Embedded UserProfileView (onHostBack): internal navigation stays native,
+# and the host-supplied root back button closes the screen from JS.
+appId: com.clerk.exponativebuildfixture
+name: Embedded UserProfileView host back round trip
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- tapOn:
+    id: 'open-embedded-profile-button'
+- extendedWaitUntil:
+    visible: 'Security'
+    timeout: 20000
+- tapOn:
+    text: 'Security'
+- extendedWaitUntil:
+    visible: 'Password|Passkeys|Two-step verification|Active devices'
+    timeout: 15000
+# Both back buttons read 'Back' (internal id 'BackButton', host root id
+# 'chevron.backward') but only one exists at a time: this tap pops Clerk's
+# internal stack, the next one is the host chevron firing onHostBack.
+- tapOn: 'Back'
+- extendedWaitUntil:
+    visible: 'Security'
+    timeout: 15000
+- tapOn: 'Back'
+- extendedWaitUntil:
+    visible:
+      id: 'open-embedded-profile-button'
+    timeout: 15000
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml

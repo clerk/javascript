@@ -12,6 +12,14 @@ export interface ButtonProps extends Omit<MosaicComponentProps<'button'>, 'rende
   size?: 'sm' | 'md' | 'lg';
   shape?: 'default' | 'square' | 'circle';
   fullWidth?: boolean;
+  /**
+   * Floors the hit area at the recommended touch target under a coarse pointer, without
+   * changing the rendered size. Defaults to `true`. Pass `false` where buttons sit close
+   * enough that the grown areas would overlap — a dense icon toolbar, a tight stack — since
+   * the later sibling's area would otherwise cover the edge of the one before it. Has no
+   * effect on `variant='link'`, which is text rather than a control.
+   */
+  touchTarget?: boolean;
 }
 
 /**
@@ -81,6 +89,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     size = 'md',
     shape = 'default',
     fullWidth = false,
+    touchTarget = true,
     disabled = false,
     className,
     style,
@@ -90,6 +99,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   ref,
 ) {
   const isIconShape = shape === 'square' || shape === 'circle';
+  const hasTouchTarget = touchTarget && variant !== 'link';
   return (
     <button
       ref={ref}
@@ -104,8 +114,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
           shape === 'square' && styles.shapeSquare,
           shape === 'circle' && styles.shapeCircle,
           isIconShape && iconSizes[size],
-          variant !== 'link' && styles.touchTarget,
-          variant !== 'link' && isIconShape && styles.touchTargetIcon,
+          hasTouchTarget && styles.touchTarget,
+          hasTouchTarget && isIconShape && styles.touchTargetIcon,
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
         ),

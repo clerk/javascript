@@ -1,5 +1,14 @@
 # @clerk/vue
 
+## 2.4.22
+
+### Patch Changes
+
+- Fix the `appearance` option rejecting valid properties such as `theme`, `variables`, and `elements` with a "does not exist in type `Appearance<Ui>`" TypeScript error. This also affects `@clerk/nuxt`, which derives its module options from `@clerk/vue`. ([#9281](https://github.com/clerk/javascript/pull/9281)) by [@BobbyLin23](https://github.com/BobbyLin23)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
 ## 2.4.21
 
 ### Patch Changes

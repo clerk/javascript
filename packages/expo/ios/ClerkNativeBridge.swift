@@ -4,7 +4,7 @@ import UIKit
 import SwiftUI
 import Observation
 @_spi(FrameworkIntegration) import ClerkKit
-import ClerkKitUI
+@_spi(FrameworkIntegration) import ClerkKitUI
 
 /// Events emitted by the native view wrappers to their React Native host views.
 public enum ClerkNativeViewEvent: String {
@@ -271,6 +271,7 @@ final class ClerkNativeBridge {
     dismissible: Bool,
     logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -279,6 +280,7 @@ final class ClerkNativeBridge {
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
@@ -290,6 +292,7 @@ final class ClerkNativeBridge {
 
   func makeUserProfileViewController(
     dismissible: Bool,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -297,6 +300,7 @@ final class ClerkNativeBridge {
     return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme
       ),
@@ -531,6 +535,7 @@ struct ClerkInlineUserButtonWrapperView: View {
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissible: Bool
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
@@ -541,6 +546,7 @@ struct ClerkInlineAuthWrapperView: View {
   @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -635,6 +641,7 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 
 struct ClerkInlineProfileWrapperView: View {
   let dismissible: Bool
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
 
@@ -643,6 +650,7 @@ struct ClerkInlineProfileWrapperView: View {
   var body: some View {
     let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {

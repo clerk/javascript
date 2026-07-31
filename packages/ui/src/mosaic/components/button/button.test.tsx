@@ -30,6 +30,36 @@ describe('Mosaic Button', () => {
     expect(button).toBeEnabled();
   });
 
+  // The touch target is an overlay with no attribute of its own, so these compare the atoms
+  // the element ends up with rather than a reflected variant.
+  it('drops the touch-target atoms when the prop is off', () => {
+    const { rerender } = render(<Button>Hi</Button>);
+    const on = screen.getByRole('button').className.split(' ');
+    rerender(<Button touchTarget={false}>Hi</Button>);
+    const off = screen.getByRole('button').className.split(' ');
+    expect(off.length).toBeLessThan(on.length);
+    expect(off.every(atom => on.includes(atom))).toBe(true);
+  });
+
+  it('leaves the touch target off a link, which is text rather than a control', () => {
+    const { rerender } = render(<Button variant='link'>Hi</Button>);
+    const on = screen.getByRole('button').className;
+    rerender(
+      <Button
+        variant='link'
+        touchTarget={false}
+      >
+        Hi
+      </Button>,
+    );
+    expect(screen.getByRole('button').className).toBe(on);
+  });
+
+  it('keeps the touch-target prop off the element', () => {
+    render(<Button touchTarget={false}>Hi</Button>);
+    expect(screen.getByRole('button')).not.toHaveAttribute('touchtarget');
+  });
+
   it('wires variant props and consumer className/style through to the element', () => {
     render(
       <Button

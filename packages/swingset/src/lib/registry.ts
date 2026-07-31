@@ -87,6 +87,12 @@ import {
   meta as organizationProfileProfileSectionMeta,
 } from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Alignment as PopoverComponentAlignment,
+  Default as PopoverComponentDefault,
+  meta as popoverComponentMeta,
+  Placement as PopoverComponentPlacement,
+} from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
@@ -155,6 +161,13 @@ const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled }
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+
+const popoverComponentModule: StoryModule = {
+  meta: popoverComponentMeta,
+  Default: PopoverComponentDefault,
+  Placement: PopoverComponentPlacement,
+  Alignment: PopoverComponentAlignment,
+};
 
 const itemModule: StoryModule = {
   meta: itemMeta,
@@ -225,6 +238,7 @@ export const registry: StoryModule[] = [
   headingModule,
   iconModule,
   menuComponentModule,
+  popoverComponentModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.

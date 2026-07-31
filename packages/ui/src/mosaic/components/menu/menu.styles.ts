@@ -107,9 +107,4 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-border'],
     blockSize: '1px',
   },
-
-  triggerIcon: {
-    height: space['4'],
-    width: space['4'],
-  },
 });
