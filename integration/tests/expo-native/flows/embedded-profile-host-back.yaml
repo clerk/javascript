@@ -10,21 +10,44 @@ name: Embedded UserProfileView host back round trip
 - runFlow: subflows/assert-signed-in.yaml
 - tapOn:
     id: 'open-embedded-profile-button'
-- extendedWaitUntil:
-    visible: 'Security'
-    timeout: 20000
-- tapOn:
-    text: 'Security'
-- extendedWaitUntil:
-    visible: 'Password|Passkeys|Two-step verification|Active devices'
-    timeout: 15000
-# Both back buttons read 'Back' (internal id 'BackButton', host root id
-# 'chevron.backward') but only one exists at a time: this tap pops Clerk's
-# internal stack, the next one is the host chevron firing onHostBack.
-- tapOn: 'Back'
-- extendedWaitUntil:
-    visible: 'Security'
-    timeout: 15000
+# The internal push differs per platform: clerk-ios pushes a Security screen
+# from the profile root, clerk-android uses tabs at the root and pushes the
+# Manage account screen instead. The double-Back contract below is the same:
+# both back buttons read 'Back' but only one exists at a time, so the first
+# tap pops Clerk's internal stack and the second is the host chevron firing
+# onHostBack.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: 'Security'
+          timeout: 20000
+      - tapOn:
+          text: 'Security'
+      - extendedWaitUntil:
+          visible: 'Password|Passkeys|Two-step verification|Active devices'
+          timeout: 15000
+      - tapOn: 'Back'
+      - extendedWaitUntil:
+          visible: 'Security'
+          timeout: 15000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: 'Edit profile'
+          timeout: 20000
+      - tapOn:
+          text: 'Manage account'
+      - extendedWaitUntil:
+          visible: 'EMAIL ADDRESSES|Add email address'
+          timeout: 15000
+      - tapOn: 'Back'
+      - extendedWaitUntil:
+          visible: 'Edit profile'
+          timeout: 15000
 - tapOn: 'Back'
 - extendedWaitUntil:
     visible:
