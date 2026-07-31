@@ -15,11 +15,9 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Flows run through the official maestro CLI. maestro-runner was tried and
-# reverted: its devicelab driver mangles typed text and its default Android
-# driver approximates Maestro's anchored regex text matching with UiSelector
-# textContains, which mis-targets taps (e.g. 'Continue' resolves to the
-# 'Continue to <app>' title instead of the button).
+# Runs the official maestro CLI. maestro-runner was tried and reverted: its
+# drivers mangle typed text and resolve text selectors by substring, so
+# tapOn 'Continue' hits the 'Continue to <app>' title instead of the button.
 command -v maestro >/dev/null 2>&1 || {
   echo "maestro is required: https://docs.maestro.dev"
   exit 1

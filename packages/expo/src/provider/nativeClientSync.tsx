@@ -1023,9 +1023,7 @@ export function useNativeClientBootstrap({
               );
             }
           } else {
-            // Also logged in release builds: a failed native configure silently
-            // disables the native components, which is undiagnosable from device
-            // logs otherwise.
+            // Warned in release too: a failed native configure silently disables the native components.
             const message = error instanceof Error ? error.message : String(error);
             console.warn(
               `[ClerkProvider] Failed to configure native Clerk (${Platform.OS}); native components will not work: ${message}`,
