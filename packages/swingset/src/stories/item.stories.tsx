@@ -2,6 +2,8 @@
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -328,6 +330,63 @@ export function Group() {
             <Item.Label>Sign out of all accounts</Item.Label>
           </Item.Content>
         </Item.Root>
+      </Item.Group>
+    </div>
+  );
+}
+
+const organizations = [
+  'Acme Corporation',
+  'Globex',
+  'Initech',
+  'Umbrella Health',
+  'Stark Industries',
+  'Wayne Enterprises',
+  'Cyberdyne Systems',
+  'Soylent Industries',
+  'Tyrell Corporation',
+  'Weyland-Yutani',
+];
+
+// A capped-height group that scrolls, with fade indicators at whichever edge still has
+// something to reveal. The scroll surface is StyleX atoms rather than a component, so it goes
+// straight onto the `Item.Group` — no wrapper element, and the group keeps its `.cl-item-group`
+// slot, which stays the hook a theme targets. The outer box only exists to cap the height and
+// to give overlays something to anchor to.
+export function Scrolling() {
+  return (
+    <div
+      className='w-full max-w-sm'
+      style={{ height: 260 }}
+      {...stylex.props(scrollAreaRoot)}
+    >
+      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+        {organizations.map(name => (
+          <Item.Root
+            key={name}
+            render={({ children, ...props }) => (
+              <button
+                {...props}
+                type='button'
+              >
+                {children}
+              </button>
+            )}
+          >
+            <Item.Media>
+              <Avatar.Root
+                size='fit'
+                shape='circle'
+              >
+                <Avatar.Fallback>{name[0]}</Avatar.Fallback>
+              </Avatar.Root>
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{name}</Item.Title>
+              <Item.Description>{organizations.indexOf(name) + 3} members</Item.Description>
+            </Item.Content>
+          </Item.Root>
+        ))}
       </Item.Group>
     </div>
   );
