@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.15.0
+
+### Minor Changes
+
+- Update fields for BillingSubscription and BillingSubscriptionItem ([#9196](https://github.com/clerk/javascript/pull/9196)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Return a `TokenVerificationError` from `decodeJwt` and `verifyToken` for tokens whose header, payload, or signature cannot be decoded. ([#9268](https://github.com/clerk/javascript/pull/9268)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
+## 3.14.0
+
+### Minor Changes
+
+- Align the `EnterpriseConnection` response resource with what the Backend API actually returns: ([#9156](https://github.com/clerk/javascript/pull/9156)) by [@manovotny](https://github.com/manovotny)
+  - `EnterpriseConnection` now exposes `provider`, `logoPublicUrl`, `allowOrganizationAccountLinking`, `authenticatable`, `disableJitProvisioning`, and `customAttributes`.
+  - `EnterpriseConnectionSamlConnection` now exposes `active`, `forceAuthn`, and `loginHint`.
+  - `EnterpriseConnectionOauthConfig` now exposes `providerKey`, `authUrl`, `tokenUrl`, `userInfoUrl`, and `requiresPkce`.
+  - Deprecated properties the Backend API never returns, which were always `undefined` despite their declared types: `allowSubdomains` on `EnterpriseConnection` (use `samlConnection.allowSubdomains`), and `idpMetadata` and `syncUserAttributes` on `EnterpriseConnectionSamlConnection` (use the top-level `syncUserAttributes`).
+  - `organizationId` is now normalized to `null` when the Backend API omits it, matching its declared `string | null` type. Properties backed by optional API fields (for example `oauthConfig.clientId` and the SAML IdP fields) are now typed as possibly `undefined` to match runtime behavior.
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+
 ## 3.13.2
 
 ### Patch Changes

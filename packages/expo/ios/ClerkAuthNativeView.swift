@@ -7,9 +7,11 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentLogoMaxHeight: CGFloat?
   private let logoState = ClerkInlineAuthLogoState()
   private var logoBoundsObservation: NSKeyValueObservation?
+  private var currentHostBackButton: Bool = false
   private var didSendDismiss = false
 
   let onAuthEvent = EventDispatcher()
+  let onHostBack = EventDispatcher()
 
   func setMode(_ mode: String?) {
     let newMode = mode ?? "signInOrUp"
@@ -28,6 +30,13 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   func setLogoMaxHeight(_ logoMaxHeight: CGFloat?) {
     guard logoMaxHeight != currentLogoMaxHeight else { return }
     currentLogoMaxHeight = logoMaxHeight
+    setNeedsHostedViewUpdate()
+  }
+
+  func setHostBackButton(_ hostBackButton: Bool?) {
+    let newHostBackButton = hostBackButton ?? false
+    guard newHostBackButton != currentHostBackButton else { return }
+    currentHostBackButton = newHostBackButton
     setNeedsHostedViewUpdate()
   }
 
@@ -98,11 +107,16 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   }
 
   override func makeHostedController() -> UIViewController? {
+    let hostBackAction: (() -> Void)? = currentHostBackButton
+      ? { [weak self] in self?.onHostBack([:]) }
+      : nil
+
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
       logoState: logoState,
       logoMaxHeight: currentLogoMaxHeight,
+      hostBackAction: hostBackAction,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()
@@ -117,7 +131,7 @@ public class ClerkAuthViewModule: Module {
     Name("ClerkAuthView")
 
     View(ClerkAuthNativeView.self) {
-      Events("onAuthEvent")
+      Events("onAuthEvent", "onHostBack")
 
       Prop("mode") { (view: ClerkAuthNativeView, mode: String?) in
         view.setMode(mode)
@@ -130,6 +144,11 @@ public class ClerkAuthViewModule: Module {
       Prop("logoMaxHeight") { (view: ClerkAuthNativeView, logoMaxHeight: CGFloat?) in
         view.setLogoMaxHeight(logoMaxHeight)
       }
+
+      Prop("hostBackButton") { (view: ClerkAuthNativeView, hostBackButton: Bool?) in
+        view.setHostBackButton(hostBackButton)
+      }
+
     }
   }
 }

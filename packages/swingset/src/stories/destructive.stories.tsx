@@ -16,7 +16,7 @@ function DestructiveTrigger(props: HTMLAttributes<HTMLElement>) {
   return (
     <Button
       {...props}
-      intent='destructive'
+      color='negative'
     >
       Delete organization
     </Button>

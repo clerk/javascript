@@ -1,13 +1,15 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
 package expo.modules.clerk
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.api.FrameworkIntegrationApi
+import com.clerk.ui.navigation.ClerkHostBackActionProvider
 import com.clerk.ui.userprofile.UserProfileView
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
@@ -25,7 +27,9 @@ private fun debugLog(tag: String, message: String) {
 class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
   // clerk-android UserProfileView dismissibility is controlled by its onDismiss callback.
   var isDismissible: Boolean = true
+  var hostBackButton: Boolean = false
   private val onProfileEvent by EventDispatcher()
+  private val onHostBack by EventDispatcher()
 
   private val viewModelStoreOwner = object : ViewModelStoreOwner {
     private val store = ViewModelStore()
@@ -40,15 +44,24 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
   @Composable
   override fun Content() {
-    debugLog(TAG, "setupView - isDismissible: $isDismissible")
+    debugLog(TAG, "setupView - isDismissible: $isDismissible, hostBackButton: $hostBackButton")
 
+    if (hostBackButton) {
+      ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { ProfileView() }
+    } else {
+      ProfileView()
+    }
+  }
+
+  @Composable
+  private fun ProfileView() {
     UserProfileView(
       clerkTheme = Clerk.customTheme,
       isDismissible = isDismissible,
       onDismiss = {
         debugLog(TAG, "Profile dismissed")
         sendEvent("dismissed")
-      }
+      },
     )
   }
 
@@ -62,10 +75,14 @@ class ClerkUserProfileViewModule : Module() {
     Name("ClerkUserProfileView")
 
     View(ClerkUserProfileNativeView::class) {
-      Events("onProfileEvent")
+      Events("onProfileEvent", "onHostBack")
 
       Prop("isDismissible") { view: ClerkUserProfileNativeView, isDismissible: Boolean ->
         view.isDismissible = isDismissible
+      }
+
+      Prop("hostBackButton") { view: ClerkUserProfileNativeView, hostBackButton: Boolean ->
+        view.hostBackButton = hostBackButton
       }
 
       OnViewDidUpdateProps { view: ClerkUserProfileNativeView ->

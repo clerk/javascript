@@ -1404,6 +1404,10 @@ export type __internal_LocalizationResource = {
         google: LocalizationValue;
         microsoft: LocalizationValue;
       };
+      oidc: {
+        groupLabel: LocalizationValue;
+        oidcProvider: LocalizationValue;
+      };
       warning: LocalizationValue;
     };
     changeProviderDialog: {
@@ -1521,6 +1525,75 @@ export type __internal_LocalizationResource = {
       activeConnectionWarning: {
         title: LocalizationValue;
         dismiss: LocalizationValue;
+      };
+      oidcCustom: {
+        mainHeaderTitle: LocalizationValue;
+        redirectUriStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          claims: {
+            description: LocalizationValue;
+            table: {
+              columns: {
+                attribute: LocalizationValue;
+                claim: LocalizationValue;
+              };
+              rows: {
+                email: { attribute: LocalizationValue };
+                firstName: { attribute: LocalizationValue };
+                lastName: { attribute: LocalizationValue };
+                subject: { attribute: LocalizationValue };
+              };
+            };
+          };
+          redirectUri: {
+            label: LocalizationValue;
+          };
+        };
+        endpointsStep: {
+          headerSubtitle: LocalizationValue;
+          discoveryUrl: {
+            description: LocalizationValue;
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          manual: {
+            authUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            description: LocalizationValue;
+            tokenUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            userInfoUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+          };
+          modes: {
+            ariaLabel: LocalizationValue;
+            discoveryUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+        };
+        credentialsStep: {
+          headerSubtitle: LocalizationValue;
+          clientId: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          clientSecret: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          paragraph: LocalizationValue;
+        };
+      };
+      unsupportedProvider: {
+        title: LocalizationValue;
+        description: LocalizationValue;
       };
       samlOkta: {
         mainHeaderTitle: LocalizationValue;

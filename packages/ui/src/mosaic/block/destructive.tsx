@@ -110,7 +110,7 @@ export function Destructive({
               </Button>
               <Button
                 type='submit'
-                intent='destructive'
+                color='negative'
                 disabled={!canSubmit}
               >
                 {primaryActionLabel}

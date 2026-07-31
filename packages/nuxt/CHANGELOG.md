@@ -1,5 +1,93 @@
 # @clerk/nuxt
 
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`9c51d74`](https://github.com/clerk/javascript/commit/9c51d74ac36391888367e4da44912c92999a7ac2), [`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f), [`fe6ee54`](https://github.com/clerk/javascript/commit/fe6ee5489d9efcdc5aec53b1ba74b0260e539f80), [`850051d`](https://github.com/clerk/javascript/commit/850051df0e6d81046d7a5536ceaba3622f8fe7c1)]:
+  - @clerk/backend@3.15.0
+  - @clerk/shared@4.25.10
+  - @clerk/vue@2.4.22
+
+## 3.0.0
+
+### Major Changes
+
+- Drop support for Nuxt 3, which reaches end-of-life on July 31, 2026. `@clerk/nuxt` now requires Nuxt 4, and the minimum supported Node.js version is now `^20.19.0 || >=22.12.0` to match Nuxt 4's own requirement. If you are still on Nuxt 3, follow the [Nuxt upgrade guide](https://nuxt.com/docs/getting-started/upgrade) to upgrade your project before updating `@clerk/nuxt`. ([#9258](https://github.com/clerk/javascript/pull/9258)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Remove `createRouteMatcher` from `@clerk/nuxt/server` and the auto-imported client-side `createRouteMatcher`. Middleware-based auth checks rely on path matching, which can diverge from how requests are actually routed and leave protected resources reachable. Move auth checks into the resources themselves. ([#9258](https://github.com/clerk/javascript/pull/9258)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Protect API routes inside the event handler itself:
+
+  ```ts
+  export default defineEventHandler(event => {
+    const { isAuthenticated, userId } = event.context.auth();
+
+    if (!isAuthenticated) {
+      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+    }
+
+    return { userId };
+  });
+  ```
+
+  Protect pages with a named route middleware and opt pages into it with `definePageMeta()`. Child routes inherit the middleware applied to their parent, so a single declaration can protect a whole section:
+
+  ```ts
+  // app/middleware/auth.ts
+  export default defineNuxtRouteMiddleware(() => {
+    const { isSignedIn } = useAuth();
+
+    if (!isSignedIn.value) {
+      return navigateTo('/sign-in');
+    }
+  });
+  ```
+
+  ```vue
+  <script setup>
+  definePageMeta({ middleware: 'auth' });
+  </script>
+  ```
+
+  If you want to hand this work to a coding agent, use this migration prompt:
+
+  ```md
+  Migrate my Nuxt project away from Clerk's removed `createRouteMatcher` API.
+
+  1. Find every matcher created with `createRouteMatcher`, along with the logic
+     that uses it (throwing 401 errors, calling `navigateTo('/sign-in')`, etc.).
+     Matchers can appear in Nitro server middleware (imported from
+     `@clerk/nuxt/server`) or in Nuxt route middleware (auto-imported).
+  2. For every API route those matchers protected, move the auth check into the
+     event handler itself:
+     const { isAuthenticated } = event.context.auth();
+     if (!isAuthenticated) throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+     Keep any role or permission checks (`event.context.auth().has(...)`) with
+     the resource as well.
+  3. For every page those matchers protected, create a named route middleware in
+     `app/middleware/` that checks `useAuth()` and redirects with `navigateTo()`,
+     then opt pages into it with `definePageMeta({ middleware: 'auth' })`. Child
+     routes inherit the middleware applied to their parent.
+  4. Remove the `createRouteMatcher` imports and calls. Keep `clerkMiddleware()`
+     itself. Middleware logic unrelated to auth protection (headers, locale
+     redirects, etc.) may stay, using plain `getRequestURL(event).pathname`
+     checks. Plain pathname checks do not normalize percent-encoding
+     (`/api/%61dmin` will not match a check for `/api/admin`), so never use
+     them for auth or security decisions. Those belong on the resource itself,
+     as in steps 2 and 3.
+  5. Make sure every route previously covered by a matcher pattern (including
+     glob patterns like `/dashboard(.*)`) now has its own check, then verify the
+     project builds.
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`23071bd`](https://github.com/clerk/javascript/commit/23071bdd6b511c63ac8312d5adb13ed9d907d4b8), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+  - @clerk/backend@3.14.0
+  - @clerk/vue@2.4.21
+
 ## 2.6.23
 
 ### Patch Changes

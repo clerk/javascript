@@ -1,0 +1,114 @@
+import * as ItemStories from './item.stories';
+
+# Item
+
+Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Title`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
+
+Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's height and gap, and `Item.Media` picks the matching column width up from context rather than taking a size of its own.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ItemStories}
+/>
+
+### Interactive
+
+<Story
+  name='Interactive'
+  storyModule={ItemStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={ItemStories}
+/>
+
+### Group
+
+<Story
+  name='Group'
+  storyModule={ItemStories}
+/>
+
+## Usage
+
+```tsx
+import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Item } from '@clerk/ui/mosaic/components/item';
+
+<Item.Group>
+  <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
+    <Item.Media>
+      <Avatar.Root shape='square' size='fit'>
+        <Avatar.Image src={org.imageUrl} alt='' />
+        <Avatar.Fallback>{org.name[0]}</Avatar.Fallback>
+      </Avatar.Root>
+    </Item.Media>
+    <Item.Content>
+      <Item.Title>Test Organization</Item.Title>
+      <Item.Description>Member</Item.Description>
+    </Item.Content>
+    <Item.Actions>
+      <Button variant='outline' size='sm'>Manage</Button>
+    </Item.Actions>
+  </Item.Root>
+</Item.Group>;
+```
+
+Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an icon at `width='100%'`. An action row that has no secondary text uses `Item.Label` in place of `Item.Title`:
+
+```tsx
+<Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
+  <Item.Media>
+    <SignOutIcon width='100%' />
+  </Item.Media>
+  <Item.Content>
+    <Item.Label>Sign out of all accounts</Item.Label>
+  </Item.Content>
+</Item.Root>;
+```
+
+## Parts
+
+| Part               | Class                 | Description                                                                |
+| ------------------ | --------------------- | -------------------------------------------------------------------------- |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.             |
+| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar. Sized by the root's `size`. |
+| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions.       |
+| `Item.Title`       | `cl-item-title`       | Primary label. Truncates to a single line.                                 |
+| `Item.Description` | `cl-item-description` | Secondary text beneath the title. Truncates to a single line.              |
+| `Item.Label`       | `cl-item-label`       | Sole label on an action row, in place of a title. Dimmed until hovered.    |
+| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                       |
+| `Item.Group`       | `cl-item-group`       | Vertical wrapper around a set of rows (layout only, no role).              |
+| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                        |
+
+Every part accepts a `render` prop for element polymorphism and forwards a ref.
+
+## Styling
+
+The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
+
+| Prop     | Attribute          | Values                              | Default |
+| -------- | ------------------ | ----------------------------------- | ------- |
+| `size`   | `data-size`        | `xs` \| `md`                        | `md`    |
+| `render` | `data-interactive` | present when a `render` is provided | —       |
+
+`size` fixes the row's height and gap. `Item.Media` reflects the same value as `data-size` and takes its width from it, so the two stay in step without being set twice:
+
+```css
+/* Re-theme interactive rows */
+.cl-item[data-interactive] {
+  background-color: var(--cl-color-card);
+}
+
+/* Widen the media column on compact rows */
+.cl-item-media[data-size='xs'] {
+  width: 1.5rem;
+}
+```
+
+`Item.Media` is a square that centers its child. Because the column is sized by the row, give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an icon at `width='100%'` — rather than a fixed pixel size that won't track `size`. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).

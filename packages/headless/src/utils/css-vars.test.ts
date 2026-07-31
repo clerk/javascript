@@ -238,6 +238,63 @@ describe('cssVars middleware', () => {
     });
   });
 
+  describe('--cl-anchor-origin', () => {
+    it("keeps both axes of the anchor's center", async () => {
+      const mw = cssVars({ sideOffset: 8 });
+      const state = createMockState({
+        placement: 'bottom',
+        referenceWidth: 100,
+        referenceHeight: 40,
+      });
+      await mw.fn(state);
+
+      const vars = getVars(state);
+      // Unlike --cl-transform-origin, the cross axis is the anchor's center (40/2), not
+      // the floating element's own edge.
+      expect(vars.get('--cl-anchor-origin')).toBe('50px 20px');
+      expect(vars.get('--cl-transform-origin')).toBe('50px -8px');
+    });
+
+    it('is the same point on every side', async () => {
+      const mw = cssVars({ sideOffset: 8 });
+
+      for (const placement of ['top', 'bottom', 'left', 'right', 'bottom-end']) {
+        const state = createMockState({ placement, referenceWidth: 100, referenceHeight: 40 });
+        await mw.fn(state);
+        expect(getVars(state).get('--cl-anchor-origin')).toBe('50px 20px');
+      }
+    });
+
+    it('is relative to the floating element', async () => {
+      const mw = cssVars();
+      const state = createMockState({ referenceWidth: 100, referenceHeight: 40 });
+      // Floating element positioned away from the anchor.
+      (state as { x: number }).x = 30;
+      (state as { y: number }).y = 60;
+      await mw.fn(state);
+
+      const vars = getVars(state);
+      expect(vars.get('--cl-anchor-origin')).toBe('20px -40px');
+    });
+
+    it('ignores the arrow', async () => {
+      const mw = cssVars({ sideOffset: 4 });
+      const state = createMockState({
+        placement: 'bottom',
+        referenceWidth: 100,
+        referenceHeight: 40,
+        arrowX: 50,
+        arrowElWidth: 12,
+      });
+      await mw.fn(state);
+
+      const vars = getVars(state);
+      // The arrow moves --cl-transform-origin but not the anchor's own center.
+      expect(vars.get('--cl-transform-origin')).toBe('56px -4px');
+      expect(vars.get('--cl-anchor-origin')).toBe('50px 20px');
+    });
+  });
+
   describe('return value', () => {
     it('returns empty object (no position changes)', async () => {
       const mw = cssVars();
@@ -247,8 +304,8 @@ describe('cssVars middleware', () => {
     });
   });
 
-  describe('all five CSS vars are set', () => {
-    it('sets exactly 5 CSS custom properties', async () => {
+  describe('all six CSS vars are set', () => {
+    it('sets exactly 6 CSS custom properties', async () => {
       const mw = cssVars({ sideOffset: 4 });
       const state = createMockState({ placement: 'bottom' });
       await mw.fn(state);
@@ -263,6 +320,7 @@ describe('cssVars middleware', () => {
         '--cl-available-width',
         '--cl-available-height',
         '--cl-transform-origin',
+        '--cl-anchor-origin',
       ]);
     });
   });

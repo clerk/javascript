@@ -102,9 +102,14 @@ export const TagInput = (props: TagInputProps) => {
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const inputValue = e.clipboardData?.getData('text');
+    if (inputValue === undefined) {
+      return;
+    }
+
     e.preventDefault();
     addTag(
-      (e.clipboardData.getData('text') || '')
+      (inputValue || '')
         .split(/,| |\n|\t/)
         .filter(Boolean)
         .map(tag => tag.trim()),

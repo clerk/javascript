@@ -1,5 +1,49 @@
 # @clerk/electron
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/clerk-js@6.25.13
+  - @clerk/shared@4.25.10
+  - @clerk/react@6.12.10
+
+## 0.0.24
+
+### Patch Changes
+
+- Forward OAuth deep-link callbacks to the primary Electron process on Windows and Linux, and bring the ([#9278](https://github.com/clerk/javascript/pull/9278)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+  signing-in window to the front when the callback arrives.
+
+  Delivering those callbacks requires Electron's single-instance lock, so `createClerkBridge` now
+  acquires it on Windows and Linux whenever `renderer` is configured, and quits secondary processes
+  after forwarding their arguments. Applications that previously ran side-by-side instances on those
+  platforms will become single-instance. macOS is unaffected. Two new escape hatches: the returned
+  bridge exposes `isPrimaryInstance` so the application can stop its own bootstrap in a secondary
+  process, and `manageSingleInstanceLock: false` leaves the lock to applications that manage it
+  themselves.
+
+- Updated dependencies []:
+  - @clerk/react@6.12.9
+
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies [[`5cb6a02`](https://github.com/clerk/javascript/commit/5cb6a02451d6aa5c8d7cc34b700f2f3e59b50927)]:
+  - @clerk/clerk-js@6.25.12
+
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/clerk-js@6.25.11
+  - @clerk/shared@4.25.9
+  - @clerk/react@6.12.9
+
 ## 0.0.21
 
 ### Patch Changes
