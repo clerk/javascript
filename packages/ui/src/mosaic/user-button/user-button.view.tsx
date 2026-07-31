@@ -438,7 +438,6 @@ function SessionsSection() {
         {data.additionalSessions.map(a => (
           <Item.Root
             key={a.sessionId}
-            size='xs'
             render={switchSession ? asButton : undefined}
             onClick={switchSession ? () => switchSession(a.sessionId) : undefined}
           >
