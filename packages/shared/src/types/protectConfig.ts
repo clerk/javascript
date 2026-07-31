@@ -6,8 +6,10 @@ export interface ProtectLoader {
   target: 'head' | 'body' | `#${string}`;
   type: string;
   /**
-   * Attribute values may contain the placeholders `{cid}`, `{pid}`, `{rid}` and `{instance_id}`,
-   * which are substituted before the element is appended. An unrecognised `{…}` is left verbatim.
+   * Attribute values may contain the placeholders `{cid}`, `{pid}`, `{rid}`, `{instance_id}` and
+   * `{sdkver}`, which are substituted before the element is appended. An unrecognised `{…}` is
+   * left verbatim. `{sdkver}` is how the server tells a build that interpolates from one that
+   * does not, so a loader wanting the current response shape has to carry it.
    */
   attributes?: Record<string, string | number | boolean>;
   /** Substituted in the same way as `attributes`. */

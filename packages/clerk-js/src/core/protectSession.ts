@@ -52,9 +52,9 @@ const BASE32_128_REGEX = /^[a-z2-7]{26}$/;
 export const CID_REGEX = /^1-[a-z2-7]{26}-[a-z2-7]{26}$/;
 
 /** The closed set of placeholders `applyLoader` substitutes. Anything else is left verbatim. */
-const PLACEHOLDER_REGEX = /\{(cid|pid|rid|instance_id)\}/g;
+const PLACEHOLDER_REGEX = /\{(cid|pid|rid|instance_id|sdkver)\}/g;
 /** Non-global twin of the above, so `test` does not carry `lastIndex` between calls. */
-const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|instance_id)\}/;
+const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|instance_id|sdkver)\}/;
 /** The placeholders that need a minted, persisted client id to substitute. */
 const HAS_CLIENT_ID_REGEX = /\{(?:cid|pid|rid)\}/;
 /** Only the correlation id binds a loader to a Specter run, so only it names the token loader. */
@@ -64,13 +64,21 @@ const HAS_CID_REGEX = /\{cid\}/;
  * Closed set — FAPI validates these by exact match and drops anything else, so a new value here
  * is a wire change. `fetch_error` and `http_<n>` are reachable only through the upgrade mint.
  */
-export type ProtectStatus = 'ok' | 'timeout' | 'script_error' | 'fetch_error' | 'unsupported' | `http_${number}`;
+export type ProtectStatus =
+  | 'ok'
+  | 'no_token'
+  | 'timeout'
+  | 'script_error'
+  | 'fetch_error'
+  | 'unsupported'
+  | `http_${number}`;
 
 export type ProtectPlaceholders = {
   cid?: string;
   pid?: string;
   rid?: string;
   instance_id?: string;
+  sdkver?: string;
 };
 
 /** The params attached to the form-encoded body of sign-in and sign-up POSTs. */
@@ -256,22 +264,64 @@ function writeStoredToken(key: string, value: StoredToken): void {
   writeStored(key, JSON.stringify(value));
 }
 
-/** The token the loader script was served with, when it is for the run we started. */
-function readInlineToken(cid: string, rid: string): StoredToken | null {
+/** Sentinel for "the deadline won", distinguishable from anything `ready` could resolve to. */
+const DEADLINE = Symbol('deadline');
+
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    !!value &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as PromiseLike<unknown>).then === 'function'
+  );
+}
+
+/** `ready` never rejects by contract; a rejection is still treated as nothing served. */
+function settleWithin(ready: PromiseLike<unknown>, deadline: number): Promise<unknown> {
+  return new Promise(resolve => {
+    const timer = setTimeout(() => resolve(DEADLINE), Math.max(0, deadline - Date.now()));
+    const settle = (value: unknown) => {
+      clearTimeout(timer);
+      resolve(value);
+    };
+    ready.then(settle, () => settle(null));
+  });
+}
+
+/**
+ * The token the loader script was served with, or the status that stands in for it.
+ *
+ * The current shape carries `ready`, a promise resolving to `{ token, exp }` or to
+ * `{ status: 'no_token' }`. It is the loader's completion signal and the seam where page-side
+ * work will later live, so the token is awaited rather than read. The base shape carries neither
+ * `cid` nor `ready` and lands on `no_token` — which is why that status exists separately from
+ * `timeout`: until the server half deploys it is the correct answer for every load, and calling
+ * that a timeout would make a normal rollout look like an outage.
+ */
+async function readInlineToken(cid: string, rid: string, deadline: number): Promise<StoredToken | ProtectStatus> {
   const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
   if (!inline || typeof inline !== 'object') {
-    return null;
+    return 'no_token';
   }
 
-  const { cid: mintedFor, token, exp } = inline as Record<string, unknown>;
-  // The global is page-visible and outlives a navigation; a token minted for anyone else's run is
-  // not ours to send.
-  if (mintedFor !== cid) {
-    return null;
+  const { cid: mintedFor, ready } = inline as Record<string, unknown>;
+  // The global is page-visible and outlives a navigation, so a token minted for anyone else's run
+  // is not ours to send. The base shape, which carries no cid at all, lands here too.
+  if (mintedFor !== cid || !isThenable(ready)) {
+    return 'no_token';
   }
 
+  const resolved = await settleWithin(ready, deadline);
+  if (resolved === DEADLINE) {
+    return 'timeout';
+  }
+  if (!resolved || typeof resolved !== 'object') {
+    return 'no_token';
+  }
+
+  const { token, exp } = resolved as Record<string, unknown>;
   const validated = validateToken(token, exp, 0);
-  return validated ? { ...validated, rid } : null;
+  // `{ status: 'no_token' }` has no token to validate and lands here, as does a malformed one.
+  return validated ? { ...validated, rid } : 'no_token';
 }
 
 function httpStatus(status: number): ProtectStatus {
@@ -389,6 +439,9 @@ export class ProtectSession {
       ...(this.#pid ? { pid: this.#pid } : {}),
       ...(this.#rid ? { rid: this.#rid } : {}),
       ...(instanceId ? { instance_id: instanceId } : {}),
+      // Sending a version is what tells the server this build interpolates placeholders at all,
+      // and so can be served the current shape. A build that leaves it verbatim gets the base one.
+      sdkver: __PKG_VERSION__,
     };
 
     const tokenLoader = templatedLoaders.find(isCorrelated);
@@ -536,11 +589,9 @@ export class ProtectSession {
       return await this.#poll(deadline);
     }
 
-    const inline = readInlineToken(this.#cid as string, this.#rid as string);
-    if (!inline) {
-      // The script ran but served no token for us. Nothing was refused and nothing errored, so
-      // `timeout` is the only member of the closed set that fits.
-      return 'timeout';
+    const inline = await readInlineToken(this.#cid as string, this.#rid as string, deadline);
+    if (typeof inline === 'string') {
+      return inline;
     }
 
     writeStoredToken(this.#tokenStorageKey, inline);

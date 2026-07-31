@@ -60,14 +60,22 @@ const session = (loaders: ProtectLoader[], instanceId?: string) => {
   return { session: ProtectSession.create(loaders, instanceId, h.applyLoader), ...h };
 };
 
-/** What Specter does: assign the global from the script body, then the element fires `load`. */
+/** What the server does: the script body assigns the global, then the element fires `load`. */
 const serveInline = (element: HTMLElement, overrides: Record<string, unknown> = {}) => {
   (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
-    v: 2,
+    v: 3,
     id: '11111111-2222-3333-4444-555555555555',
-    token: 'v1.payload.mac',
-    exp: nowSeconds() + 43_200,
+    ready: Promise.resolve({ token: 'v1.payload.mac', exp: nowSeconds() + 43_200 }),
     ...overrides,
+  };
+  element.dispatchEvent(new Event('load'));
+};
+
+/** The shape served to a build that asserts no version: no cid, no `ready`. */
+const serveBaseShape = (element: HTMLElement) => {
+  (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
+    v: 1,
+    id: '11111111-2222-3333-4444-555555555555',
   };
   element.dispatchEvent(new Event('load'));
 };
@@ -241,18 +249,71 @@ describe('ProtectSession inline token', () => {
     serveInline(await injected(), { cid: buildCid('z'.repeat(26).replace(/z/g, 'a'), 'b'.repeat(26)) });
 
     await expect(created?.getRequestParams()).resolves.toEqual({
-      __clerk_protect_status: 'timeout',
+      __clerk_protect_status: 'no_token',
       __clerk_protect_cid: created?.placeholders().cid,
     });
   });
 
-  it('reports timeout when the script loads but serves no token', async () => {
+  it('substitutes the SDK version, which is what earns the current shape', async () => {
+    const { session: created, injected } = session([
+      loader({ attributes: { 'data-cid': '{cid}', 'data-v': '{sdkver}' } }),
+    ]);
+    created?.start();
+
+    expect((await injected()).getAttribute('data-v')).toBe(__PKG_VERSION__);
+  });
+
+  it('reports no_token when the script publishes nothing', async () => {
     const { session: created, injected } = session([loader()]);
     created?.start();
 
     (await injected()).dispatchEvent(new Event('load'));
 
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+  });
+
+  it('reports no_token for the base shape an older server serves', async () => {
+    const { session: created, injected } = session([loader()]);
+    created?.start();
+
+    // Until the server half deploys this is the answer for every load, so it must not read as a
+    // timeout — that would make a normal rollout look like an outage.
+    serveBaseShape(await injected());
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+  });
+
+  it('reports no_token when ready resolves without one', async () => {
+    const { session: created, injected } = session([loader()]);
+    created?.start();
+
+    serveInline(await injected(), {
+      cid: created?.placeholders().cid,
+      ready: Promise.resolve({ status: 'no_token' }),
+    });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+  });
+
+  it('reports timeout when ready never settles', async () => {
+    const { session: created, injected } = session([loader({ tokenTimeoutMs: 60 })]);
+    created?.start();
+
+    serveInline(await injected(), { cid: created?.placeholders().cid, ready: new Promise(() => {}) });
+
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('survives a ready that rejects, which the contract says it never does', async () => {
+    const rejected = Promise.reject(new Error('specter blew up'));
+    rejected.catch(() => undefined);
+
+    const { session: created, injected } = session([loader()]);
+    created?.start();
+
+    serveInline(await injected(), { cid: created?.placeholders().cid, ready: rejected });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
   });
 
   it('reports script_error when the loader element fails to load', async () => {

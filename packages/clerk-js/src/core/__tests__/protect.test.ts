@@ -33,10 +33,10 @@ const injected = async (selector: string): Promise<Element> => {
 
 const serveInline = (element: Element, overrides: Record<string, unknown> = {}) => {
   (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
-    v: 2,
+    v: 3,
+    id: '11111111-2222-3333-4444-555555555555',
     cid: element.getAttribute('data-cid'),
-    token: 'v1.payload.mac',
-    exp: nowSeconds() + 43_200,
+    ready: Promise.resolve({ token: 'v1.payload.mac', exp: nowSeconds() + 43_200 }),
     ...overrides,
   };
   element.dispatchEvent(new Event('load'));
