@@ -49,6 +49,7 @@ import {
   fontWeightVars,
   radiusVars,
   scrollbarVars,
+  scrollFadeVars,
   space,
   spacingVars,
   targetVars,
@@ -62,6 +63,7 @@ export {
   fontWeightVars,
   radiusVars,
   scrollbarVars,
+  scrollFadeVars,
   space,
   spacingVars,
   targetVars,
@@ -77,6 +79,7 @@ export type EasingVarName = keyof typeof easingVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type ScrollbarVarName = keyof typeof scrollbarVars;
+export type ScrollFadeVarName = keyof typeof scrollFadeVars;
 export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;

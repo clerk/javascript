@@ -98,15 +98,17 @@ export function Gutter() {
   );
 }
 
-// Both knobs are plain custom properties, so they can be set anywhere in the cascade — on
-// the element, on a wrapper, or once at `:root` to retune every scroll area in a theme.
+// Theme tokens rather than component variables, so they can be set anywhere in the cascade —
+// on the element, on a wrapper, or once at `:root` to retune every scrolling surface in
+// Mosaic at the same time. Scoped to a wrapper class here so the demo doesn't retheme the
+// rest of the page.
 export function Tuning() {
   return (
     <>
       <style>{`
         .tuned-scroll-area {
-          --cl-scroll-area-fade-size: 4rem;   /* how tall the fade is */
-          --cl-scroll-area-fade-range: 3rem;  /* how far you scroll before it's at full strength */
+          --cl-scroll-fade-size: 4rem;   /* how tall the fade is */
+          --cl-scroll-fade-range: 3rem;  /* how far you scroll before it's at full strength */
         }
       `}</style>
       <ScrollArea.Root

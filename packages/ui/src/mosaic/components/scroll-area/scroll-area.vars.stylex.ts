@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 
-// ScrollArea's public var contract. The two progress vars are the whole point of the
-// component's styling API: a scroll-driven animation writes them, the default mask reads
-// them, and a consumer can read them instead to drive any treatment they like.
+// ScrollArea's per-element runtime output: vars a consumer READS, never sets. The scroll-driven
+// animations write them on every scrolling element, so a `:root` value would simply be
+// overwritten. That is why these stay component-named while the fade's actual knobs live in
+// `tokens.stylex.ts` as the global `--cl-scroll-fade-*` family — those are set, these are read.
 //
 // They are `stylex.types.number` rather than plain strings so StyleX emits an `@property`
 // registration for each. That registration is load-bearing twice over:
@@ -18,17 +19,4 @@ import * as stylex from '@stylexjs/stylex';
 export const scrollAreaVars = stylex.defineVars({
   '--cl-scroll-area-progress-start': stylex.types.number(0),
   '--cl-scroll-area-progress-end': stylex.types.number(0),
-  // Matched on purpose: the fade reaches full strength after you've scrolled its own height,
-  // so the indicator grows in at the same rate as the content it's covering moves. They stay
-  // independent knobs — a shorter range makes the fade snap in sooner without changing how
-  // tall it ends up.
-  '--cl-scroll-area-fade-size': '1.5rem',
-  '--cl-scroll-area-fade-range': '1.5rem',
-  // Width of the strip at the inline end that the fade is held back from, so a classic
-  // (space-consuming) scrollbar isn't faded along with the content. Defaults to `0px`
-  // because CSS cannot measure a scrollbar: the value differs per platform, per browser,
-  // and on macOS it changes when a mouse is connected, so any non-zero default would be
-  // wrong more often than right. Overlay scrollbars — the common case — need no inset at
-  // all. Consumers targeting a known classic-scrollbar platform can set it.
-  '--cl-scroll-area-scrollbar-inset': '0px',
 });
