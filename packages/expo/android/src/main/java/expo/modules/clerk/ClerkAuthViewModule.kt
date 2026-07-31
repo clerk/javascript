@@ -6,15 +6,10 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -95,17 +90,6 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   @Composable
   override fun Content() {
     debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, hostBackButton: $hostBackButton, activity: $activity")
-
-    // clerk-android views compose from a snapshot of the environment and do not
-    // recompose when it loads afterwards, so a view composed too early stays
-    // empty forever; hold rendering until the SDK is initialized.
-    val isInitialized by Clerk.isInitialized.collectAsState()
-    if (!isInitialized) {
-      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-      }
-      return
-    }
 
     if (hostBackButton) {
       ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { AuthContent() }
