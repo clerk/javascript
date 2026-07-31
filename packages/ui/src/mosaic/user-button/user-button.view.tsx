@@ -125,16 +125,24 @@ interface ActiveWorkspace {
   organization?: UserButtonMembership;
 }
 
-/**
- * What the trigger and the header both show. An organization wins wherever one is active, which is
- * why `combined` defaults to the organization mark; `user` mode never resolves to one.
- */
-function activeWorkspace(data: UserButtonContextValue): ActiveWorkspace {
-  const organization = data.mode === 'user' ? undefined : activeMembership(data);
+function workspace(organization: UserButtonMembership | undefined, session: UserButtonSession): ActiveWorkspace {
   if (organization) {
     return { name: organization.name, imageUrl: organization.imageUrl, shape: 'square', organization };
   }
-  return { name: data.activeSession.name, imageUrl: data.activeSession.imageUrl, shape: 'circle' };
+  return { name: session.name, imageUrl: session.imageUrl, shape: 'circle' };
+}
+
+/** The trigger follows the organization wherever one is active; `user` mode never resolves to one. */
+function triggerWorkspace(data: UserButtonContextValue): ActiveWorkspace {
+  return workspace(data.mode === 'user' ? undefined : activeMembership(data), data.activeSession);
+}
+
+/**
+ * Only an org-only surface is headed by the organization. Everywhere else the account heads it, so
+ * switching organization never changes who the popup says you are signed in as.
+ */
+function headerWorkspace(data: UserButtonContextValue): ActiveWorkspace {
+  return workspace(data.mode === 'orgs' ? activeMembership(data) : undefined, data.activeSession);
 }
 
 /** `user` mode never lists organizations, and neither does an account without any. */
@@ -280,16 +288,17 @@ interface HeaderAction {
 /** The active workspace: who you are signed in as, and what you can do about it. */
 function Header() {
   const data = useUserButtonContext();
-  const { name, imageUrl, shape, organization } = activeWorkspace(data);
+  const { name, imageUrl, shape, organization } = headerWorkspace(data);
   const subtitle = organization ? membershipSubtitle(organization) : data.activeSession.email;
+  // Inviting belongs to whichever organization is active, even where the account is what heads the
+  // surface. The gear manages whatever the header names. Signing out is a row in the list below.
+  const invitable = showsOrganizations(data) ? activeMembership(data) : undefined;
 
-  // Inviting is the one thing you can do to an organization but not to yourself, so it is the
-  // only action that varies. Signing out is a row in the list below; it does not repeat here.
   const actions: HeaderAction[] = [];
+  if (invitable && data.onInviteMembers) {
+    actions.push({ label: 'Invite', onClick: data.onInviteMembers });
+  }
   if (organization) {
-    if (data.onInviteMembers) {
-      actions.push({ label: 'Invite', onClick: data.onInviteMembers });
-    }
     if (data.onManageOrganization) {
       actions.push({ label: 'Manage organization', icon: 'cog', onClick: data.onManageOrganization });
     }
@@ -624,7 +633,7 @@ export function UserButtonRoot(props: UserButtonRootProps) {
 /** The trigger: the active workspace's avatar, and nothing else. */
 export function UserButtonTrigger() {
   const data = useUserButtonContext();
-  const { name, imageUrl, shape } = activeWorkspace(data);
+  const { name, imageUrl, shape } = triggerWorkspace(data);
 
   return (
     <Popover.Trigger

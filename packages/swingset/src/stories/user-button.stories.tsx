@@ -90,8 +90,19 @@ const initialAccounts: Account[] = [
   },
   {
     session: braden,
-    activeOrganizationId: 'org_clerk_cloud',
-    memberships: [clerkCloud],
+    // An organization only Braden is in, so switching to him changes the header, the trigger, and
+    // the list under it all at once.
+    activeOrganizationId: 'org_clerk_marketing',
+    memberships: [
+      {
+        kind: 'membership',
+        organizationId: 'org_clerk_marketing',
+        name: 'Clerk Marketing',
+        membersCount: 9,
+        imageUrl: defaultOrgLogo,
+      },
+      clerkCloud,
+    ],
     suggestions: [],
     invitations: [
       {
