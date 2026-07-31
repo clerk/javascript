@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { itemScope } from './item.markers.stylex';
 
 export const item = stylex.create({
   base: {
@@ -89,11 +90,11 @@ export const description = stylex.create({
 
 export const label = stylex.create({
   base: {
+    // keyed to the row's hover, not the text's, so pointing anywhere in the row promotes the label
     color: {
-      default: colorVars['--cl-color-neutral-faded'],
-      '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-neutral'],
-      },
+      default: null,
+      [stylex.when.ancestor(':not(:hover)', itemScope)]: colorVars['--cl-color-neutral-faded'],
+      [stylex.when.ancestor(':hover', itemScope)]: colorVars['--cl-color-neutral'],
     },
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
