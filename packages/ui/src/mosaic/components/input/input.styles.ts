@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const primary5 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
-const focusRing = '0 0 0 1.5px #fff, 0 0 0 3px #2b2b34';
+const focusRing = `0 0 0 1.5px ${colorVars['--cl-color-card']}, 0 0 0 3px ${colorVars['--cl-color-primary']}`;
 
 export const styles = stylex.create({
   base: {
