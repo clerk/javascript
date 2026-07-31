@@ -13,6 +13,7 @@ import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
 import type { IconName } from '../icons/registry';
+import { space } from '../tokens.stylex';
 import { styles } from './user-button.styles';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
@@ -192,6 +193,9 @@ function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing }: Wor
           <Icon
             name='check'
             size='sm'
+            style={{
+              width: space['7'],
+            }}
           />
         </Item.Actions>
       ) : null}
@@ -318,6 +322,43 @@ function Header() {
   );
 }
 
+interface AccountAction {
+  label: string;
+  onClick: () => void;
+  color?: 'negative';
+}
+
+/**
+ * An account, identified by its email. Every account renders this way — the active one heading
+ * its workspaces, the others under the separator — so a row is never mistaken for a workspace.
+ */
+function AccountRow({ email, actions }: { email: string; actions: AccountAction[] }) {
+  return (
+    <Item.Root size='xs'>
+      <Item.Content>
+        <Item.Description>{email}</Item.Description>
+      </Item.Content>
+      {actions.length > 0 ? (
+        <Item.Actions>
+          <Menu.Root>
+            <Menu.Trigger aria-label={`Actions for ${email}`} />
+            <Menu.Content>
+              {actions.map(a => (
+                <Menu.Item
+                  key={a.label}
+                  label={a.label}
+                  color={a.color}
+                  onClick={a.onClick}
+                />
+              ))}
+            </Menu.Content>
+          </Menu.Root>
+        </Item.Actions>
+      ) : null}
+    </Item.Root>
+  );
+}
+
 /** The signed-in account's workspaces, labelled by the account they belong to. */
 function WorkspaceList() {
   const data = useUserButtonContext();
@@ -326,47 +367,26 @@ function WorkspaceList() {
   const acceptInvitation = data.onAcceptInvitation;
   const signOutSession = data.onSignOutSession;
 
+  const actions: AccountAction[] = [];
+  if (data.onCreateOrganization) {
+    actions.push({ label: 'Create organization', onClick: data.onCreateOrganization });
+  }
+  if (data.onManageAccount) {
+    actions.push({ label: 'Manage account', onClick: data.onManageAccount });
+  }
+  if (signOutSession) {
+    actions.push({
+      label: 'Sign out',
+      color: 'negative',
+      onClick: () => signOutSession(data.activeSession.sessionId),
+    });
+  }
+
   return (
     <Item.Group {...stylex.props(styles.scroll)}>
-      <Item.Root size='xs'>
-        <Item.Content>
-          <Item.Description>{data.activeSession.email}</Item.Description>
-        </Item.Content>
-        {data.onCreateOrganization || data.onManageAccount || signOutSession ? (
-          <Item.Actions>
-            <Menu.Root>
-              <Menu.Trigger aria-label={`Actions for ${data.activeSession.email}`} />
-              <Menu.Content>
-                {data.onCreateOrganization ? (
-                  <Menu.Item
-                    label='Create organization'
-                    onClick={data.onCreateOrganization}
-                  />
-                ) : null}
-                {data.onManageAccount ? (
-                  <Menu.Item
-                    label='Manage account'
-                    onClick={data.onManageAccount}
-                  />
-                ) : null}
-                {signOutSession ? (
-                  <Menu.Item
-                    label='Sign out'
-                    color='negative'
-                    onClick={() => signOutSession(data.activeSession.sessionId)}
-                  />
-                ) : null}
-              </Menu.Content>
-            </Menu.Root>
-          </Item.Actions>
-        ) : null}
-      </Item.Root>
-      <WorkspaceRow
-        shape='circle'
-        name={data.activeSession.name}
-        imageUrl={data.activeSession.imageUrl}
-        onSelect={data.onSelectPersonal}
-        active={data.activeOrganizationId === null}
+      <AccountRow
+        email={data.activeSession.email}
+        actions={actions}
       />
       {data.memberships.map(m => (
         <WorkspaceRow
@@ -423,9 +443,55 @@ function WorkspaceList() {
 }
 
 /** The other accounts this browser is signed in to. */
-function SessionsSection() {
+/**
+ * With organizations the list is grouped by account, so another account reads as a heading with
+ * its own menu. Without them there is nothing to head, so it is a plain row you click to switch.
+ */
+function AdditionalAccount({ session }: { session: UserButtonSession }) {
   const data = useUserButtonContext();
   const switchSession = data.onSwitchSession;
+  const signOutSession = data.onSignOutSession;
+
+  if (data.hasOrganizations) {
+    const actions: AccountAction[] = [];
+    if (switchSession) {
+      actions.push({ label: 'Switch to this account', onClick: () => switchSession(session.sessionId) });
+    }
+    if (signOutSession) {
+      actions.push({ label: 'Sign out', color: 'negative', onClick: () => signOutSession(session.sessionId) });
+    }
+    return (
+      <AccountRow
+        email={session.email}
+        actions={actions}
+      />
+    );
+  }
+
+  return (
+    <Item.Root
+      size='md'
+      render={switchSession ? asButton : undefined}
+      onClick={switchSession ? () => switchSession(session.sessionId) : undefined}
+    >
+      <Item.Media>
+        <WorkspaceAvatar
+          name={session.name}
+          imageUrl={session.imageUrl}
+          shape='circle'
+          size='fit'
+        />
+      </Item.Media>
+      <Item.Content>
+        <Item.Title>{session.name}</Item.Title>
+        <Item.Description>{session.email}</Item.Description>
+      </Item.Content>
+    </Item.Root>
+  );
+}
+
+function SessionsSection() {
+  const data = useUserButtonContext();
 
   if (data.additionalSessions.length === 0) {
     return null;
@@ -436,24 +502,10 @@ function SessionsSection() {
       <Item.Separator />
       <Item.Group>
         {data.additionalSessions.map(a => (
-          <Item.Root
+          <AdditionalAccount
             key={a.sessionId}
-            render={switchSession ? asButton : undefined}
-            onClick={switchSession ? () => switchSession(a.sessionId) : undefined}
-          >
-            <Item.Media>
-              <WorkspaceAvatar
-                name={a.name}
-                imageUrl={a.imageUrl}
-                shape='circle'
-                size='fit'
-              />
-            </Item.Media>
-            <Item.Content>
-              <Item.Title>{a.name}</Item.Title>
-              <Item.Description>{a.email}</Item.Description>
-            </Item.Content>
-          </Item.Root>
+            session={a}
+          />
         ))}
       </Item.Group>
     </>
