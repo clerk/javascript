@@ -31,7 +31,7 @@ import expo.modules.kotlin.viewevent.EventDispatcher
 private const val TAG = "ClerkAuthViewModule"
 
 private fun debugLog(tag: String, message: String) {
-  if (clerkExpoDebugEnabled()) {
+  if (BuildConfig.DEBUG) {
     Log.d(tag, message)
   }
 }

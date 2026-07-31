@@ -31,7 +31,7 @@ private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
 private const val HOST_SDK = "expo"
 
 private fun debugLog(tag: String, message: String) {
-    if (clerkExpoDebugEnabled()) {
+    if (BuildConfig.DEBUG) {
         Log.d(tag, message)
     }
 }
@@ -121,7 +121,7 @@ class ClerkExpoModule : Module() {
             }
         }
 
-        return ClerkConfigurationOptions(enableDebugMode = clerkExpoDebugEnabled()).withCustomHeaders(customHeaders)
+        return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
     }
 
     private fun startClientStateObserver() {
