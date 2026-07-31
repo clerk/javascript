@@ -100,6 +100,10 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // anything is scrolling. The tradeoff is a smaller drag target on the platforms whose
 // scrollbars are draggable at all — set `auto` to take it back.
 //
+// Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
+// no width to apply to, and thinning a target that is already hard to hit would be actively
+// worse — Polaris's `s-scroll-box` gates its scrollbar styling the same way.
+//
 // Keyword-only, by the CSS spec: `scrollbar-width` accepts `auto | thin | none` and NOT a
 // length. A real pixel width exists only via `::-webkit-scrollbar`, which Firefox ignores
 // and which Chrome 121+ discards once `scrollbar-color` is set — so there is no honest way
