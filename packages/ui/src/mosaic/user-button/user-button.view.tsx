@@ -376,12 +376,9 @@ function AccountRow({ email, actions }: { email: string; actions: AccountAction[
   );
 }
 
-/** The signed-in account's workspaces, labelled by the account they belong to. */
-function WorkspaceList() {
+/** The active account's own row: what its workspaces sit under, plus its account-wide actions. */
+function ActiveAccountRow() {
   const data = useUserButtonContext();
-  const selectOrg = data.onSelectOrganization;
-  const acceptSuggestion = data.onAcceptSuggestion;
-  const acceptInvitation = data.onAcceptInvitation;
   const signOutSession = data.onSignOutSession;
 
   const actions: AccountAction[] = [];
@@ -400,14 +397,22 @@ function WorkspaceList() {
   }
 
   return (
-    <Item.Group {...stylex.props(styles.scroll)}>
-      {/* An org-only surface has no accounts to label, so the list is bare. */}
-      {data.mode === 'orgs' ? null : (
-        <AccountRow
-          email={data.activeSession.email}
-          actions={actions}
-        />
-      )}
+    <AccountRow
+      email={data.activeSession.email}
+      actions={actions}
+    />
+  );
+}
+
+/** The active account's workspaces: what it belongs to, and what it has been asked to join. */
+function WorkspaceRows() {
+  const data = useUserButtonContext();
+  const selectOrg = data.onSelectOrganization;
+  const acceptSuggestion = data.onAcceptSuggestion;
+  const acceptInvitation = data.onAcceptInvitation;
+
+  return (
+    <>
       {data.memberships.map(m => (
         <WorkspaceRow
           key={m.organizationId}
@@ -458,7 +463,7 @@ function WorkspaceList() {
           }
         />
       ))}
-    </Item.Group>
+    </>
   );
 }
 
@@ -509,24 +514,37 @@ function AdditionalAccount({ session }: { session: UserButtonSession }) {
   );
 }
 
-function SessionsSection() {
+/** Everything the surface can switch to: the active account's workspaces, then the other accounts. */
+function SwitcherList() {
   const data = useUserButtonContext();
+  const workspaces = showsOrganizations(data);
+  // An org-only surface carries no account rows at all, not even the one it belongs to.
+  const sessions = data.mode === 'orgs' ? [] : data.additionalSessions;
 
-  if (data.additionalSessions.length === 0) {
+  if (!workspaces && sessions.length === 0) {
     return null;
   }
 
-  // No separator: another account heads its own workspaces the same way the active one does, so
-  // it continues the list above rather than starting a new section.
+  // One group rather than one per account: every row is a peer you can switch to, so they share
+  // the list's spacing and its scroll.
   return (
-    <Item.Group>
-      {data.additionalSessions.map(a => (
-        <AdditionalAccount
-          key={a.sessionId}
-          session={a}
-        />
-      ))}
-    </Item.Group>
+    <>
+      <Item.Separator />
+      <Item.Group {...stylex.props(styles.scroll)}>
+        {workspaces ? (
+          <>
+            {data.mode === 'orgs' ? null : <ActiveAccountRow />}
+            <WorkspaceRows />
+          </>
+        ) : null}
+        {sessions.map(a => (
+          <AdditionalAccount
+            key={a.sessionId}
+            session={a}
+          />
+        ))}
+      </Item.Group>
+    </>
   );
 }
 
@@ -625,19 +643,12 @@ export function UserButtonTrigger() {
 
 /** The popover surface: header, workspace list, additional accounts, and footer. */
 export function UserButtonPopup() {
-  const data = useUserButtonContext();
   return (
     <Popover.Popup aria-label='Account'>
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
       <Card style={{ rowGap: 0 }}>
         <Header />
-        {showsOrganizations(data) ? (
-          <>
-            <Item.Separator />
-            <WorkspaceList />
-          </>
-        ) : null}
-        {data.mode === 'orgs' ? null : <SessionsSection />}
+        <SwitcherList />
         <Footer />
       </Card>
     </Popover.Popup>
