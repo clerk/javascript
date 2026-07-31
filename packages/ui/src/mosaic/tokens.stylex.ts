@@ -110,6 +110,27 @@ const scrollbarDefaults = {
 
 export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
 
+// The edge-fade indicator on a scrolling region. Global rather than owned by `ScrollArea`
+// because "how soft is the edge of a scrolling region" is a design-language decision, on a
+// par with a radius step — any component that grows an edge fade should read these rather
+// than mint its own family. A component that genuinely needs a different value sets the var
+// on itself; the global default still applies everywhere else.
+//
+// `size` and `range` default to the same value on purpose: the fade reaches full strength
+// after you've scrolled its own height, so it grows in at the rate the content moves.
+//
+// `inset` holds the fade back from a strip at the inline end so a space-consuming scrollbar
+// isn't faded along with the content. It defaults to `0px` because CSS cannot measure a
+// scrollbar — the width differs per platform and browser, and on macOS it changes at runtime
+// when a mouse is connected — so any non-zero default would be wrong more often than right.
+const scrollFadeDefaults = {
+  '--cl-scroll-fade-size': '1.5rem',
+  '--cl-scroll-fade-range': '1.5rem',
+  '--cl-scroll-fade-inset': '0px',
+} as const;
+
+export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);
+
 // =============================================================================
 // Spacing Tokens
 // =============================================================================

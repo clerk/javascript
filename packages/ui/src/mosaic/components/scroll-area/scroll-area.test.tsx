@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { scrollbarVars } from '../../tokens.stylex';
+import { scrollbarVars, scrollFadeVars } from '../../tokens.stylex';
 import { ScrollArea } from './scroll-area';
 import { scrollAreaVars } from './scroll-area.vars.stylex';
 
@@ -86,22 +86,24 @@ describe('Mosaic ScrollArea', () => {
   // The `--cl-*` names are the component's public API — a consumer's stylesheet references them
   // by hand, and `clerk-js` ships to apps pinned to older SDKs, so renaming one breaks themes
   // already in the wild. Assert the exact strings so a rename has to be a deliberate act.
-  it('emits the documented public custom properties', () => {
+  it('emits the documented per-element progress properties', () => {
     // `toMatchObject`, not `toEqual`: StyleX adds an internal `__varGroupHash__` key, and adding
     // a new var is not itself a breaking change — removing or renaming one is.
     expect(scrollAreaVars).toMatchObject({
       '--cl-scroll-area-progress-start': 'var(--cl-scroll-area-progress-start)',
       '--cl-scroll-area-progress-end': 'var(--cl-scroll-area-progress-end)',
-      '--cl-scroll-area-fade-size': 'var(--cl-scroll-area-fade-size)',
-      '--cl-scroll-area-fade-range': 'var(--cl-scroll-area-fade-range)',
-      '--cl-scroll-area-scrollbar-inset': 'var(--cl-scroll-area-scrollbar-inset)',
     });
   });
 
   // Shared across every scrolling surface in Mosaic rather than owned here, but the viewport
-  // reads it, so a rename would silently drop the scrollbar sizing.
-  it('reads the shared scrollbar-width token', () => {
+  // reads them, so a rename would silently drop the scrollbar sizing or the fade's knobs.
+  it('reads the shared scroll tokens', () => {
     expect(scrollbarVars).toMatchObject({ '--cl-scrollbar-width': 'var(--cl-scrollbar-width)' });
+    expect(scrollFadeVars).toMatchObject({
+      '--cl-scroll-fade-size': 'var(--cl-scroll-fade-size)',
+      '--cl-scroll-fade-range': 'var(--cl-scroll-fade-range)',
+      '--cl-scroll-fade-inset': 'var(--cl-scroll-fade-inset)',
+    });
   });
 
   it('does not make the viewport focusable on its own', () => {

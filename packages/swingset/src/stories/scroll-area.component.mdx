@@ -113,40 +113,49 @@ consumers never target the hashed atomic classes.
 
 ### Variables
 
-| Variable                           | Default  | Description                                                     |
-| ---------------------------------- | -------- | --------------------------------------------------------------- |
-| `--cl-scroll-area-progress-start`  | `0`      | 0 → 1 as the top edge gains something to reveal. **Read-only.** |
-| `--cl-scroll-area-progress-end`    | `0`      | 1 → 0 as the bottom edge runs out to reveal. **Read-only.**     |
-| `--cl-scroll-area-fade-size`       | `1.5rem` | Height of the fade band.                                        |
-| `--cl-scroll-area-fade-range`      | `1.5rem` | How far you scroll before the fade reaches full strength.       |
-| `--cl-scroll-area-scrollbar-inset` | `0px`    | Width at the inline end the fade is held back from.             |
+Two of them are **read-only per-element state**, written by the scroll-driven animations. They live
+on the viewport and inherit downward, so anything reading them has to be the viewport or a
+descendant — not the root. Setting them yourself does nothing; the animations overwrite them.
 
-The two progress vars are registered with `@property` so they interpolate; the animations write
-them, so setting them yourself has no effect. They live on the **viewport** and inherit downward, so
-anything reading them must be the viewport or a descendant of it — not the root.
+| Variable                          | Range | Description                                   |
+| --------------------------------- | ----- | --------------------------------------------- |
+| `--cl-scroll-area-progress-start` | 0 → 1 | How much the top edge has to reveal.          |
+| `--cl-scroll-area-progress-end`   | 1 → 0 | How much the bottom edge still has to reveal. |
 
-Plus one token that is **not** scoped to this component, because Mosaic has no reason to size
-scrollbars differently between components — set it once and every scrolling surface follows:
+They are registered with `@property` so they interpolate — an unregistered custom property animates
+discretely and would snap halfway through the scroll instead of tracking it.
 
-| Token                  | Default | Description                           |
-| ---------------------- | ------- | ------------------------------------- |
-| `--cl-scrollbar-width` | `thin`  | `auto`, `thin`, or `none`. See below. |
+The knobs you actually set are **theme tokens, not component variables**, because how soft the edge
+of a scrolling region is belongs to the design language rather than to one component. Set them once
+and every scrolling surface follows; a component that needs different values sets the token on
+itself.
 
-`thin` rather than the platform default, because these regions are compact panels where a ~17px bar
-reads heavy, and because `gutter: stable` means that width is content space given up whether or not
-anything is scrolling. The tradeoff is a smaller drag target on the platforms whose scrollbars are
-draggable at all — take it back with `auto`:
+| Token                    | Default  | Description                                               |
+| ------------------------ | -------- | --------------------------------------------------------- |
+| `--cl-scroll-fade-size`  | `1.5rem` | Height of the fade band.                                  |
+| `--cl-scroll-fade-range` | `1.5rem` | How far you scroll before the fade reaches full strength. |
+| `--cl-scroll-fade-inset` | `0px`    | Width at the inline end the fade is held back from.       |
+| `--cl-scrollbar-width`   | `thin`   | `auto`, `thin`, or `none`. Keyword-only — see below.      |
 
 ```css
 :root {
-  --cl-scrollbar-width: auto;
+  --cl-scroll-fade-size: 2.5rem;
+  --cl-scroll-fade-range: 2.5rem;
 }
 ```
 
-**Keyword-only, by spec.** `scrollbar-width` accepts `auto | thin | none` and _not_ a length, so
-there is no `--cl-scrollbar-width: 8px`. A real pixel width exists only through
+`size` and `range` default to the same value on purpose: the fade reaches full strength after you
+have scrolled its own height, so it grows in at the rate the content moves. They stay independent —
+a shorter range makes the fade snap in sooner without changing how tall it ends up.
+
+`--cl-scrollbar-width` is **keyword-only, by spec**. `scrollbar-width` accepts `auto | thin | none`
+and _not_ a length, so there is no `8px` value for it. A real pixel width exists only through
 `::-webkit-scrollbar`, which Firefox ignores outright and which Chrome 121+ discards as soon as
-`scrollbar-color` is set — so exposing this as a length would be a promise the platform can't keep.
+`scrollbar-color` is set — exposing it as a length would be a promise the platform can't keep.
+
+`thin` rather than the platform default because these regions are compact panels where a ~17px bar
+reads heavy. The tradeoff is a smaller drag target on the platforms whose scrollbars are draggable
+at all; take it back with `--cl-scrollbar-width: auto`.
 
 ### Replacing the indicators
 
@@ -185,20 +194,20 @@ which looks identical to the mask it was meant to replace, so the indicator sile
 as one in dark mode. `--cl-color-card-foreground` is `light-dark()`-backed and inverts to near-white
 on a dark surface, so the same rule gives a shadow in light mode and a glow in dark.
 
-### The scrollbar inset
+### The fade inset
 
-`--cl-scroll-area-scrollbar-inset` holds the fade back from a strip at the inline end, so a
-space-consuming scrollbar isn't faded along with the content.
+`--cl-scroll-fade-inset` holds the fade back from a strip at the inline end, so a space-consuming
+scrollbar isn't faded along with the content.
 
 It defaults to `0px` because **CSS cannot measure a scrollbar**. The width differs per platform and
-per browser, `scrollbar-width: thin` changes it again, and on macOS it changes at runtime when a
-mouse is connected. Any non-zero default would be wrong more often than right — and where the
+per browser, `--cl-scrollbar-width: thin` changes it again, and on macOS it changes at runtime when
+a mouse is connected. Any non-zero default would be wrong more often than right — and where the
 scrollbar overlays, which is the common case, there is nothing to hold back from. Set it only when
 you know the platform you're targeting.
 
 ```css
-.cl-scroll-area-viewport {
-  --cl-scroll-area-scrollbar-inset: 15px;
+:root {
+  --cl-scroll-fade-inset: 15px;
 }
 ```
 

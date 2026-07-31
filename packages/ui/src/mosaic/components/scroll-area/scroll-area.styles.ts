@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, scrollbarVars, space } from '../../tokens.stylex';
+import { colorVars, scrollbarVars, scrollFadeVars, space } from '../../tokens.stylex';
 import { scrollAreaVars } from './scroll-area.vars.stylex';
 
 // Same-file locals so the `var()` references read as names rather than as a wall of
@@ -8,9 +8,9 @@ import { scrollAreaVars } from './scroll-area.vars.stylex';
 // would fail static evaluation.
 const progressStart = scrollAreaVars['--cl-scroll-area-progress-start'];
 const progressEnd = scrollAreaVars['--cl-scroll-area-progress-end'];
-const fadeSize = scrollAreaVars['--cl-scroll-area-fade-size'];
-const fadeRange = scrollAreaVars['--cl-scroll-area-fade-range'];
-const scrollbarInset = scrollAreaVars['--cl-scroll-area-scrollbar-inset'];
+const fadeSize = scrollFadeVars['--cl-scroll-fade-size'];
+const fadeRange = scrollFadeVars['--cl-scroll-fade-range'];
+const fadeInset = scrollFadeVars['--cl-scroll-fade-inset'];
 
 // One animation per edge, each writing its own progress var. The end fade counts DOWN
 // rather than running `animation-direction: reverse`: with `fill-mode: both` the two are
@@ -83,7 +83,7 @@ export const styles = stylex.create({
     maskImage,
     maskPosition: 'left top, right top',
     maskRepeat: 'no-repeat',
-    maskSize: `calc(100% - ${scrollbarInset}) 100%, ${scrollbarInset} 100%`,
+    maskSize: `calc(100% - ${fadeInset}) 100%, ${fadeInset} 100%`,
   },
 
   // Only the name is gated on timeline support. A browser that ignores `animation-timeline`
