@@ -25,10 +25,14 @@ export type PopoverTitleProps = MosaicComponentProps<'h2'>;
 export type PopoverDescriptionProps = MosaicComponentProps<'p'>;
 
 /** The anchor. Renders a `<button>`; `render` swaps in another element. */
-const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(props, ref) {
+const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(
+  { className, style, ...props },
+  ref,
+) {
   return (
     <Primitive.Trigger
       ref={ref}
+      {...mergeStyleProps(themeProps('popover-trigger'), className, style)}
       {...props}
     />
   );

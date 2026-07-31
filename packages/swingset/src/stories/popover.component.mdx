@@ -147,14 +147,14 @@ Cross-axis flipping is only enabled for aligned placements, so `bottom-start` ma
 
 ## Parts
 
-| Part                  | Slot            | Description                                                             |
-| --------------------- | --------------- | ----------------------------------------------------------------------- |
-| `Popover.Root`        | —               | State provider; owns open/close, `placement`, `sideOffset`, `modal`.    |
-| `Popover.Trigger`     | —               | Anchor element; renders a `<button>` and accepts a `render` prop.       |
-| `Popover.Popup`       | `popover-popup` | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
-| `Popover.Close`       | —               | Dismisses the popover; accepts a `render` prop.                         |
-| `Popover.Title`       | —               | Heading; wired to the popup's `aria-labelledby`.                        |
-| `Popover.Description` | —               | Description; wired to the popup's `aria-describedby`.                   |
+| Part                  | Slot              | Description                                                             |
+| --------------------- | ----------------- | ----------------------------------------------------------------------- |
+| `Popover.Root`        | —                 | State provider; owns open/close, `placement`, `sideOffset`, `modal`.    |
+| `Popover.Trigger`     | `popover-trigger` | Anchor element; renders a `<button>` and accepts a `render` prop.       |
+| `Popover.Popup`       | `popover-popup`   | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
+| `Popover.Close`       | —                 | Dismisses the popover; accepts a `render` prop.                         |
+| `Popover.Title`       | —                 | Heading; wired to the popup's `aria-labelledby`.                        |
+| `Popover.Description` | —                 | Description; wired to the popup's `aria-describedby`.                   |
 
 `Popover.Popup` renders the portal and the floating positioner internally. The positioner carries
 the `popover-positioner` slot and is the `role="dialog"` element, which is why the popup's
