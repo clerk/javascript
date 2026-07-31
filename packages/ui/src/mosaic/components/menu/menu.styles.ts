@@ -12,6 +12,7 @@ export const styles = stylex.create({
 
   popup: {
     borderRadius: radiusVars['--cl-radius-element'],
+    gap: space['0.5'],
     outline: 'none',
     paddingBlock: space['0.5'],
     paddingInline: space['0.5'],
@@ -19,12 +20,10 @@ export const styles = stylex.create({
     boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
                 0 24px 24px -10px oklch(0.2046 0 0 / 4%),
                 0 0 0 1px oklch(0.2046 0 0 / 4%)`,
-
     boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
-    gap: space['0.5'],
     opacity: {
       default: 1,
       ':is([data-ending-style])': 0,
@@ -83,10 +82,10 @@ export const styles = stylex.create({
     height: space['7'],
     width: '100%',
     '::before': {
-      content: '""',
-      position: 'absolute',
       insetBlock: `calc(-1 * ${space['0.5']})`,
       insetInline: `calc(-1 * ${space['0.5']})`,
+      content: '""',
+      position: 'absolute',
     },
   },
 

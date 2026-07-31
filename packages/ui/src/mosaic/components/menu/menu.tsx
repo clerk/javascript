@@ -32,7 +32,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       ref={ref}
       render={
         render ??
-        (props => (
+        (({ color: _nativeColor, ...props }) => (
           <Button
             variant='ghost'
             size='sm'
