@@ -88,6 +88,29 @@ const targetDefaults = {
 export const targetVars = stylex.defineVars(targetDefaults);
 
 // =============================================================================
+// Scrollbar Tokens
+// =============================================================================
+// One opinion for every scrolling surface in Mosaic, set in one place. Mosaic has no
+// reason to render differently-sized scrollbars in different components, so this is a
+// token rather than a per-component prop — a consumer restyles all of them at once.
+//
+// `thin` rather than `auto`: these scroll regions are compact panels (member lists in a
+// card or a popover), where a platform-default ~17px bar reads heavy, and where
+// `scrollbar-gutter: stable` means the width is content space we give up whether or not
+// anything is scrolling. The tradeoff is a smaller drag target on the platforms whose
+// scrollbars are draggable at all — set `auto` to take it back.
+//
+// Keyword-only, by the CSS spec: `scrollbar-width` accepts `auto | thin | none` and NOT a
+// length. A real pixel width exists only via `::-webkit-scrollbar`, which Firefox ignores
+// and which Chrome 121+ discards once `scrollbar-color` is set — so there is no honest way
+// to expose this as a length.
+const scrollbarDefaults = {
+  '--cl-scrollbar-width': 'thin',
+} as const;
+
+export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
+
+// =============================================================================
 // Spacing Tokens
 // =============================================================================
 // `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's

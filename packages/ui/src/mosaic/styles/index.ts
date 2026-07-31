@@ -28,6 +28,8 @@ export type {
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
+export { ScrollArea } from '../components/scroll-area';
+export type { ScrollAreaGutter, ScrollAreaRootProps, ScrollAreaViewportProps } from '../components/scroll-area';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
@@ -48,6 +50,7 @@ import {
   easingVars,
   fontWeightVars,
   radiusVars,
+  scrollbarVars,
   space,
   spacingVars,
   targetVars,
@@ -60,6 +63,7 @@ export {
   easingVars,
   fontWeightVars,
   radiusVars,
+  scrollbarVars,
   space,
   spacingVars,
   targetVars,
@@ -74,6 +78,7 @@ export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
+export type ScrollbarVarName = keyof typeof scrollbarVars;
 export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
