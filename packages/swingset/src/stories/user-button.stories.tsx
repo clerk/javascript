@@ -21,9 +21,11 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
 };
 
-// Accounts wear their own photo. Only the flagship workspace carries the Clerk mark — the rest
-// fall back to their initials, so a switch is visible on the trigger rather than just in the list.
+// Accounts wear their own photo. Only the flagship workspace carries the Clerk mark; the rest wear
+// the generated mark Clerk gives an organization that has not uploaded a logo.
 const clerkLogo = 'https://avatars.githubusercontent.com/u/49538330?v=4';
+const defaultOrgLogo =
+  'https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJvcmdfMnp6WVh1TURBRTBYWFh5Q1lHN3dyQXRFd0VpIiwiaW5pdGlhbHMiOiJQIn0?width=48';
 
 const colin: UserButtonSession = {
   sessionId: 'sess_colin',
@@ -55,6 +57,7 @@ const clerkCloud: UserButtonMembership = {
   organizationId: 'org_clerk_cloud',
   name: 'Clerk Cloud',
   membersCount: 6,
+  imageUrl: defaultOrgLogo,
 };
 
 // Two accounts with different workspaces, so switching account changes the list under it too.
@@ -74,7 +77,14 @@ const initialAccounts: Account[] = [
       clerkCloud,
     ],
     suggestions: [
-      { kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' },
+      {
+        kind: 'suggestion',
+        id: 'sug_labs',
+        organizationId: 'org_clerk_labs',
+        name: 'Clerk Labs',
+        status: 'pending',
+        imageUrl: defaultOrgLogo,
+      },
     ],
     invitations: [],
   },
