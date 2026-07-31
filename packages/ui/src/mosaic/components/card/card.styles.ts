@@ -27,7 +27,6 @@ export const styles = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['6'],
     alignItems: 'center',
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 4%, ${colorVars['--cl-color-card']})`,
     boxSizing: 'border-box',
     display: 'flex',
     flexShrink: 0,
