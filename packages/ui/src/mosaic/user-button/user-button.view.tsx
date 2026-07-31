@@ -14,7 +14,7 @@ import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
 import type { IconName } from '../icons/registry';
 import { space } from '../tokens.stylex';
-import { styles } from './user-button.styles';
+import { styles, triggerShapes } from './user-button.styles';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
 // Session-backed, discriminated resource rows. Intended to be 1:1 with a future
@@ -582,16 +582,17 @@ export function UserButtonTrigger() {
   const isOrg = org !== undefined;
   const name = isOrg ? org.name : data.activeSession.name;
   const imageUrl = isOrg ? org.imageUrl : data.activeSession.imageUrl;
+  const shape = isOrg ? 'square' : 'circle';
 
   return (
     <Popover.Trigger
       aria-label={`Open account menu for ${name}`}
-      {...stylex.props(styles.trigger)}
+      {...stylex.props(styles.trigger, triggerShapes[shape])}
     >
       <WorkspaceAvatar
         name={name}
         imageUrl={imageUrl}
-        shape={isOrg ? 'square' : 'circle'}
+        shape={shape}
         size='md'
       />
     </Popover.Trigger>
