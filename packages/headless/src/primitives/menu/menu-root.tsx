@@ -45,7 +45,10 @@ function MenuInner(props: MenuProps) {
   const tree = useFloatingTree();
   const nodeId = useFloatingNodeId();
   const parentId = useFloatingParentNodeId();
-  const isNested = parentId != null;
+  // A submenu, not merely a menu inside some other floating element. A menu rendered in a popover
+  // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
+  // unclickable by mouse.
+  const isNested = parentId != null && parentContext != null;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
