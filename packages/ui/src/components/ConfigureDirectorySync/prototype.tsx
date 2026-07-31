@@ -77,6 +77,11 @@ export interface PrototypeState {
   isSetupComplete: boolean;
 }
 
+// Module-level mirror of the activation state so the Security overview can
+// read it after the wizard unmounts (the wizard's React state resets on exit).
+let directorySyncActivated = false;
+export const isDirectorySyncActivated = (): boolean => directorySyncActivated;
+
 const PrototypeContext = React.createContext<PrototypeState | null>(null);
 PrototypeContext.displayName = 'DirectorySyncPrototypeContext';
 
@@ -85,8 +90,13 @@ export const PrototypeStateProvider = ({ children }: PropsWithChildren): JSX.Ele
   const [setupStatus, setSetupStatus] = React.useState<PrototypeSetupStatus>('complete');
   const [syncLog, setSyncLog] = React.useState<PrototypeSyncLogState>('empty');
   const [deprovisionBehavior, setDeprovisionBehavior] = React.useState<PrototypeDeprovisionBehavior>('suspend');
-  const [isDirectorySyncActive, setIsDirectorySyncActive] = React.useState(false);
+  const [isDirectorySyncActive, setIsDirectorySyncActiveState] = React.useState(directorySyncActivated);
   const [tokenGeneration, setTokenGeneration] = React.useState(1);
+
+  const setIsDirectorySyncActive = React.useCallback((active: boolean) => {
+    directorySyncActivated = active;
+    setIsDirectorySyncActiveState(active);
+  }, []);
 
   const value = React.useMemo<PrototypeState>(
     () => ({
@@ -105,7 +115,15 @@ export const PrototypeStateProvider = ({ children }: PropsWithChildren): JSX.Ele
       providerMeta: PROTOTYPE_PROVIDERS[provider],
       isSetupComplete: setupStatus === 'complete',
     }),
-    [provider, setupStatus, syncLog, deprovisionBehavior, isDirectorySyncActive, tokenGeneration],
+    [
+      provider,
+      setupStatus,
+      syncLog,
+      deprovisionBehavior,
+      isDirectorySyncActive,
+      setIsDirectorySyncActive,
+      tokenGeneration,
+    ],
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;

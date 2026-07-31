@@ -595,9 +595,9 @@ describe('OrganizationProfile', () => {
 
       renderSecurityRoute(wrapper);
 
-      // PROTOTYPE ONLY: the overview now leads with the identity-provider setup section.
+      // PROTOTYPE ONLY: the overview now leads with the prerequisite checklist.
       expect(await screen.findByText('Identity provider')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Start setup' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Add domains' })).toBeInTheDocument();
     });
 
     it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
