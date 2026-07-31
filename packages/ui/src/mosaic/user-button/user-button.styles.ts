@@ -39,5 +39,5 @@ export const styles = stylex.create({
 // fully draws a circle around a square workspace mark.
 export const triggerShapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-control'] },
+  square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
