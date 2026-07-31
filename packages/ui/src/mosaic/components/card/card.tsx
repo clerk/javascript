@@ -8,10 +8,10 @@ import { TextContext } from '../text';
 import { elevations, headerAlignments, styles } from './card.styles';
 
 type CardAlignment = 'start' | 'center';
-type CardElevation = 'raised' | 'flush' | 'overlay';
+type CardElevation = 'card' | 'flush' | 'overlay';
 
 const DEFAULT_ALIGNMENT: CardAlignment = 'start';
-const DEFAULT_ELEVATION: CardElevation = 'raised';
+const DEFAULT_ELEVATION: CardElevation = 'card';
 
 const CardVariantContext = React.createContext<{ alignment: CardAlignment; elevation: CardElevation }>({
   alignment: DEFAULT_ALIGNMENT,
@@ -22,7 +22,7 @@ const CardVariantContext = React.createContext<{ alignment: CardAlignment; eleva
 export interface CardProps extends MosaicComponentProps<'div'> {
   /** Alignment applied to `Card.Header`. @default 'start' */
   alignment?: CardAlignment;
-  /** Surface treatment applied to the card. @default 'raised' */
+  /** Surface treatment applied to the card. @default 'card' */
   elevation?: CardElevation;
 }
 

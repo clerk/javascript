@@ -40,7 +40,7 @@ export const styles = stylex.create({
 });
 
 export const elevations = stylex.create({
-  raised: {
+  card: {
     borderRadius: radiusVars['--cl-radius-container'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],

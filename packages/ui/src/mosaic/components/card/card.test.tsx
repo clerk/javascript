@@ -17,12 +17,12 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('root')).toHaveClass('cl-card-root');
     expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'start');
-    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'raised');
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'card');
     expect(screen.getByTestId('header')).toHaveClass('cl-card-header');
     expect(screen.getByTestId('header')).toHaveAttribute('data-alignment', 'start');
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
-    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'raised');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
   });
 
   it('reflects centered alignment on the root and header', () => {

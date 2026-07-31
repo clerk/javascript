@@ -19,11 +19,11 @@ export const meta: StoryMeta = {
   styles: {
     _variants: {
       alignment: { start: {}, center: {} },
-      elevation: { raised: {}, flush: {}, overlay: {} },
+      elevation: { card: {}, flush: {}, overlay: {} },
     },
     _defaultVariants: {
       alignment: 'start',
-      elevation: 'raised',
+      elevation: 'card',
     },
   },
 };
