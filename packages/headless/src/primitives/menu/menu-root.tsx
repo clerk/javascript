@@ -101,7 +101,9 @@ function MenuInner(props: MenuProps) {
     ignoreMouse: isNested,
   });
   const role = useRole(floatingContext, { role: 'menu' });
-  const dismiss = useDismiss(floatingContext, { bubbles: true });
+  // Escape must not bubble: it closes this menu and leaves whatever it sits inside — a parent menu,
+  // or a popover — open. An outside press is the opposite, and dismisses the whole stack.
+  const dismiss = useDismiss(floatingContext, { bubbles: { escapeKey: false, outsidePress: true } });
   const listNavigation = useListNavigation(floatingContext, {
     listRef: elementsRef,
     activeIndex,
