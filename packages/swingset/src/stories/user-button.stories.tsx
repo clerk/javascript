@@ -31,14 +31,32 @@ const handlers = {
   onUpgrade: () => {},
 } satisfies Partial<UserButtonProps>;
 
-const preston = { sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', email: 'preston@clerk.dev' };
+// Workspaces wear the Clerk mark; each account gets its own photo so two signed-in
+// accounts are never mistaken for one.
+const clerkLogo = 'https://avatars.githubusercontent.com/u/49538330?v=4';
+
+const colin = {
+  sessionId: 'sess_colin',
+  userId: 'user_colin',
+  name: 'Colin',
+  email: 'colin@clerk.dev',
+  imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
+};
+
+const braden = {
+  sessionId: 'sess_braden',
+  userId: 'user_braden',
+  name: 'Braden',
+  email: 'braden@clerk.dev',
+  imageUrl: 'https://avatars.githubusercontent.com/u/64913815?v=4',
+};
 
 export function Default(_args: Record<string, unknown>) {
   return (
     <UserButton
       {...handlers}
       status='ready'
-      activeSession={preston}
+      activeSession={colin}
       activeOrganizationId='org_clerk_app'
       hasOrganizations
       memberships={[
@@ -49,14 +67,22 @@ export function Default(_args: Record<string, unknown>) {
           membersCount: 24,
           planLabel: 'Pro plan',
           upgradeable: true,
+          imageUrl: clerkLogo,
         },
-        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud' },
+        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud', imageUrl: clerkLogo },
       ]}
       suggestions={[
-        { kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' },
+        {
+          kind: 'suggestion',
+          id: 'sug_labs',
+          organizationId: 'org_clerk_labs',
+          name: 'Clerk Labs',
+          status: 'pending',
+          imageUrl: clerkLogo,
+        },
       ]}
       invitations={[]}
-      additionalSessions={[{ sessionId: 'sess_2', userId: 'user_2', name: 'Preston Booth', email: 'acme@clerk.dev' }]}
+      additionalSessions={[braden]}
     />
   );
 }
@@ -66,20 +92,13 @@ export function Personal(_args: Record<string, unknown>) {
     <UserButton
       {...handlers}
       status='ready'
-      activeSession={{
-        sessionId: 'sess_cam',
-        userId: 'user_cam',
-        name: 'Cameron Walker',
-        email: 'cameron.walker@gmail.com',
-      }}
+      activeSession={colin}
       activeOrganizationId={null}
       hasOrganizations={false}
       memberships={[]}
       suggestions={[]}
       invitations={[]}
-      additionalSessions={[
-        { sessionId: 'sess_js', userId: 'user_js', name: 'Jeremy Sallee', email: 'jsallee@gmail.com' },
-      ]}
+      additionalSessions={[braden]}
     />
   );
 }
@@ -89,7 +108,7 @@ export function MultipleSessions(_args: Record<string, unknown>) {
     <UserButton
       {...handlers}
       status='ready'
-      activeSession={preston}
+      activeSession={colin}
       activeOrganizationId='org_clerk_app'
       hasOrganizations
       memberships={[
@@ -100,14 +119,13 @@ export function MultipleSessions(_args: Record<string, unknown>) {
           membersCount: 24,
           planLabel: 'Pro plan',
           upgradeable: true,
+          imageUrl: clerkLogo,
         },
-        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud' },
+        { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud', imageUrl: clerkLogo },
       ]}
       suggestions={[]}
       invitations={[]}
-      additionalSessions={[
-        { sessionId: 'sess_cam', userId: 'user_cam', name: 'Cameron Walker', email: 'cameron.walker@gmail.com' },
-      ]}
+      additionalSessions={[braden]}
     />
   );
 }
