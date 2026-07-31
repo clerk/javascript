@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { Button } from '@clerk/ui/mosaic/components/button';
 import type { CardProps } from '@clerk/ui/mosaic/components/card';
-import { Card, cardRecipe } from '@clerk/ui/mosaic/components/card';
+import { Card } from '@clerk/ui/mosaic/components/card';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
 import { Text } from '@clerk/ui/mosaic/components/text';
 
@@ -14,8 +14,18 @@ export { default as __source } from './card.component.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Card',
-  source: 'packages/ui/src/mosaic/components/card.tsx',
-  styles: cardRecipe,
+  source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  styleEngine: 'stylex',
+  styles: {
+    _variants: {
+      alignment: { start: {}, center: {} },
+      elevation: { card: {}, flush: {}, overlay: {} },
+    },
+    _defaultVariants: {
+      alignment: 'start',
+      elevation: 'card',
+    },
+  },
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
@@ -24,7 +34,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card
+    <Card.Root
       {...knobsAsProps(props)}
       style={{ maxWidth: 400 }}
     >
@@ -36,13 +46,13 @@ export function Default(props: Record<string, unknown>) {
       <Card.Footer>
         <Button fullWidth>Continue</Button>
       </Card.Footer>
-    </Card>
+    </Card.Root>
   );
 }
 
 export function Centered() {
   return (
-    <Card
+    <Card.Root
       alignment='center'
       style={{ maxWidth: 400 }}
     >
@@ -54,6 +64,6 @@ export function Centered() {
       <Card.Footer>
         <Button fullWidth>Verify</Button>
       </Card.Footer>
-    </Card>
+    </Card.Root>
   );
 }

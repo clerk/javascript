@@ -29,7 +29,7 @@ import { Popover } from '@clerk/ui/mosaic/components/popover';
 <Popover.Root>
   <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
   <Popover.Popup aria-label='Account'>
-    <Card>
+    <Card.Root>
       <Card.Content>Flexible inner content.</Card.Content>
       <Card.Footer>
         <Button
@@ -39,7 +39,7 @@ import { Popover } from '@clerk/ui/mosaic/components/popover';
           Sign out of all accounts
         </Button>
       </Card.Footer>
-    </Card>
+    </Card.Root>
   </Popover.Popup>
 </Popover.Root>;
 ```
@@ -61,9 +61,9 @@ neither logs a development warning.
 <Popover.Root>
   <Popover.Trigger>Open</Popover.Trigger>
   <Popover.Popup aria-label='Account'>
-    <Card>
+    <Card.Root>
       <Card.Content>Flexible inner content.</Card.Content>
-    </Card>
+    </Card.Root>
   </Popover.Popup>
 </Popover.Root>;
 ```
@@ -79,9 +79,9 @@ const [open, setOpen] = useState(false);
 >
   <Popover.Trigger>Open</Popover.Trigger>
   <Popover.Popup aria-label='Account'>
-    <Card>
+    <Card.Root>
       <Card.Content>Flexible inner content.</Card.Content>
-    </Card>
+    </Card.Root>
   </Popover.Popup>
 </Popover.Root>;
 ```
@@ -97,9 +97,9 @@ region.
 <Popover.Root>
   <Popover.Trigger>Open</Popover.Trigger>
   <Popover.Popup size='lg'>
-    <Card>
+    <Card.Root>
       <Card.Content>A wider panel.</Card.Content>
-    </Card>
+    </Card.Root>
   </Popover.Popup>
 </Popover.Root>;
 ```
@@ -135,9 +135,9 @@ centering on it.
 >
   <Popover.Trigger>Open</Popover.Trigger>
   <Popover.Popup aria-label='Account'>
-    <Card>
+    <Card.Root>
       <Card.Content>Aligned to the trigger's end edge.</Card.Content>
-    </Card>
+    </Card.Root>
   </Popover.Popup>
 </Popover.Root>;
 ```
