@@ -9,17 +9,24 @@ type CardAlignment = 'start' | 'center';
 
 const CardVariantContext = React.createContext<{ alignment: CardAlignment }>({ alignment: 'start' });
 
-const Root = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(function CardRoot(
-  { className, style, ...props },
+export interface CardProps extends React.ComponentPropsWithoutRef<'div'> {
+  alignment?: CardAlignment;
+}
+
+const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
+  { alignment = 'start', children, className, style, ...props },
   ref,
 ) {
-  const { alignment } = React.useContext(CardVariantContext);
   return (
-    <div
-      ref={ref}
-      {...mergeStyleProps(themeProps('card-root', { alignment }), stylex.props(styles.root), className, style)}
-      {...props}
-    />
+    <CardVariantContext.Provider value={{ alignment }}>
+      <div
+        ref={ref}
+        {...mergeStyleProps(themeProps('card-root', { alignment }), stylex.props(styles.root), className, style)}
+        {...props}
+      >
+        {children}
+      </div>
+    </CardVariantContext.Provider>
   );
 });
 
@@ -70,19 +77,4 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'
   );
 });
 
-export interface CardProps extends React.ComponentPropsWithoutRef<'div'> {
-  alignment?: CardAlignment;
-}
-
-export function Card({ alignment = 'start', children, ...props }: CardProps) {
-  return (
-    <CardVariantContext.Provider value={{ alignment }}>
-      <Root {...props}>{children}</Root>
-    </CardVariantContext.Provider>
-  );
-}
-
-Card.Root = Root;
-Card.Header = Header;
-Card.Content = Content;
-Card.Footer = Footer;
+export const Card = { Root, Header, Content, Footer };

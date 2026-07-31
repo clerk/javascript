@@ -15,6 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Card',
   source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  styleEngine: 'stylex',
   styles: {
     _variants: {
       alignment: { start: {}, center: {} },
@@ -31,7 +32,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card
+    <Card.Root
       {...knobsAsProps(props)}
       style={{ maxWidth: 400 }}
     >
@@ -43,13 +44,13 @@ export function Default(props: Record<string, unknown>) {
       <Card.Footer>
         <Button fullWidth>Continue</Button>
       </Card.Footer>
-    </Card>
+    </Card.Root>
   );
 }
 
 export function Centered() {
   return (
-    <Card
+    <Card.Root
       alignment='center'
       style={{ maxWidth: 400 }}
     >
@@ -61,6 +62,6 @@ export function Centered() {
       <Card.Footer>
         <Button fullWidth>Verify</Button>
       </Card.Footer>
-    </Card>
+    </Card.Root>
   );
 }

@@ -13,6 +13,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    rowGap: space['5'],
     width: '100%',
   },
   header: {

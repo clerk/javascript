@@ -8,11 +8,11 @@ import { Card } from './card';
 describe('Mosaic Card', () => {
   it('renders each compound slot with the default alignment', () => {
     render(
-      <Card data-testid='root'>
+      <Card.Root data-testid='root'>
         <Card.Header data-testid='header'>Header</Card.Header>
         <Card.Content data-testid='content'>Content</Card.Content>
         <Card.Footer data-testid='footer'>Footer</Card.Footer>
-      </Card>,
+      </Card.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-card-root');
@@ -25,12 +25,12 @@ describe('Mosaic Card', () => {
 
   it('reflects centered alignment on the root and header', () => {
     render(
-      <Card
+      <Card.Root
         alignment='center'
         data-testid='root'
       >
         <Card.Header data-testid='header'>Header</Card.Header>
-      </Card>,
+      </Card.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'center');
@@ -39,11 +39,11 @@ describe('Mosaic Card', () => {
 
   it('provides the neutral text color to header copy', () => {
     render(
-      <Card>
+      <Card.Root>
         <Card.Header>
           <Text>Supporting copy</Text>
         </Card.Header>
-      </Card>,
+      </Card.Root>,
     );
 
     expect(screen.getByText('Supporting copy')).toHaveAttribute('data-color', 'neutral');
@@ -51,7 +51,7 @@ describe('Mosaic Card', () => {
 
   it('lets consumer className and style win on every slot', () => {
     render(
-      <Card
+      <Card.Root
         className='my-card'
         style={{ width: '20rem' }}
         data-testid='root'
@@ -71,7 +71,7 @@ describe('Mosaic Card', () => {
           style={{ paddingBlockEnd: 0 }}
           data-testid='footer'
         />
-      </Card>,
+      </Card.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-card-root', 'my-card');
