@@ -1,19 +1,29 @@
-import type { RenderPropOrElement } from '@clerk/headless/utils';
+import type { RenderProp } from '@clerk/headless/utils';
 import type React from 'react';
 
 /**
- * The base props every Mosaic component accepts: the native props for its default
- * tag, plus the `render` escape hatch that swaps the rendered element.
+ * The native props for `Tag` as Mosaic exposes them.
  *
  * `color` is omitted because it is a non-standard HTML attribute typed `string`,
  * which would widen any component that exposes `color` as a variant. Omitting it
  * here rather than per component means a new component inherits the narrowing.
  */
-export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
+export type MosaicElementProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
   React.ComponentPropsWithRef<Tag>,
   'color'
-> & {
-  render?: RenderPropOrElement<Tag>;
+>;
+
+/**
+ * The base props every Mosaic component accepts: the native props for its default
+ * tag, plus the `render` escape hatch that swaps the rendered element.
+ *
+ * `render` hands back `MosaicElementProps` rather than the headless primitive's
+ * props, so a callback can spread them onto a Mosaic component without the native
+ * `color` colliding with a `color` variant. Widening back to the primitive's props
+ * is safe: dropping an optional prop leaves the callback assignable to headless.
+ */
+export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = MosaicElementProps<Tag> & {
+  render?: RenderProp<MosaicElementProps<Tag>> | React.ReactElement;
 };
 
 // The public styling contract, emitted onto a component's root element:

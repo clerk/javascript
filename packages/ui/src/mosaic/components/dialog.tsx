@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { Dialog as Primitive } from '../primitives/dialog';
+import type { MosaicComponentProps } from '../props';
 import type { RecipeVariantProps } from '../slot-recipe';
 import { defineSlotRecipe, useRecipe } from '../slot-recipe';
 
@@ -122,7 +123,7 @@ const Popup = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<ty
 );
 
 interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' | 'onOpenChange' | 'modal'> {
-  trigger: React.ComponentProps<typeof Primitive.Trigger>['render'];
+  trigger: MosaicComponentProps<'button'>['render'];
   children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
   size?: DialogVariantProps['size'];
 }
