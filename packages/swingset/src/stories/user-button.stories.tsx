@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import {
   UserButton,
+  type UserButtonAccount,
   type UserButtonInvitation,
   type UserButtonMembership,
   type UserButtonProps,
@@ -44,10 +45,8 @@ const braden: UserButtonSession = {
 };
 
 /** One signed-in account and everything that belongs to it. */
-interface Account {
-  session: UserButtonSession;
+interface Account extends UserButtonAccount {
   activeOrganizationId: string | null;
-  memberships: UserButtonMembership[];
   suggestions: UserButtonSuggestion[];
   invitations: UserButtonInvitation[];
 }
@@ -170,9 +169,14 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
     memberships: account.memberships,
     suggestions: account.suggestions,
     invitations: account.invitations,
-    additionalSessions: accounts.filter(a => a.session.sessionId !== activeSessionId).map(a => a.session),
-    onSelectOrganization: organizationId => update(a => ({ ...a, activeOrganizationId: organizationId })),
-    onSelectPersonal: () => update(a => ({ ...a, activeOrganizationId: null })),
+    additionalAccounts: accounts.filter(a => a.session.sessionId !== activeSessionId),
+    onSelectWorkspace: (sessionId, organizationId) => {
+      setAccounts(
+        accounts.map(a => (a.session.sessionId === sessionId ? { ...a, activeOrganizationId: organizationId } : a)),
+      );
+      setActiveSessionId(sessionId);
+      close();
+    },
     onAcceptSuggestion: id =>
       update(a => {
         const suggestion = a.suggestions.find(s => s.id === id);
