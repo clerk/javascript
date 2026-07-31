@@ -31,7 +31,7 @@ import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButton
   status='ready'
-  activeSession={{ sessionId: 'sess_1', userId: 'user_1', name: 'Preston Booth', email: 'preston@clerk.dev' }}
+  activeSession={{ sessionId: 'sess_colin', userId: 'user_colin', name: 'Colin', email: 'colin@clerk.dev' }}
   activeOrganizationId='org_clerk_app'
   hasOrganizations
   memberships={[
@@ -40,7 +40,7 @@ import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
   ]}
   suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
   invitations={[]}
-  additionalSessions={[{ sessionId: 'sess_2', userId: 'user_2', name: 'Preston Booth', email: 'acme@clerk.dev' }]}
+  additionalSessions={[{ sessionId: 'sess_braden', userId: 'user_braden', name: 'Braden', email: 'braden@clerk.dev' }]}
   onSelectOrganization={id => setActive({ organization: id })}
   onSelectPersonal={() => setActive({ organization: null })}
   onSwitchSession={sessionId => setActive({ session: sessionId })}

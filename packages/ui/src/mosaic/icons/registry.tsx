@@ -115,7 +115,6 @@ const Users = glyph(
   />,
 );
 
-
 /** Runtime name → glyph map. `Icon`'s `name` prop is typed from these keys. */
 export const iconRegistry = {
   'chevron-right': ChevronRight,
