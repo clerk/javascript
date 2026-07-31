@@ -24,7 +24,7 @@ export const styles = stylex.create({
     boxShadow: {
       default: null,
       ':focus-visible': focusRing,
-      ':focus-visible:where([aria-invalid="true"])': 'none',
+      ':focus-visible:where([aria-invalid="true"])': focusRing,
       ':where([aria-invalid="true"])': 'none',
     },
     boxSizing: 'border-box',
