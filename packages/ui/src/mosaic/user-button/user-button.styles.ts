@@ -1,0 +1,37 @@
+import * as stylex from '@stylexjs/stylex';
+
+import { colorVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+
+export const styles = stylex.create({
+  // The avatar is the trigger, so the button paints nothing of its own.
+  trigger: {
+    padding: 0,
+    borderRadius: radiusVars['--cl-radius-full'],
+    borderStyle: 'none',
+    outline: {
+      default: 'none',
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+    },
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    outlineOffset: '2px',
+  },
+
+  // The workspace list scrolls; the header and footer stay put.
+  scroll: {
+    maxHeight: '18rem',
+    overflowY: 'auto',
+  },
+
+  branding: {
+    paddingBlock: space['2'],
+    borderBlockStartColor: colorVars['--cl-color-border-faded'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    color: colorVars['--cl-color-neutral-faded'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    textAlign: 'center',
+  },
+});
