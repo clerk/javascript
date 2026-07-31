@@ -35,13 +35,13 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     render,
     ref,
     props: {
-      ...rest,
       ...mergeStyleProps(
         themeProps('card-root', { alignment, elevation }),
         stylex.props(styles.root, elevations[elevation]),
         className,
         style,
       ),
+      ...rest,
     },
   });
 
@@ -58,13 +58,13 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     render,
     ref,
     props: {
-      ...rest,
       ...mergeStyleProps(
         themeProps('card-header', { alignment }),
         stylex.props(styles.header, headerAlignments[alignment]),
         className,
         style,
       ),
+      ...rest,
     },
   });
 
@@ -80,8 +80,8 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...rest,
       ...mergeStyleProps(themeProps('card-content'), stylex.props(styles.content), className, style),
+      ...rest,
     },
   });
 });
@@ -96,8 +96,8 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     render,
     ref,
     props: {
-      ...rest,
       ...mergeStyleProps(themeProps('card-footer', { elevation }), stylex.props(styles.footer), className, style),
+      ...rest,
     },
   });
 });
