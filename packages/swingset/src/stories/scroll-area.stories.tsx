@@ -3,7 +3,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { space } from '@clerk/ui/mosaic/styles';
+import { radiusVars, space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -74,8 +74,8 @@ export function Default() {
   return (
     <div
       {...root}
-      className={`${root.className} border-border w-full rounded-lg border`}
-      style={{ height: 260 }}
+      className={`${root.className} border-border w-full border`}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts.map(({ email, organizations }, index) => (
@@ -114,8 +114,8 @@ export function NotScrollable() {
   return (
     <div
       {...root}
-      className={`${root.className} border-border w-full rounded-lg border`}
-      style={{ height: 260 }}
+      className={`${root.className} border-border w-full border`}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts[0].organizations.map(name => (
@@ -162,8 +162,8 @@ export function Gutter() {
             <p className='text-muted-foreground mb-2 font-mono text-xs'>{gutter}</p>
             <div
               {...root}
-              className={`${root.className} border-border rounded-lg border`}
-              style={{ height: 140 }}
+              className={`${root.className} border-border border`}
+              style={{ height: 140, borderRadius: radiusVars['--cl-radius-inner'] }}
             >
               <Item.Group {...stylex.props(...scrollAreaViewport(gutter))}>
                 {names.map(name => (
@@ -244,12 +244,12 @@ export function HoverReveal() {
   return (
     <div
       {...root}
-      className={`${root.className} border-border w-full rounded-lg border`}
+      className={`${root.className} border-border w-full border`}
       css={{
         '--cl-scrollbar-thumb': 'oklch(from var(--cl-color-neutral-faded) l c h / 0)',
         '&:hover': { '--cl-scrollbar-thumb': 'var(--cl-color-neutral-faded)' },
       }}
-      style={{ height: 260 }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {themedRows.map(name => (
@@ -280,10 +280,11 @@ export function ThemedScrollbar() {
   return (
     <div
       {...root}
-      className={`${root.className} border-border w-full rounded-lg border`}
+      className={`${root.className} border-border w-full border`}
       style={
         {
           height: 260,
+          borderRadius: radiusVars['--cl-radius-inner'],
           '--cl-scrollbar-width': '14px',
           '--cl-scrollbar-thumb-inset': '4px',
           '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',

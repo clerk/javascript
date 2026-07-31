@@ -3,6 +3,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import { radiusVars } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -361,8 +362,8 @@ export function Scrolling() {
   return (
     <div
       {...root}
-      className={`${root.className} border-border w-full rounded-lg border`}
-      style={{ height: 200 }}
+      className={`${root.className} border-border w-full border`}
+      style={{ height: 200, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {organizations.map(name => (
