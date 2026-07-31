@@ -66,13 +66,20 @@ const styles = stylex.create({
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,
+    // Appearance is gated on a fine pointer so touch platforms keep the native overlay bar
+    // they already draw — there is no scrollbar there for a colour or a width to apply to, and
+    // a thin one would only shrink a target that is already hard to hit. `scrollbar-gutter`
+    // stays ungated below: it is a layout decision, not an appearance one.
     scrollbarColor: {
-      default: `${colorVars['--cl-color-neutral-faded']} transparent`,
-      // Forced-colors users get the system scrollbar; a themed one loses its contrast
-      // guarantee against a palette we no longer control.
-      '@media (forced-colors: active)': 'auto',
+      default: null,
+      '@media (pointer: fine)': {
+        default: `${colorVars['--cl-color-neutral-faded']} transparent`,
+        // Forced-colors users get the system scrollbar; a themed one loses its contrast
+        // guarantee against a palette we no longer control.
+        '@media (forced-colors: active)': 'auto',
+      },
     },
-    scrollbarWidth: scrollbarVars['--cl-scrollbar-width'],
+    scrollbarWidth: { default: null, '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-width'] },
     minHeight: 0,
     overflowX: 'hidden',
     overflowY: 'auto',

@@ -83,6 +83,10 @@ Four tokens apply to every scrolling surface in Mosaic, so setting them once ret
 | `--cl-scroll-fade-inset` | `0px`    | Width at the inline end the fade is held back from.         |
 | `--cl-scrollbar-width`   | `thin`   | `auto`, `thin`, or `none` — keyword-only, per the CSS spec. |
 
+Scrollbar appearance — colour and width — only applies under `@media (pointer: fine)`, so touch
+platforms keep the native overlay bar they already draw. The gutter is not gated: it is a layout
+decision rather than an appearance one.
+
 `--cl-scroll-fade-inset` defaults to `0px` because **CSS cannot measure a scrollbar**: the width
 differs per platform and browser, and on macOS it changes at runtime when a mouse is connected. Set
 it only when you know the platform you're targeting. Until then the mask covers the scrollbar, which
