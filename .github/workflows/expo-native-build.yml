@@ -354,7 +354,9 @@ jobs:
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          MAESTRO_DRIVER: devicelab
+          # The devicelab driver's text input mangles special characters
+          # (dropped underscores, stray trailing characters), which corrupts
+          # the test email/password; the default driver types reliably.
           MAESTRO_PLATFORM: android
         with:
           api-level: 34
