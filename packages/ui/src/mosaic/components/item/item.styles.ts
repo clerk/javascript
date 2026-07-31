@@ -1,16 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { itemScope } from './item.markers.stylex';
 
 export const item = stylex.create({
   base: {
     margin: 0,
     padding: 0,
     borderRadius: radiusVars['--cl-radius-element'],
-    gap: space['3'],
     outline: {
       default: 'none',
-      ':focus-visible': `2px solid color-mix(in oklab, ${colorVars['--cl-color-primary']} 50%, transparent)`,
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
     paddingInline: space['2'],
     alignItems: 'center',
@@ -37,23 +37,27 @@ export const item = stylex.create({
     cursor: 'pointer',
   },
 
-  // vertical density derived from the variant; horizontal padding is shared by the base
-  entity: {
-    paddingBlock: space['2'],
+  xs: {
+    gap: space['2'],
+    height: space['8'],
   },
-  action: {
-    paddingBlock: space['2.5'],
+  md: {
+    gap: space['3'],
+    height: space['13'],
   },
 });
 
 export const media = stylex.create({
   base: {
     alignItems: 'center',
+    aspectRatio: '1/1',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    width: space['9'],
   },
+
+  xs: { width: space['5'] },
+  md: { width: space['9'] },
 });
 
 export const content = stylex.create({
@@ -68,14 +72,7 @@ export const content = stylex.create({
 
 export const title = stylex.create({
   base: {
-    // Non-action rows inherit the row's foreground. Only `action` rows start faded and
-    // darken to neutral on hover. Both overrides are scoped to the marker that item.tsx
-    // sets exclusively on interactive `action` rows, so no other row's title is touched.
-    color: {
-      default: null,
-      [stylex.when.ancestor(':not(:hover)')]: colorVars['--cl-color-neutral-faded'],
-      [stylex.when.ancestor(':hover')]: colorVars['--cl-color-neutral'],
-    },
+    color: colorVars['--cl-color-neutral'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
@@ -91,37 +88,26 @@ export const description = stylex.create({
   },
 });
 
-export const actions = stylex.create({
+export const label = stylex.create({
   base: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    flexShrink: 0,
-  },
-});
-
-export const header = stylex.create({
-  base: {
-    paddingInline: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-});
-
-export const headerTitle = stylex.create({
-  base: {
-    color: colorVars['--cl-color-neutral-faded'],
+    // keyed to the row's hover, not the text's, so pointing anywhere in the row promotes the label
+    color: {
+      default: null,
+      [stylex.when.ancestor(':not(:hover)', itemScope)]: colorVars['--cl-color-neutral-faded'],
+      [stylex.when.ancestor(':hover', itemScope)]: colorVars['--cl-color-neutral'],
+    },
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },
 });
 
-export const headerActions = stylex.create({
+export const actions = stylex.create({
   base: {
-    width: space['7'],
+    gap: space['2'],
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
   },
 });
 
