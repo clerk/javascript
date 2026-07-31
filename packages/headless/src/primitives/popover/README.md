@@ -63,14 +63,15 @@ const [open, setOpen] = useState(false);
 
 ### `Popover.Root`
 
-| Prop           | Type                      | Default    | Description                        |
-| -------------- | ------------------------- | ---------- | ---------------------------------- |
-| `open`         | `boolean`                 | —          | Controlled open state              |
-| `defaultOpen`  | `boolean`                 | `false`    | Initial open state (uncontrolled)  |
-| `onOpenChange` | `(open: boolean) => void` | —          | Called when open state changes     |
-| `placement`    | `Placement`               | `"bottom"` | Floating UI placement              |
-| `sideOffset`   | `number`                  | `4`        | Gap between trigger and popup (px) |
-| `modal`        | `boolean`                 | `false`    | Traps focus within the popover     |
+| Prop           | Type                      | Default    | Description                         |
+| -------------- | ------------------------- | ---------- | ----------------------------------- |
+| `open`         | `boolean`                 | —          | Controlled open state               |
+| `defaultOpen`  | `boolean`                 | `false`    | Initial open state (uncontrolled)   |
+| `onOpenChange` | `(open: boolean) => void` | —          | Called when open state changes      |
+| `placement`    | `Placement`               | `"bottom"` | Floating UI placement               |
+| `sideOffset`   | `number`                  | `4`        | Gap between trigger and popup (px)  |
+| `alignOffset`  | `number`                  | `0`        | Nudge along the alignment axis (px) |
+| `modal`        | `boolean`                 | `false`    | Traps focus within the popover      |
 
 ### `Popover.Trigger`, `Popover.Positioner`, `Popover.Popup`, `Popover.Title`, `Popover.Description`, `Popover.Close`
 
