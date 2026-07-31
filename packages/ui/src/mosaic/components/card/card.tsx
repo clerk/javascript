@@ -3,7 +3,7 @@ import React from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { TextContext } from '../text';
-import { headerAlignments, styles } from './card.styles';
+import { elevations, headerAlignments, styles } from './card.styles';
 
 type CardAlignment = 'start' | 'center';
 type CardElevation = 'raised' | 'flush' | 'overlay';
@@ -28,7 +28,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
         ref={ref}
         {...mergeStyleProps(
           themeProps('card-root', { alignment, elevation }),
-          stylex.props(styles.root, elevation === 'flush' ? styles.flush : styles.raised),
+          stylex.props(styles.root, elevations[elevation]),
           className,
           style,
         )}

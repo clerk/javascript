@@ -10,20 +10,6 @@ export const styles = stylex.create({
     rowGap: space['5'],
     width: '100%',
   },
-  raised: {
-    borderRadius: radiusVars['--cl-radius-container'],
-    overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
-                0 24px 24px -10px oklch(0.2046 0 0 / 4%),
-                0 0 0 1px oklch(0.2046 0 0 / 4%)`,
-  },
-  flush: {
-    borderRadius: radiusVars['--cl-radius-container'],
-    overflow: 'visible',
-    backgroundColor: 'transparent',
-    boxShadow: 'none',
-  },
   header: {
     paddingInline: space['4'],
     display: 'flex',
@@ -50,6 +36,31 @@ export const styles = stylex.create({
     borderTopStyle: 'solid',
     borderTopWidth: '1px',
     width: '100%',
+  },
+});
+
+export const elevations = stylex.create({
+  raised: {
+    borderRadius: radiusVars['--cl-radius-container'],
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
+                0 24px 24px -10px oklch(0.2046 0 0 / 4%),
+                0 0 0 1px oklch(0.2046 0 0 / 4%)`,
+  },
+  flush: {
+    borderRadius: radiusVars['--cl-radius-container'],
+    overflow: 'visible',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+  },
+  overlay: {
+    borderRadius: radiusVars['--cl-radius-container'],
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
+                0 24px 24px -10px oklch(0.2046 0 0 / 4%),
+                0 0 0 1px oklch(0.2046 0 0 / 4%)`,
   },
 });
 
