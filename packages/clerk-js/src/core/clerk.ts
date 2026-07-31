@@ -1864,14 +1864,7 @@ export class Clerk implements ClerkInterface {
               );
             }
           } else if (redirectUrl) {
-            if (this.client.isEligibleForTouch()) {
-              const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-              const redirectUrlWithAuth = this.buildUrlWithAuth(
-                this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
-              );
-              await this.navigate(redirectUrlWithAuth);
-            }
-            await this.navigate(redirectUrl);
+            await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
           }
         });
       }
