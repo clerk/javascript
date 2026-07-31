@@ -4,7 +4,14 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
@@ -45,6 +52,17 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   @Composable
   override fun Content() {
     debugLog(TAG, "setupView - isDismissible: $isDismissible, hostBackButton: $hostBackButton")
+
+    // clerk-android views compose from a snapshot of the environment and do not
+    // recompose when it loads afterwards, so a view composed too early stays
+    // empty forever; hold rendering until the SDK is initialized.
+    val isInitialized by Clerk.isInitialized.collectAsState()
+    if (!isInitialized) {
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+      }
+      return
+    }
 
     if (hostBackButton) {
       ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { ProfileView() }
