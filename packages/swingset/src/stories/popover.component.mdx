@@ -17,7 +17,8 @@ inside it, usually a `Card`. Keeping the two apart means only one element ever d
 
 ## Usage
 
-Compose the surface inside the popover. `size` sets the width of the floating box; everything you
+Compose the parts: `Popover.Root` owns the open state and placement, `Popover.Trigger` is the
+anchor, and `Popover.Popup` is the floating box. Put the surface inside the popup — everything you
 see comes from the `Card`.
 
 ```tsx
@@ -25,43 +26,46 @@ import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { Popover } from '@clerk/ui/mosaic/components/popover';
 
-<Popover
-  aria-label='Account'
-  trigger={props => <Button {...props}>Open popover</Button>}
->
-  <Card>
-    <Card.Content>Flexible inner content.</Card.Content>
-    <Card.Footer>
-      <Button
-        color='negative'
-        fullWidth
-      >
-        Sign out of all accounts
-      </Button>
-    </Card.Footer>
-  </Card>
-</Popover>;
+<Popover.Root>
+  <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
+  <Popover.Popup aria-label='Account'>
+    <Card>
+      <Card.Content>Flexible inner content.</Card.Content>
+      <Card.Footer>
+        <Button
+          color='negative'
+          fullWidth
+        >
+          Sign out of all accounts
+        </Button>
+      </Card.Footer>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
 ```
 
-The `trigger` render prop receives the interaction props (ARIA attributes, click handler, and the
-`data-open` / `data-closed` state attributes) from the headless layer and should spread them onto
-whatever element opens the popover.
+`Popover.Trigger` renders a `<button>` by default. Its `render` prop swaps in your own element and
+receives the interaction props (ARIA attributes, click handler, and the `data-open` / `data-closed`
+state attributes) from the headless layer to spread onto it.
+
+`Popover.Popup` portals itself out to the document body and positions against the trigger, so it
+needs no wrapper of its own.
 
 ### Accessible name
 
-The popup is a `role="dialog"`, so it needs a name. Either pass `aria-label`, or render a
-`Popover.Title` inside it — the title wires `aria-labelledby` for you. A popover with neither logs a
-development warning.
+The popup is a `role="dialog"`, so it needs a name. Either pass `aria-label` to `Popover.Popup`, or
+render a `Popover.Title` inside it — the title wires `aria-labelledby` for you. A popover with
+neither logs a development warning.
 
 ```tsx
-<Popover
-  aria-label='Account'
-  trigger={props => <Button {...props}>Open</Button>}
->
-  <Card>
-    <Card.Content>Flexible inner content.</Card.Content>
-  </Card>
-</Popover>;
+<Popover.Root>
+  <Popover.Trigger>Open</Popover.Trigger>
+  <Popover.Popup aria-label='Account'>
+    <Card>
+      <Card.Content>Flexible inner content.</Card.Content>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
 ```
 
 ### Controlled
@@ -69,38 +73,41 @@ development warning.
 ```tsx
 const [open, setOpen] = useState(false);
 
-<Popover
+<Popover.Root
   open={open}
   onOpenChange={setOpen}
-  trigger={props => <Button {...props}>Open</Button>}
 >
-  <Card>
-    <Card.Content>Flexible inner content.</Card.Content>
-  </Card>
-</Popover>;
+  <Popover.Trigger>Open</Popover.Trigger>
+  <Popover.Popup aria-label='Account'>
+    <Card>
+      <Card.Content>Flexible inner content.</Card.Content>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
 ```
 
 ### Size
 
-`size` sets the width of the floating box: `sm` (18rem), `md` (23.5rem, the default), or `lg`
-(26rem). Each clamps to `calc(100vw - 2rem)` on narrow viewports. The popup also caps its height at
-`min(80dvh, 36rem)` — for taller content, give the surface inside a scrolling region.
+`size` on `Popover.Popup` sets the width of the floating box: `sm` (18rem), `md` (23.5rem, the
+default), or `lg` (26rem). Each clamps to `calc(100vw - 2rem)` on narrow viewports. The popup also
+caps its height at `min(80dvh, 36rem)` — for taller content, give the surface inside a scrolling
+region.
 
 ```tsx
-<Popover
-  size='lg'
-  trigger={props => <Button {...props}>Open</Button>}
->
-  <Card>
-    <Card.Content>A wider panel.</Card.Content>
-  </Card>
-</Popover>;
+<Popover.Root>
+  <Popover.Trigger>Open</Popover.Trigger>
+  <Popover.Popup size='lg'>
+    <Card>
+      <Card.Content>A wider panel.</Card.Content>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
 ```
 
 ### Placement
 
-`placement` sets the preferred side: `top`, `right`, `bottom` (the default), or `left`. `sideOffset`
-sets the gap from the trigger.
+`placement` on `Popover.Root` sets the preferred side: `top`, `right`, `bottom` (the default), or
+`left`. `sideOffset` sets the gap from the trigger.
 
 <Story
   name='Placement'
@@ -122,15 +129,17 @@ centering on it.
 />
 
 ```tsx
-<Popover
+<Popover.Root
   placement='bottom-end'
   sideOffset={8}
-  trigger={props => <Button {...props}>Open</Button>}
 >
-  <Card>
-    <Card.Content>Aligned to the trigger's end edge.</Card.Content>
-  </Card>
-</Popover>;
+  <Popover.Trigger>Open</Popover.Trigger>
+  <Popover.Popup aria-label='Account'>
+    <Card>
+      <Card.Content>Aligned to the trigger's end edge.</Card.Content>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
 ```
 
 Cross-axis flipping is only enabled for aligned placements, so `bottom-start` may become
@@ -138,19 +147,18 @@ Cross-axis flipping is only enabled for aligned placements, so `bottom-start` ma
 
 ## Parts
 
-The convenience `Popover` composes the trigger and a portalled, positioned popup. For custom
-layouts, compose the compound parts directly.
+| Part                  | Slot            | Description                                                             |
+| --------------------- | --------------- | ----------------------------------------------------------------------- |
+| `Popover.Root`        | —               | State provider; owns open/close, `placement`, `sideOffset`, `modal`.    |
+| `Popover.Trigger`     | —               | Anchor element; renders a `<button>` and accepts a `render` prop.       |
+| `Popover.Popup`       | `popover-popup` | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
+| `Popover.Close`       | —               | Dismisses the popover; accepts a `render` prop.                         |
+| `Popover.Title`       | —               | Heading; wired to the popup's `aria-labelledby`.                        |
+| `Popover.Description` | —               | Description; wired to the popup's `aria-describedby`.                   |
 
-| Part                  | Slot                 | Description                                                             |
-| --------------------- | -------------------- | ----------------------------------------------------------------------- |
-| `Popover.Root`        | —                    | State provider; owns open/close and placement.                          |
-| `Popover.Trigger`     | —                    | Anchor element; accepts a `render` prop.                                |
-| `Popover.Portal`      | —                    | Portals the popup out to the document body.                             |
-| `Popover.Positioner`  | `popover-positioner` | Floating wrapper; owns positioning, stacking, `data-side`.              |
-| `Popover.Popup`       | `popover-popup`      | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
-| `Popover.Close`       | —                    | Dismisses the popover; accepts a `render` prop.                         |
-| `Popover.Title`       | —                    | Heading; wired to the popup's `aria-labelledby`.                        |
-| `Popover.Description` | —                    | Description; wired to the popup's `aria-describedby`.                   |
+`Popover.Popup` renders the portal and the floating positioner internally. The positioner carries
+the `popover-positioner` slot and is the `role="dialog"` element, which is why the popup's
+`aria-label` / `aria-labelledby` land there.
 
 `Popover.Title` and `Popover.Description` are unstyled passthroughs from the headless layer — render
 them through your own typography (`Heading`, `Text`) inside the surface.

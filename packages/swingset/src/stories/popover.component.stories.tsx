@@ -18,45 +18,34 @@ export const meta: StoryMeta = {
   styleEngine: 'stylex',
 };
 
-const popoverTrigger = (props: Omit<React.HTMLAttributes<HTMLElement>, 'color'>) => (
-  <Button {...props}>Open popover</Button>
-);
-
 export function Default() {
   return (
-    <Popover
-      aria-label='Account'
-      trigger={popoverTrigger}
-    >
-      <Card>
-        <Card.Header>
-          <Heading size='sm'>Ada Lovelace</Heading>
-          <Text>ada@example.com</Text>
-        </Card.Header>
-        <Card.Footer>
-          <Button
-            color='negative'
-            fullWidth
-          >
-            Sign out of all accounts
-          </Button>
-        </Card.Footer>
-      </Card>
-    </Popover>
+    <Popover.Root>
+      <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
+      <Popover.Popup aria-label='Account'>
+        <Card>
+          <Card.Header>
+            <Heading size='sm'>Ada Lovelace</Heading>
+            <Text>ada@example.com</Text>
+          </Card.Header>
+          <Card.Footer>
+            <Button
+              color='negative'
+              fullWidth
+            >
+              Sign out of all accounts
+            </Button>
+          </Card.Footer>
+        </Card>
+      </Popover.Popup>
+    </Popover.Root>
   );
 }
 
 // Each placement demo shares the same trigger and panel so the example reads as the
 // placement it sets. The wrapper reserves vertical room — without it the `flip`
 // middleware bounces a `top` popover back to the bottom inside a short preview.
-const labelledTrigger = (label: string) => (props: Omit<React.HTMLAttributes<HTMLElement>, 'color'>) => (
-  <Button
-    variant='outline'
-    {...props}
-  >
-    {label}
-  </Button>
-);
+const labelledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
 
 const panel = (label: string) => (
   <Card>
@@ -77,38 +66,42 @@ export function Placement() {
         paddingBlock: '7rem',
       }}
     >
-      <Popover
-        placement='top'
-        size='sm'
-        aria-label='Top placement'
-        trigger={labelledTrigger('Top')}
-      >
-        {panel('Placed above the trigger.')}
-      </Popover>
-      <Popover
-        placement='bottom'
-        size='sm'
-        aria-label='Bottom placement'
-        trigger={labelledTrigger('Bottom')}
-      >
-        {panel('Placed below the trigger.')}
-      </Popover>
-      <Popover
-        placement='left'
-        size='sm'
-        aria-label='Left placement'
-        trigger={labelledTrigger('Left')}
-      >
-        {panel('Placed to the inline start.')}
-      </Popover>
-      <Popover
-        placement='right'
-        size='sm'
-        aria-label='Right placement'
-        trigger={labelledTrigger('Right')}
-      >
-        {panel('Placed to the inline end.')}
-      </Popover>
+      <Popover.Root placement='top'>
+        <Popover.Trigger render={labelledTrigger('Top')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Top placement'
+        >
+          {panel('Placed above the trigger.')}
+        </Popover.Popup>
+      </Popover.Root>
+      <Popover.Root placement='bottom'>
+        <Popover.Trigger render={labelledTrigger('Bottom')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Bottom placement'
+        >
+          {panel('Placed below the trigger.')}
+        </Popover.Popup>
+      </Popover.Root>
+      <Popover.Root placement='left'>
+        <Popover.Trigger render={labelledTrigger('Left')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Left placement'
+        >
+          {panel('Placed to the inline start.')}
+        </Popover.Popup>
+      </Popover.Root>
+      <Popover.Root placement='right'>
+        <Popover.Trigger render={labelledTrigger('Right')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Right placement'
+        >
+          {panel('Placed to the inline end.')}
+        </Popover.Popup>
+      </Popover.Root>
     </div>
   );
 }
@@ -123,30 +116,33 @@ export function Alignment() {
         paddingBlockEnd: '7rem',
       }}
     >
-      <Popover
-        placement='bottom-start'
-        size='sm'
-        aria-label='Bottom start'
-        trigger={labelledTrigger('bottom-start')}
-      >
-        {panel('Aligned to the trigger’s start edge.')}
-      </Popover>
-      <Popover
-        placement='bottom'
-        size='sm'
-        aria-label='Bottom'
-        trigger={labelledTrigger('bottom')}
-      >
-        {panel('Centered on the trigger.')}
-      </Popover>
-      <Popover
-        placement='bottom-end'
-        size='sm'
-        aria-label='Bottom end'
-        trigger={labelledTrigger('bottom-end')}
-      >
-        {panel('Aligned to the trigger’s end edge.')}
-      </Popover>
+      <Popover.Root placement='bottom-start'>
+        <Popover.Trigger render={labelledTrigger('bottom-start')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Bottom start'
+        >
+          {panel('Aligned to the trigger’s start edge.')}
+        </Popover.Popup>
+      </Popover.Root>
+      <Popover.Root placement='bottom'>
+        <Popover.Trigger render={labelledTrigger('bottom')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Bottom'
+        >
+          {panel('Centered on the trigger.')}
+        </Popover.Popup>
+      </Popover.Root>
+      <Popover.Root placement='bottom-end'>
+        <Popover.Trigger render={labelledTrigger('bottom-end')} />
+        <Popover.Popup
+          size='sm'
+          aria-label='Bottom end'
+        >
+          {panel('Aligned to the trigger’s end edge.')}
+        </Popover.Popup>
+      </Popover.Root>
     </div>
   );
 }

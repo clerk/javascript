@@ -13,22 +13,16 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-const trigger = (props: React.HTMLAttributes<HTMLElement>) => (
-  <button
-    type='button'
-    {...props}
-  >
-    Open
-  </button>
-);
-
 describe('Mosaic Popover', () => {
   it('renders the trigger and opens the popup on click', async () => {
     const user = userEvent.setup();
     render(
-      <Popover trigger={trigger}>
-        <div>Panel body</div>
-      </Popover>,
+      <Popover.Root>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>
+          <div>Panel body</div>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(screen.queryByText('Panel body')).not.toBeInTheDocument();
@@ -38,14 +32,32 @@ describe('Mosaic Popover', () => {
     expect(screen.getByText('Panel body')).toBeInTheDocument();
   });
 
+  it('renders a custom trigger through the render prop', () => {
+    render(
+      <Popover.Root>
+        <Popover.Trigger
+          render={props => (
+            <a
+              href='#account'
+              {...props}
+            >
+              Open
+            </a>
+          )}
+        />
+        <Popover.Popup>Body</Popover.Popup>
+      </Popover.Root>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('aria-haspopup', 'dialog');
+  });
+
   it('carries the mosaic slot classes on the positioner and popup', () => {
     render(
-      <Popover
-        defaultOpen
-        trigger={trigger}
-      >
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>Body</Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(document.querySelector('.cl-popover-positioner')).toBeInTheDocument();
@@ -54,12 +66,10 @@ describe('Mosaic Popover', () => {
 
   it('defaults the popup to the md size and reflects it as data-size', () => {
     render(
-      <Popover
-        defaultOpen
-        trigger={trigger}
-      >
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>Body</Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(document.querySelector('.cl-popover-popup')).toHaveAttribute('data-size', 'md');
@@ -67,32 +77,25 @@ describe('Mosaic Popover', () => {
 
   it('reflects an explicit size as data-size', () => {
     render(
-      <Popover
-        defaultOpen
-        size='lg'
-        trigger={trigger}
-      >
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup size='lg'>Body</Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(document.querySelector('.cl-popover-popup')).toHaveAttribute('data-size', 'lg');
   });
 
-  it('merges consumer className and style onto a part', () => {
+  it('merges consumer className and style onto the popup', () => {
     render(
       <Popover.Root defaultOpen>
-        <Popover.Trigger render={trigger} />
-        <Popover.Portal>
-          <Popover.Positioner>
-            <Popover.Popup
-              className='my-popup'
-              style={{ marginTop: '8px' }}
-            >
-              Body
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup
+          className='my-popup'
+          style={{ marginTop: '8px' }}
+        >
+          Body
+        </Popover.Popup>
       </Popover.Root>,
     );
 
@@ -104,13 +107,13 @@ describe('Mosaic Popover', () => {
   it('closes via Popover.Close', async () => {
     const user = userEvent.setup();
     render(
-      <Popover
-        defaultOpen
-        trigger={trigger}
-      >
-        <div>Body</div>
-        <Popover.Close>Dismiss</Popover.Close>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>
+          <div>Body</div>
+          <Popover.Close>Dismiss</Popover.Close>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(screen.getByText('Body')).toBeInTheDocument();
@@ -122,9 +125,12 @@ describe('Mosaic Popover', () => {
     const user = userEvent.setup();
     render(
       <div>
-        <Popover trigger={trigger}>
-          <div>Body</div>
-        </Popover>
+        <Popover.Root>
+          <Popover.Trigger>Open</Popover.Trigger>
+          <Popover.Popup>
+            <div>Body</div>
+          </Popover.Popup>
+        </Popover.Root>
         <div data-testid='outside'>outside</div>
       </div>,
     );
@@ -139,9 +145,12 @@ describe('Mosaic Popover', () => {
   it('closes when the trigger is clicked while open', async () => {
     const user = userEvent.setup();
     render(
-      <Popover trigger={trigger}>
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>
+          <div>Body</div>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     const button = screen.getByRole('button', { name: 'Open' });
@@ -156,13 +165,12 @@ describe('Mosaic Popover', () => {
   it('names the dialog from aria-label and does not warn', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <Popover
-        defaultOpen
-        aria-label='Account'
-        trigger={trigger}
-      >
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup aria-label='Account'>
+          <div>Body</div>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
@@ -174,12 +182,12 @@ describe('Mosaic Popover', () => {
   it('warns when the dialog has no accessible name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <Popover
-        defaultOpen
-        trigger={trigger}
-      >
-        <div>Body</div>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>
+          <div>Body</div>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     await settle();
@@ -190,12 +198,12 @@ describe('Mosaic Popover', () => {
   it('does not warn when a Popover.Title supplies the name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
-      <Popover
-        defaultOpen
-        trigger={trigger}
-      >
-        <Popover.Title>Account</Popover.Title>
-      </Popover>,
+      <Popover.Root defaultOpen>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup>
+          <Popover.Title>Account</Popover.Title>
+        </Popover.Popup>
+      </Popover.Root>,
     );
 
     expect(screen.getByRole('dialog', { name: 'Account' })).toBeInTheDocument();
@@ -208,12 +216,8 @@ describe('Mosaic Popover', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(
       <Popover.Root defaultOpen>
-        <Popover.Trigger render={trigger} />
-        <Popover.Portal>
-          <Popover.Positioner>
-            <Popover.Popup ref={ref}>Body</Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
+        <Popover.Trigger>Open</Popover.Trigger>
+        <Popover.Popup ref={ref}>Body</Popover.Popup>
       </Popover.Root>,
     );
 
