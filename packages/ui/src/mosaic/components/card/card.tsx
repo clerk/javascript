@@ -6,22 +6,32 @@ import { TextContext } from '../text';
 import { headerAlignments, styles } from './card.styles';
 
 type CardAlignment = 'start' | 'center';
+type CardElevation = 'raised' | 'flush';
 
-const CardVariantContext = React.createContext<{ alignment: CardAlignment }>({ alignment: 'start' });
+const CardVariantContext = React.createContext<{ alignment: CardAlignment; elevation: CardElevation }>({
+  alignment: 'start',
+  elevation: 'raised',
+});
 
 export interface CardProps extends React.ComponentPropsWithoutRef<'div'> {
   alignment?: CardAlignment;
+  elevation?: CardElevation;
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { alignment = 'start', children, className, style, ...props },
+  { alignment = 'start', elevation = 'raised', children, className, style, ...props },
   ref,
 ) {
   return (
-    <CardVariantContext.Provider value={{ alignment }}>
+    <CardVariantContext.Provider value={{ alignment, elevation }}>
       <div
         ref={ref}
-        {...mergeStyleProps(themeProps('card-root', { alignment }), stylex.props(styles.root), className, style)}
+        {...mergeStyleProps(
+          themeProps('card-root', { alignment, elevation }),
+          stylex.props(styles.root, styles[elevation]),
+          className,
+          style,
+        )}
         {...props}
       >
         {children}
@@ -68,10 +78,16 @@ const Footer = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'
   { className, style, ...props },
   ref,
 ) {
+  const { elevation } = React.useContext(CardVariantContext);
   return (
     <div
       ref={ref}
-      {...mergeStyleProps(themeProps('card-footer'), stylex.props(styles.footer), className, style)}
+      {...mergeStyleProps(
+        themeProps('card-footer', { elevation }),
+        stylex.props(styles.footer, styles[`footer-${elevation}`]),
+        className,
+        style,
+      )}
       {...props}
     />
   );

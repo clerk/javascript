@@ -4,17 +4,25 @@ import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
+    color: colorVars['--cl-color-card-foreground'],
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: space['5'],
+    width: '100%',
+  },
+  raised: {
     borderRadius: radiusVars['--cl-radius-container'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
                 0 24px 24px -10px oklch(0.2046 0 0 / 4%),
                 0 0 0 1px oklch(0.2046 0 0 / 4%)`,
-    color: colorVars['--cl-color-card-foreground'],
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: space['5'],
-    width: '100%',
+  },
+  flush: {
+    borderRadius: 0,
+    overflow: 'visible',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
   },
   header: {
     paddingInline: space['4'],
@@ -33,15 +41,21 @@ export const styles = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['6'],
     alignItems: 'center',
-    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 4%, ${colorVars['--cl-color-card']})`,
     boxSizing: 'border-box',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'space-between',
+    width: '100%',
+  },
+  'footer-raised': {
+    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-card-foreground']} 4%, ${colorVars['--cl-color-card']})`,
     borderTopColor: colorVars['--cl-color-border'],
     borderTopStyle: 'solid',
     borderTopWidth: '1px',
-    width: '100%',
+  },
+  'footer-flush': {
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
   },
 });
 

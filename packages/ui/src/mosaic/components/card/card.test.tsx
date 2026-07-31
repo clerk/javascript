@@ -17,10 +17,12 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('root')).toHaveClass('cl-card-root');
     expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'start');
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'raised');
     expect(screen.getByTestId('header')).toHaveClass('cl-card-header');
     expect(screen.getByTestId('header')).toHaveAttribute('data-alignment', 'start');
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'raised');
   });
 
   it('reflects centered alignment on the root and header', () => {
@@ -35,6 +37,20 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('root')).toHaveAttribute('data-alignment', 'center');
     expect(screen.getByTestId('header')).toHaveAttribute('data-alignment', 'center');
+  });
+
+  it('reflects flush elevation on the root and footer', () => {
+    render(
+      <Card.Root
+        elevation='flush'
+        data-testid='root'
+      >
+        <Card.Footer data-testid='footer' />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'flush');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'flush');
   });
 
   it('provides the neutral text color to header copy', () => {
