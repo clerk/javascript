@@ -31,6 +31,7 @@ export interface PopoverProps {
   onOpenChange?: (open: boolean) => void;
   placement?: Placement;
   sideOffset?: number;
+  alignOffset?: number;
   modal?: boolean;
   /**
    * Where focus lands when the popup opens.
@@ -47,7 +48,14 @@ export interface PopoverProps {
 
 function PopoverInner(props: PopoverProps) {
   const nodeId = useFloatingNodeId();
-  const { placement: placementProp = 'bottom', sideOffset = 4, modal = false, initialFocus = 'auto', children } = props;
+  const {
+    placement: placementProp = 'bottom',
+    sideOffset = 4,
+    alignOffset = 0,
+    modal = false,
+    initialFocus = 'auto',
+    children,
+  } = props;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -71,7 +79,7 @@ function PopoverInner(props: PopoverProps) {
     onOpenChange: setOpen,
     placement: placementProp,
     middleware: [
-      offset(sideOffset),
+      offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
       flip({
         crossAxis: placementProp.includes('-'),
         fallbackAxisSideDirection: 'end',
