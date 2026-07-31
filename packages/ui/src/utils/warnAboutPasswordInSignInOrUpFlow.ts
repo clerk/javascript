@@ -19,7 +19,7 @@ function formatPasswordInSignInOrUpWarning(): string {
     `component cannot detect this and recover on its own. To make the flow work for new users, either`,
     `disable password on the instance or set the instance's preferred sign-in strategy to OTP.`,
     ``,
-    `Learn more: https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options`,
+    `Learn more: https://clerk.com/docs/guides/secure/user-enumeration-protection#sign-in-or-up-under-strict-protection`,
     `(code=sign_up_if_missing_password_preferred)`,
   ].join('\n');
 }
