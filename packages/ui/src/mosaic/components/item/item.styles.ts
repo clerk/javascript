@@ -5,7 +5,7 @@ import { itemScope } from './item.markers.stylex';
 
 export const item = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-element'],
+    borderRadius: radiusVars['--cl-radius-lg'],
     outline: {
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,

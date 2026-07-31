@@ -40,10 +40,10 @@ export const styles = stylex.create({
   },
 });
 
-// shape — square shares the control radius with Button; circle rounds fully
+// shape — square shares its radius with Button; circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-control'] },
+  square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
 
 // size — square box; fallback text scales with the box via inherited font-size

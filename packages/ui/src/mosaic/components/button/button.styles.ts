@@ -73,7 +73,7 @@ export const styles = stylex.create({
       ':enabled:hover': durationVars['--cl-duration-instant'],
     },
     borderColor: 'transparent',
-    borderRadius: radiusVars['--cl-radius-control'],
+    borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
     // one ring for every color and variant — it reads as focus, not as the button's color
@@ -120,7 +120,7 @@ export const styles = stylex.create({
   // shape — icon buttons zero their inline padding; width tracks the height. Longhands because
   // StyleX ranks a longhand above a shorthand, so `paddingInline` would lose to what `sizes` sets.
   shapeSquare: {
-    borderRadius: radiusVars['--cl-radius-control'],
+    borderRadius: radiusVars['--cl-radius-md'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
   },
