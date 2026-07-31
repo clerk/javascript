@@ -88,6 +88,9 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
       ref={ref}
       src={src}
       alt={alt}
+      // An avatar is an identity mark, not content to pull out of the page — dragging one
+      // only ever produces a stray ghost image mid-interaction.
+      draggable={false}
       {...mergeStyleProps(themeProps('avatar-image'), stylex.props(reset.base, styles.image), className, style)}
       {...rest}
     />
