@@ -1,7 +1,9 @@
 /** @jsxImportSource @emotion/react */
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { ScrollArea } from '@clerk/ui/mosaic/components/scroll-area';
+import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Item } from '@clerk/ui/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
 import { Text } from '@clerk/ui/mosaic/components/text';
+import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -13,7 +15,7 @@ export { default as __source } from './scroll-area.component.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'ScrollArea',
-  source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.tsx',
+  source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
   styleEngine: 'stylex',
 };
 
@@ -26,25 +28,37 @@ const members = [
   'Barbara Liskov',
   'Frances Allen',
   'Jean Bartik',
-  'Karen Spärck Jones',
-  'Shafi Goldwasser',
 ];
 
 const rows = (names: string[] = members) =>
   names.map(name => (
-    <div
-      key={name}
-      style={{ borderBottom: '1px solid var(--cl-color-border)', padding: '0.75rem 1rem' }}
-    >
-      <Text>{name}</Text>
-    </div>
+    <Item.Root key={name}>
+      <Item.Media>
+        <Avatar.Root
+          size='fit'
+          shape='circle'
+        >
+          <Avatar.Fallback>{name[0]}</Avatar.Fallback>
+        </Avatar.Root>
+      </Item.Media>
+      <Item.Content>
+        <Item.Title>{name}</Item.Title>
+      </Item.Content>
+    </Item.Root>
   ));
 
+// The scroll surface goes straight onto the `Item.Group` that already scrolls — no wrapper
+// element, and the group keeps its own `.cl-item-group` slot, which stays the hook a theme
+// targets. `scrollAreaRoot` is on the outer box only so overlays have something to anchor to;
+// a group whose parent is already positioned doesn't need it.
 export function Default() {
   return (
-    <ScrollArea.Root style={{ height: 220, width: 320 }}>
-      <ScrollArea.Viewport>{rows()}</ScrollArea.Viewport>
-    </ScrollArea.Root>
+    <div
+      style={{ height: 220, width: 320 }}
+      {...stylex.props(scrollAreaRoot)}
+    >
+      <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows()}</Item.Group>
+    </div>
   );
 }
 
@@ -53,9 +67,12 @@ export function Default() {
 // indicators are the resting state rather than something switched off.
 export function NotScrollable() {
   return (
-    <ScrollArea.Root style={{ height: 220, width: 320 }}>
-      <ScrollArea.Viewport>{rows(members.slice(0, 3))}</ScrollArea.Viewport>
-    </ScrollArea.Root>
+    <div
+      style={{ height: 220, width: 320 }}
+      {...stylex.props(scrollAreaRoot)}
+    >
+      <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows(members.slice(0, 2))}</Item.Group>
+    </div>
   );
 }
 
@@ -69,29 +86,34 @@ export function NotScrollable() {
 // space, so there is no gutter for either value to hold open.
 export function Gutter() {
   const [overflowing, setOverflowing] = React.useState(true);
-  const content = overflowing ? rows() : rows(members.slice(0, 3));
+  const content = overflowing ? rows() : rows(members.slice(0, 2));
 
   return (
     <div style={{ display: 'grid', gap: '1rem', justifyItems: 'start' }}>
-      <Button
-        size='sm'
-        variant='outline'
+      <button
+        type='button'
         onClick={() => setOverflowing(value => !value)}
       >
         {overflowing ? 'Shrink content below the threshold' : 'Grow content past the threshold'}
-      </Button>
+      </button>
       <div style={{ display: 'flex', gap: '1.5rem' }}>
         <div style={{ display: 'grid', gap: '0.5rem' }}>
-          <ScrollArea.Root style={{ border: '1px solid var(--cl-color-border)', height: 220, width: 260 }}>
-            <ScrollArea.Viewport gutter='stable'>{content}</ScrollArea.Viewport>
-          </ScrollArea.Root>
-          <Text size='sm'>gutter=&quot;stable&quot; — rows never move</Text>
+          <div
+            style={{ border: '1px solid var(--cl-color-border)', height: 220, width: 260 }}
+            {...stylex.props(scrollAreaRoot)}
+          >
+            <Item.Group {...stylex.props(...scrollAreaViewport('stable'))}>{content}</Item.Group>
+          </div>
+          <Text size='sm'>stable — rows never move</Text>
         </div>
         <div style={{ display: 'grid', gap: '0.5rem' }}>
-          <ScrollArea.Root style={{ border: '1px solid var(--cl-color-border)', height: 220, width: 260 }}>
-            <ScrollArea.Viewport gutter='auto'>{content}</ScrollArea.Viewport>
-          </ScrollArea.Root>
-          <Text size='sm'>gutter=&quot;auto&quot; — rows widen when the scrollbar goes</Text>
+          <div
+            style={{ border: '1px solid var(--cl-color-border)', height: 220, width: 260 }}
+            {...stylex.props(scrollAreaRoot)}
+          >
+            <Item.Group {...stylex.props(...scrollAreaViewport('auto'))}>{content}</Item.Group>
+          </div>
+          <Text size='sm'>auto — rows widen when the scrollbar goes</Text>
         </div>
       </div>
     </div>
@@ -99,9 +121,8 @@ export function Gutter() {
 }
 
 // Theme tokens rather than component variables, so they can be set anywhere in the cascade —
-// on the element, on a wrapper, or once at `:root` to retune every scrolling surface in
-// Mosaic at the same time. Scoped to a wrapper class here so the demo doesn't retheme the
-// rest of the page.
+// on the element, on a wrapper, or once at `:root` to retune every scrolling surface in Mosaic
+// at the same time. Scoped to a wrapper class here so the demo doesn't retheme the page.
 export function Tuning() {
   return (
     <>
@@ -111,38 +132,36 @@ export function Tuning() {
           --cl-scroll-fade-range: 3rem;  /* how far you scroll before it's at full strength */
         }
       `}</style>
-      <ScrollArea.Root
+      <div
         className='tuned-scroll-area'
         style={{ height: 220, width: 320 }}
+        {...stylex.props(scrollAreaRoot)}
       >
-        <ScrollArea.Viewport>{rows()}</ScrollArea.Viewport>
-      </ScrollArea.Root>
+        <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows()}</Item.Group>
+      </div>
     </>
   );
 }
 
-// The indicators are a theme decision, so swapping the mask for something else needs no prop
-// and no JavaScript — just CSS.
+// The indicators are a theme decision, so swapping the mask for something else needs no
+// JavaScript — just CSS. `mask-image: none` retires the default treatment and the two progress
+// vars stay readable for whatever replaces it.
 //
-// `mask-image: none` retires the default treatment, and the two progress vars stay readable
-// for whatever replaces it. Here they drive the opacity of a pair of gradient overlays.
-//
-// Three things worth copying. The overlays hang off the VIEWPORT, because that is the element
-// the scroll-driven animations write the vars onto (they inherit downward, not up to the
-// root). They are absolutely positioned rather than sticky, so they overlay the content
-// instead of taking space in the scroll flow the way a sticky pseudo-element would. And the
-// scrim is mixed from a theme token rather than hardcoded black — a black scrim darkens a
-// dark surface, which is indistinguishable from the mask it replaced, so the indicator has to
-// flip with the theme the way `--cl-color-card-foreground` does.
+// Three things worth copying. The overlays hang off the element the atoms were applied to,
+// because that is what the animations write the vars onto — here `.cl-item-group`, since the
+// styles ride on a slot that already exists rather than a wrapper of their own. They are
+// absolutely positioned rather than sticky, so they overlay the content instead of taking space
+// in the scroll flow. And the scrim is mixed from a theme token rather than hardcoded black,
+// which would darken a dark surface and be indistinguishable from the mask it replaced.
 export function CustomIndicators() {
   return (
     <>
       <style>{`
-        .shadow-indicators .cl-scroll-area-viewport {
+        .shadow-indicators .cl-item-group {
           mask-image: none;
         }
-        .shadow-indicators .cl-scroll-area-viewport::before,
-        .shadow-indicators .cl-scroll-area-viewport::after {
+        .shadow-indicators .cl-item-group::before,
+        .shadow-indicators .cl-item-group::after {
           content: '';
           position: absolute;
           left: 0;
@@ -150,23 +169,24 @@ export function CustomIndicators() {
           height: 2rem;
           pointer-events: none;
         }
-        .shadow-indicators .cl-scroll-area-viewport::before {
+        .shadow-indicators .cl-item-group::before {
           top: 0;
           background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-start);
         }
-        .shadow-indicators .cl-scroll-area-viewport::after {
+        .shadow-indicators .cl-item-group::after {
           bottom: 0;
           background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-end);
         }
       `}</style>
-      <ScrollArea.Root
+      <div
         className='shadow-indicators'
         style={{ height: 220, width: 320 }}
+        {...stylex.props(scrollAreaRoot)}
       >
-        <ScrollArea.Viewport>{rows()}</ScrollArea.Viewport>
-      </ScrollArea.Root>
+        <Item.Group {...stylex.props(...scrollAreaViewport())}>{rows()}</Item.Group>
+      </div>
     </>
   );
 }
