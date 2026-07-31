@@ -1,0 +1,228 @@
+import * as ScrollAreaStories from './scroll-area.component.stories';
+
+# ScrollArea
+
+The Mosaic `ScrollArea` — a vertically scrolling region that fades its content at whichever edge
+still has something to reveal, so the boundary of a list reads as "there's more" rather than as a
+hard cut.
+
+The fade is **pure CSS**. Two scroll-driven animations write a progress var per edge, and a mask
+reads them. Nothing runs in JavaScript, there is no primitive behind it, and no measurement happens
+at runtime. Because the fade is a mask rather than a sticky overlay element, it is paint-only and
+**cannot shift the content** — the classic sticky-pseudo-element approach takes space in the scroll
+flow, this doesn't.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ScrollAreaStories}
+/>
+
+## Usage
+
+Two parts. `ScrollArea.Root` is the box the region occupies; `ScrollArea.Viewport` is the scroll
+container that owns the overflow, the timelines and the mask. Give the root a height — the viewport
+fills it.
+
+```tsx
+import { ScrollArea } from '@clerk/ui/mosaic/components/scroll-area';
+
+<ScrollArea.Root style={{ height: 220 }}>
+  <ScrollArea.Viewport>{members.map(m => <MemberRow key={m.id} {...m} />)}</ScrollArea.Viewport>
+</ScrollArea.Root>;
+```
+
+### Nothing to scroll
+
+When the content fits, both scroll timelines are inactive, both progress vars hold at their
+registered `initial-value: 0`, and the mask resolves to fully opaque. No indicators appear, and
+nothing had to detect that — the resting state is already the hidden one.
+
+<Story
+  name='NotScrollable'
+  storyModule={ScrollAreaStories}
+/>
+
+### Gutter
+
+`gutter` on `ScrollArea.Viewport` decides whether the scrollbar's space is held open.
+
+`auto` (the default, and CSS's own) takes the space only while the content overflows. `stable`
+reserves it either way, so a collection that crosses the overflow threshold doesn't shift its rows
+sideways.
+
+<Story
+  name='Gutter'
+  storyModule={ScrollAreaStories}
+/>
+
+Two conditions have to hold before the values differ at all, which is why the difference is easy to
+miss:
+
+1. **The scrollbars have to be space-consuming.** Windows and Linux always are; macOS only is with a
+   mouse connected, or with **System Settings → Appearance → Show scroll bars → Always**. Overlay
+   scrollbars are painted over the content and reserve nothing, so there is no gutter for either
+   value to hold open.
+2. **The content has to be able to stop overflowing.** `auto` reserves space whenever a scrollbar is
+   actually present, so with permanently-overflowing content the two are identical. The divergence
+   only appears when the content fits: `stable` keeps the gutter, `auto` gives it back.
+
+Both conditions matter, and the second is the one that usually explains an apparently broken demo —
+hence the toggle above. On a space-consuming platform, crossing the threshold makes the `auto`
+column's rows jump sideways while `stable` holds still.
+
+**Reach for `stable` only when the content can change height in place** — a filterable list, a
+paginated table, anything that gains or loses rows without navigating away. There the shift fires
+mid-interaction, while the user is typing in a search box, and reads as a bug. Everywhere else it is
+pure cost: a permanently reserved gutter beside a list that may never scroll.
+
+Neither value helps with the macOS mode switch itself. `scrollbar-gutter` is a no-op while
+scrollbars overlay, so connecting a mouse narrows the content the first time a real scrollbar
+appears no matter which you pick.
+
+The scrollbar's **size** is not a prop — see `--cl-scrollbar-width` below.
+
+### Tuning the fade
+
+<Story
+  name='Tuning'
+  storyModule={ScrollAreaStories}
+/>
+
+## Parts
+
+| Part                  | Slot                   | Description                                                      |
+| --------------------- | ---------------------- | ---------------------------------------------------------------- |
+| `ScrollArea.Root`     | `scroll-area-root`     | The box the region occupies. Positioned, so overlays can anchor. |
+| `ScrollArea.Viewport` | `scroll-area-viewport` | The scroll container; owns overflow, the timelines and the mask. |
+
+### Props
+
+Only `ScrollArea.Viewport` takes a prop of its own; `ScrollArea.Root` is a plain `div`. Both accept
+the usual `className` / `style` escape hatches and forward every other native `div` prop.
+
+| Prop     | Type                 | Default  | Description                                 |
+| -------- | -------------------- | -------- | ------------------------------------------- |
+| `gutter` | `'stable' \| 'auto'` | `'auto'` | Whether the scrollbar's space is held open. |
+
+## Styling
+
+Themed with **StyleX**. Each part carries a stable `.cl-<slot>` class alongside the StyleX atoms;
+consumers never target the hashed atomic classes.
+
+### Variables
+
+| Variable                           | Default  | Description                                                     |
+| ---------------------------------- | -------- | --------------------------------------------------------------- |
+| `--cl-scroll-area-progress-start`  | `0`      | 0 → 1 as the top edge gains something to reveal. **Read-only.** |
+| `--cl-scroll-area-progress-end`    | `0`      | 1 → 0 as the bottom edge runs out to reveal. **Read-only.**     |
+| `--cl-scroll-area-fade-size`       | `1.5rem` | Height of the fade band.                                        |
+| `--cl-scroll-area-fade-range`      | `1.5rem` | How far you scroll before the fade reaches full strength.       |
+| `--cl-scroll-area-scrollbar-inset` | `0px`    | Width at the inline end the fade is held back from.             |
+
+The two progress vars are registered with `@property` so they interpolate; the animations write
+them, so setting them yourself has no effect. They live on the **viewport** and inherit downward, so
+anything reading them must be the viewport or a descendant of it — not the root.
+
+Plus one token that is **not** scoped to this component, because Mosaic has no reason to size
+scrollbars differently between components — set it once and every scrolling surface follows:
+
+| Token                  | Default | Description                           |
+| ---------------------- | ------- | ------------------------------------- |
+| `--cl-scrollbar-width` | `thin`  | `auto`, `thin`, or `none`. See below. |
+
+`thin` rather than the platform default, because these regions are compact panels where a ~17px bar
+reads heavy, and because `gutter: stable` means that width is content space given up whether or not
+anything is scrolling. The tradeoff is a smaller drag target on the platforms whose scrollbars are
+draggable at all — take it back with `auto`:
+
+```css
+:root {
+  --cl-scrollbar-width: auto;
+}
+```
+
+**Keyword-only, by spec.** `scrollbar-width` accepts `auto | thin | none` and _not_ a length, so
+there is no `--cl-scrollbar-width: 8px`. A real pixel width exists only through
+`::-webkit-scrollbar`, which Firefox ignores outright and which Chrome 121+ discards as soon as
+`scrollbar-color` is set — so exposing this as a length would be a promise the platform can't keep.
+
+### Replacing the indicators
+
+The treatment is a theme decision, so swapping it needs no prop and no JavaScript. Set
+`mask-image: none` to retire the default fade and read the progress vars to drive whatever replaces
+it.
+
+<Story
+  name='CustomIndicators'
+  storyModule={ScrollAreaStories}
+/>
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+.cl-scroll-area-viewport {
+  mask-image: none;
+}
+.cl-scroll-area-viewport::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
+  opacity: var(--cl-scroll-area-progress-start);
+}
+```
+
+Position such overlays absolutely rather than with `position: sticky` — a sticky pseudo-element
+participates in the scroll flow and takes space from the content, which is the layout shift the mask
+approach avoids in the first place.
+
+Mix the scrim from a theme color rather than hardcoding black. A black scrim darkens a dark surface,
+which looks identical to the mask it was meant to replace, so the indicator silently stops reading
+as one in dark mode. `--cl-color-card-foreground` is `light-dark()`-backed and inverts to near-white
+on a dark surface, so the same rule gives a shadow in light mode and a glow in dark.
+
+### The scrollbar inset
+
+`--cl-scroll-area-scrollbar-inset` holds the fade back from a strip at the inline end, so a
+space-consuming scrollbar isn't faded along with the content.
+
+It defaults to `0px` because **CSS cannot measure a scrollbar**. The width differs per platform and
+per browser, `scrollbar-width: thin` changes it again, and on macOS it changes at runtime when a
+mouse is connected. Any non-zero default would be wrong more often than right — and where the
+scrollbar overlays, which is the common case, there is nothing to hold back from. Set it only when
+you know the platform you're targeting.
+
+```css
+.cl-scroll-area-viewport {
+  --cl-scroll-area-scrollbar-inset: 15px;
+}
+```
+
+### Browser support
+
+The indicators are a progressive enhancement. Without support for scroll-driven animations the
+progress vars hold at 0, the mask resolves to fully opaque, and the result is a plain scroll area —
+not a broken one. The `animation-name` is gated behind `@supports (animation-timeline: scroll())`
+for exactly this reason: an ungated animation would run on the document timeline at the default `0s`
+duration and paint both fades permanently.
+
+### Keyboard access
+
+Chrome and Firefox make an overflowing scroll container keyboard-focusable on their own; Safari does
+not, so a keyboard-only user cannot scroll it there. `ScrollArea.Viewport` deliberately does **not**
+set `tabIndex` — an always-present tab stop is wrong for a region that is often not scrollable. Pass
+it yourself, with an accessible name, where the content is known to overflow:
+
+```tsx
+<ScrollArea.Viewport
+  tabIndex={0}
+  role='region'
+  aria-label='Members'
+>
+  {members}
+</ScrollArea.Viewport>
+```

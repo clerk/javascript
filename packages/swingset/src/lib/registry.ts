@@ -94,6 +94,14 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  CustomIndicators as ScrollAreaCustomIndicators,
+  Default as ScrollAreaDefault,
+  Gutter as ScrollAreaGutter,
+  meta as scrollAreaMeta,
+  NotScrollable as ScrollAreaNotScrollable,
+  Tuning as ScrollAreaTuning,
+} from '../stories/scroll-area.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -169,6 +177,15 @@ const popoverComponentModule: StoryModule = {
   Alignment: PopoverComponentAlignment,
 };
 
+const scrollAreaModule: StoryModule = {
+  meta: scrollAreaMeta,
+  Default: ScrollAreaDefault,
+  NotScrollable: ScrollAreaNotScrollable,
+  Gutter: ScrollAreaGutter,
+  Tuning: ScrollAreaTuning,
+  CustomIndicators: ScrollAreaCustomIndicators,
+};
+
 const itemModule: StoryModule = {
   meta: itemMeta,
   Default: ItemDefault,
@@ -239,6 +256,7 @@ export const registry: StoryModule[] = [
   iconModule,
   menuComponentModule,
   popoverComponentModule,
+  scrollAreaModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.
