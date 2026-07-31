@@ -95,7 +95,13 @@ function isMergeableBody(body: unknown): body is Record<string, unknown> | undef
   if (body === undefined) {
     return true;
   }
-  return typeof body === 'object' && body !== null && !(body instanceof FormData) && !(body instanceof URLSearchParams);
+  if (typeof body !== 'object' || body === null) {
+    return false;
+  }
+  // Spreading anything else — a Blob, a typed array, a stream — would discard the caller's payload
+  // rather than add to it.
+  const prototype = Object.getPrototypeOf(body);
+  return prototype === Object.prototype || prototype === null;
 }
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
@@ -228,7 +234,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // param also keeps the request CORS-simple; a custom header would trigger the preflight that
     // breaks cookie dropping in Safari, the same reason `_method` is a query param.
     if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
-      const protectParams = await options.getProtectParams();
+      // Protect can degrade a sign-in but must never fail one, so a rejection here costs the
+      // params and nothing else.
+      const protectParams = await options.getProtectParams().catch(() => undefined);
       if (protectParams) {
         body = { ...((body ?? {}) as Record<string, unknown>), ...protectParams } as unknown as BodyInit;
         requestInit.body = body;

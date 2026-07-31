@@ -2,7 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
 import type { ProtectLoader } from '@clerk/shared/types';
 
-import type { ProtectPlaceholders, ProtectRequestParams } from './protectSession';
+import type { ApplyLoader, ProtectPlaceholders, ProtectRequestParams } from './protectSession';
 import { interpolatePlaceholders, ProtectSession } from './protectSession';
 import type { Environment } from './resources';
 export class Protect {
@@ -26,29 +26,35 @@ export class Protect {
     // here rather than at end to mark as initialized even if load fails.
     this.#initialized = true;
 
+    // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
+    // down with it.
+    try {
+      this.#apply(config.loaders, config.id || undefined);
+    } catch (error) {
+      logger.warnOnce(`[protect] failed to load: ${error}`);
+    }
+  }
+
+  #apply(configured: ProtectLoader[], instanceId?: string): void {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
-    const loaders = config.loaders.filter(loader => inRollout(loader));
+    const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
 
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
     // not using it keeps today's behaviour and stores nothing in the browser.
-    this.#session = ProtectSession.create(loaders, config.id || undefined);
+    const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
+    this.#session = ProtectSession.create(loaders, instanceId, applyLoader);
 
-    // A token was already acquired in this browser session — possibly in another tab — so there
-    // is nothing left for the loaders to do. Reusing the shared token is the whole point:
-    // acquisition happens once per browser session, not once per tab per page load.
-    const alreadyAcquired = this.#session?.hasFreshToken() ?? false;
-
-    if (!alreadyAcquired) {
-      for (const loader of loaders) {
-        try {
-          const element = this.applyLoader(loader, this.#session?.placeholders());
-          if (element && this.#session?.isTokenLoader(loader)) {
-            this.#session.observeLoaderElement(element);
-          }
-        } catch (error) {
-          logger.warnOnce(`[protect] failed to apply loader: ${error}`);
-        }
+    for (const loader of loaders) {
+      // The session injects this one itself, under the acquisition lock, so exactly one tab per
+      // browser session runs it. Every other loader runs on every page load regardless.
+      if (this.#session?.isTokenLoader(loader)) {
+        continue;
+      }
+      try {
+        this.applyLoader(loader, this.#session?.placeholders());
+      } catch (error) {
+        logger.warnOnce(`[protect] failed to apply loader: ${error}`);
       }
     }
 
@@ -62,7 +68,11 @@ export class Protect {
    * does not participate. Never rejects, and never blocks past the acquisition deadline.
    */
   getRequestParams(): Promise<ProtectRequestParams | undefined> {
-    return this.#session?.getRequestParams() ?? Promise.resolve(undefined);
+    try {
+      return (this.#session?.getRequestParams() ?? Promise.resolve(undefined)).catch(() => undefined);
+    } catch {
+      return Promise.resolve(undefined);
+    }
   }
 
   // apply individual loader
@@ -91,7 +101,9 @@ export class Protect {
     }
 
     if (loader.textContent && typeof loader.textContent === 'string') {
-      element.textContent = loader.textContent;
+      element.textContent = placeholders
+        ? interpolatePlaceholders(loader.textContent, placeholders)
+        : loader.textContent;
     }
 
     switch (target) {
@@ -115,6 +127,16 @@ export class Protect {
         return undefined;
     }
   }
+}
+
+// A malformed entry is dropped on its own, the way a failed injection always has been — it must
+// not cost the instance its other loaders.
+function isLoader(loader: unknown): loader is ProtectLoader {
+  if (!loader || typeof loader !== 'object') {
+    logger.warnOnce(`[protect] loader entry is not an object: ${loader}`);
+    return false;
+  }
+  return true;
 }
 
 // we use rollout for percentage based rollouts (as the environment file is cached)

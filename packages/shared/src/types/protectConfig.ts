@@ -10,11 +10,12 @@ export interface ProtectLoader {
    * which are substituted before the element is appended. An unrecognised `{…}` is left verbatim.
    */
   attributes?: Record<string, string | number | boolean>;
+  /** Substituted in the same way as `attributes`. */
   textContent?: string;
   /**
-   * Where to acquire the Protect session token for this load. Placeholders are substituted as they
-   * are in `attributes`. Defaults to `token` resolved relative to the loader URL carrying the
-   * `{cid}`, which is correct whenever the `{cid}` appears as a path segment.
+   * Opts this loader into the upgrade mint: the Protect session token is fetched from here instead
+   * of being taken from the one served inline with the loader itself. Placeholders are substituted
+   * as they are in `attributes`. Only this path can report `fetch_error` or an HTTP status.
    */
   tokenUrl?: string;
   /**

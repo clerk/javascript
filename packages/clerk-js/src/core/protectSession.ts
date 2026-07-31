@@ -6,9 +6,14 @@ import { SafeLock } from './auth/safeLock';
  * Correlation id and Protect session token acquisition.
  *
  * The browser mints an opaque correlation id (`cid`) and hands it to the loader through the
- * element's attributes, which are per-instance server config. The server then issues a signed
- * session token, which we acquire exactly once per browser session across all tabs and attach
- * to sign-in and sign-up requests.
+ * element's attributes, which are per-instance server config. The server mints a signed session
+ * token while serving that loader and returns it inline on the script's own global, so the gate
+ * costs no extra round trip. We acquire it exactly once per browser session across all tabs and
+ * attach it to sign-in and sign-up requests.
+ *
+ * An instance that configures `tokenUrl` gets the upgrade mint instead: a `GET` for a token that
+ * attests to work happening after the script runs. Only that path can report `fetch_error` or
+ * `http_<n>`.
  *
  * Acquisition failure is never fatal: a structured status travels in the token's place so that
  * a blocked or failed acquisition becomes a reportable fact rather than silence.
@@ -20,10 +25,21 @@ const PID_STORAGE_KEY = '__clerk_protect_pid';
 const TOKEN_STORAGE_KEY = '__clerk_protect_st';
 const ACQUISITION_LOCK_KEY = 'clerk.lock.protectSessionToken';
 
+/** Where the loader script leaves the token it was served with. */
+const INLINE_TOKEN_GLOBAL = '__clerk_specter';
+
 /** A token this close to expiry is treated as absent, so a fresh run starts before it lapses. */
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 /** Acquisition deadline when the instance does not configure one. */
 const DEFAULT_TOKEN_TIMEOUT_MS = 5 * 1_000;
+/** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
+const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
+/** A stored token claiming more remaining life than this was not minted by us. */
+const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
+/** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
+const MAX_TOKEN_LENGTH = 4_096;
+/** How long a settled, tokenless acquisition is reused before a fresh run is allowed. */
+const REACQUIRE_COOLDOWN_MS = 30 * 1_000;
 /** Bounds we hold the server-supplied `retry_in_ms` to. */
 const MIN_RETRY_DELAY_MS = 50;
 const MAX_RETRY_DELAY_MS = 1_000;
@@ -39,10 +55,14 @@ export const CID_REGEX = /^1-[a-z2-7]{26}-[a-z2-7]{26}$/;
 const PLACEHOLDER_REGEX = /\{(cid|pid|rid|instance_id)\}/g;
 /** Non-global twin of the above, so `test` does not carry `lastIndex` between calls. */
 const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|instance_id)\}/;
+/** The placeholders that need a minted, persisted client id to substitute. */
+const HAS_CLIENT_ID_REGEX = /\{(?:cid|pid|rid)\}/;
+/** Only the correlation id binds a loader to a Specter run, so only it names the token loader. */
+const HAS_CID_REGEX = /\{cid\}/;
 
 /**
  * Closed set — FAPI validates these by exact match and drops anything else, so a new value here
- * is a wire change.
+ * is a wire change. `fetch_error` and `http_<n>` are reachable only through the upgrade mint.
  */
 export type ProtectStatus = 'ok' | 'timeout' | 'script_error' | 'fetch_error' | 'unsupported' | `http_${number}`;
 
@@ -60,12 +80,17 @@ export type ProtectRequestParams = {
   __clerk_protect_cid?: string;
 };
 
+/** Appends a loader element to the document and returns it, or `undefined` when it cannot. */
+export type ApplyLoader = (loader: ProtectLoader, placeholders: ProtectPlaceholders) => HTMLElement | undefined;
+
 type StoredToken = {
   token: string;
   /** Unix seconds, as served by the token endpoint. */
   exp: number;
   rid: string;
 };
+
+type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
 /**
  * Substitutes the closed placeholder set. A recognised placeholder with no value available, and
@@ -123,6 +148,11 @@ export function buildCid(pid: string, rid: string): string {
  */
 const memoryStore = new Map<string, string>();
 
+/** Test-only: the fallback outlives any single session, so a suite has to be able to clear it. */
+export function __internal_resetProtectStorage(): void {
+  memoryStore.clear();
+}
+
 function localStorageOrNull(): Storage | null {
   try {
     return globalThis.localStorage ?? null;
@@ -133,13 +163,15 @@ function localStorageOrNull(): Storage | null {
 
 function readStored(key: string): string | null {
   try {
-    const storage = localStorageOrNull();
-    if (storage) {
-      return storage.getItem(key);
+    const value = localStorageOrNull()?.getItem(key);
+    if (typeof value === 'string') {
+      return value;
     }
   } catch {
-    // blocked — the in-memory fallback is the only copy there is
+    // blocked — the in-memory fallback below is the only copy there is
   }
+  // Reached when storage is absent, blocked, or readable but not writable: a write that hit the
+  // quota landed in memory instead, and this is the only place it can be read back from.
   return memoryStore.get(key) ?? null;
 }
 
@@ -148,6 +180,7 @@ function writeStored(key: string, value: string): void {
     const storage = localStorageOrNull();
     if (storage) {
       storage.setItem(key, value);
+      memoryStore.delete(key);
       return;
     }
   } catch {
@@ -175,8 +208,8 @@ function readOrMintPid(): string | null {
  * present: the acquisition path demands a margin so a run starts before the token lapses, while
  * the request path takes anything not yet expired.
  */
-function readStoredToken(marginMs: number): StoredToken | null {
-  const raw = readStored(TOKEN_STORAGE_KEY);
+function readStoredToken(key: string, marginMs: number): StoredToken | null {
+  const raw = readStored(key);
   if (!raw) {
     return null;
   }
@@ -193,29 +226,62 @@ function readStoredToken(marginMs: number): StoredToken | null {
   }
 
   const { token, exp, rid } = parsed as Record<string, unknown>;
-  if (typeof token !== 'string' || !token) {
+  if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid)) {
+    return null;
+  }
+
+  const validated = validateToken(token, exp, marginMs);
+  return validated ? { ...validated, rid } : null;
+}
+
+/**
+ * The store is writable by anything running on the origin, so a value that could not have come
+ * from a mint of ours is discarded rather than trusted to suppress the loaders.
+ */
+function validateToken(token: unknown, exp: unknown, marginMs: number): { token: string; exp: number } | null {
+  if (typeof token !== 'string' || !token || token.length > MAX_TOKEN_LENGTH) {
     return null;
   }
   if (typeof exp !== 'number' || !Number.isFinite(exp)) {
     return null;
   }
-  if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid)) {
+  const expMs = exp * 1_000;
+  if (expMs - marginMs <= Date.now() || expMs > Date.now() + MAX_TOKEN_LIFETIME_MS) {
     return null;
   }
-  if (exp * 1_000 - marginMs <= Date.now()) {
-    return null;
-  }
-
-  return { token, exp, rid };
+  return { token, exp };
 }
 
-function writeStoredToken(value: StoredToken): void {
-  writeStored(TOKEN_STORAGE_KEY, JSON.stringify(value));
+function writeStoredToken(key: string, value: StoredToken): void {
+  writeStored(key, JSON.stringify(value));
+}
+
+/** The token the loader script was served with, when it is for the run we started. */
+function readInlineToken(cid: string, rid: string): StoredToken | null {
+  const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
+  if (!inline || typeof inline !== 'object') {
+    return null;
+  }
+
+  const { cid: mintedFor, token, exp } = inline as Record<string, unknown>;
+  // The global is page-visible and outlives a navigation; a token minted for anyone else's run is
+  // not ours to send.
+  if (mintedFor !== cid) {
+    return null;
+  }
+
+  const validated = validateToken(token, exp, 0);
+  return validated ? { ...validated, rid } : null;
 }
 
 function httpStatus(status: number): ProtectStatus {
   // The status enum only admits `http_1xx`-`http_5xx`; anything else would be dropped by FAPI.
   return status >= 100 && status <= 599 ? (`http_${status}` as ProtectStatus) : 'fetch_error';
+}
+
+/** Worth spending the rest of the deadline on rather than reporting as the outcome. */
+function isRetryableStatus(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500;
 }
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
@@ -232,84 +298,89 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
   });
 }
 
-/**
- * Resolves the token endpoint for a loader.
- *
- * `tokenUrl` is the explicit form: like every other part of the loader it is instance config, so a
- * new placement ships without an SDK release. When it is absent we resolve `token` relative to the
- * loader URL that carries the `{cid}`. Any placement where the `{cid}` is not a path segment has
- * to declare `tokenUrl` explicitly.
- */
-function resolveTokenUrl(loader: ProtectLoader, placeholders: ProtectPlaceholders): string | undefined {
-  const base = typeof document !== 'undefined' ? document.baseURI : undefined;
+/** Resolves to `timeout` rather than waiting past `ms`, and never rejects. */
+function withDeadline(promise: Promise<ProtectStatus>, ms: number): Promise<ProtectStatus> {
+  return new Promise(resolve => {
+    const timer = setTimeout(() => resolve('timeout'), ms);
+    const settle = (status: ProtectStatus) => {
+      clearTimeout(timer);
+      resolve(status);
+    };
+    promise.then(settle, () => settle('timeout'));
+  });
+}
 
-  if (typeof loader.tokenUrl === 'string' && loader.tokenUrl) {
-    try {
-      return new URL(interpolatePlaceholders(loader.tokenUrl, placeholders), base).href;
-    } catch {
-      return undefined;
-    }
+/** Every string a loader can carry a placeholder in. */
+function templatedValues(loader: ProtectLoader): string[] {
+  const values: string[] = [];
+  if (typeof loader.tokenUrl === 'string') {
+    values.push(loader.tokenUrl);
   }
-
+  if (typeof loader.textContent === 'string') {
+    values.push(loader.textContent);
+  }
   for (const value of Object.values(loader.attributes ?? {})) {
-    if (typeof value !== 'string' || !value.includes('{cid}')) {
-      continue;
-    }
-    try {
-      return new URL('token', new URL(interpolatePlaceholders(value, placeholders), base)).href;
-    } catch {
-      // not a URL-bearing attribute
+    if (typeof value === 'string') {
+      values.push(value);
     }
   }
-
-  return undefined;
+  return values;
 }
 
 /** Does this loader reference anything we would substitute? */
 function isTemplated(loader: ProtectLoader): boolean {
-  if (typeof loader.tokenUrl === 'string' && HAS_PLACEHOLDER_REGEX.test(loader.tokenUrl)) {
-    return true;
-  }
-  return Object.values(loader.attributes ?? {}).some(
-    value => typeof value === 'string' && HAS_PLACEHOLDER_REGEX.test(value),
-  );
+  return templatedValues(loader).some(value => HAS_PLACEHOLDER_REGEX.test(value));
+}
+
+/** Does this loader need the persisted client id, as opposed to only the instance id? */
+function needsClientId(loader: ProtectLoader): boolean {
+  return templatedValues(loader).some(value => HAS_CLIENT_ID_REGEX.test(value));
+}
+
+function isCorrelated(loader: ProtectLoader): boolean {
+  return templatedValues(loader).some(value => HAS_CID_REGEX.test(value));
 }
 
 export class ProtectSession {
-  /** `null` when the platform has no CSPRNG — we then report `unsupported`. */
+  /** `null` when no loader needs it, or when the platform has no CSPRNG. */
   readonly #pid: string | null;
   readonly #rid: string | null;
   readonly #cid: string | null;
   readonly #placeholders: ProtectPlaceholders;
-  /** The loader the token is acquired against, and whose `error` event means `script_error`. */
+  /** The loader carrying the correlation id; absent when the instance has not configured the gate. */
   readonly #tokenLoader?: ProtectLoader;
-  /** Absent when the instance has not configured the gate; we then report nothing at all. */
+  /** Set only by an instance opting into the upgrade mint. */
   readonly #tokenUrl?: string;
   readonly #timeoutMs: number;
-  readonly #lock = SafeLock(ACQUISITION_LOCK_KEY);
+  readonly #applyLoader: ApplyLoader;
+  /** Namespaced per instance: two Clerk instances on one origin must not share a token. */
+  readonly #tokenStorageKey: string;
+  readonly #lock: ReturnType<typeof SafeLock>;
 
-  /**
-   * Memoised: one attempt per page load. Sign-ins after a failure read this instead of re-paying
-   * the deadline.
-   */
+  /** One attempt at a time; re-armed once it has settled without leaving a usable token. */
   #acquisition?: Promise<ProtectStatus>;
-  #scriptError = false;
-  #pollAbort?: AbortController;
+  #acquisitionSettled = false;
+  #lastAttemptAt = 0;
 
   /**
    * Returns a session only when at least one loader references a placeholder — an instance not
-   * using the correlation id keeps today's behaviour exactly, and stores nothing in the browser.
+   * using any of them keeps today's behaviour exactly.
    */
-  static create(loaders: ProtectLoader[], instanceId?: string): ProtectSession | undefined {
+  static create(loaders: ProtectLoader[], instanceId: string | undefined, applyLoader: ApplyLoader) {
     const templated = loaders.filter(isTemplated);
     if (templated.length === 0) {
       return undefined;
     }
-    return new ProtectSession(templated, instanceId);
+    return new ProtectSession(templated, instanceId, applyLoader);
   }
 
-  private constructor(templatedLoaders: ProtectLoader[], instanceId?: string) {
-    this.#pid = readOrMintPid();
+  private constructor(templatedLoaders: ProtectLoader[], instanceId: string | undefined, applyLoader: ApplyLoader) {
+    this.#applyLoader = applyLoader;
+
+    // Nothing is persisted for an instance that only templates its instance id: that needs no
+    // minted identity, so minting one would plant a durable id nobody asked for.
+    const clientIdNeeded = templatedLoaders.some(needsClientId);
+    this.#pid = clientIdNeeded ? readOrMintPid() : null;
     this.#rid = this.#pid ? random128() : null;
     this.#cid = this.#pid && this.#rid ? buildCid(this.#pid, this.#rid) : null;
 
@@ -320,67 +391,37 @@ export class ProtectSession {
       ...(instanceId ? { instance_id: instanceId } : {}),
     };
 
-    let tokenLoader: ProtectLoader | undefined;
-    let tokenUrl: string | undefined;
-    for (const loader of templatedLoaders) {
-      tokenUrl = resolveTokenUrl(loader, this.#placeholders);
-      if (tokenUrl) {
-        tokenLoader = loader;
-        break;
-      }
-    }
-
+    const tokenLoader = templatedLoaders.find(isCorrelated);
     this.#tokenLoader = tokenLoader;
-    this.#tokenUrl = tokenUrl;
-    this.#timeoutMs =
-      typeof tokenLoader?.tokenTimeoutMs === 'number' && tokenLoader.tokenTimeoutMs > 0
-        ? tokenLoader.tokenTimeoutMs
-        : DEFAULT_TOKEN_TIMEOUT_MS;
+    this.#tokenUrl = tokenLoader ? resolveTokenUrl(tokenLoader, this.#placeholders) : undefined;
+    this.#timeoutMs = clampTimeout(tokenLoader?.tokenTimeoutMs);
+
+    const suffix = instanceId ? `.${instanceId}` : '';
+    this.#tokenStorageKey = `${TOKEN_STORAGE_KEY}${suffix}`;
+    this.#lock = SafeLock(`${ACQUISITION_LOCK_KEY}${suffix}`);
   }
 
   placeholders(): ProtectPlaceholders {
     return this.#placeholders;
   }
 
+  /** The session owns this loader's injection, so `Protect` must not apply it as well. */
   isTokenLoader(loader: ProtectLoader): boolean {
     return this.#tokenLoader === loader;
   }
 
-  /**
-   * A loader that fails to load means there is nothing to acquire against, so there is no point
-   * paying the poll deadline: abort and report `script_error`.
-   */
-  observeLoaderElement(element: Element): void {
-    element.addEventListener(
-      'error',
-      () => {
-        this.#scriptError = true;
-        this.#pollAbort?.abort();
-      },
-      { once: true },
-    );
-  }
-
-  /**
-   * True when a token from this browser session is already shared with us — acquisition has
-   * already happened and the loader does not need injecting again.
-   */
-  hasFreshToken(): boolean {
-    return this.#tokenUrl ? readStoredToken(TOKEN_REFRESH_MARGIN_MS) !== null : false;
-  }
-
   /** Fire-and-forget; started at `Clerk.load()` so a sign-in normally finds the token cached. */
   start(): void {
-    if (!this.#tokenUrl || this.#acquisition) {
+    if (!this.#tokenLoader || this.#acquisition) {
       return;
     }
-    this.#acquisition = this.#acquire();
+    this.#startAcquisition();
   }
 
   async getRequestParams(): Promise<ProtectRequestParams | undefined> {
-    if (!this.#tokenUrl) {
-      // The instance interpolates the id into its loader but has not configured the token
-      // endpoint, so there is nothing to report.
+    if (!this.#tokenLoader) {
+      // The instance interpolates an id into its loader but has not configured the gate, so there
+      // is nothing to report.
       return undefined;
     }
 
@@ -388,10 +429,11 @@ export class ProtectSession {
       return { __clerk_protect_status: 'unsupported' };
     }
 
-    const status = (await this.#acquisition) ?? 'timeout';
+    this.#rearmIfStale();
+    const status = this.#acquisition ? await withDeadline(this.#acquisition, this.#timeoutMs) : 'timeout';
 
     // Re-read: another tab may have completed a run after ours gave up.
-    const stored = readStoredToken(0);
+    const stored = readStoredToken(this.#tokenStorageKey, 0);
     if (stored) {
       return {
         __clerk_protect_token: stored.token,
@@ -408,22 +450,65 @@ export class ProtectSession {
     };
   }
 
+  /**
+   * True when a token from this browser session is already shared with us. Only the token loader
+   * is skipped on the strength of it — every other loader still runs on every page load.
+   */
+  hasFreshToken(): boolean {
+    return this.#tokenLoader ? this.#freshStoredToken() !== null : false;
+  }
+
+  #freshStoredToken(): StoredToken | null {
+    return readStoredToken(this.#tokenStorageKey, TOKEN_REFRESH_MARGIN_MS);
+  }
+
+  /**
+   * A page outlives its token. Once an attempt has settled without leaving one usable, the next
+   * sign-in starts a fresh run instead of replaying a stale result for the life of the tab.
+   */
+  #rearmIfStale(): void {
+    if (!this.#acquisition) {
+      this.#startAcquisition();
+      return;
+    }
+    if (!this.#acquisitionSettled) {
+      return;
+    }
+    if (readStoredToken(this.#tokenStorageKey, 0)) {
+      return;
+    }
+    if (Date.now() - this.#lastAttemptAt < REACQUIRE_COOLDOWN_MS) {
+      return;
+    }
+    this.#startAcquisition();
+  }
+
+  #startAcquisition(): void {
+    this.#lastAttemptAt = Date.now();
+    this.#acquisitionSettled = false;
+    const settled = (status: ProtectStatus): ProtectStatus => {
+      this.#acquisitionSettled = true;
+      return status;
+    };
+    this.#acquisition = this.#acquire().then(settled, () => settled('timeout'));
+  }
+
   async #acquire(): Promise<ProtectStatus> {
     if (!this.#cid) {
       return 'unsupported';
     }
-    if (readStoredToken(TOKEN_REFRESH_MARGIN_MS)) {
-      // Step 1: valid and not near expiry. No lock, no network.
+    if (this.#freshStoredToken()) {
+      // Step 1: valid and not near expiry. No lock, no loader, no network.
       return 'ok';
     }
 
     const result = await this.#lock.acquireLockAndRun(async () => {
-      // Double-checked inside the lock. Without this re-read every tab acquires in turn,
+      // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
       // which is the exact failure this design exists to prevent.
-      if (readStoredToken(TOKEN_REFRESH_MARGIN_MS)) {
+      if (this.#freshStoredToken()) {
         return 'ok' satisfies ProtectStatus;
       }
-      return await this.#poll();
+      return await this.#mint();
     });
 
     if (typeof result === 'string') {
@@ -432,22 +517,75 @@ export class ProtectSession {
 
     // The lock was never held — `SafeLock` gives up waiting after ~5s so a wedged leader delays
     // nobody. Whatever a leader did manage to write is still ours to use.
-    if (readStoredToken(TOKEN_REFRESH_MARGIN_MS)) {
-      return 'ok';
-    }
-    return this.#scriptError ? 'script_error' : 'timeout';
+    return this.#freshStoredToken() ? 'ok' : 'timeout';
   }
 
-  /** Polls the token endpoint until the deadline. Never rejects. */
-  async #poll(): Promise<ProtectStatus> {
-    const url = this.#tokenUrl as string;
+  /** Runs the loader and takes the token it was served with. Never rejects. */
+  async #mint(): Promise<ProtectStatus> {
     const deadline = Date.now() + this.#timeoutMs;
+
+    const outcome = await this.#runTokenLoader(deadline);
+    if (outcome === 'error') {
+      return 'script_error';
+    }
+    if (outcome === 'timeout') {
+      return 'timeout';
+    }
+
+    if (this.#tokenUrl) {
+      return await this.#poll(deadline);
+    }
+
+    const inline = readInlineToken(this.#cid as string, this.#rid as string);
+    if (!inline) {
+      // The script ran but served no token for us. Nothing was refused and nothing errored, so
+      // `timeout` is the only member of the closed set that fits.
+      return 'timeout';
+    }
+
+    writeStoredToken(this.#tokenStorageKey, inline);
+    return 'ok';
+  }
+
+  /**
+   * Injects the token loader and settles on whichever of `load`, `error` or the deadline comes
+   * first. The inline token is assigned by the script body, so it is readable once `load` fires.
+   */
+  #runTokenLoader(deadline: number): Promise<LoaderOutcome> {
+    const loader = this.#tokenLoader;
+    if (!loader) {
+      return Promise.resolve('error');
+    }
+
+    let element: HTMLElement | undefined;
+    try {
+      element = this.#applyLoader(loader, this.#placeholders);
+    } catch {
+      return Promise.resolve('error');
+    }
+    if (!element) {
+      return Promise.resolve('error');
+    }
+
+    return new Promise<LoaderOutcome>(resolve => {
+      const timer = setTimeout(() => resolve('timeout'), Math.max(0, deadline - Date.now()));
+      const settle = (outcome: LoaderOutcome) => () => {
+        clearTimeout(timer);
+        resolve(outcome);
+      };
+      element.addEventListener('load', settle('loaded'), { once: true });
+      element.addEventListener('error', settle('error'), { once: true });
+    });
+  }
+
+  /** The upgrade mint: polls the token endpoint until the deadline. Never rejects. */
+  async #poll(deadline: number): Promise<ProtectStatus> {
+    const url = this.#tokenUrl as string;
     const controller = new AbortController();
-    const deadlineTimer = setTimeout(() => controller.abort(), this.#timeoutMs);
-    this.#pollAbort = controller;
+    const deadlineTimer = setTimeout(() => controller.abort(), Math.max(0, deadline - Date.now()));
 
     try {
-      while (!this.#scriptError) {
+      for (;;) {
         if (Date.now() >= deadline) {
           return 'timeout';
         }
@@ -457,9 +595,6 @@ export class ProtectSession {
           // No custom headers, no credentials: a CORS-simple GET needs no preflight.
           response = await fetch(url, { credentials: 'omit', signal: controller.signal });
         } catch {
-          if (this.#scriptError) {
-            break;
-          }
           return controller.signal.aborted ? 'timeout' : 'fetch_error';
         }
 
@@ -468,27 +603,51 @@ export class ProtectSession {
           if (!token) {
             return 'fetch_error';
           }
-          writeStoredToken(token);
+          writeStoredToken(this.#tokenStorageKey, token);
           return 'ok';
         }
 
-        if (response.status !== 202) {
+        const pending = response.status === 202;
+        if (!pending && !isRetryableStatus(response.status)) {
           return httpStatus(response.status);
         }
 
-        // Still pending. The server tells us how long to wait; we bound what we honour.
-        const delay = await readRetryDelay(response);
+        // Still pending, or transiently unavailable. Spending the remaining deadline on a retry
+        // beats reporting a blip as the outcome for the whole page.
+        const delay = pending ? await readRetryDelay(response) : MIN_RETRY_DELAY_MS * 4;
         if (Date.now() + delay >= deadline) {
-          return 'timeout';
+          return pending ? 'timeout' : httpStatus(response.status);
         }
         await sleep(delay, controller.signal);
       }
-
-      return 'script_error';
     } finally {
       clearTimeout(deadlineTimer);
-      this.#pollAbort = undefined;
     }
+  }
+}
+
+export function clampTimeout(configured: unknown): number {
+  if (typeof configured !== 'number' || !Number.isFinite(configured) || configured <= 0) {
+    return DEFAULT_TOKEN_TIMEOUT_MS;
+  }
+  return Math.min(configured, MAX_TOKEN_TIMEOUT_MS);
+}
+
+/**
+ * The upgrade mint's endpoint, for an instance that has opted into it. It is instance config like
+ * every other part of the loader, so a new placement ships without an SDK release. Absent it, the
+ * token arrives inline with the loader and there is no endpoint to resolve.
+ */
+function resolveTokenUrl(loader: ProtectLoader, placeholders: ProtectPlaceholders): string | undefined {
+  if (typeof loader.tokenUrl !== 'string' || !loader.tokenUrl) {
+    return undefined;
+  }
+
+  const base = typeof document !== 'undefined' ? document.baseURI : undefined;
+  try {
+    return new URL(interpolatePlaceholders(loader.tokenUrl, placeholders), base).href;
+  } catch {
+    return undefined;
   }
 }
 
@@ -505,14 +664,8 @@ async function readTokenPayload(response: Response, rid: string): Promise<Stored
   }
 
   const { token, exp } = json as Record<string, unknown>;
-  if (typeof token !== 'string' || !token) {
-    return null;
-  }
-  if (typeof exp !== 'number' || !Number.isFinite(exp)) {
-    return null;
-  }
-
-  return { token, exp, rid };
+  const validated = validateToken(token, exp, 0);
+  return validated ? { ...validated, rid } : null;
 }
 
 async function readRetryDelay(response: Response): Promise<number> {

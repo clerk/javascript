@@ -460,6 +460,28 @@ describe('request', () => {
 
       expect(bodyOf()).toBe('foo=bar');
     });
+
+    // Merging into any of these would spread away the caller's payload rather than add to it.
+    it.each([
+      ['a Blob', () => new Blob(['payload'])],
+      ['an array', () => [1, 2, 3]],
+      ['a URLSearchParams', () => new URLSearchParams({ identifier: 'nick@clerk.dev' })],
+    ])('leaves %s body alone', async (_label, makeBody) => {
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: makeBody() as any });
+
+      expect(getProtectParams).not.toHaveBeenCalled();
+      expect(String((fetch as Mock).mock.calls[0][1].body)).not.toContain('__clerk_protect');
+    });
+
+    it('still sends the request when resolving the params rejects', async () => {
+      getProtectParams.mockRejectedValue(new DOMException('storage is blocked', 'SecurityError'));
+
+      // Protect can degrade a sign-in but must never fail one before it is even sent.
+      await expect(
+        clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: { foo: 'bar' } as any }),
+      ).resolves.toBeDefined();
+      expect(bodyOf()).toBe('foo=bar');
+    });
   });
 
   describe('retry logic', () => {

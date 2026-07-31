@@ -1,19 +1,76 @@
 import type { ProtectLoader } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { buildCid, CID_REGEX, encodeBase32, interpolatePlaceholders, ProtectSession } from '../protectSession';
+import type { ApplyLoader } from '../protectSession';
+import {
+  __internal_resetProtectStorage,
+  buildCid,
+  CID_REGEX,
+  clampTimeout,
+  encodeBase32,
+  interpolatePlaceholders,
+  ProtectSession,
+} from '../protectSession';
 
-const TOKEN_URL = 'https://loader.example.com/ins_2abc/{cid}/loader.js';
+const LOADER_SRC = 'https://loader.example.com/ins_2abc/{cid}/loader.js';
 
+/**
+ * No `src` by default: jsdom runs with `resources: 'usable'`, so a real URL is actually fetched
+ * and fires `error` on its own schedule, racing the events these tests need to drive themselves.
+ */
 const loader = (overrides: Partial<ProtectLoader> = {}): ProtectLoader => ({
   target: 'head',
   type: 'script',
-  attributes: { src: TOKEN_URL },
+  attributes: { 'data-cid': '{cid}' },
   tokenTimeoutMs: 200,
   ...overrides,
 });
 
 const nowSeconds = () => Math.floor(Date.now() / 1_000);
+const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+
+/**
+ * Stands in for `Protect.applyLoader`, handing the test the element the session is waiting on so
+ * it can play the part of the browser and fire `load` or `error`.
+ */
+const harness = () => {
+  const elements: HTMLElement[] = [];
+  const applyLoader: ApplyLoader = (config, placeholders) => {
+    const element = document.createElement(config.type || 'script');
+    for (const [key, value] of Object.entries(config.attributes ?? {})) {
+      element.setAttribute(key, interpolatePlaceholders(String(value), placeholders));
+    }
+    document.head.appendChild(element);
+    elements.push(element);
+    return element;
+  };
+
+  const injected = async (count = 1): Promise<HTMLElement> => {
+    for (let i = 0; i < 100 && elements.length < count; i++) {
+      await tick();
+    }
+    return elements[count - 1];
+  };
+
+  return { applyLoader, elements, injected };
+};
+
+const session = (loaders: ProtectLoader[], instanceId?: string) => {
+  const h = harness();
+  return { session: ProtectSession.create(loaders, instanceId, h.applyLoader), ...h };
+};
+
+/** What Specter does: assign the global from the script body, then the element fires `load`. */
+const serveInline = (element: HTMLElement, overrides: Record<string, unknown> = {}) => {
+  (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
+    v: 2,
+    id: '11111111-2222-3333-4444-555555555555',
+    token: 'v1.payload.mac',
+    exp: nowSeconds() + 43_200,
+    ...overrides,
+  };
+  element.dispatchEvent(new Event('load'));
+};
 
 const tokenResponse = (token = 'v1.payload.mac', expInSeconds = nowSeconds() + 43_200) => ({
   status: 200,
@@ -34,6 +91,9 @@ const originalFetch = global.fetch;
 
 beforeEach(() => {
   localStorage.clear();
+  __internal_resetProtectStorage();
+  document.head.innerHTML = '';
+  delete (globalThis as unknown as Record<string, unknown>).__clerk_specter;
   global.fetch = vi.fn(() => Promise.resolve(tokenResponse())) as unknown as typeof fetch;
 });
 
@@ -41,6 +101,8 @@ afterEach(() => {
   vi.restoreAllMocks();
   global.fetch = originalFetch;
   localStorage.clear();
+  __internal_resetProtectStorage();
+  delete (globalThis as unknown as Record<string, unknown>).__clerk_specter;
 });
 
 describe('encodeBase32', () => {
@@ -78,27 +140,25 @@ describe('interpolatePlaceholders', () => {
 
 describe('ProtectSession.create', () => {
   it('returns nothing when no loader references a placeholder', () => {
-    const session = ProtectSession.create([
-      loader({ attributes: { src: 'https://loader.example.com/ins_2abc/loader.js' } }),
-    ]);
+    const { session: created } = session([loader({ attributes: { src: 'https://loader.example.com/loader.js' } })]);
 
-    expect(session).toBeUndefined();
+    expect(created).toBeUndefined();
     // An instance not using the correlation id stores nothing in the user's browser.
     expect(localStorage.getItem('__clerk_protect_pid')).toBeNull();
   });
 
   it('mints a 55-char correlation id and persists only the pid', () => {
-    const session = ProtectSession.create([loader()]);
-    const cid = session?.placeholders().cid as string;
+    const { session: created } = session([loader()]);
+    const cid = created?.placeholders().cid as string;
 
     expect(cid).toMatch(CID_REGEX);
     expect(cid).toHaveLength(55);
-    expect(localStorage.getItem('__clerk_protect_pid')).toBe(session?.placeholders().pid);
+    expect(localStorage.getItem('__clerk_protect_pid')).toBe(created?.placeholders().pid);
   });
 
   it('reuses the persisted pid and mints a fresh rid per run', () => {
-    const first = ProtectSession.create([loader()])?.placeholders();
-    const second = ProtectSession.create([loader()])?.placeholders();
+    const first = session([loader()]).session?.placeholders();
+    const second = session([loader()]).session?.placeholders();
 
     expect(second?.pid).toBe(first?.pid);
     expect(second?.rid).not.toBe(first?.rid);
@@ -106,28 +166,24 @@ describe('ProtectSession.create', () => {
   });
 
   it('substitutes the instance id when one is available', () => {
-    const session = ProtectSession.create([loader({ tokenUrl: '{instance_id}/token' })], 'ins_2abc');
-    expect(session?.placeholders().instance_id).toBe('ins_2abc');
+    const { session: created } = session([loader()], 'ins_2abc');
+    expect(created?.placeholders().instance_id).toBe('ins_2abc');
   });
 
-  it('falls back to an in-memory pid when localStorage throws', async () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('storage is blocked');
-    });
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('storage is blocked');
-    });
+  it('stores nothing for a loader that only templates the instance id', async () => {
+    const { session: created, elements } = session(
+      [loader({ attributes: { src: 'https://loader.example.com/{instance_id}/loader.js' } })],
+      'ins_2abc',
+    );
 
-    const first = ProtectSession.create([loader()]);
-    const second = ProtectSession.create([loader()]);
+    expect(created?.placeholders().instance_id).toBe('ins_2abc');
+    // The instance id needs no minted identity, so none is planted for it.
+    expect(created?.placeholders().pid).toBeUndefined();
+    expect(localStorage.getItem('__clerk_protect_pid')).toBeNull();
 
-    expect(first?.placeholders().cid).toMatch(CID_REGEX);
-    // The in-memory fallback still shares the pid across sessions on this page.
-    expect(second?.placeholders().pid).toBe(first?.placeholders().pid);
-
-    // …and acquisition still works end to end.
-    first?.start();
-    await expect(first?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    created?.start();
+    await expect(created?.getRequestParams()).resolves.toBeUndefined();
+    expect(elements).toHaveLength(0);
   });
 
   it('reports unsupported when there is no CSPRNG', async () => {
@@ -136,141 +192,103 @@ describe('ProtectSession.create', () => {
     crypto.getRandomValues = undefined;
 
     try {
-      const session = ProtectSession.create([loader()]);
-      session?.start();
+      const { session: created, elements } = session([loader()]);
+      created?.start();
 
-      await expect(session?.getRequestParams()).resolves.toEqual({ __clerk_protect_status: 'unsupported' });
-      expect(global.fetch).not.toHaveBeenCalled();
+      await expect(created?.getRequestParams()).resolves.toEqual({ __clerk_protect_status: 'unsupported' });
+      expect(elements).toHaveLength(0);
       // Nothing usable to interpolate, so the loader keeps its literal placeholder.
-      expect(session?.placeholders().cid).toBeUndefined();
+      expect(created?.placeholders().cid).toBeUndefined();
     } finally {
       crypto.getRandomValues = originalGetRandomValues;
     }
   });
 });
 
-describe('ProtectSession token acquisition', () => {
-  it('derives the token endpoint from the loader URL carrying the cid', async () => {
-    const session = ProtectSession.create([loader()]);
-    const cid = session?.placeholders().cid;
-    session?.start();
-    await session?.getRequestParams();
+describe('ProtectSession inline token', () => {
+  it('hands the correlation id to the loader it injects', async () => {
+    const { session: created, injected } = session([loader({ attributes: { src: LOADER_SRC } })], 'ins_2abc');
+    created?.start();
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      `https://loader.example.com/ins_2abc/${cid}/token`,
-      expect.objectContaining({ credentials: 'omit' }),
+    expect((await injected()).getAttribute('src')).toBe(
+      `https://loader.example.com/ins_2abc/${created?.placeholders().cid}/loader.js`,
     );
   });
 
-  it('prefers an explicitly configured token endpoint', async () => {
-    const session = ProtectSession.create(
-      [loader({ tokenUrl: 'https://loader.example.com/{instance_id}/{cid}/token' })],
-      'ins_2abc',
-    );
-    const cid = session?.placeholders().cid;
-    session?.start();
-    await session?.getRequestParams();
+  it('takes the token the loader was served with, and shares it through localStorage', async () => {
+    const { session: created, injected } = session([loader()]);
+    created?.start();
 
-    expect(global.fetch).toHaveBeenCalledWith(`https://loader.example.com/ins_2abc/${cid}/token`, expect.anything());
-  });
+    serveInline(await injected(), { cid: created?.placeholders().cid });
 
-  it('reports ok and shares the token through localStorage', async () => {
-    const session = ProtectSession.create([loader()]);
-    session?.start();
-
-    await expect(session?.getRequestParams()).resolves.toEqual({
+    await expect(created?.getRequestParams()).resolves.toEqual({
       __clerk_protect_token: 'v1.payload.mac',
       __clerk_protect_status: 'ok',
-      __clerk_protect_cid: session?.placeholders().cid,
+      __clerk_protect_cid: created?.placeholders().cid,
     });
     expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
       token: 'v1.payload.mac',
-      rid: session?.placeholders().rid,
+      rid: created?.placeholders().rid,
     });
+    // The whole point of inline delivery: no second request.
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it('polls through a 202 until the token is minted', async () => {
-    (global.fetch as Mock)
-      .mockImplementationOnce(() => Promise.resolve(retryResponse()))
-      .mockImplementationOnce(() => Promise.resolve(tokenResponse()));
+  it('ignores a token minted for someone else’s run', async () => {
+    const { session: created, injected } = session([loader()]);
+    created?.start();
 
-    const session = ProtectSession.create([loader({ tokenTimeoutMs: 1_000 })]);
-    session?.start();
+    serveInline(await injected(), { cid: buildCid('z'.repeat(26).replace(/z/g, 'a'), 'b'.repeat(26)) });
 
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
-    expect(global.fetch).toHaveBeenCalledTimes(2);
-  });
-
-  it('reports timeout when the deadline expires with no token', async () => {
-    (global.fetch as Mock).mockImplementation(() => Promise.resolve(retryResponse()));
-
-    const session = ProtectSession.create([loader({ tokenTimeoutMs: 60 })]);
-    session?.start();
-
-    await expect(session?.getRequestParams()).resolves.toEqual({
+    await expect(created?.getRequestParams()).resolves.toEqual({
       __clerk_protect_status: 'timeout',
-      __clerk_protect_cid: session?.placeholders().cid,
+      __clerk_protect_cid: created?.placeholders().cid,
     });
   });
 
-  it('reports the http status when the endpoint answers non-2xx', async () => {
-    (global.fetch as Mock).mockImplementation(() => Promise.resolve(errorResponse(503)));
+  it('reports timeout when the script loads but serves no token', async () => {
+    const { session: created, injected } = session([loader()]);
+    created?.start();
 
-    const session = ProtectSession.create([loader()]);
-    session?.start();
+    (await injected()).dispatchEvent(new Event('load'));
 
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'http_503' });
-  });
-
-  it('reports fetch_error when the token endpoint is unreachable', async () => {
-    (global.fetch as Mock).mockImplementation(() => Promise.reject(new TypeError('Failed to fetch')));
-
-    const session = ProtectSession.create([loader()]);
-    session?.start();
-
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'fetch_error' });
-  });
-
-  it('reports fetch_error when a 200 carries no usable token', async () => {
-    (global.fetch as Mock).mockImplementation(() => Promise.resolve({ status: 200, json: () => Promise.resolve({}) }));
-
-    const session = ProtectSession.create([loader()]);
-    session?.start();
-
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'fetch_error' });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
   });
 
   it('reports script_error when the loader element fails to load', async () => {
-    (global.fetch as Mock).mockImplementation(() => Promise.resolve(retryResponse()));
+    const { session: created, injected } = session([loader({ tokenTimeoutMs: 5_000 })]);
+    created?.start();
 
-    const session = ProtectSession.create([loader({ tokenTimeoutMs: 5_000 })]);
-    const element = document.createElement('script');
-    session?.observeLoaderElement(element);
-    session?.start();
+    (await injected()).dispatchEvent(new Event('error'));
 
-    element.dispatchEvent(new Event('error'));
-
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'script_error' });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'script_error' });
   });
 
-  it('reuses a fresh token without a network call', async () => {
+  it('reports timeout when the loader never settles', async () => {
+    const { session: created, injected } = session([loader({ tokenTimeoutMs: 40 })]);
+    created?.start();
+    await injected();
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('reuses a fresh token without injecting the loader at all', async () => {
     localStorage.setItem(
       '__clerk_protect_st',
       JSON.stringify({ token: 'v1.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
     );
 
-    const session = ProtectSession.create([loader()]);
-    expect(session?.hasFreshToken()).toBe(true);
+    const { session: created, elements } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(true);
+    created?.start();
 
-    session?.start();
-
-    await expect(session?.getRequestParams()).resolves.toEqual({
+    await expect(created?.getRequestParams()).resolves.toEqual({
       __clerk_protect_token: 'v1.cached.mac',
       __clerk_protect_status: 'ok',
       // The cid names the run the token was minted for, which is not this tab's run.
-      __clerk_protect_cid: buildCid(session?.placeholders().pid as string, 'b'.repeat(26)),
+      __clerk_protect_cid: buildCid(created?.placeholders().pid as string, 'b'.repeat(26)),
     });
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(elements).toHaveLength(0);
   });
 
   it('ignores a stored token that has expired', async () => {
@@ -279,19 +297,224 @@ describe('ProtectSession token acquisition', () => {
       JSON.stringify({ token: 'v1.stale.mac', exp: nowSeconds() - 1, rid: 'b'.repeat(26) }),
     );
 
-    const session = ProtectSession.create([loader()]);
-    expect(session?.hasFreshToken()).toBe(false);
+    const { session: created, injected } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(false);
 
-    session?.start();
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
   });
 
-  it('reports nothing at all when the instance configures no token endpoint', async () => {
-    const session = ProtectSession.create([loader({ attributes: { 'data-pid': '{pid}' } })]);
+  it('ignores a planted token claiming more life than we ever mint', async () => {
+    localStorage.setItem(
+      '__clerk_protect_st',
+      JSON.stringify({ token: 'v1.planted.mac', exp: nowSeconds() + 10 * 365 * 24 * 60 * 60, rid: 'b'.repeat(26) }),
+    );
 
-    session?.start();
-    await expect(session?.getRequestParams()).resolves.toBeUndefined();
+    const { session: created, injected } = session([loader()]);
+    // A page-writable store must not be able to suppress the loader for ever.
+    expect(created?.hasFreshToken()).toBe(false);
+
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('reports nothing at all for a loader that carries no correlation id', async () => {
+    const { session: created, elements } = session([loader({ attributes: { 'data-pid': '{pid}' } })]);
+
+    created?.start();
+    await expect(created?.getRequestParams()).resolves.toBeUndefined();
+    expect(elements).toHaveLength(0);
+  });
+});
+
+describe('ProtectSession upgrade mint', () => {
+  const upgrade = (overrides: Partial<ProtectLoader> = {}) =>
+    loader({ tokenUrl: 'https://loader.example.com/{instance_id}/{cid}/token', ...overrides });
+
+  it('fetches the explicitly configured endpoint once the loader has run', async () => {
+    const { session: created, injected } = session([upgrade()], 'ins_2abc');
+    created?.start();
+
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(global.fetch).toHaveBeenCalledWith(
+      `https://loader.example.com/ins_2abc/${created?.placeholders().cid}/token`,
+      expect.objectContaining({ credentials: 'omit' }),
+    );
+  });
+
+  it('never derives an endpoint from a loader attribute', async () => {
+    // The cid rides in a data attribute and the src is not a token endpoint; without an explicit
+    // tokenUrl the inline path is the only one, so nothing is fetched.
+    const { session: created, injected } = session([
+      loader({ attributes: { 'data-cid': '{cid}', 'data-loader': 'https://cdn.example.com/loader.js' } }),
+    ]);
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
     expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('polls through a 202 until the token is minted', async () => {
+    (global.fetch as Mock)
+      .mockImplementationOnce(() => Promise.resolve(retryResponse()))
+      .mockImplementationOnce(() => Promise.resolve(tokenResponse()));
+
+    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('spends the remaining deadline retrying a transient failure', async () => {
+    (global.fetch as Mock)
+      .mockImplementationOnce(() => Promise.resolve(errorResponse(503)))
+      .mockImplementationOnce(() => Promise.resolve(tokenResponse()));
+
+    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports a non-retryable http status without retrying', async () => {
+    (global.fetch as Mock).mockImplementation(() => Promise.resolve(errorResponse(400)));
+
+    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'http_400' });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports fetch_error when the token endpoint is unreachable', async () => {
+    (global.fetch as Mock).mockImplementation(() => Promise.reject(new TypeError('Failed to fetch')));
+
+    const { session: created, injected } = session([upgrade()]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'fetch_error' });
+  });
+
+  it('reports fetch_error when a 200 carries no usable token', async () => {
+    (global.fetch as Mock).mockImplementation(() => Promise.resolve({ status: 200, json: () => Promise.resolve({}) }));
+
+    const { session: created, injected } = session([upgrade()]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('load'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'fetch_error' });
+  });
+});
+
+describe('ProtectSession storage', () => {
+  it('reads back a token the quota forced into the in-memory fallback', async () => {
+    // Readable but not writable — Safari private browsing, or an exhausted origin quota.
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+
+    const { session: created, injected } = session([loader()]);
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.payload.mac',
+      __clerk_protect_status: 'ok',
+    });
+  });
+
+  it('falls back to an in-memory pid when localStorage throws outright', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage is blocked');
+    });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage is blocked');
+    });
+
+    const first = session([loader()]).session;
+    const second = session([loader()]).session;
+
+    expect(first?.placeholders().cid).toMatch(CID_REGEX);
+    // The in-memory fallback still shares the pid across sessions on this page.
+    expect(second?.placeholders().pid).toBe(first?.placeholders().pid);
+  });
+
+  it('does not share a token between two instances on one origin', async () => {
+    const a = session([loader()], 'ins_aaa');
+    a.session?.start();
+    serveInline(await a.injected(), { cid: a.session?.placeholders().cid });
+    await expect(a.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+
+    const b = session([loader()], 'ins_bbb');
+    // Instance B must run its own loader rather than sending a token minted for instance A.
+    expect(b.session?.hasFreshToken()).toBe(false);
+    expect(localStorage.getItem('__clerk_protect_st.ins_aaa')).not.toBeNull();
+    expect(localStorage.getItem('__clerk_protect_st.ins_bbb')).toBeNull();
+  });
+});
+
+describe('ProtectSession deadlines', () => {
+  it('holds a sign-in no longer than the deadline, however long acquisition takes', async () => {
+    const { session: created } = session([loader({ tokenTimeoutMs: 50 })]);
+    created?.start();
+
+    const startedAt = Date.now();
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(Date.now() - startedAt).toBeLessThan(1_000);
+  });
+
+  it('starts a fresh run once the cooldown has passed with no token to show for the last one', async () => {
+    const { session: created, injected, elements } = session([loader({ tokenTimeoutMs: 1_000 })]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('error'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'script_error' });
+    expect(elements).toHaveLength(1);
+
+    // A tab outlives its token, so a settled failure must not be replayed for the life of the page.
+    const realNow = Date.now();
+    vi.spyOn(Date, 'now').mockImplementation(() => realNow + 31_000);
+
+    const params = created?.getRequestParams();
+    serveInline(await injected(2), { cid: created?.placeholders().cid });
+
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('does not re-run within the cooldown', async () => {
+    const { session: created, injected, elements } = session([loader({ tokenTimeoutMs: 1_000 })]);
+    created?.start();
+    (await injected()).dispatchEvent(new Event('error'));
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'script_error' });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'script_error' });
+
+    // Repeated sign-in attempts must not turn a failure into a loader-injection loop.
+    expect(elements).toHaveLength(1);
+  });
+
+  it('clamps a server-configured deadline that would stall a sign-in', () => {
+    // `tokenTimeoutMs` is server config with no upper bound of its own, so the ceiling is ours.
+    expect(clampTimeout(120_000)).toBe(10_000);
+    expect(clampTimeout(1_500)).toBe(1_500);
+    expect(clampTimeout(undefined)).toBe(5_000);
+    expect(clampTimeout(0)).toBe(5_000);
+    expect(clampTimeout(-1)).toBe(5_000);
+    expect(clampTimeout('soon')).toBe(5_000);
+    expect(clampTimeout(Number.POSITIVE_INFINITY)).toBe(5_000);
   });
 });
 
@@ -316,23 +539,22 @@ describe('ProtectSession cross-tab single flight', () => {
     delete (navigator as unknown as Record<string, unknown>).locks;
   });
 
-  it('acquires once when several tabs start together', async () => {
+  it('runs the loader once when several tabs start together', async () => {
     const request = installSerialisingLocks();
 
-    // The leader's run is still in flight while the other tab queues behind the lock, so the only
-    // thing that can stop a second run is the re-read inside the lock.
-    (global.fetch as Mock).mockImplementationOnce(
-      () => new Promise(resolve => setTimeout(() => resolve(tokenResponse()), 20)),
-    );
+    const a = session([loader({ tokenTimeoutMs: 1_000 })]);
+    const b = session([loader({ tokenTimeoutMs: 1_000 })]);
+    a.session?.start();
+    b.session?.start();
 
-    const sessions = [ProtectSession.create([loader()]), ProtectSession.create([loader()])];
-    sessions.forEach(session => session?.start());
+    serveInline(await a.injected(), { cid: a.session?.placeholders().cid });
 
-    const results = await Promise.all(sessions.map(session => session?.getRequestParams()));
+    const results = await Promise.all([a.session?.getRequestParams(), b.session?.getRequestParams()]);
 
     expect(request).toHaveBeenCalledTimes(2);
-    // The second tab re-read the store inside the lock and reused the leader's token.
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    // The second tab re-read the store inside the lock and reused the leader's token, so it never
+    // injected a loader of its own.
+    expect(b.elements).toHaveLength(0);
     results.forEach(result => expect(result).toMatchObject({ __clerk_protect_status: 'ok' }));
   });
 
@@ -345,8 +567,8 @@ describe('ProtectSession cross-tab single flight', () => {
       configurable: true,
     });
 
-    const session = ProtectSession.create([loader()]);
-    session?.start();
+    const { session: created } = session([loader()]);
+    created?.start();
     // Written after the pre-lock read has already missed, so this can only be picked up by the
     // read that follows a failed lock acquisition.
     localStorage.setItem(
@@ -354,7 +576,7 @@ describe('ProtectSession cross-tab single flight', () => {
       JSON.stringify({ token: 'v1.leader.mac', exp: nowSeconds() + 43_200, rid: 'c'.repeat(26) }),
     );
 
-    await expect(session?.getRequestParams()).resolves.toMatchObject({
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
       __clerk_protect_token: 'v1.leader.mac',
       __clerk_protect_status: 'ok',
     });
@@ -366,10 +588,10 @@ describe('ProtectSession cross-tab single flight', () => {
       configurable: true,
     });
 
-    const session = ProtectSession.create([loader()]);
-    session?.start();
+    const { session: created, elements } = session([loader()]);
+    created?.start();
 
-    await expect(session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
-    expect(global.fetch).not.toHaveBeenCalled();
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(elements).toHaveLength(0);
   });
 });
