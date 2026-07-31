@@ -4,6 +4,8 @@
 // static `styles.css`. Keep it isolated from Emotion/un-migrated code — grow it
 // as components migrate.
 
+export type { MosaicComponentProps, MosaicElementProps } from '../props';
+
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -26,6 +28,17 @@ export type {
 } from '../components/menu';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+
+export { Popover } from '../components/popover';
+export type {
+  PopoverCloseProps,
+  PopoverDescriptionProps,
+  PopoverPopupProps,
+  PopoverRootProps,
+  PopoverSize,
+  PopoverTitleProps,
+  PopoverTriggerProps,
+} from '../components/popover';
 
 import {
   colorVars,
