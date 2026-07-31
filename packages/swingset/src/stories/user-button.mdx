@@ -2,16 +2,18 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher that sits behind the user avatar. The active account sits at the
-top with its organizations (including any **suggested** workspaces you can Join), and **additional
-accounts** are listed below. Hovering the active account reveals **Sign out**; clicking any additional
-account switches to it. **Settings / Members** open the combined profile modal, and the surface also
-exposes **Add organization**, **Add account**, and **Sign out of all accounts**.
+The account & organization switcher that sits behind the user avatar. The active workspace sits at the
+top with **Manage account / Sign out**, its organizations (including any **suggested** workspaces you
+can Join) are listed under the account they belong to, and **additional accounts** follow. Clicking any
+row switches to it; the account's own `⋯` menu carries its per-account actions. The foot of the surface
+exposes **Add account** and **Sign out of all accounts**.
 
-It is the styled Mosaic component composed from the headless `@clerk/headless` popover primitive plus
-slot recipes, and inherits the primitive's open/close behavior, focus management, and ARIA wiring. This
-first pass is presentational: the parts render from the props on `UserButtonRoot` (mock data in the
-examples). A `useUserButtonController()` that reads live Clerk resources is a drop-in follow-up.
+It is a composition of lower-layer Mosaic components — `Popover` for the floating surface, `Card` for
+the surface itself, `Item` for every row, `Avatar` for the workspace marks, and `Menu` for the
+per-account actions — so it inherits their behavior, focus management, and ARIA wiring rather than
+restyling any of it. This first pass is presentational: the parts render from the props on
+`UserButtonRoot` (mock data in the examples). A `useUserButtonController()` that reads live Clerk
+resources is a drop-in follow-up.
 
 ## Example
 
@@ -70,8 +72,7 @@ boundary without forcing the consumer's file to become a client component.
 ### Personal (no organizations)
 
 When the active account has no organizations, the header collapses to a personal layout —
-**Manage account / Sign out** — and the organization list is omitted. The trigger still shows the
-account avatar and name.
+**Manage account / Sign out** — and the organization list is omitted.
 
 <Story
   name='Personal'
@@ -90,26 +91,24 @@ Switching to it flips the surface to the personal layout.
 
 ## Parts
 
-| Part                   | Description                                                                  |
-| ---------------------- | ---------------------------------------------------------------------------- |
+| Part                | Description                                                                  |
+| ------------------- | ---------------------------------------------------------------------------- |
 | `UserButtonRoot`    | Owns the data + callbacks and forwards popover open state to `Popover.Root`. |
-| `UserButtonTrigger` | The sidebar trigger: active workspace avatar, name, plan badge, selector.    |
+| `UserButtonTrigger` | The trigger: the active workspace's avatar, and nothing else.                |
 | `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
 
 ## Styling
 
-The component is themed with a Mosaic slot recipe (`userButtonRecipe`). Override any slot through
-`appearance.elements` — e.g. `{ 'user-button-popup': { borderRadius: 24 } }`.
+The component owns no slots of its own — it is styled entirely by the components it composes, so
+`appearance.elements` targets those. Overriding `item` re-themes every row here _and_ everywhere else
+`Item` is used; that is the point of composing rather than restyling.
 
-| Slot                           | Description                                             |
-| ------------------------------ | ------------------------------------------------------- |
-| `user-button-trigger`       | The trigger button                                      |
-| `user-button-popup`         | The popover surface                                     |
-| `user-button-header`        | Active workspace header                                 |
-| `user-button-action`        | Header action buttons (Settings / Members)              |
-| `user-button-group`         | A divided section (workspace list, additional accounts) |
-| `user-button-item`          | A selectable workspace / account row                    |
-| `user-button-avatar`        | Org (square) / account (circle) avatar                  |
-| `user-button-inline-button` | Row actions (Join / Accept)                             |
-| `user-button-hover-action`  | The hover-revealed Sign out on the active account       |
-| `user-button-footer`        | Sign out of all accounts + branding                     |
+| Component | Slots it contributes                                                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `Popover` | `popover-positioner`, `popover-popup`                                                                                                |
+| `Card`    | `card-root`                                                                                                                          |
+| `Item`    | `item`, `item-media`, `item-content`, `item-title`, `item-description`, `item-label`, `item-actions`, `item-group`, `item-separator` |
+| `Avatar`  | `avatar`, `avatar-image`, `avatar-fallback`                                                                                          |
+| `Button`  | `button`                                                                                                                             |
+| `Icon`    | `icon`                                                                                                                               |
+| `Menu`    | `menu-trigger`, `menu-positioner`, `menu-popup`, `menu-item`, `menu-separator`                                                       |
