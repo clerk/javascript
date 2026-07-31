@@ -15,10 +15,22 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-command -v maestro-runner >/dev/null 2>&1 || {
-  echo "maestro-runner is required: https://devicelab.dev/open-source/maestro-runner/docs/getting-started"
-  exit 1
-}
+# MAESTRO_ENGINE=cli runs flows with the official maestro CLI instead of
+# maestro-runner. The runner's Android driver approximates Maestro's anchored
+# regex text matching with UiSelector textContains, which mis-targets taps
+# (e.g. 'Continue' resolves to the 'Continue to <app>' title instead of the
+# button), so Android CI uses the CLI; iOS stays on the runner's wda driver.
+if [ "${MAESTRO_ENGINE:-runner}" = "cli" ]; then
+  command -v maestro >/dev/null 2>&1 || {
+    echo "maestro is required: https://docs.maestro.dev"
+    exit 1
+  }
+else
+  command -v maestro-runner >/dev/null 2>&1 || {
+    echo "maestro-runner is required: https://devicelab.dev/open-source/maestro-runner/docs/getting-started"
+    exit 1
+  }
+fi
 
 : "${CLERK_TEST_EMAIL:?CLERK_TEST_EMAIL is required}"
 : "${CLERK_TEST_PASSWORD:?CLERK_TEST_PASSWORD is required}"
@@ -30,11 +42,23 @@ run_flow() {
   shift
   local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
 
-  maestro-runner test \
-    --output "$output_root/$output_name" \
-    --flatten \
-    --artifacts on-failure \
-    "$@"
+  if [ "${MAESTRO_ENGINE:-runner}" = "cli" ]; then
+    # The CLI's env flag is -e; translate the shared --env arguments.
+    local args=() a
+    for a in "$@"; do
+      if [ "$a" = "--env" ]; then args+=("-e"); else args+=("$a"); fi
+    done
+    maestro test \
+      --debug-output "$output_root/$output_name" \
+      --flatten-debug-output \
+      "${args[@]}"
+  else
+    maestro-runner test \
+      --output "$output_root/$output_name" \
+      --flatten \
+      --artifacts on-failure \
+      "$@"
+  fi
 }
 
 record_result() {
