@@ -3,7 +3,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { colorVars, radiusVars, space } from '@clerk/ui/mosaic/styles';
+import { radiusVars, space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -219,31 +219,18 @@ const themedRows = [
   'Oscorp',
 ];
 
-// Mosaic's own default rest colour, written out so the hidden state can be THAT colour at zero
-// alpha. Fading between two different colours would swing the hue as the bar appears; this way the
-// only channel moving is alpha.
-const thumbRest = `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`;
-
 /**
- * A scrollbar that stays invisible until you reach the region. Mosaic's own `hover` token is the
- * THUMB's state, so it can't express this — a thumb you can't see is not a target you can find.
- * Region hover is one rule of your own CSS instead.
+ * The far end of what `--cl-scrollbar-thumb-idle` is for. Mosaic already dims the bar while the
+ * pointer is elsewhere; taking that token to zero alpha removes it entirely, so the scrollbar
+ * appears only once you reach the region. One declaration, no rules of your own.
  *
- * Written as `:not(:hover)` so that reaching the region simply stops overriding, leaving the thumb
- * at Mosaic's ordinary rest colour. That keeps the reveal deliberately quiet: it restores the
- * default rather than jumping to something louder, so the thumb's own `-hover` and `-active` still
- * read as a step UP from it, exactly as they do on an unstyled scroll area. Revealing straight to a
- * strong colour spends the contrast early and leaves the thumb's own states nowhere to go.
+ * `oklch(from … / 0)` rather than the `transparent` keyword: `transparent` is `rgba(0, 0, 0, 0)` —
+ * transparent BLACK — so interpolating out of it drags the thumb through a series of dark,
+ * half-transparent greys and the bar reads as dirty on the way in. Relative colour syntax reads the
+ * base token's own channels and drops only the alpha, so the only thing moving is opacity.
  *
- * This one fades. The thumb's colour resolves through an `@property`-registered custom property
- * that the SCROLLER transitions and the thumb inherits, so retargeting the token from the region is
- * a computed-value change the transition picks up. The thumb's own `-hover` / `-active` cannot do
- * the same — Blink runs no transition declared on `::-webkit-scrollbar-thumb`, so those snap.
- *
- * The hidden value is the rest colour at zero alpha, NOT the `transparent` keyword. `transparent`
- * is `rgba(0, 0, 0, 0)` — transparent BLACK — so interpolating out of it drags the thumb through a
- * series of dark, half-transparent greys and the bar reads as dirty on the way in. Relative colour
- * syntax takes the colour's own channels and drops only the alpha.
+ * It fades because idle → base is the one step set on the SCROLLER, which owns the transition. The
+ * thumb's `-hover` and `-active` still work from there, and still snap.
  *
  * The lane stays reserved throughout: only the thumb's paint is conditional, so nothing reflows on
  * the way in or out.
@@ -255,7 +242,7 @@ export function HoverReveal() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      css={{ '&:not(:hover)': { '--cl-scrollbar-thumb': `oklch(from ${thumbRest} l c h / 0)` } }}
+      css={{ '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)' }}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>

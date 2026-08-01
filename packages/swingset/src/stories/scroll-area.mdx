@@ -93,31 +93,21 @@ identically, which is why `auto` is the default.
   storyModule={ScrollAreaStories}
 />
 
-Mosaic's `hover` token is the **thumb's** state, so it can't express this on its own — a thumb you
-can't see isn't a target you can find. Region hover is one rule of your own CSS instead:
+This is the far end of what `--cl-scrollbar-thumb-idle` is for — one declaration, no rules of your
+own:
 
 ```css
 .my-scroller {
-  /* Mosaic's own rest colour, named once so the hidden state can be that same colour at zero
-     alpha. Fading between two different colours would swing the hue as the bar appears. */
-  --thumb-rest: color-mix(in oklab, var(--cl-color-neutral-faded), var(--cl-color-card) 55%);
-}
-
-/* `:not(:hover)`, so reaching the region simply stops overriding. */
-.my-scroller:not(:hover) {
-  --cl-scrollbar-thumb: oklch(from var(--thumb-rest) l c h / 0);
+  --cl-scrollbar-thumb-idle: oklch(from var(--cl-scrollbar-thumb) l c h / 0);
 }
 ```
 
-Hiding on `:not(:hover)` rather than revealing on `:hover` is what keeps this quiet: the revealed
-state is just Mosaic's ordinary rest colour, so the thumb's own `-hover` and `-active` still read as
-a step up from it, exactly as they do on a scroll area you haven't touched. Revealing straight to a
-strong colour spends the contrast on arrival and leaves those two states nowhere to go.
+Mosaic already dims the bar while the pointer is elsewhere, so this only takes that existing state
+to zero alpha. The revealed colour stays the ordinary base, which is why the thumb's own `-hover`
+and `-active` still read as a step up from it.
 
-This one does fade. The thumb's colour resolves through an `@property`-registered custom property
-that the SCROLLER transitions and the thumb inherits, so retargeting the token from the region is a
-computed-value change the transition picks up. The thumb's own `-hover` / `-active` can't do this —
-see [Styling](#styling). The lane stays reserved throughout — only the paint is conditional, so
+It fades because idle → base is the one step set on the scroller, which owns the transition — see
+[Styling](#styling). The lane stays reserved throughout, so only the paint is conditional and
 nothing reflows on the way in or out.
 
 Reach for the zero-alpha colour rather than `transparent` in any fade like this one. `transparent`
@@ -165,7 +155,9 @@ These tokens are global, so setting them once retunes every scrolling surface in
 | `--cl-scroll-fade-range`      | `1.5rem`                 | How far you scroll before the fade reaches full strength. |
 | `--cl-scrollbar-width`        | `8px`                    | Width of the scrollbar lane. `0px` hides it.              |
 | `--cl-scrollbar-thumb-inset`  | `2px`                    | How far the thumb's paint is held inside that lane.       |
-| `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour at rest.                                     |
+| `--cl-scrollbar-thumb-offset` | `1px`                    | Nudges the thumb toward the content, without resizing it. |
+| `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour once the pointer reaches the region.         |
+| `--cl-scrollbar-thumb-idle`   | derived from the above   | Thumb colour while the pointer is elsewhere.              |
 | `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb colour while the pointer is over the thumb.         |
 | `--cl-scrollbar-thumb-active` | derived from the above   | Thumb colour while the thumb is being dragged.            |
 
@@ -173,18 +165,26 @@ The two lane sizes are in pixels rather than on the `rem` scale, deliberately: a
 rather than content, so it should stay the same hairline whether or not the surrounding text scales.
 The default is a 4px pill with a 2px track either side.
 
-The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in, so setting
-the base re-derives both — and either state can still be pinned on its own.
+The colours are four states running quietest to loudest: `idle` while the pointer is elsewhere, the
+base once it reaches the region, then `hover` and `active` for the thumb's own two. Each of the
+three derives from `--cl-scrollbar-thumb` rather than baking its value in, so setting the base
+re-derives all of them — and any one can still be pinned on its own.
 
-`hover` and `active` are the **thumb's own** states, not the region's: the colour changes when the
-pointer is over the thumb itself, not whenever it is somewhere over the scrolling area.
+`hover` and `active` are the **thumb's own** states, not the region's: they change when the pointer
+is over the thumb itself. `idle` is the region's, which is what gives the bar somewhere quieter to
+sit while you are not near it.
+
+The lane itself cannot be moved — the browser places it at the inline end of the padding box, and it
+takes no margin, offset, or transform. `--cl-scrollbar-thumb-offset` moves the **thumb inside** the
+lane instead, adding to the inset on one side and taking it off the other, so the pill shifts
+without changing width. Keep it below the inset: a larger offset drives the near-side border
+negative.
 
 Those two states switch instantly, and can't be made to animate. Blink doesn't run transitions
 declared on `::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb
 inherits the animating value — which means a change made **on the scroller** fades, while a change
-made on the thumb itself can only snap. That's the line to keep in mind when theming: retargeting
-`--cl-scrollbar-thumb` from the region (as [Reveal on hover](#reveal-on-hover) does) transitions;
-`-hover` and `-active` do not.
+made on the thumb itself can only snap. That's the line to keep in mind when theming: `idle` → base
+transitions, because reaching the region is a change on the scroller; `-hover` and `-active` do not.
 
 Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
 thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting

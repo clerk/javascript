@@ -37,7 +37,9 @@ describe('Mosaic scroll area styles', () => {
     expect(scrollbarVars).toMatchObject({
       '--cl-scrollbar-width': 'var(--cl-scrollbar-width)',
       '--cl-scrollbar-thumb-inset': 'var(--cl-scrollbar-thumb-inset)',
+      '--cl-scrollbar-thumb-offset': 'var(--cl-scrollbar-thumb-offset)',
       '--cl-scrollbar-thumb': 'var(--cl-scrollbar-thumb)',
+      '--cl-scrollbar-thumb-idle': 'var(--cl-scrollbar-thumb-idle)',
       '--cl-scrollbar-thumb-hover': 'var(--cl-scrollbar-thumb-hover)',
       '--cl-scrollbar-thumb-active': 'var(--cl-scrollbar-thumb-active)',
     });

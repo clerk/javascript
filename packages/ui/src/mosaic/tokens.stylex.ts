@@ -107,18 +107,29 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // a specific hairline rather than a ratio of anything. Rounding also matters more here than
 // elsewhere, since the thumb is only a few pixels wide to begin with.
 //
-// The two derived colours reference `--cl-scrollbar-thumb` rather than baking its value in,
-// so they resolve at use time: overriding the base re-derives both, while either state stays
-// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
-// which is what keeps a 4px bar reading as a hairline rather than a hard rule; the two states
-// then step back toward `--cl-color-card-foreground`, deepening in light mode and lightening in
-// dark, since that token already carries both.
+// `offset` nudges the pill toward the content and away from the outer edge, WITHOUT narrowing it:
+// it is added to the inset on one side and taken off the other, so only the position moves. This
+// is the only positional control there is — a scrollbar's lane is placed by the browser at the
+// inline end of the padding box and takes no margin, offset, or transform, so anything that looks
+// like moving the scrollbar has to happen to the thumb inside it. Keep it under the inset, since
+// an offset that exceeds it drives the near-side border negative and the pill stops being centred
+// in any meaningful sense.
 //
-// Setting `--cl-scrollbar-thumb: transparent` hides the thumb without giving up its lane: the
-// rest state simply paints nothing and the thumb reappears while the pointer is on it. Only the
-// paint is conditional, so nothing moves. Worth knowing that the two states below are the
-// THUMB's, not the region's, which makes that a precise target to find — it works best where
-// the fade indicators are already carrying the signal that the region scrolls.
+// The colours are FOUR states, not three, and they run from quietest to loudest: `idle` while the
+// pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
+// thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
+// they resolve at use time — overriding the base re-derives all three, while any one stays
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
+// which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
+// direction, and the other two step back toward `--cl-color-card-foreground`, deepening in light
+// mode and lightening in dark, since that token already carries both.
+//
+// Only the idle → base step can animate. It is set on the scroller, which owns the transition;
+// the thumb's own two are set on the pseudo-element, and Blink runs no transition there.
+//
+// `--cl-scrollbar-thumb-idle: oklch(from var(--cl-scrollbar-thumb) l c h / 0)` is the whole recipe
+// for a scrollbar that fades in on approach: the pill paints nothing until the pointer reaches the
+// region, and the lane is reserved either way, so nothing moves.
 //
 // Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
 // no width to apply to, and thinning a target that is already hard to hit would be actively
@@ -131,7 +142,9 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
+  '--cl-scrollbar-thumb-offset': '1px',
   '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card']} 45%)`,
   '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
   '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 30%)`,
 } as const;

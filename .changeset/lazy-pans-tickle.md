@@ -9,11 +9,15 @@ New tokens, applied to every scrolling surface at once:
 | Token                         | Default                  |
 | ----------------------------- | ------------------------ |
 | `--cl-scrollbar-thumb`        | derived from the palette |
+| `--cl-scrollbar-thumb-idle`   | derived from the above   |
 | `--cl-scrollbar-thumb-hover`  | derived from the above   |
 | `--cl-scrollbar-thumb-active` | derived from the above   |
 | `--cl-scrollbar-thumb-inset`  | `2px`                    |
+| `--cl-scrollbar-thumb-offset` | `1px`                    |
 
-Setting `--cl-scrollbar-thumb: transparent` hides the thumb without giving up its lane — it paints only while the pointer is on it, and nothing moves either way.
+The colours are four states running quietest to loudest: `idle` while the pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the thumb's own two. `--cl-scrollbar-thumb-idle: oklch(from var(--cl-scrollbar-thumb) l c h / 0)` is the whole recipe for a scrollbar that fades in on approach and gives up no layout doing it.
+
+`--cl-scrollbar-thumb-offset` shifts the thumb toward the content without resizing it. The lane itself can't be moved — the browser places it at the inline end of the padding box and it takes no margin, offset, or transform — so this adds to the inset on one side and takes it off the other.
 
 Two breaking notes if you were already theming these:
 
