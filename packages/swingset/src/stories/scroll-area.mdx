@@ -155,7 +155,6 @@ These tokens are global, so setting them once retunes every scrolling surface in
 | `--cl-scroll-fade-range`      | `1.5rem`                 | How far you scroll before the fade reaches full strength. |
 | `--cl-scrollbar-width`        | `8px`                    | Width of the scrollbar lane. `0px` hides it.              |
 | `--cl-scrollbar-thumb-inset`  | `2px`                    | How far the thumb's paint is held inside that lane.       |
-| `--cl-scrollbar-thumb-offset` | `1px`                    | Nudges the thumb toward the content, without resizing it. |
 | `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour once the pointer reaches the region.         |
 | `--cl-scrollbar-thumb-idle`   | derived from the above   | Thumb colour while the pointer is elsewhere.              |
 | `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb colour while the pointer is over the thumb.         |
@@ -174,11 +173,13 @@ re-derives all of them — and any one can still be pinned on its own.
 is over the thumb itself. `idle` is the region's, which is what gives the bar somewhere quieter to
 sit while you are not near it.
 
-The lane itself cannot be moved — the browser places it at the inline end of the padding box, and it
-takes no margin, offset, or transform. `--cl-scrollbar-thumb-offset` moves the **thumb inside** the
-lane instead, adding to the inset on one side and taking it off the other, so the pill shifts
-without changing width. Keep it below the inset: a larger offset drives the near-side border
-negative.
+There is no knob for nudging the thumb sideways within its lane, and it isn't an oversight. The lane
+can't move — the browser places it at the inline end of the padding box, and it takes no margin,
+offset, or transform — so the only lever is making the thumb's insets asymmetric. That shifts the
+pill, but it also deforms it: the paint is clipped to the content box using the **inner** radius,
+which CSS derives per corner as the outer radius minus that side's own border width, so unequal
+insets draw the two halves of each cap with different curvature. On a 4px pill the caps stop being
+round. Position the surrounding padding instead.
 
 Those two states switch instantly, and can't be made to animate. Blink doesn't run transitions
 declared on `::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb

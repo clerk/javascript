@@ -154,6 +154,13 @@ const styles = stylex.create({
       borderColor: { default: null, '@media (pointer: fine)': 'transparent' },
       borderRadius: { default: null, '@media (pointer: fine)': radiusVars['--cl-radius-full'] },
       borderStyle: { default: null, '@media (pointer: fine)': 'solid' },
+      // Uniform, and it has to stay uniform. Nudging the pill sideways by making these asymmetric
+      // works geometrically but wrecks the caps: `background-clip: content-box` clips to the
+      // content box using the INNER radius, which CSS derives per corner as the outer radius minus
+      // that side's border width, so unequal borders give the two halves of each cap different
+      // curvature. Measured on a 4px pill, the cap goes from a mirrored `35 76 76 35` to a lopsided
+      // `24 60 78 54`. There is no offsetting the thumb within its lane without paying that.
+      borderWidth: { default: null, '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb-inset'] },
       backgroundClip: { default: null, '@media (pointer: fine)': 'content-box' },
       backgroundColor: {
         default: null,
@@ -166,22 +173,6 @@ const styles = stylex.create({
           // `background-color` rather than on the var so it holds across all four states at once.
           '@media (forced-colors: active)': 'ButtonBorder',
         },
-      },
-      // Asymmetric on purpose: `offset` comes off the near side and goes onto the far one, which
-      // slides the pill toward the content without resizing it. Logical, so the nudge stays on the
-      // content side when the scrollbar moves to the left edge in RTL. The `max(0px, …)` floor
-      // matters: an offset larger than the inset would otherwise compute a NEGATIVE border width,
-      // which is invalid, so the declaration would be dropped and the border fall back to its
-      // initial `medium` — a thumb suddenly much narrower on one side, for a token value that only
-      // looks slightly too big. (Key order is the sort-keys rule's, not ours.)
-      borderBlockWidth: { default: null, '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb-inset'] },
-      borderInlineEndWidth: {
-        default: null,
-        '@media (pointer: fine)': `calc(${scrollbarVars['--cl-scrollbar-thumb-inset']} + ${scrollbarVars['--cl-scrollbar-thumb-offset']})`,
-      },
-      borderInlineStartWidth: {
-        default: null,
-        '@media (pointer: fine)': `max(0px, calc(${scrollbarVars['--cl-scrollbar-thumb-inset']} - ${scrollbarVars['--cl-scrollbar-thumb-offset']}))`,
       },
     },
     // eslint-disable-next-line @stylexjs/valid-styles -- StyleX's pseudo-element allowlist holds the bare selectors only; it compiles the combined form correctly. See the note above.

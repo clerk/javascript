@@ -107,13 +107,12 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // a specific hairline rather than a ratio of anything. Rounding also matters more here than
 // elsewhere, since the thumb is only a few pixels wide to begin with.
 //
-// `offset` nudges the pill toward the content and away from the outer edge, WITHOUT narrowing it:
-// it is added to the inset on one side and taken off the other, so only the position moves. This
-// is the only positional control there is — a scrollbar's lane is placed by the browser at the
-// inline end of the padding box and takes no margin, offset, or transform, so anything that looks
-// like moving the scrollbar has to happen to the thumb inside it. Keep it under the inset, since
-// an offset that exceeds it drives the near-side border negative and the pill stops being centred
-// in any meaningful sense.
+// There is deliberately no knob for nudging the thumb sideways within its lane. The lane itself
+// cannot move — the browser places it at the inline end of the padding box, and it takes no margin,
+// offset, or transform — so the only lever is making the thumb's insets asymmetric, and that
+// visibly deforms the pill: `background-clip: content-box` clips to the inner radius, which is the
+// outer radius minus each side's own border width, so unequal insets draw the two halves of every
+// cap with different curvature. Tried and measured; not worth a hairline of position.
 //
 // The colours are FOUR states, not three, and they run from quietest to loudest: `idle` while the
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
@@ -142,7 +141,6 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
-  '--cl-scrollbar-thumb-offset': '1px',
   '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
   '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card']} 45%)`,
   '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
