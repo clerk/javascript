@@ -17,9 +17,7 @@ slot class, which stays the hook a theme targets.
 
 ## Usage
 
-`scrollAreaViewport()` returns an array, hence the `...` spread. `scrollAreaRoot` goes on a
-positioned ancestor, and is only needed when something has to anchor against the scroll box — an
-overlay replacing the fade, for instance.
+`scrollAreaViewport()` returns an array, hence the `...` spread.
 
 ```tsx
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
@@ -52,10 +50,9 @@ const root = stylex.props(scrollAreaRoot);
 | `scrollAreaViewport(gutter?)` | the scrolling element | The scroll box itself: overflow, the edge fades, the scrollbar, and a focus ring. |
 | `scrollAreaRoot`              | a positioned ancestor | Only needed when something anchors against the scroll box.                        |
 
-`gutter` is the one argument: `auto` (the default, and CSS's own) takes the scrollbar's space only
-while the content overflows, while `stable` reserves it either way. It is an author-time decision
-rather than a theme one — whether a region needs it depends on whether its content can resize in
-place, which only that surface's author knows.
+`gutter` is the one argument — `auto` (the default) or `stable`, see [Gutter](#gutter). It is an
+author-time decision rather than a theme one, since whether a region needs it depends on whether its
+content can resize in place.
 
 ## Examples
 
@@ -66,10 +63,10 @@ place, which only that surface's author knows.
   storyModule={ScrollAreaStories}
 />
 
-The atoms are unconditional: there is no "is it scrollable" branch to write, and no measurement at
-runtime. A scroll timeline with no scrollable overflow is simply inactive, so both progress vars
-hold at their registered `initial-value: 0` and the mask resolves to fully opaque. Browsers without
-scroll-driven animation support get the same plain scrolling box rather than a broken one.
+The atoms are unconditional: no "is it scrollable" branch to write, no measurement at runtime. A
+scroll timeline with no scrollable overflow is inactive, so both progress vars hold at their
+registered `initial-value: 0` and the mask resolves to fully opaque. Browsers without scroll-driven
+animation get the same plain scrolling box rather than a broken one.
 
 ### Gutter
 
@@ -78,12 +75,12 @@ scroll-driven animation support get the same plain scrolling box rather than a b
   storyModule={ScrollAreaStories}
 />
 
-Add the rows and watch the trailing rules: `auto` jumps its content left by the lane's width as the
-list starts overflowing, while `stable` — which was already holding that lane open — doesn't move.
-That jump is the entire thing `stable` exists to prevent.
+`auto` takes the scrollbar's space only while the content overflows; `stable` reserves it either
+way. Add the rows and watch the trailing rules: `auto` jumps its content left by the lane's width as
+the list starts overflowing, `stable` doesn't move.
 
 Two conditions must **both** hold for the two to differ at all: space-consuming scrollbars, and
-content that can stop overflowing. Where the platform overlays its scrollbars, they render
+content that can stop overflowing. Where the platform overlays its scrollbars they render
 identically, which is why `auto` is the default.
 
 ### Reveal on hover
@@ -93,8 +90,7 @@ identically, which is why `auto` is the default.
   storyModule={ScrollAreaStories}
 />
 
-This is the far end of what `--cl-scrollbar-thumb-idle` is for — one declaration, no rules of your
-own:
+The far end of what `--cl-scrollbar-thumb-idle` is for — one declaration, no rules of your own:
 
 ```css
 .my-scroller {
@@ -102,19 +98,14 @@ own:
 }
 ```
 
-Mosaic already dims the bar while the pointer is elsewhere, so this only takes that existing state
-to zero alpha. The revealed colour stays the ordinary base, which is why the thumb's own `-hover`
-and `-active` still read as a step up from it.
+Mosaic already dims the bar while the pointer is elsewhere; this takes that state to zero alpha. It
+fades because idle → base is the one step set on the scroller, which owns the transition — see
+[Styling](#styling). The lane stays reserved throughout, so nothing reflows on the way in or out.
 
-It fades because idle → base is the one step set on the scroller, which owns the transition — see
-[Styling](#styling). The lane stays reserved throughout, so only the paint is conditional and
-nothing reflows on the way in or out.
-
-Reach for the zero-alpha colour rather than `transparent` in any fade like this one. `transparent`
-is defined as `rgba(0, 0, 0, 0)` — transparent **black** — so interpolating out of it drags the
-thumb through a run of dark, half-transparent greys, and a bar that should be fading in cleanly
-reads as dirty instead. Relative colour syntax (`oklch(from … l c h / 0)`) keeps the colour's own
-channels and drops only the alpha, so the transition moves along a single axis.
+Reach for a zero-alpha colour rather than `transparent` in any fade like this. `transparent` is
+defined as `rgba(0, 0, 0, 0)` — transparent **black** — so interpolating out of it drags the thumb
+through dark, half-transparent greys and reads as dirty. Relative colour syntax
+(`oklch(from … l c h / 0)`) keeps the colour's own channels and moves only the alpha.
 
 ### Theming the scrollbar
 
@@ -123,23 +114,18 @@ channels and drops only the alpha, so the transition moves along a single axis.
   storyModule={ScrollAreaStories}
 />
 
-Each step gets a colour of its own here — far louder than anything you'd ship, but told apart at a
-glance. Move the pointer into the region, then onto the bar, then drag it.
+A colour per state, far louder than anything you'd ship but told apart at a glance. Move the pointer
+into the region, then onto the bar, then drag it.
 
 Only the first of those moves animates, and the reason is structural rather than chromatic: amber →
 teal changes the region's own rest colour, so it happens on the scroller, where the transition
-lives. Pink and violet are the thumb's own states, so they switch instantly however they're written
-(see [Styling](#styling)).
+lives. Pink and violet are the thumb's own states and switch instantly however they're written (see
+[Styling](#styling)). The example stretches the transition to `0.6s` because at Mosaic's real
+`0.15s` the fade is over before you've finished moving the pointer in.
 
-This example deliberately slows the transition to `0.6s`. At Mosaic's real `--cl-duration-base` of
-`0.15s` the fade is over before you've finished moving the pointer in, which is easy to read as
-nothing happening at all — a scrollbar is small and off to one side, so it gets far less of your
-attention than a control you're aiming at.
-
-Every value here is an `oklch()` literal, which is what keeps the animated step well defined — the
+Every value is an `oklch()` literal, which is what keeps the animated step well defined — the
 registered property interpolates between two colours in one space rather than guessing across
-notations. The trap to avoid is `transparent`, for the reason given under
-[Reveal on hover](#reveal-on-hover).
+notations.
 
 ### Shadows instead of the fade
 
@@ -149,9 +135,9 @@ notations. The trap to avoid is `transparent`, for the reason given under
 />
 
 Retire the mask with `mask-image: none` and read the two per-element vars the animations write —
-`--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each describing how much that
-edge still has to reveal. They live on the element carrying the atoms and inherit downward, so a
-pseudo-element can drive itself from them.
+`--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each how much that edge still
+has to reveal. They live on the element carrying the atoms and inherit downward, so a pseudo-element
+can drive itself from them.
 
 ```css
 .cl-item-group {
@@ -212,16 +198,18 @@ These tokens are global, so setting them once retunes every scrolling surface in
 
 The two lane sizes are in pixels rather than on the `rem` scale, deliberately: a scrollbar is chrome
 rather than content, so it should stay the same hairline whether or not the surrounding text scales.
-The default is a 4px pill with a 2px track either side.
+The default is a 4px pill in an 8px lane.
 
 The colours are four states running quietest to loudest: `idle` while the pointer is elsewhere, the
-base once it reaches the region, then `hover` and `active` for the thumb's own two. Each of the
-three derives from `--cl-scrollbar-thumb` rather than baking its value in, so setting the base
-re-derives all of them — and any one can still be pinned on its own.
+base once it reaches the region — or the content takes keyboard focus — then `hover` and `active`
+for the thumb's own two. Each of the three derives from `--cl-scrollbar-thumb` rather than baking
+its value in, so setting the base re-derives all of them, and any one can still be pinned on its
+own.
 
-`hover` and `active` are the **thumb's own** states, not the region's: they change when the pointer
-is over the thumb itself. `idle` is the region's, which is what gives the bar somewhere quieter to
-sit while you are not near it.
+Only the idle → base step can animate. Blink doesn't run transitions declared on
+`::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb inherits the
+animating value: a change made **on the scroller** fades, a change made on the thumb itself can only
+snap. `-hover` and `-active` are the thumb's own states, so they are instant by construction.
 
 There is no knob for nudging the thumb sideways within its lane, and it isn't an oversight. The lane
 can't move — the browser places it at the inline end of the padding box, and it takes no margin,
@@ -230,12 +218,6 @@ pill, but it also deforms it: the paint is clipped to the content box using the 
 which CSS derives per corner as the outer radius minus that side's own border width, so unequal
 insets draw the two halves of each cap with different curvature. On a 4px pill the caps stop being
 round. Position the surrounding padding instead.
-
-Those two states switch instantly, and can't be made to animate. Blink doesn't run transitions
-declared on `::-webkit-scrollbar-thumb`, so the transition lives on the scroller and the thumb
-inherits the animating value — which means a change made **on the scroller** fades, while a change
-made on the thumb itself can only snap. That's the line to keep in mind when theming: `idle` → base
-transitions, because reaching the region is a change on the scroller; `-hover` and `-active` do not.
 
 Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
 thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
@@ -247,21 +229,24 @@ layout decision rather than an appearance one.
 One consequence worth knowing before you theme: styling the scrollbar takes macOS out of overlay
 mode, so the bar is always visible and always occupies its lane rather than auto-hiding. That is the
 cross-platform consistency the tokens exist for, but it is a change from the platform default. To
-hide the thumb without giving up the lane, set the rest colour to `transparent` — it then paints
-only while the pointer is on it. Note that this is a precise target to find, so it works best where
-the fade indicators are already carrying the signal that the region scrolls:
+keep the lane without the bar, take both resting colours transparent:
 
 ```css
 :root {
   --cl-scrollbar-thumb: transparent;
+  --cl-scrollbar-thumb-idle: transparent;
 }
 ```
 
+The thumb then paints only while the pointer is on it, and faintly — `-hover` and `-active` still
+derive from the base, so pin them too if you want more. It is a precise target to find, so this
+works best where the fades are already carrying the signal that the region scrolls.
+
 One layout note: the scrollbar takes its lane **inside** a scroller's own padding, so a padded
 surface reads as padding plus lane at the inline end. Trimming the scroller's inline-end padding to
-compensate is tempting, but only safe alongside `gutter: 'stable'` — with `auto` the lane is there
-only while the content overflows, so the trimmed padding collapses to nothing the moment it doesn't,
-and the rows sit flush against the edge. Left alone, the extra lane is the safer asymmetry.
+compensate is only safe alongside `gutter: 'stable'` — with `auto` the lane is there only while the
+content overflows, so the trimmed padding collapses the moment it doesn't and the rows sit flush
+against the edge. Left alone, the extra lane is the safer asymmetry.
 
 ## Accessibility
 
