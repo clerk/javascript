@@ -94,28 +94,36 @@ identically, which is why `auto` is the default.
 />
 
 Mosaic's `hover` token is the **thumb's** state, so it can't express this on its own — a thumb you
-can't see isn't a target you can find. Region hover is two lines of your own CSS instead:
+can't see isn't a target you can find. Region hover is one rule of your own CSS instead:
 
 ```css
 .my-scroller {
-  /* The reveal colour at zero alpha — NOT the `transparent` keyword. */
-  --cl-scrollbar-thumb: oklch(from var(--cl-color-neutral-faded) l c h / 0);
+  /* Mosaic's own rest colour, named once so the hidden state can be that same colour at zero
+     alpha. Fading between two different colours would swing the hue as the bar appears. */
+  --thumb-rest: color-mix(in oklab, var(--cl-color-neutral-faded), var(--cl-color-card) 55%);
 }
-.my-scroller:hover {
-  --cl-scrollbar-thumb: var(--cl-color-neutral-faded);
+
+/* `:not(:hover)`, so reaching the region simply stops overriding. */
+.my-scroller:not(:hover) {
+  --cl-scrollbar-thumb: oklch(from var(--thumb-rest) l c h / 0);
 }
 ```
+
+Hiding on `:not(:hover)` rather than revealing on `:hover` is what keeps this quiet: the revealed
+state is just Mosaic's ordinary rest colour, so the thumb's own `-hover` and `-active` still read as
+a step up from it, exactly as they do on a scroll area you haven't touched. Revealing straight to a
+strong colour spends the contrast on arrival and leaves those two states nowhere to go.
 
 This one does fade. The thumb's colour resolves through an `@property`-registered custom property
 that the SCROLLER transitions and the thumb inherits, so retargeting the token from the region is a
 computed-value change the transition picks up. The thumb's own `-hover` / `-active` can't do this —
-see [Styling](#styling). The lane stays reserved throughout — only the
-paint is conditional, so nothing reflows on the way in or out.
+see [Styling](#styling). The lane stays reserved throughout — only the paint is conditional, so
+nothing reflows on the way in or out.
 
 Reach for the zero-alpha colour rather than `transparent` in any fade like this one. `transparent`
 is defined as `rgba(0, 0, 0, 0)` — transparent **black** — so interpolating out of it drags the
 thumb through a run of dark, half-transparent greys, and a bar that should be fading in cleanly
-reads as dirty instead. Relative colour syntax (`oklch(from … l c h / 0)`) keeps the token's own
+reads as dirty instead. Relative colour syntax (`oklch(from … l c h / 0)`) keeps the colour's own
 channels and drops only the alpha, so the transition moves along a single axis.
 
 ### Theming the scrollbar
