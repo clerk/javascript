@@ -125,11 +125,18 @@ channels and drops only the alpha, so the transition moves along a single axis.
   storyModule={ScrollAreaStories}
 />
 
-Each state gets a colour of its own here — amber at rest, pink under the pointer, violet while
-dragging — which is far louder than anything you'd ship, but tells the three apart at a glance.
-Hover the thumb, then drag it. Nothing changes while the pointer is merely over the region: these
-are the thumb's own states, and they switch instantly rather than fading, for the reason described
-under [Styling](#styling).
+Each step gets a colour of its own here — far louder than anything you'd ship, but told apart at a
+glance. Move the pointer into the region, then onto the bar, then drag it.
+
+Only the first of those moves animates, and the reason is structural rather than chromatic: amber →
+teal changes the region's own rest colour, so it happens on the scroller, where the transition
+lives. Pink and violet are the thumb's own states, so they switch instantly however they're written
+(see [Styling](#styling)).
+
+Every value here is an `oklch()` literal, which is what keeps the animated step well defined — the
+registered property interpolates between two colours in one space rather than guessing across
+notations. The trap to avoid is `transparent`, for the reason given under
+[Reveal on hover](#reveal-on-hover).
 
 ## Styling
 

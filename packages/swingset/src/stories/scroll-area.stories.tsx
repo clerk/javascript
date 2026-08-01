@@ -265,14 +265,20 @@ export function HoverReveal() {
 
 /**
  * The scrollbar tokens are global, so setting them on any ancestor retunes every scrolling surface
- * beneath it. This one goes wider and gives each state a colour of its own — amber at rest, pink
- * under the pointer, violet while dragging — which is deliberately louder than anything you'd ship,
- * so the three are told apart at a glance. Hover the thumb, then drag it. Both switch instantly:
- * a value changed on the thumb itself cannot transition.
+ * beneath it. This one goes wider and gives each step a colour of its own — deliberately louder
+ * than anything you'd ship, so they're told apart at a glance. Move the pointer into the region,
+ * then onto the bar, then drag it.
  *
- * The states are the THUMB's, not the region's: nothing changes until the pointer is on the bar
- * itself. Setting `--cl-scrollbar-thumb` to `transparent` would hide it at rest while keeping its
- * lane, and the other two states would still work.
+ * Only the FIRST of those moves animates, and the reason is structural rather than chromatic:
+ * amber → teal is a change to the region's own rest colour, so it happens on the scroller, where
+ * the transition lives. Pink and violet are the thumb's own states, and Blink runs no transition
+ * declared on `::-webkit-scrollbar-thumb`, so those switch instantly however they're written.
+ *
+ * Every value here is an `oklch()` literal, which is what keeps the one animated step well
+ * defined — the registered property interpolates between two colours in a single space rather than
+ * guessing across notations. The trap to avoid is `transparent`: it means `rgba(0, 0, 0, 0)`, so
+ * fading out of it travels through dark greys. Use the target colour at zero alpha instead, as
+ * `HoverReveal` above does.
  */
 export function ThemedScrollbar() {
   const root = stylex.props(scrollAreaRoot);
@@ -281,17 +287,18 @@ export function ThemedScrollbar() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={
-        {
-          height: 260,
-          borderRadius: radiusVars['--cl-radius-inner'],
-          '--cl-scrollbar-width': '14px',
-          '--cl-scrollbar-thumb-inset': '4px',
-          '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',
-          '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
-          '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
-        } as React.CSSProperties
-      }
+      css={{
+        '--cl-scrollbar-width': '14px',
+        '--cl-scrollbar-thumb-inset': '4px',
+        // Rest, and the one step that fades: it is set on the scroller, so the scroller's
+        // transition carries it.
+        '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',
+        '&:hover': { '--cl-scrollbar-thumb': 'oklch(0.72 0.15 195)' },
+        // The thumb's own states. Instant, by construction.
+        '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
+        '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
+      }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {themedRows.map(name => (
