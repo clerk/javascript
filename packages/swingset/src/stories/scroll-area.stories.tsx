@@ -3,7 +3,7 @@ import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Item } from '@clerk/ui/mosaic/components/item';
 import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/styles';
+import { colorVars, radiusVars, space } from '@clerk/ui/mosaic/styles';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -219,21 +219,31 @@ const themedRows = [
   'Oscorp',
 ];
 
+// Mosaic's own default rest colour, written out so the hidden state can be THAT colour at zero
+// alpha. Fading between two different colours would swing the hue as the bar appears; this way the
+// only channel moving is alpha.
+const thumbRest = `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`;
+
 /**
  * A scrollbar that stays invisible until you reach the region. Mosaic's own `hover` token is the
  * THUMB's state, so it can't express this — a thumb you can't see is not a target you can find.
- * Region hover is two lines of your own CSS instead: park the token at `transparent` and override
- * it on the container's `:hover`.
+ * Region hover is one rule of your own CSS instead.
+ *
+ * Written as `:not(:hover)` so that reaching the region simply stops overriding, leaving the thumb
+ * at Mosaic's ordinary rest colour. That keeps the reveal deliberately quiet: it restores the
+ * default rather than jumping to something louder, so the thumb's own `-hover` and `-active` still
+ * read as a step UP from it, exactly as they do on an unstyled scroll area. Revealing straight to a
+ * strong colour spends the contrast early and leaves the thumb's own states nowhere to go.
  *
  * This one fades. The thumb's colour resolves through an `@property`-registered custom property
  * that the SCROLLER transitions and the thumb inherits, so retargeting the token from the region is
  * a computed-value change the transition picks up. The thumb's own `-hover` / `-active` cannot do
  * the same — Blink runs no transition declared on `::-webkit-scrollbar-thumb`, so those snap.
  *
- * The rest value is the reveal colour at zero alpha, NOT the `transparent` keyword. `transparent`
+ * The hidden value is the rest colour at zero alpha, NOT the `transparent` keyword. `transparent`
  * is `rgba(0, 0, 0, 0)` — transparent BLACK — so interpolating out of it drags the thumb through a
  * series of dark, half-transparent greys and the bar reads as dirty on the way in. Relative colour
- * syntax takes the token's own channels and drops only the alpha, so the fade moves along one axis.
+ * syntax takes the colour's own channels and drops only the alpha.
  *
  * The lane stays reserved throughout: only the thumb's paint is conditional, so nothing reflows on
  * the way in or out.
@@ -245,10 +255,7 @@ export function HoverReveal() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      css={{
-        '--cl-scrollbar-thumb': 'oklch(from var(--cl-color-neutral-faded) l c h / 0)',
-        '&:hover': { '--cl-scrollbar-thumb': 'var(--cl-color-neutral-faded)' },
-      }}
+      css={{ '&:not(:hover)': { '--cl-scrollbar-thumb': `oklch(from ${thumbRest} l c h / 0)` } }}
       style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
@@ -272,7 +279,8 @@ export function HoverReveal() {
  * Only the FIRST of those moves animates, and the reason is structural rather than chromatic:
  * amber → teal is a change to the region's own rest colour, so it happens on the scroller, where
  * the transition lives. Pink and violet are the thumb's own states, and Blink runs no transition
- * declared on `::-webkit-scrollbar-thumb`, so those switch instantly however they're written.
+ * declared on `::-webkit-scrollbar-thumb`, so those switch instantly however they're written. The
+ * demo slows the transition well past Mosaic's default to make that first step legible.
  *
  * Every value here is an `oklch()` literal, which is what keeps the one animated step well
  * defined — the registered property interpolates between two colours in a single space rather than
@@ -290,6 +298,11 @@ export function ThemedScrollbar() {
       css={{
         '--cl-scrollbar-width': '14px',
         '--cl-scrollbar-thumb-inset': '4px',
+        // Slowed well past Mosaic's own `base` step purely so the one animated transition is
+        // impossible to miss — at the real 0.15s the amber → teal step is over before you've
+        // finished moving the pointer, which reads as no animation at all. Nothing else in these
+        // rows reads a duration token, so this only stretches the scrollbar.
+        '--cl-duration-base': '0.6s',
         // Rest, and the one step that fades: it is set on the scroller, so the scroller's
         // transition carries it.
         '--cl-scrollbar-thumb': 'oklch(0.77 0.16 70)',

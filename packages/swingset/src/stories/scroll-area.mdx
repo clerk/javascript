@@ -133,6 +133,11 @@ teal changes the region's own rest colour, so it happens on the scroller, where 
 lives. Pink and violet are the thumb's own states, so they switch instantly however they're written
 (see [Styling](#styling)).
 
+This example deliberately slows the transition to `0.6s`. At Mosaic's real `--cl-duration-base` of
+`0.15s` the fade is over before you've finished moving the pointer in, which is easy to read as
+nothing happening at all — a scrollbar is small and off to one side, so it gets far less of your
+attention than a control you're aiming at.
+
 Every value here is an `oklch()` literal, which is what keeps the animated step well defined — the
 registered property interpolates between two colours in one space rather than guessing across
 notations. The trap to avoid is `transparent`, for the reason given under
