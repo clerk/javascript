@@ -2,7 +2,7 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { NativeAuthFlowState } from '../../specs/NativeClerkModule.types';
-import { useAuthFlow } from '../useAuthFlow';
+import { useAuthViewState } from '../useAuthViewState';
 
 const mocks = vi.hoisted(() => ({
   auth: { isLoaded: true, isSignedIn: true },
@@ -23,7 +23,7 @@ vi.mock('../../utils/native-module', () => ({
   },
 }));
 
-describe('useAuthFlow', () => {
+describe('useAuthViewState', () => {
   beforeEach(() => {
     mocks.auth = { isLoaded: true, isSignedIn: true };
     mocks.listener = undefined;
@@ -46,7 +46,7 @@ describe('useAuthFlow', () => {
   });
 
   test('loads and observes native auth-flow completion state', async () => {
-    const { result, unmount } = renderHook(() => useAuthFlow());
+    const { result, unmount } = renderHook(() => useAuthViewState());
 
     expect(mocks.moduleAddListener).toHaveBeenCalledWith('clerkNativeAuthFlowChanged', expect.any(Function));
 
@@ -68,7 +68,7 @@ describe('useAuthFlow', () => {
     mocks.auth = { isLoaded: true, isSignedIn: false };
     mocks.getAuthFlowState.mockResolvedValue({ isLoaded: true, isAuthFlowComplete: true });
 
-    const { result, rerender } = renderHook(() => useAuthFlow());
+    const { result, rerender } = renderHook(() => useAuthViewState());
 
     await waitFor(() => {
       expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: false });
@@ -83,7 +83,7 @@ describe('useAuthFlow', () => {
   test('falls back to JS session state when native auth-flow state is unavailable', () => {
     mocks.module = null;
 
-    const { result } = renderHook(() => useAuthFlow());
+    const { result } = renderHook(() => useAuthViewState());
 
     expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
     expect(mocks.moduleAddListener).not.toHaveBeenCalled();
@@ -92,7 +92,7 @@ describe('useAuthFlow', () => {
   test('falls back to JS session state when the native auth-flow state is invalid', async () => {
     mocks.getAuthFlowState.mockResolvedValue({ isLoaded: true });
 
-    const { result } = renderHook(() => useAuthFlow());
+    const { result } = renderHook(() => useAuthViewState());
 
     await waitFor(() => {
       expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
