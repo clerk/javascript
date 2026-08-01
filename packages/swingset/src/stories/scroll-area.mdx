@@ -141,6 +141,56 @@ registered property interpolates between two colours in one space rather than gu
 notations. The trap to avoid is `transparent`, for the reason given under
 [Reveal on hover](#reveal-on-hover).
 
+### Shadows instead of the fade
+
+<Story
+  name='ShadowIndicators'
+  storyModule={ScrollAreaStories}
+/>
+
+Retire the mask with `mask-image: none` and read the two per-element vars the animations write —
+`--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each describing how much that
+edge still has to reveal. They live on the element carrying the atoms and inherit downward, so a
+pseudo-element can drive itself from them.
+
+```css
+.cl-item-group {
+  mask-image: none;
+}
+.cl-item-group::before,
+.cl-item-group::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  height: var(--cl-scroll-fade-size);
+  pointer-events: none;
+}
+.cl-item-group::before {
+  top: 0;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  opacity: var(--cl-scroll-area-progress-start);
+  transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
+}
+.cl-item-group::after {
+  bottom: 0;
+  background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  opacity: var(--cl-scroll-area-progress-end);
+  transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
+}
+```
+
+The vars are registered as `<number>`, so they drive position as readily as opacity: each scrim
+slides out from behind its own edge as it fades in. Clip the root — `overflow: hidden` — so the half
+that is still offscreen stays there.
+
+Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-card-foreground` inverts
+with the theme, so one declaration reads as a shadow on light and a soft glow on dark, where black
+would vanish.
+
+Position such overlays absolutely against `scrollAreaRoot` — this is the case the root exists for —
+rather than with `position: sticky`, which takes space in the scroll flow and reintroduces the
+layout shift the mask avoids.
+
 ## Styling
 
 The fade is driven by two scroll-driven animations — no scroll listener, no measurement, nothing at
@@ -212,32 +262,6 @@ surface reads as padding plus lane at the inline end. Trimming the scroller's in
 compensate is tempting, but only safe alongside `gutter: 'stable'` — with `auto` the lane is there
 only while the content overflows, so the trimmed padding collapses to nothing the moment it doesn't,
 and the rows sit flush against the edge. Left alone, the extra lane is the safer asymmetry.
-
-### Replacing the fade
-
-Retire it with `mask-image: none` and read the two per-element vars the animations write —
-`--cl-scroll-area-progress-start` and `--cl-scroll-area-progress-end`, each describing how much that
-edge still has to reveal. They live on the element carrying the atoms and inherit downward.
-
-```css
-.cl-item-group {
-  mask-image: none;
-}
-.cl-item-group::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 2rem;
-  pointer-events: none;
-  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 28%, transparent), transparent);
-  opacity: var(--cl-scroll-area-progress-start);
-}
-```
-
-Position such overlays absolutely rather than with `position: sticky` — a sticky pseudo-element
-takes space in the scroll flow, which is the layout shift the mask approach avoids. And mix the
-scrim from a theme color rather than hardcoding black, which would darken a dark surface and look
-identical to the mask it replaced.
 
 ## Accessibility
 

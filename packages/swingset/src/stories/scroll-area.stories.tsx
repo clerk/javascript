@@ -311,3 +311,64 @@ export function ThemedScrollbar() {
     </div>
   );
 }
+
+/**
+ * The mask retired for overlay scrims, each reading the progress var for its edge. The scrim mixes
+ * from `--cl-color-card-foreground`, so it reads as a shadow on light and a glow on dark;
+ * hardcoded black would vanish on a dark surface.
+ *
+ * Each scrim slides in from behind its edge as well as fading, so the two vars drive position and
+ * opacity together. `overflow: hidden` on the root both rounds their corners and hides the
+ * offscreen half.
+ *
+ * `mask-image` is retired inline rather than from the stylesheet: swingset's dev server injects
+ * StyleX atoms with a specificity bump no selector of ours can outrank. The extracted production
+ * sheet puts them in a cascade layer, where the plain CSS below would win on its own.
+ */
+export function ShadowIndicators() {
+  const root = stylex.props(scrollAreaRoot);
+
+  return (
+    <>
+      <style>{`
+        .demo-scroll-shadows .cl-item-group::before,
+        .demo-scroll-shadows .cl-item-group::after {
+          content: '';
+          position: absolute;
+          inset-inline: 0;
+          height: var(--cl-scroll-fade-size);
+          pointer-events: none;
+        }
+        .demo-scroll-shadows .cl-item-group::before {
+          top: 0;
+          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          opacity: var(--cl-scroll-area-progress-start);
+          transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
+        }
+        .demo-scroll-shadows .cl-item-group::after {
+          bottom: 0;
+          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          opacity: var(--cl-scroll-area-progress-end);
+          transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
+        }
+      `}</style>
+      <div
+        {...root}
+        className={`${root.className} demo-scroll-shadows border-border w-full overflow-hidden border`}
+        style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      >
+        <Item.Group
+          {...stylex.props(...scrollAreaViewport())}
+          style={{ maskImage: 'none' }}
+        >
+          {themedRows.map(name => (
+            <OrganizationRow
+              key={name}
+              name={name}
+            />
+          ))}
+        </Item.Group>
+      </div>
+    </>
+  );
+}
