@@ -6,7 +6,7 @@ import { ClerkExpoModule as ClerkExpo } from '../utils/native-module';
 
 const nativeAuthFlowChangedEvent = 'clerkNativeAuthFlowChanged';
 
-export type UseAuthFlowReturn = NativeAuthFlowState;
+export type UseAuthViewStateReturn = NativeAuthFlowState;
 
 type NativeAuthFlowEventEmitter = {
   addListener(
@@ -41,7 +41,7 @@ function isNativeAuthFlowState(state: NativeAuthFlowState | undefined): state is
  * On platforms without native auth-flow completion state, it falls back to the
  * JS session state.
  */
-export function useAuthFlow(): UseAuthFlowReturn {
+export function useAuthViewState(): UseAuthViewStateReturn {
   const { isLoaded: isJsLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const [nativeState, setNativeState] = useState(initialNativeState);
   const [useJsFallback, setUseJsFallback] = useState(false);
@@ -89,13 +89,13 @@ export function useAuthFlow(): UseAuthFlowReturn {
 
           setUseJsFallback(true);
           if (__DEV__) {
-            console.error('[useAuthFlow] Failed to get native auth-flow state:', error);
+            console.error('[useAuthViewState] Failed to get native auth-flow state:', error);
           }
         });
     } catch (error) {
       setUseJsFallback(true);
       if (__DEV__) {
-        console.error('[useAuthFlow] Failed to observe native auth-flow state:', error);
+        console.error('[useAuthViewState] Failed to observe native auth-flow state:', error);
       }
     }
 
