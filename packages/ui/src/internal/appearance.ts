@@ -583,6 +583,7 @@ export type ElementsConfig = {
   paymentAttemptFooterCurrency: WithOptions;
   paymentAttemptFooterValue: WithOptions;
   paymentAttemptCopyButton: WithOptions;
+  paymentAttemptDownloadButton: WithOptions;
 
   modalBackdrop: WithOptions;
   modalContent: WithOptions;

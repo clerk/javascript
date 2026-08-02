@@ -449,6 +449,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'paymentAttemptFooterCurrency',
   'paymentAttemptFooterValue',
   'paymentAttemptCopyButton',
+  'paymentAttemptDownloadButton',
 
   'modalBackdrop',
   'modalContent',
