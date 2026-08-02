@@ -32,7 +32,7 @@
     "@babel/plugin-syntax-jsx": "^7.27.1",
     "@babel/preset-typescript": "^7.28.5",
     "@mdx-js/loader": "^3.1.1",
-    "@mdx-js/react": "^3.1.0",
+    "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^15.0.0",
     "@stylexjs/babel-plugin": "0.19.0",
     "@stylexjs/postcss-plugin": "0.19.0",
