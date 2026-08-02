@@ -105,7 +105,7 @@
     "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
     "@emotion/react": "11.14.0",
-    "@rsdoctor/rspack-plugin": "^1.5.9",
+    "@rsdoctor/rspack-plugin": "^1.6.0",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
     "@rspack/dev-server": "catalog:rspack",
