@@ -134,7 +134,7 @@
     "@tanstack/query-core": "catalog:repo",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.7"
+    "js-cookie": "3.0.8"
   },
   "devDependencies": {
     "@base-org/account": "catalog:module-manager",
