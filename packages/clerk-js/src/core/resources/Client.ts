@@ -149,7 +149,7 @@ export class Client extends BaseResource implements ClientResource {
         this.signUp = new SignUp(data.sign_up);
       }
 
-      if (data.sign_in && this.signIn instanceof SignIn && this.signIn.id === data.sign_in.id) {
+      if (data.sign_in && this.signIn instanceof SignIn && (this.signIn.id === data.sign_in.id || !this.signIn.id)) {
         this.signIn.__internal_updateFromJSON(data.sign_in);
       } else {
         this.signIn = new SignIn(data.sign_in);
