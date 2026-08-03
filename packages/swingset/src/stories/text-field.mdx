@@ -1,0 +1,58 @@
+import * as TextFieldStories from './text-field.stories';
+
+# Text Field
+
+`TextField` composes a label, Mosaic `Input`, description, and error message with automatic accessible relationships. It supports stacked authentication forms and horizontal settings rows without managing form values or validation.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={TextFieldStories}
+/>
+
+## Props
+
+<PropTable meta={TextFieldStories.meta} />
+
+## Usage
+
+```tsx
+import { TextField } from '@clerk/ui/mosaic/components/text-field';
+
+<TextField.Root required>
+  <TextField.Label>Email address</TextField.Label>
+  <TextField.Content>
+    <TextField.Input
+      name='email'
+      type='email'
+    />
+    <TextField.Description>Used for account notifications.</TextField.Description>
+  </TextField.Content>
+</TextField.Root>;
+```
+
+---
+
+## Examples
+
+### Horizontal layout
+
+<Story
+  name='Horizontal'
+  storyModule={TextFieldStories}
+/>
+
+### Invalid
+
+<Story
+  name='Invalid'
+  storyModule={TextFieldStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={TextFieldStories}
+/>

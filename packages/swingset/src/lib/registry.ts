@@ -113,6 +113,13 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import {
+  Default as TextFieldDefault,
+  Horizontal as TextFieldHorizontal,
+  Invalid as TextFieldInvalid,
+  meta as textFieldMeta,
+  Sizes as TextFieldSizes,
+} from '../stories/text-field.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { toSlug } from './slug';
@@ -200,6 +207,14 @@ const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: Tab
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
+const textFieldModule: StoryModule = {
+  meta: textFieldMeta,
+  Default: TextFieldDefault,
+  Horizontal: TextFieldHorizontal,
+  Invalid: TextFieldInvalid,
+  Sizes: TextFieldSizes,
+};
+
 const iconModule: StoryModule = {
   meta: iconMeta,
   Default: IconDefault,
@@ -262,6 +277,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   tabsComponentModule,
   textModule,
+  textFieldModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
