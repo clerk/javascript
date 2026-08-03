@@ -74,10 +74,19 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 ## Trigger
 
 The active workspace's avatar and what it is called: the org and its plan wherever one heads the
-trigger, the account otherwise. `showLabel={false}` leaves the avatar alone.
+trigger, the account otherwise.
+
+`renderTriggerLabel={false}` leaves the avatar alone.
 
 <Story
   name='AvatarOnly'
+  storyModule={UserButtonStories}
+/>
+
+`renderPlanBadge={false}` keeps the name. The badge is part of the label, so it needs both.
+
+<Story
+  name='WithoutPlanBadge'
   storyModule={UserButtonStories}
 />
 
