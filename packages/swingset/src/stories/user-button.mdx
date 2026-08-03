@@ -28,10 +28,17 @@ restyling any of it. `UserButtonView` is presentational: the parts render from t
 ## Example
 
 Every example on this page is a working prototype over the same mock accounts, so try it:
-picking a workspace or an account switches to it and closes the surface, **Join** turns a suggested
-workspace into one you're in, and the trigger updates to whatever is active. The actions that would
-navigate somewhere in a real app — Manage, Invite, Create organization, Add account — have nowhere
-to go here, so they only close the popover.
+picking a workspace or an account switches to it, **Join** turns a suggested workspace into one
+you're in, and the trigger updates to whatever is active. The actions that would navigate somewhere
+in a real app — Manage, Invite, Create organization, Add account — have nowhere to go here, so they
+only close the popover.
+
+None of it is instant. Every switch is a request against Clerk, so the prototype fakes the round
+trip the connected component really makes: the row you clicked spins, the rest stand down until it
+settles, and the surface stays open so you land back on the result. Picking a workspace is the
+exception — it is the one thing the surface exists to do, so it closes behind you. `pendingKey`
+is what drives that: the view marks the affordance whose key matches busy and disables the others,
+and the connected `UserButton` sets it from the action in flight.
 
 <Story
   name='Combined'
