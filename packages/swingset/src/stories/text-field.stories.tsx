@@ -33,11 +33,13 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 export function Default(props: Record<string, unknown>) {
+  const textFieldProps = knobsAsProps(props);
+
   return (
     <TextField.Root
-      {...knobsAsProps(props)}
+      {...textFieldProps}
       ids={{ control: 'text-field-playground' }}
-      style={{ maxWidth: 384 }}
+      style={{ maxWidth: textFieldProps.layout === 'horizontal' ? 960 : 384 }}
     >
       <TextField.Label>Email address</TextField.Label>
       <TextField.Content>
@@ -46,7 +48,11 @@ export function Default(props: Record<string, unknown>) {
           type='email'
           placeholder='you@example.com'
         />
-        <TextField.Description>Used for account notifications.</TextField.Description>
+        {textFieldProps.invalid ? (
+          <TextField.Error>Enter a valid email address.</TextField.Error>
+        ) : (
+          <TextField.Description>Used for account notifications.</TextField.Description>
+        )}
       </TextField.Content>
     </TextField.Root>
   );
