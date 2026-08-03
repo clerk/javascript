@@ -94,6 +94,11 @@ export const enUS: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.',
     checkout: {
+      addPromoCode: 'Add promo code',
+      applyPromoCode: 'Apply',
+      discount: 'Discount',
+      promoCodePlaceholder: 'Enter promo code',
+      removePromoCode: 'Remove promo code',
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:

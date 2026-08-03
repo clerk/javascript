@@ -21,6 +21,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
+  UpdateCheckoutParams,
 } from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
@@ -142,6 +143,19 @@ export class Billing implements BillingNamespace {
       await BaseResource._fetch<BillingCheckoutJSON>({
         path: Billing.path(`/checkouts`, { orgId }),
         method: 'POST',
+        body: rest as any,
+      })
+    )?.response as unknown as BillingCheckoutJSON;
+
+    return new BillingCheckout(json);
+  };
+
+  updateCheckout = async (params: UpdateCheckoutParams) => {
+    const { id, orgId, ...rest } = params;
+    const json = (
+      await BaseResource._fetch<BillingCheckoutJSON>({
+        path: Billing.path(`/checkouts/${id}`, { orgId }),
+        method: 'PATCH',
         body: rest as any,
       })
     )?.response as unknown as BillingCheckoutJSON;

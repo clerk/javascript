@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
@@ -10,7 +11,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { toNegativeAmount } from '@/ui/utils/billing';
+import { getDiscountDescription, toNegativeAmount } from '@/ui/utils/billing';
 import {
   getCheckoutSeatUnitTotal,
   getIncludedSeatsUnitTotalTier,
@@ -22,18 +23,21 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import {
+  Badge,
   Box,
   Button,
   Col,
   descriptors,
   Flex,
   Form,
+  Icon,
+  Input,
   localizationKeys,
   Spinner,
   Text,
   useLocalizations,
 } from '../../customizables';
-import { ChevronUpDown, InformationCircle } from '../../icons';
+import { ChevronUpDown, Close, InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
@@ -44,6 +48,144 @@ type PaymentMethodSource = 'existing' | 'new';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 const HIDDEN_INPUT_NAME = 'payment_method_id';
+
+const promoCodeErrorMessage = (error: unknown) => {
+  if (isClerkAPIResponseError(error)) {
+    return error.errors[0]?.longMessage || error.errors[0]?.message;
+  }
+  return error instanceof Error ? error.message : undefined;
+};
+
+const PromoCodeRow = () => {
+  const { checkout } = useCheckout();
+  const { $, t } = useLocalizations();
+  const [isEditing, setIsEditing] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  if (checkout.status !== 'needs_confirmation') {
+    return null;
+  }
+
+  const discount = checkout.totals.discounts?.discount;
+  const appliedPromoCode = discount?.promoCode;
+
+  const updatePromoCode = async (value: string) => {
+    setError(undefined);
+    setIsLoading(true);
+    const result = await checkout.update({ promoCode: value });
+    setIsLoading(false);
+
+    if (result.error) {
+      setError(promoCodeErrorMessage(result.error) || t(localizationKeys('unstable__errors.form_param_value_invalid')));
+      return;
+    }
+
+    setPromoCode('');
+    setIsEditing(false);
+  };
+
+  if (discount && appliedPromoCode) {
+    return (
+      <LineItems.Group variant='tertiary'>
+        <LineItems.Title
+          description={getDiscountDescription(discount, discount.cyclesRemaining, checkout.planPeriod, { $, t })}
+          badge={
+            <Badge sx={theme => ({ gap: theme.space.$1 })}>
+              {appliedPromoCode}
+              <Button
+                type='button'
+                variant='ghost'
+                colorScheme='neutral'
+                aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
+                isDisabled={isLoading}
+                onClick={() => void updatePromoCode('')}
+                sx={{ padding: 0 }}
+              >
+                <Icon
+                  icon={Close}
+                  size='xs'
+                />
+              </Button>
+            </Badge>
+          }
+        />
+        <LineItems.Description text={$(toNegativeAmount(discount.amount))} />
+      </LineItems.Group>
+    );
+  }
+
+  if (!isEditing) {
+    return (
+      <LineItems.Group variant='tertiary'>
+        <LineItems.Title title={localizationKeys('billing.checkout.discount')} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            type='button'
+            variant='ghost'
+            colorScheme='primary'
+            localizationKey={localizationKeys('billing.checkout.addPromoCode')}
+            onClick={() => setIsEditing(true)}
+            sx={{ padding: 0 }}
+          />
+        </Box>
+      </LineItems.Group>
+    );
+  }
+
+  const errorId = 'checkout-promo-code-error';
+
+  return (
+    <LineItems.Group variant='tertiary'>
+      <Box
+        as='form'
+        onSubmit={event => {
+          event.preventDefault();
+          void updatePromoCode(promoCode.trim());
+        }}
+        sx={theme => ({
+          display: 'grid',
+          gridColumn: '1 / -1',
+          gridTemplateColumns: 'minmax(0, 1fr) auto',
+          gap: theme.space.$2,
+        })}
+      >
+        <Input
+          aria-label={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          aria-describedby={error ? errorId : undefined}
+          hasError={Boolean(error)}
+          isDisabled={isLoading}
+          placeholder={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          value={promoCode}
+          onChange={event => {
+            setPromoCode(event.target.value);
+            setError(undefined);
+          }}
+        />
+        <Button
+          type='submit'
+          variant='bordered'
+          colorScheme='secondary'
+          isDisabled={!promoCode.trim()}
+          isLoading={isLoading}
+          localizationKey={localizationKeys('billing.checkout.applyPromoCode')}
+        />
+        {error ? (
+          <Text
+            id={errorId}
+            role='alert'
+            variant='caption'
+            colorScheme='danger'
+            sx={{ gridColumn: '1 / -1' }}
+          >
+            {error}
+          </Text>
+        ) : null}
+      </Box>
+    </LineItems.Group>
+  );
+};
 
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
@@ -139,6 +281,7 @@ export const CheckoutForm = withCardStateProvider(() => {
               />
             </LineItems.Group>
           )}
+          <PromoCodeRow />
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />

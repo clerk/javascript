@@ -108,7 +108,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
         ...common.textVariants(t)[textVariant],
       })}
     >
-      {title ? (
+      {title || badge ? (
         <Span
           sx={t => ({
             display: 'inline-flex',
@@ -123,7 +123,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
               aria-hidden
             />
           ) : null}
-          <Span localizationKey={title} />
+          {title ? <Span localizationKey={title} /> : null}
           {badge ? <Box>{badge}</Box> : null}
         </Span>
       ) : null}
