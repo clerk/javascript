@@ -180,9 +180,15 @@ function headerWorkspace(data: UserButtonContextValue): ActiveWorkspace {
   return workspace(data.mode === 'orgs' ? activeMembership(data) : undefined, data.activeSession);
 }
 
-/** `user` mode never lists organizations, and neither does an account without any. */
+/**
+ * `user` mode never lists organizations, and neither does an account with nothing to list. A
+ * pending invitation or suggestion counts: it has to be reachable before there is a membership.
+ */
 function showsOrganizations(data: UserButtonContextValue): boolean {
-  return data.mode !== 'user' && data.hasOrganizations;
+  if (data.mode === 'user') {
+    return false;
+  }
+  return data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 }
 
 /**
@@ -220,7 +226,10 @@ interface WorkspaceAvatarProps {
 
 function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) {
   return (
+    // Decorative: every avatar here sits next to the same name in text, or in a labelled button, so
+    // exposing the fallback initials would only pad the accessible name ("O Other").
     <Avatar.Root
+      aria-hidden
       size={size}
       shape={shape}
     >
