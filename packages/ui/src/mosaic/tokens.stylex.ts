@@ -255,9 +255,10 @@ export const fontWeightVars = stylex.defineVars(fontWeightDefaults);
 // Read as "how direct is this feedback": the more a change is the answer to
 // something the pointer just did, the shorter it runs. `instant` is for the state
 // that has to feel like contact rather than a fade — a press landing, a highlight
-// appearing under the cursor; `fast` for hover and other pointer-driven state;
-// `base` for that state decaying once the pointer leaves, which reads better a
-// little slower than it arrived; `slow`/`slower` for changes the pointer didn't
+// appearing under the cursor, hover included; `fast` for exits and other short
+// pointer-driven change; `base` for that state decaying once the pointer leaves,
+// which reads better a little slower than it arrived; `slow`/`slower` for changes
+// the pointer didn't
 // cause directly, like a panel or overlay resolving.
 //
 // Durations are not gated on `prefers-reduced-motion`. That signal is about

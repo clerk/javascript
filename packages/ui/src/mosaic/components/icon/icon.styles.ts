@@ -10,7 +10,10 @@ export const styles = stylex.create({
     display: 'inline-block',
     flexShrink: 0,
     // Transitions don't inherit, so the container's own color transition doesn't animate this.
-    transitionDuration: durationVars['--cl-duration-fast'],
+    // The default is `instant` because the arrival never varies (see `motion.md`); only the exit
+    // is contextual, so a container that wants one hands its timing down the same way it hands
+    // down `--_cl-icon-color` (see `button.styles.ts`).
+    transitionDuration: `var(--_cl-icon-duration, ${durationVars['--cl-duration-instant']})`,
     transitionProperty: 'color',
     transitionTimingFunction: 'linear',
   },
