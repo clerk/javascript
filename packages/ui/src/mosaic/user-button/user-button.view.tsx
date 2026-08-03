@@ -713,8 +713,11 @@ export function UserButtonPopup() {
 
 export type UserButtonProps = Omit<UserButtonRootProps, 'children'>;
 
-/** All-in-one: renders the trigger + popup from a single prop-driven call. The headline v1 API. */
-export function UserButton(props: UserButtonProps) {
+/**
+ * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
+ * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
+ */
+export function UserButtonView(props: UserButtonProps) {
   return (
     <UserButtonRoot {...props}>
       <UserButtonTrigger />
