@@ -199,6 +199,15 @@ function showsAccounts(data: UserButtonContextValue): boolean {
   return data.mode !== 'orgs' && data.additionalSessions.length > 0;
 }
 
+/**
+ * The heading tells the account rows apart from the workspaces above them, and carries "Add
+ * account". An account-only surface lists nothing to tell them apart from, so the rows stand alone
+ * and the foot takes the action.
+ */
+function showsAccountsHeading(data: UserButtonContextValue): boolean {
+  return showsAccounts(data) && data.mode !== 'user';
+}
+
 function membershipSubtitle(membership: UserButtonMembership): string {
   const parts: string[] = [];
   if (membership.membersCount !== undefined) {
@@ -354,15 +363,47 @@ interface HeaderAction {
   /** An icon renders a square, icon-only button that labels itself through `aria-label`. */
   icon?: IconName;
   onClick: () => void;
+  /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
+  busyKey?: string;
+}
+
+// Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
+function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
+  const { busy, disabled } = useBusy(busyKey ?? '');
+
+  return (
+    <Button
+      variant='outline'
+      color='neutral'
+      size='sm'
+      shape={icon ? 'square' : 'default'}
+      aria-label={icon ? label : undefined}
+      disabled={busy || disabled}
+      onClick={onClick}
+    >
+      {busy ? (
+        <Spinner size='sm' />
+      ) : icon ? (
+        <Icon
+          name={icon}
+          size='sm'
+        />
+      ) : (
+        label
+      )}
+    </Button>
+  );
 }
 
 /** The active workspace: who you are signed in as, and what you can do about it. */
 function Header() {
   const data = useUserButtonContext();
+  const signOutSession = data.onSignOutSession;
+  const { sessionId, email } = data.activeSession;
   const { name, imageUrl, shape, organization } = headerWorkspace(data);
-  const subtitle = organization ? membershipSubtitle(organization) : data.activeSession.email;
+  const subtitle = organization ? membershipSubtitle(organization) : email;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
-  // surface. The gear manages whatever the header names. Signing out is a row in the list below.
+  // surface. The gear manages whatever the header names.
   const invitable = showsOrganizations(data) ? activeMembership(data) : undefined;
 
   const actions: HeaderAction[] = [];
@@ -375,6 +416,16 @@ function Header() {
     }
   } else if (data.onManageAccount) {
     actions.push({ label: 'Manage account', icon: 'cog', onClick: data.onManageAccount });
+  }
+  // Every other surface hangs "Sign out" off the account's own row. An account-only one has no such
+  // row, so it sits beside the gear that manages the same account.
+  if (data.mode === 'user' && signOutSession) {
+    actions.push({
+      label: 'Sign out',
+      icon: 'log-out',
+      onClick: () => signOutSession(sessionId),
+      busyKey: userButtonBusyKeys.signOutSession(sessionId),
+    });
   }
 
   return (
@@ -394,24 +445,10 @@ function Header() {
         </Item.Content>
         <Item.Actions>
           {actions.map(a => (
-            <Button
+            <HeaderActionButton
               key={a.label}
-              variant='outline'
-              color='neutral'
-              size='sm'
-              shape={a.icon ? 'square' : 'default'}
-              aria-label={a.icon ? a.label : undefined}
-              onClick={a.onClick}
-            >
-              {a.icon ? (
-                <Icon
-                  name={a.icon}
-                  size='sm'
-                />
-              ) : (
-                a.label
-              )}
-            </Button>
+              {...a}
+            />
           ))}
         </Item.Actions>
       </Item.Root>
@@ -673,6 +710,28 @@ function WorkspaceSection() {
   );
 }
 
+/** The heading the account rows sit under, and the account-wide actions it carries. */
+function AccountsHeading() {
+  const data = useUserButtonContext();
+
+  const actions: AccountAction[] = [];
+  if (data.onAddAccount) {
+    actions.push({ label: 'Add account', onClick: data.onAddAccount });
+  }
+
+  return (
+    <Item.Root size='xs'>
+      <Item.Content>
+        <Item.Label>Accounts</Item.Label>
+      </Item.Content>
+      <ActionMenu
+        label='Account actions'
+        actions={actions}
+      />
+    </Item.Root>
+  );
+}
+
 /** The other signed-in accounts, under their own heading, so they never read as workspaces. */
 function AccountsSection() {
   const data = useUserButtonContext();
@@ -681,24 +740,11 @@ function AccountsSection() {
     return null;
   }
 
-  const actions: AccountAction[] = [];
-  if (data.onAddAccount) {
-    actions.push({ label: 'Add account', onClick: data.onAddAccount });
-  }
-
   return (
     <>
       <Item.Separator />
       <Item.Group>
-        <Item.Root size='xs'>
-          <Item.Content>
-            <Item.Label>Accounts</Item.Label>
-          </Item.Content>
-          <ActionMenu
-            label='Account actions'
-            actions={actions}
-          />
-        </Item.Root>
+        {showsAccountsHeading(data) ? <AccountsHeading /> : null}
         {data.additionalSessions.map(s => (
           <AdditionalSession
             key={s.sessionId}
@@ -722,8 +768,9 @@ function Footer() {
       actions.push({ icon: 'plus', label: 'Create organization', onClick: data.onCreateOrganization });
     }
   } else {
-    // The Accounts group heads itself with "Add account"; the footer carries it only without one.
-    if (data.onAddAccount && !showsAccounts(data)) {
+    // "Add account" lives in the Accounts heading wherever there is one; without it the foot
+    // carries it, the same slot "Create organization" takes on an org-only surface.
+    if (data.onAddAccount && !showsAccountsHeading(data)) {
       actions.push({ icon: 'plus', label: 'Add account', onClick: data.onAddAccount });
     }
     if (data.onSignOutAll) {
