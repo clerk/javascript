@@ -386,7 +386,7 @@ export function Scrolling() {
               >
                 <Avatar.Image
                   src='https://github.com/clerk.png'
-                  alt={name}
+                  alt=''
                 />
                 <Avatar.Fallback>{name[0]}</Avatar.Fallback>
               </Avatar.Root>

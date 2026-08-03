@@ -101,6 +101,7 @@ import {
   HoverReveal as ScrollAreaHoverReveal,
   meta as scrollAreaMeta,
   NotScrollable as ScrollAreaNotScrollable,
+  ShadowIndicators as ScrollAreaShadowIndicators,
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
@@ -230,6 +231,7 @@ const scrollAreaModule: StoryModule = {
   Gutter: ScrollAreaGutter,
   HoverReveal: ScrollAreaHoverReveal,
   ThemedScrollbar: ScrollAreaThemedScrollbar,
+  ShadowIndicators: ScrollAreaShadowIndicators,
 };
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
