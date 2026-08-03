@@ -16,7 +16,7 @@ export type UserButtonProps = UserButtonControllerOptions & UserButtonTriggerPro
  * the action resolves, and clears busy state (leaving the popover open) if it rejects. Actions that
  * open another surface (manage/create navigations) leave the popover as-is.
  */
-export function UserButton({ showLabel, ...options }: UserButtonProps = {}) {
+export function UserButton({ renderTriggerLabel, renderPlanBadge, ...options }: UserButtonProps = {}) {
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -70,7 +70,8 @@ export function UserButton({ showLabel, ...options }: UserButtonProps = {}) {
   return (
     <UserButtonView
       {...data}
-      showLabel={showLabel}
+      renderTriggerLabel={renderTriggerLabel}
+      renderPlanBadge={renderPlanBadge}
       open={open}
       onOpenChange={setOpen}
       pendingKey={displayPendingKey}
