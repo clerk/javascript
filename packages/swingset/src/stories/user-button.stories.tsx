@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import {
+  userButtonBusyKeys,
   type UserButtonInvitation,
   type UserButtonMembership,
   type UserButtonProps,
@@ -121,7 +122,6 @@ const initialAccounts: Account[] = [
 function join(account: Account, organizationId: string, name: string, imageUrl?: string): Account {
   return {
     ...account,
-    // Switching to what you just joined is what makes the Join button's effect visible.
     activeOrganizationId: organizationId,
     memberships: [...account.memberships, { kind: 'membership', organizationId, name, imageUrl }],
     suggestions: account.suggestions.filter(s => s.organizationId !== organizationId),
@@ -129,41 +129,63 @@ function join(account: Account, organizationId: string, name: string, imageUrl?:
   };
 }
 
+// Long enough to read the spinner without making the prototype feel broken.
+const LATENCY_MS = 800;
+
 /**
  * The examples are prototypes, not screenshots: every row is wired to state, so picking a workspace
- * or an account really switches to it and closes the surface, and Join turns a suggestion into a
- * workspace. The actions that would navigate somewhere in a real app (Manage, Invite, Create
- * organization, Add account) have nowhere to go here, so they only close the popover.
+ * or an account really switches to it, and Join turns a suggestion into a workspace. None of it is
+ * instant — each action is a network round trip against Clerk, so the prototype fakes one: the
+ * clicked row spins, the rest stand down, and the surface stays open so you land back on the result.
+ * Only picking a workspace closes it, because that is the one action the surface exists to perform.
+ * The actions that would navigate somewhere in a real app (Manage, Invite, Create organization, Add
+ * account) have nowhere to go here, so they only close the popover.
  */
 function usePrototype(): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState(initialAccounts);
   const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
+  const [pendingKey, setPendingKey] = useState<string | null>(null);
 
   const account = accounts.find(a => a.session.sessionId === activeSessionId) ?? accounts[0];
   const close = () => setOpen(false);
 
-  // Every switch closes the surface, the way it would once the app re-rendered around it.
-  const update = (change: (account: Account) => Account) => {
-    setAccounts(accounts.map(a => (a.session.sessionId === activeSessionId ? change(a) : a)));
-    close();
+  // One action at a time, the same re-entry guard the connected component holds while a request
+  // is in flight. `pendingKey` is what the view reads to spin one row and stand the others down.
+  const run = (key: string, commit: () => void, closeOnSuccess = false) => {
+    if (pendingKey) {
+      return;
+    }
+    setPendingKey(key);
+    setTimeout(() => {
+      commit();
+      setPendingKey(null);
+      if (closeOnSuccess) {
+        close();
+      }
+    }, LATENCY_MS);
   };
 
+  const updateActive = (change: (account: Account) => Account) =>
+    setAccounts(current => current.map(a => (a.session.sessionId === activeSessionId ? change(a) : a)));
+
   const signOutSession = (sessionId: string) => {
-    const [next] = accounts.filter(a => a.session.sessionId !== sessionId);
+    const remaining = accounts.filter(a => a.session.sessionId !== sessionId);
+    const [next] = remaining;
     // A prototype with nobody signed in has nothing left to show, so the last account stays put.
-    if (next) {
-      setAccounts(accounts.filter(a => a.session.sessionId !== sessionId));
-      if (sessionId === activeSessionId) {
-        setActiveSessionId(next.session.sessionId);
-      }
+    if (!next) {
+      return;
     }
-    close();
+    setAccounts(remaining);
+    if (sessionId === activeSessionId) {
+      setActiveSessionId(next.session.sessionId);
+    }
   };
 
   return {
     open,
     onOpenChange: setOpen,
+    pendingKey,
     activeSession: account.session,
     activeOrganizationId: account.activeOrganizationId,
     hasOrganizations: account.memberships.length > 0,
@@ -171,24 +193,33 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
     suggestions: account.suggestions,
     invitations: account.invitations,
     additionalSessions: accounts.filter(a => a.session.sessionId !== activeSessionId).map(a => a.session),
-    // Selecting an organization only ever acts on the active account.
-    onSelectOrganization: organizationId => update(a => ({ ...a, activeOrganizationId: organizationId })),
+    // Selecting an organization only ever acts on the active account, and is the one action that
+    // closes the surface behind it.
+    onSelectOrganization: organizationId =>
+      run(
+        userButtonBusyKeys.selectOrganization(organizationId),
+        () => updateActive(a => ({ ...a, activeOrganizationId: organizationId })),
+        true,
+      ),
+    // Joining switches to what you just joined, and staying open is what makes that visible.
     onAcceptSuggestion: id =>
-      update(a => {
-        const suggestion = a.suggestions.find(s => s.id === id);
-        return suggestion ? join(a, suggestion.organizationId, suggestion.name, suggestion.imageUrl) : a;
-      }),
+      run(userButtonBusyKeys.acceptSuggestion(id), () =>
+        updateActive(a => {
+          const suggestion = a.suggestions.find(s => s.id === id);
+          return suggestion ? join(a, suggestion.organizationId, suggestion.name, suggestion.imageUrl) : a;
+        }),
+      ),
     onAcceptInvitation: id =>
-      update(a => {
-        const invitation = a.invitations.find(i => i.id === id);
-        return invitation ? join(a, invitation.organizationId, invitation.organizationName, invitation.imageUrl) : a;
-      }),
-    onSwitchSession: sessionId => {
-      setActiveSessionId(sessionId);
-      close();
-    },
-    onSignOutSession: signOutSession,
-    onSignOutAll: close,
+      run(userButtonBusyKeys.acceptInvitation(id), () =>
+        updateActive(a => {
+          const invitation = a.invitations.find(i => i.id === id);
+          return invitation ? join(a, invitation.organizationId, invitation.organizationName, invitation.imageUrl) : a;
+        }),
+      ),
+    onSwitchSession: sessionId => run(userButtonBusyKeys.switchSession(sessionId), () => setActiveSessionId(sessionId)),
+    onSignOutSession: sessionId => run(userButtonBusyKeys.signOutSession(sessionId), () => signOutSession(sessionId)),
+    // Nothing is left to render once every account is gone, so this one closes too.
+    onSignOutAll: () => run(userButtonBusyKeys.signOutAll(), close),
     onManageOrganization: close,
     onInviteMembers: close,
     onManageAccount: close,
