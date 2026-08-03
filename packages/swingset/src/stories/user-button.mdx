@@ -21,9 +21,9 @@ one.
 It is a composition of lower-layer Mosaic components — `Popover` for the floating surface, `Card` for
 the surface itself, `Item` for every row, `Avatar` for the workspace marks, and `Menu` for the
 per-account actions — so it inherits their behavior, focus management, and ARIA wiring rather than
-restyling any of it. This first pass is presentational: the parts render from the props on
-`UserButtonRoot` (mock data in the examples). A `useUserButtonController()` that reads live Clerk
-resources is a drop-in follow-up.
+restyling any of it. `UserButtonView` is presentational: the parts render from the props on
+`UserButtonRoot` (mock data in the examples). The connected `UserButton` wraps it with
+`useUserButtonController()`, which reads live Clerk resources and needs no props.
 
 ## Example
 
@@ -40,12 +40,13 @@ to go here, so they only close the popover.
 
 ## Usage
 
-The all-in-one `UserButton` renders the trigger and popup from a single prop-driven call:
+The all-in-one, presentational `UserButtonView` renders the trigger and popup from a single
+prop-driven call (the connected, Clerk-backed `UserButton` wraps it and needs no props):
 
 ```tsx
-import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
+import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
 
-<UserButton
+<UserButtonView
   activeSession={{ sessionId: 'sess_colin', name: 'Colin', email: 'colin@clerk.dev' }}
   activeOrganizationId='org_clerk_app'
   hasOrganizations
