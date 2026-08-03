@@ -34,7 +34,7 @@ export const styles = stylex.create({
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
       ':focus-visible:where([aria-invalid="true"])': 'none',
     },
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: colorVars['--cl-color-input'],
     boxSizing: 'border-box',
     color: 'inherit',
     display: 'block',
