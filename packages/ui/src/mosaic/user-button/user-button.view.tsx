@@ -758,15 +758,16 @@ function AccountsSection() {
       <Item.Separator />
       <Item.Group>
         {showsAccountsHeading(data) ? (
-          <AccountsHeading />
-        ) : (
-          // Without a heading this group is the whole switcher, so it holds every account and
-          // checks the active one, the way the workspace list does above.
-          <AccountRow
-            session={data.activeSession}
-            active
-          />
-        )}
+          <>
+            <AccountsHeading />
+            {/* Under a heading the group reads as the full set of accounts, so the one you are on
+                is listed and checked. Without one it is a list of somewhere else to go. */}
+            <AccountRow
+              session={data.activeSession}
+              active
+            />
+          </>
+        ) : null}
         {data.additionalSessions.map(s => (
           <AccountRow
             key={s.sessionId}
