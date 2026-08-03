@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import {
   UserButton,
-  type UserButtonAccount,
   type UserButtonInvitation,
   type UserButtonMembership,
   type UserButtonProps,
@@ -30,7 +29,6 @@ const defaultOrgLogo =
 
 const colin: UserButtonSession = {
   sessionId: 'sess_colin',
-  userId: 'user_colin',
   name: 'Colin',
   email: 'colin@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
@@ -38,14 +36,18 @@ const colin: UserButtonSession = {
 
 const braden: UserButtonSession = {
   sessionId: 'sess_braden',
-  userId: 'user_braden',
   name: 'Braden',
   email: 'braden@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/64913815?v=4',
 };
 
-/** One signed-in account and everything that belongs to it. */
-interface Account extends UserButtonAccount {
+/**
+ * One signed-in account and everything that belongs to it. The prototype holds all of it the way a
+ * backend would; only the active account's half of it ever reaches the component.
+ */
+interface Account {
+  session: UserButtonSession;
+  memberships: UserButtonMembership[];
   activeOrganizationId: string | null;
   suggestions: UserButtonSuggestion[];
   invitations: UserButtonInvitation[];
@@ -162,21 +164,15 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
   return {
     open,
     onOpenChange: setOpen,
-    status: 'ready',
     activeSession: account.session,
     activeOrganizationId: account.activeOrganizationId,
     hasOrganizations: account.memberships.length > 0,
     memberships: account.memberships,
     suggestions: account.suggestions,
     invitations: account.invitations,
-    additionalAccounts: accounts.filter(a => a.session.sessionId !== activeSessionId),
-    onSelectWorkspace: (sessionId, organizationId) => {
-      setAccounts(
-        accounts.map(a => (a.session.sessionId === sessionId ? { ...a, activeOrganizationId: organizationId } : a)),
-      );
-      setActiveSessionId(sessionId);
-      close();
-    },
+    additionalSessions: accounts.filter(a => a.session.sessionId !== activeSessionId).map(a => a.session),
+    // Selecting an organization only ever acts on the active account.
+    onSelectOrganization: organizationId => update(a => ({ ...a, activeOrganizationId: organizationId })),
     onAcceptSuggestion: id =>
       update(a => {
         const suggestion = a.suggestions.find(s => s.id === id);
