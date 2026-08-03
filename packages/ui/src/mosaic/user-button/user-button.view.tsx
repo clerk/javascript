@@ -865,23 +865,31 @@ export function UserButtonRoot(props: UserButtonRootProps) {
 
 export interface UserButtonTriggerProps {
   /**
-   * Names the active workspace beside its avatar — the organization and its plan wherever one
-   * heads the trigger, the account otherwise. Turn it off for the avatar alone.
+   * Names the active workspace beside its avatar — the organization wherever one heads the
+   * trigger, the account otherwise. Turn it off for the avatar alone.
    *
    * @default true
    */
-  showLabel?: boolean;
+  renderTriggerLabel?: boolean;
+  /**
+   * Carries the active organization's plan beside its name. Part of the label, so it needs
+   * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
+   *
+   * @default true
+   */
+  renderPlanBadge?: boolean;
 }
 
 /** The trigger: the active workspace's avatar, and what it is called. */
-export function UserButtonTrigger({ showLabel = true }: UserButtonTriggerProps = {}) {
+export function UserButtonTrigger({ renderTriggerLabel = true, renderPlanBadge = true }: UserButtonTriggerProps = {}) {
   const data = useUserButtonContext();
   const { name, imageUrl, shape, organization } = triggerWorkspace(data);
+  const planLabel = renderPlanBadge ? organization?.planLabel : undefined;
 
   return (
     <Popover.Trigger
       aria-label={`Open account menu for ${name}`}
-      {...stylex.props(styles.trigger, showLabel ? styles.triggerLabelled : triggerShapes[shape])}
+      {...stylex.props(styles.trigger, renderTriggerLabel ? styles.triggerLabelled : triggerShapes[shape])}
     >
       <WorkspaceAvatar
         name={name}
@@ -889,10 +897,10 @@ export function UserButtonTrigger({ showLabel = true }: UserButtonTriggerProps =
         shape={shape}
         size='sm'
       />
-      {showLabel ? (
+      {renderTriggerLabel ? (
         <>
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
-          {organization?.planLabel ? <Badge color='neutral'>{organization.planLabel}</Badge> : null}
+          {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
         </>
       ) : null}
     </Popover.Trigger>
@@ -936,10 +944,13 @@ export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButton
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
  */
-export function UserButtonView({ showLabel, ...root }: UserButtonProps) {
+export function UserButtonView({ renderTriggerLabel, renderPlanBadge, ...root }: UserButtonProps) {
   return (
     <UserButtonRoot {...root}>
-      <UserButtonTrigger showLabel={showLabel} />
+      <UserButtonTrigger
+        renderTriggerLabel={renderTriggerLabel}
+        renderPlanBadge={renderPlanBadge}
+      />
       <UserButtonPopup />
     </UserButtonRoot>
   );
