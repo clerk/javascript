@@ -175,9 +175,7 @@ async function open() {
   return act;
 }
 
-// Queried by label, not role: floating-ui gives any menu trigger inside another floating element
-// `role="menuitem"`, so the `⋯` in the popover is not reachable as a button.
-const accountMenu = () => screen.getByLabelText('Actions for alice@example.com');
+const accountMenu = () => screen.getByRole('button', { name: 'Actions for alice@example.com' });
 
 /** Opens the `⋯` on the active account's row and clicks one of its actions. */
 async function accountAction(act: ReturnType<typeof userEvent.setup>, label: string) {
