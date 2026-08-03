@@ -4,12 +4,19 @@ import * as UserButtonStories from './user-button.stories';
 
 The account & organization switcher that sits behind the user avatar. The account you're signed in as
 heads the surface — the one large row, carrying a **gear** that manages it and, where an organization
-is active, an **Invite** button. Below it every signed-in account heads its own organizations
-(including any **suggested** workspaces you can Join), so a workspace always sits under the account
-it belongs to. Clicking a workspace makes it _and_ its account active in one go — `onSelectWorkspace`
-takes both — and the account's own `⋯` menu carries its per-account actions. The foot of the surface
-exposes **Add account** and **Sign out of all accounts**. `mode` narrows that to just the
-organizations or just the accounts; see [Modes](#modes).
+is active, an **Invite** button. Under it sit that account's workspaces: every organization it
+belongs to, and any **suggested** or **invited** workspaces it can Join. The account's own `⋯` menu
+carries its per-account actions. Every _other_ signed-in account sits below that under
+its own **Accounts** heading — plain rows you click to switch to, with **Add account** on the
+heading's `⋯` — so an account is never mistaken for a workspace. The foot of the surface signs you
+out of everything. `mode` narrows all of this to just the organizations or just the accounts; see
+[Modes](#modes).
+
+Only the active account's organizations are listed, and that is a data constraint rather than a
+design one: organization requests are scoped to the session that makes them, so another account's
+workspaces are unknowable until it _is_ the active one. That's why `additionalSessions` carries
+sessions alone, and why `onSelectOrganization` takes no session — it can only ever mean the active
+one.
 
 It is a composition of lower-layer Mosaic components — `Popover` for the floating surface, `Card` for
 the surface itself, `Item` for every row, `Avatar` for the workspace marks, and `Menu` for the
@@ -39,8 +46,7 @@ The all-in-one `UserButton` renders the trigger and popup from a single prop-dri
 import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButton
-  status='ready'
-  activeSession={{ sessionId: 'sess_colin', userId: 'user_colin', name: 'Colin', email: 'colin@clerk.dev' }}
+  activeSession={{ sessionId: 'sess_colin', name: 'Colin', email: 'colin@clerk.dev' }}
   activeOrganizationId='org_clerk_app'
   hasOrganizations
   memberships={[
@@ -49,13 +55,8 @@ import { UserButton } from '@clerk/ui/mosaic/user-button/user-button.view';
   ]}
   suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
   invitations={[]}
-  additionalAccounts={[
-    {
-      session: { sessionId: 'sess_braden', userId: 'user_braden', name: 'Braden', email: 'braden@clerk.dev' },
-      memberships: [{ kind: 'membership', organizationId: 'org_clerk_marketing', name: 'Clerk Marketing' }],
-    },
-  ]}
-  onSelectWorkspace={(session, organization) => setActive({ session, organization })}
+  additionalSessions={[{ sessionId: 'sess_braden', name: 'Braden', email: 'braden@clerk.dev' }]}
+  onSelectOrganization={organization => setActive({ organization })}
   onSwitchSession={session => setActive({ session })}
   onSignOutAll={() => signOut()}
 />
@@ -118,8 +119,8 @@ account is still in the props and is deliberately not rendered.
 ### User
 
 The header is the account with only its gear (**Manage account**) — there is no organization to
-invite anyone to — and every other account is a plain row you click to switch to. An organization is
-active here, and this mode ignores it entirely, down to the trigger.
+invite anyone to — and the accounts are all the list holds, with no workspace rows above them. An
+organization is active here, and this mode ignores it entirely, down to the trigger.
 
 <Story
   name='User'
