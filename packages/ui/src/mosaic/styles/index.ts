@@ -36,6 +36,18 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { TextField } from '../components/text-field';
+export type {
+  TextFieldContentProps,
+  TextFieldDescriptionProps,
+  TextFieldErrorProps,
+  TextFieldIds,
+  TextFieldInputProps,
+  TextFieldLabelProps,
+  TextFieldLayout,
+  TextFieldRootProps,
+  TextFieldSize,
+} from '../components/text-field';
 
 export { Popover } from '../components/popover';
 export type {
