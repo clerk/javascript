@@ -39,11 +39,19 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByRole('button', { name: 'Account actions' })).toBeNull();
   });
 
-  it('lists the other accounts with no heading above them', () => {
+  it('lists the accounts with no heading above them', () => {
     renderView({ onAddAccount: vi.fn(), onSwitchSession: vi.fn() });
 
     expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
     expect(screen.queryByText('Accounts')).toBeNull();
+  });
+
+  it('lists the active account too, checked rather than offered to switch to', () => {
+    renderView({ onSwitchSession: vi.fn() });
+
+    // Once as the header's subtitle, once as its own row in the list below.
+    expect(screen.getAllByText('alice@example.com')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: 'alice@example.com' })).toBeNull();
   });
 
   it('signs out of the active account from the header, beside the gear', async () => {

@@ -370,6 +370,9 @@ interface HeaderAction {
 // Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
 function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
   const { busy, disabled } = useBusy(busyKey ?? '');
+  // On an icon button the spinner takes the icon's place; on a labelled one it leads the label, so
+  // the button keeps its width while the action runs.
+  const spinner = busy ? <Spinner size='sm' /> : null;
 
   return (
     <Button
@@ -381,15 +384,18 @@ function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
       disabled={busy || disabled}
       onClick={onClick}
     >
-      {busy ? (
-        <Spinner size='sm' />
-      ) : icon ? (
-        <Icon
-          name={icon}
-          size='sm'
-        />
+      {icon ? (
+        (spinner ?? (
+          <Icon
+            name={icon}
+            size='sm'
+          />
+        ))
       ) : (
-        label
+        <>
+          {spinner}
+          {label}
+        </>
       )}
     </Button>
   );
@@ -410,22 +416,21 @@ function Header() {
   if (invitable && data.onInviteMembers) {
     actions.push({ label: 'Invite', onClick: data.onInviteMembers });
   }
+  // Every other surface hangs "Sign out" off the account's own row. An account-only one has no such
+  // row, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
+  if (data.mode === 'user' && signOutSession) {
+    actions.push({
+      label: 'Sign out',
+      onClick: () => signOutSession(sessionId),
+      busyKey: userButtonBusyKeys.signOutSession(sessionId),
+    });
+  }
   if (organization) {
     if (data.onManageOrganization) {
       actions.push({ label: 'Manage organization', icon: 'cog', onClick: data.onManageOrganization });
     }
   } else if (data.onManageAccount) {
     actions.push({ label: 'Manage account', icon: 'cog', onClick: data.onManageAccount });
-  }
-  // Every other surface hangs "Sign out" off the account's own row. An account-only one has no such
-  // row, so it sits beside the gear that manages the same account.
-  if (data.mode === 'user' && signOutSession) {
-    actions.push({
-      label: 'Sign out',
-      icon: 'log-out',
-      onClick: () => signOutSession(sessionId),
-      busyKey: userButtonBusyKeys.signOutSession(sessionId),
-    });
   }
 
   return (
@@ -654,13 +659,14 @@ function PendingRows() {
 }
 
 /**
- * Another signed-in account: a plain row you click to switch to. Its workspaces cannot be listed
- * here — they are scoped to the session that fetches them — so switching is all it offers.
+ * A signed-in account: a plain row you click to switch to, checked where it is already the active
+ * one. Its workspaces cannot be listed here — they are scoped to the session that fetches them —
+ * so switching is all it offers.
  */
-function AdditionalSession({ session }: { session: UserButtonSession }) {
+function AccountRow({ session, active }: { session: UserButtonSession; active?: boolean }) {
   const data = useUserButtonContext();
   const { busy, disabled } = useBusy(userButtonBusyKeys.switchSession(session.sessionId));
-  const switchSession = data.onSwitchSession && !busy && !disabled ? data.onSwitchSession : undefined;
+  const switchSession = data.onSwitchSession && !active && !busy && !disabled ? data.onSwitchSession : undefined;
 
   return (
     <Item.Root
@@ -683,6 +689,13 @@ function AdditionalSession({ session }: { session: UserButtonSession }) {
       {busy ? (
         <Trailing>
           <Spinner size='sm' />
+        </Trailing>
+      ) : active ? (
+        <Trailing>
+          <Icon
+            name='check'
+            size='sm'
+          />
         </Trailing>
       ) : null}
     </Item.Root>
@@ -732,7 +745,7 @@ function AccountsHeading() {
   );
 }
 
-/** The other signed-in accounts, under their own heading, so they never read as workspaces. */
+/** The signed-in accounts, under their own heading, so they never read as workspaces. */
 function AccountsSection() {
   const data = useUserButtonContext();
 
@@ -744,9 +757,18 @@ function AccountsSection() {
     <>
       <Item.Separator />
       <Item.Group>
-        {showsAccountsHeading(data) ? <AccountsHeading /> : null}
+        {showsAccountsHeading(data) ? (
+          <AccountsHeading />
+        ) : (
+          // Without a heading this group is the whole switcher, so it holds every account and
+          // checks the active one, the way the workspace list does above.
+          <AccountRow
+            session={data.activeSession}
+            active
+          />
+        )}
         {data.additionalSessions.map(s => (
-          <AdditionalSession
+          <AccountRow
             key={s.sessionId}
             session={s}
           />
