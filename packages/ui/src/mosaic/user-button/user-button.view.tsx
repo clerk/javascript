@@ -701,12 +701,12 @@ export function UserButtonPopup() {
   return (
     <Popover.Popup aria-label='Account'>
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
-      <Card style={{ rowGap: 0 }}>
+      <Card.Root style={{ rowGap: 0 }}>
         <Header />
         <WorkspaceSection />
         <AccountsSection />
         <Footer />
-      </Card>
+      </Card.Root>
     </Popover.Popup>
   );
 }
