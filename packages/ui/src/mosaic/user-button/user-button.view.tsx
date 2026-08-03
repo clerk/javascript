@@ -17,7 +17,7 @@ import { Popover } from '../components/popover';
 import { Skeleton } from '../components/skeleton';
 import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
-import { fontWeightVars, space } from '../tokens.stylex';
+import { fontWeightVars } from '../tokens.stylex';
 import { styles, triggerShapes } from './user-button.styles';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
@@ -254,6 +254,11 @@ const asButton = ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => 
   </button>
 );
 
+/** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
+function Trailing({ children }: { children: ReactNode }) {
+  return <Item.Actions {...stylex.props(styles.trailing)}>{children}</Item.Actions>;
+}
+
 interface WorkspaceRowProps {
   name: string;
   imageUrl?: string;
@@ -289,22 +294,18 @@ function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing, busy,
         <Item.Title>{name}</Item.Title>
       </Item.Content>
       {busy ? (
-        <Item.Actions>
-          <Spinner />
-        </Item.Actions>
+        <Trailing>
+          <Spinner size='sm' />
+        </Trailing>
       ) : trailing ? (
         <Item.Actions>{trailing}</Item.Actions>
-      ) : null}
-      {active ? (
-        <Item.Actions>
+      ) : active ? (
+        <Trailing>
           <Icon
             name='check'
             size='sm'
-            style={{
-              width: space['7'],
-            }}
           />
-        </Item.Actions>
+        </Trailing>
       ) : null}
     </Item.Root>
   );
@@ -331,7 +332,7 @@ function ActionRow({ icon, label, onClick, busyKey }: ActionRowProps) {
     >
       <Item.Media>
         {busy ? (
-          <Spinner />
+          <Spinner size='sm' />
         ) : (
           <Icon
             name={icon}
@@ -431,7 +432,7 @@ function ActionMenu({ label, actions }: { label: string; actions: AccountAction[
   }
 
   return (
-    <Item.Actions>
+    <Trailing>
       <Menu.Root>
         <Menu.Trigger aria-label={label} />
         <Menu.Content>
@@ -445,7 +446,7 @@ function ActionMenu({ label, actions }: { label: string; actions: AccountAction[
           ))}
         </Menu.Content>
       </Menu.Root>
-    </Item.Actions>
+    </Trailing>
   );
 }
 
@@ -487,9 +488,9 @@ function ActiveAccountRow() {
         </Item.Description>
       </Item.Content>
       {busy ? (
-        <Item.Actions>
-          <Spinner />
-        </Item.Actions>
+        <Trailing>
+          <Spinner size='sm' />
+        </Trailing>
       ) : (
         <ActionMenu
           label={`Actions for ${email}`}
@@ -643,9 +644,9 @@ function AdditionalSession({ session }: { session: UserButtonSession }) {
         <Item.Title>{session.email}</Item.Title>
       </Item.Content>
       {busy ? (
-        <Item.Actions>
-          <Spinner />
-        </Item.Actions>
+        <Trailing>
+          <Spinner size='sm' />
+        </Trailing>
       ) : null}
     </Item.Root>
   );
