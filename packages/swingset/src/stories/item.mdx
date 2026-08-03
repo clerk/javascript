@@ -34,6 +34,33 @@ Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's 
   storyModule={ItemStories}
 />
 
+### Scrolling
+
+`Item.Group` is the canonical scroll surface in Mosaic: cap its height, spread the scroll-area atoms
+onto it, and it fades its content at whichever edge still has something to reveal.
+
+<Story
+  name='Scrolling'
+  storyModule={ItemStories}
+/>
+
+```tsx
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import * as stylex from '@stylexjs/stylex';
+
+<div
+  {...stylex.props(scrollAreaRoot)}
+  style={{ height: 260 }}
+>
+  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+</div>;
+```
+
+The atoms aren't specific to `Item` — they go on anything that scrolls, and they carry the edge
+fades, the scrollbar, the gutter, and the theming tokens with them. See
+[Scroll Area](/styles/scroll-area) for the full surface: the gutter argument, what happens when
+there is nothing to scroll, the token table, and how to replace the fade entirely.
+
 ## Usage
 
 ```tsx

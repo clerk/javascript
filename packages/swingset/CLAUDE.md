@@ -57,7 +57,7 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places a component in one of six layers. Sidebar order follows the `registry` array; group order follows first appearance there. Use these exact group strings:
+`meta.group` places an entry in one of these layers. Sidebar order follows the `registry` array; group order follows first appearance there. Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
@@ -67,8 +67,17 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 | `Blocks`     | Reusable composite UI (e.g. `Destructive`)                     | C         |
 | `Components` | Styled Mosaic components — simple CVA recipe (`Button`, `Input`) or compound/slot-based (`Dialog`, `Tabs`) | A         |
 | `Primitives` | Headless `@clerk/headless` primitives (`Accordion`)            | B         |
+| `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
+| `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
 
 `AIO` → `Panels` → `Sections` → `Blocks` → `Components` → `Primitives` runs roughly high-level-composition → low-level-primitive. Composed layers (AIO/Panels/Sections/Blocks) are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
+
+`Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
+archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
+actually surfaces — an argument table for a style function, a return-value table for a hook. A
+`Styles` entry documents the theme tokens its atoms read, since those tokens _are_ its API; the
+`Hooks` entry (`use-data-table.stories.tsx`) is `meta` alone, with no story exports at all, which is
+the minimum a section entry needs.
 
 Archetype A has two forms, chosen by whether the component exposes a single flat CVA recipe: **simple** components (`Button`, `Input`) are knob-driven; **compound** components built from slot recipes (`Dialog`, `Tabs`) have no flat variant props to knob, so they're documented like a primitive but themed. Both are detailed under Archetype A below.
 

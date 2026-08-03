@@ -88,6 +88,90 @@ const targetDefaults = {
 export const targetVars = stylex.defineVars(targetDefaults);
 
 // =============================================================================
+// Scrollbar Tokens
+// =============================================================================
+// One opinion for every scrolling surface in Mosaic, set in one place. Mosaic has no
+// reason to render differently-sized scrollbars in different components, so these are
+// tokens rather than per-component props — a consumer restyles all of them at once.
+//
+// The width is a real LENGTH, not the `auto | thin | none` keyword `scrollbar-width` takes.
+// Mosaic paints the scrollbar through `::-webkit-scrollbar`, which takes a length; the two
+// paths are mutually exclusive (a non-`auto` `scrollbar-width` or `scrollbar-color` makes a
+// UA ignore the pseudo-elements outright), so specifying a length is the honest option and
+// the keyword one is gone. Firefox implements neither pseudo-element and keeps its platform
+// scrollbar. Set the width to `0px` to hide it outright, which is what the old `none` did.
+//
+// Deliberately in PIXELS rather than on the `rem` scale the rest of the tokens use. A scrollbar
+// is chrome, not content: it should stay the same hairline whether or not the surrounding text
+// scales, and 8px of lane carrying a 2px inset — a 4px pill with a 2px track either side — is
+// a specific hairline rather than a ratio of anything. Rounding also matters more here than
+// elsewhere, since the thumb is only a few pixels wide to begin with.
+//
+// There is deliberately no knob for nudging the thumb sideways within its lane. The lane itself
+// cannot move — the browser places it at the inline end of the padding box, and it takes no margin,
+// offset, or transform — so the only lever is making the thumb's insets asymmetric, and that
+// visibly deforms the pill: `background-clip: content-box` clips to the inner radius, which is the
+// outer radius minus each side's own border width, so unequal insets draw the two halves of every
+// cap with different curvature. Tried and measured; not worth a hairline of position.
+//
+// The colours are FOUR states, not three, and they run from quietest to loudest: `idle` while the
+// pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
+// thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
+// they resolve at use time — overriding the base re-derives all three, while any one stays
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-card`,
+// which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
+// direction, and the other two step back toward `--cl-color-card-foreground`, deepening in light
+// mode and lightening in dark, since that token already carries both.
+//
+// Only the idle → base step can animate. It is set on the scroller, which owns the transition;
+// the thumb's own two are set on the pseudo-element, and Blink runs no transition there.
+//
+// `--cl-scrollbar-thumb-idle: oklch(from var(--cl-scrollbar-thumb) l c h / 0)` is the whole recipe
+// for a scrollbar that fades in on approach: the pill paints nothing until the pointer reaches the
+// region, and the lane is reserved either way, so nothing moves.
+//
+// Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
+// no width to apply to, and thinning a target that is already hard to hit would be actively
+// worse — Polaris's `s-scroll-box` gates its scrollbar styling the same way.
+
+// Self-reference by literal name: the group being defined can't read its own exported object,
+// and `--`-prefixed keys are emitted verbatim, so the name is stable enough to write by hand.
+const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
+
+const scrollbarDefaults = {
+  '--cl-scrollbar-width': '8px',
+  '--cl-scrollbar-thumb-inset': '2px',
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-neutral-faded']}, ${colorVars['--cl-color-card']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card']} 45%)`,
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 15%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-card-foreground']} 30%)`,
+} as const;
+
+export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
+
+// The edge-fade indicator on a scrolling region. Global rather than owned by `ScrollArea`
+// because "how soft is the edge of a scrolling region" is a design-language decision, on a
+// par with a radius step — any component that grows an edge fade should read these rather
+// than mint its own family. A component that genuinely needs a different value sets the var
+// on itself; the global default still applies everywhere else.
+//
+// `size` and `range` default to the same value on purpose: the fade reaches full strength
+// after you've scrolled its own height, so it grows in at the rate the content moves.
+//
+// There is deliberately no `inset` knob for holding the fade back from the scrollbar. It
+// existed only to compensate for a width CSS could not measure; now that `--cl-scrollbar-width`
+// specifies that width, the two can never legitimately differ — a smaller inset lets the fade
+// cover part of the scrollbar, a larger one leaves an unfaded strip beside it — so the mask
+// derives its inset from the scrollbar token instead of exposing a second name for the same
+// number.
+const scrollFadeDefaults = {
+  '--cl-scroll-fade-size': '1.5rem',
+  '--cl-scroll-fade-range': '1.5rem',
+} as const;
+
+export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);
+
+// =============================================================================
 // Spacing Tokens
 // =============================================================================
 // `--cl-spacing` is the ONLY exposed custom property (the base unit, Tailwind's
