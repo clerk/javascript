@@ -245,7 +245,18 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   return (
     <UserButtonView
       {...prototype}
-      showLabel={false}
+      renderTriggerLabel={false}
+    />
+  );
+}
+
+export function WithoutPlanBadge(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      renderPlanBadge={false}
     />
   );
 }
