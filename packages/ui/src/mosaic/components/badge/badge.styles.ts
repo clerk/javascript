@@ -3,7 +3,13 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 // warning/negative/positive tint a faded fill and use the saturated token as text;
-// primary/neutral fill with the solid token and use its `-foreground` for text.
+// primary fills with the solid token and uses its `-foreground` for text.
+//
+// Neutral has no faded surface to tint — `--cl-color-neutral-faded` is a text gray, and its
+// `-foreground` is a text color rather than an on-fill one, so it is unreadable against the solid
+// 900. It rides the same black/white scrim the button's neutral fill does, which composites against
+// any backdrop. Must be a local binding — StyleX inlines it; an imported one fails to compile.
+const neutralScrim = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 6%, transparent)`;
 export const styles = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-full'],
@@ -26,7 +32,7 @@ export const colors = stylex.create({
     color: colorVars['--cl-color-primary-foreground'],
   },
   neutral: {
-    backgroundColor: colorVars['--cl-color-neutral'],
+    backgroundColor: neutralScrim,
     color: colorVars['--cl-color-neutral-foreground'],
   },
   warning: {
