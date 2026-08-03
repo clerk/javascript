@@ -222,7 +222,16 @@ describe('UserButton (connected)', () => {
     }
 
     expect(screen.queryByRole('button', { name: 'Acme' })).toBeNull();
-    expect(within(surface).getByText('Acme')).toBeInTheDocument();
+    // It heads the surface and is listed under it; neither one is something to click.
+    expect(within(surface).getAllByText('Acme')).toHaveLength(2);
+  });
+
+  it('heads the surface with the account where the user takes priority', async () => {
+    renderUserButton({ modePriority: 'user' });
+    await open();
+
+    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
   });
 
   it('selecting an organization calls setActive without a redirect by default and closes the popover', async () => {
@@ -335,7 +344,7 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     const act = await open();
 
-    await act.click(screen.getByRole('button', { name: 'Manage account' }));
+    await accountAction(act, 'Manage account');
 
     expect(navigate).toHaveBeenCalledWith('/user-profile');
     expect(popup()).toBeInTheDocument();
