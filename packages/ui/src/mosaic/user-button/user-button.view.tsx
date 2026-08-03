@@ -14,6 +14,8 @@ import { Icon } from '../components/icon';
 import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
+import { Skeleton } from '../components/skeleton';
+import { Spinner } from '../components/spinner';
 import type { IconName } from '../icons/registry';
 import { fontWeightVars, space } from '../tokens.stylex';
 import { styles, triggerShapes } from './user-button.styles';
@@ -102,7 +104,28 @@ export interface UserButtonCallbacks {
  */
 export type UserButtonMode = 'combined' | 'orgs' | 'user';
 
-type UserButtonContextValue = UserButtonData & UserButtonCallbacks & { mode: UserButtonMode };
+/**
+ * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
+ * container (which sets `pendingKey`) and the view (which matches against it).
+ */
+export const userButtonBusyKeys = {
+  selectOrganization: (organizationId: string) => `select-org:${organizationId}`,
+  switchSession: (sessionId: string) => `switch:${sessionId}`,
+  signOutSession: (sessionId: string) => `sign-out:${sessionId}`,
+  signOutAll: () => 'sign-out-all',
+  acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
+  acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
+} as const;
+
+export interface UserButtonBusyState {
+  /**
+   * Key of the single in-flight action (see `userButtonBusyKeys`), or `null`/absent when idle. The
+   * affordance that owns it spins; every other one is disabled so a second action cannot start.
+   */
+  pendingKey?: string | null;
+}
+
+type UserButtonContextValue = UserButtonData & UserButtonCallbacks & UserButtonBusyState & { mode: UserButtonMode };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -114,6 +137,12 @@ function useUserButtonContext(): UserButtonContextValue {
     throw new Error('UserButton parts must be rendered inside <UserButtonRoot>');
   }
   return value;
+}
+
+/** Splits the one in-flight action into the affordance that owns it and every one that must wait. */
+function useBusy(key: string): { busy: boolean; disabled: boolean } {
+  const { pendingKey } = useUserButtonContext();
+  return { busy: pendingKey === key, disabled: Boolean(pendingKey) && pendingKey !== key };
 }
 
 function activeMembership(data: UserButtonData): UserButtonMembership | undefined {
@@ -223,12 +252,15 @@ interface WorkspaceRowProps {
   active?: boolean;
   onSelect?: () => void;
   trailing?: ReactNode;
+  busy?: boolean;
+  disabled?: boolean;
 }
 
 /** One selectable workspace: personal account, organization, suggestion, or invitation. */
-function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing }: WorkspaceRowProps) {
-  // Selecting what is already selected does nothing, so the active row is not a button at all.
-  const select = active ? undefined : onSelect;
+function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing, busy, disabled }: WorkspaceRowProps) {
+  // Selecting what is already selected does nothing, so the active row is not a button at all —
+  // and neither is a row whose action is running or is waiting on another one.
+  const select = active || busy || disabled ? undefined : onSelect;
 
   return (
     <Item.Root
@@ -247,7 +279,13 @@ function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing }: Wor
       <Item.Content>
         <Item.Title>{name}</Item.Title>
       </Item.Content>
-      {trailing ? <Item.Actions>{trailing}</Item.Actions> : null}
+      {busy ? (
+        <Item.Actions>
+          <Spinner />
+        </Item.Actions>
+      ) : trailing ? (
+        <Item.Actions>{trailing}</Item.Actions>
+      ) : null}
       {active ? (
         <Item.Actions>
           <Icon
@@ -267,21 +305,30 @@ interface ActionRowProps {
   icon: IconName;
   label: string;
   onClick: () => void;
+  /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
+  busyKey?: string;
 }
 
 /** A bare action at the foot of a group ("Add account", "Sign out of all accounts"). */
-function ActionRow({ icon, label, onClick }: ActionRowProps) {
+function ActionRow({ icon, label, onClick, busyKey }: ActionRowProps) {
+  const { busy, disabled } = useBusy(busyKey ?? '');
+  const act = busy || disabled ? undefined : onClick;
+
   return (
     <Item.Root
       size='xs'
-      render={asButton}
-      onClick={onClick}
+      render={act ? asButton : undefined}
+      onClick={act}
     >
       <Item.Media>
-        <Icon
-          name={icon}
-          size='sm'
-        />
+        {busy ? (
+          <Spinner />
+        ) : (
+          <Icon
+            name={icon}
+            size='sm'
+          />
+        )}
       </Item.Media>
       <Item.Content>
         <Item.Label>{label}</Item.Label>
@@ -400,7 +447,9 @@ function ActionMenu({ label, actions }: { label: string; actions: AccountAction[
 function ActiveAccountRow() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
-  const { email } = data.activeSession;
+  const { email, sessionId } = data.activeSession;
+  // Its actions live in a menu that closes on click, so the row itself carries their spinner.
+  const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId));
 
   const actions: AccountAction[] = [];
   if (data.onCreateOrganization) {
@@ -413,7 +462,7 @@ function ActiveAccountRow() {
     actions.push({
       label: 'Sign out',
       color: 'negative',
-      onClick: () => signOutSession(data.activeSession.sessionId),
+      onClick: () => signOutSession(sessionId),
     });
   }
 
@@ -428,11 +477,40 @@ function ActiveAccountRow() {
           {email}
         </Item.Description>
       </Item.Content>
-      <ActionMenu
-        label={`Actions for ${email}`}
-        actions={actions}
-      />
+      {busy ? (
+        <Item.Actions>
+          <Spinner />
+        </Item.Actions>
+      ) : (
+        <ActionMenu
+          label={`Actions for ${email}`}
+          actions={disabled ? [] : actions}
+        />
+      )}
     </Item.Root>
+  );
+}
+
+interface MembershipRowProps {
+  membership: UserButtonMembership;
+  active: boolean;
+  onSelect?: () => void;
+}
+
+// Hooks cannot run inside a `.map`, so each row is its own component to read its own busy state.
+function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
+  const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(membership.organizationId));
+
+  return (
+    <WorkspaceRow
+      shape='square'
+      name={membership.name}
+      imageUrl={membership.imageUrl}
+      onSelect={onSelect}
+      active={active}
+      busy={busy}
+      disabled={disabled}
+    />
   );
 }
 
@@ -444,16 +522,53 @@ function MembershipRows() {
   return (
     <>
       {data.memberships.map(m => (
-        <WorkspaceRow
+        <MembershipRow
           key={m.organizationId}
-          shape='square'
-          name={m.name}
-          imageUrl={m.imageUrl}
+          membership={m}
           onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
           active={m.organizationId === data.activeOrganizationId}
         />
       ))}
     </>
+  );
+}
+
+interface PendingRowProps {
+  busyKey: string;
+  name: string;
+  imageUrl?: string;
+  actionLabel: string;
+  onAccept?: () => void;
+  /** Replaces the accept button when there is nothing left to do but wait. */
+  note?: string;
+}
+
+/** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
+function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
+  const { busy, disabled } = useBusy(busyKey);
+
+  return (
+    <WorkspaceRow
+      shape='square'
+      name={name}
+      imageUrl={imageUrl}
+      busy={busy}
+      trailing={
+        note ? (
+          <Item.Description>{note}</Item.Description>
+        ) : onAccept ? (
+          <Button
+            variant='outline'
+            color='neutral'
+            size='sm'
+            disabled={disabled}
+            onClick={onAccept}
+          >
+            {actionLabel}
+          </Button>
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -466,46 +581,25 @@ function PendingRows() {
   return (
     <>
       {data.suggestions.map(s => (
-        <WorkspaceRow
+        <PendingRow
           key={s.id}
-          shape='square'
+          busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
           name={s.name}
           imageUrl={s.imageUrl}
-          trailing={
-            // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
-            s.status === 'accepted' ? (
-              <Item.Description>Requested</Item.Description>
-            ) : acceptSuggestion ? (
-              <Button
-                variant='outline'
-                color='neutral'
-                size='sm'
-                onClick={() => acceptSuggestion(s.id)}
-              >
-                Join
-              </Button>
-            ) : undefined
-          }
+          actionLabel='Join'
+          // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
+          note={s.status === 'accepted' ? 'Requested' : undefined}
+          onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
         />
       ))}
       {data.invitations.map(i => (
-        <WorkspaceRow
+        <PendingRow
           key={i.id}
-          shape='square'
+          busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
           name={i.organizationName}
           imageUrl={i.imageUrl}
-          trailing={
-            acceptInvitation ? (
-              <Button
-                variant='outline'
-                color='neutral'
-                size='sm'
-                onClick={() => acceptInvitation(i.id)}
-              >
-                Accept
-              </Button>
-            ) : undefined
-          }
+          actionLabel='Accept'
+          onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
         />
       ))}
     </>
@@ -518,7 +612,8 @@ function PendingRows() {
  */
 function AdditionalSession({ session }: { session: UserButtonSession }) {
   const data = useUserButtonContext();
-  const switchSession = data.onSwitchSession;
+  const { busy, disabled } = useBusy(userButtonBusyKeys.switchSession(session.sessionId));
+  const switchSession = data.onSwitchSession && !busy && !disabled ? data.onSwitchSession : undefined;
 
   return (
     <Item.Root
@@ -538,6 +633,11 @@ function AdditionalSession({ session }: { session: UserButtonSession }) {
         {/* Identified by email, like the active account's row, so the two read as the same kind. */}
         <Item.Title>{session.email}</Item.Title>
       </Item.Content>
+      {busy ? (
+        <Item.Actions>
+          <Spinner />
+        </Item.Actions>
+      ) : null}
     </Item.Root>
   );
 }
@@ -617,7 +717,12 @@ function Footer() {
       actions.push({ icon: 'plus', label: 'Add account', onClick: data.onAddAccount });
     }
     if (data.onSignOutAll) {
-      actions.push({ icon: 'log-out', label: 'Sign out of all accounts', onClick: data.onSignOutAll });
+      actions.push({
+        icon: 'log-out',
+        label: 'Sign out of all accounts',
+        onClick: data.onSignOutAll,
+        busyKey: userButtonBusyKeys.signOutAll(),
+      });
     }
   }
 
@@ -645,7 +750,7 @@ function Footer() {
 
 // ─── Public parts ───────────────────────────────────────────────────────────
 
-export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks {
+export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks, UserButtonBusyState {
   children: ReactNode;
   /** @default 'combined' */
   mode?: UserButtonMode;
@@ -693,6 +798,22 @@ export function UserButtonTrigger() {
         size='sm'
       />
     </Popover.Trigger>
+  );
+}
+
+/**
+ * Holds the trigger's space while the controller loads, so nothing shifts when the real avatar
+ * lands. Non-interactive.
+ */
+export function UserButtonTriggerSkeleton() {
+  return (
+    <div {...stylex.props(styles.trigger, triggerShapes.circle)}>
+      <Skeleton
+        width='1.75rem'
+        height='1.75rem'
+        sx={t => ({ borderRadius: t.rounded.full })}
+      />
+    </div>
   );
 }
 
