@@ -295,7 +295,7 @@ export function Scrolling() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={{ height: 200, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 200, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {organizations.map(name => (
