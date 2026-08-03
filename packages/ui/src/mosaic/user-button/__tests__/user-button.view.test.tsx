@@ -125,10 +125,17 @@ describe('UserButtonTrigger', () => {
   });
 
   it('renders the avatar alone when the label is off', () => {
-    renderTrigger({ mode: 'orgs', showLabel: false });
+    renderTrigger({ mode: 'orgs', renderTriggerLabel: false });
 
     expect(screen.queryByText('Foundry')).toBeNull();
     expect(screen.queryByText('Pro')).toBeNull();
     expect(screen.getByRole('button', { name: 'Open account menu for Foundry' })).toBeInTheDocument();
+  });
+
+  it('keeps the name when only the plan badge is off', () => {
+    renderTrigger({ mode: 'orgs', renderPlanBadge: false });
+
+    expect(screen.getByText('Foundry')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
   });
 });
