@@ -34,11 +34,14 @@ export function UserButton(props: UserButtonProps = {}) {
 
   const close = () => setOpen(false);
 
-  // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view,
-  // close on success, and always clear busy so a rejection cannot leave the UI hanging.
+  // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view, and
+  // always clear busy so a rejection cannot leave the UI hanging. Only an action that ends the
+  // interaction closes the surface; the rest resolve into a popover that re-renders around the
+  // result, so you can see what you just did.
   const runAction = <Args extends unknown[]>(
     keyFor: (...args: Args) => string,
-    fn?: (...args: Args) => void | Promise<unknown>,
+    fn: ((...args: Args) => void | Promise<unknown>) | undefined,
+    closeOnSuccess = false,
   ) =>
     fn
       ? (...args: Args) => {
@@ -47,7 +50,7 @@ export function UserButton(props: UserButtonProps = {}) {
           }
           setPendingKey(keyFor(...args));
           void Promise.resolve(fn(...args))
-            .then(close, () => {})
+            .then(closeOnSuccess ? close : () => {}, () => {})
             .finally(() => setPendingKey(null));
         }
       : undefined;
@@ -69,7 +72,7 @@ export function UserButton(props: UserButtonProps = {}) {
       open={open}
       onOpenChange={setOpen}
       pendingKey={displayPendingKey}
-      onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization)}
+      onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
       onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
       onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
       onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
