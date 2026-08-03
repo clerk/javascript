@@ -68,7 +68,7 @@ export function Default() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts.map(({ email, organizations }, index) => (
@@ -100,7 +100,7 @@ export function NotScrollable() {
     <div
       {...root}
       className={`${root.className} border-border w-full border`}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {accounts[0].organizations.map(name => (
@@ -145,7 +145,7 @@ export function Gutter() {
             <div
               {...root}
               className={`${root.className} border-border border`}
-              style={{ height: 140, borderRadius: radiusVars['--cl-radius-inner'] }}
+              style={{ height: 140, borderRadius: radiusVars['--cl-radius-sm'] }}
             >
               <Item.Group {...stylex.props(...scrollAreaViewport(gutter))}>
                 {names.map(name => (
@@ -213,7 +213,7 @@ export function HoverReveal() {
       {...root}
       className={`${root.className} border-border w-full border`}
       css={{ '--cl-scrollbar-thumb-idle': 'oklch(from var(--cl-scrollbar-thumb) l c h / 0)' }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {manyRows.map(name => (
@@ -248,7 +248,7 @@ export function ThemedScrollbar() {
         '--cl-scrollbar-thumb-hover': 'oklch(0.65 0.24 15)',
         '--cl-scrollbar-thumb-active': 'oklch(0.55 0.25 295)',
       }}
-      style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+      style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
       <Item.Group {...stylex.props(...scrollAreaViewport())}>
         {manyRows.map(name => (
@@ -306,7 +306,7 @@ export function ShadowIndicators() {
       <div
         {...root}
         className={`${root.className} demo-scroll-shadows border-border w-full overflow-hidden border`}
-        style={{ height: 260, borderRadius: radiusVars['--cl-radius-inner'] }}
+        style={{ height: 260, borderRadius: radiusVars['--cl-radius-sm'] }}
       >
         <Item.Group
           {...stylex.props(...scrollAreaViewport())}
