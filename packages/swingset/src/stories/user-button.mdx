@@ -145,19 +145,3 @@ this mode ignores it, down to the trigger.
 | `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
 | `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
 | `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
-
-## Styling
-
-Owns no slots — `appearance.elements` targets what it composes. Overriding `item` re-themes every row
-here _and_ everywhere else `Item` is used; that is the point of composing rather than restyling.
-
-| Component | Slots it contributes                                                                                                                 |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `Popover` | `popover-positioner`, `popover-popup`                                                                                                |
-| `Card`    | `card-root`                                                                                                                          |
-| `Item`    | `item`, `item-media`, `item-content`, `item-title`, `item-description`, `item-label`, `item-actions`, `item-group`, `item-separator` |
-| `Avatar`  | `avatar`, `avatar-image`, `avatar-fallback`                                                                                          |
-| `Badge`   | `badge`                                                                                                                              |
-| `Button`  | `button`                                                                                                                             |
-| `Icon`    | `icon`                                                                                                                               |
-| `Menu`    | `menu-trigger`, `menu-positioner`, `menu-popup`, `menu-item`, `menu-separator`                                                       |
