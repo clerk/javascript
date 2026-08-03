@@ -107,6 +107,13 @@ export interface UserButtonCallbacks {
 export type UserButtonMode = 'combined' | 'orgs' | 'user';
 
 /**
+ * Which of the two switchers a `combined` surface leads with: the one named in the trigger and
+ * headed in the popup. Both are still listed either way. The single-purpose modes have only one
+ * thing to lead with, so they ignore it.
+ */
+export type UserButtonModePriority = 'organizations' | 'user';
+
+/**
  * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
  * container (which sets `pendingKey`) and the view (which matches against it).
  */
@@ -127,7 +134,9 @@ export interface UserButtonBusyState {
   pendingKey?: string | null;
 }
 
-type UserButtonContextValue = UserButtonData & UserButtonCallbacks & UserButtonBusyState & { mode: UserButtonMode };
+type UserButtonContextValue = UserButtonData &
+  UserButtonCallbacks &
+  UserButtonBusyState & { mode: UserButtonMode; modePriority: UserButtonModePriority };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -169,17 +178,13 @@ function workspace(organization: UserButtonMembership | undefined, session: User
   return { name: session.name, imageUrl: session.imageUrl, shape: 'circle' };
 }
 
-/** The trigger follows the organization wherever one is active; `user` mode never resolves to one. */
-function triggerWorkspace(data: UserButtonContextValue): ActiveWorkspace {
-  return workspace(data.mode === 'user' ? undefined : activeMembership(data), data.activeSession);
-}
-
 /**
- * Only an org-only surface is headed by the organization. Everywhere else the account heads it, so
- * switching organization never changes who the popup says you are signed in as.
+ * What the surface leads with: named in the trigger and headed in the popup, so the two always
+ * agree. Only an organization-led surface with an organization actually active resolves to one.
  */
-function headerWorkspace(data: UserButtonContextValue): ActiveWorkspace {
-  return workspace(data.mode === 'orgs' ? activeMembership(data) : undefined, data.activeSession);
+function leadWorkspace(data: UserButtonContextValue): ActiveWorkspace {
+  const leadsWithOrganization = data.mode === 'combined' ? data.modePriority === 'organizations' : data.mode === 'orgs';
+  return workspace(leadsWithOrganization ? activeMembership(data) : undefined, data.activeSession);
 }
 
 /**
@@ -408,7 +413,7 @@ function Header() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { sessionId, email } = data.activeSession;
-  const { name, imageUrl, shape, organization } = headerWorkspace(data);
+  const { name, imageUrl, shape, organization } = leadWorkspace(data);
   const subtitle = organization ? membershipSubtitle(organization) : email;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
@@ -836,6 +841,13 @@ export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks
   children: ReactNode;
   /** @default 'combined' */
   mode?: UserButtonMode;
+  /**
+   * Which switcher a `combined` surface leads with in the trigger and the popup's header. The
+   * other one is still listed. Ignored by the single-purpose modes.
+   *
+   * @default 'organizations'
+   */
+  modePriority?: UserButtonModePriority;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -849,7 +861,17 @@ export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks
  * the data through context.
  */
 export function UserButtonRoot(props: UserButtonRootProps) {
-  const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
+  const {
+    children,
+    mode = 'combined',
+    modePriority = 'organizations',
+    open,
+    defaultOpen,
+    onOpenChange,
+    placement,
+    sideOffset,
+    ...data
+  } = props;
   return (
     <Popover.Root
       open={open}
@@ -858,7 +880,7 @@ export function UserButtonRoot(props: UserButtonRootProps) {
       placement={placement ?? 'bottom-start'}
       sideOffset={sideOffset}
     >
-      <UserButtonContext.Provider value={{ ...data, mode }}>{children}</UserButtonContext.Provider>
+      <UserButtonContext.Provider value={{ ...data, mode, modePriority }}>{children}</UserButtonContext.Provider>
     </Popover.Root>
   );
 }
@@ -883,7 +905,7 @@ export interface UserButtonTriggerProps {
 /** The trigger: the active workspace's avatar, and what it is called. */
 export function UserButtonTrigger({ renderTriggerLabel = true, renderPlanBadge = true }: UserButtonTriggerProps = {}) {
   const data = useUserButtonContext();
-  const { name, imageUrl, shape, organization } = triggerWorkspace(data);
+  const { name, imageUrl, shape, organization } = leadWorkspace(data);
   const planLabel = renderPlanBadge ? organization?.planLabel : undefined;
 
   return (

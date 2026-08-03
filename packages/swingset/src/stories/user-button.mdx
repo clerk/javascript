@@ -2,12 +2,12 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher behind the user avatar. The account heads the surface, carrying a
-**gear** and — where an org is active — **Invite**. Its workspaces sit under it: every organization,
-plus **suggested** and **invited** ones it can Join. Every signed-in account sits under an
-**Accounts** heading — the active one checked, the rest a click away — so an account never reads as a
-workspace. The foot signs out of everything.
-`mode` narrows all of it; see [Modes](#modes).
+The account & organization switcher behind the user avatar. The active organization heads the surface,
+carrying a **gear** and **Invite**. The account's workspaces sit under it: every organization, plus
+**suggested** and **invited** ones it can Join. Every signed-in account sits under an **Accounts**
+heading — the active one checked, the rest a click away — so an account never reads as a workspace.
+The foot signs out of everything. `mode` narrows all of it, and `modePriority` picks what heads it;
+see [Modes](#modes).
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
 the session that makes them, so another account's workspaces are unknowable until it _is_ active.
@@ -95,15 +95,22 @@ trigger, the account otherwise.
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
 Everything else is data.
 
-| Mode                 | Popup                                | Trigger            | Header      |
-| -------------------- | ------------------------------------ | ------------------ | ----------- |
-| `combined` (default) | Organizations and accounts together. | The org, plus plan | The account |
-| `orgs`               | Organizations only; no account rows. | The org, plus plan | The org     |
-| `user`               | Accounts only; never shows an org.   | The account        | The account |
+| Mode                 | Popup                                | Leads with                        |
+| -------------------- | ------------------------------------ | --------------------------------- |
+| `combined` (default) | Organizations and accounts together. | The org; `modePriority` flips it. |
+| `orgs`               | Organizations only; no account rows. | The org.                          |
+| `user`               | Accounts only; never shows an org.   | The account.                      |
 
-Only `orgs` is _headed_ by the organization; elsewhere the account heads it, so switching org changes
-the trigger and the check but not who you're signed in as. **Invite** belongs to the active org
-wherever there is one; the gear manages whatever the header names.
+What a mode leads with is named in the trigger and heads the popup — the two always agree.
+**Invite** belongs to the active org wherever there is one; the gear manages whatever leads.
+
+`combined` carries both switchers, so `modePriority` picks which one leads. Everything is listed
+either way; only the trigger and the header move.
+
+<Story
+  name='UserPriority'
+  storyModule={UserButtonStories}
+/>
 
 Off-mode data is not an error. Both examples below take the same props as the one above and differ
 only by `mode`.
