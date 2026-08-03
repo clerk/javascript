@@ -2,15 +2,16 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const primary5 = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
-const focusRing = `0 0 0 1.5px ${colorVars['--cl-color-card']}, 0 0 0 3px ${colorVars['--cl-color-primary']}`;
+const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
+const interactionBorderColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 20%, transparent)`;
 
 export const styles = stylex.create({
   base: {
     borderColor: {
       default: colorVars['--cl-color-border'],
-      ':focus-visible': colorVars['--cl-color-border'],
-      ':hover:not(:focus-visible):not([aria-invalid="true"])': '#b7b7b7',
+      ':focus-visible': interactionBorderColor,
+      ':focus-visible:where([aria-invalid="true"])': colorVars['--cl-color-negative'],
+      ':hover:not([aria-invalid="true"])': interactionBorderColor,
       ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
     },
     borderStyle: 'solid',
@@ -18,15 +19,12 @@ export const styles = stylex.create({
       default: '1px',
       ':where([aria-invalid="true"])': '2px',
     },
-    outline: 'none',
+    outline: {
+      default: 'none',
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+    },
     transition: 'color 0.15s, background-color 0.15s, border-color 0.15s',
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: {
-      default: null,
-      ':focus-visible': focusRing,
-      ':focus-visible:where([aria-invalid="true"])': focusRing,
-      ':where([aria-invalid="true"])': 'none',
-    },
     boxSizing: 'border-box',
     color: 'inherit',
     display: 'block',
@@ -49,7 +47,7 @@ export const styles = stylex.create({
     },
   },
   disabled: {
-    backgroundColor: primary5,
+    backgroundColor: disabledBackgroundColor,
     cursor: 'not-allowed',
     opacity: 0.5,
     pointerEvents: 'none',
