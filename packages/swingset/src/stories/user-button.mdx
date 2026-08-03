@@ -2,43 +2,26 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher that sits behind the user avatar. The account you're signed in as
-heads the surface — the one large row, carrying a **gear** that manages it and, where an organization
-is active, an **Invite** button. Under it sit that account's workspaces: every organization it
-belongs to, and any **suggested** or **invited** workspaces it can Join. The account's own `⋯` menu
-carries its per-account actions. Every _other_ signed-in account sits below that under
-its own **Accounts** heading — plain rows you click to switch to, with **Add account** on the
-heading's `⋯` — so an account is never mistaken for a workspace. The foot of the surface signs you
-out of everything. `mode` narrows all of this to just the organizations or just the accounts; see
-[Modes](#modes).
+The account & organization switcher behind the user avatar. The account heads the surface, carrying a
+**gear** and — where an org is active — **Invite**. Its workspaces sit under it: every organization,
+plus **suggested** and **invited** ones it can Join. Other signed-in accounts sit under an
+**Accounts** heading, so an account never reads as a workspace. The foot signs out of everything.
+`mode` narrows all of it; see [Modes](#modes).
 
-Only the active account's organizations are listed, and that is a data constraint rather than a
-design one: organization requests are scoped to the session that makes them, so another account's
-workspaces are unknowable until it _is_ the active one. That's why `additionalSessions` carries
-sessions alone, and why `onSelectOrganization` takes no session — it can only ever mean the active
-one.
+Only the active account's organizations are listed. Not a design choice: org requests are scoped to
+the session that makes them, so another account's workspaces are unknowable until it _is_ active.
+Hence `additionalSessions` carries sessions alone, and `onSelectOrganization` takes no session.
 
-It is a composition of lower-layer Mosaic components — `Popover` for the floating surface, `Card` for
-the surface itself, `Item` for every row, `Avatar` for the workspace marks, and `Menu` for the
-per-account actions — so it inherits their behavior, focus management, and ARIA wiring rather than
-restyling any of it. `UserButtonView` is presentational: the parts render from the props on
-`UserButtonRoot` (mock data in the examples). The connected `UserButton` wraps it with
-`useUserButtonController()`, which reads live Clerk resources and needs no props.
+Composed from `Popover`, `Card`, `Item`, `Avatar`, and `Menu`, so behavior, focus, and ARIA come from
+them rather than being restyled. `UserButtonView` is presentational; the connected `UserButton` wraps
+it with `useUserButtonController()` and needs no props.
 
 ## Example
 
-Every example on this page is a working prototype over the same mock accounts, so try it:
-picking a workspace or an account switches to it, **Join** turns a suggested workspace into one
-you're in, and the trigger updates to whatever is active. The actions that would navigate somewhere
-in a real app — Manage, Invite, Create organization, Add account — have nowhere to go here, so they
-only close the popover.
-
-None of it is instant. Every switch is a request against Clerk, so the prototype fakes the round
-trip the connected component really makes: the row you clicked spins, the rest stand down until it
-settles, and the surface stays open so you land back on the result. Picking a workspace is the
-exception — it is the one thing the surface exists to do, so it closes behind you. `pendingKey`
-is what drives that: the view marks the affordance whose key matches busy and disables the others,
-and the connected `UserButton` sets it from the action in flight.
+A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
+stand down, and the surface stays open so you land on the result. Only picking a workspace closes it.
+`pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
+that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
 
 <Story
   name='Combined'
@@ -47,8 +30,7 @@ and the connected `UserButton` sets it from the action in flight.
 
 ## Usage
 
-The all-in-one, presentational `UserButtonView` renders the trigger and popup from a single
-prop-driven call (the connected, Clerk-backed `UserButton` wraps it and needs no props):
+`UserButtonView` renders trigger and popup from one prop-driven call:
 
 ```tsx
 import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
@@ -70,8 +52,8 @@ import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
 />
 ```
 
-For layouts that need to drop the popup into their own trigger, compose the parts directly. The data
-and callbacks live on `UserButtonRoot` and are read from context by the leaves, so they take no props:
+To drop the popup into your own trigger, compose the parts. Data and callbacks live on
+`UserButtonRoot`; the leaves read them from context:
 
 ```tsx
 import {
@@ -86,13 +68,12 @@ import {
 </UserButtonRoot>
 ```
 
-The exports are flat (not `UserButton.Trigger`) so each part can declare its own `'use client'`
-boundary without forcing the consumer's file to become a client component.
+Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use client'` boundary.
 
 ## Modes
 
-`mode` picks which switchers the surface carries. It is the only prop that changes the shape of the
-popup; everything else is data.
+`mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
+Everything else is data.
 
 | Mode                 | Popup                                | Trigger          | Header      |
 | -------------------- | ------------------------------------ | ---------------- | ----------- |
@@ -100,24 +81,18 @@ popup; everything else is data.
 | `orgs`               | Organizations only; no account rows. | The org's mark   | The org     |
 | `user`               | Accounts only; never shows an org.   | The user's photo | The account |
 
-The trigger follows whichever organization is active, which is why `combined` and `orgs` both land
-on the org's mark; `user` never resolves to an organization, so it shows the account's photo even
-when one is active.
+Only `orgs` is _headed_ by the organization; elsewhere the account heads it, so switching org changes
+the trigger and the check but not who you're signed in as. **Invite** belongs to the active org
+wherever there is one; the gear manages whatever the header names.
 
-Only `orgs` is _headed_ by the organization. Everywhere else the account heads the surface, so
-switching organization changes the trigger and the check in the list without changing who the popup
-says you're signed in as. **Invite** still belongs to the active organization wherever there is one,
-which is why it sits next to an account in `combined`; the gear manages whatever the header names.
-
-Passing organization data in `user` mode, or extra sessions in `orgs` mode, is not an error — the
-mode decides what renders, so a single set of props can drive any of the three. The two examples
-below prove it: they take exactly the same props as the one above, and differ only by `mode`.
+Off-mode data is not an error. Both examples below take the same props as the one above and differ
+only by `mode`.
 
 ### Organizations
 
-The org is the header, carrying **Invite** and the gear (**Manage organization**). With no account
-menu to hold it, **Create organization** moves to the foot of the surface. The other signed-in
-account is still in the props and is deliberately not rendered.
+The org heads it, with **Invite** and the gear (**Manage organization**). With no account menu to
+hold it, **Create organization** moves to the foot. The extra account is in the props, deliberately
+unrendered.
 
 <Story
   name='Organizations'
@@ -126,13 +101,10 @@ account is still in the props and is deliberately not rendered.
 
 ### User
 
-The header is the account, carrying **Sign out** and the gear (**Manage account**) — there is no
-organization to invite anyone to, so signing out takes the slot **Invite** occupies elsewhere, and
-there is no account row below to hang it off instead. Being the whole
-switcher, the list holds every signed-in account — the active one checked, like the active workspace
-above — and nothing else: no workspace rows, no heading, so **Add account** moves to the foot of the
-surface the same way **Create organization** does. An organization is active here, and this mode
-ignores it entirely, down to the trigger.
+The account heads it, with **Sign out** in **Invite**'s slot and the gear (**Manage account**). The
+list is the whole switcher: every account, the active one checked, no heading — so **Add account**
+moves to the foot the way **Create organization** does. An org is active; this mode ignores it, down
+to the trigger.
 
 <Story
   name='User'
@@ -149,9 +121,8 @@ ignores it entirely, down to the trigger.
 
 ## Styling
 
-The component owns no slots of its own — it is styled entirely by the components it composes, so
-`appearance.elements` targets those. Overriding `item` re-themes every row here _and_ everywhere else
-`Item` is used; that is the point of composing rather than restyling.
+Owns no slots — `appearance.elements` targets what it composes. Overriding `item` re-themes every row
+here _and_ everywhere else `Item` is used; that is the point of composing rather than restyling.
 
 | Component | Slots it contributes                                                                                                                 |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------ |
