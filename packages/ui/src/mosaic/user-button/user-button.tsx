@@ -4,10 +4,12 @@ import { useState } from 'react';
 
 import { useSpinDelay } from '../hooks/useSpinDelay';
 import { type UserButtonControllerOptions, useUserButtonController } from './user-button.controller';
-import type { UserButtonTriggerProps } from './user-button.view';
+import type { UserButtonRootProps, UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonTriggerSkeleton, UserButtonView } from './user-button.view';
 
-export type UserButtonProps = UserButtonControllerOptions & UserButtonTriggerProps;
+export type UserButtonProps = UserButtonControllerOptions &
+  UserButtonTriggerProps &
+  Pick<UserButtonRootProps, 'modePriority'>;
 
 /**
  * The connected UserButton: reads live Clerk data through `useUserButtonController` and renders
@@ -16,7 +18,7 @@ export type UserButtonProps = UserButtonControllerOptions & UserButtonTriggerPro
  * the action resolves, and clears busy state (leaving the popover open) if it rejects. Actions that
  * open another surface (manage/create navigations) leave the popover as-is.
  */
-export function UserButton({ renderTriggerLabel, renderPlanBadge, ...options }: UserButtonProps = {}) {
+export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, ...options }: UserButtonProps = {}) {
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -72,6 +74,7 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, ...options }: 
       {...data}
       renderTriggerLabel={renderTriggerLabel}
       renderPlanBadge={renderPlanBadge}
+      modePriority={modePriority}
       open={open}
       onOpenChange={setOpen}
       pendingKey={displayPendingKey}
