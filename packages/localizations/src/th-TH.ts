@@ -130,6 +130,9 @@ export const thTH: LocalizationResource = {
     credit: 'เครดิต',
     creditRemainder: 'เครดิตสำหรับส่วนที่เหลือของการสมัครสมาชิกปัจจุบันของคุณ',
     defaultFreePlanActive: 'คุณกำลังใช้แผนฟรีอยู่',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ฟรี',
     getStarted: 'เริ่มต้นใช้งาน',
     highlightedPlanBadge: 'ยอดนิยม',
@@ -141,6 +144,7 @@ export const thTH: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'รายเดือน',
+    months: undefined,
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
     payerCreditRemainder: undefined,
@@ -219,6 +223,7 @@ export const thTH: LocalizationResource = {
     year: 'ปี',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

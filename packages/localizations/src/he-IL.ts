@@ -126,6 +126,9 @@ export const heIL: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: undefined,
     getStarted: undefined,
     highlightedPlanBadge: undefined,
@@ -137,6 +140,7 @@ export const heIL: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +219,7 @@ export const heIL: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

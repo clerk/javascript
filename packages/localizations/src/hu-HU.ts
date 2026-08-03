@@ -133,6 +133,9 @@ export const huHU: LocalizationResource = {
     credit: 'Jóváírás',
     creditRemainder: 'Jóváírás a jelenlegi előfizetésed hátralévő idejére.',
     defaultFreePlanActive: 'Jelenleg az Ingyenes csomagot használod',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ingyenes',
     getStarted: 'Kezdés',
     highlightedPlanBadge: 'Népszerű',
@@ -144,6 +147,7 @@ export const huHU: LocalizationResource = {
     monthAbbreviation: 'hó',
     monthPerUnit: 'Hónap / {{unitName}}',
     monthly: 'Havi',
+    months: undefined,
     pastDue: 'Lejárt',
     pay: '{{amount}} fizetése',
     payerCreditRemainder: 'Jóváírás a fiók egyenlegből.',
@@ -222,6 +226,7 @@ export const huHU: LocalizationResource = {
     year: 'Év',
     yearAbbreviation: 'év',
     yearPerUnit: 'Év / {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

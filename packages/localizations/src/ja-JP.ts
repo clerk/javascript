@@ -133,6 +133,9 @@ export const jaJP: LocalizationResource = {
     credit: 'クレジット',
     creditRemainder: '現在のサブスクリプションの残り期間に対するクレジット。',
     defaultFreePlanActive: '現在は無料プランをご利用中です',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '無料',
     getStarted: 'はじめる',
     highlightedPlanBadge: '人気',
@@ -144,6 +147,7 @@ export const jaJP: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '月払い',
+    months: undefined,
     pastDue: '支払い遅延',
     pay: '{{amount}}を支払う',
     payerCreditRemainder: 'アカウント残高からのクレジット。',
@@ -222,6 +226,7 @@ export const jaJP: LocalizationResource = {
     year: '年',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

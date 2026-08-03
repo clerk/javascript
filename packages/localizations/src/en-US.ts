@@ -121,6 +121,9 @@ export const enUS: LocalizationResource = {
     credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
+    discountAmount: '({{amount}} off)',
+    discountCyclesRemaining: '{{cycles}} {{period}} remaining',
+    discountDuration: '({{amount}} off first {{cycles}} {{period}})',
     free: 'Free',
     getStarted: 'Get started',
     highlightedPlanBadge: 'Popular',
@@ -132,6 +135,7 @@ export const enUS: LocalizationResource = {
     monthAbbreviation: 'mo',
     monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
+    months: 'Months',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
     payerCreditRemainder: 'Credit from account balance.',
@@ -210,6 +214,7 @@ export const enUS: LocalizationResource = {
     year: 'Year',
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
+    years: 'Years',
   },
   configureSSO: {
     activate: {

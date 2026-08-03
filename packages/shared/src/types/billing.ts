@@ -846,6 +846,10 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
   };
   credits?: BillingCredits;
   /**
+   * The active discount applied to this subscription item.
+   */
+  appliedDiscount?: BillingDiscountRedemption;
+  /**
    * Seat entitlement details for this subscription item. Only set for organization subscription items with
    * seat-based billing.
    */
@@ -1026,6 +1030,45 @@ export interface BillingProrationDiscount {
 }
 
 /**
+ * A catalog discount applied to a checkout or payment.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingAppliedDiscount {
+  amount: BillingMoneyAmount;
+  discountId: string;
+  name: string;
+  effect: 'percentage' | 'fixed_amount';
+  percentOff?: number;
+  amountOff?: BillingMoneyAmount;
+  promoCode?: string;
+  cyclesRemaining: number | null;
+}
+
+/**
+ * A discount redemption applied to a subscription item.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingDiscountRedemption {
+  id: string;
+  subscriptionItemId: string;
+  discountId: string;
+  name: string;
+  source: 'promotion' | 'manual' | 'promo_code';
+  promoCode?: string;
+  effect?: 'percentage' | 'fixed_amount';
+  percentOff?: number;
+  amountOff?: BillingMoneyAmount;
+  amount?: BillingMoneyAmount;
+  cyclesRemaining: number | null;
+  cyclesApplied: number;
+  status?: 'active' | 'exhausted' | 'removed';
+  redeemedAt: Date;
+  redeemedBy: string | null;
+}
+
+/**
  * Discounts applied to the checkout, such as prorated discounts for mid-cycle seat additions.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -1037,6 +1080,10 @@ export interface BillingDiscounts {
    * means you are not charged for the portion of the new seat's cycle that has already elapsed.
    */
   proration: BillingProrationDiscount | null;
+  /**
+   * The catalog discount applied to the transaction. This field is omitted when no catalog discount applies.
+   */
+  discount?: BillingAppliedDiscount;
   /**
    * The total of all discounts applied to the checkout.
    */

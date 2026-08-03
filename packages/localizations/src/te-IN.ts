@@ -133,6 +133,9 @@ export const teIN: LocalizationResource = {
     credit: 'క్రెడిట్',
     creditRemainder: 'మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ యొక్క మిగిలిన కాలానికి క్రెడిట్.',
     defaultFreePlanActive: 'మీరు ప్రస్తుతం ఉచిత ప్లాన్‌లో ఉన్నారు',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'ఉచితం',
     getStarted: 'ప్రారంభించండి',
     highlightedPlanBadge: 'ప్రసిద్ధ',
@@ -144,6 +147,7 @@ export const teIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'నెలవారీ',
+    months: undefined,
     pastDue: 'బకాయి',
     pay: '{{amount}} చెల్లించు',
     payerCreditRemainder: undefined,
@@ -222,6 +226,7 @@ export const teIN: LocalizationResource = {
     year: 'సంవత్సరం',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

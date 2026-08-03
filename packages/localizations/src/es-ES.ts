@@ -132,6 +132,9 @@ export const esES: LocalizationResource = {
     credit: 'Crédito',
     creditRemainder: 'Crédito por el tiempo restante de tu suscripción actual.',
     defaultFreePlanActive: 'Actualmente estás en el plan gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratis',
     getStarted: 'Empezar',
     highlightedPlanBadge: 'Popular',
@@ -143,6 +146,7 @@ export const esES: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensual',
+    months: undefined,
     pastDue: 'Pago pendiente',
     pay: 'Pagar {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const esES: LocalizationResource = {
     year: 'Año',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

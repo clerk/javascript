@@ -126,6 +126,9 @@ export const skSK: LocalizationResource = {
     credit: undefined,
     creditRemainder: undefined,
     defaultFreePlanActive: undefined,
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Bezplatne',
     getStarted: 'Začať',
     highlightedPlanBadge: undefined,
@@ -137,6 +140,7 @@ export const skSK: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: undefined,
+    months: undefined,
     pastDue: undefined,
     pay: undefined,
     payerCreditRemainder: undefined,
@@ -215,6 +219,7 @@ export const skSK: LocalizationResource = {
     year: undefined,
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

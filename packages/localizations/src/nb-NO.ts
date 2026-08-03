@@ -133,6 +133,9 @@ export const nbNO: LocalizationResource = {
     credit: 'Kreditt',
     creditRemainder: 'Kreditt for gjenstående del av ditt nåværende abonnement.',
     defaultFreePlanActive: 'Du er på gratis-planen',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratis',
     getStarted: 'Kom i gang',
     highlightedPlanBadge: 'Populær',
@@ -144,6 +147,7 @@ export const nbNO: LocalizationResource = {
     monthAbbreviation: 'mnd',
     monthPerUnit: 'Måned per {{unitName}}',
     monthly: 'Månedlig',
+    months: undefined,
     pastDue: 'Forfalt',
     pay: 'Betal {{amount}}',
     payerCreditRemainder: 'Kreditt fra kontosaldo.',
@@ -222,6 +226,7 @@ export const nbNO: LocalizationResource = {
     year: 'År',
     yearAbbreviation: 'år',
     yearPerUnit: 'År per {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

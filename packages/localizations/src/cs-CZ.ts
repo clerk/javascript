@@ -130,6 +130,9 @@ export const csCZ: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
     defaultFreePlanActive: 'Aktuálně používáte bezplatný plán',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Zdarma',
     getStarted: 'Začít',
     highlightedPlanBadge: 'Populární',
@@ -141,6 +144,7 @@ export const csCZ: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Měsíčně',
+    months: undefined,
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
     payerCreditRemainder: undefined,
@@ -219,6 +223,7 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

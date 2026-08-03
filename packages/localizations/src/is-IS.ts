@@ -132,6 +132,9 @@ export const isIS: LocalizationResource = {
     credit: 'Inneign',
     creditRemainder: 'Inneign fyrir eftirstöðvar núverandi áskriftar.',
     defaultFreePlanActive: 'Þú ert á ókeypis áskrift',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ókeypis',
     getStarted: 'Byrja',
     highlightedPlanBadge: 'Vinsælt',
@@ -143,6 +146,7 @@ export const isIS: LocalizationResource = {
     monthAbbreviation: 'mán.',
     monthPerUnit: 'Mánuður á {{unitName}}',
     monthly: 'Mánaðarlega',
+    months: undefined,
     pastDue: 'Gjaldfallið',
     pay: 'Greiða {{amount}}',
     payerCreditRemainder: 'Inneign frá reikningsstöðu.',
@@ -221,6 +225,7 @@ export const isIS: LocalizationResource = {
     year: 'Ár',
     yearAbbreviation: 'ár',
     yearPerUnit: 'Ár á {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

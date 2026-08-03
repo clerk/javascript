@@ -132,6 +132,9 @@ export const viVN: LocalizationResource = {
     credit: 'Tín dụng',
     creditRemainder: 'Tín dụng cho phần còn lại của đăng ký hiện tại.',
     defaultFreePlanActive: 'Bạn hiện đang trên gói Miễn phí',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Miễn phí',
     getStarted: 'Bắt đầu',
     highlightedPlanBadge: 'Phổ biến',
@@ -143,6 +146,7 @@ export const viVN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Hàng tháng',
+    months: undefined,
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const viVN: LocalizationResource = {
     year: 'Năm',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
