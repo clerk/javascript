@@ -54,6 +54,9 @@ describe('Mosaic scroll area styles', () => {
     expect(scrollbarThumbVars).toMatchObject({
       '--_cl-scrollbar-thumb-color': 'var(--_cl-scrollbar-thumb-color)',
     });
+  });
+
+  it('keeps the fade inset off the public token namespace', () => {
     expect(Object.keys(scrollFadeVars)).not.toContain('--cl-scroll-fade-inset');
   });
 });
