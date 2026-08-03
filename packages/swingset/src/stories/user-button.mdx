@@ -4,8 +4,9 @@ import * as UserButtonStories from './user-button.stories';
 
 The account & organization switcher behind the user avatar. The account heads the surface, carrying a
 **gear** and — where an org is active — **Invite**. Its workspaces sit under it: every organization,
-plus **suggested** and **invited** ones it can Join. Other signed-in accounts sit under an
-**Accounts** heading, so an account never reads as a workspace. The foot signs out of everything.
+plus **suggested** and **invited** ones it can Join. Every signed-in account sits under an
+**Accounts** heading — the active one checked, the rest a click away — so an account never reads as a
+workspace. The foot signs out of everything.
 `mode` narrows all of it; see [Modes](#modes).
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
@@ -102,9 +103,9 @@ unrendered.
 ### User
 
 The account heads it, with **Sign out** in **Invite**'s slot and the gear (**Manage account**). The
-list is the whole switcher: every account, the active one checked, no heading — so **Add account**
-moves to the foot the way **Create organization** does. An org is active; this mode ignores it, down
-to the trigger.
+header is the active account, so the list holds only the accounts to switch to — no heading over
+them, and **Add account** moves to the foot the way **Create organization** does. An org is active;
+this mode ignores it, down to the trigger.
 
 <Story
   name='User'
