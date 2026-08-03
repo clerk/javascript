@@ -166,7 +166,7 @@ function renderUserButton(props: UserButtonProps = {}) {
 const host = () => screen.getByTestId('host');
 const trigger = () => screen.getByRole('button', { name: /Open account menu/ });
 const popup = () => screen.queryByRole('dialog', { name: 'Account' });
-const spinner = () => popup()?.querySelector('[data-cl-spinner]') ?? null;
+const spinner = () => popup()?.querySelector('.cl-spinner') ?? null;
 
 async function open() {
   const act = userEvent.setup();
