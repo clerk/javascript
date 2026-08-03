@@ -34,6 +34,18 @@ export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../component
 export type { ScrollAreaGutter } from '../components/scroll-area';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { TextField } from '../components/text-field';
+export type {
+  TextFieldContentProps,
+  TextFieldDescriptionProps,
+  TextFieldErrorProps,
+  TextFieldIds,
+  TextFieldInputProps,
+  TextFieldLabelProps,
+  TextFieldLayout,
+  TextFieldRootProps,
+  TextFieldSize,
+} from '../components/text-field';
 
 export { Popover } from '../components/popover';
 export type {
