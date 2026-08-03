@@ -356,7 +356,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
 
       await expect(matchLineItem(u.po.checkout.root, 'Total Due after')).toBeHidden();
       await expect(matchLineItem(u.po.checkout.root, 'Total due today', '$999.00')).toBeVisible();
-      expect(await countLineItems(u.po.checkout.root)).toBe(3);
+      expect(await countLineItems(u.po.checkout.root)).toBe(4);
 
       await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
       await u.po.checkout.clickPayOrSubscribe();
