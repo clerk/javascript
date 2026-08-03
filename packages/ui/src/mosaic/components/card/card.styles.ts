@@ -39,7 +39,7 @@ export const styles = stylex.create({
 
 export const elevations = stylex.create({
   card: {
-    borderRadius: radiusVars['--cl-radius-container'],
+    borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
@@ -47,13 +47,13 @@ export const elevations = stylex.create({
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
   },
   flush: {
-    borderRadius: radiusVars['--cl-radius-container'],
+    borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'visible',
     backgroundColor: 'transparent',
     boxShadow: 'none',
   },
   overlay: {
-    borderRadius: radiusVars['--cl-radius-container'],
+    borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
