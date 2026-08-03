@@ -1,5 +1,5 @@
 import type * as SharedReact from '@clerk/shared/react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -216,8 +216,13 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     await open();
 
+    const surface = popup();
+    if (!surface) {
+      throw new Error('expected the popover to be open');
+    }
+
     expect(screen.queryByRole('button', { name: 'Acme' })).toBeNull();
-    expect(screen.getByText('Acme')).toBeInTheDocument();
+    expect(within(surface).getByText('Acme')).toBeInTheDocument();
   });
 
   it('selecting an organization calls setActive without a redirect by default and closes the popover', async () => {
