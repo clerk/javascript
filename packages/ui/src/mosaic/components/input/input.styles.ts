@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
 const interactionBorderColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 20%, transparent)`;
@@ -11,8 +11,10 @@ export const styles = stylex.create({
       default: colorVars['--cl-color-border'],
       ':focus-visible': interactionBorderColor,
       ':focus-visible:where([aria-invalid="true"])': colorVars['--cl-color-negative'],
-      ':hover:not([aria-invalid="true"])': interactionBorderColor,
       ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
+      '@media (hover: hover)': {
+        ':hover:not([aria-invalid="true"])': interactionBorderColor,
+      },
     },
     borderStyle: 'solid',
     borderWidth: {
@@ -22,13 +24,16 @@ export const styles = stylex.create({
     outline: {
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+      ':focus-visible:where([aria-invalid="true"])': 'none',
     },
-    transition: 'color 0.15s, background-color 0.15s, border-color 0.15s',
     backgroundColor: colorVars['--cl-color-card'],
     boxSizing: 'border-box',
     color: 'inherit',
     display: 'block',
     fontFamily: 'inherit',
+    outlineOffset: '2px',
+    transitionDuration: durationVars['--cl-duration-base'],
+    transitionProperty: 'color, background-color, border-color',
     minWidth: 0,
     width: '100%',
     '::file-selector-button': {
