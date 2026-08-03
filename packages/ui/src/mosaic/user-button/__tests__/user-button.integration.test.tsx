@@ -241,17 +241,18 @@ describe('UserButton (connected)', () => {
     expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/org_9' });
   });
 
-  it('switching to another account calls setActive with the session and closes', async () => {
+  it('switching to another account calls setActive with the session and stays open', async () => {
     renderUserButton();
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'bob@example.com' }));
 
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_2', redirectUrl: '/after-switch' });
-    await waitFor(() => expect(popup()).toBeNull());
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
   });
 
-  it('signing out of the active account calls signOut with its session id and closes', async () => {
+  it('signing out of the active account calls signOut with its session id', async () => {
     renderUserButton();
     const act = await open();
 
@@ -259,20 +260,18 @@ describe('UserButton (connected)', () => {
 
     // Another account stays signed in, so this is a single sign out, not a full one.
     expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_1', redirectUrl: '/after-single-sign-out' });
-    await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('signing out of all accounts calls signOut with the after-sign-out url and closes', async () => {
+  it('signing out of all accounts calls signOut with the after-sign-out url', async () => {
     renderUserButton();
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'Sign out of all accounts' }));
 
     expect(signOut).toHaveBeenCalledWith({ redirectUrl: '/after-sign-out' });
-    await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('accepting an invitation accepts it, revalidates, and closes', async () => {
+  it('accepting an invitation accepts it, revalidates, and stays open', async () => {
     renderUserButton();
     const act = await open();
     const invitation = userInvitations.data[0] as ReturnType<typeof acceptable>;
@@ -281,10 +280,11 @@ describe('UserButton (connected)', () => {
 
     await waitFor(() => expect(invitation.accept).toHaveBeenCalledTimes(1));
     expect(userInvitations.revalidate).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(popup()).toBeNull());
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
   });
 
-  it('accepting a suggestion accepts it, revalidates, and closes', async () => {
+  it('accepting a suggestion accepts it, revalidates, and stays open', async () => {
     renderUserButton();
     const act = await open();
     const suggestion = userSuggestions.data[0] as ReturnType<typeof acceptable>;
@@ -293,7 +293,8 @@ describe('UserButton (connected)', () => {
 
     await waitFor(() => expect(suggestion.accept).toHaveBeenCalledTimes(1));
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(popup()).toBeNull());
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
   });
 
   it('reports an already-accepted suggestion instead of offering to join it again', async () => {
@@ -389,7 +390,8 @@ describe('UserButton (connected)', () => {
     expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
 
     deferred.resolve();
-    await waitFor(() => expect(popup()).toBeNull());
+    await waitFor(() => expect(spinner()).toBeNull());
+    expect(popup()).toBeInTheDocument();
   });
 
   it('keeps the popover open and clears busy state when an action rejects', async () => {
