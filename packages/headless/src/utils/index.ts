@@ -6,5 +6,6 @@ export {
   mergeProps,
   type RenderProp,
   type RenderPropOrElement,
+  type RenderProps,
   useRender,
 } from './use-render';

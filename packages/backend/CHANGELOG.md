@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.15.0
+
+### Minor Changes
+
+- Update fields for BillingSubscription and BillingSubscriptionItem ([#9196](https://github.com/clerk/javascript/pull/9196)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Return a `TokenVerificationError` from `decodeJwt` and `verifyToken` for tokens whose header, payload, or signature cannot be decoded. ([#9268](https://github.com/clerk/javascript/pull/9268)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
 ## 3.14.0
 
 ### Minor Changes

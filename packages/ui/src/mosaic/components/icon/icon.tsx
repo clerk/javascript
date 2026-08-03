@@ -5,6 +5,7 @@ import { useMosaicIcons } from '../../appearance';
 import type { IconName } from '../../icons/registry';
 import { iconRegistry } from '../../icons/registry';
 import { mergeStyleProps, themeProps } from '../../props';
+import { iconScope } from './icon.markers.stylex';
 import { sizes, styles } from './icon.styles';
 
 export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
@@ -32,7 +33,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   // child by what it is: `:has([data-icon='inline-end'])` can't match some other placed descendant.
   const props = mergeStyleProps(
     themeProps('icon', { size, icon: placement }),
-    stylex.props(styles.base, sizes[size]),
+    stylex.props(styles.base, sizes[size], iconScope),
     className,
     style,
   );

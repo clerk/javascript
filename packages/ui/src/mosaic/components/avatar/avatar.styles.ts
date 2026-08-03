@@ -7,6 +7,7 @@ export const styles = stylex.create({
   base: {
     overflow: 'hidden',
     alignItems: 'center',
+    aspectRatio: '1 / 1',
     boxSizing: 'border-box',
     display: 'inline-flex',
     flexShrink: 0,
@@ -24,6 +25,7 @@ export const styles = stylex.create({
     aspectRatio: '1 / 1',
     display: 'block',
     objectFit: 'cover',
+    position: 'absolute',
     height: '100%',
     width: '100%',
   },
@@ -31,8 +33,8 @@ export const styles = stylex.create({
   // fallback fills the box, centering its content and inheriting the sized font
   fallback: {
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-neutral'],
-    color: colorVars['--cl-color-neutral-foreground'],
+    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+    color: colorVars['--cl-color-neutral'],
     display: 'flex',
     fontSize: 'inherit',
     justifyContent: 'center',
@@ -41,16 +43,17 @@ export const styles = stylex.create({
   },
 });
 
-// shape — square uses a fixed 6px radius for now; circle rounds fully
+// shape — square shares the control radius with Button; circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: '0.375rem' },
+  square: { borderRadius: radiusVars['--cl-radius-control'] },
 });
 
 // size — square box; fallback text scales with the box via inherited font-size
 export const sizes = stylex.create({
-  xs: { fontSize: '0.625rem', height: space['6'], width: space['6'] },
-  sm: { fontSize: '0.75rem', height: space['8'], width: space['8'] },
-  md: { fontSize: '0.875rem', height: space['10'], width: space['10'] },
+  xs: { fontSize: '0.625rem', height: space['5'], width: space['5'] },
+  sm: { fontSize: '0.75rem', height: space['7'], width: space['7'] },
+  md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
   lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
+  fit: { fontSize: '0.75rem', height: '100%', width: '100%' },
 });

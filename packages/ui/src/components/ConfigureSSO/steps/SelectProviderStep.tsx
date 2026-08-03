@@ -78,15 +78,9 @@ export const SelectProviderStep = (): JSX.Element => {
     organizationEnterpriseConnection: c,
     enterpriseConnectionMutations: { createConnection, changeProvider },
     contentRef,
-    isOIDCFlowEnabled,
   } = useConfigureSSO();
   const { goNext, goPrev, isFirstStep } = useWizard();
   const { t } = useLocalizations();
-
-  const providerGroups = React.useMemo(
-    () => PROVIDER_GROUPS.filter(group => group.id !== 'oidc' || isOIDCFlowEnabled),
-    [isOIDCFlowEnabled],
-  );
 
   const currentCard = c.provider ? toProviderCard(c.provider) : null;
 
@@ -166,7 +160,7 @@ export const SelectProviderStep = (): JSX.Element => {
 
         <Step.Body>
           <Step.Section sx={theme => ({ gap: theme.space.$5 })}>
-            {providerGroups.map(group => (
+            {PROVIDER_GROUPS.map(group => (
               <Col
                 key={group.id}
                 elementDescriptor={descriptors.configureSSOProviderGroup}

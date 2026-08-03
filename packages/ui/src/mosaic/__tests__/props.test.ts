@@ -13,9 +13,9 @@ describe('themeProps', () => {
   });
 
   it('reflects each variant axis as a data-<axis> attribute', () => {
-    expect(themeProps('button', { intent: 'destructive', variant: 'outline' })).toEqual({
+    expect(themeProps('button', { color: 'negative', variant: 'outline' })).toEqual({
       className: 'cl-button',
-      'data-intent': 'destructive',
+      'data-color': 'negative',
       'data-variant': 'outline',
     });
   });
@@ -64,11 +64,11 @@ describe('mergeStyleProps', () => {
   });
 
   it('drops className entirely when nothing contributes one', () => {
-    expect(mergeStyleProps({ 'data-intent': 'primary' }, {})).not.toHaveProperty('className');
+    expect(mergeStyleProps({ 'data-color': 'primary' }, {})).not.toHaveProperty('className');
   });
 
   it('preserves non-class/style props from both bags', () => {
-    const merged = mergeStyleProps({ 'data-intent': 'primary' }, { role: 'button' });
-    expect(merged).toMatchObject({ 'data-intent': 'primary', role: 'button' });
+    const merged = mergeStyleProps({ 'data-color': 'primary' }, { role: 'button' });
+    expect(merged).toMatchObject({ 'data-color': 'primary', role: 'button' });
   });
 });

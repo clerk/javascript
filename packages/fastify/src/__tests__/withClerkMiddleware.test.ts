@@ -243,6 +243,47 @@ describe('withClerkMiddleware(options)', () => {
     );
   });
 
+  describe('requests that cannot be converted to a web Request', () => {
+    const setup = async () => {
+      const fastify = Fastify();
+      await fastify.register(clerkPlugin);
+      fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+        reply.send({ auth: getAuth(request) });
+      });
+      return fastify;
+    };
+
+    test('responds 400 to a hostless // request target instead of throwing', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({ method: 'GET', path: '//' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+
+    test('responds 400 to a request target that parses as a credentialed URL', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({
+        method: 'GET',
+        path: "//$%7B%23context['xwork.MethodAccessor.denyMethodExecution']@example.com%7D.action",
+      });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+
+    test('responds 400 to a forbidden method (TRACE) instead of throwing', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({ method: 'TRACE' as 'GET', path: '/' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+  });
+
   test('handles signout case by populating the req.auth', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),

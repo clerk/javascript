@@ -6,26 +6,47 @@ import * as React from 'react';
 // ---------------------------------------------------------------------------
 
 /**
+ * The props a `render` callback receives, deliberately *not* the default tag's props.
+ *
+ * `render` exists to swap the rendered element, so the element's type is unknown at
+ * the point this is declared. Two things follow, and both were previously worked
+ * around at each call site instead of here:
+ *
+ * - `ref` is not pinned to the default tag. A `div` part rendering an `<a>` could
+ *   not spread its props, because `Ref<HTMLDivElement>` is not a `Ref<HTMLAnchorElement>`.
+ * - `color` is dropped. It is a non-standard HTML attribute typed `string`, so it
+ *   collides with the `color` variant a styled component spreads these props into.
+ */
+export type RenderProps = Omit<React.HTMLAttributes<HTMLElement>, 'color'> & {
+  // SAFETY: the rendered element is chosen by the callback, after this type is fixed, so
+  // no concrete element type is correct here. `Ref<Element>` does not work: `RefObject<Element>`
+  // is not a `RefObject<HTMLAnchorElement>`. `any` is what makes the ref spreadable onto
+  // whatever the callback returns, which is the whole point of `render`. Base UI's
+  // `HTMLProps` resolves this the same way.
+  ref?: React.Ref<any>;
+};
+
+/**
  * A render prop: a function that receives computed HTML props and returns a JSX element.
  */
-export type RenderProp<Props = React.HTMLAttributes<HTMLElement>> = (props: Props) => React.ReactElement;
+export type RenderProp<Props = RenderProps> = (props: Props) => React.ReactElement;
 
 /**
  * A `render` prop: a render function receiving the part's computed props, or a
- * React element to clone with them (`render={<Link/>}`). The element form lets a
- * part render a component whose own props diverge from the tag's, which a render
- * function cannot express — it is typed to receive the tag's props verbatim.
+ * React element to clone with them (`render={<Link/>}`).
  */
-export type RenderPropOrElement<Tag extends keyof React.JSX.IntrinsicElements> =
-  | RenderProp<React.ComponentPropsWithRef<Tag>>
-  | React.ReactElement;
+export type RenderPropOrElement = RenderProp | React.ReactElement;
 
 /**
- * Props accepted by any primitive part. Extends the native props for `Tag`
- * and adds the optional `render` escape hatch, narrowed to that tag's props.
+ * Props accepted by any primitive part: the native props for `Tag` plus the
+ * optional `render` escape hatch. `color` is dropped for the reason given on
+ * `RenderProps` — a part and its render callback expose the same contract.
  */
-export type ComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithRef<Tag> & {
-  render?: RenderPropOrElement<Tag>;
+export type ComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
+  React.ComponentPropsWithRef<Tag>,
+  'color'
+> & {
+  render?: RenderPropOrElement;
 };
 
 /**
@@ -125,7 +146,7 @@ interface UseRenderParamsBase<
   /** Fallback HTML tag when `render` is not provided. */
   defaultTagName: Tag;
   /** Render prop or element from the consumer. */
-  render?: RenderPropOrElement<Tag>;
+  render?: RenderPropOrElement;
   /** Ref(s) to merge onto the rendered element. Merged with the element's own ref. */
   ref?: React.Ref<unknown> | Array<React.Ref<unknown> | undefined>;
   /** State object. Keys are mapped to data attributes via `stateAttributesMapping`. */
@@ -197,9 +218,7 @@ export function useRender<
   const computedProps = { ...props, ...dataAttrs };
 
   if (typeof render === 'function') {
-    // SAFETY: computedProps is the tag's props widened with data-* attrs; the render
-    // function is declared to receive this tag's props.
-    return render({ ...computedProps, ref: mergedRef } as React.ComponentPropsWithRef<Tag>);
+    return render({ ...computedProps, ref: mergedRef });
   }
 
   if (React.isValidElement(render)) {

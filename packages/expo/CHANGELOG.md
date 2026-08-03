@@ -1,5 +1,45 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- Add an experimental `useSSO()` hook at `@clerk/expo/experimental` that uses future auth resources and activates completed SSO sessions automatically. ([#9103](https://github.com/clerk/javascript/pull/9103)) by [@swolfand](https://github.com/swolfand)
+
+  ```tsx
+  import { useSSO } from '@clerk/expo/experimental';
+
+  const { startSSOFlow } = useSSO();
+
+  await startSSOFlow({
+    strategy: 'oauth_google',
+  });
+  ```
+
+- Support pushing the native `UserProfileView` and `AuthView` onto your app's own navigation stack. ([#9121](https://github.com/clerk/javascript/pull/9121)) by [@mikepitre](https://github.com/mikepitre)
+
+  New optional `onHostBack` prop shows a back button on the component's root screen and calls you when it is tapped. The component keeps its own navigation chrome, so screen titles, back buttons, swipe-back, and transitions inside the component stay native — hide your route's header and pop your route from the callback:
+
+  ```tsx
+  <Stack.Screen options={{ headerShown: false }} />
+  <UserProfileView isDismissible={false} onHostBack={() => router.back()} />
+  ```
+
+  The component never leaves the route on its own, so react to auth state for flow completion — either swap the content in place or pop the route.
+
+  Existing usage is unaffected: the prop is optional, and the components render exactly as before without it. Requires the corresponding clerk-ios and clerk-android SDK releases.
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.38` to `1.0.39`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.0.39. ([#9300](https://github.com/clerk/javascript/pull/9300)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.5` to `1.3.6`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.6. ([#9301](https://github.com/clerk/javascript/pull/9301)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/clerk-js@6.25.13
+  - @clerk/shared@4.25.10
+  - @clerk/react@6.12.10
+
 ## 4.1.2
 
 ### Patch Changes
