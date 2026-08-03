@@ -239,6 +239,18 @@ export function Combined(_args: Record<string, unknown>) {
   );
 }
 
+export function UserPriority(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
+    />
+  );
+}
+
 export function AvatarOnly(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 

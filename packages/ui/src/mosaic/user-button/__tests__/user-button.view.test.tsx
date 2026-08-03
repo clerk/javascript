@@ -98,6 +98,35 @@ describe('UserButtonView, user mode', () => {
   });
 });
 
+describe('UserButtonView, combined mode priority', () => {
+  function renderCombined(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganizationId: 'org_1',
+      onManageAccount: vi.fn(),
+      onManageOrganization: vi.fn(),
+      ...props,
+    });
+  }
+
+  it('heads the surface with the active organization by default', () => {
+    renderCombined();
+
+    // The subtitle is the header's alone; the row below it carries only a title.
+    expect(screen.getByText('24 members · Pro')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
+  });
+
+  it('heads the surface with the account where the user takes priority', () => {
+    renderCombined({ modePriority: 'user' });
+
+    expect(screen.queryByText('24 members · Pro')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+  });
+});
+
 describe('UserButtonTrigger', () => {
   // Closed, so the only "Foundry" or "Alice Smith" on screen is the trigger's own label.
   function renderTrigger(props: Partial<UserButtonProps> = {}) {
@@ -130,6 +159,20 @@ describe('UserButtonTrigger', () => {
     expect(screen.queryByText('Foundry')).toBeNull();
     expect(screen.queryByText('Pro')).toBeNull();
     expect(screen.getByRole('button', { name: 'Open account menu for Foundry' })).toBeInTheDocument();
+  });
+
+  it('names the active organization in combined mode', () => {
+    renderTrigger({ mode: 'combined' });
+
+    expect(screen.getByText('Foundry')).toBeInTheDocument();
+    expect(screen.getByText('Pro')).toBeInTheDocument();
+  });
+
+  it('names the account in combined mode where the user takes priority', () => {
+    renderTrigger({ mode: 'combined', modePriority: 'user' });
+
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
   });
 
   it('keeps the name when only the plan badge is off', () => {
