@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import {
-  UserButton,
   type UserButtonInvitation,
   type UserButtonMembership,
   type UserButtonProps,
   type UserButtonSession,
   type UserButtonSuggestion,
+  UserButtonView,
 } from '@clerk/ui/mosaic/user-button/user-button.view';
 import { useState } from 'react';
 
@@ -201,7 +201,7 @@ export function Combined(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   return (
-    <UserButton
+    <UserButtonView
       {...prototype}
       mode='combined'
     />
@@ -213,7 +213,7 @@ export function Organizations(_args: Record<string, unknown>) {
 
   // Fed the same data as the others, including the additional account it deliberately never shows.
   return (
-    <UserButton
+    <UserButtonView
       {...prototype}
       mode='orgs'
     />
@@ -225,7 +225,7 @@ export function User(_args: Record<string, unknown>) {
 
   // Fed the same data too: an active organization and its workspaces, none of which this mode shows.
   return (
-    <UserButton
+    <UserButtonView
       {...prototype}
       mode='user'
     />
