@@ -96,11 +96,9 @@ export const enUS: LocalizationResource = {
     checkout: {
       addPromoCode: 'Add promo code',
       applyPromoCode: 'Apply',
-      discount: 'Discount',
-      promoCodePlaceholder: 'Enter promo code',
-      removePromoCode: 'Remove promo code',
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      discount: 'Discount',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       emailForm: {
@@ -116,6 +114,8 @@ export const enUS: LocalizationResource = {
       },
       pastDueNotice: 'Your previous subscription was past due, with no payment.',
       perMonth: 'per month',
+      promoCodePlaceholder: 'Enter promo code',
+      removePromoCode: 'Remove promo code',
       title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',

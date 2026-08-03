@@ -105,8 +105,11 @@ export const deDE: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Sie können diesen Plan nicht abonnieren. Ihr vorhandenes Abonnement ist teurer als dieser Plan.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Ihre Bezahlung war erfolgreich.',
       description__subscriptionSuccessful: 'Ihr Abonnement wurde erfolgreich aktiviert.',
+      discount: undefined,
       downgradeNotice:
         'Sie behalten Ihr aktuelles Abonnement bis zum Ende des Abrechnungszeitraums. So lange können Sie weiterhin alle Funktionen nutzen, danach werden Sie auf dieses Abonnement umgestellt.',
       emailForm: {
@@ -122,6 +125,8 @@ export const deDE: LocalizationResource = {
       },
       pastDueNotice: 'Ihr vorheriges Abonnement war überfällig, ohne Zahlung.',
       perMonth: 'pro Monat',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Bezahlung',
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',

@@ -103,8 +103,11 @@ export const zhTW: LocalizationResource = {
     cannotSubscribeMonthly: '您無法每月支付訂閱此計劃。要訂閱此計劃，您需要選擇每年支付。',
     cannotSubscribeUnrecoverable: '您無法訂閱此計劃。您的現有訂閱比此計劃更昂貴。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '您的付款已成功。',
       description__subscriptionSuccessful: '您的訂閱已成功設定。',
+      discount: undefined,
       downgradeNotice: '您將保留目前的訂閱及其功能直到本計費週期結束，然後您將被切換到此訂閱。',
       emailForm: {
         subtitle: '在您可以完成購買之前，您必須新增一個電子郵件地址，以便發送收據。',
@@ -119,6 +122,8 @@ export const zhTW: LocalizationResource = {
       },
       pastDueNotice: '您的上一個訂閱已逾期，未付款。',
       perMonth: '每月',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: '結帳',
       title__paymentSuccessful: '付款成功！',
       title__subscriptionSuccessful: '成功！',

@@ -106,8 +106,11 @@ export const jaJP: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'このプランを契約することはできません。現在のサブスクリプションの方がこのプランより高額です。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '支払いが完了しました。',
       description__subscriptionSuccessful: '新しいサブスクリプションの設定が完了しました。',
+      discount: undefined,
       downgradeNotice:
         '現在の請求期間が終了するまでは既存のサブスクリプションとその機能を利用でき、その後このサブスクリプションに切り替わります。',
       emailForm: {
@@ -123,6 +126,8 @@ export const jaJP: LocalizationResource = {
       },
       pastDueNotice: '前回のサブスクリプションには未払い分が残っています。',
       perMonth: '月あたり',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'チェックアウト',
       title__paymentSuccessful: '支払いが完了しました！',
       title__subscriptionSuccessful: '成功しました！',

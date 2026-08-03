@@ -105,8 +105,11 @@ export const bnIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'আপনি এই প্ল্যানে সাবস্ক্রাইব করতে পারবেন না। আপনার বিদ্যমান সাবস্ক্রিপশন এই প্ল্যানের চেয়ে বেশি ব্যয়বহুল।',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'আপনার পেমেন্ট সফল হয়েছে।',
       description__subscriptionSuccessful: 'আপনার নতুন সাবস্ক্রিপশন সম্পূর্ণ প্রস্তুত।',
+      discount: undefined,
       downgradeNotice:
         'বিলিং চক্রের শেষ পর্যন্ত আপনি আপনার বর্তমান সাবস্ক্রিপশন এবং এর বৈশিষ্ট্যগুলি রাখবেন, তারপরে আপনাকে এই সাবস্ক্রিপশনে স্যুইচ করা হবে।',
       emailForm: {
@@ -122,6 +125,8 @@ export const bnIN: LocalizationResource = {
       },
       pastDueNotice: 'আপনার পূর্ববর্তী সাবস্ক্রিপশন বকেয়া ছিল, কোনো পেমেন্ট ছাড়াই।',
       perMonth: 'প্রতি মাসে',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'চেকআউট',
       title__paymentSuccessful: 'পেমেন্ট সফল হয়েছে!',
       title__subscriptionSuccessful: 'সফল!',

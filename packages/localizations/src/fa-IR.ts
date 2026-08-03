@@ -103,8 +103,11 @@ export const faIR: LocalizationResource = {
       'شما نمی‌توانید با پرداخت ماهانه در این طرح مشترک شوید. برای عضویت در این طرح، باید پرداخت سالانه را انتخاب کنید.',
     cannotSubscribeUnrecoverable: 'شما نمی‌توانید در این طرح مشترک شوید. اشتراک موجود شما گران‌تر از این طرح است.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'پرداخت شما با موفقیت انجام شد.',
       description__subscriptionSuccessful: 'اشتراک شما با موفقیت ایجاد شد.',
+      discount: undefined,
       downgradeNotice:
         'شما اشتراک فعلی و ویژگی‌های آن را تا پایان دوره صورتحساب حفظ خواهید کرد، سپس به این اشتراک منتقل خواهید شد.',
       emailForm: {
@@ -121,6 +124,8 @@ export const faIR: LocalizationResource = {
       },
       pastDueNotice: 'اشتراک قبلی شما سررسید گذشته بود، بدون پرداخت.',
       perMonth: 'ماهانه',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'تسویه حساب',
       title__paymentSuccessful: 'پرداخت موفقیت آمیز بود!',
       title__subscriptionSuccessful: 'موفقیت آمیز!',

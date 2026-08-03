@@ -105,8 +105,11 @@ export const isIS: LocalizationResource = {
       'Þú getur ekki skráð þig í þessa áskrift með mánaðarlegri greiðslu. Til að skrá þig þarftu að velja árlega greiðslu.',
     cannotSubscribeUnrecoverable: 'Þú getur ekki skráð þig í þessa áskrift. Núverandi áskrift þín er dýrari en þessi.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Greiðsla þín tókst.',
       description__subscriptionSuccessful: 'Nýja áskriftin þín er tilbúin.',
+      discount: undefined,
       downgradeNotice:
         'Þú heldur núverandi áskrift og eiginleikum hennar til loka greiðslutímabilsins, síðan verður þú flutt yfir í þessa áskrift.',
       emailForm: {
@@ -122,6 +125,8 @@ export const isIS: LocalizationResource = {
       },
       pastDueNotice: 'Fyrri áskrift þín var gjaldfallin, án greiðslu.',
       perMonth: 'á mánuði',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Greiðsla',
       title__paymentSuccessful: 'Greiðsla tókst!',
       title__subscriptionSuccessful: 'Tókst!',

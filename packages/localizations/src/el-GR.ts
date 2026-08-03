@@ -100,8 +100,11 @@ export const elGR: LocalizationResource = {
     cannotSubscribeMonthly: 'Δεν μπορείτε να εγγραφείτε μηνιαίως σε αυτό το πλάνο',
     cannotSubscribeUnrecoverable: 'Δεν μπορείτε να εγγραφείτε σε αυτό το πλάνο αυτήν τη στιγμή',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Η πληρωμή σας ολοκληρώθηκε επιτυχώς',
       description__subscriptionSuccessful: 'Η συνδρομή σας ξεκίνησε επιτυχώς',
+      discount: undefined,
       downgradeNotice: 'Θα υποβαθμιστείτε στο τέλος της τρέχουσας περιόδου χρέωσης',
       emailForm: {
         subtitle: 'Εισάγετε τη διεύθυνση email σας για να συνεχίσετε',
@@ -116,6 +119,8 @@ export const elGR: LocalizationResource = {
       },
       pastDueNotice: 'Η συνδρομή σας είναι ληξιπρόθεσμη. Παρακαλώ ενημερώστε τη μέθοδο πληρωμής σας.',
       perMonth: 'ανά μήνα',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Ολοκλήρωση πληρωμής',
       title__paymentSuccessful: 'Επιτυχής πληρωμή',
       title__subscriptionSuccessful: 'Επιτυχής συνδρομή',

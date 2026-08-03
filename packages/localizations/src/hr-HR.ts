@@ -106,8 +106,11 @@ export const hrHR: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Ne možete se pretplatiti na ovaj plan. Vaša postojeća pretplata je skuplja od ovog plana.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše plaćanje je uspješno.',
       description__subscriptionSuccessful: 'Vaša nova pretplata je spremna.',
+      discount: undefined,
       downgradeNotice:
         'Zadržat ćete svoju trenutnu pretplatu i njezine značajke do kraja obračunskog razdoblja, nakon čega ćete biti prebačeni na ovu pretplatu.',
       emailForm: {
@@ -123,6 +126,8 @@ export const hrHR: LocalizationResource = {
       },
       pastDueNotice: 'Vaša prethodna pretplata je bila dospjela, bez plaćanja.',
       perMonth: 'mjesečno',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Naplata',
       title__paymentSuccessful: 'Plaćanje je uspjelo!',
       title__subscriptionSuccessful: 'Uspjeh!',
