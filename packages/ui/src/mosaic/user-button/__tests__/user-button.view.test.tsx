@@ -39,18 +39,20 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByRole('button', { name: 'Account actions' })).toBeNull();
   });
 
-  it('lists the accounts with no heading above them', () => {
+  it('lists only the accounts to switch to, with no heading above them', () => {
     renderView({ onAddAccount: vi.fn(), onSwitchSession: vi.fn() });
 
     expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
     expect(screen.queryByText('Accounts')).toBeNull();
+    // The header's subtitle and nothing else: the active account is not repeated in the list.
+    expect(screen.getAllByText('alice@example.com')).toHaveLength(1);
   });
 
-  it('lists the active account too, checked rather than offered to switch to', () => {
-    renderView({ onSwitchSession: vi.fn() });
+  it('lists the active account under the heading, not offered to switch to', () => {
+    renderView({ mode: 'combined', hasOrganizations: true, onSwitchSession: vi.fn() });
 
-    // Once as the header's subtitle, once as its own row in the list below.
-    expect(screen.getAllByText('alice@example.com')).toHaveLength(2);
+    // The header's subtitle, the row heading its workspaces, and its row in the accounts group.
+    expect(screen.getAllByText('alice@example.com')).toHaveLength(3);
     expect(screen.queryByRole('button', { name: 'alice@example.com' })).toBeNull();
   });
 
