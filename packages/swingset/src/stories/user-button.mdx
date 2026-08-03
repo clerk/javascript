@@ -71,16 +71,26 @@ import {
 
 Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use client'` boundary.
 
+## Trigger
+
+The active workspace's avatar and what it is called: the org and its plan wherever one heads the
+trigger, the account otherwise. `showLabel={false}` leaves the avatar alone.
+
+<Story
+  name='AvatarOnly'
+  storyModule={UserButtonStories}
+/>
+
 ## Modes
 
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
 Everything else is data.
 
-| Mode                 | Popup                                | Trigger          | Header      |
-| -------------------- | ------------------------------------ | ---------------- | ----------- |
-| `combined` (default) | Organizations and accounts together. | The org's mark   | The account |
-| `orgs`               | Organizations only; no account rows. | The org's mark   | The org     |
-| `user`               | Accounts only; never shows an org.   | The user's photo | The account |
+| Mode                 | Popup                                | Trigger            | Header      |
+| -------------------- | ------------------------------------ | ------------------ | ----------- |
+| `combined` (default) | Organizations and accounts together. | The org, plus plan | The account |
+| `orgs`               | Organizations only; no account rows. | The org, plus plan | The org     |
+| `user`               | Accounts only; never shows an org.   | The account        | The account |
 
 Only `orgs` is _headed_ by the organization; elsewhere the account heads it, so switching org changes
 the trigger and the check but not who you're signed in as. **Invite** belongs to the active org
@@ -117,7 +127,7 @@ this mode ignores it, down to the trigger.
 | Part                | Description                                                                  |
 | ------------------- | ---------------------------------------------------------------------------- |
 | `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
-| `UserButtonTrigger` | The trigger: the active workspace's avatar, and nothing else.                |
+| `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
 | `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |
 
 ## Styling
@@ -131,6 +141,7 @@ here _and_ everywhere else `Item` is used; that is the point of composing rather
 | `Card`    | `card-root`                                                                                                                          |
 | `Item`    | `item`, `item-media`, `item-content`, `item-title`, `item-description`, `item-label`, `item-actions`, `item-group`, `item-separator` |
 | `Avatar`  | `avatar`, `avatar-image`, `avatar-fallback`                                                                                          |
+| `Badge`   | `badge`                                                                                                                              |
 | `Button`  | `button`                                                                                                                             |
 | `Icon`    | `icon`                                                                                                                               |
 | `Menu`    | `menu-trigger`, `menu-positioner`, `menu-popup`, `menu-item`, `menu-separator`                                                       |

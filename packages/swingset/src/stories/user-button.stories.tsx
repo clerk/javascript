@@ -239,6 +239,17 @@ export function Combined(_args: Record<string, unknown>) {
   );
 }
 
+export function AvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      showLabel={false}
+    />
+  );
+}
+
 export function Organizations(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
