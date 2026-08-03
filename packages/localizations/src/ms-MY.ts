@@ -134,6 +134,9 @@ export const msMY: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit untuk baki langganan semasa anda.',
     defaultFreePlanActive: 'Anda kini menggunakan pelan Percuma',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Percuma',
     getStarted: 'Mulakan',
     highlightedPlanBadge: 'Popular',
@@ -145,6 +148,7 @@ export const msMY: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Bulanan',
+    months: undefined,
     pastDue: 'Tertunggak',
     pay: 'Bayar {{amount}}',
     payerCreditRemainder: undefined,
@@ -223,6 +227,7 @@ export const msMY: LocalizationResource = {
     year: 'Tahun',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

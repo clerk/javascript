@@ -132,6 +132,9 @@ export const bnIN: LocalizationResource = {
     credit: 'ক্রেডিট',
     creditRemainder: 'আপনার বর্তমান সাবস্ক্রিপশনের অবশিষ্ট সময়ের জন্য ক্রেডিট।',
     defaultFreePlanActive: 'আপনি বর্তমানে বিনামূল্যের প্ল্যানে আছেন',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'বিনামূল্যে',
     getStarted: 'শুরু করুন',
     highlightedPlanBadge: 'জনপ্রিয়',
@@ -143,6 +146,7 @@ export const bnIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'মাসিক',
+    months: undefined,
     pastDue: 'বকেয়া',
     pay: '{{amount}} পরিশোধ করুন',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const bnIN: LocalizationResource = {
     year: 'বছর',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

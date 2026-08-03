@@ -129,6 +129,9 @@ export const zhTW: LocalizationResource = {
     credit: '餘額',
     creditRemainder: '您目前訂閱的剩餘期間的餘額。',
     defaultFreePlanActive: '您目前正在免費計劃中',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '免費',
     getStarted: '開始',
     highlightedPlanBadge: '熱門',
@@ -140,6 +143,7 @@ export const zhTW: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '每月',
+    months: undefined,
     pastDue: '逾期',
     pay: '支付 {{amount}}',
     payerCreditRemainder: '來自帳戶餘額的折抵。',
@@ -218,6 +222,7 @@ export const zhTW: LocalizationResource = {
     year: '年',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

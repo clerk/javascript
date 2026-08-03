@@ -133,6 +133,9 @@ export const caES: LocalizationResource = {
     credit: 'Crèdit',
     creditRemainder: 'Crèdit pel temps restant de la teva subscripció actual.',
     defaultFreePlanActive: 'Estàs al pla gratuït',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuït',
     getStarted: 'Comença',
     highlightedPlanBadge: 'Popular',
@@ -144,6 +147,7 @@ export const caES: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensual',
+    months: undefined,
     pastDue: 'Pagament pendent',
     pay: 'Paga {{amount}}',
     payerCreditRemainder: undefined,
@@ -222,6 +226,7 @@ export const caES: LocalizationResource = {
     year: 'Any',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

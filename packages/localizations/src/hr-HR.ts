@@ -133,6 +133,9 @@ export const hrHR: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za preostalo razdoblje vaše trenutne pretplate.',
     defaultFreePlanActive: 'Trenutno ste na besplatnom planu',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Besplatno',
     getStarted: 'Započnite',
     highlightedPlanBadge: 'Popularno',
@@ -144,6 +147,7 @@ export const hrHR: LocalizationResource = {
     monthAbbreviation: 'mj',
     monthPerUnit: 'Mjesec po {{unitName}}',
     monthly: 'Mjesečno',
+    months: undefined,
     pastDue: 'Dospjelo',
     pay: 'Plati {{amount}}',
     payerCreditRemainder: 'Kredit sa stanja računa.',
@@ -222,6 +226,7 @@ export const hrHR: LocalizationResource = {
     year: 'Godina',
     yearAbbreviation: 'god',
     yearPerUnit: 'Godina po {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

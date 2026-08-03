@@ -126,6 +126,9 @@ export const elGR: LocalizationResource = {
     credit: 'Πίστωση',
     creditRemainder: 'Υπόλοιπο πίστωσης',
     defaultFreePlanActive: 'Το προεπιλεγμένο δωρεάν πλάνο είναι ενεργό',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Δωρεάν',
     getStarted: 'Ξεκινήστε',
     highlightedPlanBadge: 'Δημοφιλές',
@@ -137,6 +140,7 @@ export const elGR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Μηνιαία',
+    months: undefined,
     pastDue: 'Ληξιπρόθεσμο',
     pay: 'Πληρωμή',
     payerCreditRemainder: undefined,
@@ -215,6 +219,7 @@ export const elGR: LocalizationResource = {
     year: 'έτος',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

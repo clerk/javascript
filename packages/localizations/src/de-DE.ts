@@ -132,6 +132,9 @@ export const deDE: LocalizationResource = {
     credit: 'Guthaben',
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
     highlightedPlanBadge: 'Beliebt',
@@ -143,6 +146,7 @@ export const deDE: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Monatlich',
+    months: undefined,
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const deDE: LocalizationResource = {
     year: 'Jahr',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

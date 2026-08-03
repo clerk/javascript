@@ -134,6 +134,9 @@ export const ptPT: LocalizationResource = {
     credit: 'Crédito',
     creditRemainder: 'Crédito relativo ao período restante da sua subscrição atual.',
     defaultFreePlanActive: 'Está atualmente no plano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Começar',
     highlightedPlanBadge: 'Popular',
@@ -145,6 +148,7 @@ export const ptPT: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensal',
+    months: undefined,
     pastDue: 'Em atraso',
     pay: 'Pagar {{amount}}',
     payerCreditRemainder: undefined,
@@ -223,6 +227,7 @@ export const ptPT: LocalizationResource = {
     year: 'Ano',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

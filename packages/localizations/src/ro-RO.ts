@@ -132,6 +132,9 @@ export const roRO: LocalizationResource = {
     credit: 'Credit',
     creditRemainder: 'Credit pentru restul abonamentului curent.',
     defaultFreePlanActive: 'În prezent ești pe planul Gratuit',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuit',
     getStarted: 'Începe',
     highlightedPlanBadge: 'Popular',
@@ -143,6 +146,7 @@ export const roRO: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Lunar',
+    months: undefined,
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const roRO: LocalizationResource = {
     year: 'An',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

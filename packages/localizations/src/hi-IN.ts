@@ -132,6 +132,9 @@ export const hiIN: LocalizationResource = {
     credit: 'क्रेडिट',
     creditRemainder: 'आपकी मौजूदा सदस्यता की शेष अवधि के लिए क्रेडिट।',
     defaultFreePlanActive: 'आप वर्तमान में निःशुल्क योजना पर हैं',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'मुफ्त',
     getStarted: 'शुरू करें',
     highlightedPlanBadge: 'लोकप्रिय',
@@ -143,6 +146,7 @@ export const hiIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'मासिक',
+    months: undefined,
     pastDue: 'बकाया',
     pay: '{{amount}} भुगतान करें',
     payerCreditRemainder: undefined,
@@ -221,6 +225,7 @@ export const hiIN: LocalizationResource = {
     year: 'वर्ष',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

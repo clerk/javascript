@@ -132,6 +132,9 @@ export const fiFI: LocalizationResource = {
     credit: 'Hyvitys',
     creditRemainder: 'Hyvitys nykyisen tilauksesi jäljellä olevalta ajalta.',
     defaultFreePlanActive: 'Olet tällä hetkellä ilmaisella tilauksella.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ilmainen',
     getStarted: 'Aloita',
     highlightedPlanBadge: 'Suosittu',
@@ -143,6 +146,7 @@ export const fiFI: LocalizationResource = {
     monthAbbreviation: 'kk',
     monthPerUnit: 'Kuukausi per {{unitName}}',
     monthly: 'Kuukausittain',
+    months: undefined,
     pastDue: 'Erääntynyt',
     pay: 'Maksa {{amount}}',
     payerCreditRemainder: 'Hyvitys tilin saldosta.',
@@ -221,6 +225,7 @@ export const fiFI: LocalizationResource = {
     year: 'Vuosi',
     yearAbbreviation: 'v',
     yearPerUnit: 'Vuosi per {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

@@ -134,6 +134,9 @@ export const taIN: LocalizationResource = {
     credit: 'கடன்',
     creditRemainder: 'உங்கள் தற்போதைய சந்தாவின் மீதமுள்ள காலத்திற்கான கடன்.',
     defaultFreePlanActive: 'நீங்கள் தற்போது இலவச திட்டத்தில் உள்ளீர்கள்',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'இலவசம்',
     getStarted: 'தொடங்குங்கள்',
     highlightedPlanBadge: 'பிரபலமான',
@@ -145,6 +148,7 @@ export const taIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'மாதந்தோறும்',
+    months: undefined,
     pastDue: 'நிலுவை',
     pay: '{{amount}} செலுத்து',
     payerCreditRemainder: undefined,
@@ -223,6 +227,7 @@ export const taIN: LocalizationResource = {
     year: 'ஆண்டு',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

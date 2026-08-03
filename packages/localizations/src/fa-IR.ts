@@ -131,6 +131,9 @@ export const faIR: LocalizationResource = {
     credit: 'اعتبار',
     creditRemainder: 'اعتبار برای باقیمانده اشتراک فعلی شما.',
     defaultFreePlanActive: 'شما در حال حاضر در طرح رایگان هستید',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'رایگان',
     getStarted: 'شروع کنید',
     highlightedPlanBadge: 'محبوب',
@@ -142,6 +145,7 @@ export const faIR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'ماهانه',
+    months: undefined,
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
     payerCreditRemainder: undefined,
@@ -220,6 +224,7 @@ export const faIR: LocalizationResource = {
     year: 'سال',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

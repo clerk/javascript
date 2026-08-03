@@ -5,6 +5,7 @@ import { useProtect } from '@/ui/common/Gate';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
+import { toNegativeAmount } from '@/ui/utils/billing';
 import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 
@@ -246,6 +247,68 @@ function SubscriptionOverviewRow({
   );
 }
 
+function SubscriptionDiscountRow({ subscriptionItem }: { subscriptionItem: BillingSubscriptionItemResource }) {
+  const { $, t } = useLocalizations();
+  const appliedDiscount = subscriptionItem.appliedDiscount;
+
+  if (!appliedDiscount || appliedDiscount.status !== 'active') {
+    return null;
+  }
+
+  const totalCycles =
+    appliedDiscount.cyclesRemaining === null ? null : appliedDiscount.cyclesApplied + appliedDiscount.cyclesRemaining;
+  const period = t(
+    subscriptionItem.planPeriod === 'annual' ? localizationKeys('billing.years') : localizationKeys('billing.months'),
+  ).toLocaleLowerCase();
+
+  const discountAmount =
+    appliedDiscount.effect === 'percentage' && appliedDiscount.percentOff !== undefined
+      ? `${appliedDiscount.percentOff}%`
+      : appliedDiscount.amountOff
+        ? $(appliedDiscount.amountOff)
+        : '';
+  const discountTitle = `${appliedDiscount.name} ${t(
+    totalCycles === null
+      ? localizationKeys('billing.discountAmount', { amount: discountAmount })
+      : localizationKeys('billing.discountDuration', {
+          amount: discountAmount,
+          cycles: totalCycles,
+          period,
+        }),
+  )}`;
+
+  return (
+    <Tr
+      sx={t =>
+        subscriptionItem.status === 'upcoming'
+          ? {
+              background: common.mutedBackground(t),
+            }
+          : {}
+      }
+    >
+      <Td sx={{ verticalAlign: 'top' }}>
+        <Col gap={1}>
+          <Text variant='subtitle'>{discountTitle}</Text>
+          {appliedDiscount.cyclesRemaining !== null ? (
+            <Text
+              variant='subtitle'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('billing.discountCyclesRemaining', {
+                cycles: appliedDiscount.cyclesRemaining,
+                period,
+              })}
+            />
+          ) : null}
+        </Col>
+      </Td>
+      <Td sx={{ textAlign: 'end' }}>
+        <Text variant='subtitle'>{appliedDiscount.amount ? $(toNegativeAmount(appliedDiscount.amount)) : null}</Text>
+      </Td>
+    </Tr>
+  );
+}
+
 function SubscriptionItemRow({
   subscriptionItem,
   length,
@@ -405,6 +468,7 @@ function SubscriptionItemRow({
           </Td>
         </Tr>
       ) : null}
+      <SubscriptionDiscountRow subscriptionItem={subscriptionItem} />
     </Fragment>
   );
 }

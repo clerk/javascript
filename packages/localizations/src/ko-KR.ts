@@ -130,6 +130,9 @@ export const koKR: LocalizationResource = {
     credit: '크레딧',
     creditRemainder: '현재 구독 남은 기간에 대한 크레딧',
     defaultFreePlanActive: '현재 무료 플랜을 사용 중이에요',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '무료',
     getStarted: '시작하기',
     highlightedPlanBadge: '인기',
@@ -141,6 +144,7 @@ export const koKR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: '월간',
+    months: undefined,
     pastDue: '연체',
     pay: '{{amount}} 결제',
     payerCreditRemainder: undefined,
@@ -219,6 +223,7 @@ export const koKR: LocalizationResource = {
     year: '년',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
