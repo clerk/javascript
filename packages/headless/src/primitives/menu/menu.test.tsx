@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Popover } from '../popover';
 import { Menu } from './index';
 
 afterEach(() => cleanup());
@@ -557,6 +558,34 @@ describe('Menu', () => {
 
       const shareTrigger = screen.getByText('Share');
       expect(shareTrigger).toHaveAttribute('role', 'menuitem');
+    });
+
+    it('leaves a trigger inside a popover as a plain button', async () => {
+      const user = userEvent.setup();
+      render(
+        <Popover.Root>
+          <Popover.Trigger>Account</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Menu.Root>
+                <Menu.Trigger>Actions</Menu.Trigger>
+                <Menu.Positioner>
+                  <Menu.Popup>
+                    <Menu.Item label='Sign out'>Sign out</Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByText('Account'));
+
+      // A popover is not a menu, so its children are not menu items. Only the floating tree is
+      // shared, and that is dismissal plumbing rather than menu hierarchy.
+      expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+      expect(screen.getByText('Actions')).not.toHaveAttribute('role');
     });
 
     it('opens submenu via controlled open prop', () => {
