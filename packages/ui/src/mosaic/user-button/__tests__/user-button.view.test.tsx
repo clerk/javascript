@@ -12,6 +12,14 @@ import { userButtonBusyKeys, UserButtonView } from '../user-button.view';
 const alice = { sessionId: 'sess_1', name: 'Alice Smith', email: 'alice@example.com' };
 const bob = { sessionId: 'sess_2', name: 'Bob Jones', email: 'bob@example.com' };
 
+const foundry = {
+  kind: 'membership',
+  organizationId: 'org_1',
+  name: 'Foundry',
+  membersCount: 24,
+  planLabel: 'Pro',
+} as const;
+
 function renderView(props: Partial<UserButtonProps> = {}) {
   return render(
     <MosaicProvider>
@@ -87,5 +95,40 @@ describe('UserButtonView, user mode', () => {
     expect(screen.getByText('Accounts')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Account actions' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
+  });
+});
+
+describe('UserButtonTrigger', () => {
+  // Closed, so the only "Foundry" or "Alice Smith" on screen is the trigger's own label.
+  function renderTrigger(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      defaultOpen: false,
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganizationId: 'org_1',
+      ...props,
+    });
+  }
+
+  it('names the active organization and its plan', () => {
+    renderTrigger({ mode: 'orgs' });
+
+    expect(screen.getByText('Foundry')).toBeInTheDocument();
+    expect(screen.getByText('Pro')).toBeInTheDocument();
+  });
+
+  it('names the account where no organization heads the trigger', () => {
+    renderTrigger({ mode: 'user' });
+
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  it('renders the avatar alone when the label is off', () => {
+    renderTrigger({ mode: 'orgs', showLabel: false });
+
+    expect(screen.queryByText('Foundry')).toBeNull();
+    expect(screen.queryByText('Pro')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Open account menu for Foundry' })).toBeInTheDocument();
   });
 });
