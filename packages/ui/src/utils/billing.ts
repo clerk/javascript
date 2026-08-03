@@ -1,7 +1,7 @@
 import type { BillingMoneyAmount, BillingSubscriptionPlanPeriod } from '@clerk/shared/types/billing';
 
-import { localizationKeys } from '../localization';
 import type { useLocalizations } from '../localization';
+import { localizationKeys } from '../localization';
 
 type Discount = {
   effect?: 'percentage' | 'fixed_amount';
