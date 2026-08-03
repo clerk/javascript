@@ -238,6 +238,16 @@ const typeScaleDefaults = {
 export const typeScaleVars = stylex.defineVars(typeScaleDefaults);
 
 // =============================================================================
+// Typography Tokens — font family
+// =============================================================================
+
+const fontFamilyDefaults = {
+  '--cl-font-family-sans': 'inherit',
+} as const;
+
+export const fontFamilyVars = stylex.defineVars(fontFamilyDefaults);
+
+// =============================================================================
 // Typography Tokens — font weight
 // =============================================================================
 // Kept separate from the step scale: weight and size vary independently.

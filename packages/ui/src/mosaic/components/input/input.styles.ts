@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
 const interactionBorderColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 20%, transparent)`;
@@ -30,7 +38,7 @@ export const styles = stylex.create({
     boxSizing: 'border-box',
     color: 'inherit',
     display: 'block',
-    fontFamily: 'inherit',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     outlineOffset: '2px',
     transitionDuration: durationVars['--cl-duration-base'],
     transitionProperty: 'color, background-color, border-color',

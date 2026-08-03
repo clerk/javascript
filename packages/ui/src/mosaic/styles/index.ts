@@ -50,6 +50,7 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   scrollbarVars,
@@ -64,6 +65,7 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   scrollbarVars,
@@ -80,6 +82,7 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type ScrollbarVarName = keyof typeof scrollbarVars;
