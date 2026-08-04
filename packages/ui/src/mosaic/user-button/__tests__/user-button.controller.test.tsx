@@ -48,6 +48,7 @@ let signOut: ReturnType<typeof vi.fn>;
 let navigate: ReturnType<typeof vi.fn>;
 let openUserProfile: ReturnType<typeof vi.fn>;
 let openOrganizationProfile: ReturnType<typeof vi.fn>;
+let openCreateOrganization: ReturnType<typeof vi.fn>;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let getContainer: () => HTMLElement | null;
 
@@ -67,6 +68,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       signOut,
       openUserProfile,
       openOrganizationProfile,
+      openCreateOrganization,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -154,6 +156,7 @@ beforeEach(() => {
   navigate = vi.fn().mockResolvedValue(undefined);
   openUserProfile = vi.fn();
   openOrganizationProfile = vi.fn();
+  openCreateOrganization = vi.fn();
   getContainer = () => null;
 });
 
@@ -610,14 +613,37 @@ describe('useUserButtonController', () => {
     expect(navigate).toHaveBeenCalledWith('/settings');
   });
 
-  it('navigates for create and add-account actions using clerk build URLs', () => {
+  // Creating an organization resolves like the two profiles do: a modal unless a URL routes
+  // instead. Adding an account always leaves, since signing in cannot happen inside the popover.
+  it('opens the create-organization modal into the portal root, and navigates for add-account', () => {
     render(<Harness />);
 
     fireEvent.click(screen.getByText('create-org'));
-    expect(navigate).toHaveBeenCalledWith('/create-org');
+    expect(openCreateOrganization).toHaveBeenCalledWith({ getContainer });
+    expect(navigate).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText('add-account'));
     expect(navigate).toHaveBeenCalledWith('/sign-in');
+  });
+
+  it('navigates to a create-organization URL when one is given', () => {
+    render(<Harness createOrganizationUrl='/new-org' />);
+
+    fireEvent.click(screen.getByText('create-org'));
+
+    expect(navigate).toHaveBeenCalledWith('/new-org');
+    expect(openCreateOrganization).not.toHaveBeenCalled();
+  });
+
+  // Without a URL there is nothing to navigate to but Clerk's own page, which is what an explicit
+  // `navigation` asks for.
+  it('falls back to the clerk create-organization URL for an explicit navigation mode', () => {
+    render(<Harness createOrganizationMode='navigation' />);
+
+    fireEvent.click(screen.getByText('create-org'));
+
+    expect(navigate).toHaveBeenCalledWith('/create-org');
+    expect(openCreateOrganization).not.toHaveBeenCalled();
   });
 
   it('accepts invitations and suggestions, then revalidates whatever the accept changed', async () => {
