@@ -27,7 +27,7 @@ function renderView(props: Partial<UserButtonProps> = {}) {
         mode='user'
         defaultOpen
         activeSession={alice}
-        activeOrganizationId={null}
+        activeOrganization={null}
         hasOrganizations={false}
         memberships={[]}
         suggestions={[]}
@@ -104,7 +104,7 @@ describe('UserButtonView, combined mode priority', () => {
       mode: 'combined',
       hasOrganizations: true,
       memberships: [foundry],
-      activeOrganizationId: 'org_1',
+      activeOrganization: foundry,
       onManageAccount: vi.fn(),
       onManageOrganization: vi.fn(),
       ...props,
@@ -134,7 +134,7 @@ describe('UserButtonTrigger', () => {
       defaultOpen: false,
       hasOrganizations: true,
       memberships: [foundry],
-      activeOrganizationId: 'org_1',
+      activeOrganization: foundry,
       ...props,
     });
   }
@@ -180,5 +180,104 @@ describe('UserButtonTrigger', () => {
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  // The active organization arrives on its own, ahead of the list it belongs to.
+  it('names the active organization before its membership list has loaded', () => {
+    renderTrigger({ mode: 'orgs', memberships: [], hasOrganizations: false, organizationsLoading: true });
+
+    expect(screen.getByText('Foundry')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).toBeNull();
+  });
+});
+
+describe('UserButtonView, loading the organization list', () => {
+  it('holds the workspace list open while its first page is in flight', () => {
+    renderView({ mode: 'combined', hasOrganizations: false, organizationsLoading: true, onManageAccount: vi.fn() });
+
+    expect(screen.getByText('Loading organizations…')).toBeInTheDocument();
+    // The account row heads the section and does not wait on the list.
+    expect(screen.getByRole('button', { name: 'Actions for alice@example.com' })).toBeInTheDocument();
+  });
+
+  it('drops the loading row once the list has landed', () => {
+    renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganization: foundry,
+      onSelectOrganization: vi.fn(),
+    });
+
+    expect(screen.queryByText('Loading organizations…')).toBeNull();
+    // Named by the trigger and the header, and listed as the active row.
+    expect(screen.getAllByText('Foundry')).toHaveLength(3);
+  });
+
+  // An account with no organizations at all has no section, loading or not.
+  it('leaves the account-only surface alone', () => {
+    renderView({ mode: 'user', organizationsLoading: true });
+
+    expect(screen.queryByText('Loading organizations…')).toBeNull();
+  });
+});
+
+describe('UserButtonView, accepted invitations', () => {
+  const gamma = {
+    kind: 'invitation',
+    id: 'inv_1',
+    organizationId: 'org_2',
+    organizationName: 'Gamma',
+    status: 'accepted',
+  } as const;
+
+  function renderInvitations(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganization: foundry,
+      invitations: [gamma],
+      onSelectOrganization: vi.fn(),
+      onAcceptInvitation: vi.fn(),
+      ...props,
+    });
+  }
+
+  it('lists an accepted invitation as a workspace to switch to, with nothing left to accept', async () => {
+    const onSelectOrganization = vi.fn();
+    renderInvitations({ onSelectOrganization });
+
+    expect(screen.queryByRole('button', { name: 'Accept' })).toBeNull();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Gamma' }));
+
+    expect(onSelectOrganization).toHaveBeenCalledWith('org_2');
+  });
+
+  it('still offers to accept a pending one', () => {
+    renderInvitations({ invitations: [{ ...gamma, status: 'pending' }] });
+
+    expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
+  });
+
+  // The membership list catches up a moment after the accept, and for that moment the organization
+  // is in both lists.
+  it('drops an accepted invitation the membership list has caught up with', () => {
+    renderInvitations({
+      memberships: [foundry, { kind: 'membership', organizationId: 'org_2', name: 'Gamma' }],
+    });
+
+    // The membership row alone, not it and an invitation row saying the same thing.
+    expect(screen.getAllByRole('button', { name: 'Gamma' })).toHaveLength(1);
+  });
+
+  it('drops one for the organization that is already active', () => {
+    renderInvitations({
+      activeOrganization: { kind: 'membership', organizationId: 'org_2', name: 'Gamma' },
+      memberships: [foundry],
+    });
+
+    // The header names it; the list does not offer to switch to what is already active.
+    expect(screen.queryByRole('button', { name: 'Gamma' })).toBeNull();
   });
 });

@@ -38,7 +38,7 @@ import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButtonView
   activeSession={{ sessionId: 'sess_colin', name: 'Colin', email: 'colin@clerk.dev' }}
-  activeOrganizationId='org_clerk_app'
+  activeOrganization={{ kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' }}
   hasOrganizations
   memberships={[
     { kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' },
