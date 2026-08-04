@@ -621,8 +621,8 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> { … }
 
 - **Published** (`build:mosaic` → `@stylexjs/rollup-plugin`): compiles the
   `styles/index.ts` barrel into `dist-mosaic/styles.css`, exported as
-  `@clerk/ui/styles.css`. Consumers choose the cascade layer at import:
-  `@import '@clerk/ui/styles.css' layer(components)`.
+  `@clerk/ui/experimental/mosaic/styles.css`. Consumers choose the cascade layer at import:
+  `@import '@clerk/ui/experimental/mosaic/styles.css' layer(components)`.
 - **Swingset** (source-consumed): `@stylexjs/unplugin/webpack` in `next.config`
   transforms StyleX **JS only** (calls → static atoms; SWC/Emotion untouched);
   `@stylexjs/postcss-plugin` extracts the **CSS** by replacing `@stylex;` in
