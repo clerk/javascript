@@ -123,6 +123,8 @@ describe('UserButtonView, standing rows down', () => {
           onSelectOrganization={vi.fn()}
           onSwitchSession={vi.fn()}
           onSignOutAll={vi.fn()}
+          onManageAccount={vi.fn()}
+          onSignOutSession={vi.fn()}
         />
       </MosaicProvider>
     );
@@ -132,6 +134,9 @@ describe('UserButtonView, standing rows down', () => {
     ['a workspace row', 'Other Co'],
     ['an account row', 'bob@example.com'],
     ['an action row', 'Sign out of all accounts'],
+    // The `⋯` stands down the same way. Withholding what it opens would unmount the trigger, so
+    // the row would drop its trailing edge for the length of the action and get it back after.
+    ['the account menu', 'Actions for alice@example.com'],
   ])('holds %s in place, disabled, while another action runs', (_name, label) => {
     const { rerender } = render(surface(null));
     const row = screen.getByRole('button', { name: label });
