@@ -1074,10 +1074,10 @@ export function UserButtonTriggerSkeleton({
   const shape = leadsWithOrganization(mode, modePriority) ? 'square' : 'circle';
 
   return (
-    <div {...stylex.props(styles.trigger, triggerShapes[shape])}>
+    <div {...stylex.props(styles.trigger)}>
       <div
         aria-hidden
-        {...stylex.props(styles.triggerSkeleton)}
+        {...stylex.props(styles.triggerSkeleton, triggerShapes[shape])}
       />
     </div>
   );
