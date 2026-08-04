@@ -182,6 +182,22 @@ describe('UserButtonTrigger', () => {
     expect(screen.queryByText('Pro')).toBeNull();
   });
 
+  // The corner follows the workspace mark, so a labelled trigger is a pill for a person and a
+  // squared-off block for an organization rather than a pill either way.
+  it('takes its corner from the workspace it names, labelled or not', () => {
+    const corner = (props: Partial<UserButtonProps>) => {
+      const { unmount } = renderTrigger(props);
+      const className = screen.getByRole('button', { name: /Open account menu/ }).className;
+      unmount();
+      return className;
+    };
+
+    expect(corner({ mode: 'orgs' })).not.toEqual(corner({ mode: 'user' }));
+    expect(corner({ mode: 'orgs', renderTriggerLabel: false })).not.toEqual(
+      corner({ mode: 'user', renderTriggerLabel: false }),
+    );
+  });
+
   // The active organization arrives on its own, ahead of the list it belongs to.
   it('names the active organization before its membership list has loaded', () => {
     renderTrigger({ mode: 'orgs', memberships: [], hasOrganizations: false, organizationsLoading: true });

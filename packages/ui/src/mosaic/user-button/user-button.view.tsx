@@ -967,7 +967,7 @@ export function UserButtonTrigger({ renderTriggerLabel = true, renderPlanBadge =
   return (
     <Popover.Trigger
       aria-label={`Open account menu for ${name}`}
-      {...stylex.props(styles.trigger, renderTriggerLabel ? styles.triggerLabelled : triggerShapes[shape])}
+      {...stylex.props(styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null, triggerShapes[shape])}
     >
       <WorkspaceAvatar
         name={name}
