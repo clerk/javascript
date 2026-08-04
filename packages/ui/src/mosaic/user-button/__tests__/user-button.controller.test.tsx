@@ -12,6 +12,7 @@ interface FakeUser {
   username: string | null;
   primaryEmailAddress: { emailAddress: string } | null;
   imageUrl: string;
+  organizationMemberships: unknown[];
 }
 
 interface FakeSession {
@@ -110,6 +111,7 @@ beforeEach(() => {
     username: 'alice',
     primaryEmailAddress: { emailAddress: 'alice@example.com' },
     imageUrl: 'https://img/alice',
+    organizationMemberships: [],
   };
   session = { id: 'sess_1', checkAuthorization: (checkAuthorization = vi.fn().mockReturnValue(true)) };
   organization = { id: 'org_1', name: 'Acme', imageUrl: 'https://img/acme', membersCount: 3 };
@@ -129,6 +131,7 @@ beforeEach(() => {
         username: null,
         primaryEmailAddress: { emailAddress: 'bob@example.com' },
         imageUrl: 'https://img/bob',
+        organizationMemberships: [],
       },
     },
   ];
@@ -324,6 +327,17 @@ describe('useUserButtonController', () => {
 
     userMemberships = list([], 5);
     rerender(<Harness />);
+    expect(screen.getByTestId('has-orgs')).toHaveTextContent('true');
+  });
+
+  // The surface decides whether to carry a workspace section at all from this, so waiting on the
+  // list would open a section under every personal-only account and then take it away again.
+  it('answers hasOrganizations from the user resource before any list has loaded', () => {
+    userMemberships = list([], 0, false, true);
+    user = { ...(user as FakeUser), organizationMemberships: [{ id: 'orgmem_1' }] };
+    render(<Harness />);
+
+    expect(screen.getByTestId('orgs-loading')).toHaveTextContent('true');
     expect(screen.getByTestId('has-orgs')).toHaveTextContent('true');
   });
 
