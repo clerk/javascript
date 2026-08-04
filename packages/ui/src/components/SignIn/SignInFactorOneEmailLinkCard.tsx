@@ -64,15 +64,14 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
     const ver = si.firstFactorVerification;
     if (ver.status === 'expired') {
       card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
-    } else if (ver.verifiedFromTheSameClient()) {
-      // The tab that opened the link shares this client, so it carries the flow forward and
-      // this one points at it. That holds for a `transferable` verification too: the account
-      // transfer is banked on the client, so either tab could consume it and only one may.
-      setSwitchTabStatus(
-        signUpIfMissingEnabled && ver.status === 'transferable' ? 'transferable' : 'verified_switch_tab',
-      );
     } else if (signUpIfMissingEnabled && ver.status === 'transferable') {
-      // Verified from another client, which has no banked transfer of its own, so this tab owns it.
+      // This tab is the sole consumer of the banked account transfer, whichever tab the link
+      // opened in. `verifiedFromTheSameClient()` cannot arbitrate that: it compares
+      // `verifiedAtClient` against this client, and on a development instance the link click
+      // reaches FAPI without dev-browser context, so it reports false even when the link opened
+      // in a tab of this same browser. Letting the opened tab transfer as well makes both fire,
+      // and the loser's rejected create detaches the winner's sign-up server-side (cleanUpClient
+      // in the FAPI sign-up create handler), stranding the flow with no sign-up at all.
       return handleSignUpIfMissingTransfer({
         clerk,
         navigate,
@@ -80,6 +79,8 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
         navigateOnSetActive,
         unsafeMetadata: signInContext.unsafeMetadata,
       });
+    } else if (ver.verifiedFromTheSameClient()) {
+      setSwitchTabStatus('verified_switch_tab');
     } else {
       await completeSignInFlow(si);
     }

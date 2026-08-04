@@ -17,6 +17,7 @@ const createMockClerk = (signUpCreateResult: unknown = {}) => {
     },
     navigate: vi.fn(),
     setActive: vi.fn(),
+    __internal_windowNavigate: vi.fn(),
   } as unknown as LoadedClerk;
 };
 
@@ -77,12 +78,14 @@ describe('handleSignUpIfMissingTransfer', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('delegates post-setActive navigation to navigateOnSetActive with afterSignUpUrl', async () => {
+  it('delegates post-setActive navigation to navigateOnSetActive when the session has a pending task', async () => {
     const clerk = createMockClerk({ status: 'complete', createdSessionId: 'sess_123' }) as LoadedClerk & {
       setActive: ReturnType<typeof vi.fn>;
     };
 
-    const session = { currentTask: null } as any;
+    // A pending task routes into the combined flow's `create/...` task routes, which are mounted
+    // inside the component, so that navigation has to stay with the in-component router.
+    const session = { currentTask: { key: 'choose-organization' } } as any;
     const decorateUrl = (url: string) => url;
 
     clerk.setActive.mockImplementation(async params => {
@@ -101,6 +104,34 @@ describe('handleSignUpIfMissingTransfer', () => {
       redirectUrl: 'https://test.com',
       decorateUrl,
     });
+    expect((clerk as any).__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  // The transfer consumes the sign-in, so the SignIn route guard is about to bounce `factor-one`
+  // to the component's start path. Routing the terminal redirect in-component loses that race and
+  // strands the user on a blank sign-in with the session already created.
+  it('leaves the component for the terminal redirect when the session has no pending task', async () => {
+    const clerk = createMockClerk({ status: 'complete', createdSessionId: 'sess_123' }) as LoadedClerk & {
+      setActive: ReturnType<typeof vi.fn>;
+    };
+
+    const session = { currentTask: null } as any;
+    const decorateUrl = (url: string) => url;
+
+    clerk.setActive.mockImplementation(async params => {
+      await params.navigate({ session, decorateUrl });
+    });
+
+    await handleSignUpIfMissingTransfer({
+      clerk,
+      navigate: mockNavigate,
+      afterSignUpUrl: 'https://test.com',
+      navigateOnSetActive: mockNavigateOnSetActive,
+    });
+
+    expect((clerk as any).__internal_windowNavigate).toHaveBeenCalledWith('https://test.com', undefined);
+    expect(mockNavigateOnSetActive).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('routes to the combined-flow continue page when sign-up has missing fields', async () => {
