@@ -75,9 +75,15 @@ export interface UserButtonData {
    * names it while the list it belongs to is still loading. `null` => the personal workspace.
    */
   activeOrganization: UserButtonMembership | null;
-  /** Explicit; do not derive from `memberships.length`. */
+  /**
+   * Explicit; do not derive from `memberships.length`. Answered before the lists are fetched, so
+   * the surface knows whether to carry a workspace section at all without waiting on them.
+   */
   hasOrganizations: boolean;
-  /** The organization list has yet to return a first page, so nothing about it is known. */
+  /**
+   * A first page is still in flight, so the workspace rows stand in as one placeholder rather than
+   * appearing a list at a time.
+   */
   organizationsLoading?: boolean;
   memberships: UserButtonMembership[];
   suggestions: UserButtonSuggestion[];
@@ -190,16 +196,14 @@ function leadWorkspace(data: UserButtonContextValue): ActiveWorkspace {
 /**
  * `user` mode never lists organizations, and neither does an account with nothing to list. A
  * pending invitation or suggestion counts: it has to be reachable before there is a membership.
- * A list still loading counts too — whether it has anything in it is exactly what is not yet known,
- * and a section that appears a moment after the surface does reads worse than one that waits.
+ * Loading does not count — `hasOrganizations` is answered before the lists are fetched, so an
+ * account with none never opens a section that then disappears under it.
  */
 function showsOrganizations(data: UserButtonContextValue): boolean {
   if (data.mode === 'user') {
     return false;
   }
-  return (
-    data.organizationsLoading || data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0
-  );
+  return data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 }
 
 /**
@@ -765,10 +769,18 @@ function WorkspaceSection() {
       <Item.Separator />
       <Item.Group {...stylex.props(styles.scroll)}>
         {data.mode === 'orgs' ? null : <ActiveAccountRow />}
-        <MembershipRows />
-        <PendingRows />
-        {data.organizationsLoading ? <WorkspaceListLoadingRow /> : null}
-        {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
+        {/* Memberships, invitations and suggestions are three separate requests landing at three
+            different moments. Rendering each as it arrives walks the list in in stages, so the
+            placeholder stands in for all of them until the last one is in. */}
+        {data.organizationsLoading ? (
+          <WorkspaceListLoadingRow />
+        ) : (
+          <>
+            <MembershipRows />
+            <PendingRows />
+            {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
+          </>
+        )}
       </Item.Group>
     </>
   );
