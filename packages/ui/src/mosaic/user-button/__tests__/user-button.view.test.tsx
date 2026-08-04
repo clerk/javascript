@@ -1,7 +1,9 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { scrollAreaViewport } from '../../components/scroll-area';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { UserButtonProps } from '../user-button.view';
 import { userButtonBusyKeys, UserButtonView } from '../user-button.view';
@@ -139,6 +141,23 @@ describe('UserButtonView, standing rows down', () => {
     const stoodDown = screen.getByRole('button', { name: label });
     expect(stoodDown).toBe(row);
     expect(stoodDown).toBeDisabled();
+  });
+});
+
+describe('UserButtonView, the scrolling workspace list', () => {
+  // The workspace list is the one surface in the popover that scrolls, so it takes the shared
+  // scroll area rather than a bare `overflow-y` of its own. `auto` rather than `stable`: a
+  // reserved gutter insets the rows whether or not the list overflows, leaving short lists with
+  // their avatars and icons off the edge the header and footer align to.
+  it('scrolls through the shared scroll area, at an automatic gutter', () => {
+    renderView({ mode: 'combined', hasOrganizations: true, memberships: [foundry], onSelectOrganization: vi.fn() });
+
+    const groups = Array.from(document.body.querySelectorAll('.cl-item-group'));
+    const scroller = groups.find(group => group.textContent?.includes('Foundry'));
+    const viewport = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
+
+    expect(viewport.length).toBeGreaterThan(0);
+    expect(scroller?.className.split(' ')).toEqual(expect.arrayContaining(viewport));
   });
 });
 
