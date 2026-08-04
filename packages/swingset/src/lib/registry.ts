@@ -116,6 +116,10 @@ import {
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import {
+  Default as UserProfileProfilePanelDefault,
+  meta as userProfileProfilePanelMeta,
+} from '../stories/user-profile-profile-panel.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -242,7 +246,14 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileProfilePanelModule: StoryModule = {
+  meta: userProfileProfilePanelMeta,
+  Default: UserProfileProfilePanelDefault,
+};
+
 export const registry: StoryModule[] = [
+  // User
+  userProfileProfilePanelModule,
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
