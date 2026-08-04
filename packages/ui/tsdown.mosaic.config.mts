@@ -9,7 +9,7 @@ import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 //
 // `useCSSLayers` wraps StyleX's atomic rules in `@layer priorityN` for correct
 // intra-StyleX precedence; consumers import the sheet into a layer they control
-// (`@import '@clerk/ui/styles.css' layer(components)`), under which those nest
+// (`@import '@clerk/ui/experimental/mosaic/styles.css' layer(components)`), under which those nest
 // cleanly, and override from a later layer.
 export default defineConfig({
   entry: ['./src/mosaic/styles/index.ts'],
@@ -26,6 +26,10 @@ export default defineConfig({
   // extract `styles.css`, and only that file is exported from the package — so there is nothing
   // to gain from pulling the primitives and their deps into a bundle nobody imports.
   external: ['react', 'react-dom', '@stylexjs/stylex', /^@clerk\/headless/],
+  // The bundle collapses every module into one, so the per-file `'use client'` directives are lost.
+  // Everything here is interactive and hook-driven, so the entry is a client boundary in whole —
+  // without this, importing it from a React Server Component fails.
+  outputOptions: { banner: "'use client';" },
   plugins: [
     stylexPlugin({
       fileName: 'styles.css',

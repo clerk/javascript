@@ -63,6 +63,7 @@ export default defineConfig((overrideOptions: Options) => {
       internal: 'src/internal.ts',
       errors: 'src/errors.ts',
       experimental: 'src/experimental.ts',
+      'experimental/mosaic': 'src/experimental/mosaic.ts',
       legacy: 'src/legacy.ts',
       types: 'src/types/index.ts',
     },

@@ -5,6 +5,8 @@
 // as components migrate.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
+export { UserButton } from '../user-button/user-button';
+export type { UserButtonProps } from '../user-button/user-button';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';

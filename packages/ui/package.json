@@ -57,7 +57,12 @@
       "default": "./dist/experimental/index.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
-    "./styles.css": {
+    "./experimental/mosaic": {
+      "types": "./dist-mosaic/index.d.ts",
+      "import": "./dist-mosaic/index.js",
+      "default": "./dist-mosaic/index.js"
+    },
+    "./experimental/mosaic/styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist-mosaic/styles.css"
     },
@@ -81,7 +86,7 @@
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm type-check",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm check:no-emotion && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze",
     "build:esm": "tsdown",
     "build:mosaic": "tsdown --config tsdown.mosaic.config.mts",
@@ -89,6 +94,7 @@
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
+    "check:no-emotion": "node scripts/check-mosaic-emotion-free.mjs",
     "check:no-rhc": "node ../../scripts/search-for-rhc.mjs directory dist/no-rhc",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
@@ -107,6 +113,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/headless": "workspace:^",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@emotion/cache": "11.11.0",
@@ -126,7 +133,6 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
-    "@clerk/headless": "workspace:^",
     "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^1.5.9",
     "@rspack/cli": "catalog:rspack",
