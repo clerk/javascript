@@ -260,7 +260,11 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     // Invite is the other way into administering the organization, so it lands wherever managing it
     // lands. Splitting them would send one to the app's own page and the other to Clerk's.
     onInviteMembers: canInviteMembers ? manageOrganization : undefined,
-    onCreateOrganization: () => void router.navigate(clerk.buildCreateOrganizationUrl()),
+    // The instance can restrict who opens an organization, and the flag also goes false once a user
+    // reaches their creation limit, so it covers both ways the action can be unavailable.
+    onCreateOrganization: user.createOrganizationEnabled
+      ? () => void router.navigate(clerk.buildCreateOrganizationUrl())
+      : undefined,
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
