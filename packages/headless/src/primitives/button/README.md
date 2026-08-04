@@ -28,9 +28,9 @@ import { Button } from '@/primitives/button';
 </Button>
 ```
 
-The button keeps its place in the tab order, is marked `aria-disabled`, and ignores clicks, `Enter`, and `Space`. Focus is not pulled off its current element by a pointer press either.
+The button keeps its place in the tab order, is marked `aria-disabled`, and ignores clicks and keyboard activation. Focus is not pulled off its current element by a pointer press either.
 
-Those suppressed events do not propagate, so a clickable ancestor does not fire — a natively disabled control dispatches no mouse event at all. Only the activation keys are suppressed: `Tab` still moves focus off the button, and `Escape` and the arrow keys still reach an enclosing dialog or menu.
+Suppression is the consumer's handler plus the event's default action, not propagation. Events still bubble, so an enclosing dialog or menu keeps seeing them. Every key but `Tab` has its default prevented — `Tab` is exempt so focus can still move off the button, which is the point of keeping it focusable.
 
 ### Non-native element
 

@@ -27,19 +27,19 @@ function isLink(element: HTMLElement): boolean {
   return element.tagName === 'A' && element.hasAttribute('href');
 }
 
-// Propagation is stopped as well as the default action: a natively disabled control
-// dispatches no mouse event at all, so an ancestor handler never sees the press either.
-function suppressEvent(event: React.SyntheticEvent): void {
+function preventDefault(event: React.SyntheticEvent): void {
   event.preventDefault();
-  event.stopPropagation();
 }
 
-// Only the keys that activate a button. Suppressing every key would swallow `Tab` —
-// trapping focus on the button `focusableWhenDisabled` exists to keep focusable — along
-// with the `Escape` and arrow keys an enclosing dialog or menu listens for.
-function suppressActivationKey(event: React.KeyboardEvent): void {
-  if (event.key === 'Enter' || event.key === ' ') {
-    suppressEvent(event);
+/** Replaces the consumer's handler while disabled, so theirs never runs. */
+function noop(): void {}
+
+// Every key but `Tab`, so focus can still move off the button — the whole point of keeping
+// it focusable. Propagation is deliberately left alone: an enclosing dialog or menu still
+// sees the key.
+function preventDefaultUnlessTab(event: React.KeyboardEvent): void {
+  if (event.key !== 'Tab') {
+    event.preventDefault();
   }
 }
 
@@ -96,12 +96,15 @@ export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button
     // Without the `disabled` attribute the element still receives events, so they are
     // suppressed here. These overwrite rather than chain: `mergeProps` runs the consumer's
     // handler after ours, and a disabled button must not run it at all.
-    merged.onClick = suppressEvent;
-    merged.onKeyDown = suppressActivationKey;
-    merged.onKeyUp = suppressActivationKey;
-    // Keeps a pointer press from pulling focus off wherever it currently sits, matching
-    // what the `disabled` attribute does.
-    merged.onMouseDown = suppressEvent;
+    merged.onClick = preventDefault;
+    merged.onMouseDown = noop;
+    merged.onKeyUp = noop;
+    // Blocking the pointer press is what keeps focus on whatever currently holds it. It has
+    // to be `pointerdown` rather than `mousedown` — preventing that one does not stop focus.
+    merged.onPointerDown = preventDefault;
+    // Only a focusable disabled button needs its keys neutered; a natively disabled one
+    // never receives them.
+    merged.onKeyDown = focusableWhenDisabled ? preventDefaultUnlessTab : noop;
   }
 
   return useRender({

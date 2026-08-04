@@ -190,27 +190,7 @@ describe('Button', () => {
       expect(screen.getByRole('textbox', { name: 'After' })).toHaveFocus();
     });
 
-    it('does not reach an ancestor click handler', async () => {
-      const user = userEvent.setup();
-      const onAncestorClick = vi.fn();
-      render(
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- stands in for a clickable ancestor, which is the case under test
-        <div onClick={onAncestorClick}>
-          <Button
-            disabled
-            focusableWhenDisabled
-          >
-            Save
-          </Button>
-        </div>,
-      );
-
-      await user.click(screen.getByRole('button', { name: 'Save' }));
-
-      expect(onAncestorClick).not.toHaveBeenCalled();
-    });
-
-    it('lets non-activation keys reach an ancestor', async () => {
+    it('lets keys still reach an ancestor', async () => {
       const user = userEvent.setup();
       const onAncestorKeyDown = vi.fn();
       render(
