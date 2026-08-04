@@ -134,6 +134,9 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const environment = useMosaicEnvironment();
   const displayConfig = environment?.displayConfig;
   const singleSessionMode = environment?.authConfig?.singleSessionMode ?? false;
+  // clerk-js refuses `setActive({ organization: null })` outright on an instance that forces
+  // organization selection, so there is no personal workspace to offer a way back to.
+  const forceOrganizationSelection = environment?.organizationSettings?.forceOrganizationSelection ?? false;
 
   const manageAccount = profileAction({
     url: options?.userProfileUrl,
@@ -219,6 +222,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     // before the paginated list is asked. The fetched count still counts, in case the resource is
     // behind the server.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
+    hidePersonal: forceOrganizationSelection,
     // `isLoading` is "a request is out and nothing has come back", which is the only window where
     // an empty list is indistinguishable from one that has not arrived. Paging in later pages
     // leaves it false, since by then the list is already on screen.
