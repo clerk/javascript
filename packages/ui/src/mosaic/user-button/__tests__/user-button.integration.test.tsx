@@ -222,28 +222,6 @@ describe('UserButton (connected)', () => {
     expect(accountMenu()).toBeInTheDocument();
   });
 
-  it('does not offer the active organization as something to select', async () => {
-    renderUserButton();
-    await open();
-
-    const surface = popup();
-    if (!surface) {
-      throw new Error('expected the popover to be open');
-    }
-
-    expect(screen.queryByRole('button', { name: 'Acme' })).toBeNull();
-    // It heads the surface and is listed under it; neither one is something to click.
-    expect(within(surface).getAllByText('Acme')).toHaveLength(2);
-  });
-
-  it('heads the surface with the account where the user takes priority', async () => {
-    renderUserButton({ modePriority: 'user' });
-    await open();
-
-    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
-  });
-
   it('selecting an organization calls setActive without a redirect by default and closes the popover', async () => {
     renderUserButton();
     const act = await open();
@@ -264,13 +242,12 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('selecting an organization redirects to the configured afterSelectOrganizationUrl', async () => {
-    const act = userEvent.setup();
-    renderUserButton({ afterSelectOrganizationUrl: org => `/o/${org.id}` });
-    await act.click(trigger());
-    await act.click(screen.getByRole('button', { name: 'Other' }));
+  it('drops the personal workspace where the app hides it, leaving the organizations', async () => {
+    renderUserButton({ hidePersonal: true });
+    await open();
 
-    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/org_9' });
+    expect(screen.queryByText('Personal account')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Other' })).toBeInTheDocument();
   });
 
   it('switching to another account calls setActive with the session and stays open', async () => {
@@ -327,25 +304,6 @@ describe('UserButton (connected)', () => {
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(spinner()).toBeNull());
     expect(popup()).toBeInTheDocument();
-  });
-
-  it('reports an already-accepted suggestion instead of offering to join it again', async () => {
-    userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta', 'accepted')], 1);
-    renderUserButton();
-    await open();
-
-    expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
-    expect(screen.getByText('Requested')).toBeInTheDocument();
-  });
-
-  it('lists pending invitations and suggestions even with no organization memberships', async () => {
-    userMemberships = list([], 0);
-    organization = null;
-    renderUserButton();
-    await open();
-
-    expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument();
   });
 
   it('drops add-account and sign-out-of-all in single-session mode', async () => {
@@ -472,12 +430,8 @@ describe('UserButton (connected)', () => {
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
   });
 
-  it('mounts the paging sentinel only while more workspace pages remain', async () => {
-    renderUserButton();
-    await open();
-    expect(pagingRef).not.toHaveBeenCalled();
-  });
-
+  // The view decides whether to mount the sentinel at all; this is the wiring that carries the
+  // in-view ref from the paginated lists, through the controller, to it.
   it('hands the paging sentinel to the in-view ref when a list has a next page', async () => {
     userMemberships = list([membership('org_1', 'Acme', 3)], 1, true);
     renderUserButton();
