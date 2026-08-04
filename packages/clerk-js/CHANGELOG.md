@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.127.2
+
+### Patch Changes
+
+- Add a "Forgot password?" action on the sign-in start page when the password field is shown. This improves the account recovery UX when strict user enumeration protection is enabled. ([#9224](https://github.com/clerk/javascript/pull/9224)) by [@jescalan](https://github.com/jescalan)
+
 ## 5.127.1
 
 ### Patch Changes
