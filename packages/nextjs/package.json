@@ -55,6 +55,12 @@
       "import": "./dist/esm/experimental.js",
       "require": "./dist/cjs/experimental.js"
     },
+    "./experimental/mosaic": {
+      "types": "./dist/types/experimental/mosaic.d.ts",
+      "import": "./dist/esm/experimental/mosaic.js",
+      "require": "./dist/cjs/experimental/mosaic.js"
+    },
+    "./experimental/mosaic/styles.css": "./dist/experimental/mosaic/styles.css",
     "./legacy": {
       "types": "./dist/types/legacy.d.ts",
       "import": "./dist/esm/legacy.js",
@@ -70,7 +76,7 @@
     "webhooks"
   ],
   "scripts": {
-    "build": "pnpm clean && tsup",
+    "build": "pnpm clean && tsup && node ../../scripts/copy-mosaic-styles.mjs dist/experimental/mosaic/styles.css",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
@@ -78,7 +84,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
+    "lint:attw": "attw --pack . --exclude-entrypoints experimental/mosaic/styles.css --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:watch": "vitest watch"
@@ -91,6 +97,7 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
+    "@clerk/ui": "workspace:*",
     "crypto-es": "^2.1.0",
     "next": "15.5.19"
   },

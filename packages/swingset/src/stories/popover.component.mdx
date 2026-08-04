@@ -189,10 +189,10 @@ them through your own typography (`Heading`, `Text`) inside the surface.
 Unlike the slot-recipe components, the Mosaic popover is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots in the table above) alongside the StyleX atoms.
 Consumers never target the hashed atomic classes — override by targeting the `.cl-*` slot from a
-CSS layer that wins over `@clerk/ui/styles.css`:
+CSS layer that wins over `@clerk/ui/experimental/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/ui/experimental/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-popover-popup[data-size='lg'] {
