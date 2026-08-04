@@ -17,10 +17,9 @@ export const styles = stylex.create({
     outlineOffset: '2px',
   },
 
-  // A labelled trigger is a pill around the avatar and its text, so it pads and rounds itself
-  // instead of tracing the avatar.
+  // A labelled trigger surrounds the avatar and its text, so it pads itself rather than tracing
+  // the avatar. Its corner still comes from `triggerShapes`.
   triggerLabelled: {
-    borderRadius: radiusVars['--cl-radius-full'],
     gap: space['2'],
     paddingBlock: space['1'],
     alignItems: 'center',
@@ -68,8 +67,8 @@ export const styles = stylex.create({
   },
 });
 
-// The focus ring traces the avatar, so the trigger takes the avatar's radius. Rounding it
-// fully draws a circle around a square workspace mark.
+// The trigger takes the corner of the workspace mark it carries: round for a person, squared for
+// an organization. Rounding it fully would draw a circle around a square mark, labelled or not.
 export const triggerShapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
   square: { borderRadius: radiusVars['--cl-radius-md'] },
