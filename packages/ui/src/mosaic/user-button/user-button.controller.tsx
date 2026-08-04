@@ -54,6 +54,11 @@ export type UserButtonControllerOptions = UserProfileMode &
     afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
     /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
     afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
+    /**
+     * Leaves the personal workspace out, for an app whose organizations are the whole product. An
+     * instance that forces organization selection withholds it either way; this cannot opt back in.
+     */
+    hidePersonal?: boolean;
   };
 
 function resolveAfterSelectUrl<T extends object>(config: AfterSelectUrl<T> | undefined, entity: T): string | undefined {
@@ -222,7 +227,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     // before the paginated list is asked. The fetched count still counts, in case the resource is
     // behind the server.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
-    hidePersonal: forceOrganizationSelection,
+    hidePersonal: forceOrganizationSelection || (options?.hidePersonal ?? false),
     // `isLoading` is "a request is out and nothing has come back", which is the only window where
     // an empty list is indistinguishable from one that has not arrived. Paging in later pages
     // leaves it false, since by then the list is already on screen.
