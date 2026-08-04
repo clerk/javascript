@@ -1,5 +1,26 @@
 # @clerk/ui
 
+## 1.28.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+### Patch Changes
+
+- fix(ui): Avoid races between email link tabs when using sign up if missing ([#9328](https://github.com/clerk/javascript/pull/9328)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+  - @clerk/localizations@4.14.0
+
 ## 1.27.2
 
 ### Patch Changes

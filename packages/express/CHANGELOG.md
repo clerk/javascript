@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.1.50
+
+### Patch Changes
+
+- Respond with 400 Bad Request instead of surfacing a 500 when an incoming request cannot be represented as a fetch `Request`. Vulnerability-scanner probes such as hostless `//` request targets, targets that parse as credentialed URLs, and forbidden methods like TRACE previously threw inside the middleware and polluted error logs. ([#9290](https://github.com/clerk/javascript/pull/9290)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`a601cd7`](https://github.com/clerk/javascript/commit/a601cd7f45095fdbf8b0a23b01d9f559feeda347), [`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/backend@3.15.1
+  - @clerk/shared@4.26.0
+
 ## 2.1.49
 
 ### Patch Changes
