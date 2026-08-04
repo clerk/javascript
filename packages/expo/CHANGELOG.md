@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.20.0
+
+### Minor Changes
+
+- Deprecate `@clerk/clerk-expo` in favor of `@clerk/expo` and add a runtime warning linking to the migration guide. ([#9248](https://github.com/clerk/javascript/pull/9248)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`e0154fe`](https://github.com/clerk/javascript/commit/e0154fe4e3150288e0df6c125de7e45a2b5d0960)]:
+  - @clerk/clerk-js@5.127.2
+
 ## 2.19.42
 
 ### Patch Changes
