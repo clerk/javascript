@@ -16,3 +16,14 @@ import { clerkPlugin } from '@clerk/fastify';
 const server: FastifyInstance = Fastify({ logger: true });
 server.register(clerkPlugin);
 `);
+
+export const incompatibleFastifyVersion = (foundVersion: string) =>
+  createErrorMessage(`@clerk/fastify requires fastify@>=5 but is being registered on fastify@${foundVersion}.
+
+To resolve this, either:
+  - upgrade your fastify dependency to ^5, or
+  - pin @clerk/fastify@^1 to keep using fastify@4 (LTS):
+
+      npm install @clerk/fastify@^1
+      # or: pnpm add @clerk/fastify@^1
+`);

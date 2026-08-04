@@ -59,4 +59,31 @@ describe('clerkPlugin()', () => {
     expect(fastify.decorateRequest).toHaveBeenCalledWith('clerk', null);
     expect(doneFn).toHaveBeenCalled();
   });
+
+  test.each(['4.28.0', '3.29.5', '2.0.0'])(
+    'throws an actionable error when registered on fastify@%s',
+    version => {
+      const doneFn = vi.fn();
+      const fastify = createFastifyInstanceMock({ version });
+
+      expect(() => {
+        clerkPlugin(fastify, {}, doneFn);
+      }).toThrowError(new RegExp(`requires fastify@>=5 but is being registered on fastify@${version.replace(/\./g, '\\.')}`));
+      expect(() => {
+        clerkPlugin(fastify, {}, doneFn);
+      }).toThrowError(/pin @clerk\/fastify@\^1/);
+      expect(doneFn).not.toHaveBeenCalled();
+    },
+  );
+
+  test.each(['5.0.0', '5.8.5', '6.0.0-alpha.1'])(
+    'does not throw on supported fastify@%s',
+    version => {
+      const doneFn = vi.fn();
+      const fastify = createFastifyInstanceMock({ version });
+
+      expect(() => clerkPlugin(fastify, {}, doneFn)).not.toThrow();
+      expect(doneFn).toHaveBeenCalled();
+    },
+  );
 });

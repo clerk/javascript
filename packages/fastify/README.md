@@ -35,6 +35,8 @@
 - Node.js `>=20.9.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_fastify).
 
+> **Still on Fastify 4 (LTS)?** Pin `@clerk/fastify@^1`. The current major requires Fastify 5; registering it on Fastify 4 throws at plugin registration time with an actionable error explaining your options.
+
 ### Installation
 
 The fastest way to get started with Clerk is by following the [Fastify Quickstart](https://clerk.com/docs/quickstarts/fastify?utm_source=github&utm_medium=clerk_fastify).
