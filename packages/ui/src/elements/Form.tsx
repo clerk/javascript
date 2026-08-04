@@ -12,6 +12,7 @@ import { LastAuthenticationStrategyBadge } from './Badge';
 import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
+import type { FieldDevHintValue } from './FieldDevHint';
 
 const [FormState, useFormState] = createContextAndHook<{
   isLoading: boolean;
@@ -126,24 +127,40 @@ type CommonInputProps = CommonFieldRootProps & {
   onActionClicked?: React.MouseEventHandler;
   icon?: React.ComponentType;
   isLastAuthenticationStrategy?: boolean;
+  devHint?: FieldDevHintValue;
 };
 
 const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
-  const { isOptional, isLastAuthenticationStrategy, icon, actionLabel, children, onActionClicked, ...fieldProps } =
-    props;
+  const {
+    isOptional,
+    isLastAuthenticationStrategy,
+    icon,
+    actionLabel,
+    children,
+    onActionClicked,
+    devHint,
+    ...fieldProps
+  } = props;
   return (
     <Field.Root {...fieldProps}>
       <Col
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
-        sx={{ position: 'relative', flex: '1 1 auto' }}
+        sx={{
+          position: 'relative',
+          flex: '1 1 auto',
+          // Reveal the dev hint icon only while the field is hovered or focused.
+          ...(devHint && {
+            '&:hover [data-dev-hint-trigger], &:focus-within [data-dev-hint-trigger]': { opacity: 1 },
+          }),
+        }}
       >
         <Flex
           direction='col'
           sx={t => ({ gap: t.space.$2 })}
         >
           <Field.LabelRow>
-            <Field.Label />
+            <Field.Label devHint={devHint} />
             <Field.LabelIcon icon={icon} />
             {!actionLabel && isOptional && <Field.AsOptional />}
             {actionLabel && (
