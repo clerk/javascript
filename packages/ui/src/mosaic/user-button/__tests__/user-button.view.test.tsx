@@ -321,12 +321,72 @@ describe('UserButtonView, loading the organization list', () => {
   });
 
   // `hasOrganizations` is known before the lists are fetched, so an account that has none never
-  // shows a section that then vanishes under it.
-  it('keeps the section out of a surface with nothing to list, even while the lists load', () => {
+  // shows a list that then vanishes under it. The account row above it is not the list's to
+  // withhold, so it stays either way.
+  it('keeps the list out of a surface with nothing to list, even while the lists load', () => {
     renderView({ mode: 'combined', hasOrganizations: false, organizationsLoading: true, onManageAccount: vi.fn() });
 
     expect(screen.queryByText('Loading organizations…')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Actions for alice@example.com' })).toBeInTheDocument();
+  });
+});
+
+// The row carries the account's own actions, so an account with no organizations would otherwise
+// have nowhere to manage or sign out of the account it is signed in as.
+describe('UserButtonView, the active account row without organizations', () => {
+  function renderWithoutOrganizations(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      mode: 'combined',
+      hasOrganizations: false,
+      onManageAccount: vi.fn(),
+      onCreateOrganization: vi.fn(),
+      onSignOutSession: vi.fn(),
+      ...props,
+    });
+  }
+
+  it('offers the account its own actions with no organizations to head', async () => {
+    const onSignOutSession = vi.fn();
+    renderWithoutOrganizations({ onSignOutSession });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Actions for alice@example.com' }));
+
+    expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('menuitem', { name: 'Sign out' }));
+
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+  });
+
+  // The header hands "Sign out" its own slot only where there is no account row to carry it, which
+  // is the account-only surface and nowhere else.
+  it('leaves the header sign-out to the account-only surface', () => {
+    renderWithoutOrganizations();
+
+    expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
+  });
+
+  it('still lists no organizations', () => {
+    renderWithoutOrganizations();
+
+    expect(screen.queryByText('Loading organizations…')).toBeNull();
+    expect(screen.getByText('Accounts')).toBeInTheDocument();
+  });
+
+  // An org-only surface is not about the account, so it gains no row from this.
+  it('leaves an org-only surface without an account row', () => {
+    renderWithoutOrganizations({ mode: 'orgs', hasOrganizations: true, memberships: [foundry] });
+
     expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
+  });
+
+  // The account-only surface names the account in its header and carries the actions there, so
+  // repeating it as a row would say the same thing twice.
+  it('leaves an account-only surface without an account row', () => {
+    renderWithoutOrganizations({ mode: 'user' });
+
+    expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
+    expect(screen.getAllByText('alice@example.com')).toHaveLength(1);
   });
 });
 
