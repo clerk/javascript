@@ -19,6 +19,7 @@ interface FakeUser {
   username: string | null;
   primaryEmailAddress: { emailAddress: string } | null;
   imageUrl: string;
+  organizationMemberships: unknown[];
 }
 
 interface FakeSession {
@@ -122,6 +123,7 @@ beforeEach(() => {
     username: 'alice',
     primaryEmailAddress: { emailAddress: 'alice@example.com' },
     imageUrl: 'https://img/alice',
+    organizationMemberships: [{ id: 'orgmem_1' }],
   };
   session = { id: 'sess_1', checkAuthorization: vi.fn().mockReturnValue(true) };
   organization = { id: 'org_1', name: 'Acme', imageUrl: '', membersCount: 3 };
@@ -141,6 +143,7 @@ beforeEach(() => {
         username: null,
         primaryEmailAddress: { emailAddress: 'bob@example.com' },
         imageUrl: 'https://img/bob',
+        organizationMemberships: [],
       },
     },
   ];
