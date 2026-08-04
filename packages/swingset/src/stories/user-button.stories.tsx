@@ -112,6 +112,7 @@ const initialAccounts: Account[] = [
         id: 'inv_app',
         organizationId: 'org_clerk_app',
         organizationName: 'Clerk app',
+        status: 'pending',
         imageUrl: clerkLogo,
       },
     ],
@@ -187,7 +188,8 @@ function usePrototype(): Omit<UserButtonProps, 'mode'> {
     onOpenChange: setOpen,
     pendingKey,
     activeSession: account.session,
-    activeOrganizationId: account.activeOrganizationId,
+    // The join is the backend's, not the component's: it is handed the active organization whole.
+    activeOrganization: account.memberships.find(m => m.organizationId === account.activeOrganizationId) ?? null,
     hasOrganizations: account.memberships.length > 0,
     memberships: account.memberships,
     suggestions: account.suggestions,
