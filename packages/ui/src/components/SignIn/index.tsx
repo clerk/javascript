@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,
   SignUpContext,
@@ -34,6 +34,7 @@ import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
+import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInProtectCheck } from './SignInProtectCheck';
@@ -88,10 +89,7 @@ function SignInRoutes(): JSX.Element {
           <SignInFactorOneSolanaWalletsCard />
         </Route>
         <Route path='verify'>
-          <SignInEmailLinkFlowComplete
-            redirectUrlComplete={signInContext.afterSignInUrl}
-            redirectUrl='../factor-two'
-          />
+          <SignInEmailLinkVerify />
         </Route>
 
         {signInContext.isCombinedFlow && (

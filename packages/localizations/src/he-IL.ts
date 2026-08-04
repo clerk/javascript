@@ -1379,6 +1379,10 @@ export const heIL: LocalizationResource = {
         subtitleNewTab: 'חזור לכרטיסייה שנפתחה חדשה להמשך',
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'השתמש בקישור האימות שנשלח לדוא״ל שלך',
