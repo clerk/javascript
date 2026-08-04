@@ -14,6 +14,8 @@ export { Button } from '../components/button';
 export type { ButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Field } from '../components/field';
+export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
@@ -34,19 +36,6 @@ export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../component
 export type { ScrollAreaGutter } from '../components/scroll-area';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
-export { TextField } from '../components/text-field';
-export type {
-  TextFieldContentProps,
-  TextFieldDescriptionProps,
-  TextFieldErrorProps,
-  TextFieldIds,
-  TextFieldInputProps,
-  TextFieldLabelProps,
-  TextFieldLayout,
-  TextFieldRootProps,
-  TextFieldSize,
-} from '../components/text-field';
-
 export { Popover } from '../components/popover';
 export type {
   PopoverCloseProps,
