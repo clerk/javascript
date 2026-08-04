@@ -249,7 +249,10 @@ const withProtectService = withInstanceKeys('with-protect-service', base.clone()
 
 const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust', base.clone().setId('withNeedsClientTrust'));
 
-const withPasskeys = withInstanceKeys('with-passkeys', base.clone().setId('withPasskeys'));
+const withPasskeys = withInstanceKeys(
+  'with-passkeys',
+  base.clone().setId('withPasskeys').setEnvVariable('private', 'CLERK_API_URL', STAGING_API_URL),
+);
 
 export const envs = {
   base,
