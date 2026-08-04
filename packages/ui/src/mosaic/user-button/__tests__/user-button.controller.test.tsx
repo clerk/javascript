@@ -23,6 +23,7 @@ interface FakeList {
   data: unknown[];
   count: number;
   hasNextPage: boolean;
+  isLoading: boolean;
   revalidate: ReturnType<typeof vi.fn>;
 }
 
@@ -31,7 +32,7 @@ let isSessionLoaded: boolean;
 let isOrgLoaded: boolean;
 let user: FakeUser | null;
 let session: { id: string; checkAuthorization: ReturnType<typeof vi.fn> } | null;
-let organization: { id: string } | null;
+let organization: { id: string; name: string; imageUrl: string; membersCount: number } | null;
 let userMemberships: FakeList;
 let userInvitations: FakeList;
 let userSuggestions: FakeList;
@@ -76,7 +77,12 @@ vi.mock('../../../hooks/useOrganizationListInView', () => ({
   useOrganizationListInView: () => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef }),
 }));
 
-function acceptable(id: string, orgId: string, orgName: string, status: 'pending' | 'accepted' = 'pending') {
+function acceptable(
+  id: string,
+  orgId: string,
+  orgName: string,
+  status: 'pending' | 'accepted' | 'revoked' | 'expired' = 'pending',
+) {
   return {
     id,
     status,
@@ -89,8 +95,8 @@ function membership(orgId: string, name: string, membersCount: number) {
   return { organization: { id: orgId, name, imageUrl: '', membersCount } };
 }
 
-function list(data: unknown[], count: number, hasNextPage = false): FakeList {
-  return { data, count, hasNextPage, revalidate: vi.fn().mockResolvedValue(undefined) };
+function list(data: unknown[], count: number, hasNextPage = false, isLoading = false): FakeList {
+  return { data, count, hasNextPage, isLoading, revalidate: vi.fn().mockResolvedValue(undefined) };
 }
 
 beforeEach(() => {
@@ -106,7 +112,7 @@ beforeEach(() => {
     imageUrl: 'https://img/alice',
   };
   session = { id: 'sess_1', checkAuthorization: (checkAuthorization = vi.fn().mockReturnValue(true)) };
-  organization = { id: 'org_1' };
+  organization = { id: 'org_1', name: 'Acme', imageUrl: 'https://img/acme', membersCount: 3 };
   userMemberships = list([membership('org_1', 'Acme', 3), membership('org_9', 'Other', 1)], 2);
   userInvitations = list([acceptable('inv_1', 'org_3', 'Gamma')], 1);
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
@@ -146,8 +152,9 @@ function Harness(options: UserButtonControllerOptions = {}) {
       <output data-testid='active-name'>{c.activeSession.name}</output>
       <output data-testid='active-email'>{c.activeSession.email}</output>
       <output data-testid='active-session'>{c.activeSession.sessionId}</output>
-      <output data-testid='active-org'>{String(c.activeOrganizationId)}</output>
+      <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
+      <output data-testid='orgs-loading'>{String(c.organizationsLoading)}</output>
       <output data-testid='additional'>{c.additionalSessions.map(a => a.sessionId).join(',')}</output>
       <output data-testid='has-more'>{String(c.paging?.hasMore)}</output>
       <output data-testid='paging-ref'>{String(c.paging?.ref === pagingRef)}</output>
@@ -231,6 +238,14 @@ function memberships() {
   return JSON.parse(screen.getByTestId('memberships').textContent ?? '[]');
 }
 
+function invitations() {
+  return JSON.parse(screen.getByTestId('invitations').textContent ?? '[]');
+}
+
+function activeOrganization() {
+  return JSON.parse(screen.getByTestId('active-org').textContent ?? 'null');
+}
+
 describe('useUserButtonController', () => {
   it('is loading until the user, session, and organization are all loaded', () => {
     isUserLoaded = false;
@@ -270,13 +285,36 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('active-name')).toHaveTextContent('alice@example.com');
   });
 
-  it('reflects the active organization id, and null in personal mode', () => {
+  it('describes the active organization whole, and null in personal mode', () => {
     const { rerender } = render(<Harness />);
-    expect(screen.getByTestId('active-org')).toHaveTextContent('org_1');
+    expect(activeOrganization()).toMatchObject({
+      kind: 'membership',
+      organizationId: 'org_1',
+      name: 'Acme',
+      imageUrl: 'https://img/acme',
+      membersCount: 3,
+    });
 
     organization = null;
     rerender(<Harness />);
-    expect(screen.getByTestId('active-org')).toHaveTextContent('null');
+    expect(activeOrganization()).toBeNull();
+  });
+
+  // The trigger names it, so waiting on the list it belongs to would show the wrong workspace first.
+  it('names the active organization from the organization itself, not the membership list', () => {
+    userMemberships = list([], 0, false, true);
+    render(<Harness />);
+
+    expect(activeOrganization()).toMatchObject({ organizationId: 'org_1', name: 'Acme' });
+  });
+
+  it('reports the organization list as loading until every one of its three parts has landed', () => {
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('orgs-loading')).toHaveTextContent('false');
+
+    userSuggestions = list([], 0, false, true);
+    rerender(<Harness />);
+    expect(screen.getByTestId('orgs-loading')).toHaveTextContent('true');
   });
 
   it('derives hasOrganizations from the membership count, not the array length', () => {
@@ -310,13 +348,29 @@ describe('useUserButtonController', () => {
       status: 'pending',
     });
 
-    const invitations = JSON.parse(screen.getByTestId('invitations').textContent ?? '[]');
-    expect(invitations[0]).toMatchObject({
+    expect(invitations()[0]).toMatchObject({
       kind: 'invitation',
       id: 'inv_1',
       organizationId: 'org_3',
       organizationName: 'Gamma',
+      status: 'pending',
     });
+  });
+
+  // Accepting is all an invitation row offers, and an accepted one lists as the workspace it joined.
+  it('lists invitations still open to the account, dropping the revoked and expired ones', () => {
+    userInvitations = list(
+      [
+        acceptable('inv_1', 'org_3', 'Gamma'),
+        acceptable('inv_2', 'org_4', 'Delta', 'accepted'),
+        acceptable('inv_3', 'org_5', 'Epsilon', 'revoked'),
+        acceptable('inv_4', 'org_6', 'Zeta', 'expired'),
+      ],
+      4,
+    );
+    render(<Harness />);
+
+    expect(invitations().map((i: { id: string }) => i.id)).toEqual(['inv_1', 'inv_2']);
   });
 
   it('reports more to page in when any of the three lists has a next page', () => {
@@ -399,21 +453,25 @@ describe('useUserButtonController', () => {
     expect(navigate).toHaveBeenCalledWith('/sign-in');
   });
 
-  it('accepts invitations and suggestions, then revalidates the collection', async () => {
+  it('accepts invitations and suggestions, then revalidates whatever the accept changed', async () => {
     render(<Harness />);
 
+    // Accepting an invitation joins the organization, so the membership list is stale too.
     const invitation = userInvitations.data[0] as ReturnType<typeof acceptable>;
     await act(async () => {
       fireEvent.click(screen.getByText('accept-invitation'));
     });
     expect(invitation.accept).toHaveBeenCalledTimes(1);
     expect(userInvitations.revalidate).toHaveBeenCalledTimes(1);
+    expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
 
+    // A suggestion only files a request an admin has yet to approve, so nothing has been joined.
     const suggestion = userSuggestions.data[0] as ReturnType<typeof acceptable>;
     await act(async () => {
       fireEvent.click(screen.getByText('accept-suggestion'));
     });
     expect(suggestion.accept).toHaveBeenCalledTimes(1);
     expect(userSuggestions.revalidate).toHaveBeenCalledTimes(1);
+    expect(userMemberships.revalidate).toHaveBeenCalledTimes(1);
   });
 });
