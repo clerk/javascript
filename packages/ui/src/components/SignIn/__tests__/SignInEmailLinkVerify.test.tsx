@@ -23,7 +23,11 @@ describe('SignInEmailLinkVerify', () => {
     });
   });
 
-  it('completes the signUpIfMissing transfer when this client owns the sign-in', async () => {
+  // The banked transfer is consumed exactly once, and this tab cannot tell whether the polling
+  // tab is about to consume it: `verifiedAtClient` does not match on a development instance even
+  // when both tabs share a client. A second consumer would have its create rejected, and that
+  // rejection detaches the winner's sign-up server-side, so this tab never transfers.
+  it('leaves the signUpIfMissing transfer to the polling tab even when this client owns the sign-in', async () => {
     window.history.replaceState({}, '', '/sign-in/verify?__clerk_status=transferable');
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withEmailAddress();
@@ -32,18 +36,16 @@ describe('SignInEmailLinkVerify', () => {
     props.setProps({ withSignUp: true });
 
     fixtures.signIn.firstFactorVerification = { status: 'transferable' } as any;
-    fixtures.signUp.create.mockResolvedValueOnce({
-      status: 'missing_requirements',
-      missingFields: ['first_name'],
-      unverifiedFields: [],
-    } as any);
 
     render(<SignInEmailLinkVerify />, { wrapper });
 
+    await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
     await waitFor(() => {
-      expect(fixtures.signUp.create).toHaveBeenCalledWith(expect.objectContaining({ transfer: true }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
+      screen.getByText('Email verified');
+      screen.getByText(/return to original tab/i);
     });
+    expect(fixtures.signUp.create).not.toHaveBeenCalled();
+    expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../create/continue');
   });
 
   it('points back to the original tab when another client owns the signUpIfMissing transfer', async () => {

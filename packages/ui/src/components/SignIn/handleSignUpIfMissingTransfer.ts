@@ -4,6 +4,7 @@ import type { LoadedClerk } from '@clerk/shared/types';
 
 import type { SignInContextType } from '../../contexts';
 import type { RouteContextValue } from '../../router/RouteContext';
+import { clerkWindowNavigate } from '../../utils/windowNavigate';
 
 type HandleSignUpIfMissingTransferProps = {
   clerk: LoadedClerk;
@@ -45,9 +46,19 @@ export async function handleSignUpIfMissingTransfer({
       return clerk.setActive({
         session: res.createdSessionId,
         navigate: async ({ session, decorateUrl }) => {
-          // navigateOnSetActive routes pending session tasks to the combined
-          // flow's `create/...` task routes and handles Safari ITP via decorateUrl.
-          await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
+          // A pending task routes into the combined flow's `create/...` task routes, which are
+          // mounted inside this component, so the in-component router is the right one to use.
+          if (session.currentTask) {
+            await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
+            return;
+          }
+
+          // Terminal redirect. The transfer consumed the sign-in, so `client.signIn` is now null
+          // and the SignIn route guard is about to bounce this route to the component's start
+          // path. An in-component navigate races that and loses, stranding the user on a blank
+          // sign-in screen with the session already created. Leave the component outright
+          // instead. decorateUrl still applies, for the Safari ITP cookie refresh.
+          clerkWindowNavigate(clerk, decorateUrl(afterSignUpUrl));
         },
       });
     case 'missing_requirements':
