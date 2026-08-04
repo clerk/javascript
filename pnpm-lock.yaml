@@ -876,6 +876,9 @@ importers:
         specifier: catalog:repo
         version: 2.8.1
     devDependencies:
+      '@clerk/ui':
+        specifier: workspace:*
+        version: link:../ui
       crypto-es:
         specifier: ^2.1.0
         version: 2.1.0
@@ -919,6 +922,9 @@ importers:
       '@clerk/shared':
         specifier: workspace:^
         version: link:../shared
+      '@clerk/ui':
+        specifier: workspace:^
+        version: link:../ui
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -932,9 +938,6 @@ importers:
       '@clerk/localizations':
         specifier: workspace:*
         version: link:../localizations
-      '@clerk/ui':
-        specifier: workspace:*
-        version: link:../ui
       '@types/semver':
         specifier: ^7.7.1
         version: 7.7.1
@@ -1195,6 +1198,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@clerk/headless':
+        specifier: workspace:^
+        version: link:../headless
       '@clerk/localizations':
         specifier: workspace:^
         version: link:../localizations
@@ -1253,9 +1259,6 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
-      '@clerk/headless':
-        specifier: workspace:^
-        version: link:../headless
       '@floating-ui/react-dom':
         specifier: ^2.1.8
         version: 2.1.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
