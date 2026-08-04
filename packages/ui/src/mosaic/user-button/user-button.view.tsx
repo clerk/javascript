@@ -58,6 +58,8 @@ export interface UserButtonInvitation {
   organizationId: string;
   organizationName: string;
   imageUrl?: string;
+  /** `accepted` is already a workspace, so it lists as one rather than offering to be accepted. */
+  status: 'pending' | 'accepted';
 }
 
 /** Feeds one more page into a list as its foot scrolls into view. */
@@ -68,10 +70,15 @@ export interface UserButtonPaging {
 
 export interface UserButtonData {
   activeSession: UserButtonSession;
-  /** `null` => the personal workspace is active. */
-  activeOrganizationId: string | null;
+  /**
+   * The active organization, described whole rather than found in `memberships`, so the surface
+   * names it while the list it belongs to is still loading. `null` => the personal workspace.
+   */
+  activeOrganization: UserButtonMembership | null;
   /** Explicit; do not derive from `memberships.length`. */
   hasOrganizations: boolean;
+  /** The organization list has yet to return a first page, so nothing about it is known. */
+  organizationsLoading?: boolean;
   memberships: UserButtonMembership[];
   suggestions: UserButtonSuggestion[];
   invitations: UserButtonInvitation[];
@@ -156,13 +163,6 @@ function useBusy(key: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: Boolean(pendingKey) && pendingKey !== key };
 }
 
-function activeMembership(data: UserButtonData): UserButtonMembership | undefined {
-  if (data.activeOrganizationId === null) {
-    return undefined;
-  }
-  return data.memberships.find(m => m.organizationId === data.activeOrganizationId);
-}
-
 interface ActiveWorkspace {
   name: string;
   imageUrl?: string;
@@ -184,18 +184,22 @@ function workspace(organization: UserButtonMembership | undefined, session: User
  */
 function leadWorkspace(data: UserButtonContextValue): ActiveWorkspace {
   const leadsWithOrganization = data.mode === 'combined' ? data.modePriority === 'organizations' : data.mode === 'orgs';
-  return workspace(leadsWithOrganization ? activeMembership(data) : undefined, data.activeSession);
+  return workspace(leadsWithOrganization ? (data.activeOrganization ?? undefined) : undefined, data.activeSession);
 }
 
 /**
  * `user` mode never lists organizations, and neither does an account with nothing to list. A
  * pending invitation or suggestion counts: it has to be reachable before there is a membership.
+ * A list still loading counts too — whether it has anything in it is exactly what is not yet known,
+ * and a section that appears a moment after the surface does reads worse than one that waits.
  */
 function showsOrganizations(data: UserButtonContextValue): boolean {
   if (data.mode === 'user') {
     return false;
   }
-  return data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
+  return (
+    data.organizationsLoading || data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0
+  );
 }
 
 /**
@@ -417,7 +421,7 @@ function Header() {
   const subtitle = organization ? membershipSubtitle(organization) : email;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
-  const invitable = showsOrganizations(data) ? activeMembership(data) : undefined;
+  const invitable = showsOrganizations(data) ? data.activeOrganization : null;
 
   const actions: HeaderAction[] = [];
   if (invitable && data.onInviteMembers) {
@@ -585,7 +589,7 @@ function MembershipRows() {
           key={m.organizationId}
           membership={m}
           onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganizationId}
+          active={m.organizationId === data.activeOrganization?.organizationId}
         />
       ))}
     </>
@@ -636,6 +640,16 @@ function PendingRows() {
   const data = useUserButtonContext();
   const acceptSuggestion = data.onAcceptSuggestion;
   const acceptInvitation = data.onAcceptInvitation;
+  const selectOrganization = data.onSelectOrganization;
+
+  // Accepting an invitation joins the organization, so an accepted one is a workspace the surface
+  // may already be showing. It stays listed only for as long as the membership list has yet to
+  // catch up with it, which is what keeps it reachable in the meantime.
+  const listed = new Set(data.memberships.map(m => m.organizationId));
+  if (data.activeOrganization) {
+    listed.add(data.activeOrganization.organizationId);
+  }
+  const invitations = data.invitations.filter(i => i.status === 'pending' || !listed.has(i.organizationId));
 
   return (
     <>
@@ -651,16 +665,31 @@ function PendingRows() {
           onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
         />
       ))}
-      {data.invitations.map(i => (
-        <PendingRow
-          key={i.id}
-          busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
-          name={i.organizationName}
-          imageUrl={i.imageUrl}
-          actionLabel='Accept'
-          onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
-        />
-      ))}
+      {invitations.map(i =>
+        // Already joined, so it is a workspace like any other: click the row to switch to it.
+        i.status === 'accepted' ? (
+          <MembershipRow
+            key={i.id}
+            membership={{
+              kind: 'membership',
+              organizationId: i.organizationId,
+              name: i.organizationName,
+              imageUrl: i.imageUrl,
+            }}
+            active={false}
+            onSelect={selectOrganization ? () => selectOrganization(i.organizationId) : undefined}
+          />
+        ) : (
+          <PendingRow
+            key={i.id}
+            busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
+            name={i.organizationName}
+            imageUrl={i.imageUrl}
+            actionLabel='Accept'
+            onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
+          />
+        ),
+      )}
     </>
   );
 }
@@ -709,6 +738,20 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
   );
 }
 
+/** Holds the workspace list's place until its first page lands. */
+function WorkspaceListLoadingRow() {
+  return (
+    <Item.Root size='xs'>
+      <Item.Media>
+        <Spinner size='sm' />
+      </Item.Media>
+      <Item.Content>
+        <Item.Description>Loading organizations…</Item.Description>
+      </Item.Content>
+    </Item.Root>
+  );
+}
+
 /** The active account and everything it can switch to. This is the group that scrolls. */
 function WorkspaceSection() {
   const data = useUserButtonContext();
@@ -724,6 +767,7 @@ function WorkspaceSection() {
         {data.mode === 'orgs' ? null : <ActiveAccountRow />}
         <MembershipRows />
         <PendingRows />
+        {data.organizationsLoading ? <WorkspaceListLoadingRow /> : null}
         {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
       </Item.Group>
     </>
