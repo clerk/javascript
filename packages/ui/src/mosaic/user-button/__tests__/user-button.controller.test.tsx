@@ -13,6 +13,7 @@ interface FakeUser {
   primaryEmailAddress: { emailAddress: string } | null;
   imageUrl: string;
   organizationMemberships: unknown[];
+  createOrganizationEnabled: boolean;
 }
 
 interface FakeSession {
@@ -122,6 +123,7 @@ beforeEach(() => {
     primaryEmailAddress: { emailAddress: 'alice@example.com' },
     imageUrl: 'https://img/alice',
     organizationMemberships: [],
+    createOrganizationEnabled: true,
   };
   session = { id: 'sess_1', checkAuthorization: (checkAuthorization = vi.fn().mockReturnValue(true)) };
   organization = { id: 'org_1', name: 'Acme', imageUrl: 'https://img/acme', membersCount: 3 };
@@ -143,6 +145,7 @@ beforeEach(() => {
         primaryEmailAddress: { emailAddress: 'bob@example.com' },
         imageUrl: 'https://img/bob',
         organizationMemberships: [],
+        createOrganizationEnabled: true,
       },
     },
   ];
@@ -179,6 +182,7 @@ function Harness(options: UserButtonControllerOptions = {}) {
       <output data-testid='can-invite'>{String(Boolean(c.onInviteMembers))}</output>
       <output data-testid='can-sign-out-all'>{String(Boolean(c.onSignOutAll))}</output>
       <output data-testid='can-add-account'>{String(Boolean(c.onAddAccount))}</output>
+      <output data-testid='can-create-org'>{String(Boolean(c.onCreateOrganization))}</output>
       <output data-testid='memberships'>{JSON.stringify(c.memberships)}</output>
       <output data-testid='suggestions'>{JSON.stringify(c.suggestions)}</output>
       <output data-testid='invitations'>{JSON.stringify(c.invitations)}</output>
@@ -512,6 +516,17 @@ describe('useUserButtonController', () => {
     rerender(<Harness />);
     fireEvent.click(screen.getByText('sign-out-one'));
     expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_2', redirectUrl: '/after-sign-out' });
+  });
+
+  // An instance can restrict who may open an organization, and a user at their creation limit is
+  // restricted the same way. Offering the action anyway lands them on a page that turns them away.
+  it('drops create-organization for a user who cannot open one', () => {
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('can-create-org')).toHaveTextContent('true');
+
+    user = { ...(user as FakeUser), createOrganizationEnabled: false };
+    rerender(<Harness />);
+    expect(screen.getByTestId('can-create-org')).toHaveTextContent('false');
   });
 
   it('drops sign-out-all and add-account in single-session mode', () => {
