@@ -20,6 +20,7 @@ interface FakeUser {
   primaryEmailAddress: { emailAddress: string } | null;
   imageUrl: string;
   organizationMemberships: unknown[];
+  createOrganizationEnabled: boolean;
 }
 
 interface FakeSession {
@@ -128,6 +129,7 @@ beforeEach(() => {
     primaryEmailAddress: { emailAddress: 'alice@example.com' },
     imageUrl: 'https://img/alice',
     organizationMemberships: [{ id: 'orgmem_1' }],
+    createOrganizationEnabled: true,
   };
   session = { id: 'sess_1', checkAuthorization: vi.fn().mockReturnValue(true) };
   organization = { id: 'org_1', name: 'Acme', imageUrl: '', membersCount: 3 };
@@ -148,6 +150,7 @@ beforeEach(() => {
         primaryEmailAddress: { emailAddress: 'bob@example.com' },
         imageUrl: 'https://img/bob',
         organizationMemberships: [],
+        createOrganizationEnabled: true,
       },
     },
   ];
@@ -250,6 +253,16 @@ describe('UserButton (connected)', () => {
     expect(screen.getByRole('button', { name: 'Other' })).toBeInTheDocument();
   });
 
+  // `mode` is the view's own prop; this only proves the connected component hands it down, since
+  // the account-only surface is otherwise indistinguishable from an account with no organizations.
+  it('forwards mode to the view, so an account-only surface lists no organizations', async () => {
+    renderUserButton({ mode: 'user' });
+    await open();
+
+    expect(screen.queryByRole('button', { name: 'Other' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
+  });
+
   it('switching to another account calls setActive with the session and stays open', async () => {
     renderUserButton();
     const act = await open();
@@ -348,6 +361,17 @@ describe('UserButton (connected)', () => {
 
     expect(navigate).toHaveBeenCalledWith('/create-org');
     await waitFor(() => expect(popup()).toBeNull());
+  });
+
+  it('leaves create-organization out of the account menu for a user who cannot open one', async () => {
+    user = { ...(user as FakeUser), createOrganizationEnabled: false };
+    renderUserButton();
+    const act = await open();
+    await act.click(accountMenu());
+
+    // The menu is still there; it is only this one item that has nothing to offer.
+    expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Create organization' })).toBeNull();
   });
 
   it('spins the clicked affordance and stands every other one down while an action is in flight', async () => {

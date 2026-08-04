@@ -10,7 +10,7 @@ import { userButtonBusyKeys, UserButtonTriggerSkeleton, UserButtonView } from '.
 
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
-  Pick<UserButtonRootProps, 'modePriority'>;
+  Pick<UserButtonRootProps, 'mode' | 'modePriority'>;
 
 /** The one action in flight: which affordance owns it, and what the surface froze on to run it. */
 interface PendingAction {
@@ -26,7 +26,13 @@ interface PendingAction {
  * busy state (leaving the popover open) if it rejects. Actions that hand off to another surface
  * (managing, inviting, creating, adding an account) close the popover on the way out.
  */
-export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, ...options }: UserButtonProps = {}) {
+export function UserButton({
+  renderTriggerLabel,
+  renderPlanBadge,
+  mode,
+  modePriority,
+  ...options
+}: UserButtonProps = {}) {
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState<PendingAction | null>(null);
@@ -101,6 +107,7 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
       {...data}
       renderTriggerLabel={renderTriggerLabel}
       renderPlanBadge={renderPlanBadge}
+      mode={mode}
       modePriority={modePriority}
       open={open}
       onOpenChange={setOpen}
