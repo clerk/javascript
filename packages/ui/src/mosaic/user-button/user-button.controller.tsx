@@ -36,9 +36,23 @@ export type UserButtonController =
 // path template resolved against the organization, or a builder function.
 type AfterSelectUrl<T> = ((entity: T) => string) | string;
 
-export interface UserButtonControllerOptions {
-  afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
-}
+/**
+ * How a profile surface opens, in the shape `<UserButton>` and `<OrganizationSwitcher>` already
+ * use: a URL is the whole opt-in to navigation, and `modal` forbids one, so the pair can never
+ * contradict itself. The two profiles are configured apart, so routing one leaves the other a modal.
+ */
+type UserProfileMode =
+  | { userProfileUrl: string; userProfileMode?: 'navigation' }
+  | { userProfileUrl?: never; userProfileMode?: 'modal' };
+
+type OrganizationProfileMode =
+  | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
+  | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
+
+export type UserButtonControllerOptions = UserProfileMode &
+  OrganizationProfileMode & {
+    afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
+  };
 
 function resolveAfterSelectUrl(
   config: AfterSelectUrl<OrganizationResource> | undefined,
@@ -51,6 +65,28 @@ function resolveAfterSelectUrl(
     return populateParamFromObject({ urlWithParam: config, entity });
   }
   return undefined;
+}
+
+/**
+ * One rule for both profiles: open the modal unless a URL routes instead. An explicit mode has the
+ * last word; a URL on its own means navigation, so passing one is all it takes to route. `url`
+ * falls back to Clerk's own so an explicit `navigation` still lands somewhere.
+ */
+function profileAction({
+  url,
+  mode,
+  openModal,
+  buildUrl,
+  navigate,
+}: {
+  url: string | undefined;
+  mode: 'navigation' | 'modal' | undefined;
+  openModal: () => void;
+  buildUrl: () => string;
+  navigate: (to: string) => unknown;
+}): () => void {
+  const resolved = mode ?? (url ? 'navigation' : 'modal');
+  return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
 }
 
 const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
@@ -96,6 +132,22 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const environment = useMosaicEnvironment();
   const displayConfig = environment?.displayConfig;
   const singleSessionMode = environment?.authConfig?.singleSessionMode ?? false;
+
+  const manageAccount = profileAction({
+    url: options?.userProfileUrl,
+    mode: options?.userProfileMode,
+    openModal: () => clerk.openUserProfile(),
+    buildUrl: () => clerk.buildUserProfileUrl(),
+    navigate: router.navigate,
+  });
+
+  const manageOrganization = profileAction({
+    url: options?.organizationProfileUrl,
+    mode: options?.organizationProfileMode,
+    openModal: () => clerk.openOrganizationProfile(),
+    buildUrl: () => clerk.buildOrganizationProfileUrl(),
+    navigate: router.navigate,
+  });
 
   if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded) {
     return { status: 'loading' };
@@ -187,9 +239,11 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     // Single-session apps cannot hold a second account, so adding one and signing out of "all
     // accounts" are meaningless there; the per-account sign out on the active row remains.
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
-    onManageAccount: () => void router.navigate(clerk.buildUserProfileUrl()),
-    onManageOrganization: () => void router.navigate(clerk.buildOrganizationProfileUrl()),
-    onInviteMembers: canInviteMembers ? () => void router.navigate(clerk.buildOrganizationProfileUrl()) : undefined,
+    onManageAccount: manageAccount,
+    onManageOrganization: manageOrganization,
+    // Invite is the other way into administering the organization, so it lands wherever managing it
+    // lands. Splitting them would send one to the app's own page and the other to Clerk's.
+    onInviteMembers: canInviteMembers ? manageOrganization : undefined,
     onCreateOrganization: () => void router.navigate(clerk.buildCreateOrganizationUrl()),
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {

@@ -44,6 +44,8 @@ let singleSessionMode: boolean;
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
 let navigate: ReturnType<typeof vi.fn>;
+let openUserProfile: ReturnType<typeof vi.fn>;
+let openOrganizationProfile: ReturnType<typeof vi.fn>;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
@@ -57,6 +59,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       navigate,
       setActive,
       signOut,
+      openUserProfile,
+      openOrganizationProfile,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -138,6 +142,8 @@ beforeEach(() => {
   setActive = vi.fn().mockResolvedValue(undefined);
   signOut = vi.fn().mockResolvedValue(undefined);
   navigate = vi.fn().mockResolvedValue(undefined);
+  openUserProfile = vi.fn();
+  openOrganizationProfile = vi.fn();
 });
 
 afterEach(() => {
@@ -448,17 +454,70 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('can-add-account')).toHaveTextContent('false');
   });
 
-  it('navigates for manage, invite, create, and add-account actions using clerk build URLs', () => {
+  // Both profiles open as a modal unless a URL routes instead, which is what the pre-Mosaic
+  // UserButton and OrganizationSwitcher each do. Nothing navigates, so the page underneath stays.
+  it('opens the profile modals for manage-account and manage-org', () => {
     render(<Harness />);
 
     fireEvent.click(screen.getByText('manage-account'));
-    expect(navigate).toHaveBeenCalledWith('/user-profile');
+    expect(openUserProfile).toHaveBeenCalled();
 
     fireEvent.click(screen.getByText('manage-org'));
-    expect(navigate).toHaveBeenCalledWith('/org-profile');
+    expect(openOrganizationProfile).toHaveBeenCalled();
+
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  // A URL is the whole opt-in: passing one means navigation, with no mode to remember to pass
+  // alongside it. The two are resolved apart, so routing one profile leaves the other a modal.
+  it('navigates to a profile URL when one is given, and only for that profile', () => {
+    render(<Harness userProfileUrl='/account' />);
+
+    fireEvent.click(screen.getByText('manage-account'));
+    expect(navigate).toHaveBeenCalledWith('/account');
+    expect(openUserProfile).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText('manage-org'));
+    expect(openOrganizationProfile).toHaveBeenCalled();
+  });
+
+  it('navigates to an organization profile URL when one is given', () => {
+    render(<Harness organizationProfileUrl='/settings' />);
+
+    fireEvent.click(screen.getByText('manage-org'));
+
+    expect(navigate).toHaveBeenCalledWith('/settings');
+    expect(openOrganizationProfile).not.toHaveBeenCalled();
+  });
+
+  // An explicit `navigation` is redundant next to a URL, but it is what the pre-Mosaic props accept,
+  // so passing both has to resolve the same as passing the URL alone.
+  it('accepts an explicit navigation mode alongside a URL', () => {
+    render(
+      <Harness
+        organizationProfileUrl='/settings'
+        organizationProfileMode='navigation'
+      />,
+    );
+
+    fireEvent.click(screen.getByText('manage-org'));
+
+    expect(navigate).toHaveBeenCalledWith('/settings');
+    expect(openOrganizationProfile).not.toHaveBeenCalled();
+  });
+
+  // Invite is the other way into administering the org, so it lands wherever manage-org lands.
+  // Splitting them would send one to the app's own page and the other to Clerk's.
+  it('sends invite-members to the same place as manage-org', () => {
+    render(<Harness organizationProfileUrl='/settings' />);
 
     fireEvent.click(screen.getByText('invite-members'));
-    expect(navigate).toHaveBeenCalledWith('/org-profile');
+
+    expect(navigate).toHaveBeenCalledWith('/settings');
+  });
+
+  it('navigates for create and add-account actions using clerk build URLs', () => {
+    render(<Harness />);
 
     fireEvent.click(screen.getByText('create-org'));
     expect(navigate).toHaveBeenCalledWith('/create-org');
