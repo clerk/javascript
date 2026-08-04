@@ -1,45 +1,22 @@
-import { useClerk } from '@clerk/shared/react';
-
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { useSignInContext } from '../../contexts';
-import { useRouter } from '../../router';
-import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
 
 /**
  * The SignIn tree's email-link verify route: the tab the verification link opened in.
  *
- * Mounted directly under the SignIn root, so the `../create/...` paths
- * `handleSignUpIfMissingTransfer` navigates to resolve as they do from `factor-one`.
+ * A `transferable` verification is consumed by the polling tab, never here. The banked account
+ * transfer can be consumed exactly once and no signal available to this tab says whether the
+ * polling tab is about to do it — `verifiedAtClient` does not match on a development instance
+ * even when both tabs share a client. Two consumers means the loser's rejected create detaches
+ * the winner's sign-up server-side, so this tab only points the user back to the original.
  */
 export const SignInEmailLinkVerify = () => {
-  const clerk = useClerk();
-  const { navigate } = useRouter();
-  const { afterSignInUrl, afterSignUpUrl, signUpIfMissingEnabled, navigateOnSetActive, unsafeMetadata } =
-    useSignInContext();
-
-  const onTransferable = async () => {
-    // Mirrors `verifiedFromTheSameClient` on the polling card: whichever tab shares the client
-    // with the sign-in carries the flow forward. Only that client holds the banked account
-    // transfer, so a link opened on another device has nothing to consume here.
-    if (!signUpIfMissingEnabled || clerk.client.signIn.firstFactorVerification.status !== 'transferable') {
-      return false;
-    }
-
-    await handleSignUpIfMissingTransfer({
-      clerk,
-      navigate,
-      afterSignUpUrl,
-      navigateOnSetActive,
-      unsafeMetadata,
-    });
-    return true;
-  };
+  const { afterSignInUrl } = useSignInContext();
 
   return (
     <SignInEmailLinkFlowComplete
       redirectUrlComplete={afterSignInUrl}
       redirectUrl='../factor-two'
-      onTransferable={onTransferable}
     />
   );
 };

@@ -167,7 +167,7 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     });
   });
 
-  it('defers to the newly opened tab when a transferable email link was verified from the same client', async () => {
+  it('performs the transfer itself when a transferable email link was verified from the same client', async () => {
     const email = 'test@clerk.com';
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withEmailAddress();
@@ -178,8 +178,11 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     });
     props.setProps({ withSignUp: true });
 
-    // The account transfer is banked once on the shared client, so the tab that opened the
-    // link consumes it and this one must not race for it.
+    // This tab is the sole consumer of the banked transfer regardless of which tab the link
+    // opened in. `verifiedFromTheSameClient()` cannot arbitrate that - it reports false on a
+    // development instance even for a tab of this same browser - so handing the transfer to the
+    // opened tab would let both fire, and the loser's rejected create detaches the winner's
+    // sign-up server-side.
     fixtures.signIn.createEmailLinkFlow.mockReturnValue({
       startEmailLinkFlow: vi.fn().mockResolvedValue({
         status: 'needs_first_factor',
@@ -190,6 +193,11 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       }),
       cancelEmailLinkFlow: vi.fn(),
     } as any);
+    fixtures.signUp.create.mockResolvedValueOnce({
+      status: 'missing_requirements',
+      missingFields: ['first_name'],
+      unverifiedFields: [],
+    } as any);
 
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
@@ -197,10 +205,9 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
     await userEvent.click(await screen.findByText(`Email link to ${email}`));
 
     await waitFor(() => {
-      screen.getByText('Email verified');
-      screen.getByText(/newly opened tab/i);
+      expect(fixtures.signUp.create).toHaveBeenCalledWith(expect.objectContaining({ transfer: true }));
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
     });
-    expect(fixtures.signUp.create).not.toHaveBeenCalled();
   });
 
   it('triggers sign-up transfer when email link verification becomes transferable', async () => {
@@ -243,6 +250,53 @@ describe('SignInFactorOne sign-up-if-missing transfer', () => {
       );
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../create/continue');
     });
+  });
+
+  // Every other email-link transfer case here resolves to `missing_requirements`, which routes
+  // with a relative in-component navigate. A `complete` transfer instead has to leave the
+  // component: it consumes the sign-in, so the SignIn route guard sends `factor-one` back to the
+  // start path, and an in-component navigate loses that race and lands on a blank sign-in.
+  it('leaves the component on a completed email-link transfer rather than routing in-component', async () => {
+    const email = 'test@clerk.com';
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.withPassword();
+      f.withPreferredSignInStrategy({ strategy: 'password' });
+      f.withEnumerationProtection();
+      f.startSignInWithEmailAddress({ supportEmailLink: true, identifier: email });
+    });
+    props.setProps({ withSignUp: true });
+
+    fixtures.signIn.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow: vi.fn().mockResolvedValue({
+        status: 'needs_first_factor',
+        firstFactorVerification: {
+          status: 'transferable',
+          verifiedFromTheSameClient: () => false,
+        },
+      }),
+      cancelEmailLinkFlow: vi.fn(),
+    } as any);
+    fixtures.signUp.create.mockResolvedValueOnce({
+      status: 'complete',
+      createdSessionId: 'sess_transfer',
+    } as any);
+    fixtures.clerk.setActive.mockImplementation(async (params: any) => {
+      await params.navigate?.({ session: { currentTask: null }, decorateUrl: (url: string) => url });
+    });
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+    await userEvent.click(await screen.findByText('Use another method'));
+    await userEvent.click(await screen.findByText(`Email link to ${email}`));
+
+    await waitFor(() => {
+      expect(fixtures.signUp.create).toHaveBeenCalledWith(expect.objectContaining({ transfer: true }));
+      expect(fixtures.clerk.setActive).toHaveBeenCalledWith(expect.objectContaining({ session: 'sess_transfer' }));
+    });
+
+    // The terminal redirect must not go through the component's router.
+    expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../create/continue');
   });
 
   it('surfaces transfer errors instead of leaving the code form loading', async () => {
