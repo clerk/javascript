@@ -28,10 +28,10 @@ export const styles = stylex.create({
     alignItems: 'center',
   },
 
-  // Sized to the avatar it stands in for. StyleX rather than the shared `Skeleton`, which is still
-  // Emotion-backed and would pull that runtime into the app-mountable Mosaic build.
+  // Sized to the avatar it stands in for; it takes that avatar's corner from `triggerShapes`, since
+  // this block is the only part of the placeholder that paints. StyleX rather than the shared
+  // `Skeleton`, which is still Emotion-backed and would pull that runtime into the Mosaic build.
   triggerSkeleton: {
-    borderRadius: radiusVars['--cl-radius-full'],
     animationDuration: '2s',
     animationIterationCount: 'infinite',
     animationName: {
