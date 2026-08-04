@@ -197,6 +197,67 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('data-disabled', '');
   });
 
+  describe('focusableWhenDisabled', () => {
+    it('marks the button aria-disabled instead of disabled', () => {
+      render(
+        <Button
+          disabled
+          focusableWhenDisabled
+        >
+          Hi
+        </Button>,
+      );
+      const button = screen.getByRole('button');
+      expect(button).not.toBeDisabled();
+      expect(button).toHaveAttribute('aria-disabled', 'true');
+      // The styles gate every interactive state on `data-disabled`, so it has to be
+      // reflected identically whether or not the native attribute is present.
+      expect(button).toHaveAttribute('data-disabled', '');
+    });
+
+    it('stays reachable by keyboard', async () => {
+      render(
+        <Button
+          disabled
+          focusableWhenDisabled
+        >
+          Hi
+        </Button>,
+      );
+      await userEvent.tab();
+      expect(screen.getByRole('button')).toHaveFocus();
+    });
+
+    it('does not call onClick while disabled', async () => {
+      const onClick = vi.fn();
+      render(
+        <Button
+          disabled
+          focusableWhenDisabled
+          onClick={onClick}
+        >
+          Hi
+        </Button>,
+      );
+      await userEvent.click(screen.getByRole('button'));
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('still dims and blocks the cursor', () => {
+      const { rerender } = render(<Button disabled>Hi</Button>);
+      const nativelyDisabled = screen.getByRole('button').className;
+      rerender(
+        <Button
+          disabled
+          focusableWhenDisabled
+        >
+          Hi
+        </Button>,
+      );
+      expect(screen.getByRole('button').className).toBe(nativelyDisabled);
+    });
+  });
+
   it('forwards arbitrary button props and the ref', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(
