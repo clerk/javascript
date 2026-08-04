@@ -20,6 +20,7 @@ export const styles = stylex.create({
 });
 
 export const sizes = stylex.create({
+  xs: { height: space['3'], width: space['3'] },
   sm: { height: space['3.5'], width: space['3.5'] },
   md: { height: space['4'], width: space['4'] },
   lg: { height: space['5'], width: space['5'] },
