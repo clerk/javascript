@@ -25,6 +25,12 @@ import { Default as DestructiveDefault, meta as destructiveMeta } from '../stori
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
+import {
+  Default as FieldDefault,
+  Invalid as FieldInvalid,
+  meta as fieldMeta,
+  SettingsRow as FieldSettingsRow,
+} from '../stories/field.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Colors as HeadingColors,
@@ -113,13 +119,6 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
-import {
-  Default as TextFieldDefault,
-  Horizontal as TextFieldHorizontal,
-  Invalid as TextFieldInvalid,
-  meta as textFieldMeta,
-  Sizes as TextFieldSizes,
-} from '../stories/text-field.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { toSlug } from './slug';
@@ -207,12 +206,11 @@ const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: Tab
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
-const textFieldModule: StoryModule = {
-  meta: textFieldMeta,
-  Default: TextFieldDefault,
-  Horizontal: TextFieldHorizontal,
-  Invalid: TextFieldInvalid,
-  Sizes: TextFieldSizes,
+const fieldModule: StoryModule = {
+  meta: fieldMeta,
+  Default: FieldDefault,
+  SettingsRow: FieldSettingsRow,
+  Invalid: FieldInvalid,
 };
 
 const iconModule: StoryModule = {
@@ -277,7 +275,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   tabsComponentModule,
   textModule,
-  textFieldModule,
+  fieldModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
