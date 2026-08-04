@@ -492,7 +492,7 @@ interface AccountAction {
 }
 
 /** The `⋯` that hangs off a row's trailing edge. Renders nothing when it would be empty. */
-function ActionMenu({ label, actions }: { label: string; actions: AccountAction[] }) {
+function ActionMenu({ label, actions, disabled }: { label: string; actions: AccountAction[]; disabled?: boolean }) {
   if (actions.length === 0) {
     return null;
   }
@@ -500,7 +500,10 @@ function ActionMenu({ label, actions }: { label: string; actions: AccountAction[
   return (
     <Trailing>
       <Menu.Root>
-        <Menu.Trigger aria-label={label} />
+        <Menu.Trigger
+          aria-label={label}
+          disabled={disabled}
+        />
         <Menu.Content>
           {actions.map(a => (
             <Menu.Item
@@ -560,7 +563,8 @@ function ActiveAccountRow() {
       ) : (
         <ActionMenu
           label={`Actions for ${email}`}
-          actions={disabled ? [] : actions}
+          actions={actions}
+          disabled={disabled}
         />
       )}
     </Item.Root>
