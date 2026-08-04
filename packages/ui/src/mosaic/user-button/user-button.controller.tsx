@@ -66,6 +66,16 @@ function displayName(user: UserResource): string {
   return user.primaryEmailAddress?.emailAddress ?? '';
 }
 
+function toMembership(organization: OrganizationResource): UserButtonMembership {
+  return {
+    kind: 'membership',
+    organizationId: organization.id,
+    name: organization.name,
+    imageUrl: organization.imageUrl || undefined,
+    membersCount: organization.membersCount,
+  };
+}
+
 function toSession(sessionId: string, user: UserResource): UserButtonSession {
   return {
     sessionId,
@@ -100,13 +110,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];
 
-  const memberships: UserButtonMembership[] = membershipData.map(m => ({
-    kind: 'membership',
-    organizationId: m.organization.id,
-    name: m.organization.name,
-    imageUrl: m.organization.imageUrl || undefined,
-    membersCount: m.organization.membersCount,
-  }));
+  const memberships: UserButtonMembership[] = membershipData.map(m => toMembership(m.organization));
 
   const suggestions: UserButtonSuggestion[] = suggestionData.map(s => ({
     kind: 'suggestion',
@@ -117,13 +121,21 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     status: s.status,
   }));
 
-  const invitations: UserButtonInvitation[] = invitationData.map(i => ({
-    kind: 'invitation',
-    id: i.id,
-    organizationId: i.publicOrganizationData.id,
-    organizationName: i.publicOrganizationData.name,
-    imageUrl: i.publicOrganizationData.imageUrl || undefined,
-  }));
+  // Accepting is all an invitation row offers, so a revoked or expired one has nothing to offer.
+  const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
+    i.status === 'pending' || i.status === 'accepted'
+      ? [
+          {
+            kind: 'invitation',
+            id: i.id,
+            status: i.status,
+            organizationId: i.publicOrganizationData.id,
+            organizationName: i.publicOrganizationData.name,
+            imageUrl: i.publicOrganizationData.imageUrl || undefined,
+          },
+        ]
+      : [],
+  );
 
   // Organization requests are scoped to the session that makes them, so another account's
   // workspaces are unknowable until it is the active one. Sessions are all we can hand over.
@@ -138,8 +150,12 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   return {
     status: 'ready',
     activeSession: toSession(session.id, user),
-    activeOrganizationId: organization?.id ?? null,
+    activeOrganization: organization ? toMembership(organization) : null,
     hasOrganizations: (userMemberships.count ?? 0) > 0,
+    // `isLoading` is "a request is out and nothing has come back", which is the only window where
+    // an empty list is indistinguishable from one that has not arrived. Paging in later pages
+    // leaves it false, since by then the list is already on screen.
+    organizationsLoading: userMemberships.isLoading || userInvitations.isLoading || userSuggestions.isLoading,
     memberships,
     suggestions,
     invitations,
@@ -177,9 +193,14 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
     },
+    // Accepting an invitation joins the organization, so the membership list is stale too. A
+    // suggestion only files a request an admin has yet to approve, so nothing has been joined.
     onAcceptInvitation: invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
-      return Promise.resolve(invitation?.accept()).finally(() => void userInvitations.revalidate?.());
+      return Promise.resolve(invitation?.accept()).finally(() => {
+        void userInvitations.revalidate?.();
+        void userMemberships.revalidate?.();
+      });
     },
   };
 }
