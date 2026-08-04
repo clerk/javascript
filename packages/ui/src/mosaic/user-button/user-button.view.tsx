@@ -15,6 +15,7 @@ import { Icon } from '../components/icon';
 import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
+import { scrollAreaViewport } from '../components/scroll-area';
 import { Spinner } from '../components/spinner';
 import { truncationStyles } from '../components/typography.styles';
 import type { IconName } from '../icons/registry';
@@ -776,7 +777,10 @@ function WorkspaceSection() {
   return (
     <>
       <Item.Separator />
-      <Item.Group {...stylex.props(styles.scroll)}>
+      {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
+          overflows, so short lists would sit their avatars and icons off the edge the header and
+          footer align to. */}
+      <Item.Group {...stylex.props(...scrollAreaViewport('auto'), styles.scroll)}>
         {data.mode === 'orgs' ? null : <ActiveAccountRow />}
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the

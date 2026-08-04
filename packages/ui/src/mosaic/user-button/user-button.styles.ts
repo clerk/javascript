@@ -54,10 +54,10 @@ export const styles = stylex.create({
     maxWidth: '12rem',
   },
 
-  // The workspace list scrolls; the header and footer stay put.
+  // The workspace list scrolls; the header and footer stay put. Only the cap is ours — the scroll
+  // area carries the overflow itself, along with the edge fades and the scrollbar.
   scroll: {
     maxHeight: '18rem',
-    overflowY: 'auto',
   },
 
   // The trailing column is as wide as the `⋯` menu button that owns it, so whatever stands in
