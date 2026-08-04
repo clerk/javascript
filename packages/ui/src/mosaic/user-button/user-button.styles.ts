@@ -17,14 +17,11 @@ export const styles = stylex.create({
     outlineOffset: '2px',
   },
 
-  // A labelled trigger surrounds the avatar and its text, so it pads itself rather than tracing
-  // the avatar. Its corner still comes from `triggerShapes`.
+  // A labelled trigger sits in a host app's chrome, so it stays flush like the avatar-only form
+  // and only spaces the avatar from its text.
   triggerLabelled: {
     gap: space['2'],
-    paddingBlock: space['1'],
     alignItems: 'center',
-    paddingInlineEnd: space['2'],
-    paddingInlineStart: space['1'],
   },
 
   // Matches `Item.Title`, so the trigger names a workspace the same way its row does. Capped,
