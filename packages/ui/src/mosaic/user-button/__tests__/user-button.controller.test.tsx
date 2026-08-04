@@ -484,6 +484,17 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('hide-personal')).toHaveTextContent('true');
   });
 
+  // An app whose organizations are the whole product withholds it itself. The instance setting is
+  // the other way in, and neither one can be talked out of it by the other.
+  it('lets the app withhold the personal workspace on an instance that allows one', () => {
+    const { rerender } = render(<Harness hidePersonal />);
+    expect(screen.getByTestId('hide-personal')).toHaveTextContent('true');
+
+    forceOrganizationSelection = true;
+    rerender(<Harness hidePersonal={false} />);
+    expect(screen.getByTestId('hide-personal')).toHaveTextContent('true');
+  });
+
   it('switches sessions and routes each sign out to the URL that matches what is left', () => {
     const { rerender } = render(<Harness />);
 
