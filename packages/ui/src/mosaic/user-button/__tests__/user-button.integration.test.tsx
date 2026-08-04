@@ -30,6 +30,7 @@ interface FakeList {
   data: unknown[];
   count: number;
   hasNextPage: boolean;
+  isLoading: boolean;
   revalidate: ReturnType<typeof vi.fn>;
 }
 
@@ -38,7 +39,7 @@ let isSessionLoaded: boolean;
 let isOrgLoaded: boolean;
 let user: FakeUser | null;
 let session: { id: string; checkAuthorization: ReturnType<typeof vi.fn> } | null;
-let organization: { id: string } | null;
+let organization: { id: string; name: string; imageUrl: string; membersCount: number } | null;
 let userMemberships: FakeList;
 let userInvitations: FakeList;
 let userSuggestions: FakeList;
@@ -95,8 +96,8 @@ function membership(orgId: string, name: string, membersCount: number) {
   return { organization: { id: orgId, name, imageUrl: '', membersCount } };
 }
 
-function list(data: unknown[], count: number, hasNextPage = false): FakeList {
-  return { data, count, hasNextPage, revalidate: vi.fn().mockResolvedValue(undefined) };
+function list(data: unknown[], count: number, hasNextPage = false, isLoading = false): FakeList {
+  return { data, count, hasNextPage, isLoading, revalidate: vi.fn().mockResolvedValue(undefined) };
 }
 
 /** A promise whose settling is controlled by the test, to hold an async action in flight. */
@@ -123,7 +124,7 @@ beforeEach(() => {
     imageUrl: 'https://img/alice',
   };
   session = { id: 'sess_1', checkAuthorization: vi.fn().mockReturnValue(true) };
-  organization = { id: 'org_1' };
+  organization = { id: 'org_1', name: 'Acme', imageUrl: '', membersCount: 3 };
   userMemberships = list([membership('org_1', 'Acme', 3), membership('org_9', 'Other', 1)], 2);
   userInvitations = list([acceptable('inv_1', 'org_3', 'Gamma')], 1);
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
