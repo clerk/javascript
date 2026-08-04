@@ -14,7 +14,7 @@ import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
-  Pick<UserButtonModeProps, 'modePriority'> & {
+  UserButtonModeProps & {
     /**
      * Stands in while Clerk is still answering, so the space the button will take is held rather
      * than appearing under whatever is beside it. Dropped once nobody is signed in, since that is
@@ -45,9 +45,11 @@ interface PendingAction {
  * ```
  *
  * @example
- * `modePriority` picks which switcher the menu leads with — in its header, and in the trigger beside
- * the avatar. The other one is still listed.
+ * `mode` narrows the menu to one switcher, and `modePriority` picks which one a combined menu leads
+ * with — in its header, and in the trigger beside the avatar. The other one is still listed.
  * ```tsx
+ * <UserButton mode='orgs' />
+ * <UserButton mode='user' />
  * <UserButton modePriority='user' />
  * ```
  *
@@ -84,7 +86,7 @@ interface PendingAction {
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
+  const { renderTriggerLabel, renderTriggerBadge, mode, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
     props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
@@ -141,9 +143,9 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   const handOff = (fn: (() => void) | undefined) =>
     fn
       ? () => {
-          close();
-          fn();
-        }
+        close();
+        fn();
+      }
       : undefined;
 
   // `setActive` swaps the active organization while its promise is still in flight, so the live
@@ -171,6 +173,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       {...data}
       renderTriggerLabel={renderTriggerLabel}
       renderTriggerBadge={renderTriggerBadge}
+      mode={mode}
       modePriority={modePriority}
       customMenuItems={menuItems}
       menuItemOrder={menuItemOrder}
