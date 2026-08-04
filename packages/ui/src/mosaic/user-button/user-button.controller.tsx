@@ -151,7 +151,10 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     status: 'ready',
     activeSession: toSession(session.id, user),
     activeOrganization: organization ? toMembership(organization) : null,
-    hasOrganizations: (userMemberships.count ?? 0) > 0,
+    // The user resource carries its own memberships, so whether the account has any is settled
+    // before the paginated list is asked. The fetched count still counts, in case the resource is
+    // behind the server.
+    hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
     // `isLoading` is "a request is out and nothing has come back", which is the only window where
     // an empty list is indistinguishable from one that has not arrived. Paging in later pages
     // leaves it false, since by then the list is already on screen.
