@@ -4,7 +4,8 @@ import type { ReactElement } from 'react';
 import { useState } from 'react';
 
 import { useSpinDelay } from '../hooks/useSpinDelay';
-import { type UserButtonControllerOptions, useUserButtonController } from './user-button.controller';
+import type { UserButtonController, UserButtonControllerOptions } from './user-button.controller';
+import { useUserButtonController } from './user-button.controller';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonView } from './user-button.view';
@@ -18,6 +19,12 @@ export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   Pick<UserButtonModeProps, 'modePriority'>;
+
+/** The one action in flight: which affordance owns it, and what the surface froze on to run it. */
+interface PendingAction {
+  key: string;
+  snapshot: Extract<UserButtonController, { status: 'ready' }>;
+}
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an
@@ -71,11 +78,11 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   const { renderTriggerLabel, renderPlanBadge, modePriority, customMenuItems, menuItemOrder, ...options } = props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
-  const [pendingKey, setPendingKey] = useState<string | null>(null);
+  const [action, setAction] = useState<PendingAction | null>(null);
 
-  // Hold the spinner off for quick actions and steady it once shown. Re-entry is still guarded on
-  // the immediate `pendingKey`; only the view's feedback is delayed.
-  const displayPendingKey = useSpinDelay(pendingKey);
+  // Every action here is a network round trip, so there is nothing to debounce and the click gets
+  // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
+  const displayPendingKey = useSpinDelay(action?.key ?? null, { delay: 0 });
 
   // Nothing stands in for the button until Clerk answers: while it is loading, a signed-out visitor
   // is indistinguishable from a session still resolving, so anything rendered here is a button
@@ -112,16 +119,20 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   ) =>
     fn
       ? (...args: Args) => {
-          if (pendingKey) {
+          if (action) {
             return;
           }
-          setPendingKey(keyFor(...args));
+          setAction({ key: keyFor(...args), snapshot: controller });
           void Promise.resolve(fn(...args))
             .then(closeOnSuccess ? close : () => {}, () => {})
-            .finally(() => setPendingKey(null));
+            .finally(() => setAction(null));
         }
       : undefined;
 
+  // `setActive` swaps the active organization while its promise is still in flight, so the live
+  // controller would rearrange the popup mid-action: the header renaming itself, the check jumping
+  // rows, Invite coming and going as the permission is re-read. Rendering the snapshot the action
+  // started from holds it all still, and the result lands in one step when the action settles.
   const {
     status: _status,
     onSelectOrganization,
@@ -131,7 +142,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     onAcceptSuggestion,
     onAcceptInvitation,
     ...data
-  } = controller;
+  } = action?.snapshot ?? controller;
 
   return (
     <UserButtonView

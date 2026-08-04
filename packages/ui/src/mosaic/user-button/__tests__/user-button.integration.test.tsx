@@ -382,12 +382,40 @@ describe('UserButton (connected)', () => {
 
     await act.click(screen.getByRole('button', { name: 'Other' }));
 
-    // The spinner is spin-delayed, so it surfaces only after the delay window elapses.
-    await waitFor(() => expect(spinner()).toBeInTheDocument(), { timeout: 2000 });
-    // A stood-down row stops being a button rather than rendering a disabled one.
-    expect(screen.queryByRole('button', { name: 'Sign out of all accounts' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'bob@example.com' })).toBeNull();
+    // Every one of these is a network round trip, so there is nothing to debounce: the click gets
+    // its spinner in the same pass rather than after a delay window.
+    expect(spinner()).toBeInTheDocument();
+    // A stood-down row stays a button, disabled. Dropping it to a static row would remount it,
+    // and with it the avatar it carries.
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeDisabled();
     expect(popup()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
+  // `setActive` swaps the active organization while its promise is still in flight, so live data
+  // would rearrange the surface under the pointer: the header renaming itself, the check jumping
+  // rows, and Invite appearing or leaving as the permission is re-read.
+  it('holds the surface on the data it started with until the action settles', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Other' }));
+    organization = { id: 'org_9', name: 'Other', imageUrl: '', membersCount: 1 };
+
+    // Any re-render now reads the swapped organization; the surface must not follow it.
+    await waitFor(() => expect(spinner()).toBeInTheDocument());
+    const surface = popup();
+    if (!surface) {
+      throw new Error('expected the popover to be open');
+    }
+    // Still the organization the surface opened on: heading it and listed under it, unclickable.
+    expect(within(surface).getAllByText('Acme')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: 'Acme' })).toBeNull();
 
     deferred.resolve();
     await waitFor(() => expect(popup()).toBeNull());
@@ -402,7 +430,7 @@ describe('UserButton (connected)', () => {
 
     await act.click(screen.getByRole('button', { name: 'Join' }));
 
-    await waitFor(() => expect(spinner()).toBeInTheDocument(), { timeout: 2000 });
+    expect(spinner()).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
 
     deferred.resolve();
@@ -417,13 +445,13 @@ describe('UserButton (connected)', () => {
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'Other' }));
-    await waitFor(() => expect(spinner()).toBeInTheDocument(), { timeout: 2000 });
+    expect(spinner()).toBeInTheDocument();
 
     deferred.reject(new Error('setActive failed'));
 
     await waitFor(() => expect(spinner()).toBeNull(), { timeout: 2000 });
     expect(popup()).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
   });
 
   it('mounts the paging sentinel only while more workspace pages remain', async () => {
