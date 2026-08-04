@@ -40,6 +40,7 @@ let userSuggestions: FakeList;
 let signedInSessions: FakeSession[];
 let pagingRef: (element: HTMLElement | null) => void;
 let singleSessionMode: boolean;
+let forceOrganizationSelection: boolean;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -75,6 +76,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_environment: {
         displayConfig: { afterSwitchSessionUrl: '/after-switch' },
         authConfig: { singleSessionMode },
+        organizationSettings: { forceOrganizationSelection },
       },
     }),
   };
@@ -128,6 +130,7 @@ beforeEach(() => {
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
   pagingRef = vi.fn();
   singleSessionMode = false;
+  forceOrganizationSelection = false;
   signedInSessions = [
     { id: 'sess_1', user: user },
     {
@@ -168,6 +171,7 @@ function Harness(options: UserButtonControllerOptions = {}) {
       <output data-testid='active-session'>{c.activeSession.sessionId}</output>
       <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
+      <output data-testid='hide-personal'>{String(c.hidePersonal)}</output>
       <output data-testid='orgs-loading'>{String(c.organizationsLoading)}</output>
       <output data-testid='additional'>{c.additionalSessions.map(a => a.sessionId).join(',')}</output>
       <output data-testid='has-more'>{String(c.paging?.hasMore)}</output>
@@ -467,6 +471,17 @@ describe('useUserButtonController', () => {
 
     fireEvent.click(screen.getByText('select-org'));
     expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
+  });
+
+  // An instance that requires an organization has no personal workspace: clerk-js refuses
+  // `setActive({ organization: null })` outright there, so offering the switch would offer nothing.
+  it('reports no personal workspace where the instance forces an organization', () => {
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('hide-personal')).toHaveTextContent('false');
+
+    forceOrganizationSelection = true;
+    rerender(<Harness />);
+    expect(screen.getByTestId('hide-personal')).toHaveTextContent('true');
   });
 
   it('switches sessions and routes each sign out to the URL that matches what is left', () => {
