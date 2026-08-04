@@ -193,11 +193,31 @@ describe('UserButtonTrigger', () => {
 
 describe('UserButtonView, loading the organization list', () => {
   it('holds the workspace list open while its first page is in flight', () => {
-    renderView({ mode: 'combined', hasOrganizations: false, organizationsLoading: true, onManageAccount: vi.fn() });
+    renderView({ mode: 'combined', hasOrganizations: true, organizationsLoading: true, onManageAccount: vi.fn() });
 
     expect(screen.getByText('Loading organizations…')).toBeInTheDocument();
     // The account row heads the section and does not wait on the list.
     expect(screen.getByRole('button', { name: 'Actions for alice@example.com' })).toBeInTheDocument();
+  });
+
+  // Memberships, invitations and suggestions are three requests that land at three different
+  // moments; showing each as it arrives walks the list in in stages.
+  it('withholds every row until all three lists have landed, rather than filling in as they arrive', () => {
+    renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      organizationsLoading: true,
+      memberships: [foundry],
+      invitations: [
+        { kind: 'invitation', id: 'inv_1', organizationId: 'org_2', organizationName: 'Gamma', status: 'pending' },
+      ],
+      onSelectOrganization: vi.fn(),
+      onAcceptInvitation: vi.fn(),
+    });
+
+    expect(screen.getByText('Loading organizations…')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Foundry' })).toBeNull();
+    expect(screen.queryByText('Gamma')).toBeNull();
   });
 
   it('drops the loading row once the list has landed', () => {
@@ -219,6 +239,15 @@ describe('UserButtonView, loading the organization list', () => {
     renderView({ mode: 'user', organizationsLoading: true });
 
     expect(screen.queryByText('Loading organizations…')).toBeNull();
+  });
+
+  // `hasOrganizations` is known before the lists are fetched, so an account that has none never
+  // shows a section that then vanishes under it.
+  it('keeps the section out of a surface with nothing to list, even while the lists load', () => {
+    renderView({ mode: 'combined', hasOrganizations: false, organizationsLoading: true, onManageAccount: vi.fn() });
+
+    expect(screen.queryByText('Loading organizations…')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
   });
 });
 
