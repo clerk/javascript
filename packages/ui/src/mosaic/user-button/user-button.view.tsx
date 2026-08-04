@@ -769,8 +769,13 @@ function WorkspaceListLoadingRow() {
 /** The active account and everything it can switch to. This is the group that scrolls. */
 function WorkspaceSection() {
   const data = useUserButtonContext();
+  // The account row carries the account's own actions, so it is not the workspace list's to
+  // withhold: an account with no organizations still needs somewhere to manage and sign out of it.
+  // The other two surfaces name the account in their header instead, or are not about it at all.
+  const accountRow = data.mode === 'combined' ? <ActiveAccountRow /> : null;
+  const listsOrganizations = showsOrganizations(data);
 
-  if (!showsOrganizations(data)) {
+  if (!accountRow && !listsOrganizations) {
     return null;
   }
 
@@ -781,11 +786,11 @@ function WorkspaceSection() {
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
       <Item.Group {...stylex.props(...scrollAreaViewport('auto'), styles.scroll)}>
-        {data.mode === 'orgs' ? null : <ActiveAccountRow />}
+        {accountRow}
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
-        {data.organizationsLoading ? (
+        {listsOrganizations && data.organizationsLoading ? (
           <WorkspaceListLoadingRow />
         ) : (
           <>
