@@ -194,12 +194,20 @@ function workspace(organization: UserButtonMembership | undefined, session: User
 }
 
 /**
+ * Whether the surface leads with an organization, which its mode settles on its own — before any
+ * data loads, so the placeholder can take the same corner the real trigger will.
+ */
+function leadsWithOrganization(mode: UserButtonMode, modePriority: UserButtonModePriority): boolean {
+  return mode === 'combined' ? modePriority === 'organizations' : mode === 'orgs';
+}
+
+/**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
  * agree. Only an organization-led surface with an organization actually active resolves to one.
  */
 function leadWorkspace(data: UserButtonContextValue): ActiveWorkspace {
-  const leadsWithOrganization = data.mode === 'combined' ? data.modePriority === 'organizations' : data.mode === 'orgs';
-  return workspace(leadsWithOrganization ? (data.activeOrganization ?? undefined) : undefined, data.activeSession);
+  const leadsWithOrg = leadsWithOrganization(data.mode, data.modePriority);
+  return workspace(leadsWithOrg ? (data.activeOrganization ?? undefined) : undefined, data.activeSession);
 }
 
 /**
@@ -1056,11 +1064,17 @@ export function UserButtonTrigger({ renderTriggerLabel = true, renderPlanBadge =
 
 /**
  * Holds the trigger's space while the controller loads, so nothing shifts when the real avatar
- * lands. Non-interactive.
+ * lands. That includes its corner, which the mode settles without waiting on data: an
+ * organization-led surface squares off, an account-led one stays round. Non-interactive.
  */
-export function UserButtonTriggerSkeleton() {
+export function UserButtonTriggerSkeleton({
+  mode = 'combined',
+  modePriority = 'organizations',
+}: Pick<UserButtonRootProps, 'mode' | 'modePriority'> = {}) {
+  const shape = leadsWithOrganization(mode, modePriority) ? 'square' : 'circle';
+
   return (
-    <div {...stylex.props(styles.trigger, triggerShapes.circle)}>
+    <div {...stylex.props(styles.trigger, triggerShapes[shape])}>
       <div
         aria-hidden
         {...stylex.props(styles.triggerSkeleton)}
