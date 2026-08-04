@@ -18,7 +18,7 @@ import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
-  Pick<UserButtonModeProps, 'modePriority'>;
+  UserButtonModeProps;
 
 /** The one action in flight: which affordance owns it, and what the surface froze on to run it. */
 interface PendingAction {
@@ -43,9 +43,11 @@ interface PendingAction {
  * ```
  *
  * @example
- * `modePriority` picks which switcher the menu leads with — in its header, and in the trigger beside
- * the avatar. The other one is still listed.
+ * `mode` narrows the menu to one switcher, and `modePriority` picks which one a combined menu leads
+ * with — in its header, and in the trigger beside the avatar. The other one is still listed.
  * ```tsx
+ * <UserButton mode='orgs' />
+ * <UserButton mode='user' />
  * <UserButton modePriority='user' />
  * ```
  *
@@ -75,7 +77,7 @@ interface PendingAction {
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderPlanBadge, modePriority, customMenuItems, menuItemOrder, ...options } = props;
+  const { renderTriggerLabel, renderPlanBadge, mode, modePriority, customMenuItems, menuItemOrder, ...options } = props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState<PendingAction | null>(null);
@@ -164,6 +166,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       {...data}
       renderTriggerLabel={renderTriggerLabel}
       renderPlanBadge={renderPlanBadge}
+      mode={mode}
       modePriority={modePriority}
       customMenuItems={menuItems}
       menuItemOrder={menuItemOrder}
