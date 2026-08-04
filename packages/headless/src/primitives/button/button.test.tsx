@@ -170,6 +170,67 @@ describe('Button', () => {
       expect(onSubmit).not.toHaveBeenCalled();
     });
 
+    it('can be tabbed past', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <Button
+            disabled
+            focusableWhenDisabled
+          >
+            Save
+          </Button>
+          <input aria-label='After' />
+        </div>,
+      );
+
+      screen.getByRole('button', { name: 'Save' }).focus();
+      await user.tab();
+
+      expect(screen.getByRole('textbox', { name: 'After' })).toHaveFocus();
+    });
+
+    it('does not reach an ancestor click handler', async () => {
+      const user = userEvent.setup();
+      const onAncestorClick = vi.fn();
+      render(
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- stands in for a clickable ancestor, which is the case under test
+        <div onClick={onAncestorClick}>
+          <Button
+            disabled
+            focusableWhenDisabled
+          >
+            Save
+          </Button>
+        </div>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(onAncestorClick).not.toHaveBeenCalled();
+    });
+
+    it('lets non-activation keys reach an ancestor', async () => {
+      const user = userEvent.setup();
+      const onAncestorKeyDown = vi.fn();
+      render(
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- stands in for a dialog listening for Escape
+        <div onKeyDown={onAncestorKeyDown}>
+          <Button
+            disabled
+            focusableWhenDisabled
+          >
+            Save
+          </Button>
+        </div>,
+      );
+
+      screen.getByRole('button', { name: 'Save' }).focus();
+      await user.keyboard('{Escape}');
+
+      expect(onAncestorKeyDown).toHaveBeenCalled();
+    });
+
     it('does not take focus on pointer interaction', async () => {
       const user = userEvent.setup();
       render(
@@ -261,8 +322,47 @@ describe('Button', () => {
       );
 
       const button = screen.getByRole('button', { name: 'Save' });
-      expect(button).not.toHaveAttribute('tabindex');
+      expect(button).toHaveAttribute('tabindex', '-1');
       expect(button).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    // An anchor is tabbable on its own, so this needs the explicit `-1` rather than
+    // the absence of the attribute.
+    it('drops a disabled link out of the tab order', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <Button
+            nativeButton={false}
+            // eslint-disable-next-line jsx-a11y/anchor-has-content -- the render element is a template; Button supplies the children
+            render={<a href='#target' />}
+            disabled
+          >
+            Save
+          </Button>
+          <input aria-label='After' />
+        </div>,
+      );
+
+      await user.tab();
+
+      expect(screen.getByRole('textbox', { name: 'After' })).toHaveFocus();
+    });
+
+    it('forwards a ref to the rendered element', () => {
+      const ref = React.createRef<HTMLAnchorElement>();
+      render(
+        <Button
+          nativeButton={false}
+          ref={ref}
+          // eslint-disable-next-line jsx-a11y/anchor-has-content -- the render element is a template; Button supplies the children
+          render={<a href='#target' />}
+        >
+          Save
+        </Button>,
+      );
+
+      expect(ref.current).toBe(screen.getByRole('button', { name: 'Save' }));
     });
 
     it('stays in the tab order when disabled and focusable', async () => {

@@ -27,8 +27,20 @@ function isLink(element: HTMLElement): boolean {
   return element.tagName === 'A' && element.hasAttribute('href');
 }
 
+// Propagation is stopped as well as the default action: a natively disabled control
+// dispatches no mouse event at all, so an ancestor handler never sees the press either.
 function suppressEvent(event: React.SyntheticEvent): void {
   event.preventDefault();
+  event.stopPropagation();
+}
+
+// Only the keys that activate a button. Suppressing every key would swallow `Tab` —
+// trapping focus on the button `focusableWhenDisabled` exists to keep focusable — along
+// with the `Escape` and arrow keys an enclosing dialog or menu listens for.
+function suppressActivationKey(event: React.KeyboardEvent): void {
+  if (event.key === 'Enter' || event.key === ' ') {
+    suppressEvent(event);
+  }
 }
 
 /**
@@ -43,7 +55,9 @@ function suppressEvent(event: React.SyntheticEvent): void {
  * // Button semantics on a link
  * <Button nativeButton={false} render={<a href='/settings' />}>Settings</Button>
  */
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+// `HTMLElement` rather than `HTMLButtonElement`: `nativeButton={false}` renders an anchor or
+// a span, and the ref has to accept one.
+export const Button = React.forwardRef<HTMLElement, ButtonProps>(function Button(props, ref) {
   const { render, disabled = false, focusableWhenDisabled = false, nativeButton = true, ...otherProps } = props;
 
   // The `disabled` attribute is what makes a native button inert, but it also takes the
@@ -54,7 +68,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     ? { type: 'button', disabled: nativelyDisabled ? disabled : undefined }
     : {
         role: 'button',
-        tabIndex: disabled && !focusableWhenDisabled ? undefined : 0,
+        // `-1` rather than dropping the attribute: an `<a href>` is tabbable on its own,
+        // so omitting it would leave a disabled link in the tab order.
+        tabIndex: disabled && !focusableWhenDisabled ? -1 : 0,
         onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
           if (event.key === ' ') {
             // Space scrolls the page on anything that is not a native button.
@@ -81,8 +97,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     // suppressed here. These overwrite rather than chain: `mergeProps` runs the consumer's
     // handler after ours, and a disabled button must not run it at all.
     merged.onClick = suppressEvent;
-    merged.onKeyDown = suppressEvent;
-    merged.onKeyUp = suppressEvent;
+    merged.onKeyDown = suppressActivationKey;
+    merged.onKeyUp = suppressActivationKey;
     // Keeps a pointer press from pulling focus off wherever it currently sits, matching
     // what the `disabled` attribute does.
     merged.onMouseDown = suppressEvent;

@@ -30,6 +30,8 @@ import { Button } from '@/primitives/button';
 
 The button keeps its place in the tab order, is marked `aria-disabled`, and ignores clicks, `Enter`, and `Space`. Focus is not pulled off its current element by a pointer press either.
 
+Those suppressed events do not propagate, so a clickable ancestor does not fire — a natively disabled control dispatches no mouse event at all. Only the activation keys are suppressed: `Tab` still moves focus off the button, and `Escape` and the arrow keys still reach an enclosing dialog or menu.
+
 ### Non-native element
 
 ```tsx
@@ -62,4 +64,4 @@ Standard `<button>` attributes pass through. `type` defaults to `"button"` on a 
 
 - Native + disabled: the `disabled` attribute.
 - Native + `disabled` + `focusableWhenDisabled`: `aria-disabled="true"`, no `disabled` attribute.
-- `nativeButton={false}`: `role="button"`, `tabIndex={0}` (removed when disabled without `focusableWhenDisabled`), `aria-disabled` when disabled. `Enter` and `Space` activate it; `Enter` on a link is left to the browser so it does not fire twice.
+- `nativeButton={false}`: `role="button"`, `tabIndex={0}` (`-1` when disabled without `focusableWhenDisabled`, since an `<a href>` is tabbable on its own and dropping the attribute would leave it in the tab order), `aria-disabled` when disabled. `Enter` and `Space` activate it; `Enter` on a link is left to the browser so it does not fire twice.
