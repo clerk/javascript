@@ -65,6 +65,13 @@ const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negativ
 
 export const styles = stylex.create({
   base: {
+    // Handed to `Icon`, which needs its own copy: transitions don't inherit, so without this
+    // the icon would still be catching up 0.1s after the button itself has landed.
+    '--_cl-icon-duration': {
+      default: durationVars['--cl-duration-base'],
+      ':enabled:active': durationVars['--cl-duration-instant'],
+      ':enabled:hover': durationVars['--cl-duration-instant'],
+    },
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-control'],
     borderStyle: 'solid',
@@ -86,13 +93,15 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',
-    // The press reads as contact, not a fade, so it lands instantly. Release falls back to
-    // `fast` — `:active` stops matching as the color heads back. Instant press, soft settle.
+    // The duration a state carries governs the transition INTO it, so one declaration per
+    // state gives an instant arrival and a 0.15s settle out. Instant because a hover or a
+    // press confirms something the user just did, and confirmation cannot lag; see `motion.md`.
     transitionDuration: {
-      default: durationVars['--cl-duration-fast'],
+      default: durationVars['--cl-duration-base'],
       ':enabled:active': durationVars['--cl-duration-instant'],
+      ':enabled:hover': durationVars['--cl-duration-instant'],
     },
-    transitionProperty: 'background-color, border-color, color, opacity',
+    transitionProperty: 'background-color, border-color, color, opacity, text-decoration-color',
     // Linear, not `--cl-ease-default`: nothing here moves. An ease on already non-uniform
     // color interpolation just drags the midpoint, and the house curve's overshoot would
     // extrapolate past the target color.
@@ -361,6 +370,10 @@ export const variants = stylex.create({
 
   // link opts out of the box the size axis sets — it reads as text, not a control. Per-side
   // zeros for the same reason `shapeSquare` uses them.
+  //
+  // The underline is always drawn and only its color moves: `text-decoration-line` is a keyword,
+  // so toggling it cannot tween and the exit would snap where every other property fades. A
+  // transparent decoration paints nothing and never participates in layout.
   'link-primary': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
@@ -373,7 +386,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-primary'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -389,7 +403,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-neutral-foreground'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -405,7 +420,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },
