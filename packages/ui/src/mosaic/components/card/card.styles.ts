@@ -27,7 +27,6 @@ export const styles = stylex.create({
     paddingBlock: space['4'],
     paddingInline: space['6'],
     alignItems: 'center',
-    boxSizing: 'border-box',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'space-between',
