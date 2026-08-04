@@ -49,8 +49,13 @@ type OrganizationProfileMode =
   | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
   | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
 
+type CreateOrganizationMode =
+  | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
+  | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
+
 export type UserButtonControllerOptions = UserProfileMode &
-  OrganizationProfileMode & {
+  OrganizationProfileMode &
+  CreateOrganizationMode & {
     afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
     /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
     afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
@@ -72,11 +77,11 @@ function resolveAfterSelectUrl<T extends object>(config: AfterSelectUrl<T> | und
 }
 
 /**
- * One rule for both profiles: open the modal unless a URL routes instead. An explicit mode has the
- * last word; a URL on its own means navigation, so passing one is all it takes to route. `url`
- * falls back to Clerk's own so an explicit `navigation` still lands somewhere.
+ * One rule for every surface Clerk can host: open the modal unless a URL routes instead. An explicit
+ * mode has the last word; a URL on its own means navigation, so passing one is all it takes to
+ * route. `url` falls back to Clerk's own so an explicit `navigation` still lands somewhere.
  */
-function profileAction({
+function openOrNavigate({
   url,
   mode,
   openModal,
@@ -143,7 +148,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   // organization selection, so there is no personal workspace to offer a way back to.
   const forceOrganizationSelection = environment?.organizationSettings?.forceOrganizationSelection ?? false;
 
-  const manageAccount = profileAction({
+  const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
     openModal: () => clerk.openUserProfile({ getContainer }),
@@ -151,11 +156,19 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     navigate: router.navigate,
   });
 
-  const manageOrganization = profileAction({
+  const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
     openModal: () => clerk.openOrganizationProfile({ getContainer }),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
+    navigate: router.navigate,
+  });
+
+  const createOrganization = openOrNavigate({
+    url: options?.createOrganizationUrl,
+    mode: options?.createOrganizationMode,
+    openModal: () => clerk.openCreateOrganization({ getContainer }),
+    buildUrl: () => clerk.buildCreateOrganizationUrl(),
     navigate: router.navigate,
   });
 
@@ -262,9 +275,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     onInviteMembers: canInviteMembers ? manageOrganization : undefined,
     // The instance can restrict who opens an organization, and the flag also goes false once a user
     // reaches their creation limit, so it covers both ways the action can be unavailable.
-    onCreateOrganization: user.createOrganizationEnabled
-      ? () => void router.navigate(clerk.buildCreateOrganizationUrl())
-      : undefined,
+    onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
     onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
     onAcceptSuggestion: suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
