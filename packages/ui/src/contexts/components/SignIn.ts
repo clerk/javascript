@@ -1,4 +1,4 @@
-import { SIGN_IN_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
+import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
@@ -12,6 +12,7 @@ import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
+import { warnAboutPasswordInSignInOrUpFlow } from '../../utils/warnAboutPasswordInSignInOrUpFlow';
 import { clerkWindowNavigate } from '../../utils/windowNavigate';
 import { getInitialValuesFromQueryParams } from '../utils';
 
@@ -30,6 +31,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  signUpIfMissingEnabled: boolean;
   navigateOnSetActive: (opts: {
     session: SessionResource;
     redirectUrl: string;
@@ -127,6 +129,24 @@ export const useSignInContext = (): SignInContextType => {
     );
   }
 
+  // Static preconditions of the sign-up-if-missing flow, shared by SignInStart (which requests
+  // `signUpIfMissing` on sign-in create) and the factor-one cards (which handle the resulting
+  // `transferable` verification status). Per-attempt conditions (identifier type, password use)
+  // stay at the call sites.
+  // `attackProtection` is optional-chained because it is introduced alongside this flow: an app
+  // pinned to an older clerk-js runtime builds a `UserSettings` resource without the field.
+  const signUpIfMissingEnabled =
+    isCombinedFlow &&
+    Boolean(userSettings.attackProtection?.enumeration_protection?.enabled) &&
+    signUpMode === SIGN_UP_MODES.PUBLIC;
+
+  if (clerk.instanceType === 'development') {
+    warnAboutPasswordInSignInOrUpFlow({
+      signUpIfMissingEnabled,
+      passwordEnabled: userSettings.instanceIsPasswordBased,
+    });
+  }
+
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
   // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
   // resolves to the embedded `…/create/protect-check` route there and the standalone sign-up route
@@ -197,6 +217,7 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    signUpIfMissingEnabled,
     navigateOnSetActive,
     taskUrl,
   };

@@ -1388,6 +1388,10 @@ export const nlBE: LocalizationResource = {
         subtitleNewTab: 'Ga naar de pasgeopende tab om verder te gaan',
         titleNewTab: 'Ingelogd in andere tab',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Gebruik de verificatielink die naar je e-mail is verzonden',

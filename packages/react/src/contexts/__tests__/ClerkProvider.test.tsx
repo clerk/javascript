@@ -32,12 +32,12 @@ const customUi = {} as Ui<CustomAppearance>;
 describe('ClerkProvider', () => {
   describe('Type tests', () => {
     describe('publishableKey', () => {
-      it('expects a publishableKey and children as the minimum accepted case', () => {
+      it('accepts an explicit publishableKey', () => {
         expectTypeOf({ publishableKey: 'test', children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
 
-      it('errors if no publishableKey', () => {
-        expectTypeOf({ children: '' }).not.toMatchTypeOf<ClerkProviderProps>();
+      it('accepts no explicit publishableKey', () => {
+        expectTypeOf({ children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
     });
   });

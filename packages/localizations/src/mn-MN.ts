@@ -1388,6 +1388,10 @@ export const mnMN: LocalizationResource = {
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд шинээр нээгдсэн таб руу буцна уу',
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Имэйлдээ илгээсэн баталгаажуулах холбоосыг ашиглана уу',
