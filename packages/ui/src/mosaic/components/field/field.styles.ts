@@ -21,6 +21,8 @@ export const styles = stylex.create({
   },
   errorIcon: {
     flexShrink: 0,
+    position: 'relative',
+    top: 1,
   },
   disabledText: {
     opacity: 0.5,
