@@ -76,6 +76,27 @@ describe('useSpinDelay', () => {
     expect(result.current).toBeNull();
   });
 
+  // Direct feedback on a click has nothing to debounce, so a zero delay must not cost a timer's
+  // worth of render passes before the spinner appears.
+  it('surfaces the value in the same pass when there is no delay to wait out', async () => {
+    const { result, rerender } = render(null, { delay: 0, minDuration: 200 });
+    await act(() => rerender({ value: 'a' }));
+
+    expect(result.current).toBe('a');
+  });
+
+  it('still holds a zero-delay value for minDuration', async () => {
+    const { result, rerender } = render(null, { delay: 0, minDuration: 200 });
+    await act(() => rerender({ value: 'a' }));
+    await act(() => rerender({ value: null }));
+
+    await advance(199);
+    expect(result.current).toBe('a');
+
+    await advance(1);
+    expect(result.current).toBeNull();
+  });
+
   it('swaps to a new value immediately when one replaces another mid-show', async () => {
     const { result, rerender } = render(null, { delay: 500, minDuration: 200 });
     await act(() => rerender({ value: 'a' }));
