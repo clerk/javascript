@@ -4,7 +4,7 @@ import { colorVars, fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   label: {
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-primary'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   message: {
