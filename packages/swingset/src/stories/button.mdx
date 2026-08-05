@@ -138,7 +138,9 @@ Press the button above to run a stand-in action: it goes pending for two seconds
 While `isPending`, the label fades to zero opacity and a spinner centers over it. The label stays
 mounted rather than being swapped out, so the button holds the width its content gives it — watch
 that it doesn't resize across the flip — and nothing around it reflows. Every child sits in one
-box, so an icon fades with its label instead of hanging on beside the spinner.
+box, so an icon fades with its label instead of hanging on beside the spinner. That box is the slot
+`cl-button-content`, so it can be targeted directly — `.cl-button-content` for the content row of
+any submit button, `.cl-button[data-pending] .cl-button-content` for it mid-action.
 
 A pending button is inert but not `disabled`: it carries `aria-disabled`, drops its pointer events
 so hover and press stop firing, and cancels the press so the form can't be submitted twice. The

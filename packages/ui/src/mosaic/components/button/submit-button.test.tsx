@@ -29,6 +29,13 @@ describe('Mosaic SubmitButton', () => {
     expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
   });
 
+  // The wrapper is not an implementation detail a consumer can ignore — it is the box their
+  // children actually land in — so it carries a slot class they can target.
+  it('names the content box with a slot class', () => {
+    render(<SubmitButton>Save</SubmitButton>);
+    expect(content()).toHaveClass('cl-button-content');
+  });
+
   it('boxes every child in one content span', () => {
     render(
       <SubmitButton>

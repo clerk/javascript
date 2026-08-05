@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { SpinDelayOptions } from '../../hooks/useSpinDelay';
 import { useSpinDelay } from '../../hooks/useSpinDelay';
-import { mergeStyleProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../reset.styles';
 import { Spinner } from '../spinner';
 import type { ButtonProps } from './button';
@@ -95,7 +95,12 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
       {...mergeStyleProps(stylex.props(styles.root, isPending && styles.rootPending), className)}
       {...rest}
     >
-      <span {...stylex.props(reset.base, styles.content, showPending && styles.contentPending)}>
+      <span
+        {...mergeStyleProps(
+          themeProps('button-content'),
+          stylex.props(reset.base, styles.content, showPending && styles.contentPending),
+        )}
+      >
         {withTruncatableLabel(children)}
       </span>
       {isPending || showPending ? (
