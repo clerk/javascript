@@ -35,7 +35,12 @@ const terms: CustomProfileItem = {
   content: <p>Terms body</p>,
 };
 
-const docs: CustomProfileItem = { label: 'Docs', href: 'https://clerk.com/docs', icon: <span>docs icon</span> };
+const docs: CustomProfileItem = {
+  label: 'Docs',
+  path: 'docs',
+  href: 'https://clerk.com/docs',
+  icon: <span>docs icon</span>,
+};
 
 beforeEach(() => {
   emitted = undefined;
@@ -145,7 +150,7 @@ describe('useCustomPages', () => {
       render(
         <Harness
           items={[terms, docs]}
-          order={['security', 'terms', 'account', 'https://clerk.com/docs']}
+          order={['security', 'terms', 'account', 'docs']}
         />,
       );
 

@@ -19,9 +19,10 @@ export interface CustomProfilePage {
 export interface CustomProfileLink {
   /** Names the row in the profile's navigation. */
   label: string;
+  /** Identifies the row, for ordering. */
+  path: string;
   /** Where the row goes. */
   href: string;
-  path?: never;
   icon?: ReactNode;
   content?: never;
 }
@@ -44,10 +45,7 @@ export interface CustomPagesBridge {
   portals: ReactNode[];
 }
 
-const isPage = (item: CustomProfileItem): item is CustomProfilePage => item.path !== undefined;
-
-/** A page is identified by where it lives, which the profile's routing already requires be unique. */
-const identify = (item: CustomProfileItem): string => (isPage(item) ? item.path : item.href);
+const isLink = (item: CustomProfileItem): item is CustomProfileLink => item.href !== undefined;
 
 /**
  * The ids to send, in the order the profile should show them.
@@ -104,7 +102,7 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
     [],
   );
 
-  const byId = new Map((items ?? []).map(item => [identify(item), item]));
+  const byId = new Map((items ?? []).map(item => [item.path, item]));
   const ids = order?.length ? arrange(order, byId, builtInPages) : [...byId.keys()];
 
   if (!ids.length) {
@@ -123,11 +121,12 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
     // icon pair as invalid. So the icon callbacks go out whether or not there is an icon to put
     // through them; without them, leaving `icon` off would silently cost you the page.
     const icon = bind(`icon:${id}`);
-    const content = isPage(item) ? bind(`content:${id}`) : undefined;
+    const content = isLink(item) ? undefined : bind(`content:${id}`);
 
     return {
       label: item.label,
-      url: id,
+      // A page is routed to by its path; a link is followed to wherever it points.
+      url: isLink(item) ? item.href : item.path,
       mountIcon: icon.mount,
       unmountIcon: icon.unmount,
       ...(content && { mount: content.mount, unmount: content.unmount }),
@@ -135,8 +134,8 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
   });
 
   const portals = (items ?? []).flatMap(item => [
-    portalInto(containers, `icon:${identify(item)}`, item.icon),
-    ...(isPage(item) ? [portalInto(containers, `content:${identify(item)}`, item.content)] : []),
+    portalInto(containers, `icon:${item.path}`, item.icon),
+    ...(isLink(item) ? [] : [portalInto(containers, `content:${item.path}`, item.content)]),
   ]);
 
   return { customPages, portals };

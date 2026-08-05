@@ -18,8 +18,8 @@ export interface UserButtonUserProfileProps {
   customPages?: CustomProfileItem[];
   /**
    * The order the profile's navigation runs in, by id: a built-in page's id, or a custom entry's
-   * `path` or `href`. Anything left out follows the pages named here. The first page is the one the
-   * profile opens on, so it cannot be a link.
+   * `path`. Anything left out follows the pages named here. The first page is the one the profile
+   * opens on, so it cannot be a link.
    */
   pageOrder?: (UserProfilePageId | (string & {}))[];
 }
