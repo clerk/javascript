@@ -169,9 +169,18 @@ interface DescriptionProps {
   copyLabel?: string;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
+  descriptionInnerAlignment?: 'start' | 'center' | 'end';
 }
 
-function Description({ text, prefix, suffix, truncateText = false, copyText = false, copyLabel }: DescriptionProps) {
+function Description({
+  text,
+  prefix,
+  suffix,
+  truncateText = false,
+  copyText = false,
+  copyLabel,
+  descriptionInnerAlignment = 'end',
+}: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -192,7 +201,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'end',
+          alignItems: descriptionInnerAlignment,
           gap: t.space.$1,
           minWidth: '0',
         })}

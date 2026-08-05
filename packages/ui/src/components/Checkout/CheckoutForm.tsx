@@ -23,7 +23,6 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import {
-  Badge,
   Box,
   Button,
   Col,
@@ -37,7 +36,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { ChevronUpDown, Close, InformationCircle } from '../../icons';
+import { ChevronUpDown, Close, InformationCircle, TriangleRight } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
@@ -88,37 +87,44 @@ const PromoCodeRow = () => {
 
   if (discount && appliedPromoCode) {
     return (
-      <LineItems.Group variant='tertiary'>
+      <LineItems.Group
+        variant='primary'
+        borderTop
+      >
         <LineItems.Title
+          title={appliedPromoCode}
           description={getDiscountDescription(discount, discount.cyclesRemaining, checkout.planPeriod, { $, t })}
           badge={
-            <Badge sx={theme => ({ gap: theme.space.$1 })}>
-              {appliedPromoCode}
-              <Button
-                type='button'
-                variant='ghost'
-                colorScheme='neutral'
-                aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
-                isDisabled={isLoading}
-                onClick={() => void updatePromoCode('')}
-                sx={{ padding: 0 }}
-              >
-                <Icon
-                  icon={Close}
-                  size='xs'
-                />
-              </Button>
-            </Badge>
+            <Button
+              type='button'
+              variant='ghost'
+              colorScheme='neutral'
+              aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
+              isDisabled={isLoading}
+              onClick={() => void updatePromoCode('')}
+              sx={{ padding: 0 }}
+            >
+              <Icon
+                icon={Close}
+                size='xs'
+              />
+            </Button>
           }
         />
-        <LineItems.Description text={$(toNegativeAmount(discount.amount))} />
+        <LineItems.Description
+          text={$(toNegativeAmount(discount.amount))}
+          descriptionInnerAlignment='start'
+        />
       </LineItems.Group>
     );
   }
 
   if (!isEditing) {
     return (
-      <LineItems.Group variant='tertiary'>
+      <LineItems.Group
+        variant='tertiary'
+        borderTop
+      >
         <LineItems.Title title={localizationKeys('billing.checkout.discount')} />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
