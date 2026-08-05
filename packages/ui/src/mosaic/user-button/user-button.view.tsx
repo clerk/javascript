@@ -449,7 +449,9 @@ function Header() {
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
   const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const subtitle = organization ? membershipSubtitle(organization) : identifier;
+  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  const accountSubtitle = identifier === name ? '' : identifier;
+  const subtitle = organization ? membershipSubtitle(organization) : accountSubtitle;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
   const invitable = showsOrganizations(data) ? data.activeOrganization : null;
