@@ -25,12 +25,7 @@ import { Default as DestructiveDefault, meta as destructiveMeta } from '../stori
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
-import {
-  Default as FieldDefault,
-  Invalid as FieldInvalid,
-  meta as fieldMeta,
-  SettingsRow as FieldSettingsRow,
-} from '../stories/field.stories';
+import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Colors as HeadingColors,
@@ -222,8 +217,6 @@ const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: T
 const fieldModule: StoryModule = {
   meta: fieldMeta,
   Default: FieldDefault,
-  SettingsRow: FieldSettingsRow,
-  Invalid: FieldInvalid,
 };
 
 const iconModule: StoryModule = {

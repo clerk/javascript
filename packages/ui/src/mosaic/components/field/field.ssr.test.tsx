@@ -8,33 +8,38 @@ import { Input } from '../input';
 import { Field } from './field';
 
 describe('Mosaic Field SSR', () => {
-  it('emits the field-owned control ID and stable part IDs', () => {
+  it('emits complete caller-owned label and message relationships', () => {
     const html = renderToString(
-      <Field.Root
-        invalid
-        required
-      >
-        <Field.Label>Email</Field.Label>
+      <Field.Root>
+        <Field.Label
+          id='email-label'
+          htmlFor='account-email'
+        >
+          Email
+        </Field.Label>
         <Input
           id='account-email'
-          aria-describedby='external'
+          name='email'
+          required
+          aria-labelledby='email-label'
+          aria-describedby='email-description email-error'
+          aria-invalid='true'
         />
-        <Field.Description>Description</Field.Description>
-        <Field.Error>Error</Field.Error>
+        <Field.Description id='email-description'>Description</Field.Description>
+        <Field.Error id='email-error'>Error</Field.Error>
       </Field.Root>,
     );
 
-    const labelControlId = html.match(/for="([^"]+)"/)?.[1];
-    const inputControlId = html.match(/<input[^>]*\sid="([^"]+)"/)?.[1];
-    expect(labelControlId).toBeDefined();
-    expect(labelControlId).toBe(inputControlId);
-    expect(inputControlId).not.toBe('account-email');
-    expect(html).toMatch(/id="cl-field-[^"]+-label"/);
-    expect(html).toMatch(/id="cl-field-[^"]+-description"/);
-    expect(html).toMatch(/id="cl-field-[^"]+-error"/);
-    expect(html).toContain('aria-describedby="external"');
-    expect(html).not.toContain('aria-labelledby');
+    expect(html).toContain('id="email-label"');
+    expect(html).toContain('for="account-email"');
+    expect(html).toContain('id="account-email"');
+    expect(html).toContain('name="email"');
+    expect(html).toContain('aria-labelledby="email-label"');
+    expect(html).toContain('aria-describedby="email-description email-error"');
     expect(html).toContain('aria-invalid="true"');
+    expect(html).toContain('id="email-description"');
+    expect(html).toContain('id="email-error"');
     expect(html).toContain('required=""');
+    expect(html).not.toContain('cl-field-control');
   });
 });
