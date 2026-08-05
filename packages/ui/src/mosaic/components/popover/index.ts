@@ -3,7 +3,6 @@ export type {
   PopoverCloseProps,
   PopoverDescriptionProps,
   PopoverPopupProps,
-  PopoverRootProps,
   PopoverSize,
   PopoverTitleProps,
   PopoverTriggerProps,
