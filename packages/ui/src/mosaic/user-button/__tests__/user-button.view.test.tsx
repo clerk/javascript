@@ -167,42 +167,48 @@ describe('UserButtonView, the personal workspace', () => {
     const onSelectOrganization = vi.fn();
     renderWorkspaces({ onSelectOrganization });
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Alice Smith' }));
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Personal account' }));
 
     expect(onSelectOrganization).toHaveBeenCalledWith(null);
+  });
+
+  // Named for what it is among organizations rather than for the account, the way the existing
+  // OrganizationSwitcher names it. The trigger and header still name the account itself.
+  it('names it "Personal account" rather than repeating the account', () => {
+    renderWorkspaces({ activeOrganization: null });
+
+    expect(screen.getByText('Personal account')).toBeInTheDocument();
+    // The trigger's label and the header it heads, and no third.
+    expect(screen.getAllByText('Alice Smith')).toHaveLength(2);
   });
 
   // The same contract every workspace row follows: what is already selected is not a button.
   it('checks it, and offers no switch, where it is what is active', () => {
     renderWorkspaces({ activeOrganization: null });
 
-    expect(screen.queryByRole('button', { name: 'Alice Smith' })).toBeNull();
-    // The trigger's label, the header it heads, and the row it is checked on.
-    expect(screen.getAllByText('Alice Smith')).toHaveLength(3);
+    expect(screen.queryByRole('button', { name: 'Personal account' })).toBeNull();
   });
 
   it('lists it on an org-only surface, which is the one place the switch is the whole point', () => {
     renderWorkspaces({ mode: 'orgs' });
 
-    expect(screen.getByRole('button', { name: 'Alice Smith' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Personal account' })).toBeInTheDocument();
   });
 
   it('spins it while the switch is in flight', () => {
     renderWorkspaces({ pendingKey: userButtonBusyKeys.selectOrganization(null) });
 
-    const row = screen.getByRole('button', { name: 'Alice Smith' });
+    const row = screen.getByRole('button', { name: 'Personal account' });
     expect(row).toBeDisabled();
     expect(row.querySelector('.cl-spinner')).not.toBeNull();
   });
 
   // An account with no organizations lists no workspaces at all, so there is nothing to switch
-  // between and no row to add. Counted by text rather than by role: the row it would add is the
-  // active one, which renders checked rather than as a button.
+  // between and no row to add.
   it('stays out of a surface with no organizations to leave', () => {
     renderWorkspaces({ hasOrganizations: false, memberships: [], activeOrganization: null });
 
-    // The trigger's label and the header it heads, and no third.
-    expect(screen.getAllByText('Alice Smith')).toHaveLength(2);
+    expect(screen.queryByText('Personal account')).toBeNull();
   });
 });
 
@@ -228,7 +234,7 @@ describe('UserButtonView, workspace list order', () => {
     const list = groups.find(group => group.textContent?.includes('Gamma'));
     const titles = Array.from(list?.querySelectorAll('.cl-item-title') ?? []).map(node => node.textContent);
 
-    expect(titles).toEqual(['Gamma', 'Beta', 'Alice Smith', 'Foundry']);
+    expect(titles).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
   });
 });
 

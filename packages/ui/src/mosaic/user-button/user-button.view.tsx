@@ -601,18 +601,19 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
  * The account's own workspace, which is what "no active organization" is. Listed alongside the
  * organizations so switching into one is not a one-way door: `null` is how you leave.
  *
- * Named and shaped by the same `workspace()` the trigger and header read, so whichever one is
- * active reads the same in all three places.
+ * Named for what it is among organizations rather than for the account, the way the existing
+ * OrganizationSwitcher names it. The trigger and header name the account itself, since that is
+ * what they are about.
  */
 function PersonalRow() {
   const data = useUserButtonContext();
   const selectOrganization = data.onSelectOrganization;
-  const { name, imageUrl, shape } = workspace(undefined, data.activeSession);
+  const { imageUrl, shape } = workspace(undefined, data.activeSession);
   const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(null));
 
   return (
     <WorkspaceRow
-      name={name}
+      name='Personal account'
       imageUrl={imageUrl}
       shape={shape}
       active={!data.activeOrganization}
