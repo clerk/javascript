@@ -122,6 +122,7 @@ const LINK_REPLACEMENTS = [
   ['billing-per-unit-total-tier', '/docs/reference/types/billing-per-unit-total-tier'],
   ['billing-subscription-item-resource', '/docs/reference/types/billing-subscription-item-resource'],
   ['billing-subscription-item-seats', '/docs/reference/types/billing-subscription-item-seats'],
+  ['billing-subscription-item-status', '/docs/reference/backend/types/billing-subscription-item-status'],
   ['feature-resource', '/docs/reference/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/types/billing-statement-group'],
   ['billing-statement-resource', '/docs/reference/types/billing-statement-resource'],
