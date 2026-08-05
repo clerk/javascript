@@ -81,6 +81,12 @@ export interface UserButtonData {
    */
   hasOrganizations: boolean;
   /**
+   * The account has no workspace of its own to return to, so the organizations are all there is.
+   * Withholds the personal row rather than standing it down: this is not a switch that is
+   * momentarily unavailable, it is a workspace that does not exist here.
+   */
+  hidePersonal?: boolean;
+  /**
    * A first page is still in flight, so the workspace rows stand in as one placeholder rather than
    * appearing a list at a time.
    */
@@ -610,6 +616,10 @@ function PersonalRow() {
   const selectOrganization = data.onSelectOrganization;
   const { imageUrl, shape } = workspace(undefined, data.activeSession);
   const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(null));
+
+  if (data.hidePersonal) {
+    return null;
+  }
 
   return (
     <WorkspaceRow
