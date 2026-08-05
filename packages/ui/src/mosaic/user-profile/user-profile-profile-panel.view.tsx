@@ -63,7 +63,7 @@ function FieldRow({ label, value, onChange }: { label: string; value: string; on
 
   return (
     <Field.Root {...mergeStyleProps(themeProps('user-profile-profile-panel-field-row'), stylex.props(styles.row))}>
-      <Field.Label {...stylex.props(styles.fieldLabel)}>{label}</Field.Label>
+      <Field.Label>{label}</Field.Label>
       <Input
         readOnly={!onChange}
         size='md'
