@@ -6,6 +6,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Icon } from '../icon';
 import { sizes as typographySizes, styles as typographyStyles } from '../typography.styles';
+import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
 
 function useNativeLabelWarning(label: HTMLLabelElement | null) {
@@ -16,14 +17,14 @@ function useNativeLabelWarning(label: HTMLLabelElement | null) {
   }, [label]);
 }
 
-/** Props for the field container. */
+/** Props for a field container that associates exactly one form control. */
 export type FieldRootProps = MosaicComponentProps<'div'>;
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
   { render, className, style, ...rest },
   ref,
 ) {
-  return useRender({
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
@@ -32,16 +33,23 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
       ...rest,
     },
   });
+
+  return <FieldProvider>{element}</FieldProvider>;
 });
 
 /** Props for a native field label. */
 export type FieldLabelProps = MosaicComponentProps<'label'>;
 
 const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function MosaicFieldLabel(
-  { render, className, style, ...rest },
+  { render, className, style, id: idProp, htmlFor: htmlForProp, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
+  const generatedId = React.useId();
+  const id = idProp ?? (context ? `cl-field-${generatedId}-label` : undefined);
+  const htmlFor = htmlForProp ?? context?.controlId;
   const [label, setLabel] = React.useState<HTMLLabelElement | null>(null);
+  useRegisterFieldPartId(htmlForProp === undefined ? id : undefined, context?.setLabelIds);
   useNativeLabelWarning(label);
   return useRender({
     defaultTagName: 'label',
@@ -55,6 +63,8 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
         style,
       ),
       ...rest,
+      id,
+      htmlFor,
     },
   });
 });
@@ -63,9 +73,13 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
 export type FieldDescriptionProps = MosaicComponentProps<'p'>;
 
 const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps>(function MosaicFieldDescription(
-  { render, className, style, ...rest },
+  { render, className, style, id: idProp, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
+  const generatedId = React.useId();
+  const id = idProp ?? (context ? `cl-field-${generatedId}-description` : undefined);
+  useRegisterFieldPartId(id, context?.setMessageIds);
   return useRender({
     defaultTagName: 'p',
     render,
@@ -78,6 +92,7 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
         style,
       ),
       ...rest,
+      id,
     },
   });
 });
@@ -86,9 +101,13 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
 export type FieldErrorProps = MosaicComponentProps<'p'>;
 
 const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(function MosaicFieldError(
-  { render, className, style, children, ...rest },
+  { render, className, style, id: idProp, children, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
+  const generatedId = React.useId();
+  const id = idProp ?? (context ? `cl-field-${generatedId}-error` : undefined);
+  useRegisterFieldPartId(id, context?.setMessageIds);
   return useRender({
     defaultTagName: 'p',
     render,
@@ -101,6 +120,7 @@ const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(funct
         style,
       ),
       ...rest,
+      id,
       children: (
         <>
           <Icon
@@ -116,5 +136,5 @@ const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(funct
   });
 });
 
-/** Context-free styled parts for composing a field with explicit native semantics. */
+/** Styled parts for composing an automatically associated single-control field. */
 export const Field = { Root, Label, Description, Error: FieldError };
