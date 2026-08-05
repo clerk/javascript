@@ -43,7 +43,12 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     organizationDomains,
     organizationEnterpriseConnection,
     contentRef,
-    organizationDomainMutations: { createDomain, revalidate, prepareOwnershipVerification },
+    organizationDomainMutations: {
+      createDomain,
+      revalidate,
+      prepareOwnershipVerification,
+      attemptOwnershipVerification,
+    },
     enterpriseConnectionMutations: { updateConnection },
   } = useConfigureSSO();
   const { goPrev, goNext, isFirstStep, isLastStep } = useWizard();
@@ -86,6 +91,17 @@ export const OrganizationDomainsStep = (): JSX.Element => {
 
     try {
       await prepareOwnershipVerification([domain]);
+    } catch (err: any) {
+      const apiError = getFieldError(err) ?? getGlobalError(err);
+      card.setError(apiError);
+    }
+  };
+
+  const handleAttemptOwnershipVerification = async (domain: OrganizationDomainResource) => {
+    card.setError(undefined);
+
+    try {
+      await attemptOwnershipVerification([domain]);
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
@@ -170,6 +186,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                       domain={domain}
                       onRemove={() => setDomainToRemove(domain)}
                       onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
+                      onAttemptOwnershipVerification={() => handleAttemptOwnershipVerification(domain)}
                       isRemoveDisabled={isRemoveDisabled}
                       removeDisabledTooltip={lastVerifiedDomainTooltip}
                     />
@@ -366,12 +383,14 @@ const DomainCard = ({
   domain,
   onRemove,
   onPrepareOwnershipVerification,
+  onAttemptOwnershipVerification,
   isRemoveDisabled = false,
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
   onPrepareOwnershipVerification: () => Promise<void>;
+  onAttemptOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
@@ -488,6 +507,7 @@ const DomainCard = ({
             <TxtRecord
               key='unverified'
               ownershipVerification={ownershipVerification}
+              onAttemptOwnershipVerification={onAttemptOwnershipVerification}
             />
           )}
         </Animated>
@@ -549,9 +569,18 @@ const ExpiredNotice = ({
 
 const TxtRecord = ({
   ownershipVerification,
+  onAttemptOwnershipVerification,
 }: {
   ownershipVerification: OrganizationDomainResource['ownershipVerification'];
+  onAttemptOwnershipVerification: () => Promise<void>;
 }): JSX.Element => {
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleCheckNow = () => {
+    setIsChecking(true);
+    void onAttemptOwnershipVerification().finally(() => setIsChecking(false));
+  };
+
   return (
     <Col
       elementDescriptor={descriptors.configureSSOVerifyDomainCardTxtRecord}
@@ -561,6 +590,13 @@ const TxtRecord = ({
         as='p'
         colorScheme='secondary'
         localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.instructions')}
+        sx={t => ({ fontSize: t.fontSizes.$sm })}
+      />
+
+      <Text
+        as='p'
+        colorScheme='secondary'
+        localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.pendingHint')}
         sx={t => ({ fontSize: t.fontSizes.$sm })}
       />
 
@@ -605,6 +641,26 @@ const TxtRecord = ({
           sx={{ flex: 1, minWidth: 0 }}
         />
       </Flex>
+
+      <Button
+        variant='bordered'
+        colorScheme='secondary'
+        size='xs'
+        isDisabled={isChecking}
+        isLoading={isChecking}
+        onClick={handleCheckNow}
+        sx={t => ({ alignSelf: 'flex-start', gap: t.space.$1x5 })}
+      >
+        <Icon
+          icon={RotateLeftRight}
+          size='sm'
+          colorScheme='neutral'
+        />
+        <Text
+          as='span'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.txtRecord.checkNowButton')}
+        />
+      </Button>
     </Col>
   );
 };
