@@ -98,8 +98,11 @@ export interface UserButtonData {
 
 /** All optional. An unhandled action hides (or de-activates) the affordance it drives. */
 export interface UserButtonCallbacks {
-  /** Acts on the active account; another account's organizations are unreachable until you switch. */
-  onSelectOrganization?: (organizationId: string) => void;
+  /**
+   * Acts on the active account; another account's organizations are unreachable until you switch.
+   * `null` selects the personal workspace, which is how an account leaves an organization.
+   */
+  onSelectOrganization?: (organizationId: string | null) => void;
   onAcceptSuggestion?: (suggestionId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onSwitchSession?: (sessionId: string) => void;
@@ -131,7 +134,7 @@ export type UserButtonModePriority = 'organizations' | 'user';
  * container (which sets `pendingKey`) and the view (which matches against it).
  */
 export const userButtonBusyKeys = {
-  selectOrganization: (organizationId: string) => `select-org:${organizationId}`,
+  selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
   switchSession: (sessionId: string) => `switch:${sessionId}`,
   signOutSession: (sessionId: string) => `sign-out:${sessionId}`,
   signOutAll: () => 'sign-out-all',
@@ -594,7 +597,33 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
   );
 }
 
-/** The organizations the active account belongs to. The personal one is the account row above. */
+/**
+ * The account's own workspace, which is what "no active organization" is. Listed alongside the
+ * organizations so switching into one is not a one-way door: `null` is how you leave.
+ *
+ * Named and shaped by the same `workspace()` the trigger and header read, so whichever one is
+ * active reads the same in all three places.
+ */
+function PersonalRow() {
+  const data = useUserButtonContext();
+  const selectOrganization = data.onSelectOrganization;
+  const { name, imageUrl, shape } = workspace(undefined, data.activeSession);
+  const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(null));
+
+  return (
+    <WorkspaceRow
+      name={name}
+      imageUrl={imageUrl}
+      shape={shape}
+      active={!data.activeOrganization}
+      onSelect={selectOrganization ? () => selectOrganization(null) : undefined}
+      busy={busy}
+      disabled={disabled}
+    />
+  );
+}
+
+/** The organizations the active account belongs to. Its own workspace is the row above. */
 function MembershipRows() {
   const data = useUserButtonContext();
   const selectOrganization = data.onSelectOrganization;
@@ -670,18 +699,8 @@ function PendingRows() {
 
   return (
     <>
-      {data.suggestions.map(s => (
-        <PendingRow
-          key={s.id}
-          busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
-          name={s.name}
-          imageUrl={s.imageUrl}
-          actionLabel='Join'
-          // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
-          note={s.status === 'accepted' ? 'Requested' : undefined}
-          onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
-        />
-      ))}
+      {/* Invitations first: one is addressed to this account and joins on accept, where a
+          suggestion only files a request. Same order as the existing OrganizationSwitcher. */}
       {invitations.map(i =>
         // Already joined, so it is a workspace like any other: click the row to switch to it.
         i.status === 'accepted' ? (
@@ -707,6 +726,18 @@ function PendingRows() {
           />
         ),
       )}
+      {data.suggestions.map(s => (
+        <PendingRow
+          key={s.id}
+          busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
+          name={s.name}
+          imageUrl={s.imageUrl}
+          actionLabel='Join'
+          // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
+          note={s.status === 'accepted' ? 'Requested' : undefined}
+          onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
+        />
+      ))}
     </>
   );
 }
@@ -794,15 +825,20 @@ function WorkspaceSection() {
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
-        {listsOrganizations && data.organizationsLoading ? (
-          <WorkspaceListLoadingRow />
-        ) : (
-          <>
-            <MembershipRows />
-            <PendingRows />
-            {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
-          </>
-        )}
+        {listsOrganizations &&
+          (data.organizationsLoading ? (
+            <WorkspaceListLoadingRow />
+          ) : (
+            <>
+              {/* What is on offer leads the list: an invitation or suggestion is the one row here
+                  that goes away if it is not acted on, and the workspaces held are not going
+                  anywhere. This is the order the existing OrganizationSwitcher lists them in. */}
+              <PendingRows />
+              <PersonalRow />
+              <MembershipRows />
+              {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
+            </>
+          ))}
       </Item.Group>
     </>
   );
