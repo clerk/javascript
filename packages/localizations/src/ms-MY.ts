@@ -106,8 +106,11 @@ export const msMY: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Anda tidak boleh melanggan pelan ini. Langganan sedia ada anda lebih mahal daripada pelan ini.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Pembayaran anda berjaya.',
       description__subscriptionSuccessful: 'Langganan baharu anda telah sedia.',
+      discount: undefined,
       downgradeNotice:
         'Anda akan mengekalkan langganan semasa anda dan cirinya sehingga akhir kitaran pengebilan, kemudian anda akan ditukar kepada langganan ini.',
       emailForm: {
@@ -124,6 +127,8 @@ export const msMY: LocalizationResource = {
       },
       pastDueNotice: 'Langganan anda sebelum ini tertunggak, tanpa pembayaran.',
       perMonth: 'sebulan',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pembayaran',
       title__paymentSuccessful: 'Pembayaran berjaya!',
       title__subscriptionSuccessful: 'Berjaya!',

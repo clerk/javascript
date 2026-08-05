@@ -86,6 +86,14 @@ export interface BillingNamespace {
   startCheckout: (params: CreateCheckoutParams) => Promise<BillingCheckoutResource>;
 
   /**
+   * Applies or removes a promo code on an existing Billing checkout for the current user or supplied Organization.
+   * @returns A [`BillingCheckoutResource`](/docs/reference/types/billing-checkout-resource) object.
+   *
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+   */
+  updateCheckout: (params: UpdateCheckoutParams) => Promise<BillingCheckoutResource>;
+
+  /**
    * Gets the credit balance for the current payer.
    * @returns A [`BillingCreditBalanceResource`](https://clerk.com/docs/reference/types/billing-credit-balance-resource) object.
    *
@@ -1289,6 +1297,22 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 }>;
 
 /**
+ * The `updateCheckout()` method accepts the following parameters.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type UpdateCheckoutParams = WithOptionalOrgType<{
+  /**
+   * The unique identifier for the checkout session.
+   */
+  id: string;
+  /**
+   * The promo code to apply. Use an empty string to remove the applied promo code.
+   */
+  promoCode: string;
+}>;
+
+/**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
  *
  * @unionReturnHeadings
@@ -1516,6 +1540,11 @@ export interface CheckoutFlowFinalizeParams {
  * Common methods available on all checkout flow instances.
  */
 interface CheckoutFlowMethods {
+  /**
+   * Updates the current checkout. Use an empty promo code to remove the applied promo code.
+   */
+  update: (params: Pick<UpdateCheckoutParams, 'promoCode'>) => Promise<{ error: ClerkError | null }>;
+
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */

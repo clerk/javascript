@@ -105,8 +105,11 @@ export const viVN: LocalizationResource = {
       'Bạn không thể đăng ký gói này bằng cách thanh toán hàng tháng. Để đăng ký gói này, bạn cần chọn thanh toán hàng năm.',
     cannotSubscribeUnrecoverable: 'Bạn không thể đăng ký gói này. Gói đăng ký hiện tại của bạn đắt hơn gói này.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Thanh toán của bạn đã thành công.',
       description__subscriptionSuccessful: 'Đăng ký mới của bạn đã được thiết lập.',
+      discount: undefined,
       downgradeNotice:
         'Bạn sẽ giữ đăng ký hiện tại và các tính năng của nó cho đến cuối chu kỳ thanh toán, sau đó bạn sẽ được chuyển sang đăng ký này.',
       emailForm: {
@@ -122,6 +125,8 @@ export const viVN: LocalizationResource = {
       },
       pastDueNotice: 'Đăng ký trước của bạn đã quá hạn và chưa thanh toán.',
       perMonth: 'hàng tháng',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Thanh toán',
       title__paymentSuccessful: 'Thanh toán thành công!',
       title__subscriptionSuccessful: 'Thành công!',

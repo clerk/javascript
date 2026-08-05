@@ -105,8 +105,11 @@ export const caES: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       "No pots subscriure't a aquest pla. La teva subscripció actual és més cara que aquest pla.",
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: "El teu pagament s'ha realitzat correctament.",
       description__subscriptionSuccessful: 'La teva nova subscripció està a punt.',
+      discount: undefined,
       downgradeNotice:
         'Mantindràs la teva subscripció actual i les seves funcions fins al final del cicle de facturació; després es canviarà a aquesta subscripció.',
       emailForm: {
@@ -123,6 +126,8 @@ export const caES: LocalizationResource = {
       },
       pastDueNotice: 'La teva subscripció anterior tenia un pagament pendent.',
       perMonth: 'al mes',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pagament',
       title__paymentSuccessful: 'Pagament realitzat amb èxit!',
       title__subscriptionSuccessful: 'Tot a punt!',

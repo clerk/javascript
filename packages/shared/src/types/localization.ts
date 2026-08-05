@@ -303,6 +303,11 @@ export type __internal_LocalizationResource = {
       };
     };
     checkout: {
+      addPromoCode: LocalizationValue;
+      applyPromoCode: LocalizationValue;
+      discount: LocalizationValue;
+      promoCodePlaceholder: LocalizationValue;
+      removePromoCode: LocalizationValue;
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;

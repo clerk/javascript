@@ -5,7 +5,7 @@ import { useProtect } from '@/ui/common/Gate';
 import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
 import { ProfileSection } from '@/ui/elements/Section';
 import { common } from '@/ui/styledSystem';
-import { toNegativeAmount } from '@/ui/utils/billing';
+import { getBillingPeriodLabel, getDiscountDescription, toNegativeAmount } from '@/ui/utils/billing';
 import { getSeatLimitAndIncludedSeatsLocalizationKey } from '@/ui/utils/billingPlanSeats';
 import { isManageableSubscriptionItem } from '@/ui/utils/billingSubscription';
 
@@ -257,25 +257,12 @@ function SubscriptionDiscountRow({ subscriptionItem }: { subscriptionItem: Billi
 
   const totalCycles =
     appliedDiscount.cyclesRemaining === null ? null : appliedDiscount.cyclesApplied + appliedDiscount.cyclesRemaining;
-  const period = t(
-    subscriptionItem.planPeriod === 'annual' ? localizationKeys('billing.years') : localizationKeys('billing.months'),
-  ).toLocaleLowerCase();
-
-  const discountAmount =
-    appliedDiscount.effect === 'percentage' && appliedDiscount.percentOff !== undefined
-      ? `${appliedDiscount.percentOff}%`
-      : appliedDiscount.amountOff
-        ? $(appliedDiscount.amountOff)
-        : '';
-  const discountTitle = `${appliedDiscount.name} ${t(
-    totalCycles === null
-      ? localizationKeys('billing.discountAmount', { amount: discountAmount })
-      : localizationKeys('billing.discountDuration', {
-          amount: discountAmount,
-          cycles: totalCycles,
-          period,
-        }),
-  )}`;
+  const discountTitle = `${appliedDiscount.name} (${getDiscountDescription(
+    appliedDiscount,
+    totalCycles,
+    subscriptionItem.planPeriod,
+    { $, t },
+  )})`;
 
   return (
     <Tr
@@ -296,7 +283,7 @@ function SubscriptionDiscountRow({ subscriptionItem }: { subscriptionItem: Billi
               colorScheme='secondary'
               localizationKey={localizationKeys('billing.discountCyclesRemaining', {
                 cycles: appliedDiscount.cyclesRemaining,
-                period,
+                period: getBillingPeriodLabel(subscriptionItem.planPeriod, appliedDiscount.cyclesRemaining, t),
               })}
             />
           ) : null}

@@ -94,8 +94,11 @@ export const enUS: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.',
     checkout: {
+      addPromoCode: 'Add promo code',
+      applyPromoCode: 'Apply',
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      discount: 'Discount',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       emailForm: {
@@ -111,6 +114,8 @@ export const enUS: LocalizationResource = {
       },
       pastDueNotice: 'Your previous subscription was past due, with no payment.',
       perMonth: 'per month',
+      promoCodePlaceholder: 'Enter promo code',
+      removePromoCode: 'Remove promo code',
       title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
@@ -121,9 +126,9 @@ export const enUS: LocalizationResource = {
     credit: 'Credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
-    discountAmount: '({{amount}} off)',
+    discountAmount: '{{amount}} off',
     discountCyclesRemaining: '{{cycles}} {{period}} remaining',
-    discountDuration: '({{amount}} off first {{cycles}} {{period}})',
+    discountDuration: '{{amount}} off first {{cycles}} {{period}}',
     free: 'Free',
     getStarted: 'Get started',
     highlightedPlanBadge: 'Popular',

@@ -106,8 +106,11 @@ export const teIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'మీరు ఈ ప్లాన్‌కు సబ్‌స్క్రైబ్ చేయలేరు. మీ ప్రస్తుత సబ్‌స్క్రిప్షన్ ఈ ప్లాన్ కంటే ఖరీదైనది.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'మీ చెల్లింపు విజయవంతమైంది.',
       description__subscriptionSuccessful: 'మీ కొత్త సబ్‌స్క్రిప్షన్ పూర్తిగా సిద్ధంగా ఉంది.',
+      discount: undefined,
       downgradeNotice:
         'బిల్లింగ్ చక్రం ముగిసే వరకు మీరు మీ ప్రస్తుత సబ్‌స్క్రిప్షన్‌ను మరియు దాని ఫీచర్లను ఉంచుకుంటారు, ఆ తర్వాత మీరు ఈ సబ్‌స్క్రిప్షన్‌కు మార్చబడతారు.',
       emailForm: {
@@ -123,6 +126,8 @@ export const teIN: LocalizationResource = {
       },
       pastDueNotice: 'మీ మునుపటి సబ్‌స్క్రిప్షన్ చెల్లింపు లేకుండా బకాయిగా ఉంది.',
       perMonth: 'నెలకు',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'చెక్అవుట్',
       title__paymentSuccessful: 'చెల్లింపు విజయవంతమైంది!',
       title__subscriptionSuccessful: 'విజయం!',

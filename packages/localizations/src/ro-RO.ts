@@ -105,8 +105,11 @@ export const roRO: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Nu te poți abona la acest plan. Abonamentul tău actual este mai scump decât acest plan.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Plata ta a fost efectuată cu succes.',
       description__subscriptionSuccessful: 'Noul tău abonament este configurat.',
+      discount: undefined,
       downgradeNotice:
         'Vei păstra abonamentul curent și funcțiile sale până la finalul ciclului de facturare, apoi vei fi schimbat la acest abonament.',
       emailForm: {
@@ -122,6 +125,8 @@ export const roRO: LocalizationResource = {
       },
       pastDueNotice: 'Abonamentul anterior era restant, fără plată.',
       perMonth: 'pe lună',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Plată',
       title__paymentSuccessful: 'Plata a reușit!',
       title__subscriptionSuccessful: 'Succes!',

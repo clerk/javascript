@@ -103,8 +103,11 @@ export const csCZ: LocalizationResource = {
       'Nelze se přihlásit k tomuto plánu s měsíční platbou. Abyste se k němu přihlásili, musíte zvolit roční platbu.',
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše platba byla úspěšná.',
       description__subscriptionSuccessful: 'Vaše nové předplatné je nastaveno.',
+      discount: undefined,
       downgradeNotice:
         'Současné předplatné a jeho funkce si ponecháte do konce fakturačního cyklu, poté budete převedeni na toto předplatné.',
       emailForm: {
@@ -120,6 +123,8 @@ export const csCZ: LocalizationResource = {
       },
       pastDueNotice: 'Vaše předchozí předplatné bylo po splatnosti, bez platby.',
       perMonth: 'měsíčně',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pokladna',
       title__paymentSuccessful: 'Platba byla úspěšná!',
       title__subscriptionSuccessful: 'Úspěch!',

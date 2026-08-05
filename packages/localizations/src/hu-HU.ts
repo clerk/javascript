@@ -106,8 +106,11 @@ export const huHU: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Nem tudsz előfizetni erre a csomagra. A jelenlegi előfizetésed drágább, mint ez a csomag.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'A fizetés sikeres volt.',
       description__subscriptionSuccessful: 'Az új előfizetésed beállítva.',
+      discount: undefined,
       downgradeNotice:
         'A jelenlegi előfizetésed és funkciói a számlázási ciklus végéig megmaradnak, ezután átváltunk erre az előfizetésre.',
       emailForm: {
@@ -123,6 +126,8 @@ export const huHU: LocalizationResource = {
       },
       pastDueNotice: 'Az előző előfizetésed lejárt, fizetés nélkül.',
       perMonth: 'havonta',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pénztár',
       title__paymentSuccessful: 'Sikeres fizetés!',
       title__subscriptionSuccessful: 'Sikeres!',
