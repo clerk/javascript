@@ -9,10 +9,6 @@ export const styles = stylex.create({
     flexShrink: 0,
     position: 'relative',
   },
-  avatarButton: {
-    borderWidth: 0,
-    position: 'relative',
-  },
   avatarEditSurface: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-full'],
@@ -65,11 +61,6 @@ export const styles = stylex.create({
     marginInline: space['4'],
     backgroundColor: colorVars['--cl-color-border'],
     height: '1px',
-  },
-  input: {
-    flexShrink: 0,
-    maxWidth: '50%',
-    width: '10.9375rem',
   },
   providerIcon: {
     flexShrink: 0,

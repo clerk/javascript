@@ -109,9 +109,9 @@ function FieldRow({ label, value, onChange }: { label: string; value: string; on
       <Input
         readOnly={!onChange}
         size='md'
+        style={{ flexShrink: 0, maxWidth: '50%', width: '10.9375rem' }}
         value={value}
         onChange={handleChange}
-        {...stylex.props(styles.input)}
       />
     </Field.Root>
   );
@@ -207,9 +207,9 @@ function AccountSection({
                   color='neutral'
                   shape='circle'
                   size='lg'
+                  style={{ borderWidth: 0, position: 'relative' }}
                   variant='ghost'
                   onClick={onEditProfilePicture}
-                  {...stylex.props(styles.avatarButton)}
                 >
                   {avatar}
                   <span

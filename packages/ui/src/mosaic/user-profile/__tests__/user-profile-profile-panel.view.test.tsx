@@ -38,6 +38,8 @@ describe('UserProfileProfilePanelView', () => {
     const usernameInput = screen.getByRole('textbox', { name: 'Username' });
     expect(nameInput).toHaveValue('Preston Booth');
     expect(usernameInput).toHaveValue('prestonxyz');
+    expect(nameInput).toHaveStyle({ width: '10.9375rem', maxWidth: '50%', flexShrink: 0 });
+    expect(usernameInput).toHaveStyle({ width: '10.9375rem', maxWidth: '50%', flexShrink: 0 });
     expect(nameInput.closest('.cl-field-root')).not.toBeNull();
     expect(usernameInput.closest('.cl-field-root')).not.toBeNull();
     expect(screen.getByText('Name')).toHaveAttribute('for', nameInput.id);
@@ -51,6 +53,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('item1@clerk.dev')).toHaveAttribute('data-color', 'primary');
     const editProfilePicture = screen.getByRole('button', { name: 'Edit profile picture' });
     expect(editProfilePicture).toHaveAttribute('data-size', 'lg');
+    expect(editProfilePicture).toHaveStyle({ borderWidth: 0, position: 'relative' });
     expect(editProfilePicture.querySelector('.cl-avatar')).not.toBeNull();
     expect(screen.queryByRole('tab')).toBeNull();
     expect(screen.queryByRole('heading', { name: 'User Profile' })).toBeNull();
