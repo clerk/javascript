@@ -95,13 +95,17 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
   return localStrategies.includes(factor.strategy);
 }
 
-// The priority of second factors is: TOTP -> Phone code -> any other factor.
-// A passkey is never the starting factor unless it is the only option (users
-// pick it from the alternative-methods list instead), and even then only on
-// browsers with WebAuthn support — without it the passkey card is a dead end.
+// The priority of second factors is: Passkey -> TOTP -> Phone code -> any other factor.
+// Passkey is only offered on browsers with WebAuthn support — without it the passkey
+// card is a dead end, so fall through to the enrolled code-based factors instead.
 export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[] | null): SignInFactor | null {
   if (!secondFactors || secondFactors.length === 0) {
     return null;
+  }
+
+  const passkeyFactor = findPasskeyStrategy(secondFactors);
+  if (passkeyFactor) {
+    return passkeyFactor;
   }
 
   const totpFactor = secondFactors.find(f => f.strategy === 'totp');
@@ -114,12 +118,7 @@ export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[
     return phoneCodeFactor;
   }
 
-  const nonPasskeyFactor = secondFactors.find(f => f.strategy !== 'passkey');
-  if (nonPasskeyFactor) {
-    return nonPasskeyFactor;
-  }
-
-  return isWebAuthnSupported() ? secondFactors[0] : null;
+  return secondFactors.find(f => f.strategy !== 'passkey') || null;
 }
 
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];

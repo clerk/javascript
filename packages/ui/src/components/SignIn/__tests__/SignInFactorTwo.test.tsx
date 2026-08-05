@@ -406,7 +406,7 @@ describe('SignInFactorTwo', () => {
     });
 
     describe('Passkey', () => {
-      it('is never the starting factor when another second factor is available', async () => {
+      it('falls back to the enrolled code factors when webauthn is not supported', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -424,6 +424,23 @@ describe('SignInFactorTwo', () => {
       });
 
       mockWebAuthn(() => {
+        it('is the starting factor ahead of the enrolled code factors', async () => {
+          const { wrapper, fixtures } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.startSignInFactorTwo({
+              supportPhoneCode: true,
+              supportTotp: true,
+              supportPasskey: true,
+            });
+          });
+          fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+          render(<SignInFactorTwo />, { wrapper });
+
+          await screen.findByText('Use your passkey');
+          expect(screen.queryAllByTestId('otp-input-segment').length).toBe(0);
+        });
+
         it('renders the passkey card when passkey is the only second factor', async () => {
           const { wrapper } = await createFixtures(f => {
             f.withEmailAddress();
