@@ -11,6 +11,8 @@ interface FakeUser {
   lastName: string | null;
   username: string | null;
   primaryEmailAddress: { emailAddress: string } | null;
+  primaryPhoneNumber?: { phoneNumber: string } | null;
+  primaryWeb3Wallet?: { web3Wallet: string } | null;
   imageUrl: string;
   organizationMemberships: unknown[];
   createOrganizationEnabled: boolean;
@@ -176,7 +178,7 @@ function Harness(options: UserButtonControllerOptions = {}) {
     <div>
       <output data-testid='status'>{c.status}</output>
       <output data-testid='active-name'>{c.activeSession.name}</output>
-      <output data-testid='active-email'>{c.activeSession.email}</output>
+      <output data-testid='active-identifier'>{c.activeSession.identifier}</output>
       <output data-testid='active-session'>{c.activeSession.sessionId}</output>
       <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
@@ -307,7 +309,6 @@ describe('useUserButtonController', () => {
     const { rerender } = render(<Harness />);
     expect(screen.getByTestId('status')).toHaveTextContent('ready');
     expect(screen.getByTestId('active-name')).toHaveTextContent('Alice Smith');
-    expect(screen.getByTestId('active-email')).toHaveTextContent('alice@example.com');
     expect(screen.getByTestId('active-session')).toHaveTextContent('sess_1');
 
     user = { ...(user as FakeUser), firstName: null, lastName: null };
@@ -317,6 +318,25 @@ describe('useUserButtonController', () => {
     user = { ...user, username: null };
     rerender(<Harness />);
     expect(screen.getByTestId('active-name')).toHaveTextContent('alice@example.com');
+  });
+
+  // The identifier is what the account is addressed by, so it follows Clerk's own precedence
+  // rather than reaching for the email: an account with no email still has something to show.
+  it('identifies the active account by username, then email, then phone, then wallet', () => {
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('active-identifier')).toHaveTextContent('alice');
+
+    user = { ...(user as FakeUser), username: null };
+    rerender(<Harness />);
+    expect(screen.getByTestId('active-identifier')).toHaveTextContent('alice@example.com');
+
+    user = { ...user, primaryEmailAddress: null, primaryPhoneNumber: { phoneNumber: '+15550100' } };
+    rerender(<Harness />);
+    expect(screen.getByTestId('active-identifier')).toHaveTextContent('+15550100');
+
+    user = { ...user, primaryPhoneNumber: null, primaryWeb3Wallet: { web3Wallet: '0xabc' } };
+    rerender(<Harness />);
+    expect(screen.getByTestId('active-identifier')).toHaveTextContent('0xabc');
   });
 
   it('describes the active organization whole, and null in personal mode', () => {
