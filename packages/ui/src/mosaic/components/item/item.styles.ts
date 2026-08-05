@@ -5,8 +5,6 @@ import { itemScope } from './item.markers.stylex';
 
 export const item = stylex.create({
   base: {
-    margin: 0,
-    padding: 0,
     borderRadius: radiusVars['--cl-radius-element'],
     outline: {
       default: 'none',
@@ -14,10 +12,8 @@ export const item = stylex.create({
     },
     paddingInline: space['2'],
     alignItems: 'center',
-    boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
-    fontFamily: 'inherit',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     outlineOffset: '2px',
