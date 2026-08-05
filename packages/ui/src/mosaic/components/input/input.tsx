@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { sizes, styles } from './input.styles';
 
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
@@ -22,7 +23,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
       disabled,
       ...mergeStyleProps(
         themeProps('input', { size, disabled }),
-        stylex.props(styles.base, sizes[size], disabled && styles.disabled),
+        stylex.props(reset.base, styles.base, sizes[size], disabled && styles.disabled),
         className,
         style,
       ),

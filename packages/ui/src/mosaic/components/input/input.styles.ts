@@ -35,8 +35,6 @@ export const styles = stylex.create({
       ':focus-visible:where([aria-invalid="true"])': 'none',
     },
     backgroundColor: colorVars['--cl-color-input'],
-    boxSizing: 'border-box',
-    color: 'inherit',
     display: 'block',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     outlineOffset: '2px',
