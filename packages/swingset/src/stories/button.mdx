@@ -123,6 +123,98 @@ by the styles, not by `pointer-events`: the button stays hit-testable, which is 
 `cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
 That tooltip is worth adding — a disabled control with no explanation is a dead end.
 
+### Submitting
+
+`SubmitButton` is a `Button` that defaults `type` to `submit` and adds `isPending`. Use it for
+the button that commits a form; reach for plain `Button` everywhere else.
+
+<Story
+  name='Submit'
+  storyModule={ButtonStories}
+/>
+
+Press the button above to run a stand-in action: it goes pending for two seconds, then comes back.
+
+While `isPending`, the label fades to zero opacity and a spinner centers over it. The label stays
+mounted rather than being swapped out, so the button holds the width its content gives it — watch
+that it doesn't resize across the flip — and nothing around it reflows. Every child sits in one
+box, so an icon fades with its label instead of hanging on beside the spinner.
+
+A pending button is inert but not `disabled`: it carries `aria-disabled`, drops its pointer events
+so hover and press stop firing, and cancels the press so the form can't be submitted twice. The
+native `disabled` attribute would do all of that too, but it takes the button out of the tab order
+mid-action — pulling focus away at the exact moment the spinner is announced. The state is also
+reflected as `data-pending` for styling.
+
+#### The spinner is delayed
+
+The button becomes pending the instant `isPending` flips, but the spinner waits 300ms before it's
+drawn, then stays up at least 200ms once it is. Plenty of actions resolve faster than a spinner
+takes to read, and one that appears and vanishes inside a few frames registers as a glitch rather
+than as progress.
+
+<Story
+  name='SubmitDelay'
+  storyModule={ButtonStories}
+/>
+
+Nothing about the pending _state_ is delayed — only the pixels. Both buttons above go inert and
+announce themselves the moment they're pressed, which is what stops a double submit; the fast one
+simply finishes before its spinner is due.
+
+Both numbers move with `spinDelay`. An action already known to be slow has nothing to gain by
+waiting, so it can skip straight to the spinner:
+
+```tsx
+<SubmitButton
+  isPending={isSubmitting}
+  spinDelay={{ delay: 0 }}
+>
+  Save changes
+</SubmitButton>
+```
+
+#### What assistive tech gets
+
+The spinner is decorative everywhere else in Mosaic, but here it is the only signal the action is
+running, so it enters the accessibility tree as an indeterminate `progressbar` the moment
+`isPending` flips — including during the delay above, when it's mounted but not yet drawn. That's
+why the delay is `opacity` and not conditional rendering: `visibility: hidden` or `display: none`
+would take it back out of the tree, and so would not rendering it. Fading the label with `opacity`
+is the same call — it keeps the button named "Save changes" for the whole action instead of going
+briefly nameless.
+
+The indicator is named in its own right, via `pendingLabel` (default `pending`). It is not folded
+into the button's name: `progressbar` is a range role, so name computation reads its _value_ —
+absent, since it's indeterminate — rather than its label, and a descendant one contributes nothing
+to the button above it. `pendingLabel` is untranslated, so pass a localized string wherever the
+surrounding copy is localized.
+
+```tsx
+<SubmitButton
+  isPending={isSubmitting}
+  pendingLabel='Saving'
+>
+  Save changes
+</SubmitButton>
+```
+
+<Story
+  name='SubmitSizes'
+  storyModule={ButtonStories}
+/>
+
+The spinner is sized off the `Icon` scale, since it stands in for one. That scale stops at `md`,
+so `md` and `lg` buttons share the larger ring.
+
+<Story
+  name='SubmitVariants'
+  storyModule={ButtonStories}
+/>
+
+Both the ring and its arc are mixed from `currentColor`, so the spinner reads on a `filled`
+button's fill and on a bare surface alike without a color prop to keep in step with the button's.
+
 ### Touch target
 
 Every size is shorter than the 44px a fingertip needs, so under `pointer: coarse` the button grows
