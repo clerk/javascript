@@ -11,6 +11,7 @@ import { Heading } from '../components/heading';
 import { Icon } from '../components/icon';
 import { Input } from '../components/input';
 import { Item } from '../components/item';
+import { Menu } from '../components/menu';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
 import { colorVars, space } from '../tokens.stylex';
@@ -266,17 +267,15 @@ function ConnectedAccountsSection({
                     </Item.Content>
                     <Item.Actions>
                       {connected && onManage ? (
-                        <Button
-                          aria-label={`Manage ${account.provider}`}
-                          color='neutral'
-                          shape='square'
-                          size='sm'
-                          touchTarget={false}
-                          variant='ghost'
-                          onClick={() => onManage(account.id)}
-                        >
-                          <Icon name='ellipsis' />
-                        </Button>
+                        <Menu.Root placement='bottom-end'>
+                          <Menu.Trigger aria-label={`Manage ${account.provider}`} />
+                          <Menu.Content>
+                            <Menu.Item
+                              label='Manage'
+                              onClick={() => onManage(account.id)}
+                            />
+                          </Menu.Content>
+                        </Menu.Root>
                       ) : null}
                       {!connected && onConnect ? (
                         <Button
@@ -413,17 +412,15 @@ function ContactSection({
             </Item.Content>
             {onManage ? (
               <Item.Actions>
-                <Button
-                  aria-label={`Manage ${item.value}`}
-                  color='neutral'
-                  shape='square'
-                  size='sm'
-                  touchTarget={false}
-                  variant='ghost'
-                  onClick={() => onManage(item.id)}
-                >
-                  <Icon name='ellipsis' />
-                </Button>
+                <Menu.Root placement='bottom-end'>
+                  <Menu.Trigger aria-label={`Manage ${item.value}`} />
+                  <Menu.Content>
+                    <Menu.Item
+                      label='Manage'
+                      onClick={() => onManage(item.id)}
+                    />
+                  </Menu.Content>
+                </Menu.Root>
               </Item.Actions>
             ) : null}
           </Item.Root>
