@@ -267,15 +267,24 @@ function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) 
   );
 }
 
-/** Renders `<button>` so a whole row is one click target. Rows with their own controls skip it. */
-const asButton = ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
-  <button
-    type='button'
-    {...props}
-  >
-    {children}
-  </button>
-);
+/**
+ * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
+ *
+ * A row that is waiting on an action stays a button and takes `disabled`, rather than dropping to a
+ * static row: swapping the host element out remounts the row, and the avatar it carries comes back
+ * as initials while it re-resolves an image the browser already has.
+ */
+const asButton =
+  (disabled = false) =>
+  ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+    <button
+      type='button'
+      disabled={disabled}
+      {...props}
+    >
+      {children}
+    </button>
+  );
 
 /** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
 function Trailing({ children }: { children: ReactNode }) {
@@ -295,14 +304,15 @@ interface WorkspaceRowProps {
 
 /** One selectable workspace: personal account, organization, suggestion, or invitation. */
 function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing, busy, disabled }: WorkspaceRowProps) {
-  // Selecting what is already selected does nothing, so the active row is not a button at all —
-  // and neither is a row whose action is running or is waiting on another one.
-  const select = active || busy || disabled ? undefined : onSelect;
+  // Selecting what is already selected does nothing, so the active row is not a button at all. A
+  // row that is merely waiting stays one, disabled.
+  const select = active ? undefined : onSelect;
+  const waiting = Boolean(busy || disabled);
 
   return (
     <Item.Root
       size='xs'
-      render={select ? asButton : undefined}
+      render={select ? asButton(waiting) : undefined}
       onClick={select}
     >
       <Item.Media>
@@ -345,13 +355,12 @@ interface ActionRowProps {
 /** A bare action at the foot of a group ("Add account", "Sign out of all accounts"). */
 function ActionRow({ icon, label, onClick, busyKey }: ActionRowProps) {
   const { busy, disabled } = useBusy(busyKey ?? '');
-  const act = busy || disabled ? undefined : onClick;
 
   return (
     <Item.Root
       size='xs'
-      render={act ? asButton : undefined}
-      onClick={act}
+      render={asButton(busy || disabled)}
+      onClick={onClick}
     >
       <Item.Media>
         {busy ? (
@@ -705,12 +714,13 @@ function PendingRows() {
 function AccountRow({ session, active }: { session: UserButtonSession; active?: boolean }) {
   const data = useUserButtonContext();
   const { busy, disabled } = useBusy(userButtonBusyKeys.switchSession(session.sessionId));
-  const switchSession = data.onSwitchSession && !active && !busy && !disabled ? data.onSwitchSession : undefined;
+  // The account you are already on is not something to switch to, so its row is not a button.
+  const switchSession = active ? undefined : data.onSwitchSession;
 
   return (
     <Item.Root
       size='xs'
-      render={switchSession ? asButton : undefined}
+      render={switchSession ? asButton(busy || disabled) : undefined}
       onClick={switchSession ? () => switchSession(session.sessionId) : undefined}
     >
       <Item.Media>

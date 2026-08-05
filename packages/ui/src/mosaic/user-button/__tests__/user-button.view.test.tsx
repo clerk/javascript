@@ -98,6 +98,50 @@ describe('UserButtonView, user mode', () => {
   });
 });
 
+// Rows carry avatars, and an avatar's load state dies with the element it hangs off. Swapping a
+// row's host element out while it waits would remount it, dropping the avatar back to its initials
+// for the length of the action — so a row that stands down stays the button it was.
+describe('UserButtonView, standing rows down', () => {
+  const other = { kind: 'membership', organizationId: 'org_2', name: 'Other Co' } as const;
+
+  function surface(pendingKey: string | null) {
+    return (
+      <MosaicProvider>
+        <UserButtonView
+          mode='combined'
+          defaultOpen
+          activeSession={alice}
+          activeOrganization={foundry}
+          hasOrganizations
+          memberships={[foundry, other]}
+          suggestions={[]}
+          invitations={[]}
+          additionalSessions={[bob]}
+          pendingKey={pendingKey}
+          onSelectOrganization={vi.fn()}
+          onSwitchSession={vi.fn()}
+          onSignOutAll={vi.fn()}
+        />
+      </MosaicProvider>
+    );
+  }
+
+  it.each([
+    ['a workspace row', 'Other Co'],
+    ['an account row', 'bob@example.com'],
+    ['an action row', 'Sign out of all accounts'],
+  ])('holds %s in place, disabled, while another action runs', (_name, label) => {
+    const { rerender } = render(surface(null));
+    const row = screen.getByRole('button', { name: label });
+
+    rerender(surface(userButtonBusyKeys.switchSession('sess_9')));
+
+    const stoodDown = screen.getByRole('button', { name: label });
+    expect(stoodDown).toBe(row);
+    expect(stoodDown).toBeDisabled();
+  });
+});
+
 describe('UserButtonView, combined mode priority', () => {
   function renderCombined(props: Partial<UserButtonProps> = {}) {
     return renderView({
