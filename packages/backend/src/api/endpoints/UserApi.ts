@@ -726,7 +726,7 @@ export class UserAPI extends AbstractAPI {
    * });
    * ```
    */
-  public async removePassword(userId: string, params: RemovePasswordParams = {}) {
+  public async removePassword(userId: string, params: RemovePasswordParams = {}): Promise<User> {
     this.requireId(userId);
 
     return this.request<User>({
