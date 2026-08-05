@@ -210,6 +210,20 @@ describe('UserButtonView, the personal workspace', () => {
 
     expect(screen.queryByText('Personal account')).toBeNull();
   });
+
+  // An instance that requires an organization has no personal workspace to return to, so the row
+  // would stand there and do nothing. It is withheld rather than stood down: this is not a moment
+  // where the switch is unavailable, it is a surface where the workspace does not exist.
+  it('stays out of a surface that has no personal workspace', () => {
+    renderWorkspaces({
+      hidePersonal: true,
+      memberships: [foundry, { kind: 'membership', organizationId: 'org_2', name: 'Gamma' }],
+    });
+
+    expect(screen.queryByText('Personal account')).toBeNull();
+    // The organizations are still listed; it is only the way back out of them that is gone.
+    expect(screen.getByRole('button', { name: 'Gamma' })).toBeInTheDocument();
+  });
 });
 
 // The order the existing OrganizationSwitcher lists these in: what is on offer leads, invitations
