@@ -97,6 +97,30 @@ describe('createClerkRequest', () => {
       expect(req.cookies.get('baz')).toBe('qux');
     });
 
+    // `%E2` is an incomplete UTF-8 lead byte, so `decodeURIComponent` throws on it.
+    // The decode runs over the whole header, so a cookie Clerk never set and never
+    // reads can fail the request before any auth logic runs (issue #9333).
+    it('does not throw when another cookie has a malformed percent-escape', () => {
+      const req = new Request('http://localhost:3000', {
+        headers: new Headers({ cookie: '__session=abc; analytics_id=%E2%9' }),
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).cookies.get('__session')).toBe('abc');
+    });
+
+    // A value that cannot be decoded is kept as-is, so callers still see whatever
+    // the client sent rather than an empty or dropped cookie.
+    it.each([
+      ['truncated sequence', '%E2%9'],
+      ['lone continuation byte', '%98'],
+      ['overlong encoding', '%C0%80'],
+    ])('leaves a cookie with a %s undecoded', (_label, value) => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: `analytics_id=${value}` }) }),
+      );
+      expect(req.cookies.get('analytics_id')).toBe(value);
+    });
+
     it('should parse and return cookies even if no cookie header exists', () => {
       const req = createClerkRequest(new Request('http://localhost:3000', { headers: new Headers() }));
       expect(req.cookies.get('foo')).toBeUndefined();

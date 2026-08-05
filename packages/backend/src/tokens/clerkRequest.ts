@@ -99,7 +99,22 @@ class ClerkRequest extends Request {
   }
 
   private decodeCookieValue(str: string) {
-    return str ? str.replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent) : str;
+    if (!str) {
+      return str;
+    }
+
+    // The decode runs over the whole header rather than per value, so an escape
+    // in any cookie - including ones Clerk neither set nor reads - reaches
+    // `decodeURIComponent`, which throws on invalid UTF-8 (truncated, lone, or
+    // overlong sequences). This is called from the constructor, so that would
+    // fail the request before any auth logic runs. Leave such runs raw instead.
+    return str.replace(/(%[0-9A-Z]{2})+/g, match => {
+      try {
+        return decodeURIComponent(match);
+      } catch {
+        return match;
+      }
+    });
   }
 }
 
