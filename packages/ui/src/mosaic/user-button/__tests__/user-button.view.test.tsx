@@ -149,6 +149,89 @@ describe('UserButtonView, standing rows down', () => {
   });
 });
 
+// Switching into an organization is not a one-way door: the account's own workspace is listed
+// alongside the organizations, so there is always a way back out of one.
+describe('UserButtonView, the personal workspace', () => {
+  function renderWorkspaces(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganization: foundry,
+      onSelectOrganization: vi.fn(),
+      ...props,
+    });
+  }
+
+  it('lists the account itself as a workspace to switch back to', async () => {
+    const onSelectOrganization = vi.fn();
+    renderWorkspaces({ onSelectOrganization });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Alice Smith' }));
+
+    expect(onSelectOrganization).toHaveBeenCalledWith(null);
+  });
+
+  // The same contract every workspace row follows: what is already selected is not a button.
+  it('checks it, and offers no switch, where it is what is active', () => {
+    renderWorkspaces({ activeOrganization: null });
+
+    expect(screen.queryByRole('button', { name: 'Alice Smith' })).toBeNull();
+    // The trigger's label, the header it heads, and the row it is checked on.
+    expect(screen.getAllByText('Alice Smith')).toHaveLength(3);
+  });
+
+  it('lists it on an org-only surface, which is the one place the switch is the whole point', () => {
+    renderWorkspaces({ mode: 'orgs' });
+
+    expect(screen.getByRole('button', { name: 'Alice Smith' })).toBeInTheDocument();
+  });
+
+  it('spins it while the switch is in flight', () => {
+    renderWorkspaces({ pendingKey: userButtonBusyKeys.selectOrganization(null) });
+
+    const row = screen.getByRole('button', { name: 'Alice Smith' });
+    expect(row).toBeDisabled();
+    expect(row.querySelector('.cl-spinner')).not.toBeNull();
+  });
+
+  // An account with no organizations lists no workspaces at all, so there is nothing to switch
+  // between and no row to add. Counted by text rather than by role: the row it would add is the
+  // active one, which renders checked rather than as a button.
+  it('stays out of a surface with no organizations to leave', () => {
+    renderWorkspaces({ hasOrganizations: false, memberships: [], activeOrganization: null });
+
+    // The trigger's label and the header it heads, and no third.
+    expect(screen.getAllByText('Alice Smith')).toHaveLength(2);
+  });
+});
+
+// The order the existing OrganizationSwitcher lists these in: what is on offer leads, invitations
+// ahead of suggestions, and the workspaces you already hold follow.
+describe('UserButtonView, workspace list order', () => {
+  it('leads with the invitations, then the suggestions, then the workspaces held', () => {
+    renderView({
+      mode: 'combined',
+      hasOrganizations: true,
+      memberships: [foundry],
+      activeOrganization: foundry,
+      suggestions: [{ kind: 'suggestion', id: 'sug_1', organizationId: 'org_3', name: 'Beta', status: 'pending' }],
+      invitations: [
+        { kind: 'invitation', id: 'inv_1', organizationId: 'org_2', organizationName: 'Gamma', status: 'pending' },
+      ],
+      onSelectOrganization: vi.fn(),
+      onAcceptInvitation: vi.fn(),
+      onAcceptSuggestion: vi.fn(),
+    });
+
+    const groups = Array.from(document.body.querySelectorAll('.cl-item-group'));
+    const list = groups.find(group => group.textContent?.includes('Gamma'));
+    const titles = Array.from(list?.querySelectorAll('.cl-item-title') ?? []).map(node => node.textContent);
+
+    expect(titles).toEqual(['Gamma', 'Beta', 'Alice Smith', 'Foundry']);
+  });
+});
+
 describe('UserButtonView, the scrolling workspace list', () => {
   // The workspace list is the one surface in the popover that scrolls, so it takes the shared
   // scroll area rather than a bare `overflow-y` of its own. `auto` rather than `stable`: a
