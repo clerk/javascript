@@ -24,7 +24,4 @@ export const styles = stylex.create({
     position: 'relative',
     top: 1,
   },
-  disabledText: {
-    opacity: 0.5,
-  },
 });
