@@ -22,8 +22,8 @@ export function Default(_args: Record<string, unknown>) {
   return (
     <UserProfileProfilePanelView
       emails={[
-        { id: 'email_1', value: 'item1@clerk.dev', isDefault: true },
-        { id: 'email_2', value: 'item2@clerk.dev' },
+        { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
+        { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
       ]}
       connectedAccounts={[
         {
@@ -37,16 +37,20 @@ export function Default(_args: Record<string, unknown>) {
       ]}
       imageUrl={profileImageUrl}
       name={name}
-      phones={[{ id: 'phone_1', value: '+1 801-888-8181' }]}
+      phones={[{ id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true }]}
       username={username}
       onAddEmail={() => undefined}
       onAddPhone={() => undefined}
       onConnectAccount={() => undefined}
       onDeleteAccount={() => undefined}
       onEditProfilePicture={() => undefined}
-      onManageEmail={() => undefined}
-      onManagePhone={() => undefined}
-      onManageConnectedAccount={() => undefined}
+      onRemoveConnectedAccount={() => undefined}
+      onRemoveEmail={() => undefined}
+      onRemovePhone={() => undefined}
+      onSetPrimaryEmail={() => undefined}
+      onSetPrimaryPhone={() => undefined}
+      onVerifyEmail={() => undefined}
+      onVerifyPhone={() => undefined}
       onNameChange={setName}
       onUsernameChange={setUsername}
     />

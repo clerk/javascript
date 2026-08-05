@@ -120,4 +120,94 @@ describe('UserProfileProfilePanelView', () => {
     expect(onAddEmail).toHaveBeenCalledOnce();
     expect(onManageEmail).toHaveBeenCalledWith('email_2');
   });
+
+  it('matches the existing conditional contact and connected-account actions', async () => {
+    const onVerifyEmail = vi.fn();
+    const onSetPrimaryEmail = vi.fn();
+    const onRemoveEmail = vi.fn();
+    const onVerifyPhone = vi.fn();
+    const onSetPrimaryPhone = vi.fn();
+    const onRemovePhone = vi.fn();
+    const onRemoveConnectedAccount = vi.fn();
+    const user = userEvent.setup();
+
+    renderView({
+      emails: [
+        { id: 'email_primary', value: 'primary@clerk.dev', isDefault: true, isVerified: false },
+        { id: 'email_secondary', value: 'secondary@clerk.dev', isVerified: true },
+        { id: 'email_unverified', value: 'unverified@clerk.dev', isVerified: false },
+      ],
+      phones: [
+        { id: 'phone_unverified', value: '+1 801-555-0100', isVerified: false },
+        { id: 'phone_secondary', value: '+1 801-555-0101', isVerified: true },
+      ],
+      connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz' }],
+      onVerifyEmail,
+      onSetPrimaryEmail,
+      onRemoveEmail,
+      onVerifyPhone,
+      onSetPrimaryPhone,
+      onRemovePhone,
+      onRemoveConnectedAccount,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Manage primary@clerk.dev' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Complete verification' }));
+    expect(onVerifyEmail).toHaveBeenCalledWith('email_primary');
+
+    await user.click(screen.getByRole('button', { name: 'Manage secondary@clerk.dev' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(onSetPrimaryEmail).toHaveBeenCalledWith('email_secondary');
+
+    await user.click(screen.getByRole('button', { name: 'Manage secondary@clerk.dev' }));
+    const removeEmail = screen.getByRole('menuitem', { name: 'Remove email' });
+    expect(removeEmail).toHaveAttribute('data-color', 'negative');
+    await user.click(removeEmail);
+    expect(onRemoveEmail).toHaveBeenCalledWith('email_secondary');
+
+    await user.click(screen.getByRole('button', { name: 'Manage unverified@clerk.dev' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+    expect(onVerifyEmail).toHaveBeenCalledWith('email_unverified');
+
+    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
+    expect(onVerifyPhone).toHaveBeenCalledWith('phone_unverified');
+
+    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
+    expect(onRemovePhone).toHaveBeenCalledWith('phone_unverified');
+
+    await user.click(screen.getByRole('button', { name: 'Manage +1 801-555-0101' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(onSetPrimaryPhone).toHaveBeenCalledWith('phone_secondary');
+
+    await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
+    const removeConnectedAccount = screen.getByRole('menuitem', { name: 'Remove' });
+    expect(removeConnectedAccount).toHaveAttribute('data-color', 'negative');
+    await user.click(removeConnectedAccount);
+    expect(onRemoveConnectedAccount).toHaveBeenCalledWith('github');
+  });
+
+  it('hides action triggers when immutable items have no available actions', () => {
+    renderView({
+      emails: [
+        {
+          id: 'email_immutable',
+          value: 'immutable@clerk.dev',
+          isDefault: true,
+          isVerified: true,
+          canRemove: false,
+        },
+      ],
+      phones: [],
+      connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz', canRemove: false }],
+      onVerifyEmail: vi.fn(),
+      onSetPrimaryEmail: vi.fn(),
+      onRemoveEmail: vi.fn(),
+      onRemoveConnectedAccount: vi.fn(),
+    });
+
+    expect(screen.queryByRole('button', { name: 'Manage immutable@clerk.dev' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument();
+  });
 });

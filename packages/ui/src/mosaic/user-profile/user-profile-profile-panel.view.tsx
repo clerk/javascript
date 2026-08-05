@@ -21,11 +21,16 @@ export interface UserProfileEmail {
   id: string;
   value: string;
   isDefault?: boolean;
+  isVerified?: boolean;
+  canRemove?: boolean;
 }
 
 export interface UserProfilePhone {
   id: string;
   value: string;
+  isDefault?: boolean;
+  isVerified?: boolean;
+  canRemove?: boolean;
 }
 
 export interface UserProfileConnectedAccount {
@@ -34,6 +39,7 @@ export interface UserProfileConnectedAccount {
   identifier?: string;
   iconUrl?: string;
   connected?: boolean;
+  canRemove?: boolean;
 }
 
 export interface UserProfileProfilePanelViewProps {
@@ -48,11 +54,46 @@ export interface UserProfileProfilePanelViewProps {
   onUsernameChange?: (value: string) => void;
   onAddEmail?: () => void;
   onManageEmail?: (id: string) => void;
+  onVerifyEmail?: (id: string) => void;
+  onSetPrimaryEmail?: (id: string) => void;
+  onRemoveEmail?: (id: string) => void;
   onAddPhone?: () => void;
   onManagePhone?: (id: string) => void;
+  onVerifyPhone?: (id: string) => void;
+  onSetPrimaryPhone?: (id: string) => void;
+  onRemovePhone?: (id: string) => void;
   onConnectAccount?: (id: string) => void;
   onManageConnectedAccount?: (id: string) => void;
+  onRemoveConnectedAccount?: (id: string) => void;
   onDeleteAccount?: () => void;
+}
+
+interface ProfileMenuAction {
+  label: string;
+  color?: 'neutral' | 'negative';
+  onClick: () => void;
+}
+
+function ProfileActionMenu({ label, actions }: { label: string; actions: ProfileMenuAction[] }) {
+  if (actions.length === 0) {
+    return null;
+  }
+
+  return (
+    <Menu.Root placement='bottom-end'>
+      <Menu.Trigger aria-label={label} />
+      <Menu.Content>
+        {actions.map(action => (
+          <Menu.Item
+            key={action.label}
+            color={action.color}
+            label={action.label}
+            onClick={action.onClick}
+          />
+        ))}
+      </Menu.Content>
+    </Menu.Root>
+  );
 }
 
 function Divider() {
@@ -87,8 +128,14 @@ function AccountSection({
   onUsernameChange,
   onAddEmail,
   onManageEmail,
+  onVerifyEmail,
+  onSetPrimaryEmail,
+  onRemoveEmail,
   onAddPhone,
   onManagePhone,
+  onVerifyPhone,
+  onSetPrimaryPhone,
+  onRemovePhone,
 }: Pick<
   UserProfileProfilePanelViewProps,
   | 'imageUrl'
@@ -101,8 +148,14 @@ function AccountSection({
   | 'onUsernameChange'
   | 'onAddEmail'
   | 'onManageEmail'
+  | 'onVerifyEmail'
+  | 'onSetPrimaryEmail'
+  | 'onRemoveEmail'
   | 'onAddPhone'
   | 'onManagePhone'
+  | 'onVerifyPhone'
+  | 'onSetPrimaryPhone'
+  | 'onRemovePhone'
 >) {
   const initials = name
     .split(/\s+/)
@@ -191,15 +244,23 @@ function AccountSection({
           <ContactSection
             divided
             items={emails}
+            kind='email'
             label='Email'
             onAdd={onAddEmail}
             onManage={onManageEmail}
+            onRemove={onRemoveEmail}
+            onSetPrimary={onSetPrimaryEmail}
+            onVerify={onVerifyEmail}
           />
           <ContactSection
             items={phones}
+            kind='phone'
             label='Phone'
             onAdd={onAddPhone}
             onManage={onManagePhone}
+            onRemove={onRemovePhone}
+            onSetPrimary={onSetPrimaryPhone}
+            onVerify={onVerifyPhone}
           />
         </Card.Content>
       </Card.Root>
@@ -211,10 +272,12 @@ function ConnectedAccountsSection({
   accounts,
   onConnect,
   onManage,
+  onRemove,
 }: {
   accounts: UserProfileConnectedAccount[];
   onConnect?: (id: string) => void;
   onManage?: (id: string) => void;
+  onRemove?: (id: string) => void;
 }) {
   return (
     <section
@@ -236,6 +299,16 @@ function ConnectedAccountsSection({
           <Item.Group>
             {accounts.map((account, index) => {
               const connected = account.connected ?? Boolean(account.identifier);
+              const actions: ProfileMenuAction[] = [];
+              if (onRemove && account.canRemove !== false) {
+                actions.push({
+                  label: 'Remove',
+                  color: 'negative',
+                  onClick: () => onRemove(account.id),
+                });
+              } else if (!onRemove && onManage) {
+                actions.push({ label: 'Manage', onClick: () => onManage(account.id) });
+              }
               return (
                 <Fragment key={account.id}>
                   {index > 0 ? (
@@ -266,16 +339,11 @@ function ConnectedAccountsSection({
                       {account.identifier ? <Item.Description>{account.identifier}</Item.Description> : null}
                     </Item.Content>
                     <Item.Actions>
-                      {connected && onManage ? (
-                        <Menu.Root placement='bottom-end'>
-                          <Menu.Trigger aria-label={`Manage ${account.provider}`} />
-                          <Menu.Content>
-                            <Menu.Item
-                              label='Manage'
-                              onClick={() => onManage(account.id)}
-                            />
-                          </Menu.Content>
-                        </Menu.Root>
+                      {connected ? (
+                        <ProfileActionMenu
+                          actions={actions}
+                          label={`Manage ${account.provider}`}
+                        />
                       ) : null}
                       {!connected && onConnect ? (
                         <Button
@@ -348,16 +416,24 @@ function DangerZoneSection({ onDelete }: { onDelete: () => void }) {
 }
 
 function ContactSection({
+  kind,
   label,
   items,
   onAdd,
   onManage,
+  onVerify,
+  onSetPrimary,
+  onRemove,
   divided,
 }: {
+  kind: 'email' | 'phone';
   label: string;
-  items: Array<{ id: string; value: string; isDefault?: boolean }>;
+  items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
   onAdd?: () => void;
   onManage?: (id: string) => void;
+  onVerify?: (id: string) => void;
+  onSetPrimary?: (id: string) => void;
+  onRemove?: (id: string) => void;
   divided?: boolean;
 }) {
   return (
@@ -387,44 +463,65 @@ function ContactSection({
         ) : null}
       </div>
       <Item.Group {...stylex.props(styles.contactList)}>
-        {items.map(item => (
-          <Item.Root
-            key={item.id}
-            size='xs'
-          >
-            <Item.Content>
-              <div {...stylex.props(styles.contactValue)}>
-                <Text
-                  render={props => <span {...props} />}
-                  color='neutral'
-                >
-                  {item.value}
-                </Text>
-                {item.isDefault ? (
-                  <Badge
+        {items.map(item => {
+          const actions: ProfileMenuAction[] = [];
+          const hasExplicitActions = Boolean(onVerify || onSetPrimary || onRemove);
+
+          if (item.isVerified === false && onVerify) {
+            actions.push({
+              label: item.isDefault ? 'Complete verification' : kind === 'email' ? 'Verify' : 'Verify phone number',
+              onClick: () => onVerify(item.id),
+            });
+          } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
+            actions.push({ label: 'Set as primary', onClick: () => onSetPrimary(item.id) });
+          }
+
+          if (onRemove && item.canRemove !== false) {
+            actions.push({
+              label: kind === 'email' ? 'Remove email' : 'Remove phone number',
+              color: 'negative',
+              onClick: () => onRemove(item.id),
+            });
+          }
+
+          if (!hasExplicitActions && onManage) {
+            actions.push({ label: 'Manage', onClick: () => onManage(item.id) });
+          }
+
+          return (
+            <Item.Root
+              key={item.id}
+              size='xs'
+            >
+              <Item.Content>
+                <div {...stylex.props(styles.contactValue)}>
+                  <Text
+                    render={props => <span {...props} />}
                     color='neutral'
-                    style={{ backgroundColor: 'rgba(23, 23, 23, 0.06)', color: 'inherit' }}
                   >
-                    Default
-                  </Badge>
-                ) : null}
-              </div>
-            </Item.Content>
-            {onManage ? (
-              <Item.Actions>
-                <Menu.Root placement='bottom-end'>
-                  <Menu.Trigger aria-label={`Manage ${item.value}`} />
-                  <Menu.Content>
-                    <Menu.Item
-                      label='Manage'
-                      onClick={() => onManage(item.id)}
-                    />
-                  </Menu.Content>
-                </Menu.Root>
-              </Item.Actions>
-            ) : null}
-          </Item.Root>
-        ))}
+                    {item.value}
+                  </Text>
+                  {item.isDefault ? (
+                    <Badge
+                      color='neutral'
+                      style={{ backgroundColor: 'rgba(23, 23, 23, 0.06)', color: 'inherit' }}
+                    >
+                      Default
+                    </Badge>
+                  ) : null}
+                </div>
+              </Item.Content>
+              {actions.length > 0 ? (
+                <Item.Actions>
+                  <ProfileActionMenu
+                    actions={actions}
+                    label={`Manage ${item.value}`}
+                  />
+                </Item.Actions>
+              ) : null}
+            </Item.Root>
+          );
+        })}
       </Item.Group>
       {divided ? <Divider /> : null}
     </section>
@@ -443,10 +540,17 @@ export function UserProfileProfilePanelView({
   onUsernameChange,
   onAddEmail,
   onManageEmail,
+  onVerifyEmail,
+  onSetPrimaryEmail,
+  onRemoveEmail,
   onAddPhone,
   onManagePhone,
+  onVerifyPhone,
+  onSetPrimaryPhone,
+  onRemovePhone,
   onConnectAccount,
   onManageConnectedAccount,
+  onRemoveConnectedAccount,
   onDeleteAccount,
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
@@ -468,6 +572,12 @@ export function UserProfileProfilePanelView({
         onEditProfilePicture={onEditProfilePicture}
         onManageEmail={onManageEmail}
         onManagePhone={onManagePhone}
+        onRemoveEmail={onRemoveEmail}
+        onRemovePhone={onRemovePhone}
+        onSetPrimaryEmail={onSetPrimaryEmail}
+        onSetPrimaryPhone={onSetPrimaryPhone}
+        onVerifyEmail={onVerifyEmail}
+        onVerifyPhone={onVerifyPhone}
         onNameChange={onNameChange}
         onUsernameChange={onUsernameChange}
       />
@@ -476,6 +586,7 @@ export function UserProfileProfilePanelView({
           accounts={connectedAccounts}
           onConnect={onConnectAccount}
           onManage={onManageConnectedAccount}
+          onRemove={onRemoveConnectedAccount}
         />
       ) : null}
       {onDeleteAccount ? <DangerZoneSection onDelete={onDeleteAccount} /> : null}
