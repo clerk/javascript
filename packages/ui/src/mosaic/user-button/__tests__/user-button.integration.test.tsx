@@ -194,7 +194,8 @@ async function open() {
   return act;
 }
 
-const accountMenu = () => screen.getByRole('button', { name: 'Actions for alice@example.com' });
+// Alice has a username, so that is what identifies her row; Bob has none and falls back to email.
+const accountMenu = () => screen.getByRole('button', { name: 'Actions for alice' });
 
 /** Opens the `⋯` on the active account's row and clicks one of its actions. */
 async function accountAction(act: ReturnType<typeof userEvent.setup>, label: string) {
