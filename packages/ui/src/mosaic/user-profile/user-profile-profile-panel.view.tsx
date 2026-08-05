@@ -195,7 +195,7 @@ function AccountSection({
         <Card.Content style={{ paddingInline: 0 }}>
           <div {...mergeStyleProps(themeProps('user-profile-profile-panel-picture-row'), stylex.props(styles.row))}>
             <Text
-              color='neutral'
+              color='primary'
               style={{ fontWeight: 510 }}
             >
               Profile picture
@@ -392,7 +392,7 @@ function DangerZoneSection({ onDelete }: { onDelete: () => void }) {
         <Card.Content style={{ paddingInline: 0 }}>
           <div {...stylex.props(styles.row)}>
             <div {...stylex.props(styles.dangerContent)}>
-              <Text color='neutral'>Delete account</Text>
+              <Text color='primary'>Delete account</Text>
               <Text
                 color='neutral'
                 size='xs'
@@ -446,7 +446,7 @@ function ContactSection({
       >
         <Text
           id={`user-profile-profile-panel-${label.toLowerCase()}`}
-          color='neutral'
+          color='primary'
           style={{ fontWeight: 510 }}
         >
           {label}
@@ -497,7 +497,7 @@ function ContactSection({
                 <div {...stylex.props(styles.contactValue)}>
                   <Text
                     render={props => <span {...props} />}
-                    color='neutral'
+                    color='primary'
                   >
                     {item.value}
                   </Text>

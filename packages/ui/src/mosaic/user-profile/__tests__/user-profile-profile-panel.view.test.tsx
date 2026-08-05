@@ -45,6 +45,10 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
     expect(screen.getByText('+1 801-888-8181')).toBeInTheDocument();
+    expect(screen.getByText('Profile picture')).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByText('Email')).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByText('Phone')).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByText('item1@clerk.dev')).toHaveAttribute('data-color', 'primary');
     const editProfilePicture = screen.getByRole('button', { name: 'Edit profile picture' });
     expect(editProfilePicture).toHaveAttribute('data-size', 'lg');
     expect(editProfilePicture.querySelector('.cl-avatar')).not.toBeNull();
@@ -82,6 +86,8 @@ describe('UserProfileProfilePanelView', () => {
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: 'p' })).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByText('This action is permanent and irreversible.')).toHaveAttribute('data-color', 'neutral');
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
     expect(onManageConnectedAccount).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
