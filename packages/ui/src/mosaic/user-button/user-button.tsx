@@ -2,15 +2,33 @@
 
 import { useState } from 'react';
 
+import type { CustomProfileItem } from '../hooks/useCustomPages';
+import { useCustomPages } from '../hooks/useCustomPages';
 import { useSpinDelay } from '../hooks/useSpinDelay';
+import type { UserProfilePageId } from '../hooks/useUserProfilePages';
+import { useUserProfilePages } from '../hooks/useUserProfilePages';
 import type { UserButtonController, UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
 import type { UserButtonRootProps, UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonTriggerSkeleton, UserButtonView } from './user-button.view';
 
+/** Configures the UserProfile this button opens. */
+export interface UserButtonUserProfileProps {
+  /** Pages and links of your own, added to the profile's navigation. */
+  customPages?: CustomProfileItem[];
+  /**
+   * The order the profile's navigation runs in, by id: a built-in page's id, or a custom entry's
+   * `path` or `href`. Anything left out follows the pages named here. The first page is the one the
+   * profile opens on, so it cannot be a link.
+   */
+  pageOrder?: (UserProfilePageId | (string & {}))[];
+}
+
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
-  Pick<UserButtonRootProps, 'mode' | 'modePriority'>;
+  Pick<UserButtonRootProps, 'mode' | 'modePriority'> & {
+    userProfileProps?: UserButtonUserProfileProps;
+  };
 
 /** The one action in flight: which affordance owns it, and what the surface froze on to run it. */
 interface PendingAction {
@@ -31,9 +49,19 @@ export function UserButton({
   renderPlanBadge,
   mode,
   modePriority,
+  userProfileProps,
   ...options
 }: UserButtonProps = {}) {
-  const controller = useUserButtonController(options);
+  // The profile opens in clerk-js's own React root, so its custom pages reach it as portals rendered
+  // from here. They have to outlive the popover that opened it, and the button's own data with it,
+  // which is why they hang off the container rather than anything the popover renders.
+  const builtInPages = useUserProfilePages();
+  const { customPages, portals } = useCustomPages({
+    items: userProfileProps?.customPages,
+    order: userProfileProps?.pageOrder,
+    builtInPages,
+  });
+  const controller = useUserButtonController(options, customPages);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState<PendingAction | null>(null);
 
@@ -43,15 +71,18 @@ export function UserButton({
 
   if (controller.status === 'loading') {
     return (
-      <UserButtonTriggerSkeleton
-        mode={mode}
-        modePriority={modePriority}
-      />
+      <>
+        <UserButtonTriggerSkeleton
+          mode={mode}
+          modePriority={modePriority}
+        />
+        {portals}
+      </>
     );
   }
 
   if (controller.status !== 'ready') {
-    return null;
+    return <>{portals}</>;
   }
 
   const close = () => setOpen(false);
@@ -108,26 +139,29 @@ export function UserButton({
   } = action?.snapshot ?? controller;
 
   return (
-    <UserButtonView
-      {...data}
-      renderTriggerLabel={renderTriggerLabel}
-      renderPlanBadge={renderPlanBadge}
-      mode={mode}
-      modePriority={modePriority}
-      open={open}
-      onOpenChange={setOpen}
-      pendingKey={displayPendingKey}
-      onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
-      onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
-      onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
-      onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
-      onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
-      onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
-      onManageAccount={handOff(onManageAccount)}
-      onManageOrganization={handOff(onManageOrganization)}
-      onInviteMembers={handOff(onInviteMembers)}
-      onCreateOrganization={handOff(onCreateOrganization)}
-      onAddAccount={handOff(onAddAccount)}
-    />
+    <>
+      <UserButtonView
+        {...data}
+        renderTriggerLabel={renderTriggerLabel}
+        renderPlanBadge={renderPlanBadge}
+        mode={mode}
+        modePriority={modePriority}
+        open={open}
+        onOpenChange={setOpen}
+        pendingKey={displayPendingKey}
+        onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
+        onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
+        onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
+        onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
+        onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
+        onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
+        onManageAccount={handOff(onManageAccount)}
+        onManageOrganization={handOff(onManageOrganization)}
+        onInviteMembers={handOff(onInviteMembers)}
+        onCreateOrganization={handOff(onCreateOrganization)}
+        onAddAccount={handOff(onAddAccount)}
+      />
+      {portals}
+    </>
   );
 }

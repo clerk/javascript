@@ -11,4 +11,11 @@
  * @experimental The surface and the components behind it are subject to change.
  */
 export { UserButton } from '@clerk/ui/experimental/mosaic';
-export type { UserButtonProps } from '@clerk/ui/experimental/mosaic';
+export type {
+  CustomProfileItem,
+  CustomProfileLink,
+  CustomProfilePage,
+  UserButtonProps,
+  UserButtonUserProfileProps,
+  UserProfilePageId,
+} from '@clerk/ui/experimental/mosaic';

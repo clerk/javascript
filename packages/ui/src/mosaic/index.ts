@@ -3,5 +3,7 @@
 // `./styles` is the build barrel, and re-exporting it would publish the headless primitive types too.
 import './styles';
 
+export type { CustomProfileItem, CustomProfileLink, CustomProfilePage } from './hooks/useCustomPages';
+export type { UserProfilePageId } from './hooks/useUserProfilePages';
 export { UserButton } from './user-button/user-button';
-export type { UserButtonProps } from './user-button/user-button';
+export type { UserButtonProps, UserButtonUserProfileProps } from './user-button/user-button';
