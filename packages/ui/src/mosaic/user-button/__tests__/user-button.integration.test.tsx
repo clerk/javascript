@@ -51,6 +51,8 @@ let singleSessionMode: boolean;
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
 let navigate: ReturnType<typeof vi.fn>;
+let openUserProfile: ReturnType<typeof vi.fn>;
+let openOrganizationProfile: ReturnType<typeof vi.fn>;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -63,6 +65,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       navigate,
       setActive,
       signOut,
+      openUserProfile,
+      openOrganizationProfile,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -150,6 +154,8 @@ beforeEach(() => {
   setActive = vi.fn().mockResolvedValue(undefined);
   signOut = vi.fn().mockResolvedValue(undefined);
   navigate = vi.fn().mockResolvedValue(undefined);
+  openUserProfile = vi.fn();
+  openOrganizationProfile = vi.fn();
 });
 
 afterEach(() => {
@@ -344,23 +350,25 @@ describe('UserButton (connected)', () => {
     expect(screen.queryByRole('menuitem', { name: 'Add account' })).toBeNull();
   });
 
-  it('managing the account navigates and leaves the popover open', async () => {
+  it('managing the account opens the UserProfile modal and leaves the popover open', async () => {
     renderUserButton();
     const act = await open();
 
     await accountAction(act, 'Manage account');
 
-    expect(navigate).toHaveBeenCalledWith('/user-profile');
+    expect(openUserProfile).toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
     expect(popup()).toBeInTheDocument();
   });
 
-  it('inviting members navigates and leaves the popover open', async () => {
+  it('inviting members opens the OrganizationProfile modal and leaves the popover open', async () => {
     renderUserButton();
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'Invite' }));
 
-    expect(navigate).toHaveBeenCalledWith('/org-profile');
+    expect(openOrganizationProfile).toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
     expect(popup()).toBeInTheDocument();
   });
 
