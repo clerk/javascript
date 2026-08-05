@@ -52,12 +52,11 @@ type OrganizationProfileMode =
 export type UserButtonControllerOptions = UserProfileMode &
   OrganizationProfileMode & {
     afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
+    /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
+    afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
   };
 
-function resolveAfterSelectUrl(
-  config: AfterSelectUrl<OrganizationResource> | undefined,
-  entity: OrganizationResource,
-): string | undefined {
+function resolveAfterSelectUrl<T extends object>(config: AfterSelectUrl<T> | undefined, entity: T): string | undefined {
   if (typeof config === 'function') {
     return config(entity);
   }
@@ -202,6 +201,16 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     return [toSession(s.id, sessionUser)];
   });
 
+  // `null` is Clerk's own name for the personal workspace, and it has no organization to resolve
+  // against, so it takes its own URL rather than the organizations'.
+  const afterSelectUrl = (organizationId: string | null): string | undefined => {
+    if (!organizationId) {
+      return resolveAfterSelectUrl(options?.afterSelectPersonalUrl, user);
+    }
+    const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
+    return selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
+  };
+
   return {
     status: 'ready',
     activeSession: toSession(session.id, user),
@@ -222,17 +231,8 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
-    // `null` is Clerk's own name for the personal workspace. It has no organization to resolve a
-    // redirect against, so `afterSelectOrganizationUrl` has nothing to say about it.
-    onSelectOrganization: organizationId => {
-      const selected = organizationId
-        ? membershipData.find(m => m.organization.id === organizationId)?.organization
-        : undefined;
-      return clerk.setActive({
-        organization: organizationId,
-        redirectUrl: selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined,
-      });
-    },
+    onSelectOrganization: organizationId =>
+      clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
     onSwitchSession: sessionId =>
       clerk.setActive({ session: sessionId, redirectUrl: displayConfig?.afterSwitchSessionUrl }),
     onSignOutSession: sessionId =>

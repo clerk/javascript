@@ -439,13 +439,34 @@ describe('useUserButtonController', () => {
     expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/Other' });
   });
 
-  // `null` is Clerk's own name for the personal workspace, so selecting it is the same call with
-  // nothing to resolve a redirect against.
+  // `null` is Clerk's own name for the personal workspace. There is no organization to resolve a
+  // redirect against, so `afterSelectOrganizationUrl` has nothing to say about it.
   it('selects the personal workspace by clearing the active organization', () => {
     render(<Harness afterSelectOrganizationUrl='/orgs/:id' />);
 
     fireEvent.click(screen.getByText('select-personal'));
     expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
+  });
+
+  // Its own redirect, resolved against the user the way an organization's is resolved against the
+  // organization.
+  it('redirects the personal workspace to the configured afterSelectPersonalUrl', () => {
+    const { rerender } = render(<Harness afterSelectPersonalUrl='/u/:id' />);
+
+    fireEvent.click(screen.getByText('select-personal'));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/u/user_1' });
+
+    rerender(<Harness afterSelectPersonalUrl={u => `/u/${u.username}`} />);
+    fireEvent.click(screen.getByText('select-personal'));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: '/u/alice' });
+  });
+
+  // The two are configured apart, so routing the personal workspace leaves the organizations alone.
+  it('keeps the personal redirect off the organizations', () => {
+    render(<Harness afterSelectPersonalUrl='/u/:id' />);
+
+    fireEvent.click(screen.getByText('select-org'));
+    expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: undefined });
   });
 
   it('switches sessions and routes each sign out to the URL that matches what is left', () => {
