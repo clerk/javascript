@@ -186,6 +186,12 @@ function Harness(options: UserButtonControllerOptions = {}) {
       </button>
       <button
         type='button'
+        onClick={() => void c.onSelectOrganization?.(null)}
+      >
+        select-personal
+      </button>
+      <button
+        type='button'
         onClick={() => void c.onSwitchSession?.('sess_2')}
       >
         switch
@@ -431,6 +437,15 @@ describe('useUserButtonController', () => {
     rerender(<Harness afterSelectOrganizationUrl={org => `/o/${org.name}`} />);
     fireEvent.click(screen.getByText('select-org'));
     expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/Other' });
+  });
+
+  // `null` is Clerk's own name for the personal workspace, so selecting it is the same call with
+  // nothing to resolve a redirect against.
+  it('selects the personal workspace by clearing the active organization', () => {
+    render(<Harness afterSelectOrganizationUrl='/orgs/:id' />);
+
+    fireEvent.click(screen.getByText('select-personal'));
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
   });
 
   it('switches sessions and routes each sign out to the URL that matches what is left', () => {
