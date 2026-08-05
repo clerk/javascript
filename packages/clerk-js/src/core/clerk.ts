@@ -122,7 +122,6 @@ import type {
   SignOut,
   SignOutCallback,
   SignOutOptions,
-  SignUpField,
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
@@ -150,7 +149,6 @@ import { ModuleManager } from '@/utils/moduleManager';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
@@ -163,6 +161,7 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
+  navigateToNextStepSignUp,
   removeClerkQueryParam,
   requiresUserInput,
   stripOrigin,
@@ -1912,14 +1911,7 @@ export class Clerk implements ClerkInterface {
               );
             }
           } else if (redirectUrl) {
-            if (this.client.isEligibleForTouch()) {
-              const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-              const redirectUrlWithAuth = this.buildUrlWithAuth(
-                this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
-              );
-              await this.navigate(redirectUrlWithAuth);
-            }
-            await this.navigate(redirectUrl);
+            await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
           }
         });
       }
@@ -2345,6 +2337,14 @@ export class Clerk implements ClerkInterface {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.Expired);
     } else if (verificationStatus === 'client_mismatch') {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.ClientMismatch);
+    } else if (verificationStatus === 'transferable') {
+      // signUpIfMissing flow: the email was verified but the user doesn't exist, so there is
+      // no session to complete here. The sign-up transfer is banked on the client that owns
+      // the sign-in; consuming it is left to the caller, which knows where to route next.
+      if (typeof params.onVerifiedOnOtherDevice === 'function') {
+        params.onVerifiedOnOtherDevice();
+      }
+      return;
     } else if (verificationStatus !== 'verified') {
       throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
     }
@@ -2491,54 +2491,20 @@ export class Clerk implements ClerkInterface {
 
     const redirectUrls = new RedirectUrls(this.#options, params);
 
-    const navigateToContinueSignUp = makeNavigate(
+    const continueSignUpUrl =
       params.continueSignUpUrl ||
-        buildURL(
-          {
-            base: displayConfig.signUpUrl,
-            hashPath: '/continue',
-          },
-          { stringify: true },
-        ),
-    );
-
-    const navigateToSignUpProtectCheck = makeNavigate(
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true });
+    const verifyEmailAddressUrl =
+      params.verifyEmailAddressUrl ||
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-email-address' }, { stringify: true });
+    const verifyPhoneNumberUrl =
+      params.verifyPhoneNumberUrl ||
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true });
+    const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
-        buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
-    );
+      buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
 
-    const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
-      // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
-      // check must run BEFORE the generic missing-fields short-circuit below — otherwise the
-      // OAuth/SAML callback would land on /continue instead of the challenge.
-      if (signUp.protectCheck || missingFields.includes('protect_check')) {
-        return navigateToSignUpProtectCheck();
-      }
-
-      if (missingFields.length) {
-        return navigateToContinueSignUp();
-      }
-
-      return completeSignUpFlow({
-        signUp,
-        verifyEmailPath:
-          params.verifyEmailAddressUrl ||
-          buildURL(
-            {
-              base: displayConfig.signUpUrl,
-              hashPath: '/verify-email-address',
-            },
-            { stringify: true },
-          ),
-        verifyPhonePath:
-          params.verifyPhoneNumberUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
-        protectCheckPath:
-          params.signUpProtectCheckUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true }),
-        navigate,
-      });
-    };
+    const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
@@ -2684,7 +2650,14 @@ export class Clerk implements ClerkInterface {
             },
           });
         case 'missing_requirements':
-          return navigateToNextStepSignUp({ missingFields: res.missingFields });
+          return navigateToNextStepSignUp({
+            signUp: res,
+            continueSignUpUrl,
+            verifyEmailAddressUrl,
+            verifyPhoneNumberUrl,
+            signUpProtectCheckUrl,
+            navigate,
+          });
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
@@ -2739,7 +2712,14 @@ export class Clerk implements ClerkInterface {
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
-      return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
+      return navigateToNextStepSignUp({
+        signUp,
+        continueSignUpUrl,
+        verifyEmailAddressUrl,
+        verifyPhoneNumberUrl,
+        signUpProtectCheckUrl,
+        navigate,
+      });
     }
 
     if (this.session?.currentTask) {

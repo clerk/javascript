@@ -45,7 +45,10 @@ function MenuInner(props: MenuProps) {
   const tree = useFloatingTree();
   const nodeId = useFloatingNodeId();
   const parentId = useFloatingParentNodeId();
-  const isNested = parentId != null;
+  // A submenu, not merely a menu inside some other floating element. A menu rendered in a popover
+  // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
+  // unclickable by mouse.
+  const isNested = parentId != null && parentContext != null;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -97,7 +100,17 @@ function MenuInner(props: MenuProps) {
     toggle: !isNested,
     ignoreMouse: isNested,
   });
-  const role = useRole(floatingContext, { role: 'menu' });
+  const baseRole = useRole(floatingContext, { role: 'menu' });
+  // `useRole` decides submenu-ness from the floating tree alone, so a menu inside a popover gets
+  // `role="menuitem"` on its trigger with no parent menu to be an item of. `isNested` is the real answer.
+  const role = useMemo(() => {
+    if (isNested) {
+      return baseRole;
+    }
+    const reference = { ...baseRole.reference };
+    delete reference.role;
+    return { ...baseRole, reference };
+  }, [baseRole, isNested]);
   const dismiss = useDismiss(floatingContext, { bubbles: true });
   const listNavigation = useListNavigation(floatingContext, {
     listRef: elementsRef,

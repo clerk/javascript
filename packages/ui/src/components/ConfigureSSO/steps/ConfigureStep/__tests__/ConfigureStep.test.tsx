@@ -14,7 +14,6 @@ import type { EnterpriseConnectionProviderType } from '../../../types';
 // left undefined so that footer self-hides in this isolated render.
 const contextState = vi.hoisted(() => ({
   provider: undefined as string | undefined,
-  isOIDCFlowEnabled: true,
   enterpriseConnection: undefined as
     | {
         id: string;
@@ -45,7 +44,6 @@ vi.mock('../../../ConfigureSSOContext', () => ({
       provider: contextState.provider,
       hasConnection: true,
     },
-    isOIDCFlowEnabled: contextState.isOIDCFlowEnabled,
   }),
 }));
 
@@ -63,34 +61,28 @@ const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
 describe('resolveConfigureSteps', () => {
   it('dispatches custom and legacy OIDC provider keys to the OIDC sub-flow', () => {
-    expect(resolveConfigureSteps('oauth_custom_clerk_dev', true)).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_clerk_dev', true)).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_ghe_acme', true)).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_gitlab_ent_acme', true)).toBe(OidcCustomConfigureSteps);
-    expect(resolveConfigureSteps('oidc_custom', true)).toBe(OidcCustomConfigureSteps);
-  });
-
-  it('does not dispatch OIDC providers while the experimental flow is disabled', () => {
-    expect(resolveConfigureSteps('oauth_custom_clerk_dev', false)).toBeUndefined();
-    expect(resolveConfigureSteps('oidc_clerk_dev', false)).toBeUndefined();
+    expect(resolveConfigureSteps('oauth_custom_clerk_dev')).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_clerk_dev')).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_ghe_acme')).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_gitlab_ent_acme')).toBe(OidcCustomConfigureSteps);
+    expect(resolveConfigureSteps('oidc_custom')).toBe(OidcCustomConfigureSteps);
   });
 
   it('dispatches SAML providers by exact literal', () => {
-    expect(resolveConfigureSteps('saml_okta', false)).toBe(SamlOktaConfigureSteps);
-    expect(resolveConfigureSteps('saml_custom', false)).toBe(SamlCustomConfigureSteps);
-    expect(resolveConfigureSteps('saml_google', false)).toBe(SamlGoogleConfigureSteps);
-    expect(resolveConfigureSteps('saml_microsoft', false)).toBe(SamlMicrosoftConfigureSteps);
+    expect(resolveConfigureSteps('saml_okta')).toBe(SamlOktaConfigureSteps);
+    expect(resolveConfigureSteps('saml_custom')).toBe(SamlCustomConfigureSteps);
+    expect(resolveConfigureSteps('saml_google')).toBe(SamlGoogleConfigureSteps);
+    expect(resolveConfigureSteps('saml_microsoft')).toBe(SamlMicrosoftConfigureSteps);
   });
 
   it('returns undefined for an unrecognized provider so the caller can degrade', () => {
-    expect(resolveConfigureSteps('ldap_enterprise' as EnterpriseConnectionProviderType, true)).toBeUndefined();
+    expect(resolveConfigureSteps('ldap_enterprise' as EnterpriseConnectionProviderType)).toBeUndefined();
   });
 });
 
 describe('ConfigureProviderStep', () => {
   beforeEach(() => {
     contextState.provider = undefined;
-    contextState.isOIDCFlowEnabled = true;
     contextState.enterpriseConnection = undefined;
     updateConnection.mockReset();
   });
@@ -468,16 +460,5 @@ describe('ConfigureProviderStep', () => {
     renderStep(wrapper);
 
     expect(await screen.findByText(/unsupported provider/i)).toBeInTheDocument();
-  });
-
-  it('degrades to the unsupported-provider state for an existing OIDC connection when the flag is off', async () => {
-    contextState.provider = 'oauth_custom_clerk_dev';
-    contextState.isOIDCFlowEnabled = false;
-    const { wrapper } = await createFixtures();
-
-    renderStep(wrapper);
-
-    expect(await screen.findByText(/unsupported provider/i)).toBeInTheDocument();
-    expect(screen.queryByText(/create a new oidc application/i)).not.toBeInTheDocument();
   });
 });

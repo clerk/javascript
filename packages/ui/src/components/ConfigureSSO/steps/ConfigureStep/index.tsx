@@ -28,13 +28,8 @@ const STEPS_BY_SAML_PROVIDER: Record<SamlProviderType, ConfigureStepsComponent> 
 
 export const resolveConfigureSteps = (
   provider: EnterpriseConnectionProviderType,
-  isOIDCFlowEnabled: boolean,
-): ConfigureStepsComponent | undefined => {
-  if (isOidcProvider(provider)) {
-    return isOIDCFlowEnabled ? OidcCustomConfigureSteps : undefined;
-  }
-  return STEPS_BY_SAML_PROVIDER[provider];
-};
+): ConfigureStepsComponent | undefined =>
+  isOidcProvider(provider) ? OidcCustomConfigureSteps : STEPS_BY_SAML_PROVIDER[provider];
 
 export const ConfigureStep = (): JSX.Element => {
   const { organizationEnterpriseConnection: c } = useConfigureSSO();
@@ -68,13 +63,13 @@ export const ConfigureStep = (): JSX.Element => {
 };
 
 export const ConfigureProviderStep = (): JSX.Element | null => {
-  const { organizationEnterpriseConnection: c, isOIDCFlowEnabled } = useConfigureSSO();
+  const { organizationEnterpriseConnection: c } = useConfigureSSO();
 
   if (!c.provider) {
     return null;
   }
 
-  const ConfigureSteps = resolveConfigureSteps(c.provider, isOIDCFlowEnabled);
+  const ConfigureSteps = resolveConfigureSteps(c.provider);
 
   return (
     <Flow.Part part='configureCreateApp'>

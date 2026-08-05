@@ -1,5 +1,21 @@
 # Change Log
 
+## 6.12.11
+
+### Patch Changes
+
+- Allow `ClerkProvider` to omit `publishableKey` when it is supplied through `VITE_CLERK_PUBLISHABLE_KEY` or `CLERK_PUBLISHABLE_KEY`. ([#9314](https://github.com/clerk/javascript/pull/9314)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
+## 6.12.10
+
+### Patch Changes
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
 ## 6.12.9
 
 ### Patch Changes

@@ -1,5 +1,42 @@
 # @clerk/ui
 
+## 1.28.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+### Patch Changes
+
+- fix(ui): Avoid races between email link tabs when using sign up if missing ([#9328](https://github.com/clerk/javascript/pull/9328)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+  - @clerk/localizations@4.14.0
+
+## 1.27.2
+
+### Patch Changes
+
+- Enable self-serve OIDC configuration for every application. Organization admins can now select an OIDC provider in the `<OrganizationProfile />` Security tab without the `experimental.oidcSelfServe` option, and existing OIDC connections open their configuration steps instead of the unsupported-provider state. The `experimental.oidcSelfServe` option no longer does anything and can be removed from `<ClerkProvider />` and `Clerk.load()`. ([#9288](https://github.com/clerk/javascript/pull/9288)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+  - @clerk/localizations@4.13.10
+
+## 1.27.1
+
+### Patch Changes
+
+- Prevent phone number and multi-email fields from crashing when they receive paste events without clipboard data. ([#9274](https://github.com/clerk/javascript/pull/9274)) by [@brkalow](https://github.com/brkalow)
+
 ## 1.27.0
 
 ### Minor Changes

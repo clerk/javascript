@@ -1,5 +1,29 @@
 # Change Log
 
+## 3.15.1
+
+### Patch Changes
+
+- Add the optional `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` parameters to `CreateUserParams`. The Backend API has supported these arrays on `POST /v1/users` since they shipped, but `createUser()` had no way to pass them, so every email address and phone number was necessarily created verified. Each array runs parallel to `emailAddress` / `phoneNumber` — one item per identifier, applied by position — and an item set to `'reserved'` creates that identifier unverified but still usable for sign-in and locked so no other user can claim it. ([#9305](https://github.com/clerk/javascript/pull/9305)) by [@dmoerner](https://github.com/dmoerner)
+
+  The `createUser()` documentation is corrected accordingly: it stated unconditionally that created email addresses and phone numbers are automatically verified, which is only the default.
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
+## 3.15.0
+
+### Minor Changes
+
+- Update fields for BillingSubscription and BillingSubscriptionItem ([#9196](https://github.com/clerk/javascript/pull/9196)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Return a `TokenVerificationError` from `decodeJwt` and `verifyToken` for tokens whose header, payload, or signature cannot be decoded. ([#9268](https://github.com/clerk/javascript/pull/9268)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
 ## 3.14.0
 
 ### Minor Changes

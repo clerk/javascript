@@ -1397,6 +1397,10 @@ export const fiFI: LocalizationResource = {
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',

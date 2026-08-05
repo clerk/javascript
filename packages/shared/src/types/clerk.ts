@@ -1525,10 +1525,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * directly with the provided Clerk instance. Used by React Native / Expo.
          */
         runtimeEnvironment: 'headless';
-        /**
-         * Temporary flag that gates the self-serve OIDC flow in `<ConfigureSSO />`. Remove once the self-serve OIDC flow reaches GA.
-         */
-        oidcSelfServe: boolean;
       },
       Record<string, any>
     >;

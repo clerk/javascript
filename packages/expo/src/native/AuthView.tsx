@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
@@ -18,6 +18,9 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  * After authentication completes, the session is automatically synced with the JS SDK.
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
+ *
+ * To push the auth flow onto your own navigation stack, hide the route's header and
+ * pass `onHostBack` so Clerk's own chrome takes over.
  *
  * @example
  * ```tsx
@@ -43,7 +46,8 @@ export function AuthView({
   isDismissible = true,
   logoMaxHeight,
   onDismiss,
-}: AuthViewProps): ReactElement {
+  onHostBack,
+}: AuthViewProps) {
   const handleAuthEvent = useCallback(
     (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -71,7 +75,9 @@ export function AuthView({
       mode={mode}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
+      hostBackButton={!!onHostBack}
       onAuthEvent={handleAuthEvent}
+      onHostBack={onHostBack ? () => onHostBack() : undefined}
     >
       {logo ? (
         <View

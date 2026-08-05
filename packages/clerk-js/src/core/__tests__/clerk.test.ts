@@ -349,6 +349,8 @@ describe('Clerk singleton', () => {
         const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0][0]);
         expect(redirectUrl.pathname).toEqual('/v1/client/touch');
         expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
+        // A second navigate would supersede the touch hop and abort it before it completes.
+        expect(sut.navigate).toHaveBeenCalledTimes(1);
       });
 
       it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {

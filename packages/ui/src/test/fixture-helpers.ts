@@ -636,6 +636,14 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.mfa = { required };
   };
 
+  const withEnumerationProtection = () => {
+    us.attack_protection = {
+      enumeration_protection: {
+        enabled: true,
+      },
+    };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -657,5 +665,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withLegalConsent,
     withWaitlistMode,
     withMfaRequired,
+    withEnumerationProtection,
   };
 };
