@@ -270,9 +270,9 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
     onManageAccount: manageAccount,
     onManageOrganization: manageOrganization,
-    // Invite is the other way into administering the organization, so it lands wherever managing it
-    // lands. Splitting them would send one to the app's own page and the other to Clerk's.
-    onInviteMembers: canInviteMembers ? manageOrganization : undefined,
+    // Invite has no page of its own to route to, so it opens its modal even where managing the
+    // organization is routed to the app's own page.
+    onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // The instance can restrict who opens an organization, and the flag also goes false once a user
     // reaches their creation limit, so it covers both ways the action can be unavailable.
     onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
