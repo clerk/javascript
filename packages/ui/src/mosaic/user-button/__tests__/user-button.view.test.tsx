@@ -12,8 +12,8 @@ import { userButtonBusyKeys, UserButtonView } from '../user-button.view';
 // this is the only place the three surfaces can be told apart. One describe per mode covers what
 // each carries and withholds; the describes after them cover what the modes share.
 
-const alice = { sessionId: 'sess_1', name: 'Alice Smith', email: 'alice@example.com' };
-const bob = { sessionId: 'sess_2', name: 'Bob Jones', email: 'bob@example.com' };
+const alice = { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' };
+const bob = { sessionId: 'sess_2', name: 'Bob Jones', identifier: 'bob@example.com' };
 
 const foundry = {
   kind: 'membership',
@@ -82,7 +82,7 @@ const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.spl
 /** The workspace list: the one group in the popup that scrolls. */
 const workspaceList = () => groups().find(group => scrollClasses.every(name => group.classList.contains(name)));
 
-/** The accounts group: the one whose rows are titled by email rather than by workspace name. */
+/** The accounts group: the one whose rows are titled by identifier rather than by workspace name. */
 const accountsList = () =>
   groups().find(group => group !== workspaceList() && titles(group).some(title => title.includes('@')));
 
