@@ -5,7 +5,7 @@ import type { StoryMeta } from '@/lib/types';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
-export { default as __source } from './field.stories?raw';
+export { default as __source } from './field.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
@@ -23,15 +23,13 @@ const stackStyles = {
 export function Default() {
   return (
     <Field.Root style={stackStyles}>
-      <Field.Label htmlFor='email'>Email address</Field.Label>
+      <Field.Label>Email address</Field.Label>
       <Input
-        id='email'
         name='email'
         type='email'
         placeholder='you@example.com'
-        aria-describedby='email-description'
       />
-      <Field.Description id='email-description'>Used for account notifications.</Field.Description>
+      <Field.Description>Used for account notifications.</Field.Description>
     </Field.Root>
   );
 }
