@@ -2,7 +2,6 @@ import type {
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps,
   MenuPortalProps,
-  MenuProps,
   MenuSeparatorProps,
 } from '@clerk/headless/menu';
 import { Menu as Primitive } from '@clerk/headless/menu';
@@ -15,8 +14,6 @@ import { Button } from '../button';
 import { Icon } from '../icon';
 import { reset } from '../reset.styles';
 import { styles } from './menu.styles';
-
-export type { MenuProps, MenuSeparatorProps };
 
 export type MenuTriggerProps = MosaicComponentProps<'button'>;
 

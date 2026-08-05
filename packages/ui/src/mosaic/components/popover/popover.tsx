@@ -1,4 +1,3 @@
-import type { PopoverProps as HeadlessPopoverProps } from '@clerk/headless/popover';
 import { Popover as Primitive } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -9,8 +8,6 @@ import { reset } from '../reset.styles';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg';
-
-export type PopoverRootProps = HeadlessPopoverProps;
 
 /**
  * The headless parts type their props (and the `render` callback's argument) against

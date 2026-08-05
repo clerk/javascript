@@ -24,13 +24,7 @@ export type { IconProps } from '../components/icon';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
-export type {
-  MenuContentProps,
-  MenuItemProps,
-  MenuProps,
-  MenuSeparatorProps,
-  MenuTriggerProps,
-} from '../components/menu';
+export type { MenuContentProps, MenuItemProps, MenuTriggerProps } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
 export { Spinner } from '../components/spinner';
@@ -43,7 +37,6 @@ export type {
   PopoverCloseProps,
   PopoverDescriptionProps,
   PopoverPopupProps,
-  PopoverRootProps,
   PopoverSize,
   PopoverTitleProps,
   PopoverTriggerProps,
