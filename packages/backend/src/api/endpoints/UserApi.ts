@@ -366,6 +366,12 @@ export type VerifyPasswordParams = {
   password: string;
 };
 
+/** @inline */
+export type RemovePasswordParams = {
+  /** When set to `true`, all of the user's active sessions are revoked after their password is removed. Defaults to `false`. */
+  signOutOfOtherSessions?: boolean;
+};
+
 /** @generateWithEmptyComment */
 export type VerifyTOTPParams = {
   /** The ID of the user to verify the TOTP for. */
@@ -694,6 +700,39 @@ export class UserAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, userId, 'organization_invitations'),
       queryParams,
+    });
+  }
+
+  /**
+   * Removes the password credential from the given user. This is a privileged operation and does not require the user's current password. Password removal is allowed even when the user has no other sign-in method configured.
+   *
+   * By default, existing sessions remain active. Set `signOutOfOtherSessions` to `true` to revoke sessions active when the request is processed.
+   * @param userId - The ID of the user whose password to remove.
+   * @param params - Options for the request.
+   * @returns The updated [`User`](https://clerk.com/docs/reference/backend/types/backend-user).
+   * @example
+   * ### Keep existing sessions active
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123');
+   * ```
+   *
+   * @example
+   * ### Revoke existing sessions
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123', {
+   *   signOutOfOtherSessions: true,
+   * });
+   * ```
+   */
+  public async removePassword(userId: string, params: RemovePasswordParams = {}): Promise<User> {
+    this.requireId(userId);
+
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'remove_password'),
+      bodyParams: params,
     });
   }
 
