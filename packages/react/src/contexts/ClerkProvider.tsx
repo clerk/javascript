@@ -1,10 +1,11 @@
-import { ClerkContextProvider } from '@clerk/shared/react';
+import { ClerkContextProvider, ClerkInstanceContext } from '@clerk/shared/react';
 import React from 'react';
 
+import { errorThrower } from '../errors/errorThrower';
 import { multipleClerkProvidersError } from '../errors/messages';
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { ClerkProviderProps, IsomorphicClerkOptions, Ui } from '../types';
-import { mergeWithEnv, withMaxAllowedInstancesGuard } from '../utils';
+import { mergeWithEnv } from '../utils';
 import { IS_REACT_SHARED_VARIANT_COMPATIBLE } from '../utils/versionCheck';
 
 function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
@@ -26,7 +27,14 @@ function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   );
 }
 
-const ClerkProvider = withMaxAllowedInstancesGuard(ClerkProviderBase, 'ClerkProvider', multipleClerkProvidersError);
+function ClerkProvider<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
+  // Context is per React tree, so a second root or React Native surface sharing
+  // the JS runtime can never false-positive as a nested provider.
+  if (React.useContext(ClerkInstanceContext)) {
+    errorThrower.throw(multipleClerkProvidersError);
+  }
+  return <ClerkProviderBase {...props} />;
+}
 
 ClerkProvider.displayName = 'ClerkProvider';
 
