@@ -17,7 +17,7 @@ import type {
 // The container awaits these one-shot actions to drive busy state, so the controller exposes their
 // promise; navigation callbacks stay fire-and-forget (`() => void`) and reach the view's DOM handlers.
 interface UserButtonAsyncCallbacks {
-  onSelectOrganization?: (organizationId: string) => void | Promise<unknown>;
+  onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
   onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
   onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
   onSignOutAll?: () => void | Promise<unknown>;
@@ -222,8 +222,12 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
+    // `null` is Clerk's own name for the personal workspace. It has no organization to resolve a
+    // redirect against, so `afterSelectOrganizationUrl` has nothing to say about it.
     onSelectOrganization: organizationId => {
-      const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
+      const selected = organizationId
+        ? membershipData.find(m => m.organization.id === organizationId)?.organization
+        : undefined;
       return clerk.setActive({
         organization: organizationId,
         redirectUrl: selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined,
