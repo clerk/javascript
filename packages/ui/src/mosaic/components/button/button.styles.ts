@@ -84,12 +84,10 @@ export const styles = stylex.create({
     alignItems: 'center',
     // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
-    boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
     // A button is sized by its own axis, not by whatever row it lands in.
     flexShrink: 0,
-    fontFamily: 'inherit',
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',

@@ -5,6 +5,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { useContextProps } from '../../utils/context';
+import { reset } from '../reset.styles';
 import type { TypographyColor, TypographySize } from '../typography.styles';
 import { colors, sizes } from '../typography.styles';
 
@@ -23,7 +24,12 @@ export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function M
   const { size = 'sm', color = 'primary', render, className, style, ...rest } = useContextProps(rawProps, TextContext);
 
   const props = {
-    ...mergeStyleProps(themeProps('text', { size, color }), stylex.props(sizes[size], colors[color]), className, style),
+    ...mergeStyleProps(
+      themeProps('text', { size, color }),
+      stylex.props(reset.base, sizes[size], colors[color]),
+      className,
+      style,
+    ),
     ...rest,
   };
 
