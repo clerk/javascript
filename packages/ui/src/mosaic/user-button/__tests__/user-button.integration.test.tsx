@@ -258,7 +258,7 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     const act = await open();
 
-    await act.click(screen.getByRole('button', { name: 'Alice Smith' }));
+    await act.click(screen.getByRole('button', { name: 'Personal account' }));
 
     expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
     await waitFor(() => expect(popup()).toBeNull());
