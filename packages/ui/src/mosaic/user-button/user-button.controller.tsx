@@ -1,3 +1,4 @@
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationResource, UserResource } from '@clerk/shared/types';
 
@@ -101,14 +102,7 @@ function openOrNavigate({
 const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
 
 function displayName(user: UserResource): string {
-  const full = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
-  if (full) {
-    return full;
-  }
-  if (user.username) {
-    return user.username;
-  }
-  return user.primaryEmailAddress?.emailAddress ?? '';
+  return getFullName(user) || getIdentifier(user);
 }
 
 function toMembership(organization: OrganizationResource): UserButtonMembership {
@@ -125,7 +119,7 @@ function toSession(sessionId: string, user: UserResource): UserButtonSession {
   return {
     sessionId,
     name: displayName(user),
-    email: user.primaryEmailAddress?.emailAddress ?? '',
+    identifier: getIdentifier(user),
     imageUrl: user.imageUrl,
   };
 }
