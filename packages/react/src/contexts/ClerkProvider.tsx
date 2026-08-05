@@ -27,7 +27,7 @@ function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   );
 }
 
-function ClerkProvider<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
+function ClerkProviderGuard<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   // Context is per React tree, so a second root or React Native surface sharing
   // the JS runtime can never false-positive as a nested provider.
   if (React.useContext(ClerkInstanceContext)) {
@@ -35,6 +35,9 @@ function ClerkProvider<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
   }
   return <ClerkProviderBase {...props} />;
 }
+
+// Cast preserves the pre-existing public type of ClerkProvider so the export is not a breaking change.
+const ClerkProvider = ClerkProviderGuard as typeof ClerkProviderBase & { displayName: string };
 
 ClerkProvider.displayName = 'ClerkProvider';
 
