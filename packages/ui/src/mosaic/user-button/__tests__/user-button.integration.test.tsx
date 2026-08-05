@@ -350,7 +350,7 @@ describe('UserButton (connected)', () => {
     expect(screen.queryByRole('menuitem', { name: 'Add account' })).toBeNull();
   });
 
-  it('managing the account opens the UserProfile modal and leaves the popover open', async () => {
+  it('managing the account opens the UserProfile modal and closes the popover', async () => {
     renderUserButton();
     const act = await open();
 
@@ -358,10 +358,10 @@ describe('UserButton (connected)', () => {
 
     expect(openUserProfile).toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
-    expect(popup()).toBeInTheDocument();
+    await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('inviting members opens the OrganizationProfile modal and leaves the popover open', async () => {
+  it('inviting members opens the OrganizationProfile modal and closes the popover', async () => {
     renderUserButton();
     const act = await open();
 
@@ -369,17 +369,17 @@ describe('UserButton (connected)', () => {
 
     expect(openOrganizationProfile).toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
-    expect(popup()).toBeInTheDocument();
+    await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('creating an organization navigates and leaves the popover open', async () => {
+  it('creating an organization navigates and closes the popover', async () => {
     renderUserButton();
     const act = await open();
 
     await accountAction(act, 'Create organization');
 
     expect(navigate).toHaveBeenCalledWith('/create-org');
-    expect(popup()).toBeInTheDocument();
+    await waitFor(() => expect(popup()).toBeNull());
   });
 
   it('spins the clicked affordance and stands every other one down while an action is in flight', async () => {
