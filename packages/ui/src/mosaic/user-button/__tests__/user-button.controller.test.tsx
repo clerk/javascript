@@ -47,6 +47,7 @@ let navigate: ReturnType<typeof vi.fn>;
 let openUserProfile: ReturnType<typeof vi.fn>;
 let openOrganizationProfile: ReturnType<typeof vi.fn>;
 let checkAuthorization: ReturnType<typeof vi.fn>;
+let getContainer: () => HTMLElement | null;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -55,6 +56,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useSession: () => ({ isLoaded: isSessionLoaded, session }),
     useOrganization: () => ({ isLoaded: isOrgLoaded, organization }),
+    // Stubbed with a sentinel so the assertion is that this exact function reaches Clerk, rather
+    // than that some function did.
+    usePortalRoot: () => getContainer,
     useClerk: () => ({
       navigate,
       setActive,
@@ -144,6 +148,7 @@ beforeEach(() => {
   navigate = vi.fn().mockResolvedValue(undefined);
   openUserProfile = vi.fn();
   openOrganizationProfile = vi.fn();
+  getContainer = () => null;
 });
 
 afterEach(() => {
@@ -466,6 +471,18 @@ describe('useUserButtonController', () => {
     expect(openOrganizationProfile).toHaveBeenCalled();
 
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  // An app that mounts the button inside its own dialog or popover puts a portal root around it, and
+  // the modal has to land there too or it renders behind the surface that opened it.
+  it('opens the profile modals into the portal root the app configured', () => {
+    render(<Harness />);
+
+    fireEvent.click(screen.getByText('manage-account'));
+    expect(openUserProfile).toHaveBeenCalledWith({ getContainer });
+
+    fireEvent.click(screen.getByText('manage-org'));
+    expect(openOrganizationProfile).toHaveBeenCalledWith({ getContainer });
   });
 
   // A URL is the whole opt-in: passing one means navigation, with no mode to remember to pass
