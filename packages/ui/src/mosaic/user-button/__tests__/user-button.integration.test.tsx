@@ -254,6 +254,16 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
+  it('leaving the active organization for the personal workspace clears it', async () => {
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Alice Smith' }));
+
+    expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
   it('selecting an organization redirects to the configured afterSelectOrganizationUrl', async () => {
     const act = userEvent.setup();
     renderUserButton({ afterSelectOrganizationUrl: org => `/o/${org.id}` });
