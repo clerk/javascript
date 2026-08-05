@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationResource, UserResource } from '@clerk/shared/types';
 
 import { populateParamFromObject } from '../../contexts/utils';
@@ -129,6 +129,9 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
 
   const clerk = useClerk();
   const router = useMosaicRouter();
+  // An app can mount the button inside its own dialog or popover; the modal has to portal into that
+  // same root or it renders behind the surface that opened it.
+  const getContainer = usePortalRoot();
   const environment = useMosaicEnvironment();
   const displayConfig = environment?.displayConfig;
   const singleSessionMode = environment?.authConfig?.singleSessionMode ?? false;
@@ -136,7 +139,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const manageAccount = profileAction({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile(),
+    openModal: () => clerk.openUserProfile({ getContainer }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -144,7 +147,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const manageOrganization = profileAction({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () => clerk.openOrganizationProfile(),
+    openModal: () => clerk.openOrganizationProfile({ getContainer }),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
