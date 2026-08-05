@@ -49,6 +49,7 @@ let navigate: ReturnType<typeof vi.fn>;
 let openUserProfile: ReturnType<typeof vi.fn>;
 let openOrganizationProfile: ReturnType<typeof vi.fn>;
 let openCreateOrganization: ReturnType<typeof vi.fn>;
+let openInviteMembers: ReturnType<typeof vi.fn>;
 let checkAuthorization: ReturnType<typeof vi.fn>;
 let getContainer: () => HTMLElement | null;
 
@@ -69,6 +70,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       openUserProfile,
       openOrganizationProfile,
       openCreateOrganization,
+      openInviteMembers,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -157,6 +159,7 @@ beforeEach(() => {
   openUserProfile = vi.fn();
   openOrganizationProfile = vi.fn();
   openCreateOrganization = vi.fn();
+  openInviteMembers = vi.fn();
   getContainer = () => null;
 });
 
@@ -603,14 +606,15 @@ describe('useUserButtonController', () => {
     expect(openOrganizationProfile).not.toHaveBeenCalled();
   });
 
-  // Invite is the other way into administering the org, so it lands wherever manage-org lands.
-  // Splitting them would send one to the app's own page and the other to Clerk's.
-  it('sends invite-members to the same place as manage-org', () => {
+  // Invite opens its own modal rather than following manage-org: there is no invite page to route
+  // to, so an app that routes organization management to its own page still gets the form here.
+  it('opens the invite-members modal into the portal root, whatever manage-org is routed to', () => {
     render(<Harness organizationProfileUrl='/settings' />);
 
     fireEvent.click(screen.getByText('invite-members'));
 
-    expect(navigate).toHaveBeenCalledWith('/settings');
+    expect(openInviteMembers).toHaveBeenCalledWith({ getContainer });
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   // Creating an organization resolves like the two profiles do: a modal unless a URL routes
