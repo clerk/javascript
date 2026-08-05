@@ -14,7 +14,7 @@ import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import { colorVars, space } from '../tokens.stylex';
+import { colorVars, fontWeightVars, space } from '../tokens.stylex';
 import { styles } from './user-profile-profile-panel.styles';
 
 export interface UserProfileEmail {
@@ -196,7 +196,7 @@ function AccountSection({
           <div {...mergeStyleProps(themeProps('user-profile-profile-panel-picture-row'), stylex.props(styles.row))}>
             <Text
               color='primary'
-              style={{ fontWeight: 510 }}
+              style={{ fontWeight: fontWeightVars['--cl-font-medium'] }}
             >
               Profile picture
             </Text>
@@ -447,7 +447,7 @@ function ContactSection({
         <Text
           id={`user-profile-profile-panel-${label.toLowerCase()}`}
           color='primary'
-          style={{ fontWeight: 510 }}
+          style={{ fontWeight: fontWeightVars['--cl-font-medium'] }}
         >
           {label}
         </Text>
