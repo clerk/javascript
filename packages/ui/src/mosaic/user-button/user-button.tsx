@@ -23,8 +23,8 @@ interface PendingAction {
  * the presentational `UserButtonView`. Owns the popover open state and the single in-flight action:
  * it marks the clicked affordance busy (spinner + disables the rest), holds the surface still on
  * the data the action started from, closes the popover only when the action resolves, and clears
- * busy state (leaving the popover open) if it rejects. Actions that open another surface
- * (manage/create navigations) leave the popover as-is.
+ * busy state (leaving the popover open) if it rejects. Actions that hand off to another surface
+ * (managing, inviting, creating, adding an account) close the popover on the way out.
  */
 export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, ...options }: UserButtonProps = {}) {
   const controller = useUserButtonController(options);
@@ -66,6 +66,16 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
         }
       : undefined;
 
+  // A modal or another page takes over from here, so there is nothing left for the popover to show;
+  // left up, it would sit over the very surface it just opened.
+  const handOff = (fn: (() => void) | undefined) =>
+    fn
+      ? () => {
+          close();
+          fn();
+        }
+      : undefined;
+
   // `setActive` swaps the active organization while its promise is still in flight, so the live
   // controller would rearrange the popup mid-action: the header renaming itself, the check jumping
   // rows, Invite coming and going as the permission is re-read. Rendering the snapshot the action
@@ -78,6 +88,11 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
     onSignOutAll,
     onAcceptSuggestion,
     onAcceptInvitation,
+    onManageAccount,
+    onManageOrganization,
+    onInviteMembers,
+    onCreateOrganization,
+    onAddAccount,
     ...data
   } = action?.snapshot ?? controller;
 
@@ -96,6 +111,11 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
       onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
       onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
       onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
+      onManageAccount={handOff(onManageAccount)}
+      onManageOrganization={handOff(onManageOrganization)}
+      onInviteMembers={handOff(onInviteMembers)}
+      onCreateOrganization={handOff(onCreateOrganization)}
+      onAddAccount={handOff(onAddAccount)}
     />
   );
 }
