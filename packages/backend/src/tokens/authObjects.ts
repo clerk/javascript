@@ -113,17 +113,19 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
  * individually, creating proper discriminated unions where each token type
  * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
+type AuthenticatedMachineObjectFor<T extends MachineTokenType> = {
+  id: string;
+  subject: string;
+  scopes: string[];
+  getToken: () => Promise<string>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+  tokenType: T;
+  isAuthenticated: true;
+} & MachineObjectExtendedProperties<true>[T];
+
 export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
-  ? {
-      id: string;
-      subject: string;
-      scopes: string[];
-      getToken: () => Promise<string>;
-      has: CheckAuthorizationFromSessionClaims;
-      debug: AuthObjectDebug;
-      tokenType: T;
-      isAuthenticated: true;
-    } & MachineObjectExtendedProperties<true>[T]
+  ? AuthenticatedMachineObjectFor<T>
   : never;
 
 /**
@@ -134,17 +136,19 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
  * individually, creating proper discriminated unions where each token type
  * gets its own distinct properties (e.g., oauth_token won't have claims).
  */
+type UnauthenticatedMachineObjectFor<T extends MachineTokenType> = {
+  id: null;
+  subject: null;
+  scopes: null;
+  getToken: () => Promise<null>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+  tokenType: T;
+  isAuthenticated: false;
+} & MachineObjectExtendedProperties<false>[T];
+
 export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = T extends any
-  ? {
-      id: null;
-      subject: null;
-      scopes: null;
-      getToken: () => Promise<null>;
-      has: CheckAuthorizationFromSessionClaims;
-      debug: AuthObjectDebug;
-      tokenType: T;
-      isAuthenticated: false;
-    } & MachineObjectExtendedProperties<false>[T]
+  ? UnauthenticatedMachineObjectFor<T>
   : never;
 
 export type InvalidTokenAuthObject = {

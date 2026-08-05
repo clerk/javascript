@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     typecheck: {
       enabled: true,
-      include: ['**/*.test.ts'],
+      include: ['**/*.test.ts', '**/*.test-d.ts'],
     },
     coverage: {
       provider: 'v8',
