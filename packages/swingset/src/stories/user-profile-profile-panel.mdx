@@ -26,8 +26,14 @@ import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-
     id: email.id,
     value: email.emailAddress,
     isDefault: email.id === user.primaryEmailAddressId,
+    isVerified: email.verification.status === 'verified',
   }))}
-  phones={user.phoneNumbers.map(phone => ({ id: phone.id, value: phone.phoneNumber }))}
+  phones={user.phoneNumbers.map(phone => ({
+    id: phone.id,
+    value: phone.phoneNumber,
+    isDefault: phone.id === user.primaryPhoneNumberId,
+    isVerified: phone.verification.status === 'verified',
+  }))}
   connectedAccounts={user.externalAccounts.map(account => ({
     id: account.id,
     provider: account.provider,
@@ -36,5 +42,12 @@ import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-
   }))}
   onNameChange={setName}
   onUsernameChange={setUsername}
+  onVerifyEmail={verifyEmail}
+  onSetPrimaryEmail={setPrimaryEmail}
+  onRemoveEmail={removeEmail}
+  onVerifyPhone={verifyPhone}
+  onSetPrimaryPhone={setPrimaryPhone}
+  onRemovePhone={removePhone}
+  onRemoveConnectedAccount={removeConnectedAccount}
 />
 ```
