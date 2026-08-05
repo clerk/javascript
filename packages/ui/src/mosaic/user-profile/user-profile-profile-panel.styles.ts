@@ -66,6 +66,10 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-border'],
     height: '1px',
   },
+  fieldLabel: {
+    color: colorVars['--cl-color-neutral-foreground'],
+    fontWeight: 510,
+  },
   input: {
     flexShrink: 0,
     maxWidth: '50%',

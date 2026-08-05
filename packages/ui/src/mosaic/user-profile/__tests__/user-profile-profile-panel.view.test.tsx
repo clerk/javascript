@@ -34,8 +34,14 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByRole('heading', { name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Profile' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Account' }).nextElementSibling).toHaveClass('cl-card-root');
-    expect(screen.getByDisplayValue('Preston Booth')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('prestonxyz')).toBeInTheDocument();
+    const nameInput = screen.getByRole('textbox', { name: 'Name' });
+    const usernameInput = screen.getByRole('textbox', { name: 'Username' });
+    expect(nameInput).toHaveValue('Preston Booth');
+    expect(usernameInput).toHaveValue('prestonxyz');
+    expect(nameInput.closest('.cl-field-root')).not.toBeNull();
+    expect(usernameInput.closest('.cl-field-root')).not.toBeNull();
+    expect(screen.getByText('Name')).toHaveAttribute('for', nameInput.id);
+    expect(screen.getByText('Username')).toHaveAttribute('for', usernameInput.id);
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
     expect(screen.getByText('+1 801-888-8181')).toBeInTheDocument();
