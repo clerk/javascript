@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, scrollFadeVars, space, typeScaleVars } from '../tokens.stylex';
 
 const pulse = stylex.keyframes({
   '50%': { opacity: 0.5 },
@@ -54,9 +54,12 @@ export const styles = stylex.create({
     maxWidth: '12rem',
   },
 
-  // The workspace list scrolls; the header and footer stay put. Only the cap is ours — the scroll
-  // area carries the overflow itself, along with the edge fades and the scrollbar.
+  // The workspace list scrolls; the header and footer stay put. The scroll area carries the
+  // overflow itself, along with the edge fades and the scrollbar, so only the cap and the scroll
+  // padding are ours. The padding answers those fades: tabbing to a row below the fold would
+  // otherwise land it flush against the edge the mask fades out, on the one row you just moved to.
   scroll: {
+    scrollPaddingBlock: scrollFadeVars['--cl-scroll-fade-size'],
     maxHeight: '18rem',
   },
 
