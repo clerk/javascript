@@ -87,10 +87,18 @@ const LINK_REPLACEMENTS = [
   ['enterprise-account', '/docs/reference/backend/types/backend-enterprise-account'],
   ['enterprise-account-connection', '/docs/reference/backend/types/backend-enterprise-account-connection'],
   ['enterprise-connection', '/docs/reference/backend/types/backend-enterprise-connection'],
+  [
+    'enterprise-connection-custom-attribute',
+    '/docs/reference/backend/types/backend-enterprise-connection-custom-attribute',
+  ],
   ['enterprise-connection-oauth-config', '/docs/reference/backend/types/backend-enterprise-connection-oauth-config'],
   [
     'enterprise-connection-saml-connection',
     '/docs/reference/backend/types/backend-enterprise-connection-saml-connection',
+  ],
+  [
+    'enterprise-connection-saml-connection-login-hint',
+    '/docs/reference/backend/types/backend-enterprise-connection-saml-connection-login-hint',
   ],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
@@ -117,6 +125,7 @@ const LINK_REPLACEMENTS = [
   ['feature-resource', '/docs/reference/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/types/billing-statement-group'],
   ['billing-statement-resource', '/docs/reference/types/billing-statement-resource'],
+  ['billing-totals', '/docs/reference/types/billing-totals'],
   ['billing-subscription-resource', '/docs/reference/types/billing-subscription-resource'],
   ['clerk-api-response-error', '/docs/reference/types/clerk-api-response-error'],
   ['clerk-api-error', '/docs/reference/types/clerk-api-error'],
