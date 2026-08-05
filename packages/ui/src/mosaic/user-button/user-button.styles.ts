@@ -2,6 +2,10 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
 
+const pulse = stylex.keyframes({
+  '50%': { opacity: 0.5 },
+});
+
 export const styles = stylex.create({
   // The avatar is the trigger, so the button paints nothing of its own.
   trigger: {
@@ -22,6 +26,22 @@ export const styles = stylex.create({
   triggerLabelled: {
     gap: space['2'],
     alignItems: 'center',
+  },
+
+  // Sized to the avatar it stands in for. StyleX rather than the shared `Skeleton`, which is still
+  // Emotion-backed and would pull that runtime into the app-mountable Mosaic build.
+  triggerSkeleton: {
+    borderRadius: radiusVars['--cl-radius-full'],
+    animationDuration: '2s',
+    animationIterationCount: 'infinite',
+    animationName: {
+      default: pulse,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: 'cubic-bezier(0.4, 0, 0.6, 1)',
+    backgroundColor: colorVars['--cl-color-border'],
+    blockSize: '1.75rem',
+    inlineSize: '1.75rem',
   },
 
   // Matches `Item.Title`, so the trigger names a workspace the same way its row does. Capped,

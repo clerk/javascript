@@ -15,7 +15,6 @@ import { Icon } from '../components/icon';
 import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Popover } from '../components/popover';
-import { Skeleton } from '../components/skeleton';
 import { Spinner } from '../components/spinner';
 import { truncationStyles } from '../components/typography.styles';
 import type { IconName } from '../icons/registry';
@@ -992,10 +991,9 @@ export function UserButtonTrigger({ renderTriggerLabel = true, renderPlanBadge =
 export function UserButtonTriggerSkeleton() {
   return (
     <div {...stylex.props(styles.trigger, triggerShapes.circle)}>
-      <Skeleton
-        width='1.75rem'
-        height='1.75rem'
-        sx={t => ({ borderRadius: t.rounded.full })}
+      <div
+        aria-hidden
+        {...stylex.props(styles.triggerSkeleton)}
       />
     </div>
   );
