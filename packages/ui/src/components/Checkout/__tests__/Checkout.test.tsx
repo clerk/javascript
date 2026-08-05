@@ -1708,7 +1708,7 @@ describe('Checkout', () => {
       fixtures.clerk.billing.startCheckout.mockResolvedValue(checkout as any);
       fixtures.clerk.billing.updateCheckout.mockRejectedValue(new Error('Invalid promo code'));
 
-      const { getByRole, userEvent } = render(
+      const { baseElement, getByRole, userEvent } = render(
         <Drawer.Root
           open
           onOpenChange={() => {}}
@@ -1721,8 +1721,9 @@ describe('Checkout', () => {
         { wrapper },
       );
 
-      await userEvent.click(await waitFor(() => getByRole('button', { name: 'Add promo code' })));
-      const input = getByRole('textbox', { name: 'Enter promo code' });
+      const input = await waitFor(() => getByRole('textbox', { name: 'Enter promo code' }));
+      const lineItemsRoot = baseElement.querySelector('.cl-checkoutFormLineItemsRoot');
+      expect(lineItemsRoot?.nextElementSibling).toContainElement(input);
       await userEvent.type(input, 'INVALID');
       await userEvent.click(getByRole('button', { name: 'Apply' }));
 
@@ -1775,7 +1776,7 @@ describe('Checkout', () => {
         .mockResolvedValueOnce(appliedCheckout as any)
         .mockResolvedValueOnce(checkout as any);
 
-      const { getByRole, getByText, queryByText, userEvent } = render(
+      const { getByRole, getByText, queryByRole, queryByText, userEvent } = render(
         <Drawer.Root
           open
           onOpenChange={() => {}}
@@ -1788,8 +1789,7 @@ describe('Checkout', () => {
         { wrapper },
       );
 
-      await userEvent.click(await waitFor(() => getByRole('button', { name: 'Add promo code' })));
-      await userEvent.type(getByRole('textbox', { name: 'Enter promo code' }), 'WELCOME20');
+      await userEvent.type(await waitFor(() => getByRole('textbox', { name: 'Enter promo code' })), 'WELCOME20');
       await userEvent.click(getByRole('button', { name: 'Apply' }));
 
       await waitFor(() => {
@@ -1800,6 +1800,7 @@ describe('Checkout', () => {
         expect(getByText('Prorated discount').closest('.cl-lineItemsGroup')?.nextElementSibling).toBe(
           getByText('WELCOME20').closest('.cl-lineItemsGroup'),
         );
+        expect(queryByRole('textbox', { name: 'Enter promo code' })).toBeNull();
       });
 
       await userEvent.click(getByRole('button', { name: 'Remove promo code' }));
@@ -1809,6 +1810,7 @@ describe('Checkout', () => {
           expect.objectContaining({ id: 'chk_promo', promoCode: '' }),
         );
         expect(queryByText('WELCOME20')).toBeNull();
+        expect(getByRole('textbox', { name: 'Enter promo code' })).toBeVisible();
       });
     });
   });
