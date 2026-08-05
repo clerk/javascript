@@ -257,12 +257,12 @@ function SubscriptionDiscountRow({ subscriptionItem }: { subscriptionItem: Billi
 
   const totalCycles =
     appliedDiscount.cyclesRemaining === null ? null : appliedDiscount.cyclesApplied + appliedDiscount.cyclesRemaining;
-  const discountTitle = `${appliedDiscount.name} ${getDiscountDescription(
+  const discountTitle = `${appliedDiscount.name} (${getDiscountDescription(
     appliedDiscount,
     totalCycles,
     subscriptionItem.planPeriod,
     { $, t },
-  )}`;
+  )})`;
 
   return (
     <Tr

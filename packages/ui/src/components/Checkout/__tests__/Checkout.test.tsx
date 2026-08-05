@@ -1794,7 +1794,7 @@ describe('Checkout', () => {
 
       await waitFor(() => {
         expect(getByText('WELCOME20')).toBeVisible();
-        expect(getByText('(20% off first 1 month)')).toBeVisible();
+        expect(getByText('20% off first 1 month')).toBeVisible();
         expect(getByText('-$25.98')).toBeVisible();
         expect(queryByText('-$50.00')).toBeNull();
         expect(getByText('Prorated discount').closest('.cl-lineItemsGroup')?.nextElementSibling).toBe(
