@@ -129,6 +129,16 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
         }
       : undefined;
 
+  // A modal or another page takes over from here, so there is nothing left for the popover to show;
+  // left up, it would sit over the very surface it just opened.
+  const handOff = (fn: (() => void) | undefined) =>
+    fn
+      ? () => {
+          close();
+          fn();
+        }
+      : undefined;
+
   // `setActive` swaps the active organization while its promise is still in flight, so the live
   // controller would rearrange the popup mid-action: the header renaming itself, the check jumping
   // rows, Invite coming and going as the permission is re-read. Rendering the snapshot the action
@@ -141,6 +151,11 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     onSignOutAll,
     onAcceptSuggestion,
     onAcceptInvitation,
+    onManageAccount,
+    onManageOrganization,
+    onInviteMembers,
+    onCreateOrganization,
+    onAddAccount,
     ...data
   } = action?.snapshot ?? controller;
 
@@ -161,6 +176,11 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
       onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
       onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
+      onManageAccount={handOff(onManageAccount)}
+      onManageOrganization={handOff(onManageOrganization)}
+      onInviteMembers={handOff(onInviteMembers)}
+      onCreateOrganization={handOff(onCreateOrganization)}
+      onAddAccount={handOff(onAddAccount)}
     />
   );
 }
