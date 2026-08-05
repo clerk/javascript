@@ -109,6 +109,14 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByText('Foundry')).toBeNull();
   });
 
+  // A nameless account is titled by its identifier, so repeating it underneath says nothing.
+  it('drops the identifier line when it would only repeat the title', () => {
+    renderUserMode({ activeSession: { ...alice, name: 'alice@example.com' } });
+
+    const header = groups()[0];
+    expect(within(header).getAllByText('alice@example.com')).toHaveLength(1);
+  });
+
   it('lists no workspaces at all', () => {
     renderUserMode();
 
