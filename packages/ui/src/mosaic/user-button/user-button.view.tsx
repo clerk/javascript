@@ -29,7 +29,8 @@ import { styles, triggerShapes } from './user-button.styles';
 export interface UserButtonSession {
   sessionId: string;
   name: string;
-  email: string;
+  /** Whatever the account is addressed by: username, email, phone, or wallet. */
+  identifier: string;
   imageUrl?: string;
 }
 
@@ -446,9 +447,9 @@ function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
 function Header() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
-  const { sessionId, email } = data.activeSession;
+  const { sessionId, identifier } = data.activeSession;
   const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const subtitle = organization ? membershipSubtitle(organization) : email;
+  const subtitle = organization ? membershipSubtitle(organization) : identifier;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
   const invitable = showsOrganizations(data) ? data.activeOrganization : null;
@@ -537,13 +538,13 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: Acco
 }
 
 /**
- * The active account, identified by its email. It heads the workspaces that belong to it and
+ * The active account, named by its identifier. It heads the workspaces that belong to it and
  * carries the account-wide actions, the way the "Accounts" row heads the other accounts.
  */
 function ActiveAccountRow() {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
-  const { email, sessionId } = data.activeSession;
+  const { identifier, sessionId } = data.activeSession;
   // Its actions live in a menu that closes on click, so the row itself carries their spinner.
   const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId));
 
@@ -570,7 +571,7 @@ function ActiveAccountRow() {
             fontWeight: fontWeightVars['--cl-font-medium'],
           }}
         >
-          {email}
+          {identifier}
         </Item.Description>
       </Item.Content>
       {busy ? (
@@ -579,7 +580,7 @@ function ActiveAccountRow() {
         </Trailing>
       ) : (
         <ActionMenu
-          label={`Actions for ${email}`}
+          label={`Actions for ${identifier}`}
           actions={actions}
           disabled={disabled}
         />
@@ -787,8 +788,8 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
         />
       </Item.Media>
       <Item.Content>
-        {/* Identified by email, like the active account's row, so the two read as the same kind. */}
-        <Item.Title>{session.email}</Item.Title>
+        {/* Named by its identifier, like the active account's row, so the two read as the same kind. */}
+        <Item.Title>{session.identifier}</Item.Title>
       </Item.Content>
       {busy ? (
         <Trailing>
