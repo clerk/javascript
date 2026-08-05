@@ -37,7 +37,7 @@ that would navigate (Manage, Invite, Create organization, Add account) only clos
 import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
 
 <UserButtonView
-  activeSession={{ sessionId: 'sess_colin', name: 'Colin', email: 'colin@clerk.dev' }}
+  activeSession={{ sessionId: 'sess_colin', name: 'Colin', identifier: 'colin@clerk.dev' }}
   activeOrganization={{ kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' }}
   hasOrganizations
   memberships={[
@@ -46,7 +46,7 @@ import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
   ]}
   suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
   invitations={[]}
-  additionalSessions={[{ sessionId: 'sess_braden', name: 'Braden', email: 'braden@clerk.dev' }]}
+  additionalSessions={[{ sessionId: 'sess_braden', name: 'Braden', identifier: 'braden@clerk.dev' }]}
   onSelectOrganization={organization => setActive({ organization })}
   onSwitchSession={session => setActive({ session })}
   onSignOutAll={() => signOut()}

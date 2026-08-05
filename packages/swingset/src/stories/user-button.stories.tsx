@@ -31,14 +31,14 @@ const defaultOrgLogo =
 const colin: UserButtonSession = {
   sessionId: 'sess_colin',
   name: 'Colin',
-  email: 'colin@clerk.dev',
+  identifier: 'colin@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
 };
 
 const braden: UserButtonSession = {
   sessionId: 'sess_braden',
   name: 'Braden',
-  email: 'braden@clerk.dev',
+  identifier: 'braden@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/64913815?v=4',
 };
 
