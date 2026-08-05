@@ -1,52 +1,51 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Input } from '../input';
 import { Field } from './field';
 
 describe('Mosaic Field', () => {
-  it('supports explicit native label and message relationships', () => {
+  it('generates native label and message relationships', () => {
     render(
       <Field.Root>
-        <Field.Label
-          id='email-label'
-          htmlFor='email'
-        >
-          Email
-        </Field.Label>
-        <Input
-          id='email'
-          aria-labelledby='email-label'
-          aria-describedby='email-description email-error'
-          aria-invalid='true'
-        />
-        <Field.Description id='email-description'>Used for account notifications.</Field.Description>
-        <Field.Error id='email-error'>Enter a valid email.</Field.Error>
+        <Field.Label>Email</Field.Label>
+        <Input aria-invalid='true' />
+        <Field.Description>Used for account notifications.</Field.Description>
+        <Field.Error>Enter a valid email.</Field.Error>
       </Field.Root>,
     );
 
     const control = screen.getByRole('textbox', { name: 'Email' });
-    expect(screen.getByText('Email')).toHaveAttribute('id', 'email-label');
-    expect(screen.getByText('Email')).toHaveAttribute('for', 'email');
-    expect(control).toHaveAttribute('id', 'email');
-    expect(control).toHaveAttribute('aria-labelledby', 'email-label');
-    expect(control).toHaveAttribute('aria-describedby', 'email-description email-error');
+    const label = screen.getByText('Email');
+    const description = screen.getByText('Used for account notifications.');
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    expect(control.id).not.toBe('');
+    expect(label.id).not.toBe('');
+    expect(label).toHaveAttribute('for', control.id);
+    expect(control).toHaveAttribute('aria-labelledby', label.id);
+    expect(description.id).not.toBe('');
+    expect(error?.id).not.toBe('');
+    expect(control).toHaveAttribute('aria-describedby', `${description.id} ${error?.id}`);
     expect(control).toHaveAttribute('aria-invalid', 'true');
-    expect(screen.getByText('Used for account notifications.')).toHaveAttribute('id', 'email-description');
-    expect(screen.getByText('Enter a valid email.').closest('p')).toHaveAttribute('id', 'email-error');
   });
 
-  it('preserves caller-provided IDs and ARIA attributes unchanged', () => {
+  it('preserves caller-provided IDs and merges ARIA relationships', () => {
     render(
       <Field.Root aria-label='Account details'>
         <Field.Label
           id='custom-label'
-          htmlFor='custom-control'
           aria-hidden='false'
         >
           Account
         </Field.Label>
+        <Input
+          id='custom-control'
+          aria-labelledby='external-label custom-label'
+          aria-describedby='external-description custom-description'
+        />
         <Field.Description
           id='custom-description'
           aria-live='polite'
@@ -66,6 +65,12 @@ describe('Mosaic Field', () => {
     expect(screen.getByText('Account')).toHaveAttribute('id', 'custom-label');
     expect(screen.getByText('Account')).toHaveAttribute('for', 'custom-control');
     expect(screen.getByText('Account')).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByRole('textbox')).toHaveAttribute('id', 'custom-control');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-labelledby', 'external-label custom-label');
+    expect(screen.getByRole('textbox')).toHaveAttribute(
+      'aria-describedby',
+      'external-description custom-description custom-error',
+    );
     expect(screen.getByText('Description')).toHaveAttribute('id', 'custom-description');
     expect(screen.getByText('Description')).toHaveAttribute('aria-live', 'polite');
     expect(screen.getByRole('alert')).toHaveAttribute('id', 'custom-error');
@@ -137,6 +142,79 @@ describe('Mosaic Field', () => {
     }
     expect(inside).toHaveClass('cl-input');
     expect(inside).not.toHaveClass('cl-field-control');
+  });
+
+  it('finalizes explicit IDs and generated relationships during hydration', async () => {
+    const field = (
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='custom-control' />
+        <Field.Description>Description</Field.Description>
+      </Field.Root>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(field);
+    expect(container.querySelector('input')).not.toHaveAttribute('id', 'custom-control');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    await act(() => {
+      root = hydrateRoot(container, field);
+    });
+
+    const control = container.querySelector('input');
+    const label = container.querySelector('label');
+    const description = container.querySelector('.cl-field-description');
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(control).toHaveAttribute('id', 'custom-control');
+    expect(label).toHaveAttribute('for', control?.id);
+    expect(control).toHaveAttribute('aria-labelledby', label?.id);
+    expect(control).toHaveAttribute('aria-describedby', description?.id);
+
+    await act(() => root?.unmount());
+    consoleError.mockRestore();
+  });
+
+  it('warns when Root contains more than one form control', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(
+      <Field.Root>
+        <Input />
+        <Input />
+      </Field.Root>,
+    );
+
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(consoleWarn).toHaveBeenCalledWith(
+      '[clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
+    );
+    consoleWarn.mockRestore();
+  });
+
+  it('updates registered control and message IDs as parts change', () => {
+    const { rerender } = render(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='account-email' />
+        <Field.Description>Description</Field.Description>
+      </Field.Root>,
+    );
+    const descriptionId = screen.getByText('Description').id;
+
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('aria-describedby', descriptionId);
+
+    rerender(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='billing-email' />
+      </Field.Root>,
+    );
+
+    const control = screen.getByRole('textbox', { name: 'Email' });
+    expect(control).toHaveAttribute('id', 'billing-email');
+    expect(control).not.toHaveAttribute('aria-describedby');
+    expect(screen.getByText('Email')).toHaveAttribute('for', 'billing-email');
   });
 
   it('forwards refs and native props from every part', () => {
