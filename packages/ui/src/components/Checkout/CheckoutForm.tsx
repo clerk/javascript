@@ -109,7 +109,15 @@ const AppliedPromoCodeRow = () => {
             aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
             isDisabled={isLoading}
             onClick={() => void updatePromoCode('')}
-            sx={{ padding: 0 }}
+            sx={{
+              padding: 0,
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: '-18px',
+              },
+            }}
           >
             <Icon
               icon={Close}
