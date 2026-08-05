@@ -55,6 +55,7 @@ let navigate: ReturnType<typeof vi.fn>;
 let openUserProfile: ReturnType<typeof vi.fn>;
 let openOrganizationProfile: ReturnType<typeof vi.fn>;
 let openCreateOrganization: ReturnType<typeof vi.fn>;
+let openInviteMembers: ReturnType<typeof vi.fn>;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -70,6 +71,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       openUserProfile,
       openOrganizationProfile,
       openCreateOrganization,
+      openInviteMembers,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -162,6 +164,7 @@ beforeEach(() => {
   openUserProfile = vi.fn();
   openOrganizationProfile = vi.fn();
   openCreateOrganization = vi.fn();
+  openInviteMembers = vi.fn();
 });
 
 afterEach(() => {
@@ -345,13 +348,13 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('inviting members opens the OrganizationProfile modal and closes the popover', async () => {
+  it('inviting members opens the InviteMembers modal and closes the popover', async () => {
     renderUserButton();
     const act = await open();
 
     await act.click(screen.getByRole('button', { name: 'Invite' }));
 
-    expect(openOrganizationProfile).toHaveBeenCalled();
+    expect(openInviteMembers).toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
     await waitFor(() => expect(popup()).toBeNull());
   });
