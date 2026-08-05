@@ -20,7 +20,7 @@ export const useUserProfileCustomPages = (
   children: React.ReactNode | React.ReactNode[],
   options?: UseCustomPagesOptions,
 ) => {
-  const reorderItemsLabels = ['account', 'security', 'billing', 'apiKeys'];
+  const reorderItemsLabels = ['account', 'security', 'oauthApplications', 'billing', 'apiKeys'];
   return useCustomPages(
     {
       children,

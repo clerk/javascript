@@ -2,12 +2,20 @@ import { renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { OrganizationProfilePage } from '../../components/uiComponents';
-import { useOrganizationProfileCustomPages } from '../useCustomPages';
+import { OrganizationProfilePage, UserProfilePage } from '../../components/uiComponents';
+import { useOrganizationProfileCustomPages, useUserProfileCustomPages } from '../useCustomPages';
 
 vi.mock('@clerk/shared', () => ({
   logErrorInDevMode: vi.fn(),
 }));
+
+describe('useUserProfileCustomPages', () => {
+  it('accepts OAuth Applications as a reorder item', () => {
+    const { result } = renderHook(() => useUserProfileCustomPages(<UserProfilePage label='oauthApplications' />));
+
+    expect(result.current.customPages).toEqual([{ label: 'oauthApplications' }]);
+  });
+});
 
 describe('useOrganizationProfileCustomPages', () => {
   it('uses separate portals for duplicate non-keyed custom pages', () => {

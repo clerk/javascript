@@ -1891,6 +1891,13 @@ export const enUS: LocalizationResource = {
     apiKeysPage: {
       title: 'API keys',
     },
+    oauthApplicationsPage: {
+      title: 'OAuth applications',
+      authorizedApplications: {
+        title: 'Applications with access',
+        empty: 'No OAuth applications currently have access to your account.',
+      },
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -2089,6 +2096,7 @@ export const enUS: LocalizationResource = {
       apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your account info.',
+      oauthApplications: 'OAuth applications',
       security: 'Security',
       title: 'Account',
     },

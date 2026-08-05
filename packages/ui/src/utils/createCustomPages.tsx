@@ -10,7 +10,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Building, Code, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
+import { Building, Code, Connections, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -22,7 +22,7 @@ export type CustomPageContent = {
 };
 
 type ProfileReorderItem = {
-  label: 'account' | 'security' | 'members' | 'general' | 'billing' | 'apiKeys';
+  label: 'account' | 'security' | 'oauthApplications' | 'members' | 'general' | 'billing' | 'apiKeys';
 };
 
 type ProfileCustomPage = {
@@ -60,6 +60,7 @@ type CreateCustomPagesParams = {
   }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
+  nonPreemptiveDefaultRouteIds?: string[];
 };
 
 export const createUserProfileCustomPages = (
@@ -74,6 +75,7 @@ export const createUserProfileCustomPages = (
       getDefaultRoutes: getUserProfileDefaultRoutes,
       setFirstPathToRoot: setFirstPathToUserProfileRoot,
       excludedPathsFromDuplicateWarning: [],
+      nonPreemptiveDefaultRouteIds: [USER_PROFILE_NAVBAR_ROUTE_ID.OAUTH_APPLICATIONS],
     },
     clerk,
     shouldShowBilling,
@@ -104,7 +106,13 @@ export const createOrganizationProfileCustomPages = (
 };
 
 const createCustomPages = (
-  { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
+  {
+    customPages,
+    getDefaultRoutes,
+    setFirstPathToRoot,
+    excludedPathsFromDuplicateWarning,
+    nonPreemptiveDefaultRouteIds = [],
+  }: CreateCustomPagesParams,
   clerk: LoadedClerk,
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
@@ -138,6 +146,7 @@ const createCustomPages = (
   const { allRoutes, contents } = getRoutesAndContents({
     customPages: validCustomPages,
     defaultRoutes: INITIAL_ROUTES,
+    nonPreemptiveDefaultRouteIds,
   });
 
   assertExternalLinkAsRoot(allRoutes);
@@ -158,10 +167,22 @@ const createCustomPages = (
 type GetRoutesAndContentsParams = {
   customPages: CustomPage[];
   defaultRoutes: NavbarRoute[];
+  nonPreemptiveDefaultRouteIds: string[];
 };
 
-const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndContentsParams) => {
-  let remainingDefaultRoutes: NavbarRoute[] = defaultRoutes.map(r => r);
+const getRoutesAndContents = ({
+  customPages,
+  defaultRoutes,
+  nonPreemptiveDefaultRouteIds,
+}: GetRoutesAndContentsParams) => {
+  const collisionSafeDefaultRoutes = resolveNonPreemptiveDefaultRouteCollisions(
+    defaultRoutes,
+    customPages,
+    nonPreemptiveDefaultRouteIds,
+  );
+  const defaultRouteIds = collisionSafeDefaultRoutes.map(route => route.id);
+  const hasReorderItems = customPages.some(customPage => isReorderItem(customPage, defaultRouteIds));
+  let remainingDefaultRoutes: NavbarRoute[] = collisionSafeDefaultRoutes.map(route => route);
   const contents: CustomPageContent[] = [];
 
   const routesWithoutDefaults: NavbarRoute[] = customPages.map((cp, index) => {
@@ -196,15 +217,52 @@ const getRoutesAndContents = ({ customPages, defaultRoutes }: GetRoutesAndConten
         path: pageURL,
       };
     }
-    const reorderItem = defaultRoutes.find(r => r.id === cp.label) as NavbarRoute;
+    const reorderItem = collisionSafeDefaultRoutes.find(r => r.id === cp.label) as NavbarRoute;
     remainingDefaultRoutes = remainingDefaultRoutes.filter(({ id }) => id !== cp.label);
     return { ...reorderItem };
   });
 
-  const allRoutes = [...remainingDefaultRoutes, ...routesWithoutDefaults];
+  const remainingNonPreemptiveRoutes = remainingDefaultRoutes.filter(route =>
+    nonPreemptiveDefaultRouteIds.includes(route.id),
+  );
+  const remainingExistingRoutes = remainingDefaultRoutes.filter(
+    route => !nonPreemptiveDefaultRouteIds.includes(route.id),
+  );
+  const allRoutes = hasReorderItems
+    ? [...remainingExistingRoutes, ...routesWithoutDefaults, ...remainingNonPreemptiveRoutes]
+    : [...remainingDefaultRoutes, ...routesWithoutDefaults];
 
   return { allRoutes, contents };
 };
+
+const resolveNonPreemptiveDefaultRouteCollisions = (
+  defaultRoutes: NavbarRoute[],
+  customPages: CustomPage[],
+  nonPreemptiveDefaultRouteIds: string[],
+) => {
+  const usedPaths = new Set(
+    customPages.filter(isCustomPage).map(customPage => routeCollisionKey(sanitizeCustomPageURL(customPage.url))),
+  );
+
+  return defaultRoutes.map(route => {
+    if (!nonPreemptiveDefaultRouteIds.includes(route.id) || !usedPaths.has(routeCollisionKey(route.path))) {
+      usedPaths.add(routeCollisionKey(route.path));
+      return route;
+    }
+
+    const fallbackPath = `${route.path}-clerk`;
+    let path = fallbackPath;
+    let suffix = 2;
+    while (usedPaths.has(routeCollisionKey(path))) {
+      path = `${fallbackPath}-${suffix}`;
+      suffix += 1;
+    }
+    usedPaths.add(routeCollisionKey(path));
+    return { ...route, path };
+  });
+};
+
+const routeCollisionKey = (path: string) => path.replace(/\/+$/, '').toLowerCase();
 
 const setFirstPathToUserProfileRoot = (routes: NavbarRoute[]): NavbarRoute[] => {
   return routes.map((r, index) => (index === 0 ? { ...r, path: '/' } : r));
@@ -290,6 +348,12 @@ const getUserProfileDefaultRoutes = ({
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: ShieldCheck,
       path: 'security',
+    },
+    {
+      name: localizationKeys('userProfile.navbar.oauthApplications'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.OAUTH_APPLICATIONS,
+      icon: Connections,
+      path: 'oauth-applications',
     },
   ];
   if (commerce) {

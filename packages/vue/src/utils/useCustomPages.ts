@@ -12,7 +12,7 @@ import { useCustomElementPortal } from './useCustomElementPortal';
 
 export const useUserProfileCustomPages = () => {
   const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
-    reorderItemsLabels: ['account', 'security', 'billing', 'apiKeys'],
+    reorderItemsLabels: ['account', 'security', 'oauthApplications', 'billing', 'apiKeys'],
     PageComponent: UserProfilePage,
     LinkComponent: UserProfileLink,
     componentName: 'UserProfile',

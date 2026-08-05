@@ -125,7 +125,7 @@ type PageProps<T extends string> =
       labelIcon?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'oauthApplications' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;

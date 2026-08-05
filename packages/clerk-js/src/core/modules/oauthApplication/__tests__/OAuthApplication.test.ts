@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { InstanceType, OAuthConsentInfoJSON } from '@clerk/shared/types';
+import type { InstanceType, OAuthApplicationJSON, OAuthConsentInfoJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { mockFetch } from '@/test/core-fixtures';
@@ -20,6 +20,23 @@ const consentPayload: OAuthConsentInfoJSON = {
   scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
 };
 
+const applicationsPayload: OAuthApplicationJSON[] = [
+  {
+    object: 'oauth_application',
+    id: 'oa_123',
+    name: 'My App',
+    client_uri: 'https://app.example',
+    client_image_url: 'https://img.example/logo.png',
+  },
+  {
+    object: 'oauth_application',
+    id: 'oa_456',
+    name: 'Another App',
+    client_uri: null,
+    client_image_url: null,
+  },
+];
+
 describe('OAuthApplication', () => {
   let oauthApp: OAuthApplication;
 
@@ -31,6 +48,51 @@ describe('OAuthApplication', () => {
     (global.fetch as Mock)?.mockClear?.();
     BaseResource.clerk = null as any;
     vi.restoreAllMocks();
+  });
+
+  describe('getApplications', () => {
+    it('lists and maps OAuth applications from FAPI', async () => {
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValue({ response: applicationsPayload } as any);
+
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.getApplications()).resolves.toEqual([
+        {
+          object: 'oauth_application',
+          id: 'oa_123',
+          name: 'My App',
+          clientUri: 'https://app.example',
+          clientImageUrl: 'https://img.example/logo.png',
+        },
+        {
+          object: 'oauth_application',
+          id: 'oa_456',
+          name: 'Another App',
+          clientUri: null,
+          clientImageUrl: null,
+        },
+      ]);
+      expect(fetchSpy).toHaveBeenCalledWith(
+        { method: 'GET', path: '/me/oauth_applications' },
+        { skipUpdateClient: true },
+      );
+    });
+
+    it('accepts a non-enveloped FAPI response', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue(applicationsPayload as any);
+
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.getApplications()).resolves.toHaveLength(2);
+    });
+
+    it('throws ClerkRuntimeError with network_error when _fetch returns null', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue(null);
+
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.getApplications()).rejects.toMatchObject({ code: 'network_error' });
+    });
   });
 
   describe('getConsentInfo', () => {

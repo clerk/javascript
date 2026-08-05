@@ -694,8 +694,16 @@ export type __internal_LocalizationResource = {
       description: LocalizationValue;
       account: LocalizationValue;
       security: LocalizationValue;
+      oauthApplications: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
+    };
+    oauthApplicationsPage: {
+      title: LocalizationValue;
+      authorizedApplications: {
+        title: LocalizationValue;
+        empty: LocalizationValue;
+      };
     };
     start: {
       headerTitle__account: LocalizationValue;

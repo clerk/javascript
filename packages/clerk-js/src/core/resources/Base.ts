@@ -84,7 +84,7 @@ export abstract class BaseResource {
   }
 
   // TODO @userland-errors:
-  static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
+  static async _fetch<J extends ClerkResourceJSON | ClerkResourceJSON[] | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
@@ -92,7 +92,7 @@ export abstract class BaseResource {
   }
 
   // TODO @userland-errors:
-  protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
+  protected static async _baseFetch<J extends ClerkResourceJSON | ClerkResourceJSON[] | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {

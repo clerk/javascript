@@ -20,6 +20,8 @@ describe('UserProfile', () => {
       expect(profileElements.length).toBeGreaterThan(0);
       const securityElements = screen.getAllByRole('button', { name: /Security/i });
       expect(securityElements.length).toBeGreaterThan(0);
+      const oauthApplicationElements = screen.getAllByRole('button', { name: /OAuth applications/i });
+      expect(oauthApplicationElements.length).toBeGreaterThan(0);
     });
 
     it('includes custom nav items', async () => {

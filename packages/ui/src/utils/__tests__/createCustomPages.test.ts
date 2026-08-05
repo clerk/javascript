@@ -6,16 +6,21 @@ import {
   createUserProfileCustomPages as cUPCP,
 } from '../createCustomPages';
 
-const createUserProfileCustomPages = (arr: any) => cUPCP(arr, { sdkMetadata: { environment: 'test' } } as any);
+const createUserProfileCustomPages = (arr: any, features: { billing?: boolean; apiKeys?: boolean } = {}) =>
+  cUPCP(arr, { sdkMetadata: { environment: 'test' } } as any, features.billing ?? false, {
+    commerceSettings: { billing: { user: { enabled: features.billing ?? false } } },
+    apiKeysSettings: { user_api_keys_enabled: features.apiKeys ?? false },
+  } as any);
 const createOrganizationProfileCustomPages = (arr: any) => cOPCP(arr, { sdkMetadata: { environment: 'test' } } as any);
 
 describe('createCustomPages', () => {
   describe('createUserProfileCustomPages', () => {
     it('should return the default pages if no custom pages are passed', () => {
       const { routes, contents } = createUserProfileCustomPages([]);
-      expect(routes.length).toEqual(2);
+      expect(routes.length).toEqual(3);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
+      expect(routes[2].id).toEqual('oauthApplications');
       expect(contents.length).toEqual(0);
     });
 
@@ -39,17 +44,18 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[2].id).toEqual('oauthApplications');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
     });
 
-    it('should reorder the default pages when their label is used to target them', () => {
+    it('should reorder the default pages without changing the legacy root', () => {
       const customPages: CustomPage[] = [
         {
           label: 'Custom1',
@@ -71,14 +77,53 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].name).toEqual('Custom1');
       expect(routes[1].id).toEqual('account');
       expect(routes[2].id).toEqual('security');
       expect(routes[3].name).toEqual('Custom2');
+      expect(routes[4].id).toEqual('oauthApplications');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
+    });
+
+    it.each([
+      [{ billing: true }, 'billing'],
+      [{ apiKeys: true }, 'apiKeys'],
+    ] as const)('preserves the legacy root when optional page %s is enabled', (features, expectedRoot) => {
+      const { routes } = createUserProfileCustomPages([{ label: 'account' }, { label: 'security' }], features);
+
+      expect(routes[0].id).toEqual(expectedRoot);
+      expect(routes.at(-1)?.id).toEqual('oauthApplications');
+    });
+
+    it('keeps occupied legacy OAuth application paths reachable', () => {
+      const customPages: CustomPage[] = [
+        {
+          label: 'Legacy OAuth page',
+          url: 'OAuth-Applications/',
+          mount: () => undefined,
+          unmount: () => undefined,
+          mountIcon: () => undefined,
+          unmountIcon: () => undefined,
+        },
+        {
+          label: 'Legacy OAuth fallback page',
+          url: 'OAUTH-APPLICATIONS-CLERK/',
+          mount: () => undefined,
+          unmount: () => undefined,
+          mountIcon: () => undefined,
+          unmountIcon: () => undefined,
+        },
+      ];
+
+      const { routes } = createUserProfileCustomPages(customPages);
+      expect(routes.find(route => route.id === 'oauthApplications')?.path).toEqual('oauth-applications-clerk-2');
+      expect(routes.find(route => route.name === 'Legacy OAuth page')?.path).toEqual('OAuth-Applications/');
+      expect(routes.find(route => route.name === 'Legacy OAuth fallback page')?.path).toEqual(
+        'OAUTH-APPLICATIONS-CLERK/',
+      );
     });
 
     it('ignores invalid entries', () => {
@@ -105,11 +150,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].name).toEqual('Custom1');
       expect(routes[1].id).toEqual('account');
       expect(routes[2].id).toEqual('security');
       expect(routes[3].name).toEqual('Custom2');
+      expect(routes[4].id).toEqual('oauthApplications');
     });
 
     it('sets the path of the first page to be the root (/)', () => {
@@ -134,11 +180,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('account');
       expect(routes[2].path).toEqual('security');
       expect(routes[3].path).toEqual('custom2');
+      expect(routes[4].path).toEqual('oauth-applications');
     });
 
     it('sets the path of both account and security pages to root (/) if account is first', () => {
@@ -163,11 +210,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('custom1');
       expect(routes[2].path).toEqual('security');
       expect(routes[3].path).toEqual('custom2');
+      expect(routes[4].path).toEqual('oauth-applications');
     });
 
     it('sets the path of both account and security pages to root (/) if security is first', () => {
@@ -192,11 +240,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('custom1');
       expect(routes[2].path).toEqual('account');
       expect(routes[3].path).toEqual('custom2');
+      expect(routes[4].path).toEqual('oauth-applications');
     });
 
     it('throws if the first item in the navbar is an external link', () => {
@@ -239,11 +288,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Link1');
+      expect(routes[2].id).toEqual('oauthApplications');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Link1');
       expect(contents.length).toEqual(1);
       expect(contents[0].url).toEqual('custom1');
     });
@@ -270,10 +320,10 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(5);
-      expect(routes[2].path).toEqual('https://www.fullurl.com');
-      expect(routes[3].path).toEqual('/url-with-slash');
-      expect(routes[4].path).toEqual('/url-without-slash');
+      expect(routes.length).toEqual(6);
+      expect(routes[3].path).toEqual('https://www.fullurl.com');
+      expect(routes[4].path).toEqual('/url-with-slash');
+      expect(routes[5].path).toEqual('/url-without-slash');
     });
 
     it('sanitizes the path for custom pages', () => {
@@ -296,9 +346,9 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
-      expect(routes[2].path).toEqual('url-with-slash');
-      expect(routes[3].path).toEqual('url-without-slash');
+      expect(routes.length).toEqual(5);
+      expect(routes[3].path).toEqual('url-with-slash');
+      expect(routes[4].path).toEqual('url-without-slash');
     });
 
     it('throws when a custom page has an absolute URL', () => {

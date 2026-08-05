@@ -19,6 +19,12 @@ const APIKeysPage = lazy(() =>
   })),
 );
 
+const OAuthApplicationsPage = lazy(() =>
+  import(/* webpackChunkName: "up-oauth-applications-page"*/ './OAuthApplicationsPage').then(module => ({
+    default: module.OAuthApplicationsPage,
+  })),
+);
+
 const PlansPage = lazy(() =>
   import(/* webpackChunkName: "up-plans-page"*/ './PlansPage').then(module => ({
     default: module.PlansPage,
@@ -49,11 +55,21 @@ export const UserProfileRoutes = () => {
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
+  const isOAuthApplicationsPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.OAUTH_APPLICATIONS;
+  const oauthApplicationsPagePath =
+    pages.routes.find(route => route.id === USER_PROFILE_NAVBAR_ROUTE_ID.OAUTH_APPLICATIONS)?.path ??
+    'oauth-applications';
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
   const isAPIKeysPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
-    const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && !isSecurityPageRoot && index === 0;
+    const shouldFirstCustomItemBeOnRoot =
+      !isAccountPageRoot &&
+      !isSecurityPageRoot &&
+      !isOAuthApplicationsPageRoot &&
+      !isBillingPageRoot &&
+      !isAPIKeysPageRoot &&
+      index === 0;
     return (
       <Route
         index={shouldFirstCustomItemBeOnRoot}
@@ -83,6 +99,15 @@ export const UserProfileRoutes = () => {
           <Switch>
             <Route index>
               <SecurityPage />
+            </Route>
+          </Switch>
+        </Route>
+        <Route path={isOAuthApplicationsPageRoot ? undefined : oauthApplicationsPagePath}>
+          <Switch>
+            <Route index>
+              <Suspense fallback={''}>
+                <OAuthApplicationsPage />
+              </Suspense>
             </Route>
           </Switch>
         </Route>

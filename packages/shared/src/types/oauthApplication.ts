@@ -91,9 +91,35 @@ export type GetOAuthConsentInfoParams = {
 };
 
 /**
+ * @internal
+ */
+export interface OAuthApplicationJSON extends ClerkResourceJSON {
+  object: 'oauth_application';
+  name: string;
+  client_uri: string | null;
+  client_image_url: string | null;
+}
+
+/**
+ * An OAuth application that currently has access to the signed-in user's account.
+ */
+export type OAuthApplicationInfo = {
+  object: 'oauth_application';
+  id: string;
+  name: string;
+  clientUri: string | null;
+  clientImageUrl: string | null;
+};
+
+/**
  * Namespace exposed on `Clerk` for OAuth application / consent helpers.
  */
 export interface OAuthApplicationNamespace {
+  /**
+   * Lists OAuth applications that currently have access to the signed-in user's account.
+   */
+  getApplications: () => Promise<OAuthApplicationInfo[]>;
+
   /**
    * Loads consent metadata for the given OAuth client for the signed-in user.
    */

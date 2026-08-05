@@ -55,6 +55,7 @@ export type ProfileSectionId =
   | 'mfa'
   | 'danger'
   | 'activeDevices'
+  | 'oauthApplications'
   | 'organizationProfile'
   | 'organizationDanger'
   | 'organizationDomains'
@@ -74,6 +75,7 @@ export type ProfileSectionId =
 export type ProfilePageId =
   | 'account'
   | 'security'
+  | 'oauthApplications'
   | 'organizationGeneral'
   | 'organizationMembers'
   | 'organizationSecurity'

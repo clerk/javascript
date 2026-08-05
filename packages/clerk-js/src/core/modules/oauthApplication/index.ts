@@ -1,6 +1,8 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   GetOAuthConsentInfoParams,
+  OAuthApplicationInfo,
+  OAuthApplicationJSON,
   OAuthApplicationNamespace,
   OAuthConsentInfo,
   OAuthConsentInfoJSON,
@@ -9,6 +11,29 @@ import type {
 import { BaseResource } from '../../resources/internal';
 
 export class OAuthApplication implements OAuthApplicationNamespace {
+  async getApplications(): Promise<OAuthApplicationInfo[]> {
+    const json = await BaseResource._fetch<OAuthApplicationJSON[]>(
+      {
+        method: 'GET',
+        path: '/me/oauth_applications',
+      },
+      { skipUpdateClient: true },
+    );
+
+    if (!json) {
+      throw new ClerkRuntimeError('Network request failed while offline', { code: 'network_error' });
+    }
+
+    const data = json.response ?? json;
+    return data.map(application => ({
+      object: application.object,
+      id: application.id,
+      name: application.name,
+      clientUri: application.client_uri,
+      clientImageUrl: application.client_image_url,
+    }));
+  }
+
   async getConsentInfo(params: GetOAuthConsentInfoParams): Promise<OAuthConsentInfo> {
     const { oauthClientId, scope, redirectUri } = params;
     const search = {
