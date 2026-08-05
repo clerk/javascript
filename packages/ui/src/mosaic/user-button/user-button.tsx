@@ -42,7 +42,12 @@ export function UserButton({
   const displayPendingKey = useSpinDelay(action?.key ?? null, { delay: 0 });
 
   if (controller.status === 'loading') {
-    return <UserButtonTriggerSkeleton />;
+    return (
+      <UserButtonTriggerSkeleton
+        mode={mode}
+        modePriority={modePriority}
+      />
+    );
   }
 
   if (controller.status !== 'ready') {
