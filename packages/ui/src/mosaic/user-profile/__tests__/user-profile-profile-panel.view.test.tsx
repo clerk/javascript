@@ -83,6 +83,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    expect(onManageConnectedAccount).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
     await user.click(screen.getByRole('button', { name: 'Connect' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
 
@@ -111,6 +113,8 @@ describe('UserProfileProfilePanelView', () => {
     await user.type(screen.getByRole('textbox', { name: 'Name' }), ' Jr.');
     await user.click(within(screen.getByRole('region', { name: 'Email' })).getByRole('button', { name: 'Add' }));
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
+    expect(onManageEmail).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
 
     expect(onNameChange).toHaveBeenCalled();
     expect(onAddEmail).toHaveBeenCalledOnce();
