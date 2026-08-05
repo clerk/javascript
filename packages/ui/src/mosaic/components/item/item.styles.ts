@@ -52,6 +52,12 @@ export const item = stylex.create({
       },
     },
     cursor: 'pointer',
+    // A row that is standing down while another action runs keeps its place and its look, but
+    // stops answering the pointer — one declaration takes the cursor and the hover states with it.
+    pointerEvents: {
+      default: null,
+      ':disabled': 'none',
+    },
   },
 
   xs: {
