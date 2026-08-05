@@ -293,7 +293,6 @@ export const CheckoutForm = withCardStateProvider(() => {
               />
             </LineItems.Group>
           )}
-          <AppliedPromoCodeRow />
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
@@ -326,6 +325,8 @@ export const CheckoutForm = withCardStateProvider(() => {
               <LineItems.Description text={totals.pastDue ? $(totals.pastDue) : ''} />
             </LineItems.Group>
           )}
+
+          <AppliedPromoCodeRow />
 
           {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial ? (
             <LineItems.Group variant='tertiary'>
