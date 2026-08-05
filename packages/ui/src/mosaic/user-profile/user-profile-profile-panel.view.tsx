@@ -1,11 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ChangeEvent, ReactElement } from 'react';
-import { Fragment, useId } from 'react';
+import { Fragment } from 'react';
 
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Card } from '../components/card';
+import { Field } from '../components/field';
 import { Heading } from '../components/heading';
 import { Icon } from '../components/icon';
 import { Input } from '../components/input';
@@ -58,30 +59,19 @@ function Divider() {
 }
 
 function FieldRow({ label, value, onChange }: { label: string; value: string; onChange?: (value: string) => void }) {
-  const inputId = useId();
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => onChange?.(event.target.value);
 
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-profile-panel-field-row'), stylex.props(styles.row))}>
-      <label htmlFor={inputId}>
-        <Text
-          render={props => <span {...props} />}
-          color='neutral'
-          style={{ fontWeight: 510 }}
-        >
-          {label}
-        </Text>
-      </label>
+    <Field.Root {...mergeStyleProps(themeProps('user-profile-profile-panel-field-row'), stylex.props(styles.row))}>
+      <Field.Label {...stylex.props(styles.fieldLabel)}>{label}</Field.Label>
       <Input
-        aria-label={label}
-        id={inputId}
         readOnly={!onChange}
         size='md'
         value={value}
         onChange={handleChange}
         {...stylex.props(styles.input)}
       />
-    </div>
+    </Field.Root>
   );
 }
 
