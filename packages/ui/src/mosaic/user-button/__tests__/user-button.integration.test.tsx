@@ -54,6 +54,7 @@ let signOut: ReturnType<typeof vi.fn>;
 let navigate: ReturnType<typeof vi.fn>;
 let openUserProfile: ReturnType<typeof vi.fn>;
 let openOrganizationProfile: ReturnType<typeof vi.fn>;
+let openCreateOrganization: ReturnType<typeof vi.fn>;
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -68,6 +69,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       signOut,
       openUserProfile,
       openOrganizationProfile,
+      openCreateOrganization,
       buildUserProfileUrl: () => '/user-profile',
       buildOrganizationProfileUrl: () => '/org-profile',
       buildCreateOrganizationUrl: () => '/create-org',
@@ -159,6 +161,7 @@ beforeEach(() => {
   navigate = vi.fn().mockResolvedValue(undefined);
   openUserProfile = vi.fn();
   openOrganizationProfile = vi.fn();
+  openCreateOrganization = vi.fn();
 });
 
 afterEach(() => {
@@ -353,13 +356,25 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('creating an organization navigates and closes the popover', async () => {
+  it('creating an organization opens the modal and closes the popover', async () => {
     renderUserButton();
     const act = await open();
 
     await accountAction(act, 'Create organization');
 
-    expect(navigate).toHaveBeenCalledWith('/create-org');
+    expect(openCreateOrganization).toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
+  it('creating an organization navigates instead when a URL routes it', async () => {
+    renderUserButton({ createOrganizationUrl: '/new-org' });
+    const act = await open();
+
+    await accountAction(act, 'Create organization');
+
+    expect(navigate).toHaveBeenCalledWith('/new-org');
+    expect(openCreateOrganization).not.toHaveBeenCalled();
     await waitFor(() => expect(popup()).toBeNull());
   });
 
