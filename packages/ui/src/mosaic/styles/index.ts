@@ -79,8 +79,6 @@ export type {
   MenuMediaProps,
   MenuMediaSize,
   MenuPopupProps,
-  MenuProps,
-  MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
@@ -109,7 +107,6 @@ export type {
   PopoverCloseProps,
   PopoverDescriptionProps,
   PopoverPopupProps,
-  PopoverRootProps,
   PopoverSize,
   PopoverTitleProps,
   PopoverTriggerProps,

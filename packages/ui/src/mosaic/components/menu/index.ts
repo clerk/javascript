@@ -5,7 +5,5 @@ export type {
   MenuMediaProps,
   MenuMediaSize,
   MenuPopupProps,
-  MenuProps,
-  MenuSeparatorProps,
   MenuTriggerProps,
 } from './menu';
