@@ -349,6 +349,19 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
+  // A custom action is the app's to run, and whatever it opens takes over from here, so the popover
+  // goes with it the way it does for managing an account.
+  it('running a custom menu item calls back and closes the popover', async () => {
+    const onClick = vi.fn();
+    renderUserButton({ customMenuItems: [{ id: 'terms', label: 'Terms of service', onClick }] });
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Terms of service' }));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(popup()).toBeNull());
+  });
+
   it('inviting members opens the InviteMembers modal and closes the popover', async () => {
     renderUserButton();
     const act = await open();
