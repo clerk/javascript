@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 import {
   userButtonBusyKeys,
   type UserButtonInvitation,
@@ -295,6 +296,57 @@ export function User(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='user'
+    />
+  );
+}
+
+export function CustomMenuItems(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  // The app's own rows join the foot, and `menuItemOrder` puts them wherever it names them. Ids for
+  // rows the surface does not carry are ignored, so one order can cover every mode.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      // With another account to switch to, the Accounts heading carries "Add account" instead of the
+      // foot. One account leaves both built-in rows here, which is what there is to order.
+      additionalSessions={[]}
+      customMenuItems={[
+        {
+          id: 'settings',
+          label: 'App settings',
+          icon: (
+            <Icon
+              name='cog'
+              size='sm'
+            />
+          ),
+          onClick: () => {},
+        },
+        // `icon` takes any node, so an app brings its own glyph rather than picking from Mosaic's set.
+        {
+          id: 'docs',
+          label: 'Documentation',
+          icon: (
+            <svg
+              width='16'
+              height='16'
+              viewBox='0 0 16 16'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='1.5'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            >
+              <path d='M2.5 3.5h4a2 2 0 0 1 2 2v7a1.5 1.5 0 0 0-1.5-1.5h-4.5Z' />
+              <path d='M14.5 3.5h-4a2 2 0 0 0-2 2v7a1.5 1.5 0 0 1 1.5-1.5h4.5Z' />
+            </svg>
+          ),
+          href: 'https://clerk.com/docs',
+        },
+      ]}
+      menuItemOrder={['docs', 'addAccount', 'signOutAll', 'settings']}
     />
   );
 }

@@ -138,6 +138,28 @@ this mode ignores it, down to the trigger.
   storyModule={UserButtonStories}
 />
 
+## Menu items
+
+`customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with
+`onClick` is an action and closes the popup on the way out; a row with `href` is a link and navigates
+on its own, so it stays followable while another action is in flight. The `icon` is optional — a row
+without one still holds the column, so labels stay in line.
+
+`menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
+ids it knows are `createOrganization`, `addAccount`, `signOutAll`, and each custom item's `id`. Those
+are the only actions the foot lists as rows; the rest live in the header or behind a `⋯`, where
+there is no list for an order to run in.
+
+Which of the three the foot carries depends on the surface, not just the mode: `createOrganization`
+is a row only on an org-only surface, and `addAccount` only where no Accounts heading holds it — an
+account with nobody to switch to. So an id the surface has not got is ignored rather than an error,
+and one order can cover every mode.
+
+<Story
+  name='CustomMenuItems'
+  storyModule={UserButtonStories}
+/>
+
 ## Parts
 
 | Part                | Description                                                                  |
