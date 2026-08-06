@@ -650,6 +650,7 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: 'Affiliation',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
@@ -658,6 +659,7 @@ export const enUS: LocalizationResource = {
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
+        ownershipLabel: 'Ownership',
         txtRecord: {
           hostLabel: 'Host / Name',
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
@@ -666,6 +668,7 @@ export const enUS: LocalizationResource = {
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
         verifyAgainButton: 'Verify again',
+        verifyOwnershipButton: 'Verify ownership',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

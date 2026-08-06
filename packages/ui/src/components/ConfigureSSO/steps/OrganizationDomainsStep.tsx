@@ -25,7 +25,7 @@ import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { Tooltip } from '@/elements/Tooltip';
-import { Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
+import { ArrowRight, Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
 import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
@@ -383,6 +383,7 @@ const DomainCard = ({
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
   const hasOwnershipVerification = Boolean(ownershipVerification);
+  const isAffiliationVerified = (domain.affiliationVerification ?? domain.verification)?.status === 'verified';
   const cardId = ownershipVerification?.status ?? 'unverified';
 
   const removeButton = (
@@ -434,6 +435,32 @@ const DomainCard = ({
           >
             {domain.name}
           </Text>
+
+          {isAffiliationVerified && (
+            <>
+              <Text
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.affiliationLabel')}
+                sx={t => ({ fontSize: t.fontSizes.$xs })}
+              />
+              <Badge
+                colorScheme='success'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__verified')}
+              />
+              <Icon
+                icon={ArrowRight}
+                size='sm'
+                colorScheme='neutral'
+              />
+              <Text
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.ownershipLabel')}
+                sx={t => ({ fontSize: t.fontSizes.$xs })}
+              />
+            </>
+          )}
 
           <Badge
             elementDescriptor={descriptors.configureSSOVerifyDomainCardBadge}
@@ -546,7 +573,11 @@ const ExpiredNotice = ({
         />
         <Text
           as='span'
-          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButton')}
+          localizationKey={
+            isExpired
+              ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButton')
+              : localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyOwnershipButton')
+          }
         />
       </Button>
     </Col>
