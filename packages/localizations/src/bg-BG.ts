@@ -1307,9 +1307,9 @@ export const bgBG: LocalizationResource = {
   },
   signIn: {
     accountSwitcher: {
-      action__addAccount: 'Добавете профил',
-      action__signOutAll: 'Изход от всички профили',
-      subtitle: 'Изберете акаунт с който да продължите',
+      action__addAccount: 'Добавете акаунт',
+      action__signOutAll: 'Изход от всички акаунти',
+      subtitle: 'Изберете акаунт, с който да продължите',
       title: 'Изберете акаунт',
     },
     alternativeMethods: {
@@ -2058,7 +2058,7 @@ export const bgBG: LocalizationResource = {
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'Препоръчително е да излезете от всички други устройства, когато променяте паролата си.',
+        'Препоръчително е да излезете от всички други устройства, на които може да сте използвали старата си парола.',
       readonly:
         'Вашата парола в момента не може да бъде редактирана, тъй като можете да влизате само чрез корпоративна връзка.',
       successMessage__set: 'Паролата ви беше зададена.',
