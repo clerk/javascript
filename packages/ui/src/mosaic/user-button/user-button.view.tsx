@@ -20,6 +20,8 @@ import { Spinner } from '../components/spinner';
 import { truncationStyles } from '../components/typography.styles';
 import type { IconName } from '../icons/registry';
 import { fontWeightVars } from '../tokens.stylex';
+import type { UserButtonMenuItem, UserButtonMenuItemId } from './user-button.menu';
+import { arrangeMenuRows } from './user-button.menu';
 import { styles, triggerShapes } from './user-button.styles';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
@@ -149,6 +151,18 @@ export const userButtonBusyKeys = {
   acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
 } as const;
 
+/** The app's own actions at the foot of the popup, and the order the foot's rows run in. */
+export interface UserButtonMenuProps {
+  /** Actions and links of your own, added to the foot of the popup ahead of Clerk's own rows. */
+  customMenuItems?: UserButtonMenuItem[];
+  /**
+   * The order the foot's rows run in, by id: a built-in row's id, or a custom item's `id`. Anything
+   * left out follows the rows named here. An id the surface does not carry as a row is ignored,
+   * since which rows the foot has depends on its mode.
+   */
+  menuItemOrder?: (UserButtonMenuItemId | (string & {}))[];
+}
+
 export interface UserButtonBusyState {
   /**
    * Key of the single in-flight action (see `userButtonBusyKeys`), or `null`/absent when idle. The
@@ -159,7 +173,8 @@ export interface UserButtonBusyState {
 
 type UserButtonContextValue = UserButtonData &
   UserButtonCallbacks &
-  UserButtonBusyState & { mode: UserButtonMode; modePriority: UserButtonModePriority };
+  UserButtonBusyState &
+  UserButtonMenuProps & { mode: UserButtonMode; modePriority: UserButtonModePriority };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
@@ -365,34 +380,42 @@ function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing, busy,
   );
 }
 
+const asAnchor =
+  (href: string) =>
+  ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+    <a
+      href={href}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+
 interface ActionRowProps {
-  icon: IconName;
+  /** Identifies the row, for ordering. */
+  id: UserButtonMenuItemId | (string & {});
+  icon?: ReactNode;
   label: string;
-  onClick: () => void;
+  /** Where the row goes, for a row that leaves rather than acting. */
+  href?: string;
+  onClick?: () => void;
   /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
   busyKey?: string;
 }
 
 /** A bare action at the foot of a group ("Add account", "Sign out of all accounts"). */
-function ActionRow({ icon, label, onClick, busyKey }: ActionRowProps) {
+function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
   const { busy, disabled } = useBusy(busyKey ?? '');
 
   return (
     <Item.Root
       size='xs'
-      render={asButton(busy || disabled)}
+      // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
+      // has nothing to wait behind and never stands down.
+      render={href ? asAnchor(href) : asButton(busy || disabled)}
       onClick={onClick}
     >
-      <Item.Media>
-        {busy ? (
-          <Spinner size='sm' />
-        ) : (
-          <Icon
-            name={icon}
-            size='sm'
-          />
-        )}
-      </Item.Media>
+      <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
       <Item.Content>
         <Item.Label>{label}</Item.Label>
       </Item.Content>
@@ -937,26 +960,54 @@ function Footer() {
 
   // An org-only surface has no account menu to carry "Create organization", so it lands here
   // instead, in the slot the account-wide actions occupy everywhere else.
-  const actions: ActionRowProps[] = [];
+  const builtIn: ActionRowProps[] = [];
   if (data.mode === 'orgs') {
     if (data.onCreateOrganization) {
-      actions.push({ icon: 'plus', label: 'Create organization', onClick: data.onCreateOrganization });
+      builtIn.push({
+        id: 'createOrganization',
+        icon: (
+          <Icon
+            name='plus'
+            size='sm'
+          />
+        ),
+        label: 'Create organization',
+        onClick: data.onCreateOrganization,
+      });
     }
   } else {
     // "Add account" lives in the Accounts heading wherever there is one; without it the foot
     // carries it, the same slot "Create organization" takes on an org-only surface.
     if (data.onAddAccount && !showsAccountsHeading(data)) {
-      actions.push({ icon: 'plus', label: 'Add account', onClick: data.onAddAccount });
+      builtIn.push({
+        id: 'addAccount',
+        icon: (
+          <Icon
+            name='plus'
+            size='sm'
+          />
+        ),
+        label: 'Add account',
+        onClick: data.onAddAccount,
+      });
     }
     if (data.onSignOutAll) {
-      actions.push({
-        icon: 'log-out',
+      builtIn.push({
+        id: 'signOutAll',
+        icon: (
+          <Icon
+            name='log-out'
+            size='sm'
+          />
+        ),
         label: 'Sign out of all accounts',
         onClick: data.onSignOutAll,
         busyKey: userButtonBusyKeys.signOutAll(),
       });
     }
   }
+
+  const actions = arrangeMenuRows<ActionRowProps>(data.menuItemOrder, data.customMenuItems ?? [], builtIn);
 
   return (
     <>
@@ -966,7 +1017,7 @@ function Footer() {
           <Item.Group>
             {actions.map(action => (
               <ActionRow
-                key={action.label}
+                key={action.id}
                 {...action}
               />
             ))}
@@ -982,7 +1033,8 @@ function Footer() {
 
 // ─── Public parts ───────────────────────────────────────────────────────────
 
-export interface UserButtonRootProps extends UserButtonData, UserButtonCallbacks, UserButtonBusyState {
+export interface UserButtonRootProps
+  extends UserButtonData, UserButtonCallbacks, UserButtonBusyState, UserButtonMenuProps {
   children: ReactNode;
   /** @default 'combined' */
   mode?: UserButtonMode;
