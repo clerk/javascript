@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Mosaic components mounted directly in the host app's tree, rather than through clerk-js. They
  * read Clerk via `@clerk/shared/react` hooks, so a `ClerkProvider` above them is all they need.
