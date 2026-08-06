@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import {
   colorVars,
   durationVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   space,
@@ -88,6 +89,7 @@ export const styles = stylex.create({
     display: 'inline-flex',
     // A button is sized by its own axis, not by whatever row it lands in.
     flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',
