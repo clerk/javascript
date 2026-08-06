@@ -447,6 +447,26 @@ describe('UserButtonView, the workspace list', () => {
       expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
     });
 
+    // Every other affordance on the surface swaps its icon for a spinner, but these carry a label
+    // rather than an icon, so the spinner goes inside the button instead of taking its place.
+    it('spins inside the join button rather than replacing it', () => {
+      renderList({ suggestions: [beta], pendingKey: userButtonBusyKeys.acceptSuggestion('sug_1') });
+
+      const join = screen.getByRole('button', { name: 'Join' });
+      expect(join).toHaveAttribute('aria-busy', 'true');
+      expect(within(join).getByRole('progressbar')).toBeInTheDocument();
+      // The row itself stays as it was: the button is what reports the action, not the trailing edge.
+      expect(row(workspaceList(), 'Beta')?.querySelector('.cl-spinner')).toBe(within(join).getByRole('progressbar'));
+    });
+
+    it('spins inside the accept button too', () => {
+      renderList({ invitations: [gamma], pendingKey: userButtonBusyKeys.acceptInvitation('inv_1') });
+
+      const accept = screen.getByRole('button', { name: 'Accept' });
+      expect(accept).toHaveAttribute('aria-busy', 'true');
+      expect(within(accept).getByRole('progressbar')).toBeInTheDocument();
+    });
+
     // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
     it('reports an accepted suggestion instead of offering to join it again', () => {
       renderList({ suggestions: [{ ...beta, status: 'accepted' }] });
