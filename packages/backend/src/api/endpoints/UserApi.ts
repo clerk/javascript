@@ -224,7 +224,7 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  </ul>
    *
-   * If you need support for any particular hashing algorithm, [contact support](https://clerk.com/contact/support).
+   * If you need support for any particular hashing algorithm, [contact support](/contact/support).
    */
   passwordHasher: PasswordHasher;
 };
