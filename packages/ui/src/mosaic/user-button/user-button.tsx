@@ -3,6 +3,7 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
+import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useSpinDelay } from '../hooks/useSpinDelay';
 import type { UserButtonController, UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
@@ -86,11 +87,17 @@ interface PendingAction {
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderTriggerBadge, mode, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
+  const { renderTriggerLabel, renderTriggerBadge, mode: requestedMode, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
     props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState<PendingAction | null>(null);
+
+  // Organizations off at the instance leaves nothing for an organization surface to lead with or
+  // list, so the button is the account's whatever mode asked for. clerk-js withholds its own
+  // `<OrganizationSwitcher>` at the mount boundary; nothing mounts this one, so the gate lives here.
+  const organizationsEnabled = useMosaicEnvironment()?.organizationSettings?.enabled ?? true;
+  const mode = organizationsEnabled ? requestedMode : 'user';
 
   // Every action here is a network round trip, so there is nothing to debounce and the click gets
   // its spinner at once. The hook is still what steadies it, holding it up long enough to read.

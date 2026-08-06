@@ -48,6 +48,7 @@ let userSuggestions: FakeList;
 let signedInSessions: FakeSession[];
 let pagingRef: ReturnType<typeof vi.fn>;
 let singleSessionMode: boolean;
+let organizationsEnabled: boolean;
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -82,6 +83,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_environment: {
         displayConfig: { afterSwitchSessionUrl: '/after-switch' },
         authConfig: { singleSessionMode },
+        organizationSettings: { enabled: organizationsEnabled },
       },
     }),
   };
@@ -142,6 +144,7 @@ beforeEach(() => {
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
   pagingRef = vi.fn();
   singleSessionMode = false;
+  organizationsEnabled = true;
   signedInSessions = [
     { id: 'sess_1', user },
     {
@@ -204,18 +207,43 @@ async function accountAction(act: ReturnType<typeof userEvent.setup>, label: str
 }
 
 describe('UserButton (connected)', () => {
-  it('renders a non-interactive placeholder while the controller is loading', () => {
-    isUserLoaded = false;
-    renderUserButton();
+  // Nothing stands in for the button before Clerk answers, in any mode: until it does, a signed-out
+  // visitor is indistinguishable from a session still resolving, so a placeholder here would be
+  // promising a button to people who never get one.
+  describe.each(['combined', 'orgs', 'user'] as const)('in %s mode', mode => {
+    it('renders nothing while Clerk is still loading', () => {
+      isUserLoaded = false;
+      renderUserButton({ mode });
+      expect(host()).toBeEmptyDOMElement();
+    });
 
-    expect(host()).not.toBeEmptyDOMElement();
-    expect(screen.queryByRole('button')).toBeNull();
-  });
+    it('renders nothing when nobody is signed in', () => {
+      user = null;
+      renderUserButton({ mode });
+      expect(host()).toBeEmptyDOMElement();
+    });
 
-  it('renders nothing when there is no active user', () => {
-    user = null;
-    renderUserButton();
-    expect(host()).toBeEmptyDOMElement();
+    // Organizations off at the instance is the same answer whatever mode asked for: the button is
+    // the account's. An org-only surface would otherwise render its own empty shell, since the
+    // clerk-js mount boundary that withholds `<OrganizationSwitcher>` never runs for this one.
+    it('leaves organizations out entirely when the instance has them disabled', async () => {
+      organizationsEnabled = false;
+      renderUserButton({ mode });
+
+      // The account heads the surface, rather than the organization that is active regardless.
+      expect(screen.getByRole('button', { name: 'Open account menu for Alice Smith' })).toBeInTheDocument();
+      await open();
+
+      for (const name of ['Acme', 'Other', 'Beta', 'Gamma', 'Personal account']) {
+        expect(screen.queryByText(name)).toBeNull();
+      }
+      expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+
+      // Everything the account itself carries is still on offer.
+      expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeInTheDocument();
+    });
   });
 
   it('renders the trigger and keeps the popover closed until clicked', () => {
