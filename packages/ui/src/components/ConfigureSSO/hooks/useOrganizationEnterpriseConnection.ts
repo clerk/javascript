@@ -211,9 +211,14 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     attemptOwnershipVerification,
     revalidate: revalidateDomains,
   } = __internal_useOrganizationDomains({
-    enrollmentMode: 'enterprise_sso',
+    createEnrollmentMode: 'enterprise_sso',
     onOwnershipVerified: handleDomainOwnershipVerified,
   });
+
+  const verifiedOwnershipDomains = useMemo(
+    () => organizationDomains?.filter(domain => domain.ownershipVerification?.status === 'verified'),
+    [organizationDomains],
+  );
 
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
@@ -229,7 +234,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
       return createEnterpriseConnection({
         provider,
-        domains: organizationDomains?.map(domain => domain.name),
+        domains: verifiedOwnershipDomains?.map(domain => domain.name),
       });
     };
 
@@ -243,7 +248,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
         await deleteEnterpriseConnection(enterpriseConnection.id);
       }
 
-      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
+      const domains = enterpriseConnection?.domains ?? verifiedOwnershipDomains?.map(domain => domain.name);
 
       return createEnterpriseConnection({
         provider,
@@ -281,7 +286,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     };
   }, [
     organization,
-    organizationDomains,
+    verifiedOwnershipDomains,
     enterpriseConnection,
     createEnterpriseConnection,
     updateEnterpriseConnection,

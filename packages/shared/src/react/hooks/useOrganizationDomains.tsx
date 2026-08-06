@@ -25,6 +25,11 @@ export type UseOrganizationDomainsParams = {
    */
   enrollmentMode?: OrganizationEnrollmentMode;
   /**
+   * Enrollment mode assigned to domains created through this hook. Defaults to
+   * `enrollmentMode`, so filtering and creation retain their existing behavior.
+   */
+  createEnrollmentMode?: OrganizationEnrollmentMode;
+  /**
    * Invoked from the ownership-verification poll whenever an `attempt` resolves
    * one or more domains as `verified`.
    */
@@ -64,7 +69,13 @@ export type UseOrganizationDomainsReturn = {
  * @internal
  */
 function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseOrganizationDomainsReturn {
-  const { keepPreviousData = true, enabled = true, enrollmentMode, onOwnershipVerified } = params;
+  const {
+    keepPreviousData = true,
+    enabled = true,
+    enrollmentMode,
+    createEnrollmentMode = enrollmentMode,
+    onOwnershipVerified,
+  } = params;
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
@@ -101,9 +112,12 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
 
   const createDomain = useCallback(
     async (name: string) => {
-      let created = await organization?.createDomain(name, enrollmentMode ? { enrollmentMode } : undefined);
+      let created = await organization?.createDomain(
+        name,
+        createEnrollmentMode ? { enrollmentMode: createEnrollmentMode } : undefined,
+      );
 
-      if (created && enrollmentMode === 'enterprise_sso') {
+      if (created && createEnrollmentMode === 'enterprise_sso') {
         const prepared = await organization?.prepareOwnershipVerification([created.id]);
         created = prepared?.data[0] ?? created;
       }
@@ -111,7 +125,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       await revalidate();
       return created;
     },
-    [organization, revalidate, enrollmentMode],
+    [organization, revalidate, createEnrollmentMode],
   );
 
   const prepareOwnershipVerification = useCallback(

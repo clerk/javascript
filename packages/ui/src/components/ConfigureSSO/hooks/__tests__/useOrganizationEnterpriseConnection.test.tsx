@@ -185,20 +185,22 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  it('createConnection forwards the provider and the organization domains', async () => {
-    domainsState.data = [{ name: 'acme.com' }, { name: 'example.com' }];
+  it('createConnection forwards the provider and ownership-verified organization domains', async () => {
+    domainsState.data = [
+      { name: 'acme.com', ownershipVerification: { status: 'verified' } },
+      { name: 'example.com', ownershipVerification: null },
+    ];
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
     await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
-    // `name` is derived by FAPI, so it is not sent from the client; `domains`
-    // are the verified organization domains passed straight through by the
-    // caller.
+    // `name` is derived by FAPI, so it is not sent from the client; only
+    // ownership-verified domains are valid SSO connection domains.
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      domains: ['acme.com', 'example.com'],
+      domains: ['acme.com'],
     });
   });
 

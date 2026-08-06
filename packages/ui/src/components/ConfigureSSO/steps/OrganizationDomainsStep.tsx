@@ -382,6 +382,7 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
+  const hasOwnershipVerification = Boolean(ownershipVerification);
   const cardId = ownershipVerification?.status ?? 'unverified';
 
   const removeButton = (
@@ -447,7 +448,7 @@ const DomainCard = ({
             }
           />
 
-          {!isVerified && !isExpired && (
+          {!isVerified && !isExpired && hasOwnershipVerification && (
             <Spinner
               size='xs'
               colorScheme='neutral'
@@ -468,9 +469,10 @@ const DomainCard = ({
 
       <Box sx={{ overflow: 'hidden' }}>
         <Animated>
-          {isExpired ? (
+          {!hasOwnershipVerification || isExpired ? (
             <ExpiredNotice
-              key='expired'
+              key={isExpired ? 'expired' : 'unprepared'}
+              isExpired={isExpired}
               expiresAt={ownershipVerification?.expiresAt ?? null}
               onPrepareOwnershipVerification={onPrepareOwnershipVerification}
             />
@@ -497,9 +499,11 @@ const DomainCard = ({
 };
 
 const ExpiredNotice = ({
+  isExpired,
   expiresAt,
   onPrepareOwnershipVerification,
 }: {
+  isExpired: boolean;
   expiresAt: Date | null;
   onPrepareOwnershipVerification: () => Promise<void>;
 }): JSX.Element => {
@@ -515,15 +519,17 @@ const ExpiredNotice = ({
       elementDescriptor={descriptors.configureSSOVerifyDomainCardExpired}
       sx={t => ({ gap: t.space.$3, paddingInline: t.space.$4, paddingBottom: t.space.$4 })}
     >
-      <Text
-        as='p'
-        colorScheme='secondary'
-        localizationKey={
-          expiresAt
-            ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredAtLabel', { date: expiresAt })
-            : localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredLabel')
-        }
-      />
+      {isExpired && (
+        <Text
+          as='p'
+          colorScheme='secondary'
+          localizationKey={
+            expiresAt
+              ? localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredAtLabel', { date: expiresAt })
+              : localizationKeys('configureSSO.organizationDomainsStep.domainCard.expiredLabel')
+          }
+        />
+      )}
 
       <Button
         variant='bordered'
