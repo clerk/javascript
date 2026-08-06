@@ -9,6 +9,7 @@ import { Button } from './button';
 import { Card } from './card';
 import { Heading } from './heading';
 import { Icon } from './icon';
+import { Input } from './input';
 import { Item } from './item';
 import { reset } from './reset.styles';
 import { Text } from './text';
@@ -50,6 +51,7 @@ const cases: Array<[string, React.ReactElement]> = [
       name='ellipsis'
     />,
   ],
+  ['Input', <Input key='input' />],
   ['Item', <Item.Root key='item' />],
   ['Item.Group', <Item.Group key='item-group' />],
   ['Item.Separator', <Item.Separator key='item-separator' />],

@@ -18,6 +18,8 @@ export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export { Input } from '../components/input';
+export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
@@ -48,6 +50,7 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   scrollbarVars,
@@ -62,6 +65,7 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   scrollbarVars,
@@ -78,6 +82,7 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type ScrollbarVarName = keyof typeof scrollbarVars;
