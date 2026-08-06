@@ -1001,27 +1001,6 @@ export function UserButtonTrigger({
   );
 }
 
-/**
- * Holds the trigger's space while the controller loads, so nothing shifts when the real avatar
- * lands. That includes its corner, which the mode settles without waiting on data: an
- * organization-led surface squares off, an account-led one stays round. Non-interactive.
- */
-export function UserButtonTriggerSkeleton({
-  mode = 'combined',
-  modePriority = 'organizations',
-}: UserButtonModeProps = {}): ReactElement {
-  const shape = leadsWithOrganization(mode, modePriority) ? 'square' : 'circle';
-
-  return (
-    <div {...stylex.props(styles.trigger)}>
-      <div
-        aria-hidden
-        {...stylex.props(styles.triggerSkeleton, triggerShapes[shape])}
-      />
-    </div>
-  );
-}
-
 /** The popover surface: header, workspace list, additional accounts, and footer. */
 export function UserButtonPopup(): ReactElement {
   return (
