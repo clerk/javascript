@@ -331,6 +331,8 @@ function WorkspaceRow({ name, imageUrl, shape, active, onSelect, trailing, busy,
   return (
     <Item.Root
       size='xs'
+      // The check is decorative, so without this the active row reads like the ones you can switch to.
+      aria-current={active ? 'true' : undefined}
       render={select ? asButton(waiting) : undefined}
       onClick={select}
     >
@@ -778,6 +780,7 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
   return (
     <Item.Root
       size='xs'
+      aria-current={active ? 'true' : undefined}
       render={switchSession ? asButton(busy || disabled) : undefined}
       onClick={switchSession ? () => switchSession(session.sessionId) : undefined}
     >

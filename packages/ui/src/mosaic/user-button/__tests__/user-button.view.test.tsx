@@ -76,6 +76,10 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
 const titles = (group: HTMLElement | undefined) =>
   Array.from(group?.querySelectorAll('.cl-item-title') ?? []).map(node => node.textContent ?? '');
+const row = (group: HTMLElement | undefined, title: string) =>
+  Array.from(group?.querySelectorAll<HTMLElement>('.cl-item') ?? []).find(
+    node => node.querySelector('.cl-item-title')?.textContent === title,
+  );
 
 const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
 
@@ -281,6 +285,13 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.queryByRole('button', { name: 'alice@example.com' })).toBeNull();
   });
 
+  it('names the account it is on as the current one', () => {
+    renderCombined();
+
+    expect(row(accountsList(), 'alice@example.com')).toHaveAttribute('aria-current', 'true');
+    expect(row(accountsList(), 'bob@example.com')).not.toHaveAttribute('aria-current');
+  });
+
   it('keeps "Add account" in the Accounts heading rather than at the foot', async () => {
     renderCombined();
 
@@ -341,6 +352,23 @@ describe('UserButtonView, the workspace list', () => {
 
     expect(scrollClasses.length).toBeGreaterThan(0);
     expect(workspaceList()).toBeDefined();
+  });
+
+  // The check beside the active row is decorative, so on its own it leaves that row reading to a
+  // screen reader exactly like the ones there is still somewhere to switch to.
+  it('names the active workspace as the current one', () => {
+    renderList({ memberships: [foundry, otherCo] });
+
+    expect(row(workspaceList(), 'Foundry')).toHaveAttribute('aria-current', 'true');
+    expect(row(workspaceList(), 'Other Co')).not.toHaveAttribute('aria-current');
+    expect(row(workspaceList(), 'Personal account')).not.toHaveAttribute('aria-current');
+  });
+
+  it('names the personal workspace as the current one where no organization is active', () => {
+    renderList({ activeOrganization: null });
+
+    expect(row(workspaceList(), 'Personal account')).toHaveAttribute('aria-current', 'true');
+    expect(row(workspaceList(), 'Foundry')).not.toHaveAttribute('aria-current');
   });
 
   it('hands the paging sentinel to the in-view ref only while more pages remain', () => {
