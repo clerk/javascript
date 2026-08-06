@@ -41,6 +41,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    field: dynamic(() => import('../stories/field.component.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.

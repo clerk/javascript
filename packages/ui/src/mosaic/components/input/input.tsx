@@ -5,6 +5,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../reset.styles';
+import { useOptionalFieldControlProps } from '../field/field.context';
 import { sizes, styles } from './input.styles';
 
 export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> {
@@ -12,15 +13,30 @@ export interface InputProps extends Omit<MosaicComponentProps<'input'>, 'size'> 
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(function MosaicInput(
-  { size = 'md', disabled = false, render, className, style, ...rest },
+  {
+    size = 'md',
+    disabled = false,
+    render,
+    className,
+    style,
+    id,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    ...rest
+  },
   ref,
 ) {
+  const fieldProps = useOptionalFieldControlProps({ id, ariaLabelledBy, ariaDescribedBy });
+
   return useRender({
     defaultTagName: 'input',
     render,
     ref,
     props: {
       disabled,
+      id: fieldProps?.id ?? id,
+      'aria-labelledby': fieldProps?.['aria-labelledby'] ?? ariaLabelledBy,
+      'aria-describedby': fieldProps?.['aria-describedby'] ?? ariaDescribedBy,
       ...mergeStyleProps(
         themeProps('input', { size, disabled }),
         stylex.props(reset.base, styles.base, sizes[size], disabled && styles.disabled),
