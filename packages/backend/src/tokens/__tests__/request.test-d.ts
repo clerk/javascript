@@ -1,6 +1,7 @@
 import { expectTypeOf, test } from 'vitest';
 
 import type { AuthenticateRequestOptions, RequestState, TokenType } from '../../internal';
+import type { AuthenticatedMachineObject, InvalidTokenAuthObject, SignedInAuthObject } from '../authObjects';
 import type { AuthenticatedState, HandshakeState, UnauthenticatedState } from '../authStatus';
 import { authenticateRequest } from '../request';
 
@@ -80,4 +81,19 @@ test('pins Parameters/ReturnType extraction to the last overload', () => {
     [request: Request, options?: AuthenticateRequestOptions]
   >();
   expectTypeOf<ReturnType<typeof authenticateRequest>>().toEqualTypeOf<Promise<RequestState<'session_token'>>>();
+});
+
+test('narrowing tokenType on a state narrows the toAuth return type', async () => {
+  const request = new Request('https://example.com');
+  const state = await authenticateRequest(request, { acceptsToken: ['session_token', 'api_key'] });
+
+  if (state.status === 'signed-in' && state.tokenType === 'session_token') {
+    expectTypeOf(state.toAuth({ treatPendingAsSignedOut: true })).toEqualTypeOf<SignedInAuthObject>();
+  }
+  if (state.status === 'signed-in' && state.tokenType === 'api_key') {
+    expectTypeOf(state.toAuth()).toEqualTypeOf<AuthenticatedMachineObject<'api_key'>>();
+  }
+  if (state.status === 'signed-out' && state.tokenType === null) {
+    expectTypeOf(state.toAuth()).toEqualTypeOf<InvalidTokenAuthObject>();
+  }
 });

@@ -276,45 +276,50 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
     getToken: () => Promise.resolve(token),
     has: () => false,
     debug: createDebug(debugData),
-    isAuthenticated: true,
+    isAuthenticated: true as const,
   };
 
-  // Type assertions are safe here since we know the verification result type matches the tokenType.
-  // We need these assertions because TS can't infer the specific type
-  // just from the tokenType discriminator.
-
+  // Each branch literal is checked against its concrete object type; the final cast only bridges
+  // the generic T, which TS can't correlate with the narrowed branch.
   switch (tokenType) {
     case TokenType.ApiKey: {
       const result = verificationResult as APIKey;
-      return {
+      // FAPI guarantees an api_key subject is a user_ or org_ id, so exactly one of the checks matches.
+      const ownership = {
+        userId: result.subject.startsWith('user_') ? result.subject : null,
+        orgId: result.subject.startsWith('org_') ? result.subject : null,
+      } as { userId: string; orgId: null } | { userId: null; orgId: string };
+      const authObject: AuthenticatedMachineObjectFor<'api_key'> = {
         ...baseObject,
         tokenType,
         name: result.name,
         claims: result.claims,
         scopes: result.scopes,
-        userId: result.subject.startsWith('user_') ? result.subject : null,
-        orgId: result.subject.startsWith('org_') ? result.subject : null,
-      } as unknown as AuthenticatedMachineObject<T>;
+        ...ownership,
+      };
+      return authObject as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.M2MToken: {
       const result = verificationResult as M2MToken;
-      return {
+      const authObject: AuthenticatedMachineObjectFor<'m2m_token'> = {
         ...baseObject,
         tokenType,
         claims: result.claims,
         scopes: result.scopes,
         machineId: result.subject,
-      } as unknown as AuthenticatedMachineObject<T>;
+      };
+      return authObject as unknown as AuthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
       const result = verificationResult as IdPOAuthAccessToken;
-      return {
+      const authObject: AuthenticatedMachineObjectFor<'oauth_token'> = {
         ...baseObject,
         tokenType,
         scopes: result.scopes,
         userId: result.subject,
         clientId: result.clientId,
-      } as unknown as AuthenticatedMachineObject<T>;
+      };
+      return authObject as unknown as AuthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
@@ -335,12 +340,12 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
     has: () => false,
     getToken: () => Promise.resolve(null),
     debug: createDebug(debugData),
-    isAuthenticated: false,
+    isAuthenticated: false as const,
   };
 
   switch (tokenType) {
     case TokenType.ApiKey: {
-      return {
+      const authObject: UnauthenticatedMachineObjectFor<'api_key'> = {
         ...baseObject,
         tokenType,
         name: null,
@@ -348,25 +353,28 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         scopes: null,
         userId: null,
         orgId: null,
-      } as unknown as UnauthenticatedMachineObject<T>;
+      };
+      return authObject as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.M2MToken: {
-      return {
+      const authObject: UnauthenticatedMachineObjectFor<'m2m_token'> = {
         ...baseObject,
         tokenType,
         claims: null,
         scopes: null,
         machineId: null,
-      } as unknown as UnauthenticatedMachineObject<T>;
+      };
+      return authObject as unknown as UnauthenticatedMachineObject<T>;
     }
     case TokenType.OAuthToken: {
-      return {
+      const authObject: UnauthenticatedMachineObjectFor<'oauth_token'> = {
         ...baseObject,
         tokenType,
         scopes: null,
         userId: null,
         clientId: null,
-      } as unknown as UnauthenticatedMachineObject<T>;
+      };
+      return authObject as unknown as UnauthenticatedMachineObject<T>;
     }
     default:
       throw new Error(`Invalid token type: ${tokenType}`);
@@ -498,9 +506,9 @@ export const getAuthObjectForAcceptedToken = ({
   // 3. single token: must match exactly, else return appropriate unauthenticated object
   if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
     if (isMachineTokenType(acceptsToken)) {
-      return unauthenticatedMachineObject(acceptsToken, authObject.debug);
+      return unauthenticatedMachineObject(acceptsToken, authObject.debug?.());
     }
-    return signedOutAuthObject(authObject.debug);
+    return signedOutAuthObject(authObject.debug?.());
   }
 
   // 4. default: return as-is
