@@ -196,9 +196,7 @@ describe('contract pins: mutual assignability of every return type', () => {
 });
 
 describe('contract pins: InferAuthObjectFromToken(Array) support protect()-style usage', () => {
-  // Mimic @clerk/nextjs protect(), which passes a bare AuthenticatedMachineObject
-  // union as MachineType. Published nextjs dists import these helpers by name from
-  // @clerk/backend/internal, so their signatures are frozen for the 3.x line.
+  // Mimic @clerk/nextjs protect(), which passes a bare AuthenticatedMachineObject union as MachineType.
   test('single token helper accepts every clean machine member', () => {
     type Session = InferAuthObjectFromToken<'session_token', SignedInAuthObject, AuthenticatedMachineObject>;
     expectTypeOf<Session>().toEqualTypeOf<SignedInAuthObject>();
@@ -255,9 +253,8 @@ describe('contract pins: GetAuthFnNoRequest mutual assignability', () => {
 });
 
 describe('contract pins: any-typed acceptsToken collapses to any', () => {
-  // nextjs auth.protect() passes an untyped (any) token and accesses
-  // redirect helpers on the result unconditionally; the signatures must keep
-  // resolving to `any` for `any` inputs.
+  // nextjs auth.protect() passes an untyped token and dereferences the result,
+  // so `any` inputs must keep resolving to `any`.
   const getAuth: GetAuthFn<Request> = (_request: any, _options: any) => {
     return {} as any;
   };
