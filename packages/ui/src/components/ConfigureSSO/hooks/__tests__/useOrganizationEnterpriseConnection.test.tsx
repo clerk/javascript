@@ -47,7 +47,9 @@ const mutationSpies = vi.hoisted(() => ({
 }));
 
 const domainsState = vi.hoisted(() => ({
-  data: undefined as Array<{ name: string }> | undefined,
+  affiliation: undefined as Array<{ id: string; name: string; ownershipVerification: unknown }> | undefined,
+  enterpriseSSO: undefined as Array<{ id: string; name: string; ownershipVerification: unknown }> | undefined,
+  calls: [] as Array<{ enrollmentMode?: string }>,
   isLoading: false,
 }));
 
@@ -59,14 +61,17 @@ vi.mock('@clerk/shared/react', () => ({
     updateEnterpriseConnection: mutationSpies.update,
     deleteEnterpriseConnection: mutationSpies.delete,
   }),
-  __internal_useOrganizationDomains: () => ({
-    data: domainsState.data,
-    isLoading: domainsState.isLoading,
-    createDomain: vi.fn(),
-    prepareOwnershipVerification: vi.fn(),
-    attemptOwnershipVerification: vi.fn(),
-    revalidate: vi.fn(() => Promise.resolve()),
-  }),
+  __internal_useOrganizationDomains: (params: { enrollmentMode?: string }) => {
+    domainsState.calls.push({ enrollmentMode: params.enrollmentMode });
+    return {
+      data: params.enrollmentMode === 'enterprise_sso' ? domainsState.enterpriseSSO : domainsState.affiliation,
+      isLoading: domainsState.isLoading,
+      createDomain: vi.fn(),
+      prepareOwnershipVerification: vi.fn(),
+      attemptOwnershipVerification: vi.fn(),
+      revalidate: vi.fn(() => Promise.resolve()),
+    };
+  },
   __internal_useOrganizationEnterpriseConnectionTestRuns: (params: { enabled?: boolean }) => {
     testRunsState.calls.push({ enabled: params.enabled });
     return {
@@ -91,7 +96,9 @@ import { useOrganizationEnterpriseConnection } from '../useOrganizationEnterpris
 beforeEach(() => {
   connectionsState.data = [];
   connectionsState.isLoading = false;
-  domainsState.data = undefined;
+  domainsState.affiliation = undefined;
+  domainsState.enterpriseSSO = undefined;
+  domainsState.calls = [];
   domainsState.isLoading = false;
   testRunsState.calls = [];
   testRunsState.isLoading = false;
@@ -186,9 +193,9 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
   it('createConnection forwards the provider and ownership-verified organization domains', async () => {
-    domainsState.data = [
-      { name: 'acme.com', ownershipVerification: { status: 'verified' } },
-      { name: 'example.com', ownershipVerification: null },
+    domainsState.affiliation = [{ id: 'dmn_affiliation', name: 'example.com', ownershipVerification: null }];
+    domainsState.enterpriseSSO = [
+      { id: 'dmn_ownership', name: 'acme.com', ownershipVerification: { status: 'verified' } },
     ];
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
@@ -205,7 +212,8 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
   });
 
   it('createConnection forwards undefined domains when the organization has none', async () => {
-    domainsState.data = undefined;
+    domainsState.affiliation = undefined;
+    domainsState.enterpriseSSO = undefined;
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
@@ -224,5 +232,17 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     await result.current.enterpriseConnectionMutations.setConnectionActive('ent_1', true);
 
     expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
+  });
+
+  it('merges affiliation and enterprise SSO domain responses', () => {
+    domainsState.affiliation = [{ id: 'dmn_affiliation', name: 'example.com', ownershipVerification: null }];
+    domainsState.enterpriseSSO = [
+      { id: 'dmn_enterprise_sso', name: 'acme.com', ownershipVerification: { status: 'unverified' } },
+    ];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.organizationDomains?.map(domain => domain.name)).toEqual(['example.com', 'acme.com']);
+    expect(domainsState.calls).toEqual([{ enrollmentMode: undefined }, { enrollmentMode: 'enterprise_sso' }]);
   });
 });
