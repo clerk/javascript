@@ -126,6 +126,7 @@ export const TagInput = (props: TagInputProps) => {
       onFocus={focusInput}
       sx={[
         t => ({
+          alignContent: 'flex-start',
           maxWidth: '100%',
           padding: `${t.space.$1x5} ${t.space.$2}`,
           backgroundColor: t.colors.$colorInput,

@@ -3,6 +3,7 @@ import React from 'react';
 
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { truncationStyles } from '../typography.styles';
 import { iconSizes, sizes, styles, variants } from './button.styles';
 
@@ -59,7 +60,7 @@ function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
     result.push(
       <span
         key={`label-${result.length}`}
-        {...stylex.props(truncationStyles.singleLine, styles.label)}
+        {...stylex.props(reset.base, truncationStyles.singleLine, styles.label)}
       >
         {run}
       </span>,
@@ -108,6 +109,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       {...mergeStyleProps(
         themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
+          reset.base,
           styles.base,
           sizes[size],
           variants[`${variant}-${color}`],

@@ -1,10 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontFamilyVars, typeScaleVars } from '../tokens.stylex';
 
 export type TypographySize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 
 export type TypographyColor = 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
+
+export const styles = stylex.create({
+  base: {
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
+  },
+});
 
 export const sizes = stylex.create({
   xs: {

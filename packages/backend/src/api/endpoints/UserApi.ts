@@ -233,13 +233,13 @@ export type UserPasswordHashingParams = {
 export type CreateUserParams = {
   /** The ID of the user as used in your external systems or your previous authentication solution. Must be unique across your instance. */
   externalId?: string;
-  /** The email address(es) to assign to the user. Must be unique across your instance. The first email address will be set as the users primary email address. Created verified by default; see `emailAddressIdentificationStatus` to create them reserved. */
+  /** The email addresses to assign to the user. Each address must be unique across your instance. The first email address becomes the user's primary email address. Addresses are created as verified by default; use `emailAddressIdentificationStatus` to create reserved addresses. */
   emailAddress?: string[];
-  /** Controls the status each email address is created with. Runs parallel to `emailAddress`: when provided, it must contain exactly one item per email address, applied by position. When omitted or empty, every email address is created `'verified'`. Set an item to `'reserved'` to create the corresponding email address reserved instead (unverified but usable for sign-in and locked so no other user can claim it). */
+  /** Sets the creation status of each email address. Entries correspond by index to `emailAddress`, and the array must contain exactly one entry per email address. If omitted, every email address is created as `'verified'`. Use `'reserved'` to create an unverified address that can still be used for sign-in and cannot be claimed by another user. */
   emailAddressIdentificationStatus?: ('verified' | 'reserved')[];
-  /** The phone number(s) to assign to the user. Must be unique across your instance. The first phone number will be set as the users primary phone number. Created verified by default; see `phoneNumberIdentificationStatus` to create them reserved. */
+  /** The phone numbers to assign to the user. Each number must be unique across your instance. The first phone number becomes the user's primary phone number. Numbers are created as verified by default; use `phoneNumberIdentificationStatus` to create reserved numbers. */
   phoneNumber?: string[];
-  /** Controls the status each phone number is created with. Runs parallel to `phoneNumber`: when provided, it must contain exactly one item per phone number, applied by position. When omitted or empty, every phone number is created `'verified'`. Set an item to `'reserved'` to create the corresponding phone number reserved instead (unverified but usable for sign-in and locked so no other user can claim it). */
+  /** Sets the creation status of each phone number. Entries correspond by index to `phoneNumber`, and the array must contain exactly one entry per phone number. If omitted, every phone number is created as `'verified'`. Use `'reserved'` to create an unverified number that can still be used for sign-in and cannot be claimed by another user. */
   phoneNumberIdentificationStatus?: ('verified' | 'reserved')[];
   /** The username to assign to the user. Must be unique across your instance. */
   username?: string;
@@ -366,6 +366,12 @@ export type VerifyPasswordParams = {
   password: string;
 };
 
+/** @inline */
+export type RemovePasswordParams = {
+  /** When set to `true`, all of the user's active sessions are revoked after their password is removed. Defaults to `false`. */
+  signOutOfOtherSessions?: boolean;
+};
+
 /** @generateWithEmptyComment */
 export type VerifyTOTPParams = {
   /** The ID of the user to verify the TOTP for. */
@@ -457,7 +463,7 @@ export class UserAPI extends AbstractAPI {
    *
    * Your settings in the [Clerk Dashboard](https://dashboard.clerk.com) determine how you should setup your user model. Anything **Required** will need to be provided when creating a user. Trying to add a field that isn't enabled will result in an error.
    *
-   * By default, any email address and phone number created using this method is automatically verified. Use `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` to instead create some or all of them as reserved (unverified but usable for sign-in and locked so no other user can claim them).
+   * By default, email addresses and phone numbers created using this method are verified automatically. Use `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` to create any of them as reserved. Reserved identifiers are unverified, but they can still be used for sign-in and cannot be claimed by another user.
    *
    * > [!CAUTION]
    * >
@@ -694,6 +700,39 @@ export class UserAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, userId, 'organization_invitations'),
       queryParams,
+    });
+  }
+
+  /**
+   * Removes the password credential from the given user. This is a privileged operation and does not require the user's current password. Password removal is allowed even when the user has no other sign-in method configured.
+   *
+   * By default, existing sessions remain active. Set `signOutOfOtherSessions` to `true` to revoke sessions active when the request is processed.
+   * @param userId - The ID of the user whose password to remove.
+   * @param params - Options for the request.
+   * @returns The updated [`User`](https://clerk.com/docs/reference/backend/types/backend-user).
+   * @example
+   * ### Keep existing sessions active
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123');
+   * ```
+   *
+   * @example
+   * ### Revoke existing sessions
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123', {
+   *   signOutOfOtherSessions: true,
+   * });
+   * ```
+   */
+  public async removePassword(userId: string, params: RemovePasswordParams = {}): Promise<User> {
+    this.requireId(userId);
+
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'remove_password'),
+      bodyParams: params,
     });
   }
 
