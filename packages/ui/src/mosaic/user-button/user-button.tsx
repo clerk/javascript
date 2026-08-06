@@ -7,7 +7,7 @@ import { useSpinDelay } from '../hooks/useSpinDelay';
 import { type UserButtonControllerOptions, useUserButtonController } from './user-button.controller';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
-import { userButtonBusyKeys, UserButtonTriggerSkeleton, UserButtonView } from './user-button.view';
+import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 
 /**
  * Everything `<UserButton />` takes: where its profile surfaces open (`UserButtonControllerOptions`),
@@ -22,8 +22,8 @@ export type UserButtonProps = UserButtonControllerOptions &
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an
  * account, open the profile, and sign out. It reads the active session and organization from Clerk
- * itself, so it takes no data — drop it in a nav bar and it renders a placeholder while Clerk loads,
- * then nothing at all when nobody is signed in.
+ * itself, so it takes no data — drop it in a nav bar and it renders nothing until Clerk has answered,
+ * and nothing at all when nobody is signed in.
  *
  * Every action in the menu is a request, so the row you click spins while the others stand down, and
  * the menu stays open on the result. Only an action that takes you somewhere else closes it.
@@ -77,10 +77,10 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   // the immediate `pendingKey`; only the view's feedback is delayed.
   const displayPendingKey = useSpinDelay(pendingKey);
 
-  if (controller.status === 'loading') {
-    return <UserButtonTriggerSkeleton />;
-  }
-
+  // Nothing stands in for the button until Clerk answers: while it is loading, a signed-out visitor
+  // is indistinguishable from a session still resolving, so anything rendered here is a button
+  // promised to people who are never going to get one. `<ClerkLoading>` is where an app that knows
+  // its own nav puts a placeholder.
   if (controller.status !== 'ready') {
     return null;
   }
