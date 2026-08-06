@@ -36,9 +36,14 @@ export default defineConfig({
   //
   // StyleX is compiled away at build time; only the tiny `props` merger survives. Bundling it keeps
   // it out of consumer trees entirely, so nobody inherits our StyleX version or has to have it.
+  //
+  // Floating UI arrives through the bundled `@clerk/headless` primitives, so leaving it external
+  // would make it the one install this entry still demands, defeating the point: SDKs inline this
+  // bundle so consumers need nothing beyond React and `@clerk/shared`. Its contexts are per-tree,
+  // not global, so a second copy alongside the Emotion UI's is inert.
   deps: {
     neverBundle: ['react', 'react-dom'],
-    alwaysBundle: [/^@clerk\/headless/, '@stylexjs/stylex'],
+    alwaysBundle: [/^@clerk\/headless/, '@stylexjs/stylex', /^@floating-ui\//],
   },
   // The bundle collapses every module into one, so the per-file `'use client'` directives are lost.
   // Everything here is interactive and hook-driven, so the entry is a client boundary in whole —
