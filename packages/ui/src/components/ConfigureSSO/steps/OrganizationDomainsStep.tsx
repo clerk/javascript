@@ -36,6 +36,9 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
 
+const hasVerifiedAffiliation = (domain: OrganizationDomainResource): boolean =>
+  (domain.affiliationVerification ?? domain.verification)?.status === 'verified';
+
 export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
@@ -109,6 +112,11 @@ export const OrganizationDomainsStep = (): JSX.Element => {
       await updateConnection(enterpriseConnection.id, { domains });
     }
 
+    if (hasVerifiedAffiliation(domain)) {
+      await revalidate();
+      return;
+    }
+
     await domain.delete();
     await revalidate();
   };
@@ -116,10 +124,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
   const ownershipDomains = organizationDomains?.filter(domain => domain.ownershipVerification) ?? [];
   const affiliationVerifiedDomains =
-    organizationDomains?.filter(
-      domain =>
-        !domain.ownershipVerification && (domain.affiliationVerification ?? domain.verification)?.status === 'verified',
-    ) ?? [];
+    organizationDomains?.filter(domain => !domain.ownershipVerification && hasVerifiedAffiliation(domain)) ?? [];
 
   // A connection needs at least one verified domain to point at, so the last
   // remaining verified domain cannot be removed while a connection exists
@@ -188,11 +193,12 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                   const isVerified = domain.ownershipVerification?.status === 'verified';
                   const isLastVerifiedDomain = isVerified && verifiedDomainCount === 1;
                   const isRemoveDisabled = lockLastVerifiedDomain && isLastVerifiedDomain;
+                  const canRemove = domain.enrollmentMode === 'enterprise_sso' || Boolean(enterpriseConnection);
                   return (
                     <DomainCard
                       key={domain.id}
                       domain={domain}
-                      onRemove={() => setDomainToRemove(domain)}
+                      onRemove={canRemove ? () => setDomainToRemove(domain) : undefined}
                       onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
                       isRemoveDisabled={isRemoveDisabled}
                       removeDisabledTooltip={lastVerifiedDomainTooltip}
@@ -222,6 +228,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
           onClose={() => setDomainToRemove(null)}
           domain={domainToRemove.name}
           isConnectionActive={Boolean(enterpriseConnection?.active)}
+          preserveAffiliationVerification={hasVerifiedAffiliation(domainToRemove)}
           onRemove={() => handleRemoveDomain(domainToRemove)}
           contentRef={contentRef}
         />
@@ -452,7 +459,7 @@ const DomainCard = ({
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
-  onRemove: () => void;
+  onRemove?: () => void;
   onPrepareOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
@@ -464,10 +471,10 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
-  const isAffiliationVerified = (domain.affiliationVerification ?? domain.verification)?.status === 'verified';
+  const isAffiliationVerified = hasVerifiedAffiliation(domain);
   const cardId = ownershipVerification?.status ?? 'unverified';
 
-  const removeButton = (
+  const removeButton = onRemove ? (
     <Button
       elementDescriptor={descriptors.configureSSOVerifyDomainCardRemoveButton}
       variant='ghost'
@@ -482,7 +489,7 @@ const DomainCard = ({
         sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
       />
     </Button>
-  );
+  ) : null;
 
   return (
     <Col
@@ -565,7 +572,7 @@ const DomainCard = ({
           )}
         </Flex>
 
-        {isRemoveDisabled && removeDisabledTooltip ? (
+        {removeButton && isRemoveDisabled && removeDisabledTooltip ? (
           <Tooltip.Root>
             <Tooltip.Trigger>{removeButton}</Tooltip.Trigger>
             <Tooltip.Content text={removeDisabledTooltip} />

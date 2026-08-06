@@ -18,6 +18,7 @@ const renderDialog = (
     onClose?: () => void;
     domain?: string;
     isConnectionActive?: boolean;
+    preserveAffiliationVerification?: boolean;
   } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
@@ -28,6 +29,7 @@ const renderDialog = (
         onClose={onClose}
         domain={props.domain ?? 'acme.com'}
         isConnectionActive={props.isConnectionActive ?? false}
+        preserveAffiliationVerification={props.preserveAffiliationVerification ?? false}
         onRemove={() => onRemove()}
         contentRef={{ current: null }}
       />
@@ -78,6 +80,16 @@ describe('RemoveDomainDialog', () => {
 
     expect(screen.getByText("You're about to remove acme.com from this enterprise connection.")).toBeInTheDocument();
     expect(screen.queryByText(/Users won't be able to sign-in/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps affiliation verification when removing a domain from SSO', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    renderDialog(wrapper, { domain: 'acme.com', preserveAffiliationVerification: true });
+
+    expect(screen.getByRole('heading', { name: 'Remove from SSO' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove from SSO' })).toBeInTheDocument();
+    expect(screen.getByText(/existing affiliation verification will remain active/i)).toBeInTheDocument();
   });
 
   it('invokes onClose when Cancel is clicked', async () => {

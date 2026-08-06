@@ -142,7 +142,8 @@ describe('ConfigureSSO', () => {
 
       const { findByRole, findByText, queryByText, userEvent } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText(/we noticed you have verified domains legacy\.example/i);
+      await findByText(/we noticed you have verified domains/i);
+      await findByText('legacy.example');
       expect(queryByText('Affiliation')).not.toBeInTheDocument();
       await userEvent.click(await findByRole('button', { name: /verify ownership/i }));
 

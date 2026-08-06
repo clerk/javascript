@@ -651,7 +651,8 @@ export const enUS: LocalizationResource = {
     organizationDomainsStep: {
       affiliationDomainSuggestion: {
         formButtonPrimary__verify: 'Verify ownership',
-        messageLabel: 'We noticed you have verified domains {{domains}}. Do you want to verify their ownership?',
+        messageLabel:
+          'We noticed you have verified domains <bold>{{domains}}</bold>. Do you want to verify their ownership?',
       },
       domainCard: {
         affiliationLabel: 'Affiliation',
@@ -682,11 +683,15 @@ export const enUS: LocalizationResource = {
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
+        removeFromSSOButton: 'Remove from SSO',
         removeButton: 'Remove domain',
         subtitle__active:
           "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        subtitle__preserveAffiliation:
+          "You're about to remove {{domain}} from this enterprise connection. Its existing affiliation verification will remain active.",
         title: 'Removing domain',
+        title__preserveAffiliation: 'Remove from SSO',
       },
       subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
       title: 'Add SSO domains',
