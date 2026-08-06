@@ -182,6 +182,7 @@ export type InferAuthObject<
   MachineType extends AuthObject,
 > = T extends SessionTokenType ? SessionType : Extract<MachineType, { tokenType: T }>;
 
+// The two delegates below are unused in-repo but imported by published 3.x SDK dists; delete in the next major.
 /**
  * Infers auth object type from an array of token types.
  */
