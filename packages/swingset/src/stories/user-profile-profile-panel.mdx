@@ -1,0 +1,53 @@
+import * as UserProfileProfilePanelStories from './user-profile-profile-panel.stories';
+
+# UserProfileProfilePanel
+
+The Profile panel from UserProfile, composed without the surrounding navigation shell. The
+presentational view renders account details, connected accounts, and the danger zone from props
+while its callbacks provide the seam for connected Clerk resources.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserProfileProfilePanelStories}
+/>
+
+## Usage
+
+```tsx
+import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-profile-profile-panel.view';
+
+<UserProfileProfilePanelView
+  imageUrl={user.imageUrl}
+  name={user.fullName ?? ''}
+  username={user.username ?? ''}
+  emails={user.emailAddresses.map(email => ({
+    id: email.id,
+    value: email.emailAddress,
+    isDefault: email.id === user.primaryEmailAddressId,
+    isVerified: email.verification.status === 'verified',
+  }))}
+  phones={user.phoneNumbers.map(phone => ({
+    id: phone.id,
+    value: phone.phoneNumber,
+    isDefault: phone.id === user.primaryPhoneNumberId,
+    isVerified: phone.verification.status === 'verified',
+  }))}
+  connectedAccounts={user.externalAccounts.map(account => ({
+    id: account.id,
+    provider: account.provider,
+    identifier: account.emailAddress,
+    connected: true,
+  }))}
+  onNameChange={setName}
+  onUsernameChange={setUsername}
+  onVerifyEmail={verifyEmail}
+  onSetPrimaryEmail={setPrimaryEmail}
+  onRemoveEmail={removeEmail}
+  onVerifyPhone={verifyPhone}
+  onSetPrimaryPhone={setPrimaryPhone}
+  onRemovePhone={removePhone}
+  onRemoveConnectedAccount={removeConnectedAccount}
+/>
+```

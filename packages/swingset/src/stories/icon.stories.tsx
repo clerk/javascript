@@ -17,7 +17,7 @@ export const meta: StoryMeta = {
   styleEngine: 'stylex',
   styles: {
     _variants: {
-      size: { sm: {}, md: {}, lg: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       size: 'md',
@@ -44,6 +44,11 @@ export function Default(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <Icon
+        {...knobsAsProps(props)}
+        name='chevron-right'
+        size='xs'
+      />
       <Icon
         {...knobsAsProps(props)}
         name='chevron-right'
