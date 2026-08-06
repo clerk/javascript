@@ -3,7 +3,7 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 # UserProfileProfilePanel
 
 The Profile panel from UserProfile, composed without the surrounding navigation shell. The
-presentational view renders account details, connected accounts, and the danger zone from props
+presentational view renders account details, connected accounts, Web3 wallets, and the danger zone from props
 while its callbacks provide the seam for connected Clerk resources.
 
 ## Example
@@ -40,6 +40,12 @@ import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-
     identifier: account.emailAddress,
     connected: true,
   }))}
+  web3Wallets={user.web3Wallets.map(wallet => ({
+    id: wallet.id,
+    address: wallet.web3Wallet,
+    isPrimary: wallet.id === user.primaryWeb3WalletId,
+    isVerified: wallet.verification.status === 'verified',
+  }))}
   onNameChange={setName}
   onUsernameChange={setUsername}
   onVerifyEmail={verifyEmail}
@@ -49,5 +55,8 @@ import { UserProfileProfilePanelView } from '@clerk/ui/mosaic/user-profile/user-
   onSetPrimaryPhone={setPrimaryPhone}
   onRemovePhone={removePhone}
   onRemoveConnectedAccount={removeConnectedAccount}
+  onAddWeb3Wallet={addWeb3Wallet}
+  onSetPrimaryWeb3Wallet={setPrimaryWeb3Wallet}
+  onRemoveWeb3Wallet={removeWeb3Wallet}
 />
 ```

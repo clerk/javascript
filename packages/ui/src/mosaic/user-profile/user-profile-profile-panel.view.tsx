@@ -42,6 +42,16 @@ export interface UserProfileConnectedAccount {
   canRemove?: boolean;
 }
 
+export interface UserProfileWeb3Wallet {
+  id: string;
+  address: string;
+  provider?: string;
+  iconUrl?: string;
+  isPrimary?: boolean;
+  isVerified?: boolean;
+  canRemove?: boolean;
+}
+
 export interface UserProfileProfilePanelViewProps {
   imageUrl?: string;
   name: string;
@@ -49,6 +59,7 @@ export interface UserProfileProfilePanelViewProps {
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
   connectedAccounts?: UserProfileConnectedAccount[];
+  web3Wallets?: UserProfileWeb3Wallet[];
   onEditProfilePicture?: () => void;
   onNameChange?: (value: string) => void;
   onUsernameChange?: (value: string) => void;
@@ -65,6 +76,10 @@ export interface UserProfileProfilePanelViewProps {
   onConnectAccount?: (id: string) => void;
   onManageConnectedAccount?: (id: string) => void;
   onRemoveConnectedAccount?: (id: string) => void;
+  onAddWeb3Wallet?: () => void;
+  onManageWeb3Wallet?: (id: string) => void;
+  onSetPrimaryWeb3Wallet?: (id: string) => void;
+  onRemoveWeb3Wallet?: (id: string) => void;
   onDeleteAccount?: () => void;
 }
 
@@ -290,7 +305,7 @@ function ConnectedAccountsSection({
       </Heading>
       <Card.Root elevation='outlined'>
         <Card.Content style={{ paddingBlock: space['4'], paddingInline: space['4'] }}>
-          <Item.Group {...stylex.props(styles.connectedAccountsList)}>
+          <Item.Group {...stylex.props(styles.resourceList)}>
             {accounts.map((account, index) => {
               const connected = account.connected ?? Boolean(account.identifier);
               const actions: ProfileMenuAction[] = [];
@@ -364,6 +379,140 @@ function ConnectedAccountsSection({
                         </Button>
                       ) : null}
                     </Item.Actions>
+                  </Item.Root>
+                </Fragment>
+              );
+            })}
+          </Item.Group>
+        </Card.Content>
+      </Card.Root>
+    </section>
+  );
+}
+
+const shortenWeb3Address = (address: string) => {
+  if (address.length <= 10) {
+    return address;
+  }
+
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+function Web3WalletsSection({
+  wallets,
+  onAdd,
+  onManage,
+  onSetPrimary,
+  onRemove,
+}: {
+  wallets: UserProfileWeb3Wallet[];
+  onAdd?: () => void;
+  onManage?: (id: string) => void;
+  onSetPrimary?: (id: string) => void;
+  onRemove?: (id: string) => void;
+}) {
+  return (
+    <section
+      aria-labelledby='user-profile-profile-panel-web3-wallets'
+      {...stylex.props(styles.section)}
+    >
+      <div {...stylex.props(styles.sectionHeader)}>
+        <Heading
+          id='user-profile-profile-panel-web3-wallets'
+          render={props => <h4 {...props} />}
+          size='xs'
+        >
+          Web3 wallets
+        </Heading>
+        {onAdd ? (
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+            onClick={onAdd}
+          >
+            Add
+          </Button>
+        ) : null}
+      </div>
+      <Card.Root elevation='outlined'>
+        <Card.Content style={{ paddingBlock: space['4'], paddingInline: space['4'] }}>
+          <Item.Group {...stylex.props(styles.resourceList)}>
+            {wallets.map((wallet, index) => {
+              const actions: ProfileMenuAction[] = [];
+              const hasExplicitActions = Boolean(onSetPrimary || onRemove);
+
+              if (!wallet.isPrimary && wallet.isVerified !== false && onSetPrimary) {
+                actions.push({ label: 'Set as primary', onClick: () => onSetPrimary(wallet.id) });
+              }
+
+              if (onRemove && wallet.canRemove !== false) {
+                actions.push({ label: 'Remove wallet', color: 'negative', onClick: () => onRemove(wallet.id) });
+              }
+
+              if (!hasExplicitActions && onManage) {
+                actions.push({ label: 'Manage', onClick: () => onManage(wallet.id) });
+              }
+
+              const address = shortenWeb3Address(wallet.address);
+
+              return (
+                <Fragment key={wallet.id}>
+                  {index > 0 ? (
+                    <Item.Separator
+                      style={{
+                        backgroundColor: colorVars['--cl-color-border'],
+                        marginBlock: space['4'],
+                        marginInline: space['4'],
+                        width: 'auto',
+                      }}
+                    />
+                  ) : null}
+                  <Item.Root
+                    size='md'
+                    style={{ height: 'auto', paddingBlock: 0, paddingInline: 0 }}
+                  >
+                    {wallet.iconUrl ? (
+                      <Item.Media style={{ width: space['6'] }}>
+                        <img
+                          alt=''
+                          src={wallet.iconUrl}
+                          {...stylex.props(styles.providerIcon)}
+                        />
+                      </Item.Media>
+                    ) : null}
+                    <Item.Content style={{ gap: space['0.5'] }}>
+                      <div {...stylex.props(styles.contactValue)}>
+                        <Item.Title>{wallet.provider ?? address}</Item.Title>
+                        {wallet.isPrimary ? (
+                          <Badge
+                            color='neutral'
+                            style={{ backgroundColor: 'rgba(23, 23, 23, 0.06)', color: 'inherit' }}
+                          >
+                            Primary
+                          </Badge>
+                        ) : null}
+                        {wallet.isVerified === false ? <Badge color='warning'>Unverified</Badge> : null}
+                      </div>
+                      {wallet.provider ? (
+                        <Item.Description
+                          style={{
+                            fontSize: typeScaleVars['--cl-text-sm-size'],
+                            lineHeight: typeScaleVars['--cl-text-sm-leading'],
+                          }}
+                        >
+                          {address}
+                        </Item.Description>
+                      ) : null}
+                    </Item.Content>
+                    {actions.length > 0 ? (
+                      <Item.Actions>
+                        <ProfileActionMenu
+                          actions={actions}
+                          label={`Manage ${wallet.provider ?? address}`}
+                        />
+                      </Item.Actions>
+                    ) : null}
                   </Item.Root>
                 </Fragment>
               );
@@ -536,6 +685,7 @@ export function UserProfileProfilePanelView({
   emails = [],
   phones = [],
   connectedAccounts = [],
+  web3Wallets = [],
   onEditProfilePicture,
   onNameChange,
   onUsernameChange,
@@ -552,6 +702,10 @@ export function UserProfileProfilePanelView({
   onConnectAccount,
   onManageConnectedAccount,
   onRemoveConnectedAccount,
+  onAddWeb3Wallet,
+  onManageWeb3Wallet,
+  onSetPrimaryWeb3Wallet,
+  onRemoveWeb3Wallet,
   onDeleteAccount,
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
@@ -588,6 +742,15 @@ export function UserProfileProfilePanelView({
           onConnect={onConnectAccount}
           onManage={onManageConnectedAccount}
           onRemove={onRemoveConnectedAccount}
+        />
+      ) : null}
+      {web3Wallets.length > 0 || onAddWeb3Wallet ? (
+        <Web3WalletsSection
+          wallets={web3Wallets}
+          onAdd={onAddWeb3Wallet}
+          onManage={onManageWeb3Wallet}
+          onRemove={onRemoveWeb3Wallet}
+          onSetPrimary={onSetPrimaryWeb3Wallet}
         />
       ) : null}
       {onDeleteAccount ? <DangerZoneSection onDelete={onDeleteAccount} /> : null}

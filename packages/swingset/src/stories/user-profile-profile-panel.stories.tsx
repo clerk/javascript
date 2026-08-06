@@ -35,6 +35,16 @@ export function Default(_args: Record<string, unknown>) {
         },
         { id: 'apple', provider: 'Apple', iconUrl: providerIconUrl('apple'), connected: false },
       ]}
+      web3Wallets={[
+        {
+          id: 'metamask',
+          address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+          provider: 'MetaMask',
+          iconUrl: providerIconUrl('metamask'),
+          isPrimary: true,
+          isVerified: true,
+        },
+      ]}
       imageUrl={profileImageUrl}
       name={name}
       phones={[{ id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true }]}
@@ -47,6 +57,9 @@ export function Default(_args: Record<string, unknown>) {
       onRemoveConnectedAccount={() => undefined}
       onRemoveEmail={() => undefined}
       onRemovePhone={() => undefined}
+      onAddWeb3Wallet={() => undefined}
+      onRemoveWeb3Wallet={() => undefined}
+      onSetPrimaryWeb3Wallet={() => undefined}
       onSetPrimaryEmail={() => undefined}
       onSetPrimaryPhone={() => undefined}
       onVerifyEmail={() => undefined}

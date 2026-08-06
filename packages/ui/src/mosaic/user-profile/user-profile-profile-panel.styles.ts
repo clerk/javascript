@@ -48,7 +48,7 @@ export const styles = stylex.create({
     display: 'flex',
     minWidth: 0,
   },
-  connectedAccountsList: {
+  resourceList: {
     padding: 0,
   },
   dangerContent: {
@@ -86,5 +86,11 @@ export const styles = stylex.create({
     gap: space['2'],
     display: 'flex',
     flexDirection: 'column',
+  },
+  sectionHeader: {
+    gap: space['3'],
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'space-between',
   },
 });

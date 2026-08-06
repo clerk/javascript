@@ -102,6 +102,65 @@ describe('UserProfileProfilePanelView', () => {
     expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
+  it('renders Web3 wallets and forwards wallet actions', async () => {
+    const onAddWeb3Wallet = vi.fn();
+    const onSetPrimaryWeb3Wallet = vi.fn();
+    const onRemoveWeb3Wallet = vi.fn();
+    const user = userEvent.setup();
+    renderView({
+      web3Wallets: [
+        {
+          id: 'primary',
+          address: '0x1234567890abcdef1234567890abcdef12345678',
+          provider: 'MetaMask',
+          isPrimary: true,
+          isVerified: true,
+        },
+        {
+          id: 'secondary',
+          address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+          provider: 'Coinbase Wallet',
+          isVerified: true,
+        },
+      ],
+      onAddWeb3Wallet,
+      onSetPrimaryWeb3Wallet,
+      onRemoveWeb3Wallet,
+    });
+
+    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByText('MetaMask')).toBeInTheDocument();
+    expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
+    expect(screen.getByText('Primary')).toBeInTheDocument();
+
+    await user.click(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByRole('button', { name: 'Add' }));
+    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
+    const removeWallet = screen.getByRole('menuitem', { name: 'Remove wallet' });
+    expect(removeWallet).toHaveAttribute('data-color', 'negative');
+    await user.click(removeWallet);
+
+    expect(onAddWeb3Wallet).toHaveBeenCalledOnce();
+    expect(onSetPrimaryWeb3Wallet).toHaveBeenCalledWith('secondary');
+    expect(onRemoveWeb3Wallet).toHaveBeenCalledWith('secondary');
+  });
+
+  it('shows unverified Web3 wallets without a set-primary action', async () => {
+    const user = userEvent.setup();
+    renderView({
+      web3Wallets: [{ id: 'unverified', address: 'short', isVerified: false }],
+      onSetPrimaryWeb3Wallet: vi.fn(),
+      onRemoveWeb3Wallet: vi.fn(),
+    });
+
+    expect(screen.getByText('short')).toBeInTheDocument();
+    expect(screen.getByText('Unverified')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage short' }));
+    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
+  });
+
   it('renders safely before profile data is available', () => {
     render(
       <MosaicProvider>
