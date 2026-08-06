@@ -649,6 +649,10 @@ export const enUS: LocalizationResource = {
       title: 'Configure Single Sign-On (SSO)',
     },
     organizationDomainsStep: {
+      affiliationDomainSuggestion: {
+        formButtonPrimary__verify: 'Verify ownership',
+        messageLabel: 'We noticed you have verified domains {{domains}}. Do you want to verify their ownership?',
+      },
       domainCard: {
         affiliationLabel: 'Affiliation',
         badge__expired: 'Expired',
@@ -668,7 +672,6 @@ export const enUS: LocalizationResource = {
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
         verifyAgainButton: 'Verify again',
-        verifyOwnershipButton: 'Verify ownership',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

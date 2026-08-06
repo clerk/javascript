@@ -140,10 +140,10 @@ describe('ConfigureSSO', () => {
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
       mockOrganizationDomains(fixtures, [affiliationVerifiedDomain]);
 
-      const { findByRole, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
+      const { findByRole, findByText, queryByText, userEvent } = render(<ConfigureSSO />, { wrapper });
 
-      await findByText('Affiliation');
-      await findByText('Ownership');
+      await findByText(/we noticed you have verified domains legacy\.example/i);
+      expect(queryByText('Affiliation')).not.toBeInTheDocument();
       await userEvent.click(await findByRole('button', { name: /verify ownership/i }));
 
       expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledWith(undefined);

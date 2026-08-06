@@ -1,4 +1,5 @@
 ---
+'@clerk/localizations': patch
 '@clerk/ui': patch
 ---
 
