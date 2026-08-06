@@ -8,7 +8,7 @@ import React from 'react';
 import type { AvatarProps } from '../components/avatar';
 import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
-import { Button } from '../components/button';
+import { Button, SubmitButton } from '../components/button';
 import { Card } from '../components/card';
 import { ClerkLogo } from '../components/clerk-logo';
 import { Icon } from '../components/icon';
@@ -685,20 +685,26 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
       shape='square'
       name={name}
       imageUrl={imageUrl}
-      busy={busy}
       trailing={
         note ? (
           <Item.Description>{note}</Item.Description>
         ) : onAccept ? (
-          <Button
+          // Every other affordance here swaps its icon for a spinner, but this one is a labelled
+          // button, so the spinner goes inside it rather than taking the row's trailing edge — the
+          // press and the thing that reports it stay the same element. `pendingKey` is already
+          // spin-delayed by the container, so this asks for no second delay of its own.
+          <SubmitButton
+            type='button'
             variant='outline'
             color='neutral'
             size='sm'
+            isPending={busy}
+            spinDelay={{ delay: 0 }}
             disabled={disabled}
             onClick={onAccept}
           >
             {actionLabel}
-          </Button>
+          </SubmitButton>
         ) : undefined
       }
     />
