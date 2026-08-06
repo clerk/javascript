@@ -9,7 +9,7 @@ import { TextContext } from '../text';
 import { elevations, headerAlignments, styles } from './card.styles';
 
 type CardAlignment = 'start' | 'center';
-type CardElevation = 'card' | 'flush' | 'overlay';
+type CardElevation = 'card' | 'flush' | 'outlined' | 'overlay';
 
 const DEFAULT_ALIGNMENT: CardAlignment = 'start';
 const DEFAULT_ELEVATION: CardElevation = 'card';

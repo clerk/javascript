@@ -67,6 +67,20 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
+  it('reflects outlined elevation on the root and footer', () => {
+    render(
+      <Card.Root
+        elevation='outlined'
+        data-testid='root'
+      >
+        <Card.Footer data-testid='footer' />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'outlined');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'outlined');
+  });
+
   it('provides the neutral text color to header copy', () => {
     render(
       <Card.Root>

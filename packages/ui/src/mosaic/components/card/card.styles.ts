@@ -52,6 +52,15 @@ export const elevations = stylex.create({
     backgroundColor: 'transparent',
     boxShadow: 'none',
   },
+  outlined: {
+    borderColor: colorVars['--cl-color-border'],
+    borderRadius: radiusVars['--cl-radius-container'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    overflow: 'hidden',
+    backgroundColor: colorVars['--cl-color-card'],
+    boxShadow: 'none',
+  },
   overlay: {
     borderRadius: radiusVars['--cl-radius-container'],
     overflow: 'hidden',
