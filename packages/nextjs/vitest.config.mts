@@ -6,7 +6,7 @@ export default defineConfig({
     typecheck: {
       enabled: true,
       tsconfig: './tsconfig.test.json',
-      include: ['**/*.{test.ts,test.tsx}'],
+      include: ['**/*.{test.ts,test.tsx}', '**/*.test-d.ts'],
     },
     env: {
       CLERK_SECRET_KEY: 'TEST_SECRET_KEY',
