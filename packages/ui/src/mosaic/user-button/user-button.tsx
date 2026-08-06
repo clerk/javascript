@@ -9,7 +9,7 @@ import { userButtonBusyKeys, UserButtonTriggerSkeleton, UserButtonView } from '.
 
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
-  Pick<UserButtonRootProps, 'modePriority'>;
+  Pick<UserButtonRootProps, 'modePriority' | 'customMenuItems' | 'menuItemOrder'>;
 
 /**
  * The connected UserButton: reads live Clerk data through `useUserButtonController` and renders
@@ -18,7 +18,14 @@ export type UserButtonProps = UserButtonControllerOptions &
  * the action resolves, and clears busy state (leaving the popover open) if it rejects. Actions that
  * open another surface (manage/create navigations) leave the popover as-is.
  */
-export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, ...options }: UserButtonProps = {}) {
+export function UserButton({
+  renderTriggerLabel,
+  renderPlanBadge,
+  modePriority,
+  customMenuItems,
+  menuItemOrder,
+  ...options
+}: UserButtonProps = {}) {
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -36,6 +43,20 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
   }
 
   const close = () => setOpen(false);
+
+  // A custom action is the app's to run, and whatever it opens takes over from here, so the popover
+  // goes with it. A link navigates away on its own.
+  const menuItems = customMenuItems?.map(item =>
+    item.href === undefined
+      ? {
+          ...item,
+          onClick: () => {
+            close();
+            item.onClick();
+          },
+        }
+      : item,
+  );
 
   // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view, and
   // always clear busy so a rejection cannot leave the UI hanging. Only an action that ends the
@@ -75,6 +96,8 @@ export function UserButton({ renderTriggerLabel, renderPlanBadge, modePriority, 
       renderTriggerLabel={renderTriggerLabel}
       renderPlanBadge={renderPlanBadge}
       modePriority={modePriority}
+      customMenuItems={menuItems}
+      menuItemOrder={menuItemOrder}
       open={open}
       onOpenChange={setOpen}
       pendingKey={displayPendingKey}
