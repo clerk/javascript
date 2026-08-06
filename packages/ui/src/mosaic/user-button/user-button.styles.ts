@@ -59,7 +59,8 @@ export const styles = stylex.create({
   // padding are ours. The padding answers those fades: tabbing to a row below the fold would
   // otherwise land it flush against the edge the mask fades out, on the one row you just moved to.
   scroll: {
-    scrollPaddingBlock: scrollFadeVars['--cl-scroll-fade-size'],
+    scrollPaddingBlockEnd: scrollFadeVars['--cl-scroll-fade-size'],
+    scrollPaddingBlockStart: scrollFadeVars['--cl-scroll-fade-size'],
     maxHeight: '18rem',
   },
 
