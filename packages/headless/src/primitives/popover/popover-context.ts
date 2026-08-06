@@ -21,6 +21,9 @@ export interface PopoverContextValue {
   popupRef: React.RefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   modal: boolean;
+  initialFocus: 'auto' | 'first';
+  /** Where focus goes when the popup closes, or `null` to leave focus alone. */
+  returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   labelId: string;
   descriptionId: string;
   hasTitle: boolean;
