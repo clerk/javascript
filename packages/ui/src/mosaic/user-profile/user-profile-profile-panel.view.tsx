@@ -14,7 +14,7 @@ import { Item } from '../components/item';
 import { Menu } from '../components/menu';
 import { Text } from '../components/text';
 import { mergeStyleProps, themeProps } from '../props';
-import { colorVars, fontWeightVars, space } from '../tokens.stylex';
+import { colorVars, fontWeightVars, space, typeScaleVars } from '../tokens.stylex';
 import { styles } from './user-profile-profile-panel.styles';
 
 export interface UserProfileEmail {
@@ -188,10 +188,7 @@ function AccountSection({
       >
         Account
       </Heading>
-      <Card.Root
-        elevation='flush'
-        {...stylex.props(styles.card)}
-      >
+      <Card.Root elevation='outlined'>
         <Card.Content style={{ paddingInline: 0 }}>
           <div {...mergeStyleProps(themeProps('user-profile-profile-panel-picture-row'), stylex.props(styles.row))}>
             <Text
@@ -291,12 +288,9 @@ function ConnectedAccountsSection({
       >
         Connected accounts
       </Heading>
-      <Card.Root
-        elevation='flush'
-        {...stylex.props(styles.card)}
-      >
-        <Card.Content style={{ paddingInline: 0 }}>
-          <Item.Group>
+      <Card.Root elevation='outlined'>
+        <Card.Content style={{ paddingBlock: space['4'], paddingInline: space['4'] }}>
+          <Item.Group {...stylex.props(styles.connectedAccountsList)}>
             {accounts.map((account, index) => {
               const connected = account.connected ?? Boolean(account.identifier);
               const actions: ProfileMenuAction[] = [];
@@ -315,15 +309,15 @@ function ConnectedAccountsSection({
                     <Item.Separator
                       style={{
                         backgroundColor: colorVars['--cl-color-border'],
-                        marginBlock: space['2'],
-                        marginInline: space['2'],
+                        marginBlock: space['4'],
+                        marginInline: space['4'],
                         width: 'auto',
                       }}
                     />
                   ) : null}
                   <Item.Root
                     size='md'
-                    style={{ height: 'auto', paddingBlock: space['2'] }}
+                    style={{ height: 'auto', paddingBlock: 0, paddingInline: 0 }}
                   >
                     {account.iconUrl ? (
                       <Item.Media style={{ width: space['6'] }}>
@@ -334,9 +328,18 @@ function ConnectedAccountsSection({
                         />
                       </Item.Media>
                     ) : null}
-                    <Item.Content>
+                    <Item.Content style={{ gap: space['0.5'] }}>
                       <Item.Title>{account.provider}</Item.Title>
-                      {account.identifier ? <Item.Description>{account.identifier}</Item.Description> : null}
+                      {account.identifier ? (
+                        <Item.Description
+                          style={{
+                            fontSize: typeScaleVars['--cl-text-sm-size'],
+                            lineHeight: typeScaleVars['--cl-text-sm-leading'],
+                          }}
+                        >
+                          {account.identifier}
+                        </Item.Description>
+                      ) : null}
                     </Item.Content>
                     <Item.Actions>
                       {connected ? (
@@ -385,10 +388,7 @@ function DangerZoneSection({ onDelete }: { onDelete: () => void }) {
       >
         Danger zone
       </Heading>
-      <Card.Root
-        elevation='flush'
-        {...stylex.props(styles.card)}
-      >
+      <Card.Root elevation='outlined'>
         <Card.Content style={{ paddingInline: 0 }}>
           <div {...stylex.props(styles.row)}>
             <div {...stylex.props(styles.dangerContent)}>
@@ -492,6 +492,7 @@ function ContactSection({
             <Item.Root
               key={item.id}
               size='xs'
+              {...stylex.props(styles.contactItem)}
             >
               <Item.Content>
                 <div {...stylex.props(styles.contactValue)}>

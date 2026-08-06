@@ -25,32 +25,31 @@ export const styles = stylex.create({
     top: '25px',
     width: '20px',
   },
-  card: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-container'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    rowGap: 0,
-  },
   contactHeader: {
     gap: space['3'],
     paddingInline: space['4'],
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'space-between',
+    paddingBlockEnd: space['2'],
     paddingBlockStart: space['4'],
   },
+  contactItem: {
+    paddingInline: 0,
+    minHeight: space['11'],
+  },
   contactList: {
-    paddingBlock: space['2'],
-    paddingInline: space['2'],
+    paddingBlock: 0,
+    paddingInline: space['4'],
   },
   contactValue: {
     gap: space['2'],
     alignItems: 'center',
     display: 'flex',
     minWidth: 0,
+  },
+  connectedAccountsList: {
+    padding: 0,
   },
   dangerContent: {
     display: 'flex',
