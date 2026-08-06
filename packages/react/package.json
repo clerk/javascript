@@ -113,11 +113,11 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@clerk/ui": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
+    "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1",
     "semver": "^7.8.5",
     "yaml": "^2.9.0"
