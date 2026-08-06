@@ -1,35 +1,3 @@
-import type { ReactNode } from 'react';
-
-/**
- * A built-in action the foot of the popup lists as a row of its own, named by the id `menuItemOrder`
- * knows it by. The surface's other actions live in its header or behind a `⋯`, where there is no
- * list for an order to run in.
- */
-export type UserButtonMenuItemId = 'createOrganization' | 'addAccount' | 'signOutAll';
-
-interface UserButtonMenuItemBase {
-  /** Identifies the row, for ordering. */
-  id: string;
-  /** Names the row. */
-  label: string;
-  icon?: ReactNode;
-}
-
-/** An action of your own at the foot of the popup. */
-export interface UserButtonMenuAction extends UserButtonMenuItemBase {
-  onClick: () => void;
-  href?: never;
-}
-
-/** A row at the foot of the popup that leaves for somewhere else. */
-export interface UserButtonMenuLink extends UserButtonMenuItemBase {
-  /** Where the row goes. */
-  href: string;
-  onClick?: never;
-}
-
-export type UserButtonMenuItem = UserButtonMenuAction | UserButtonMenuLink;
-
 /**
  * The foot's rows, in the order it shows them.
  *
