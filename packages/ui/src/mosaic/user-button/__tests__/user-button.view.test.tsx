@@ -543,6 +543,89 @@ describe('UserButtonView, the workspace list', () => {
   });
 });
 
+// The foot is the one flat list of actions the surface has; everything else lives in the header or
+// behind a `⋯`. So it is where an app's own actions land, and the only list an order can run in.
+describe('UserButtonView, the foot', () => {
+  const terms = { id: 'terms', label: 'Terms of service' };
+  const support = { id: 'support', label: 'Support', href: '/support' };
+
+  const action = () => ({ ...terms, onClick: vi.fn() });
+
+  /** The foot's rows, in the order it lists them. It is the last group in the popup. */
+  const footLabels = () =>
+    Array.from(groups().at(-1)?.querySelectorAll('.cl-item-label') ?? []).map(node => node.textContent ?? '');
+
+  // The app's own actions lead, the way the existing UserButton lists them above "Add account".
+  it('leads with the custom rows', () => {
+    renderView({ customMenuItems: [action(), support] });
+
+    expect(footLabels()).toEqual(['Terms of service', 'Support', 'Sign out of all accounts']);
+  });
+
+  it('runs a custom action on press', async () => {
+    const item = action();
+    renderView({ customMenuItems: [item] });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Terms of service' }));
+
+    expect(item.onClick).toHaveBeenCalled();
+  });
+
+  it('renders a custom link as one, pointed where it was told', () => {
+    renderView({ customMenuItems: [support] });
+
+    expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
+  });
+
+  it('renders the icon a custom row brings', () => {
+    renderView({ customMenuItems: [{ ...action(), icon: <svg data-testid='glyph' /> }] });
+
+    expect(screen.getByTestId('glyph')).toBeInTheDocument();
+  });
+
+  it('orders the rows by the ids it is given', () => {
+    renderView({ customMenuItems: [action(), support], menuItemOrder: ['signOutAll', 'support'] });
+
+    expect(footLabels()).toEqual(['Sign out of all accounts', 'Support', 'Terms of service']);
+  });
+
+  // Only some of the built-in actions are rows at all, and which of those a surface carries depends
+  // on its mode, so naming one it has not got is ordinary rather than a mistake.
+  it('drops an id no row answers to', () => {
+    renderView({ customMenuItems: [action()], menuItemOrder: ['manageAccount', 'signOutAll', 'nonsense'] });
+
+    expect(footLabels()).toEqual(['Sign out of all accounts', 'Terms of service']);
+  });
+
+  // "Add account" is a row only where no Accounts heading carries it, so this is the one surface
+  // whose foot has both account-wide actions to order.
+  it('orders "Add account" where the foot is what carries it', () => {
+    renderView({ additionalSessions: [], customMenuItems: [action()], menuItemOrder: ['addAccount', 'terms'] });
+
+    expect(footLabels()).toEqual(['Add account', 'Terms of service', 'Sign out of all accounts']);
+  });
+
+  it('carries the custom rows on an org-only surface too', () => {
+    renderView({ mode: 'orgs', hasOrganizations: true, activeOrganization: foundry, customMenuItems: [action()] });
+
+    expect(footLabels()).toEqual(['Terms of service', 'Create organization']);
+  });
+
+  it('holds a custom action in place, disabled, while another action runs', () => {
+    renderView({ customMenuItems: [action()], pendingKey: userButtonBusyKeys.switchSession('sess_9') });
+
+    expect(screen.getByRole('button', { name: 'Terms of service' })).toBeDisabled();
+  });
+
+  // A link is the browser's navigation rather than one of the surface's one-shot actions, so it has
+  // nothing to wait behind.
+  it('leaves a custom link followable while another action runs', () => {
+    renderView({ customMenuItems: [support], pendingKey: userButtonBusyKeys.switchSession('sess_9') });
+
+    expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
+  });
+});
+
 // Rows carry avatars, and an avatar's load state dies with the element it hangs off. Swapping a
 // row's host element out while it waits would remount it, dropping the avatar back to its initials
 // for the length of the action — so a row that stands down stays the button it was.
