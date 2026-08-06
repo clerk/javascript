@@ -440,7 +440,7 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('replaces the accept button with a spinner while a suggestion is being joined', async () => {
+  it('spins inside the join button while a suggestion is being joined', async () => {
     const deferred = createDeferred();
     const suggestion = userSuggestions.data[0] as ReturnType<typeof acceptable>;
     suggestion.accept.mockReturnValueOnce(deferred.promise);
@@ -449,8 +449,10 @@ describe('UserButton (connected)', () => {
 
     await act.click(screen.getByRole('button', { name: 'Join' }));
 
-    expect(spinner()).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Join' })).toBeNull();
+    // The button you pressed is what reports the action, so it is still there to read.
+    const join = screen.getByRole('button', { name: 'Join' });
+    expect(join).toHaveAttribute('aria-busy', 'true');
+    expect(within(join).getByRole('progressbar')).toBeInTheDocument();
 
     deferred.resolve();
     await waitFor(() => expect(spinner()).toBeNull());
