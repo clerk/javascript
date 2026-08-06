@@ -7,6 +7,7 @@ import { createClerkPageObject } from './clerk';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
+import { createMosaicUserButtonPageObject } from './mosaicUserButton';
 import { createOrganizationProfileComponentPageObject } from './organizationProfile';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createPlanDetailsPageObject } from './planDetails';
@@ -50,6 +51,7 @@ export const createPageObjects = ({
     testingToken: createTestingTokenPageObject(testArgs),
     userAvatar: createUserAvatarPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
+    mosaicUserButton: createMosaicUserButtonPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
