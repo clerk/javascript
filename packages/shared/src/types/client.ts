@@ -82,7 +82,10 @@ export interface ClientResource extends ClerkResource {
    */
   captchaBypass: boolean;
   /**
-   * The date and time when the client's authentication cookie will expire.
+   * The date and time when the client authentication cookie is currently set to expire. Clerk can refresh this
+   * cookie, so the value can change. Returns `null` when the expiration is unavailable.
+   *
+   * [Device Trust](https://clerk.com/docs/guides/secure/device-trust) uses the client cookie to recognize a known browser.
    */
   cookieExpiresAt: Date | null;
   /**
