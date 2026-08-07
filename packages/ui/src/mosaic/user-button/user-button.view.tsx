@@ -974,17 +974,17 @@ export interface UserButtonTriggerProps {
    *
    * @default true
    */
-  renderPlanBadge?: boolean;
+  renderTriggerBadge?: boolean;
 }
 
 /** The trigger: the active workspace's avatar, and what it is called. */
 export function UserButtonTrigger({
   renderTriggerLabel = true,
-  renderPlanBadge = true,
+  renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
   const data = useUserButtonContext();
   const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const planLabel = renderPlanBadge ? organization?.planLabel : undefined;
+  const planLabel = renderTriggerBadge ? organization?.planLabel : undefined;
 
   return (
     <Popover.Trigger
@@ -1028,12 +1028,12 @@ export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButton
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
  */
-export function UserButtonView({ renderTriggerLabel, renderPlanBadge, ...root }: UserButtonProps): ReactElement {
+export function UserButtonView({ renderTriggerLabel, renderTriggerBadge, ...root }: UserButtonProps): ReactElement {
   return (
     <UserButtonRoot {...root}>
       <UserButtonTrigger
         renderTriggerLabel={renderTriggerLabel}
-        renderPlanBadge={renderPlanBadge}
+        renderTriggerBadge={renderTriggerBadge}
       />
       <UserButtonPopup />
     </UserButtonRoot>

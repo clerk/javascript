@@ -702,7 +702,7 @@ describe('UserButtonTrigger', () => {
   });
 
   it('keeps the name when only the plan badge is off', () => {
-    renderTrigger({ mode: 'organization', renderPlanBadge: false });
+    renderTrigger({ mode: 'organization', renderTriggerBadge: false });
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.queryByText('Pro')).toBeNull();
