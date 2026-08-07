@@ -65,14 +65,44 @@ export interface FapiClient {
 // List of paths that should not receive the session ID parameter in the URL
 const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
+// The requests Protect gates. Params are attached to these and nothing else.
+const protectPathPrefixes = ['/client/sign_ins', '/client/sign_ups'];
+
 type FapiClientOptions = {
   frontendApi: string;
   domain?: string;
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  /**
+   * Resolves the Protect params (`__clerk_protect_token` / `_status` / `_cid`) to merge into the
+   * body of a sign-in or sign-up POST, or `undefined` when this instance does not participate.
+   * Resolves to `undefined` before the environment has loaded, so early requests carry nothing.
+   */
+  getProtectParams?: () => Promise<Record<string, string | undefined> | undefined>;
   isSatellite?: boolean;
 };
+
+function isProtectGatedRequest(method: string, path: string | undefined): boolean {
+  if (method === 'GET' || !path) {
+    return false;
+  }
+  return protectPathPrefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/** Only a plain-object body (or none at all) can take extra params without changing its shape. */
+function isMergeableBody(body: unknown): body is Record<string, unknown> | undefined {
+  if (body === undefined) {
+    return true;
+  }
+  if (typeof body !== 'object' || body === null) {
+    return false;
+  }
+  // Spreading anything else — a Blob, a typed array, a stream — would discard the caller's payload
+  // rather than add to it.
+  const prototype = Object.getPrototypeOf(body);
+  return prototype === Object.prototype || prototype === null;
+}
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
@@ -195,7 +225,23 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
-    const { method = 'GET', body } = requestInit;
+    const { method = 'GET' } = requestInit;
+    let { body } = requestInit;
+
+    // The Protect session token rides in the form-encoded body of sign-in and
+    // sign-up POSTs. It has to be merged here, before the body is stringified below — the
+    // onBeforeRequest callbacks run after stringification, so they cannot add a body param. A body
+    // param also keeps the request CORS-simple; a custom header would trigger the preflight that
+    // breaks cookie dropping in Safari, the same reason `_method` is a query param.
+    if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
+      // Protect can degrade a sign-in but must never fail one, so a rejection here costs the
+      // params and nothing else.
+      const protectParams = await options.getProtectParams().catch(() => undefined);
+      if (protectParams) {
+        body = { ...((body ?? {}) as Record<string, unknown>), ...protectParams } as unknown as BodyInit;
+        requestInit.body = body;
+      }
+    }
 
     if (body && typeof body === 'object' && !(body instanceof FormData)) {
       requestInit.body = filterUndefinedValues(body);

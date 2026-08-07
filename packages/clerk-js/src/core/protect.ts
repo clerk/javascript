@@ -2,9 +2,12 @@ import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
 import type { ProtectLoader } from '@clerk/shared/types';
 
+import type { ApplyLoader, ProtectPlaceholders, ProtectRequestParams } from './protectSession';
+import { interpolatePlaceholders, ProtectSession } from './protectSession';
 import type { Environment } from './resources';
 export class Protect {
   #initialized: boolean = false;
+  #session?: ProtectSession;
 
   load(env: Environment): void {
     const config = env?.protectConfig;
@@ -23,31 +26,57 @@ export class Protect {
     // here rather than at end to mark as initialized even if load fails.
     this.#initialized = true;
 
-    for (const loader of config.loaders) {
+    // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
+    // down with it.
+    try {
+      this.#apply(config.loaders, config.id || undefined);
+    } catch (error) {
+      logger.warnOnce(`[protect] failed to load: ${error}`);
+    }
+  }
+
+  #apply(configured: ProtectLoader[], instanceId?: string): void {
+    // Rollout is decided before anything else, because the session is only meaningful for the
+    // loaders we are actually going to apply.
+    const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
+
+    // Only an instance whose loaders reference the correlation id gets a session, so an instance
+    // not using it keeps today's behaviour and stores nothing in the browser.
+    const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
+    this.#session = ProtectSession.create(loaders, instanceId, applyLoader);
+
+    for (const loader of loaders) {
+      // The session injects this one itself, under the acquisition lock, so exactly one tab per
+      // browser session runs it. Every other loader runs on every page load regardless.
+      if (this.#session?.isTokenLoader(loader)) {
+        continue;
+      }
       try {
-        this.applyLoader(loader);
+        this.applyLoader(loader, this.#session?.placeholders());
       } catch (error) {
         logger.warnOnce(`[protect] failed to apply loader: ${error}`);
       }
     }
+
+    // Acquisition is prefetched here rather than at sign-in, so a sign-in normally finds the token
+    // long since cached and acquisition stays off the latency-critical path.
+    this.#session?.start();
+  }
+
+  /**
+   * The Protect params to attach to a sign-in or sign-up request, or `undefined` when this instance
+   * does not participate. Never rejects, and never blocks past the acquisition deadline.
+   */
+  getRequestParams(): Promise<ProtectRequestParams | undefined> {
+    try {
+      return (this.#session?.getRequestParams() ?? Promise.resolve(undefined)).catch(() => undefined);
+    } catch {
+      return Promise.resolve(undefined);
+    }
   }
 
   // apply individual loader
-  applyLoader(loader: ProtectLoader) {
-    // we use rollout for percentage based rollouts (as the environment file is cached)
-    if (loader.rollout !== undefined) {
-      const rollout = loader.rollout;
-      if (typeof rollout !== 'number' || rollout < 0) {
-        // invalid rollout percentage - do nothing
-        logger.warnOnce(`[protect] loader rollout value is invalid: ${rollout}`);
-        return;
-      }
-      if (rollout === 0 || Math.random() > rollout) {
-        // not in rollout percentage - do nothing
-        return;
-      }
-    }
-
+  applyLoader(loader: ProtectLoader, placeholders?: ProtectPlaceholders): HTMLElement | undefined {
     const type = loader.type || 'script';
     const target = loader.target || 'body';
 
@@ -57,6 +86,8 @@ export class Protect {
       for (const [key, value] of Object.entries(loader.attributes)) {
         switch (typeof value) {
           case 'string':
+            element.setAttribute(key, placeholders ? interpolatePlaceholders(value, placeholders) : value);
+            break;
           case 'number':
           case 'boolean':
             element.setAttribute(key, String(value));
@@ -70,28 +101,56 @@ export class Protect {
     }
 
     if (loader.textContent && typeof loader.textContent === 'string') {
-      element.textContent = loader.textContent;
+      element.textContent = placeholders
+        ? interpolatePlaceholders(loader.textContent, placeholders)
+        : loader.textContent;
     }
 
     switch (target) {
       case 'head':
         document.head.appendChild(element);
-        break;
+        return element;
       case 'body':
         document.body.appendChild(element);
-        break;
+        return element;
       default:
         if (target?.startsWith('#')) {
           const targetElement = document.getElementById(target.substring(1));
           if (!targetElement) {
             logger.warnOnce(`[protect] loader target element not found: ${target}`);
-            return;
+            return undefined;
           }
           targetElement.appendChild(element);
-          return;
+          return element;
         }
         logger.warnOnce(`[protect] loader target is invalid: ${target}`);
-        break;
+        return undefined;
     }
   }
+}
+
+// A malformed entry is dropped on its own, the way a failed injection always has been — it must
+// not cost the instance its other loaders.
+function isLoader(loader: unknown): loader is ProtectLoader {
+  if (!loader || typeof loader !== 'object') {
+    logger.warnOnce(`[protect] loader entry is not an object: ${loader}`);
+    return false;
+  }
+  return true;
+}
+
+// we use rollout for percentage based rollouts (as the environment file is cached)
+function inRollout(loader: ProtectLoader): boolean {
+  if (loader.rollout === undefined) {
+    return true;
+  }
+
+  const rollout = loader.rollout;
+  if (typeof rollout !== 'number' || rollout < 0) {
+    // invalid rollout percentage - do nothing
+    logger.warnOnce(`[protect] loader rollout value is invalid: ${rollout}`);
+    return false;
+  }
+
+  return rollout !== 0 && Math.random() <= rollout;
 }
