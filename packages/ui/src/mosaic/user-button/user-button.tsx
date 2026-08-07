@@ -68,7 +68,7 @@ export type UserButtonProps = UserButtonControllerOptions &
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderPlanBadge, modePriority, customMenuItems, menuItemOrder, ...options } = props;
+  const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, ...options } = props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -137,7 +137,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     <UserButtonView
       {...data}
       renderTriggerLabel={renderTriggerLabel}
-      renderPlanBadge={renderPlanBadge}
+      renderTriggerBadge={renderTriggerBadge}
       modePriority={modePriority}
       customMenuItems={menuItems}
       menuItemOrder={menuItemOrder}
