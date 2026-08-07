@@ -24,7 +24,7 @@ import { createTestUtils } from '../testUtils';
 // The template's layout, plus the one line this suite adds. Its appearance options are what the
 // shared sign-in page object's selectors depend on, so they are carried over verbatim.
 const layout = () => `import './globals.css';
-import './mosaic.css';
+import '@clerk/nextjs/experimental/mosaic/styles.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 
@@ -52,20 +52,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }`;
 
-// The layered form is what `@clerk/react`'s mosaic entry documents. If Next cannot resolve a bare
-// specifier through `@import`, the fallback is a plain `import` of the same file from the layout.
-const mosaicCss = () => `@import '@clerk/nextjs/experimental/mosaic/styles.css' layer(clerk);\n`;
-
 // Both UserButtons mount together while signed in, so every case below runs with the legacy Emotion
 // tree and the Mosaic tree live at once rather than proving coexistence in one isolated smoke test.
 const mosaicPage = () => `'use client';
 import { UserButton } from '@clerk/nextjs/experimental/mosaic';
-import { SignIn, SignedIn, SignedOut, UserButton as LegacyUserButton } from '@clerk/nextjs';
+import { SignIn, Show, UserButton as LegacyUserButton } from '@clerk/nextjs';
 
 export default function Page() {
   return (
     <main>
-      <SignedIn>
+      <Show when='signed-in'>
         <UserButton
           userProfileProps={{
             customPages: [
@@ -78,10 +74,10 @@ export default function Page() {
           }}
         />
         <LegacyUserButton />
-      </SignedIn>
-      <SignedOut>
+      </Show>
+      <Show when='signed-out'>
         <SignIn routing='hash' />
-      </SignedOut>
+      </Show>
     </main>
   );
 }`;
@@ -107,18 +103,23 @@ test.describe('Mosaic UserButton @nextjs', () => {
   let fakeUser: FakeUserWithEmail;
   let otherUser: FakeUserWithEmail;
   let fakeOrganization: FakeOrganization;
+  // Filled as each resource is created, so a setup that fails halfway still tears down what it made.
+  const cleanup: (() => Promise<unknown>)[] = [];
 
   test.beforeAll(async () => {
+    // Installing and booting a fresh app, before a single test runs.
+    test.setTimeout(90_000);
+
     app = await appConfigs.next.appRouter
       .clone()
       // Deliberately no `.addDependency('@clerk/ui', PKGLAB)`, unlike composed-components.test.ts.
       // The Mosaic entry is bundled into @clerk/react at build time, so @clerk/nextjs alone has to
       // be enough. The absence of that line is what the last test in this file asserts.
-      .addFile('src/app/mosaic.css', mosaicCss)
       .addFile('src/app/layout.tsx', layout)
       .addFile('src/app/mosaic/page.tsx', mosaicPage)
       .addFile('src/app/api/me/route.ts', meRoute)
       .commit();
+    cleanup.push(() => app.teardown());
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
@@ -136,17 +137,17 @@ test.describe('Mosaic UserButton @nextjs', () => {
     fakeUser = createUser();
     otherUser = createUser();
     const user = await m.services.users.createBapiUser(fakeUser);
+    cleanup.unshift(() => fakeUser.deleteIfExists());
     await m.services.users.createBapiUser(otherUser);
+    cleanup.unshift(() => otherUser.deleteIfExists());
     fakeOrganization = await m.services.users.createFakeOrganization(user.id);
+    cleanup.unshift(() => fakeOrganization.delete());
   });
 
   test.afterAll(async () => {
-    try {
-      await fakeOrganization.delete();
-      await otherUser.deleteIfExists();
-      await fakeUser.deleteIfExists();
-    } finally {
-      await app.teardown();
+    test.setTimeout(90_000);
+    for (const teardown of cleanup) {
+      await teardown();
     }
   });
 
@@ -194,7 +195,7 @@ test.describe('Mosaic UserButton @nextjs', () => {
     await expect(u.po.mosaicUserButton.popup()).toHaveCount(0);
   });
 
-  test('selecting an organization, then the personal workspace, reaches the server', async ({ page, context }) => {
+  test('selecting the personal workspace, then the organization, reaches the server', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await context.clearCookies();
 
@@ -204,6 +205,19 @@ test.describe('Mosaic UserButton @nextjs', () => {
 
     await u.page.goToRelative('/mosaic');
     await u.po.mosaicUserButton.waitForMounted();
+
+    // The only organization is already active on sign-in, so its row is the current item rather than
+    // a button. Personal is the reachable move first; the organization becomes selectable after it.
+    await u.po.mosaicUserButton.expectTriggerLabel(fakeOrganization.name);
+
+    await u.po.mosaicUserButton.toggleTrigger();
+    await u.po.mosaicUserButton.waitForPopover();
+    await u.po.mosaicUserButton.selectPersonalWorkspace();
+    await u.po.mosaicUserButton.waitForPopoverClosed();
+
+    await expect(async () => {
+      expect((await readAuthState(page)).orgId).toBeNull();
+    }).toPass();
 
     await u.po.mosaicUserButton.toggleTrigger();
     await u.po.mosaicUserButton.waitForPopover();
@@ -216,15 +230,6 @@ test.describe('Mosaic UserButton @nextjs', () => {
       expect(auth.orgId).toBe(fakeOrganization.organization.id);
       expect(auth.orgRole).toBe('org:admin');
       expect(auth.orgSlug).toBeTruthy();
-    }).toPass();
-
-    await u.po.mosaicUserButton.toggleTrigger();
-    await u.po.mosaicUserButton.waitForPopover();
-    await u.po.mosaicUserButton.selectPersonalWorkspace();
-    await u.po.mosaicUserButton.waitForPopoverClosed();
-
-    await expect(async () => {
-      expect((await readAuthState(page)).orgId).toBeNull();
     }).toPass();
   });
 
@@ -298,7 +303,7 @@ test.describe('Mosaic UserButton @nextjs', () => {
 
     await u.po.mosaicUserButton.toggleTrigger();
     await u.po.mosaicUserButton.waitForPopover();
-    await u.po.mosaicUserButton.triggerManageAccount();
+    await u.po.mosaicUserButton.triggerManageAccount(fakeUser.email);
 
     // The modal is rendered by clerk-js, so the legacy page object is the right tool. Reaching it
     // from a Mosaic surface is the hand-off under test.

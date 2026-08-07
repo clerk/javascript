@@ -11,7 +11,8 @@ export const createMosaicUserButtonPageObject = (testArgs: { page: EnhancedPage 
   const { page } = testArgs;
 
   const trigger = () => page.getByRole('button', { name: /^Open account menu for / });
-  const popup = () => page.getByRole('dialog', { name: 'Account' });
+  // Exact, because clerk-js labels the legacy popover "Account panel" and role names match on substring.
+  const popup = () => page.getByRole('dialog', { name: 'Account', exact: true });
 
   const self = {
     trigger,
@@ -39,7 +40,11 @@ export const createMosaicUserButtonPageObject = (testArgs: { page: EnhancedPage 
     clickMenuItem: (name: string) => page.getByRole('menuitem', { name, exact: true }).click(),
     /** Header and foot actions alike; each name appears once in the popup. */
     clickAction: (name: string) => popup().getByRole('button', { name, exact: true }).click(),
-    triggerManageAccount: () => self.clickAction('Manage account'),
+    /** Manage account is only reachable through the account row's actions menu. */
+    triggerManageAccount: async (identifier: string) => {
+      await self.openAccountActions(identifier);
+      await self.clickMenuItem('Manage account');
+    },
     triggerManageOrganization: () => self.clickAction('Manage organization'),
     triggerSignOutAll: () => self.clickAction('Sign out of all accounts'),
   };
