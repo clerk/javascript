@@ -9,8 +9,9 @@ import { UserButton } from '../user-button';
 
 // End-to-end wiring test for the connected UserButton: it renders the real view through the real
 // controller against a mocked Clerk, then drives the real popover DOM. Unlike the controller test
-// (controller -> Clerk), this proves the layers compose — including the container's
-// close-on-success: one-shot actions close the popover, navigations leave it open.
+// (controller -> Clerk), this proves the layers compose, including what closes the popover:
+// selecting a workspace closes on success in the machine, and anything that opens a modal or
+// navigates closes before it hands off.
 
 interface FakeUser {
   id: string;
@@ -210,7 +211,7 @@ describe('UserButton (connected)', () => {
   // Nothing stands in for the button before Clerk answers, in any mode: until it does, a signed-out
   // visitor is indistinguishable from a session still resolving, so a placeholder here would be
   // promising a button to people who never get one.
-  describe.each(['combined', 'orgs', 'user'] as const)('in %s mode', mode => {
+  describe.each(['combined', 'organization', 'user'] as const)('in %s mode', mode => {
     it('renders nothing while Clerk is still loading', () => {
       isUserLoaded = false;
       renderUserButton({ mode });
