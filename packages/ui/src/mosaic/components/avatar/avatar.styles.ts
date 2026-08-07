@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // root — clips its parts to the shape/size; fill comes from the image or fallback
@@ -10,6 +10,7 @@ export const styles = stylex.create({
     aspectRatio: '1 / 1',
     display: 'inline-flex',
     flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     lineHeight: 1,

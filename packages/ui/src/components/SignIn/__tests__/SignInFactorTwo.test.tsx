@@ -407,6 +407,28 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Use another method', () => {
+    it('does not render when only one verification factor is available', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo({ supportPhoneCode: true });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockResolvedValueOnce({} as SignInResource);
+      render(<SignInFactorTwo />, { wrapper });
+
+      expect(screen.queryByText('Use another method')).not.toBeInTheDocument();
+    });
+
+    it('renders when multiple verification factors are available', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo({ supportPhoneCode: true, supportEmailCode: true });
+      });
+
+      fixtures.signIn.prepareSecondFactor.mockResolvedValueOnce({} as SignInResource);
+      render(<SignInFactorTwo />, { wrapper });
+
+      expect(screen.getByText('Use another method')).toBeInTheDocument();
+    });
+
     it('renders the other authentication methods list component when clicking on "Use another method"', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
