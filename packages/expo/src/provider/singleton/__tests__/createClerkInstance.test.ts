@@ -2,7 +2,7 @@ import type { Clerk } from '@clerk/clerk-js';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { DUMMY_CLERK_CLIENT_RESOURCE } from '../../../cache';
+import { DUMMY_CLERK_CLIENT_RESOURCE, DUMMY_CLERK_ENVIRONMENT_RESOURCE } from '../../../cache';
 import type { TokenCache } from '../../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
 
@@ -552,7 +552,7 @@ describe('createClerkInstance', () => {
       expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
     });
 
-    test('does not persist the dummy client snapshot', async () => {
+    test('does not persist the dummy client snapshot but still clears the cached session JWT', async () => {
       const set = vi.fn(() => Promise.resolve());
 
       const createClerkInstance = await loadCreateClerkInstance();
@@ -568,8 +568,10 @@ describe('createClerkInstance', () => {
       const listener = clerk.addListener.mock.calls[0]?.[0] as (payload: { client: unknown }) => void;
       expect(listener).toBeTypeOf('function');
 
-      listener({ client: { id: DUMMY_CLERK_CLIENT_RESOURCE.id } });
-      expect(set).not.toHaveBeenCalled();
+      listener({ client: { id: DUMMY_CLERK_CLIENT_RESOURCE.id, lastActiveSessionId: null } });
+      expect(set).not.toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_client'), expect.any(String));
+      // A sessionless emission, dummy or not, still wipes the offline JWT fallback.
+      expect(set).toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_session_jwt'), '');
 
       listener({
         client: {
@@ -580,6 +582,81 @@ describe('createClerkInstance', () => {
         },
       });
       expect(set).toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_client'), expect.any(String));
+    });
+
+    test('does not persist the dummy environment snapshot', async () => {
+      const set = vi.fn(() => Promise.resolve());
+
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        __experimental_resourceCache: () => ({
+          get: () => Promise.resolve(null),
+          set,
+        }),
+      }) as unknown as MockClerk;
+
+      (clerk as unknown as { __internal_environment: unknown }).__internal_environment = {
+        __internal_toSnapshot: () => ({
+          object: 'environment',
+          id: '',
+          display_config: { id: DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id },
+        }),
+      };
+
+      const listener = clerk.addListener.mock.calls[0]?.[0] as (payload: { client: unknown }) => void;
+      listener({ client: null });
+      expect(set).not.toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_environment'), expect.any(String));
+
+      (clerk as unknown as { __internal_environment: unknown }).__internal_environment = {
+        __internal_toSnapshot: () => ({
+          object: 'environment',
+          id: 'env_real',
+          display_config: { id: 'display_config_real' },
+        }),
+      };
+      listener({ client: null });
+      expect(set).toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_environment'), expect.any(String));
+    });
+
+    test('treats a persisted dummy environment as missing', async () => {
+      mocks.requestInitialResources.mockImplementation(() => new Promise(() => {}));
+
+      const cachedClient = { object: 'client', id: 'client_cached', sessions: [] };
+      const dummyEnvironmentSnapshot = {
+        object: 'environment',
+        id: '',
+        display_config: { id: DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id },
+      };
+
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        __experimental_resourceCache: () => ({
+          get: (key: string) => {
+            if (key.startsWith('__clerk_cache_environment')) {
+              return Promise.resolve(JSON.stringify(dummyEnvironmentSnapshot));
+            }
+            if (key.startsWith('__clerk_cache_client')) {
+              return Promise.resolve(JSON.stringify(cachedClient));
+            }
+            return Promise.resolve(null);
+          },
+          set: () => Promise.resolve(),
+        }),
+      }) as unknown as MockClerk;
+
+      const resources = await clerk.__internal_getCachedResources?.();
+
+      expect(resources?.client).toEqual(cachedClient);
+      expect(resources?.environment).toMatchObject({
+        auth_config: { session_minter: false },
+      });
+
+      await vi.advanceTimersByTimeAsync(3_000);
+      expect(mocks.requestInitialResources).toHaveBeenCalledTimes(1);
     });
 
     test('stops recovering after the initial resources load', async () => {

@@ -238,13 +238,18 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
+            // Persisting a dummy would make the next boot see a populated cache and skip recovery.
             if (environment) {
-              void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
+              const environmentSnapshot = environment.__internal_toSnapshot();
+              if (environmentSnapshot.display_config?.id !== DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id) {
+                void EnvironmentResourceCache.save(environmentSnapshot);
+              }
             }
 
-            // Persisting the dummy would make the next boot see a populated cache and skip recovery.
-            if (client && client.id !== DUMMY_CLERK_CLIENT_RESOURCE.id) {
-              void ClientResourceCache.save(client.__internal_toSnapshot());
+            if (client) {
+              if (client.id !== DUMMY_CLERK_CLIENT_RESOURCE.id) {
+                void ClientResourceCache.save(client.__internal_toSnapshot());
+              }
               if (client.lastActiveSessionId) {
                 const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
                 const token = currentSession?.lastActiveToken?.getRawString();
@@ -261,9 +266,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             client: ClientJSONSnapshot | null;
             environment: EnvironmentJSONSnapshot | null;
           }> => {
-            const environment = await EnvironmentResourceCache.load();
+            const cachedEnvironment = await EnvironmentResourceCache.load();
             const cachedClient = await ClientResourceCache.load();
-            // Installs that persisted the dummy before the save guard existed must still recover.
+            // Installs that persisted a dummy before the save guard existed must still recover.
+            const environment =
+              cachedEnvironment?.display_config?.id === DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id
+                ? null
+                : cachedEnvironment;
             const client = cachedClient?.id === DUMMY_CLERK_CLIENT_RESOURCE.id ? null : cachedClient;
             if (!environment || !client) {
               scheduleResourceRetry(3000);
