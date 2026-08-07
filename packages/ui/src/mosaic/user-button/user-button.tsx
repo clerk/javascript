@@ -2,8 +2,12 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
+import type { CustomProfileItem } from '../hooks/useCustomPages';
+import { useCustomPages } from '../hooks/useCustomPages';
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useSpinDelay } from '../hooks/useSpinDelay';
+import type { UserProfilePageId } from '../hooks/useUserProfilePages';
+import { useUserProfilePages } from '../hooks/useUserProfilePages';
 import { useMachine } from '../machine/useMachine';
 import type { UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
@@ -12,7 +16,23 @@ import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.typ
 import type { UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 
-/** Everything `<UserButton />` takes: profile routing, trigger content, and the app's own menu rows. */
+/** Configures the UserProfile this button opens. */
+export interface UserButtonUserProfileProps {
+  /** Pages and links of your own, added to the profile's navigation. */
+  customPages?: CustomProfileItem[];
+  /**
+   * The order the profile's navigation runs in, by id: a built-in page's id, or a custom entry's
+   * `path`. Anything left out follows the pages named here. The first page is the one the profile
+   * opens on, so it cannot be a link.
+   */
+  pageOrder?: (UserProfilePageId | (string & {}))[];
+}
+
+/**
+ * Everything `<UserButton />` takes: where its profile surfaces open (`UserButtonControllerOptions`),
+ * what the trigger shows (`UserButtonTriggerProps`), the app's own rows at the foot of the menu
+ * (`UserButtonMenuProps`), and the profile it opens (`UserButtonUserProfileProps`).
+ */
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
@@ -23,6 +43,7 @@ export type UserButtonProps = UserButtonControllerOptions &
      * an answer and not a wait.
      */
     fallback?: ReactNode;
+    userProfileProps?: UserButtonUserProfileProps;
   };
 
 /**
@@ -69,10 +90,14 @@ export type UserButtonProps = UserButtonControllerOptions &
  * ```
  *
  * @example
- * `customMenuItems` adds your own rows to the foot of the menu, each one either an `onClick` action
- * or an `href` link, and `menuItemOrder` names the order the foot's rows run in.
+ * `customPages` adds your own pages to the profile this button opens; `customMenuItems` adds your
+ * own rows to the foot of the menu, each one either an `onClick` action or an `href` link.
  * ```tsx
  * <UserButton
+ *   userProfileProps={{
+ *     customPages: [{ path: 'usage', label: 'Usage', icon: <ChartIcon />, content: <UsagePage /> }],
+ *     pageOrder: ['account', 'usage', 'security'],
+ *   }}
  *   customMenuItems={[
  *     { id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' },
  *     { id: 'support', label: 'Contact support', icon: <ChatIcon />, onClick: () => openSupportChat() },
@@ -82,9 +107,27 @@ export type UserButtonProps = UserButtonControllerOptions &
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderTriggerBadge, mode: requestedMode, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
-    props;
-  const controller = useUserButtonController(options);
+  const {
+    renderTriggerLabel,
+    renderTriggerBadge,
+    mode: requestedMode,
+    modePriority,
+    userProfileProps,
+    customMenuItems,
+    menuItemOrder,
+    fallback,
+    ...options
+  } = props;
+  // The profile opens in clerk-js's own React root, so its custom pages reach it as portals rendered
+  // from here. They have to outlive the popover that opened it, and the button's own data with it,
+  // which is why they hang off the container rather than anything the popover renders.
+  const builtInPages = useUserProfilePages();
+  const { customPages, portals } = useCustomPages({
+    items: userProfileProps?.customPages,
+    order: userProfileProps?.pageOrder,
+    builtInPages,
+  });
+  const controller = useUserButtonController(options, customPages);
   // The popover's open state and the one action in flight are the same flow: an action that ends the
   // interaction closes the surface, so they settle together or not at all.
   const [{ value, context }, send] = useMachine(userButtonMachine);
@@ -99,13 +142,13 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
   const displayPendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
 
+  // If controller ever goes back into loading, we want to preserve the portals
   if (controller.status === 'loading') {
-    return <>{fallback}</>;
+    return <>{fallback}{portals}</>;
   }
 
-  // Signed out is an answer, so the placeholder goes too rather than promising a button.
-  if (controller.status === 'hidden') {
-    return null;
+  if (controller.status !== 'ready') {
+    return <>{portals}</>;
   }
 
   const close = () => send({ type: 'CLOSE' });
@@ -169,28 +212,31 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   } = context.frozen ?? controller;
 
   return (
-    <UserButtonView
-      {...data}
-      renderTriggerLabel={renderTriggerLabel}
-      renderTriggerBadge={renderTriggerBadge}
-      mode={mode}
-      modePriority={modePriority}
-      customMenuItems={menuItems}
-      menuItemOrder={menuItemOrder}
-      open={value !== 'closed'}
-      onOpenChange={next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' })}
-      pendingKey={displayPendingKey}
-      onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
-      onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
-      onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
-      onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
-      onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
-      onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
-      onManageAccount={handOff(onManageAccount)}
-      onManageOrganization={handOff(onManageOrganization)}
-      onInviteMembers={handOff(onInviteMembers)}
-      onCreateOrganization={handOff(onCreateOrganization)}
-      onAddAccount={handOff(onAddAccount)}
-    />
+    <>
+      <UserButtonView
+        {...data}
+        renderTriggerLabel={renderTriggerLabel}
+        renderTriggerBadge={renderTriggerBadge}
+        mode={mode}
+        modePriority={modePriority}
+        customMenuItems={menuItems}
+        menuItemOrder={menuItemOrder}
+        open={value !== 'closed'}
+        onOpenChange={next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' })}
+        pendingKey={displayPendingKey}
+        onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
+        onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
+        onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
+        onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
+        onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
+        onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
+        onManageAccount={handOff(onManageAccount)}
+        onManageOrganization={handOff(onManageOrganization)}
+        onInviteMembers={handOff(onInviteMembers)}
+        onCreateOrganization={handOff(onCreateOrganization)}
+        onAddAccount={handOff(onAddAccount)}
+      />
+      {portals}
+    </>
   );
 }
