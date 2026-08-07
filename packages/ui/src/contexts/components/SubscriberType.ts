@@ -6,7 +6,7 @@ export const SubscriberTypeContext = createContext<ForPayerType | undefined>(DEF
 
 export const useSubscriberTypeContext = (): ForPayerType => useContext(SubscriberTypeContext) || DEFAUlT;
 
-export const useSubscriberTypeLocalizationRoot = () => {
+export const useSubscriberTypeLocalizationRoot = (): 'userProfile' | 'organizationProfile' => {
   const subscriberType = useSubscriberTypeContext();
   return subscriberType === 'user' ? 'userProfile' : 'organizationProfile';
 };

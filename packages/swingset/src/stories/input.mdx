@@ -1,0 +1,51 @@
+import * as InputStories from './input.stories';
+
+# Input
+
+The `Input` component is the standard text field in Mosaic. It uses a fixed height (shadcn-style) with size and disabled variants.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={InputStories}
+/>
+
+## Props
+
+<PropTable meta={InputStories.meta} />
+
+## Usage
+
+The snippet below reflects the props selected in the table above — change a prop and it updates here.
+
+<Usage
+  component='Input'
+  module='@clerk/ui/mosaic/components/input'
+  props={{ placeholder: 'Enter text…' }}
+/>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={InputStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={InputStories}
+/>
+
+### Invalid
+
+<Story
+  name='Invalid'
+  storyModule={InputStories}
+/>

@@ -6,7 +6,7 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { useClipboard } from '@/ui/hooks';
-import { Check, ClipboardOutline } from '@/ui/icons';
+import { Checkmark, Clipboard } from '@/ui/icons';
 import { localizationKeys } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
@@ -82,8 +82,8 @@ export const CopyAPIKeyModal = ({
                     value={apiKeySecret}
                     readOnly
                     sx={{ width: '100%' }}
-                    copyIcon={ClipboardOutline}
-                    copiedIcon={Check}
+                    copyIcon={Clipboard}
+                    copiedIcon={Checkmark}
                   />
                 </Form.CommonInputWrapper>
               </Form.ControlRow>

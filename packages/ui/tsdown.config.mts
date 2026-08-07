@@ -12,7 +12,9 @@ export default defineConfig(({ watch }) => {
     target: 'es2022',
     platform: 'browser',
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
+    noExternal: ['@clerk/headless'],
     format: ['esm'], // ESM only
+    fixedExtension: false,
     minify: false,
     plugins: [
       svgr({
@@ -39,6 +41,7 @@ export default defineConfig(({ watch }) => {
         './src/internal/index.ts',
         './src/themes/index.ts',
         './src/themes/experimental.ts',
+        './src/experimental/index.ts',
       ],
       outDir: './dist',
       unbundle: true,

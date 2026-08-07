@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>iframe probe (no Clerk)</title>
+  </head>
+  <body>
+    <h1>iframe probe</h1>
+    <script>
+      // Records the events the embedded document actually receives, so a test can assert
+      // which of `focus` / `visibilitychange` fire on parent-tab re-activation.
+      window.__events = [];
+      const rec = type =>
+        window.__events.push({
+          type,
+          visibility: document.visibilityState,
+          hasFocus: document.hasFocus(),
+          t: Date.now(),
+        });
+      window.addEventListener('focus', () => rec('window.focus'));
+      window.addEventListener('blur', () => rec('window.blur'));
+      document.addEventListener('visibilitychange', () => rec('visibilitychange'));
+      rec('init');
+    </script>
+  </body>
+</html>

@@ -23,5 +23,17 @@
       "Bash(cat secrets/**:*)",
       "Bash(cat **/.keys.json:*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"This is the clerk/javascript SDK monorepo. A project skill named clerk-monorepo documents the repo setup, the pnpm + turbo dev loop, the package map, and the hard rules for changesets, conventional commits, and PRs. Invoke it via the Skill tool (skill: clerk-monorepo) before building, testing, committing, changing any package, or opening a PR in this repo.\"}}'"
+          }
+        ]
+      }
+    ]
   }
 }

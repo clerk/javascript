@@ -13,7 +13,7 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
-import type { Appearance, Ui } from '@clerk/ui/internal';
+import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
@@ -30,9 +30,9 @@ export type PluginOptions<TUi extends Ui = Ui> = Without<
 > &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
-    appearance?: Appearance<TUi>;
+    appearance?: ExtractAppearanceType<TUi, Appearance>;
     /**
-     * Optional object to use the bundled Clerk UI instead of loading from CDN.
+     * An object to use the bundled Clerk UI instead of loading from CDN.
      * Import `ui` from `@clerk/ui` and pass it here to bundle the UI with your application.
      * When omitted, UI is loaded from Clerk's CDN.
      */

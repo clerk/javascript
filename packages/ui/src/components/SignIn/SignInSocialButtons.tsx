@@ -9,13 +9,12 @@ import { handleError as _handleError } from '@/ui/utils/errorHandler';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
+import { buildSignInOAuthTransportCallbackParams } from './buildOAuthCallbackParams';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
@@ -25,12 +24,13 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const clerk = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
-  const { displayConfig } = useEnvironment();
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
-  const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+  const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
-  const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
+  const shouldUsePopup =
+    !clerk.__internal_hasOAuthTransport &&
+    (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup()));
   const { onAlternativePhoneCodeProviderClick, ...rest } = props;
 
   const handleError = (err: any) => {
@@ -56,7 +56,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
     <SocialButtons
       {...rest}
       showLastAuthenticationStrategy
-      idleAfterDelay={!shouldUsePopup}
+      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasOAuthTransport}
       oauthCallback={strategy => {
         if (shouldUsePopup) {
           // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
@@ -76,8 +76,23 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
         }
 
         return signIn
-          .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
-          .catch(err => handleError(err));
+          .authenticateWithRedirect({
+            strategy,
+            redirectUrl,
+            redirectUrlComplete,
+            oidcPrompt: ctx.oidcPrompt,
+            __internal_callbackParams: {
+              ...buildSignInOAuthTransportCallbackParams(ctx),
+              __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+            },
+          })
+          .catch(err => {
+            const res = handleError(err);
+            if (clerk.__internal_hasOAuthTransport) {
+              card.setIdle();
+            }
+            return res;
+          });
       }}
       web3Callback={strategy => {
         if (strategy === 'web3_solana_signature') {
@@ -91,6 +106,8 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
             signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
             strategy,
             secondFactorUrl: 'factor-two',
+            protectCheckUrl: 'protect-check',
+            signUpProtectCheckUrl: ctx.isCombinedFlow ? 'create/protect-check' : undefined,
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
       }}

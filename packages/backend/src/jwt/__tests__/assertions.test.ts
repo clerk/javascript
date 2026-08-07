@@ -93,6 +93,12 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
     );
   });
 
+  it('throws error when audience string[] has no intersection with aud string[]', () => {
+    expect(() => assertAudienceClaim([audience], [invalidAudience])).toThrow(
+      `Invalid JWT audience claim array (aud) ${JSON.stringify([audience])}. Is not included in "${JSON.stringify([invalidAudience])}".`,
+    );
+  });
+
   it('throws error when aud is a substring of audience', () => {
     expect(() => assertAudienceClaim(audience.slice(0, -2), audience)).toThrow(
       `Invalid JWT audience claim (aud) "${audience.slice(0, -2)}". Is not included in "${JSON.stringify([audience])}".`,
@@ -107,10 +113,15 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
 });
 
 describe('assertHeaderType(typ?, allowedTypes?)', () => {
-  it('does not throw error if type is missing', () => {
+  it('does not throw error if type is missing and allowed types are not configured', () => {
     expect(() => assertHeaderType(undefined)).not.toThrow();
-    expect(() => assertHeaderType(undefined, 'JWT')).not.toThrow();
-    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).not.toThrow();
+  });
+
+  it('throws error if type is missing and allowed types are configured', () => {
+    expect(() => assertHeaderType(undefined, 'JWT')).toThrow(`Invalid JWT type undefined. Expected "JWT".`);
+    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).toThrow(
+      `Invalid JWT type undefined. Expected "JWT, at+jwt".`,
+    );
   });
 
   it('does not throw error if type matches default allowed type (JWT)', () => {
@@ -193,10 +204,21 @@ describe('assertSubClaim(sub?)', () => {
 });
 
 describe('assertAuthorizedPartiesClaim(azp?, authorizedParties?)', () => {
-  it('does not throw if azp missing or empty', () => {
+  it('does not throw if azp missing or empty and no authorizedParties are configured', () => {
     expect(() => assertAuthorizedPartiesClaim()).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim('')).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim(undefined)).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim('', [])).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim(undefined, [])).not.toThrow();
+  });
+
+  it('throws error if azp is missing or empty but authorizedParties are configured', () => {
+    expect(() => assertAuthorizedPartiesClaim('', ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) "". Expected "azp-1".`,
+    );
+    expect(() => assertAuthorizedPartiesClaim(undefined, ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) undefined. Expected "azp-1".`,
+    );
   });
 
   it('does not throw if authorizedParties missing or empty', () => {

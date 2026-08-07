@@ -17,6 +17,7 @@ type VerificationLinkCardProps = {
   formTitle?: LocalizationKey;
   formSubtitle: LocalizationKey;
   resendButton: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
   profileImageUrl?: string;
   onResendCodeClicked: React.MouseEventHandler;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
@@ -46,6 +47,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
                 identifier={props.safeIdentifier}
                 avatarUrl={props.profileImageUrl}
                 onClick={goBack}
+                editButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
               />
             </VerificationLink>
           </Header.Root>

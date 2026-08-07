@@ -9,6 +9,7 @@ export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
+export * from './EmailApi';
 export * from './EnterpriseConnectionApi';
 export * from './IdPOAuthAccessTokenApi';
 export * from './InstanceApi';
@@ -17,11 +18,44 @@ export * from './MachineApi';
 export * from './M2MTokenApi';
 export * from './JwksApi';
 export * from './JwtTemplatesApi';
-export * from './OrganizationApi';
+// `GetOrganizationMembershipListParams` and `GetOrganizationInvitationListParams` are defined on
+// both `UserApi` (user-scoped) and `OrganizationApi` (org-scoped) with different shapes.
+// UserApi's variants remain the canonical public exports through this barrel; OrganizationApi's
+// variants are reachable via direct import from `./OrganizationApi`, and typedoc still resolves
+// them locally on the class methods.
+// Similarly, `CreateParams` is defined on both `InvitationApi` and `OrganizationApi`, and
+// `UpdateParams` is defined on both `InstanceApi` and `OrganizationApi`. The InvitationApi /
+// InstanceApi variants remain the canonical public exports through this barrel (via their
+// `export * from` lines); OrganizationApi's `CreateParams` and `UpdateParams` are reachable via
+// direct import from `./OrganizationApi`.
+export { OrganizationAPI } from './OrganizationApi';
+export type {
+  CreateBulkOrganizationInvitationParams,
+  CreateOrganizationDomainParams,
+  CreateOrganizationInvitationParams,
+  CreateOrganizationMembershipParams,
+  DeleteOrganizationDomainParams,
+  DeleteOrganizationMembershipParams,
+  GetInstanceOrganizationMembershipListParams,
+  GetOrganizationDomainListParams,
+  GetOrganizationInvitationParams,
+  GetOrganizationListParams,
+  GetOrganizationParams,
+  MetadataParams,
+  RevokeOrganizationInvitationParams,
+  UpdateLogoParams,
+  UpdateMetadataParams,
+  UpdateOrganizationDomainParams,
+  UpdateOrganizationMembershipMetadataParams,
+  UpdateOrganizationMembershipParams,
+} from './OrganizationApi';
+export * from './OrganizationPermissionApi';
+export * from './OrganizationRoleApi';
 export * from './OAuthApplicationsApi';
 export * from './PhoneNumberApi';
 export * from './ProxyCheckApi';
 export * from './RedirectUrlApi';
+export * from './RoleSetApi';
 export * from './SamlConnectionApi';
 export * from './SessionApi';
 export * from './SignInTokenApi';

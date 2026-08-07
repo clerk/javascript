@@ -64,7 +64,7 @@ type UseCustomPagesOptions = {
   allowForAnyChildren: boolean;
 };
 
-type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode };
+type CustomPageWithIdType = UserProfilePageProps & { children?: React.ReactNode; portalId?: string };
 
 /**
  * Exclude any children that is used for identifying Custom Pages or Custom Items.
@@ -104,6 +104,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
   const { children, LinkComponent, PageComponent, MenuItemsComponent, reorderItemsLabels, componentName } = params;
   const { allowForAnyChildren = false } = options || {};
   const validChildren: CustomPageWithIdType[] = [];
+  const portalIdCounts = new Map<string, number>();
 
   React.Children.forEach(children, child => {
     if (
@@ -121,13 +122,21 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
 
     const { children, label, url, labelIcon } = props;
 
+    const childKey = (child as ReactElement).key;
+
     if (isThatComponent(child, PageComponent)) {
       if (isReorderItem(props, reorderItemsLabels)) {
         // This is a reordering item
         validChildren.push({ label });
       } else if (isCustomPage(props)) {
         // this is a custom page
-        validChildren.push({ label, labelIcon, children, url });
+        validChildren.push({
+          label,
+          labelIcon,
+          children,
+          url,
+          portalId: getCustomPagePortalId('page', props, childKey, portalIdCounts),
+        });
       } else {
         logErrorInDevMode(customPageWrongProps(componentName));
         return;
@@ -137,7 +146,12 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
     if (isThatComponent(child, LinkComponent)) {
       if (isExternalLink(props)) {
         // This is an external link
-        validChildren.push({ label, labelIcon, url });
+        validChildren.push({
+          label,
+          labelIcon,
+          url,
+          portalId: getCustomPagePortalId('link', props, childKey, portalIdCounts),
+        });
       } else {
         logErrorInDevMode(customLinkWrongProps(componentName));
         return;
@@ -151,12 +165,12 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
 
   validChildren.forEach((cp, index) => {
     if (isCustomPage(cp)) {
-      customPageContents.push({ component: cp.children, id: index });
-      customPageLabelIcons.push({ component: cp.labelIcon, id: index });
+      customPageContents.push({ component: cp.children, id: cp.portalId || index });
+      customPageLabelIcons.push({ component: cp.labelIcon, id: cp.portalId || index });
       return;
     }
     if (isExternalLink(cp)) {
-      customLinkLabelIcons.push({ component: cp.labelIcon, id: index });
+      customLinkLabelIcons.push({ component: cp.labelIcon, id: cp.portalId || index });
     }
   });
 
@@ -165,7 +179,7 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
   const customLinkLabelIconsPortals = useCustomElementPortal(customLinkLabelIcons);
 
   const customPages: CustomPage[] = [];
-  const customPagesPortals: React.ComponentType[] = [];
+  const customPagesPortals: Array<{ key: string; portal: React.ComponentType }> = [];
 
   validChildren.forEach((cp, index) => {
     if (isReorderItem(cp, reorderItemsLabels)) {
@@ -177,15 +191,15 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         portal: contentPortal,
         mount,
         unmount,
-      } = customPageContentsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customPageContentsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       const {
         portal: labelPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customPageLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customPageLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mount, unmount, mountIcon, unmountIcon });
-      customPagesPortals.push(contentPortal);
-      customPagesPortals.push(labelPortal);
+      customPagesPortals.push({ key: `content:${cp.portalId || index}`, portal: contentPortal });
+      customPagesPortals.push({ key: `label:${cp.portalId || index}`, portal: labelPortal });
       return;
     }
     if (isExternalLink(cp)) {
@@ -193,14 +207,30 @@ const useCustomPages = (params: UseCustomPagesParams, options?: UseCustomPagesOp
         portal: labelPortal,
         mount: mountIcon,
         unmount: unmountIcon,
-      } = customLinkLabelIconsPortals.find(p => p.id === index) as UseCustomElementPortalReturn;
+      } = customLinkLabelIconsPortals.find(p => p.id === (cp.portalId || index)) as UseCustomElementPortalReturn;
       customPages.push({ label: cp.label, url: cp.url, mountIcon, unmountIcon });
-      customPagesPortals.push(labelPortal);
+      customPagesPortals.push({ key: `label:${cp.portalId || index}`, portal: labelPortal });
       return;
     }
   });
 
   return { customPages, customPagesPortals };
+};
+
+const getCustomPagePortalId = (
+  type: 'page' | 'link',
+  props: Pick<CustomPageWithIdType, 'label' | 'url'>,
+  key: React.Key | null,
+  portalIdCounts: Map<string, number>,
+) => {
+  if (key != null) {
+    return `${type}:key:${key}`;
+  }
+
+  const baseId = `${type}:${props.label}:${props.url}`;
+  const occurrence = portalIdCounts.get(baseId) ?? 0;
+  portalIdCounts.set(baseId, occurrence + 1);
+  return `${baseId}:${occurrence}`;
 };
 
 const isReorderItem = (childProps: any, validItems: string[]): boolean => {

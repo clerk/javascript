@@ -1,13 +1,16 @@
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
+import { SignUpContinue } from '../SignUpContinue';
 import { SignUpStart } from '../SignUpStart';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -495,6 +498,77 @@ describe('SignUpStart', () => {
       );
     });
 
+    it('removes the ticket before setting the session active after continuing the sign up', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withPassword({ required: true });
+        f.startSignUpWithEmailAddress({ emailVerificationStatus: 'verified' });
+      });
+      let currentUrl = new URL('http://localhost/sign-up?__clerk_ticket=test_ticket');
+      let ticketAtSetActive: string | null | undefined;
+
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: {
+          get href() {
+            return currentUrl.href;
+          },
+          get search() {
+            return currentUrl.search;
+          },
+        },
+      });
+      Object.defineProperty(window, 'history', {
+        configurable: true,
+        value: {
+          state: undefined,
+          replaceState: vi.fn((_state, _title, url) => {
+            currentUrl = new URL(url, currentUrl);
+          }),
+        },
+      });
+
+      fixtures.signUp.create.mockResolvedValueOnce(fixtures.signUp as SignUpResource);
+      fixtures.router.navigate.mockImplementation((to, options) => {
+        currentUrl = new URL(`/sign-up/${to}`, currentUrl);
+        currentUrl.search = options?.searchParams?.toString() || '';
+        return Promise.resolve(true);
+      });
+      fixtures.signUp.update.mockImplementationOnce(() => {
+        fixtures.signUp.status = 'complete';
+        fixtures.signUp.createdSessionId = 'sess_ticket';
+        return Promise.resolve(fixtures.signUp);
+      });
+      fixtures.clerk.setActive.mockImplementationOnce(() => {
+        ticketAtSetActive = new URL(window.location.href).searchParams.get('__clerk_ticket');
+        return Promise.resolve();
+      });
+
+      const { rerender, userEvent } = render(<SignUpStart />, { wrapper });
+
+      await waitFor(() =>
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({
+          strategy: 'ticket',
+          ticket: 'test_ticket',
+          unsafeMetadata: undefined,
+        }),
+      );
+      await waitFor(() =>
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('continue', {
+          searchParams: new URLSearchParams('__clerk_ticket=test_ticket'),
+        }),
+      );
+      expect(currentUrl.href).toBe('http://localhost/sign-up/continue?__clerk_ticket=test_ticket');
+
+      rerender(<SignUpContinue />);
+      await userEvent.type(screen.getByLabelText('Password'), 'a-secure-password');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalled());
+      expect(ticketAtSetActive).toBeNull();
+    });
+
     it('should show the sign up form when ticket detected and mode is restricted', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
@@ -520,6 +594,57 @@ describe('SignUpStart', () => {
       );
 
       await waitFor(() => screen.getByText(/create your account/i));
+    });
+  });
+
+  describe('Captcha', () => {
+    // The ticket tests above mutate window.location and don't restore it (no afterEach in this
+    // suite); reset to a clean URL so the ticket flow doesn't fire during these renders.
+    beforeEach(() => {
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: new URL('http://localhost/sign-up'),
+      });
+    });
+
+    it('renders the captcha widget in the form (email) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    it('renders the captcha widget in the social-only (no form) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignUpStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    describe('spotlight', () => {
+      const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
+
+      it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress({ required: true });
+          f.withSocialProvider({ provider: 'google' });
+        });
+        render(<SignUpStart />, { wrapper });
+
+        const google = screen.getByText(/continue with google/i);
+        expect(google.closest('[inert]')).toBeNull();
+
+        simulateCaptchaInteractive(getCaptcha());
+
+        await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+        expect(getCaptcha().closest('[inert]')).toBeNull();
+        expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
+
+        simulateCaptchaResolved(getCaptcha());
+        await waitFor(() => expect(google.closest('[inert]')).toBeNull());
+      });
     });
   });
 });

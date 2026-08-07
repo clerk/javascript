@@ -1,4 +1,5 @@
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../localization';
@@ -9,7 +10,7 @@ const PlansPageInternal = () => {
   const { navigate } = useRouter();
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBottomWidth: t.borderWidths.$normal,
@@ -32,7 +33,7 @@ const PlansPageInternal = () => {
       <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
         <PricingTable />
       </PricingTableContext.Provider>
-    </>
+    </ProfileCard.Page>
   );
 };
 

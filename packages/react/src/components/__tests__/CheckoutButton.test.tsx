@@ -101,6 +101,7 @@ describe('CheckoutButton', () => {
       const props = {
         planId: 'test_plan',
         planPeriod: 'month' as const,
+        seatsQuantity: 7,
         onSubscriptionComplete: vi.fn(),
         newSubscriptionRedirectUrl: '/success',
         checkoutProps: {
@@ -121,6 +122,7 @@ describe('CheckoutButton', () => {
             onSubscriptionComplete: props.onSubscriptionComplete,
             newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
             planPeriod: props.planPeriod,
+            seatsQuantity: props.seatsQuantity,
           }),
         );
       });

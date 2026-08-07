@@ -1,14 +1,10 @@
-'use client';
-
-import { useMemo } from 'react';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { LoadedClerk } from '../../types/clerk';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQuery } from '../query/useQuery';
 import { useUserBase } from './base/useUserBase';
-import { readOAuthConsentFromSearch, useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
+import { useOAuthConsentCacheKeys } from './useOAuthConsent.shared';
 import type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
 
 const HOOK_NAME = 'useOAuthConsent';
@@ -16,28 +12,9 @@ const HOOK_NAME = 'useOAuthConsent';
 /**
  * The `useOAuthConsent()` hook loads OAuth application consent metadata for the **signed-in** user
  * (`GET /me/oauth/consent/{oauthClientId}`). Ensure the user is authenticated before relying on this hook
- * (for example, redirect to sign-in on your custom consent route).
- *
- * `oauthClientId` and `scope` are optional. On the client, values default from a single snapshot of
- * `window.location.search` (`client_id` and `scope`). Pass them explicitly to override.
- *
- * @internal
+ * (e.g., redirect to sign-in on your custom consent route).
  *
  * @example
- * ### From the URL (`?client_id=...&scope=...`)
- *
- * ```tsx
- * import { useOAuthConsent } from '@clerk/react/internal'
- *
- * export default function OAuthConsentPage() {
- *   const { data, isLoading, error } = useOAuthConsent()
- *   // ...
- * }
- * ```
- *
- * @example
- * ### Explicit values (override URL)
- *
  * ```tsx
  * import { useOAuthConsent } from '@clerk/react/internal'
  *
@@ -47,22 +24,14 @@ const HOOK_NAME = 'useOAuthConsent';
  * })
  * ```
  */
-export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthConsentReturn {
+export function useOAuthConsent(params: UseOAuthConsentParams): UseOAuthConsentReturn {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
-  const { oauthClientId: oauthClientIdParam, scope: scopeParam, keepPreviousData = true, enabled = true } = params;
+  const { oauthClientId: oauthClientIdParam, scope, redirectUri, keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserBase();
 
-  const fromUrl = useMemo(() => {
-    if (typeof window === 'undefined' || !window.location) {
-      return { oauthClientId: '' };
-    }
-    return readOAuthConsentFromSearch(window.location.search);
-  }, []);
-
-  const oauthClientId = (oauthClientIdParam !== undefined ? oauthClientIdParam : fromUrl.oauthClientId).trim();
-  const scope = scopeParam !== undefined ? scopeParam : fromUrl.scope;
+  const oauthClientId = (oauthClientIdParam ?? '').trim();
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
@@ -70,6 +39,7 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
     userId: user?.id ?? null,
     oauthClientId,
     scope,
+    redirectUri,
   });
 
   const hasClientId = oauthClientId.length > 0;
@@ -77,7 +47,7 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
 
   const query = useClerkQuery({
     queryKey,
-    queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope }),
+    queryFn: () => fetchConsentInfo(clerk, { oauthClientId, scope, redirectUri }),
     enabled: queryEnabled,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData && queryEnabled),
   });
@@ -90,7 +60,6 @@ export function useOAuthConsent(params: UseOAuthConsentParams = {}): UseOAuthCon
   };
 }
 
-function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string }) {
-  const { oauthClientId, scope } = params;
-  return clerk.oauthApplication.getConsentInfo(scope !== undefined ? { oauthClientId, scope } : { oauthClientId });
+function fetchConsentInfo(clerk: LoadedClerk, params: { oauthClientId: string; scope?: string; redirectUri?: string }) {
+  return clerk.oauthApplication.getConsentInfo(params);
 }

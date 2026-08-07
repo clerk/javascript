@@ -13,7 +13,7 @@ import { Avatar } from '@/ui/elements/Avatar';
 import { Drawer } from '@/ui/elements/Drawer';
 import { Switch } from '@/ui/elements/Switch';
 
-import { normalizeFormatted, SubscriberTypeContext } from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import {
   Box,
   Col,
@@ -217,6 +217,7 @@ interface HeaderProps {
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
+  const { $ } = useLocalizations();
 
   const fee = useMemo(() => {
     if (!plan.annualMonthlyFee) {
@@ -229,8 +230,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
     if (!fee) {
       return '';
     }
-    return `${fee.currencySymbol}${normalizeFormatted(fee.amountFormatted)}`;
-  }, [fee]);
+    return $(fee, { style: 'short' });
+  }, [fee, $]);
 
   return (
     <Box

@@ -1,12 +1,11 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
-import { createError, eventHandler, setResponseHeader } from 'h3';
 
-// @ts-expect-error: Nitro import. Handled by Nuxt.
-import { useRuntimeConfig } from '#imports';
+import { createError, eventHandler, setResponseHeader, useRuntimeConfig } from '#imports';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
@@ -26,13 +25,13 @@ interface ClerkMiddleware {
    * @example
    * export default clerkMiddleware((event) => { ... }, options);
    */
-  (handler: EventHandler, options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+  (handler: EventHandler, options?: AuthenticateRequestOptions): EventHandler;
 
   /**
    * @example
    * export default clerkMiddleware(options);
    */
-  (options?: AuthenticateRequestOptions): ReturnType<typeof eventHandler>;
+  (options?: AuthenticateRequestOptions): EventHandler;
 }
 
 /**
@@ -159,6 +158,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       };
     }
 
-    await handler?.(event);
+    try {
+      await handler?.(event);
+    } catch (e) {
+      if (isMalformedURLError(e)) {
+        throw createError({ statusCode: 400, statusMessage: 'Bad Request' });
+      }
+      throw e;
+    }
   });
 };

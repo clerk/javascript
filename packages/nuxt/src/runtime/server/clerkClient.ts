@@ -4,7 +4,6 @@ import { deprecated } from '@clerk/shared/deprecated';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { H3Event } from 'h3';
 
-// @ts-expect-error: Nitro import. Handled by Nuxt.
 import { useRuntimeConfig } from '#imports';
 
 function resolveApiUrl(runtimeConfig: ReturnType<typeof useRuntimeConfig>): string {

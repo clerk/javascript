@@ -12,7 +12,7 @@ import { useWizard, Wizard } from '../../common';
 import { useWaitlistContext } from '../../contexts';
 import { Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { useLoadingStatus } from '../../hooks';
-import { SpinnerJumbo } from '../../icons';
+import { Spinner } from '../../icons';
 import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import type { Fields } from './waitlistFormHelpers';
@@ -108,7 +108,7 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
                 align='center'
               >
                 <Icon
-                  icon={SpinnerJumbo}
+                  icon={Spinner}
                   sx={t => ({
                     margin: 'auto',
                     width: t.sizes.$6,

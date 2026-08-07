@@ -4,8 +4,22 @@ import { Readable } from 'stream';
 
 import type { ExpressRequestWithAuth } from './types';
 
+/**
+ * Brand attached to the `req.auth` handler installed by Clerk middleware.
+ * `req.auth` is a property name shared with other auth libraries (express-jwt,
+ * passport, express-openid-connect), so its mere presence proves nothing about
+ * whether Clerk authenticated the request. `Symbol.for` registers the brand
+ * globally so it stays stable across multiple copies of this package loaded in
+ * the same process.
+ */
+const clerkAuthBrand = Symbol.for('@clerk/express.auth');
+
+export const brandRequestAuth = <T extends (...args: never[]) => unknown>(authHandler: T): T =>
+  Object.assign(authHandler, { [clerkAuthBrand]: true });
+
 export const requestHasAuthObject = (req: ExpressRequest): req is ExpressRequestWithAuth => {
-  return 'auth' in req;
+  const auth = (req as Partial<ExpressRequestWithAuth>).auth;
+  return typeof auth === 'function' && (auth as unknown as Record<symbol, unknown>)[clerkAuthBrand] === true;
 };
 
 export const loadClientEnv = () => {

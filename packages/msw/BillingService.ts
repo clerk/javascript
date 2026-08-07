@@ -3,9 +3,9 @@ import type {
   BillingCheckoutTotalsJSON,
   BillingInitializedPaymentMethodJSON,
   BillingMoneyAmountJSON,
+  BillingPayerJSON,
   BillingPaymentJSON,
   BillingPaymentMethodJSON,
-  BillingPayerJSON,
   BillingPlanJSON,
   BillingStatementJSON,
   BillingSubscriptionItemJSON,
@@ -169,9 +169,9 @@ export class BillingService {
     planPeriod: BillingSubscriptionPlanPeriod,
   ): BillingMoneyAmountJSON {
     if (planPeriod === 'annual') {
-      return plan.annual_fee ?? plan.fee;
+      return plan.annual_fee ?? plan.fee ?? this.createMoney(0);
     }
-    return plan.fee;
+    return plan.fee ?? this.createMoney(0);
   }
 
   static createSubscriptionItem(
@@ -338,12 +338,22 @@ export class BillingService {
     const totals: BillingCheckoutTotalsWithOptionalAccountCredit = {
       grand_total: amount,
       subtotal: amount,
+      base_fee: amount,
       tax_total: tax,
       total_due_now: amount,
       credit: null,
+      credits: null,
       past_due: null,
       total_due_after_free_trial: amount,
       account_credit: null,
+      discounts: null,
+      total_due_per_period: amount,
+      totals_due_per_period: {
+        subtotal: amount,
+        base_fee: amount,
+        tax_total: tax,
+        grand_total: amount,
+      },
     };
     return totals;
   }

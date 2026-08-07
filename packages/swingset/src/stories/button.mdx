@@ -1,0 +1,238 @@
+import * as ButtonStories from './button.stories';
+
+# Button
+
+Button is the primary action element in Mosaic, used for form submissions and discrete user-triggered actions.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={ButtonStories}
+/>
+
+## Props
+
+<PropTable meta={ButtonStories.meta} />
+
+## Usage
+
+<Usage
+  component='Button'
+  module='@clerk/ui/mosaic/components/button'
+>
+  Click me
+</Usage>
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={ButtonStories}
+/>
+
+`size` sets the height, and under a coarse pointer every size floors at 44px instead — a
+fingertip is the same width whatever density the surrounding UI runs at, so the floor is a fixed
+`--cl-target-coarse` rather than a step on the spacing scale a consumer can rescale. Icon buttons
+take the floor on both axes, so a square button stays square rather than growing tall and narrow.
+`link` opts out entirely: it reads as text, not a control. None of this is visible on a mouse —
+it applies at `@media (pointer: coarse)`.
+
+### Variants
+
+<Story
+  name='Variants'
+  storyModule={ButtonStories}
+/>
+
+### Colors
+
+`color` and `variant` are independent: `color` picks the palette, `variant` decides how much of
+it to show. Every combination below is the same two props.
+
+Hover and focus are part of the matrix — hover a cell, or tab through it, to see them. `filled`
+shifts its fill and `link` underlines. `outline` and `ghost` share the same neutral hover fill,
+except `ghost` under `negative`, which is the one cell that tints by color. The focus ring is
+the same for every cell.
+
+<Story
+  name='Colors'
+  storyModule={ButtonStories}
+/>
+
+### Shapes
+
+<Story
+  name='Shapes'
+  storyModule={ButtonStories}
+/>
+
+### Icons
+
+An icon is a child, not a prop. Give it a `placement` and `Icon` reflects that as `data-icon`,
+which the button selects on to tighten the padding on that edge — pass icons on either side, or
+both, with nothing to declare on the button itself.
+
+<Story
+  name='Icons'
+  storyModule={ButtonStories}
+/>
+
+The tightened value isn't chosen by eye. An icon is centered in the button, so it already has
+`(height − icon size) / 2` of space above and below it; matching the inline side to that puts it
+in a square cell — 8px at every size, against 12px of text padding at `md` and `lg`, 10px at `sm`.
+The text side keeps the larger inset, since a run of text ends in a stem where an icon trails off.
+The middle button in each row below carries no icon, for comparison.
+
+<Story
+  name='IconSizes'
+  storyModule={ButtonStories}
+/>
+
+### Truncation
+
+A button sizes to its own content and doesn't shrink, so most of the time there's nothing to
+truncate. When its width _is_ constrained — `fullWidth` in a narrow container, or an explicit
+width — the label can't wrap to cope, because `size` fixes the height and a second line would
+grow out of the button. It stays on one line and ends in an ellipsis instead.
+
+Only text children truncate. Button wraps a text child in a span of its own to run the ellipsis
+against, since a bare text node is laid out in an anonymous box no selector can reach. Element
+children pass through as direct flex items, so an icon keeps its size and its padding while the
+label gives way around it.
+
+<Story
+  name='Truncation'
+  storyModule={ButtonStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={ButtonStories}
+/>
+
+A disabled button keeps its resting fill and dims — it doesn't fall back to a gray of its own, so
+which color and variant it is stays legible while it's unavailable. Hover and press are suppressed
+by the styles, not by `pointer-events`: the button stays hit-testable, which is what makes
+`cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
+That tooltip is worth adding — a disabled control with no explanation is a dead end.
+
+### Submitting
+
+`SubmitButton` is a `Button` that defaults `type` to `submit` and adds `isPending`. Use it for
+the button that commits a form; reach for plain `Button` everywhere else.
+
+<Story
+  name='Submit'
+  storyModule={ButtonStories}
+/>
+
+Press the button above to run a stand-in action: it goes pending for two seconds, then comes back.
+
+While `isPending`, the label fades to zero opacity and a spinner centers over it. The label stays
+mounted rather than being swapped out, so the button holds the width its content gives it — watch
+that it doesn't resize across the flip — and nothing around it reflows. Every child sits in one
+box, so an icon fades with its label instead of hanging on beside the spinner. That box is the slot
+`cl-button-content`, so it can be targeted directly — `.cl-button-content` for the content row of
+any submit button, `.cl-button[data-pending] .cl-button-content` for it mid-action.
+
+A pending button is inert but not `disabled`: it carries `aria-disabled`, drops its pointer events
+so hover and press stop firing, and cancels the press so the form can't be submitted twice. The
+native `disabled` attribute would do all of that too, but it takes the button out of the tab order
+mid-action — pulling focus away at the exact moment the spinner is announced. The state is also
+reflected as `data-pending` for styling.
+
+#### The spinner is delayed
+
+The button becomes pending the instant `isPending` flips, but the spinner waits 300ms before it's
+drawn, then stays up at least 200ms once it is. Plenty of actions resolve faster than a spinner
+takes to read, and one that appears and vanishes inside a few frames registers as a glitch rather
+than as progress.
+
+<Story
+  name='SubmitDelay'
+  storyModule={ButtonStories}
+/>
+
+Nothing about the pending _state_ is delayed — only the pixels. Both buttons above go inert and
+announce themselves the moment they're pressed, which is what stops a double submit; the fast one
+simply finishes before its spinner is due.
+
+Both numbers move with `spinDelay`. An action already known to be slow has nothing to gain by
+waiting, so it can skip straight to the spinner:
+
+```tsx
+<SubmitButton
+  isPending={isSubmitting}
+  spinDelay={{ delay: 0 }}
+>
+  Save changes
+</SubmitButton>
+```
+
+#### What assistive tech gets
+
+The spinner is decorative everywhere else in Mosaic, but here it is the only signal the action is
+running, so it enters the accessibility tree as an indeterminate `progressbar` the moment
+`isPending` flips — including during the delay above, when it's mounted but not yet drawn. That's
+why the delay is `opacity` and not conditional rendering: `visibility: hidden` or `display: none`
+would take it back out of the tree, and so would not rendering it. Fading the label with `opacity`
+is the same call — it keeps the button named "Save changes" for the whole action instead of going
+briefly nameless.
+
+The indicator is named in its own right, via `pendingLabel` (default `pending`). It is not folded
+into the button's name: `progressbar` is a range role, so name computation reads its _value_ —
+absent, since it's indeterminate — rather than its label, and a descendant one contributes nothing
+to the button above it. `pendingLabel` is untranslated, so pass a localized string wherever the
+surrounding copy is localized.
+
+```tsx
+<SubmitButton
+  isPending={isSubmitting}
+  pendingLabel='Saving'
+>
+  Save changes
+</SubmitButton>
+```
+
+<Story
+  name='SubmitSizes'
+  storyModule={ButtonStories}
+/>
+
+The spinner is sized off the `Icon` scale, since it stands in for one. That scale stops at `md`,
+so `md` and `lg` buttons share the larger ring.
+
+<Story
+  name='SubmitVariants'
+  storyModule={ButtonStories}
+/>
+
+Both the ring and its arc are mixed from `currentColor`, so the spinner reads on a `filled`
+button's fill and on a bare surface alike without a color prop to keep in step with the button's.
+
+### Touch target
+
+Every size is shorter than the 44px a fingertip needs, so under `pointer: coarse` the button grows
+its hit area with an invisible overlay — the rendered size doesn't change, and nothing shifts on a
+mouse. Default shape grows on the block axis only; square and circle grow on both, being as narrow
+as they are short. `link` is text, not a control, and never takes one.
+
+Opt out with `touchTarget={false}` where buttons sit close enough for the overlays to overlap — a
+dense icon toolbar, a tight stack. Overlap isn't symmetrical: the later sibling's overlay covers
+the edge of the one before it, so a tap there activates the wrong button.
+
+```tsx
+<Button
+  shape='square'
+  touchTarget={false}
+>
+  ×
+</Button>
+```

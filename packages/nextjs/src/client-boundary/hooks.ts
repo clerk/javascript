@@ -4,6 +4,7 @@ export {
   useAuth,
   useClerk,
   useEmailLink,
+  useOAuthConsent,
   useOrganization,
   useOrganizationList,
   useOrganizationCreationDefaults,

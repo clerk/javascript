@@ -7,7 +7,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "lib": ["dom", "dom.iterable", "es2021.intl"],
+    "lib": ["dom", "dom.iterable", "es2020", "es2021.intl"],
     "module": "esnext",
     "moduleResolution": "Bundler",
     "noEmit": true,
@@ -22,7 +22,9 @@
     "useUnknownInCatchVariables": false,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "rootDir": "./src",
+    "types": ["@rspack/core/module", "cloudflare-turnstile"]
   },
   "include": ["src", "vitest.config.mts", "vitest.setup.mts", "../shared/internal/clerk-js/componentGuards.ts"]
 }

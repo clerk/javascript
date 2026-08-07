@@ -6,8 +6,7 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * A button component that opens the Clerk Plan Details drawer when clicked. This component is part of
- * Clerk's Billing feature which is available under a public beta.
+ * A button component that opens the Clerk Plan Details drawer when clicked.
  *
  * @example
  * ```tsx

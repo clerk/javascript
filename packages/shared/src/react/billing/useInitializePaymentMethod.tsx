@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 
 import type { BillingInitializedPaymentMethodResource, ForPayerType } from '../../types';
-import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
-import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useOrganizationBase } from '../hooks/base/useOrganizationBase';
 import { useUserBase } from '../hooks/base/useUserBase';
 import { useBillingIsEnabled } from '../hooks/useBillingIsEnabled';
 import { useClearQueriesOnSignOut } from '../hooks/useClearQueriesOnSignOut';
+import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
+import { useClerkQueryClient } from '../query/use-clerk-query-client';
+import { useClerkQuery } from '../query/useQuery';
 
 type InitializePaymentMethodOptions = {
   for?: ForPayerType;

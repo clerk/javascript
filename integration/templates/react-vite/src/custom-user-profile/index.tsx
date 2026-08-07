@@ -1,9 +1,12 @@
 import { UserProfile } from '@clerk/react';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { PageContext, PageContextProvider } from '../PageContext.tsx';
 
 function Page1() {
   const { counter, setCounter } = useContext(PageContext);
+  // Local state lives INSIDE the portaled custom page. It only resets if the
+  // page is remounted, so it is our instrument for detecting remounts.
+  const [localCounter, setLocalCounter] = useState(0);
 
   return (
     <>
@@ -15,13 +18,31 @@ function Page1() {
       >
         Update
       </button>
+      <p data-local-counter={1}>Local counter: {localCounter}</p>
+      <button
+        data-local-counter={1}
+        onClick={() => setLocalCounter(a => a + 1)}
+      >
+        Increment local
+      </button>
     </>
   );
 }
 
 export default function Page() {
+  // Bumping parent state recreates the <UserProfile> element, forcing the
+  // profile component (and useCustomPages) to rerender. The custom page content
+  // must survive this without remounting.
+  const [parentTick, setParentTick] = useState(0);
+
   return (
     <PageContextProvider>
+      <button
+        data-testid='rerender-parent'
+        onClick={() => setParentTick(t => t + 1)}
+      >
+        Rerender parent: {parentTick}
+      </button>
       <UserProfile
         fallback={<>Loading user profile</>}
         path={'/custom-user-profile'}

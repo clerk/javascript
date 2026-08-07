@@ -61,7 +61,7 @@ export const EmailsSection = ({
             return (
               <Fragment key={email.emailAddress}>
                 <ProfileSection.Item id='emailAddresses'>
-                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
+                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1, alignItems: 'center' })}>
                     <Text
                       sx={t => ({ color: t.colors.$colorForeground })}
                       truncate

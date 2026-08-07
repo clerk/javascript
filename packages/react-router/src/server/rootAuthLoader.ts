@@ -4,6 +4,7 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authFnContext, requestStateContext } from './clerkMiddleware';
 import type {
+  AdditionalStateOptions,
   LoaderFunctionArgsWithAuth,
   LoaderFunctionReturn,
   RootAuthLoaderCallback,
@@ -40,6 +41,7 @@ interface RootAuthLoader {
 async function processRootAuthLoader(
   args: LoaderFunctionArgs,
   requestState: RequestState,
+  additionalState: AdditionalStateOptions,
   handler?: RootAuthLoaderCallback<any>,
 ): Promise<LoaderFunctionReturn> {
   const hasMiddleware = IsOptIntoMiddleware(args.context) && !!args.context.get(authFnContext);
@@ -47,7 +49,7 @@ async function processRootAuthLoader(
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    const { clerkState } = getResponseClerkState(requestState, args.context);
+    const { clerkState } = getResponseClerkState(requestState, args.context, additionalState);
     return {
       ...clerkState,
     };
@@ -69,7 +71,13 @@ async function processRootAuthLoader(
       }
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
-      return injectRequestStateIntoResponse(handlerResult, requestState, args.context, includeClerkHeaders);
+      return injectRequestStateIntoResponse(
+        handlerResult,
+        requestState,
+        args.context,
+        additionalState,
+        includeClerkHeaders,
+      );
     } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
@@ -83,6 +91,7 @@ async function processRootAuthLoader(
         new Response(JSON.stringify(handlerResult.data), handlerResult.init ?? undefined),
         requestState,
         args.context,
+        additionalState,
         includeClerkHeaders,
       );
     } catch {
@@ -91,7 +100,7 @@ async function processRootAuthLoader(
   }
 
   // If the return value of the user's handler is null or a plain object, return plain object with streaming support
-  const { clerkState } = getResponseClerkState(requestState, args.context);
+  const { clerkState } = getResponseClerkState(requestState, args.context, additionalState);
 
   return {
     ...(handlerResult ?? {}),
@@ -111,13 +120,14 @@ export const rootAuthLoader: RootAuthLoader = async (
   const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
 
   const hasMiddlewareFlag = IsOptIntoMiddleware(args.context);
-  const requestState = hasMiddlewareFlag && args.context.get(requestStateContext);
+  const contextValue = hasMiddlewareFlag && args.context.get(requestStateContext);
 
-  if (!requestState) {
+  if (!contextValue) {
     throw new Error(
       'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
     );
   }
 
-  return processRootAuthLoader(args, requestState, handler);
+  const { requestState, additionalState } = contextValue;
+  return processRootAuthLoader(args, requestState, additionalState, handler);
 };

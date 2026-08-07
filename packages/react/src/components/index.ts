@@ -2,6 +2,7 @@ export {
   APIKeys,
   CreateOrganization,
   GoogleOneTap,
+  OAuthConsent,
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,
@@ -34,6 +35,7 @@ export {
 
 export type { ShowProps } from './controlComponents';
 
+export { InviteMembersButton } from './InviteMembersButton';
 export { SignInButton } from './SignInButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
 export { SignOutButton } from './SignOutButton';

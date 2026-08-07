@@ -155,7 +155,7 @@ export const OrganizationListPageList = (props: { onCreateOrganizationClick: () 
       <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
-          <Actions role='menu'>
+          <Actions>
             <PersonalAccountPreview />
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {

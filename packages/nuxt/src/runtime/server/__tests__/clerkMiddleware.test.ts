@@ -1,4 +1,5 @@
-import { createApp, eventHandler, setResponseHeader, toWebHandler } from 'h3';
+import { normalizePath } from '@clerk/shared/pathMatcher';
+import { createApp, createError, eventHandler, getRequestURL, setResponseHeader, toWebHandler } from 'h3';
 import { describe, expect, test, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
@@ -37,9 +38,16 @@ const MOCK_OPTIONS = {
   signUpUrl: '/bar',
 };
 
-vi.mock('#imports', () => {
+vi.mock('#imports', async () => {
+  const h3 = await import('h3');
   return {
     useRuntimeConfig: () => ({}),
+    createError,
+    eventHandler,
+    setResponseHeader,
+    getRequestHeaders: h3.getRequestHeaders,
+    getRequestProtocol: h3.getRequestProtocol,
+    getRequestURL: h3.getRequestURL,
   };
 });
 
@@ -58,6 +66,24 @@ vi.mock('../clerkClient', () => {
 });
 
 describe('clerkMiddleware(params)', () => {
+  test('returns 400 when the handler encounters malformed percent-encoding while matching paths', async () => {
+    const app = createApp();
+    const handler = toWebHandler(app);
+    app.use(
+      clerkMiddleware(event => {
+        if (normalizePath(getRequestURL(event).pathname).startsWith('/api/admin')) {
+          throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+        }
+      }),
+    );
+    app.use(
+      '/',
+      eventHandler(() => ({ status: 'ok' })),
+    );
+    const response = await handler(new Request(new URL('/api/%zz/users', 'http://localhost')));
+    expect(response.status).toBe(400);
+  });
+
   test('renders route as normally when used without params', async () => {
     const app = createApp();
     const handler = toWebHandler(app);

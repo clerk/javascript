@@ -22,20 +22,35 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
 export type EnterpriseConnectionJSONSnapshot = EnterpriseConnectionJSON;
 
 export interface EnterpriseConnectionResource extends ClerkResource {
+  /** The enterprise connection ID. */
   id: string;
+  /** The display name of the connection. */
   name: string;
+  /** Whether the enterprise connection is active. */
   active: boolean;
+  /** The identity provider the connection uses (e.g., `saml_okta`, `oidc_custom`). */
   provider: string;
+  /** The public URL of the identity provider's logo, or `null` when none is set. */
   logoPublicUrl: string | null;
+  /** Domains associated with the enterprise connection. */
   domains: string[];
+  /** Organization ID when the connection is linked to an organization, otherwise `null`. */
   organizationId: string | null;
+  /** Whether user attributes are synced from the identity provider on each sign-in. */
   syncUserAttributes: boolean;
+  /** Whether additional identification methods are disabled for users signing in through this connection. */
   disableAdditionalIdentifications: boolean;
+  /** Whether this connection supports account linking via organization membership. */
   allowOrganizationAccountLinking: boolean;
+  /** Custom attributes configured for the connection. */
   customAttributes: unknown[];
+  /** The OAuth configuration, present when the enterprise connection uses OIDC, otherwise `null`. */
   oauthConfig: EnterpriseOAuthConfigResource | null;
+  /** The SAML configuration, present when the enterprise connection uses SAML, otherwise `null`. */
   samlConnection: EnterpriseSamlConnectionNestedResource | null;
+  /** The date when the connection was created. */
   createdAt: Date | null;
+  /** The date when the connection was last updated. */
   updatedAt: Date | null;
   __internal_toSnapshot: () => EnterpriseConnectionJSONSnapshot;
 }
@@ -47,6 +62,8 @@ export interface EnterpriseSamlConnectionNestedJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -64,6 +81,10 @@ export interface EnterpriseSamlConnectionNestedResource {
   idpEntityId: string;
   idpSsoUrl: string;
   idpCertificate: string;
+  /** Unix timestamp (milliseconds) of the start of the IdP certificate validity window (X.509 NotBefore). */
+  idpCertificateIssuedAt: number;
+  /** Unix timestamp (milliseconds) of the end of the IdP certificate validity window (X.509 NotAfter). */
+  idpCertificateExpiresAt: number;
   idpMetadataUrl: string;
   idpMetadata: string;
   acsUrl: string;
@@ -79,7 +100,11 @@ export interface EnterpriseOAuthConfigJSON {
   name: string;
   provider_key?: string;
   client_id: string;
+  redirect_uri?: string;
   discovery_url?: string;
+  auth_url?: string;
+  token_url?: string;
+  user_info_url?: string;
   logo_public_url?: string | null;
   requires_pkce?: boolean;
   created_at: number;
@@ -91,9 +116,81 @@ export interface EnterpriseOAuthConfigResource {
   name: string;
   clientId: string;
   providerKey?: string;
+  redirectUri?: string;
   discoveryUrl?: string;
+  authUrl?: string;
+  tokenUrl?: string;
+  userInfoUrl?: string;
   logoPublicUrl?: string | null;
   requiresPkce?: boolean;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
+
+export type OrganizationEnterpriseConnectionProvider =
+  | 'saml_custom'
+  | 'saml_okta'
+  | 'saml_google'
+  | 'saml_microsoft'
+  | 'oidc_custom'
+  | 'oidc_github_enterprise'
+  | 'oidc_gitlab';
+
+/** @deprecated Use `OrganizationEnterpriseConnectionProvider` instead. */
+export type MeEnterpriseConnectionProvider = OrganizationEnterpriseConnectionProvider;
+
+export type OrganizationEnterpriseConnectionSamlInput = {
+  idpEntityId?: string | null;
+  idpSsoUrl?: string | null;
+  idpCertificate?: string | null;
+  idpMetadataUrl?: string | null;
+  idpMetadata?: string | null;
+  attributeMapping?: Record<string, unknown> | null;
+  allowSubdomains?: boolean | null;
+  allowIdpInitiated?: boolean | null;
+  forceAuthn?: boolean | null;
+};
+
+/** @deprecated Use `OrganizationEnterpriseConnectionSamlInput` instead. */
+export type MeEnterpriseConnectionSamlInput = OrganizationEnterpriseConnectionSamlInput;
+
+export type OrganizationEnterpriseConnectionOidcInput = {
+  clientId?: string | null;
+  clientSecret?: string | null;
+  discoveryUrl?: string | null;
+  authUrl?: string | null;
+  tokenUrl?: string | null;
+  userInfoUrl?: string | null;
+  requiresPkce?: boolean | null;
+};
+
+/** @deprecated Use `OrganizationEnterpriseConnectionOidcInput` instead. */
+export type MeEnterpriseConnectionOidcInput = OrganizationEnterpriseConnectionOidcInput;
+
+export type CreateOrganizationEnterpriseConnectionParams = {
+  provider: OrganizationEnterpriseConnectionProvider;
+  name?: string;
+  /** FQDN strings the connection authenticates. Required by the org-scoped create endpoint. */
+  domains?: string[];
+  organizationId?: string | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
+};
+
+/** @deprecated Use `CreateOrganizationEnterpriseConnectionParams` instead. */
+export type CreateMeEnterpriseConnectionParams = CreateOrganizationEnterpriseConnectionParams;
+
+export type UpdateOrganizationEnterpriseConnectionParams = {
+  name?: string | null;
+  domains?: string[];
+  active?: boolean | null;
+  syncUserAttributes?: boolean | null;
+  disableAdditionalIdentifications?: boolean | null;
+  organizationId?: string | null;
+  customAttributes?: Record<string, unknown> | null;
+  saml?: OrganizationEnterpriseConnectionSamlInput | null;
+  oidc?: OrganizationEnterpriseConnectionOidcInput | null;
+};
+
+/** @deprecated Use `UpdateOrganizationEnterpriseConnectionParams` instead. */
+export type UpdateMeEnterpriseConnectionParams = UpdateOrganizationEnterpriseConnectionParams;

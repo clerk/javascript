@@ -11,15 +11,16 @@ import type {
   CreateOrganizationModalProps,
   EnvironmentResource,
   GoogleOneTapProps,
+  InviteMembersModalProps,
   OrganizationProfileModalProps,
-  SignInProps,
   SignInModalProps,
-  SignUpProps,
+  SignInProps,
   SignUpModalProps,
+  SignUpProps,
   UserProfileModalProps,
   UserProfileProps,
-  WaitlistProps,
   WaitlistModalProps,
+  WaitlistProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense, useCallback, useRef, useSyncExternalStore } from 'react';
@@ -34,6 +35,7 @@ import {
   CreateOrganizationModal,
   EnableOrganizationsPrompt,
   ImpersonationFab,
+  InviteMembersModal,
   KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
@@ -90,6 +92,7 @@ export type ComponentControls = {
       | 'signUp'
       | 'userProfile'
       | 'organizationProfile'
+      | 'inviteMembers'
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
@@ -105,9 +108,11 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : T extends 'enableOrganizationsPrompt'
-              ? __internal_EnableOrganizationsPromptProps
-              : UserProfileProps,
+            : T extends 'inviteMembers'
+              ? InviteMembersModalProps
+              : T extends 'enableOrganizationsPrompt'
+                ? __internal_EnableOrganizationsPromptProps
+                : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -116,6 +121,7 @@ export type ComponentControls = {
       | 'signUp'
       | 'userProfile'
       | 'organizationProfile'
+      | 'inviteMembers'
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
@@ -170,6 +176,7 @@ interface ComponentsState {
   userProfileModal: null | UserProfileModalProps;
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileModalProps;
+  inviteMembersModal: null | InviteMembersModalProps;
   createOrganizationModal: null | CreateOrganizationModalProps;
   enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
@@ -236,29 +243,41 @@ export const mountComponentRenderer = (
       // .unmountComponent incorrectly called before the component is rendered
       if (!componentsControlsResolver) {
         const deferredPromise = createDeferredPromise();
-        componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot).render(
-            <Components
-              getClerk={getClerk}
-              getEnvironment={getEnvironment}
-              options={options}
-              onComponentsMounted={() => {
-                // Defer warning check to avoid blocking component mount
-                // Only check in development mode (based on publishable key, not NODE_ENV)
-                if (getClerk().instanceType === 'development') {
-                  const scheduleWarningCheck =
-                    typeof requestIdleCallback === 'function'
-                      ? requestIdleCallback
-                      : (cb: () => void) => setTimeout(cb, 0);
-                  scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
-                }
-                deferredPromise.resolve();
-              }}
-              moduleManager={moduleManager}
-            />,
+        const mountTimeout = setTimeout(() => {
+          console.error(
+            '[Clerk UI] Component renderer did not mount within 10s. Common causes: a failed chunk load, a dev-server misconfiguration (e.g. unresolved lazy-compilation proxy), or a ClerkProvider/mountX call before the page is hydrated. Check the Network tab for stalled or empty requests.',
           );
-          return deferredPromise.promise.then(() => componentsControls);
-        });
+        }, 10_000);
+        componentsControlsResolver = import('./lazyModules/common')
+          .then(({ createRoot }) => {
+            createRoot(clerkRoot).render(
+              <Components
+                getClerk={getClerk}
+                getEnvironment={getEnvironment}
+                options={options}
+                onComponentsMounted={() => {
+                  clearTimeout(mountTimeout);
+                  // Defer warning check to avoid blocking component mount
+                  // Only check in development mode (based on publishable key, not NODE_ENV)
+                  if (getClerk().instanceType === 'development') {
+                    const scheduleWarningCheck =
+                      typeof requestIdleCallback === 'function'
+                        ? requestIdleCallback
+                        : (cb: () => void) => setTimeout(cb, 0);
+                    scheduleWarningCheck(() => warnAboutCustomizationWithoutPinning(options));
+                  }
+                  deferredPromise.resolve();
+                }}
+                moduleManager={moduleManager}
+              />,
+            );
+            return deferredPromise.promise.then(() => componentsControls);
+          })
+          .catch(err => {
+            clearTimeout(mountTimeout);
+            console.error('[Clerk UI] Failed to initialize component renderer:', err);
+            throw err;
+          });
       }
       return componentsControlsResolver.then(controls => controls);
     },
@@ -288,6 +307,7 @@ const Components = (props: ComponentsProps) => {
     userProfileModal: null,
     userVerificationModal: null,
     organizationProfileModal: null,
+    inviteMembersModal: null,
     createOrganizationModal: null,
     enableOrganizationsPromptModal: null,
     organizationSwitcherPrefetch: false,
@@ -315,6 +335,7 @@ const Components = (props: ComponentsProps) => {
     userProfileModal,
     userVerificationModal,
     organizationProfileModal,
+    inviteMembersModal,
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
@@ -592,6 +613,23 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedInviteMembersModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'organizationProfile'}
+      componentAppearance={inviteMembersModal?.appearance}
+      flowName={'organizationProfile'}
+      onClose={() => componentsControls.closeModal('inviteMembers')}
+      onExternalNavigate={() => componentsControls.closeModal('inviteMembers')}
+      startPath={buildVirtualRouterUrl({ base: '/inviteMembers', path: urlStateParam?.path })}
+      getContainer={inviteMembersModal?.getContainer ?? (() => null)}
+      componentName={'InviteMembersModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+    >
+      <InviteMembersModal {...inviteMembersModal} />
+    </LazyModalRenderer>
+  );
+
   const mountedCreateOrganizationModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -676,6 +714,7 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {userVerificationModal && mountedUserVerificationModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
+        {inviteMembersModal && mountedInviteMembersModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}

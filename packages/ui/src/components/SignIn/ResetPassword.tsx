@@ -14,6 +14,7 @@ import { Col, descriptors, localizationKeys, useLocalizations } from '../../cust
 import { useConfirmPassword } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 
 const ResetPasswordInternal = () => {
   const signIn = useCoreSignIn();
@@ -78,10 +79,15 @@ const ResetPasswordInternal = () => {
     passwordField.clearFeedback();
     confirmField.clearFeedback();
     try {
-      const { status, createdSessionId } = await signIn.resetPassword({
+      const res = await signIn.resetPassword({
         password: passwordField.value,
         signOutOfOtherSessions: sessionsField.checked,
       });
+      const { status, createdSessionId } = res;
+
+      if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+        return;
+      }
 
       switch (status) {
         case 'complete':

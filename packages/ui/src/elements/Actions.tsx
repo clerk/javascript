@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, Icon, SimpleButton, Spinner, useLocalizations } from '../customizables';
+import { Button, Col, descriptors, Flex, Icon, Spinner, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
@@ -43,85 +43,6 @@ type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   spinnerSize?: PropsOfComponent<typeof Spinner>['size'];
 };
 
-export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
-  const card = useCardState();
-  const status = useLoadingStatus();
-  const {
-    icon,
-    onClick: onClickProp,
-    iconElementDescriptor,
-    sx,
-    iconElementId,
-    iconSx,
-    iconBoxElementDescriptor,
-    iconBoxElementId,
-    iconBoxSx,
-    trailing,
-    spinnerSize,
-    ...rest
-  } = props;
-
-  const onClick: React.MouseEventHandler<HTMLButtonElement> = async e => {
-    card.setLoading();
-    status.setLoading();
-    try {
-      await onClickProp?.(e);
-    } finally {
-      card.setIdle();
-      status.setIdle();
-    }
-  };
-
-  return (
-    <SimpleButton
-      size='xs'
-      variant='outline'
-      hoverAsFocus
-      sx={[
-        t => ({
-          borderRadius: t.radii.$lg,
-          gap: 0,
-          justifyContent: 'center',
-          padding: t.space.$1,
-        }),
-        sx,
-      ]}
-      isDisabled={card.isLoading}
-      onClick={onClick}
-      role='menuitem'
-      {...rest}
-    >
-      <Flex
-        elementDescriptor={iconBoxElementDescriptor}
-        elementId={iconBoxElementId}
-        justify='center'
-        as='span'
-      >
-        {status.isLoading ? (
-          <Spinner
-            size={spinnerSize || 'xs'}
-            elementDescriptor={descriptors.spinner}
-          />
-        ) : (
-          <Icon
-            elementDescriptor={iconElementDescriptor}
-            elementId={iconElementId}
-            icon={icon}
-            sx={[
-              theme => ({
-                width: theme.sizes.$4,
-                height: theme.sizes.$4,
-              }),
-              iconSx,
-            ]}
-          />
-        )}
-      </Flex>
-      {trailing}
-    </SimpleButton>
-  );
-};
-
 export const SmallAction = (props: ActionProps) => {
   const { sx, iconBoxSx, iconSx, ...rest } = props;
   return (
@@ -131,7 +52,7 @@ export const SmallAction = (props: ActionProps) => {
       textVariant='buttonSmall'
       sx={[
         t => ({
-          borderRadius: t.radii.$lg,
+          borderRadius: t.radii.$md,
           gap: t.space.$0x5,
           justifyContent: 'center',
           flex: '1 1 0',
@@ -202,7 +123,6 @@ export const Action = (props: ActionProps) => {
       ]}
       isDisabled={card.isLoading}
       onClick={onClick}
-      role='menuitem'
       {...rest}
     >
       <Flex

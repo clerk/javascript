@@ -7,7 +7,7 @@ export const multipleChildrenInButtonComponent = (name: string) =>
   `You've passed multiple children components to <${name}/>. You can only pass a single child component or text.`;
 
 export const invalidStateError =
-  'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/support';
+  'Invalid state. Feel free to submit a bug or reach out to support here: https://clerk.com/contact/support';
 
 export const unsupportedNonBrowserDomainOrProxyUrlFunction =
   'Unsupported usage of isSatellite, domain or proxyUrl. The usage of isSatellite, domain or proxyUrl as function is not supported in non-browser environments.';

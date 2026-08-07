@@ -30,6 +30,9 @@ const createTokenCache = (): TokenCache => {
     saveToken: (key: string, token: string) => {
       return SecureStore.setItemAsync(key, token, secureStoreOpts);
     },
+    clearToken: (key: string) => {
+      return SecureStore.deleteItemAsync(key, secureStoreOpts);
+    },
   };
 };
 
@@ -43,6 +46,7 @@ const createTokenCache = (): TokenCache => {
  * To implement your own token cache, create an object that implements the `TokenCache` interface:
  * - `getToken(key: string): Promise<string | null>`
  * - `saveToken(key: string, token: string): Promise<void>`
+ * - `clearToken(key: string): void | Promise<void>` (optional)
  *
  * @type {TokenCache | undefined} Object with `getToken` and `saveToken` methods, undefined on web
  */

@@ -1,0 +1,9 @@
+# Configuration for actionlint (run by .github/workflows/actionlint.yml).
+# See SDK-79 / Monorepo Supply-Chain Hardening.
+
+self-hosted-runner:
+  # Blacksmith self-hosted runner labels. actionlint cannot know custom runner
+  # labels, so declare them here to avoid false "unknown runner label" errors.
+  labels:
+    - blacksmith-8vcpu-ubuntu-2204
+    - blacksmith-6vcpu-macos-26

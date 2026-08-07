@@ -45,6 +45,7 @@ describe('subpath /internal exports', () => {
         "authenticatedMachineObject",
         "constants",
         "createAuthenticateRequest",
+        "createBootstrapSignedOutState",
         "createClerkRequest",
         "createRedirect",
         "debugRequestState",

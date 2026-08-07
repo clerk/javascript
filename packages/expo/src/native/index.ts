@@ -23,14 +23,14 @@
  *
  * - {@link AuthView} - Authentication flow (sign-in/sign-up), renders inline
  * - {@link UserProfileView} - User profile and account management, renders inline
- * - {@link UserButton} - Avatar button that opens native profile modal
+ * - {@link UserButton} - Avatar button that opens the native user profile
  *
  * @module @clerk/expo/native
  */
 
 export { AuthView } from './AuthView';
 export type { AuthViewProps, AuthViewMode } from './AuthView.types';
+export type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
 export { UserButton } from './UserButton';
-export type { UserButtonProps } from './UserButton';
 export { UserProfileView } from './UserProfileView';
 export type { UserProfileViewProps } from './UserProfileView';

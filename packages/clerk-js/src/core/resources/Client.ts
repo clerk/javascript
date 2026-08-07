@@ -33,7 +33,6 @@ export class Client extends BaseResource implements ClientResource {
   lastActiveSessionId: string | null = null;
   captchaBypass = false;
   cookieExpiresAt: Date | null = null;
-  /** Last authentication strategy used by this client; `null` when unknown/disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
@@ -74,8 +73,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
-    return this._baseGet({ fetchMaxTries });
+  fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries, abortSignal });
   }
 
   async destroy(): Promise<void> {

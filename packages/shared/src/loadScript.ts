@@ -46,7 +46,9 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
       });
 
       script.src = src;
-      script.nonce = nonce;
+      if (nonce) {
+        script.nonce = nonce;
+      }
       beforeLoad?.(script);
       document.body.appendChild(script);
     });

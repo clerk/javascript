@@ -16,7 +16,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import { Upload } from '../../icons';
+import { ArrowUpTray } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
@@ -157,7 +157,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                   icon={
                     <Icon
                       size='md'
-                      icon={Upload}
+                      icon={ArrowUpTray}
                       sx={t => ({
                         color: t.colors.$colorMutedForeground,
                         transitionDuration: t.transitionDuration.$controls,

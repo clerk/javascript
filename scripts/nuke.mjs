@@ -31,24 +31,5 @@ try {
   console.log('Cannot access packages directory');
 }
 
-// Iterate over `playground/*`
-try {
-  const playgroundDir = resolve('playground');
-  await access(playgroundDir);
-  try {
-    const playgrounds = await readdir(playgroundDir);
-
-    await Promise.allSettled(
-      playgrounds.map(
-        dir => $$`rm -rf ${DIRECTORIES_TO_CLEAN.map(directory => join(join(playgroundDir, dir), directory))}`,
-      ),
-    ).then(() => void console.log(`Cleaned playground directories`));
-  } catch (error) {
-    console.error(error);
-  }
-} catch {
-  console.log('Cannot access playground directory');
-}
-
 await $$`rm -rf .turbo`.then(() => console.log('Removed root .turbo directory'));
 await $$`rm -rf node_modules`.then(() => console.log('Removed root node_modules'));

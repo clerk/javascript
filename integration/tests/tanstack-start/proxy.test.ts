@@ -53,6 +53,32 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesProxy] })(
       expect(decoded).not.toContain('localhost');
     });
 
+    test('handshake redirect preserves query string from the original request', async () => {
+      // Regression guard: a request to `/path?foo=bar` behind a reverse proxy should
+      // produce a handshake whose `redirect_url` keeps the original query string.
+      // Surfaced while investigating a report where a TanStack Start app inside
+      // Lovable's iframe saw its `?token=...` disappear across the handshake.
+      const url = new URL('/me?foo=bar&baz=qux', app.serverUrl);
+      const res = await fetch(url.toString(), {
+        headers: {
+          'x-forwarded-proto': 'https',
+          'x-forwarded-host': 'myapp.example.com',
+          'sec-fetch-dest': 'document',
+          Accept: 'text/html',
+          Cookie: '__clerk_db_jwt=needstobeset; __client_uat=1',
+        },
+        redirect: 'manual',
+      });
+
+      expect(res.status).toBe(307);
+      const location = res.headers.get('location') ?? '';
+      const handshakeUrl = new URL(location);
+      const redirectUrl = handshakeUrl.searchParams.get('redirect_url');
+      expect(redirectUrl).toBeTruthy();
+      expect(redirectUrl).toContain('foo=bar');
+      expect(redirectUrl).toContain('baz=qux');
+    });
+
     test('auth works correctly with proxy enabled', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/');

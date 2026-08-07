@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
     "lib": ["es6", "dom"],
     "jsx": "react",
     "module": "ES2020",
@@ -20,7 +19,8 @@
     "allowJs": true,
     "target": "ES2019",
     "noEmitOnError": false,
-    "incremental": false
+    "incremental": false,
+    "rootDir": "./src"
   },
   "include": ["src"]
 }

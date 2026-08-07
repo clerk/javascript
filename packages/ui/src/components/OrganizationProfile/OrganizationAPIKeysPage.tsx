@@ -4,6 +4,7 @@ import { APIKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
 import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { APIKeysPage } from '../APIKeys/APIKeys';
 
@@ -18,19 +19,21 @@ export const OrganizationAPIKeysPage = () => {
   }
 
   return (
-    <Col gap={4}>
-      <Header.Root>
-        <Header.Title
-          localizationKey={localizationKeys('organizationProfile.apiKeysPage.title')}
-          textVariant='h2'
-        />
-      </Header.Root>
-      <APIKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
-        <APIKeysPage
-          subject={organization.id}
-          revokeModalRoot={contentRef}
-        />
-      </APIKeysContext.Provider>
-    </Col>
+    <ProfileCard.Page>
+      <Col gap={4}>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('organizationProfile.apiKeysPage.title')}
+            textVariant='h2'
+          />
+        </Header.Root>
+        <APIKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
+          <APIKeysPage
+            subject={organization.id}
+            revokeModalRoot={contentRef}
+          />
+        </APIKeysContext.Provider>
+      </Col>
+    </ProfileCard.Page>
   );
 };

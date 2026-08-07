@@ -9,6 +9,7 @@ const componentImportPaths = {
   CreateOrganization: () => import(/* webpackChunkName: "createorganization" */ './../components/CreateOrganization'),
   OrganizationProfile: () =>
     import(/* webpackChunkName: "organizationprofile" */ './../components/OrganizationProfile'),
+  InviteMembers: () => import(/* webpackChunkName: "invitemembers" */ './../components/InviteMembers'),
   OrganizationSwitcher: () =>
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
@@ -29,6 +30,7 @@ const componentImportPaths = {
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
+  ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
@@ -89,6 +91,10 @@ export const OrganizationProfileModal = lazy(() =>
   componentImportPaths.OrganizationProfile().then(module => ({ default: module.OrganizationProfileModal })),
 );
 
+export const InviteMembersModal = lazy(() =>
+  componentImportPaths.InviteMembers().then(module => ({ default: module.InviteMembersModal })),
+);
+
 export const OrganizationSwitcher = lazy(() =>
   componentImportPaths.OrganizationSwitcher().then(module => ({ default: module.OrganizationSwitcher })),
 );
@@ -119,6 +125,10 @@ export const PricingTable = lazy(() =>
 );
 
 export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => ({ default: module.APIKeys })));
+
+export const ConfigureSSO = lazy(() =>
+  componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
+);
 
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
@@ -170,6 +180,7 @@ export const ClerkComponents = {
   SignUpModal,
   UserProfileModal,
   OrganizationProfileModal,
+  InviteMembersModal,
   CreateOrganizationModal,
   UserVerificationModal,
   GoogleOneTap,
@@ -180,6 +191,7 @@ export const ClerkComponents = {
   Checkout,
   PlanDetails,
   APIKeys,
+  ConfigureSSO,
   OAuthConsent,
   SubscriptionDetails,
   TaskChooseOrganization,

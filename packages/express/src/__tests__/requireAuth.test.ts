@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { requireAuth } from '../requireAuth';
-import type { ExpressRequestWithAuth } from '../types';
+import { brandRequestAuth, requestHasAuthObject } from '../utils';
 import { mockRequestWithAuth, runMiddleware } from './helpers';
 
 let mockAuthenticateAndDecorateRequest: Mock;
@@ -87,11 +87,11 @@ describe('requireAuth', () => {
 
     mockAuthenticateAndDecorateRequest.mockImplementation((): RequestHandler => {
       return (req, _res, next) => {
-        if ((req as ExpressRequestWithAuth).auth) {
+        if (requestHasAuthObject(req)) {
           return next();
         }
         const requestState = mockAuthenticateRequest({ request: req });
-        Object.assign(req, { auth: () => requestState.toAuth() });
+        Object.assign(req, { auth: brandRequestAuth(() => requestState.toAuth()) });
         next();
       };
     });

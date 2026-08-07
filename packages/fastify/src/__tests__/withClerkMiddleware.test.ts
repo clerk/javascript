@@ -4,17 +4,21 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 
-const authenticateRequestMock = vi.fn();
+const { authenticateRequestMock, createClerkClientMock, mockClerkClient } = vi.hoisted(() => {
+  const authenticateRequestMock = vi.fn();
+  const mockClerkClient = {
+    authenticateRequest: (...args: any) => authenticateRequestMock(...args),
+  };
+  const createClerkClientMock = vi.fn(() => mockClerkClient);
+
+  return { authenticateRequestMock, createClerkClientMock, mockClerkClient };
+});
 
 vi.mock('@clerk/backend', async () => {
   const actual = await vi.importActual('@clerk/backend');
   return {
     ...actual,
-    createClerkClient: () => {
-      return {
-        authenticateRequest: (...args: any) => authenticateRequestMock(...args),
-      };
-    },
+    createClerkClient: (...args: any[]) => createClerkClientMock(...args),
   };
 });
 
@@ -22,6 +26,69 @@ describe('withClerkMiddleware(options)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+  });
+
+  test('creates the request client with plugin runtime keys', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'runtime_publishable_key',
+    });
+
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      const auth = getAuth(request);
+      reply.send({ auth });
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        secretKey: 'runtime_secret_key',
+        publishableKey: 'runtime_publishable_key',
+      }),
+    );
+  });
+
+  test('creates the request client with an apiUrl derived from the runtime publishable key', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
+    });
+
+    fastify.get('/', (_request: FastifyRequest, reply: FastifyReply) => {
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        apiUrl: 'https://api.clerkstage.dev',
+        publishableKey: 'pk_test_aW1tdW5lLWhhd2stNjUuY2xlcmsuYWNjb3VudHNzdGFnZS5kZXYk',
+      }),
+    );
   });
 
   test('handles signin with Authorization Bearer', async () => {
@@ -139,6 +206,81 @@ describe('withClerkMiddleware(options)', () => {
       'x-clerk-auth-status': 'handshake',
       'x-clerk-auth-reason': 'auth-reason',
       'x-clerk-auth-message': 'auth-message',
+    });
+  });
+
+  test('exposes the runtime key clerk client instance on request.clerk', async () => {
+    authenticateRequestMock.mockResolvedValueOnce({
+      headers: new Headers(),
+      toAuth: () => ({
+        tokenType: 'session_token',
+      }),
+    });
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, {
+      secretKey: 'runtime_secret_key',
+      publishableKey: 'runtime_publishable_key',
+    });
+
+    let clerkOnRequest: unknown;
+    fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+      clerkOnRequest = request.clerk;
+      reply.send({});
+    });
+
+    const response = await fastify.inject({
+      method: 'GET',
+      path: '/',
+    });
+
+    expect(response.statusCode).toEqual(200);
+    expect(clerkOnRequest).toBe(mockClerkClient);
+    expect(createClerkClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        secretKey: 'runtime_secret_key',
+        publishableKey: 'runtime_publishable_key',
+      }),
+    );
+  });
+
+  describe('requests that cannot be converted to a web Request', () => {
+    const setup = async () => {
+      const fastify = Fastify();
+      await fastify.register(clerkPlugin);
+      fastify.get('/', (request: FastifyRequest, reply: FastifyReply) => {
+        reply.send({ auth: getAuth(request) });
+      });
+      return fastify;
+    };
+
+    test('responds 400 to a hostless // request target instead of throwing', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({ method: 'GET', path: '//' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+
+    test('responds 400 to a request target that parses as a credentialed URL', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({
+        method: 'GET',
+        path: "//$%7B%23context['xwork.MethodAccessor.denyMethodExecution']@example.com%7D.action",
+      });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
+    });
+
+    test('responds 400 to a forbidden method (TRACE) instead of throwing', async () => {
+      const fastify = await setup();
+
+      const response = await fastify.inject({ method: 'TRACE' as 'GET', path: '/' });
+
+      expect(response.statusCode).toEqual(400);
+      expect(authenticateRequestMock).not.toHaveBeenCalled();
     });
   });
 

@@ -15,6 +15,7 @@ export const UVFactorOneEmailCodeCard = (props: UVFactorOneEmailCodeCardProps) =
         cardSubtitle={localizationKeys('reverification.emailCode.subtitle')}
         inputLabel={localizationKeys('reverification.emailCode.formTitle')}
         resendButton={localizationKeys('reverification.emailCode.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
       />
     </Flow.Part>
   );

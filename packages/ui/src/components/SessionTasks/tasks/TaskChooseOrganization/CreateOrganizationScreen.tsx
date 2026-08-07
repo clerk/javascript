@@ -15,7 +15,7 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
 import { IconButton } from '@/ui/elements/IconButton';
-import { Upload } from '@/ui/icons';
+import { ArrowUpTray } from '@/ui/icons';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -136,7 +136,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
                 icon={
                   <Icon
                     size='md'
-                    icon={Upload}
+                    icon={ArrowUpTray}
                     sx={t => ({
                       color: t.colors.$colorMutedForeground,
                       transitionDuration: t.transitionDuration.$controls,

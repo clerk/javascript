@@ -1,6 +1,8 @@
 import type {
   AttemptAffiliationVerificationParams,
+  CreateOrganizationDomainParams,
   OrganizationDomainJSON,
+  OrganizationDomainOwnershipVerification,
   OrganizationDomainResource,
   OrganizationDomainVerification,
   OrganizationEnrollmentMode,
@@ -17,6 +19,8 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
   organizationId!: string;
   enrollmentMode!: OrganizationEnrollmentMode;
   verification!: OrganizationDomainVerification | null;
+  affiliationVerification!: OrganizationDomainVerification | null;
+  ownershipVerification!: OrganizationDomainOwnershipVerification | null;
   affiliationEmailAddress!: string | null;
   createdAt!: Date;
   updatedAt!: Date;
@@ -28,12 +32,15 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
     this.fromJSON(data);
   }
 
-  static async create(organizationId: string, { name }: { name: string }): Promise<OrganizationDomainResource> {
+  static async create(
+    organizationId: string,
+    { name, enrollmentMode }: CreateOrganizationDomainParams,
+  ): Promise<OrganizationDomainResource> {
     const json = (
       await BaseResource._fetch<OrganizationDomainJSON>({
         path: `/organizations/${organizationId}/domains`,
         method: 'POST',
-        body: { name } as any,
+        body: { name, enrollment_mode: enrollmentMode } as any,
       })
     )?.response as unknown as OrganizationDomainJSON;
     return new OrganizationDomain(json);
@@ -81,15 +88,39 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
       this.affiliationEmailAddress = data.affiliation_email_address;
       this.totalPendingSuggestions = data.total_pending_suggestions;
       this.totalPendingInvitations = data.total_pending_invitations;
-      if (data.verification) {
-        this.verification = {
-          status: data.verification.status,
-          strategy: data.verification.strategy,
-          attempts: data.verification.attempts,
-          expiresAt: unixEpochToDate(data.verification.expires_at),
+
+      const affiliationVerificationJSON = data.affiliation_verification ?? data.verification;
+      if (affiliationVerificationJSON) {
+        const affiliationVerification: OrganizationDomainVerification = {
+          status: affiliationVerificationJSON.status,
+          strategy: affiliationVerificationJSON.strategy,
+          attempts: affiliationVerificationJSON.attempts,
+          expiresAt: unixEpochToDate(affiliationVerificationJSON.expires_at),
+        };
+        this.affiliationVerification = affiliationVerification;
+        // Deprecated alias, kept in sync for backwards compatibility.
+        this.verification = affiliationVerification;
+      } else {
+        this.affiliationVerification = null;
+        this.verification = null;
+      }
+
+      if (data.ownership_verification) {
+        this.ownershipVerification = {
+          status: data.ownership_verification.status,
+          strategy: data.ownership_verification.strategy,
+          attempts: data.ownership_verification.attempts,
+          expiresAt: data.ownership_verification.expire_at
+            ? unixEpochToDate(data.ownership_verification.expire_at)
+            : null,
+          verifiedAt: data.ownership_verification.verified_at
+            ? unixEpochToDate(data.ownership_verification.verified_at)
+            : null,
+          txtRecordName: data.ownership_verification.txt_record_name ?? null,
+          txtRecordValue: data.ownership_verification.txt_record_value ?? null,
         };
       } else {
-        this.verification = null;
+        this.ownershipVerification = null;
       }
     }
     return this;

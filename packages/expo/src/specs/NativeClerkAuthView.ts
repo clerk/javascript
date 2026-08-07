@@ -1,16 +1,19 @@
-/* eslint-disable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
-// These deep imports from react-native internals are required by codegen.
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import type { HostComponent, ViewProps } from 'react-native';
-import type { BubblingEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
-/* eslint-enable import/namespace, import/default, import/no-named-as-default, import/no-named-as-default-member, simple-import-sort/imports */
+import { requireNativeView } from 'expo';
+import type { NativeSyntheticEvent, ViewProps } from 'react-native';
+import { Platform } from 'react-native';
 
-type AuthEvent = Readonly<{ type: string; data: string }>;
+type AuthEvent = Readonly<{ type: string }>;
 
 interface NativeProps extends ViewProps {
   mode?: string;
-  isDismissable?: boolean;
-  onAuthEvent?: BubblingEventHandler<AuthEvent>;
+  isDismissible?: boolean;
+  logoMaxHeight?: number;
+  hostBackButton?: boolean;
+  onAuthEvent?: (event: NativeSyntheticEvent<AuthEvent>) => void;
+  onHostBack?: (event: NativeSyntheticEvent<object>) => void;
 }
 
-export default codegenNativeComponent<NativeProps>('ClerkAuthView') as HostComponent<NativeProps>;
+const NativeClerkAuthView =
+  Platform.OS === 'ios' || Platform.OS === 'android' ? requireNativeView<NativeProps>('ClerkAuthView') : null;
+
+export default NativeClerkAuthView;

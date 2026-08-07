@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/shared/react/index';
 import type { ComponentType } from 'react';
 
-import { buildSSOCallbackURL, withRedirect } from '@/ui/common';
+import { withRedirect } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '@/ui/contexts';
+import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
@@ -15,8 +15,6 @@ import { hasMultipleEnterpriseConnections } from './shared';
  */
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
-  const { displayConfig } = useEnvironment();
-
   const clerk = useClerk();
   const signIn = clerk.client.signIn;
 
@@ -31,7 +29,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
   }));
 
   const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
-    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+    const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
     return signIn.authenticateWithRedirect({

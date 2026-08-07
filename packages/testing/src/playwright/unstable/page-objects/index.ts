@@ -7,6 +7,7 @@ import { createClerkPageObject } from './clerk';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
+import { createOrganizationProfileComponentPageObject } from './organizationProfile';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createPlanDetailsPageObject } from './planDetails';
 import { createPricingTablePageObject } from './pricingTable';
@@ -40,6 +41,7 @@ export const createPageObjects = ({
     expect: createExpectPageObject(testArgs),
     impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
+    organizationProfile: createOrganizationProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     pricingTable: createPricingTablePageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),

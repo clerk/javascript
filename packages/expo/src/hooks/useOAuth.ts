@@ -62,7 +62,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     // Create a redirect url for the current platform and environment.
     //
     // This redirect URL needs to be whitelisted for your Clerk production instance via
-    // https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
+    // https://clerk.com/docs/reference/backend-api/tag/redirect-urls/POST/redirect_urls
     //
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi

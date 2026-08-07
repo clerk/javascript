@@ -19,6 +19,7 @@ import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
   API_KEY_PREFIX,
   isJwtFormat,
+  JWT_CATEGORY_M2M_TOKEN,
   M2M_SUBJECT_PREFIX,
   M2M_TOKEN_PREFIX,
   OAUTH_ACCESS_TOKEN_TYPES,
@@ -44,7 +45,7 @@ export type VerifyTokenOptions = Simplify<
  * > [!WARNING]
  * > This is a lower-level method intended for more advanced use-cases. It's recommended to use [`authenticateRequest()`](https://clerk.com/docs/reference/backend/authenticate-request), which fully authenticates a token passed from the `request` object.
  *
- * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
+ * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/jwks/GET/jwks){{ target: '_blank' }}.
  *
  * @param token - The token to verify.
  * @param options - Options for verifying the token. It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })`.
@@ -118,6 +119,20 @@ export async function verifyToken(
 
   const { header } = decodedResult;
   const { kid } = header;
+
+  // Reject machine JWTs (e.g. M2M) tagged with a non-session category but signed by the same
+  // instance key, regardless of transport. Reciprocal of the machine verifier's `cat` check.
+  if (header.cat === JWT_CATEGORY_M2M_TOKEN) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          action: TokenVerificationErrorAction.EnsureClerkJWT,
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: 'Invalid session token category.',
+        }),
+      ],
+    };
+  }
 
   try {
     let key: JsonWebKey;
@@ -236,7 +251,7 @@ async function verifyAPIKey(
  * Verifies any type of machine token by detecting its type from the prefix or JWT claims.
  * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
- * @param token - The token to verify (e.g. starts with "mt_", "oat_", "ak_", or a JWT)
+ * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
@@ -261,7 +276,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
       } as MachineTokenReturnType<never, MachineTokenVerificationError>;
     }
 
-    if (decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
+    if (typeof decodedResult.payload.sub === 'string' && decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
       return verifyM2MJwt(token, decodedResult, options);
     }
 

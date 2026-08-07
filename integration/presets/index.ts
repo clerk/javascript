@@ -1,6 +1,7 @@
 import { astro } from './astro';
 import { chromeExtension } from './chrome-extension';
 import { customFlows } from './custom-flows';
+import { electron } from './electron';
 import { envs, instanceKeys } from './envs';
 import { expo } from './expo';
 import { express } from './express';
@@ -17,6 +18,7 @@ import { vue } from './vue';
 export const appConfigs = {
   chromeExtension,
   customFlows,
+  electron,
   envs,
   express,
   fastify,

@@ -15,6 +15,7 @@ export const SignInFactorOneEmailCodeCard = (props: SignInFactorOneEmailCodeCard
         cardSubtitle={localizationKeys('signIn.emailCode.subtitle')}
         inputLabel={localizationKeys('signIn.emailCode.formTitle')}
         resendButton={localizationKeys('signIn.emailCode.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
       />
     </Flow.Part>
   );

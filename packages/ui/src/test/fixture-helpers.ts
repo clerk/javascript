@@ -119,6 +119,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   type SignInFactorTwoParams = {
     identifier?: string;
     supportPhoneCode?: boolean;
+    supportEmailCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
     supportResetPasswordEmail?: boolean;
@@ -185,17 +186,21 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
+  const startSignInVerification = (
+    status: Extract<SignInJSON['status'], 'needs_client_trust' | 'needs_second_factor'>,
+    params?: SignInFactorTwoParams,
+  ) => {
     const {
       identifier = '+30 691 1111111',
       supportPhoneCode = true,
+      supportEmailCode,
       supportTotp,
       supportBackupCode,
       supportResetPasswordEmail,
       supportResetPasswordPhone,
     } = params || {};
     baseClient.sign_in = {
-      status: 'needs_second_factor',
+      status,
       identifier,
       ...(supportResetPasswordEmail
         ? {
@@ -216,6 +221,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_identifiers: ['email_address', 'phone_number'],
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.com' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
       ],
@@ -223,7 +229,45 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo };
+  const startSignInFactorTwo = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_second_factor', params);
+
+  const startSignInClientTrust = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_client_trust', params);
+
+  const startSignInWithProtectCheck = (params?: {
+    expiresAt?: number;
+    uiHints?: Record<string, string>;
+    sdkUrl?: string;
+  }) => {
+    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    baseClient.sign_in = {
+      id: 'sia_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'needs_protect_check',
+      identifier: 'test@clerk.com',
+      supported_first_factors: [],
+      supported_second_factors: [],
+      first_factor_verification: null,
+      second_factor_verification: null,
+      created_session_id: null,
+      protect_check: {
+        status: 'pending',
+        token: 'challenge-token',
+        sdk_url: sdkUrl,
+        ...(expiresAt !== undefined && { expires_at: expiresAt }),
+        ...(uiHints !== undefined && { ui_hints: uiHints }),
+      },
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  return {
+    startSignInWithEmailAddress,
+    startSignInWithPhoneNumber,
+    startSignInFactorTwo,
+    startSignInClientTrust,
+    startSignInWithProtectCheck,
+  };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
@@ -289,11 +333,32 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignUpJSON;
   };
 
+  const startSignUpWithProtectCheck = (params?: {
+    expiresAt?: number;
+    uiHints?: Record<string, string>;
+    sdkUrl?: string;
+  }) => {
+    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'missing_requirements',
+      missing_fields: ['protect_check'],
+      protect_check: {
+        status: 'pending',
+        token: 'challenge-token',
+        sdk_url: sdkUrl,
+        ...(expiresAt !== undefined && { expires_at: expiresAt }),
+        ...(uiHints !== undefined && { ui_hints: uiHints }),
+      },
+    } as SignUpJSON;
+  };
+
   return {
     startSignUpWithEmailAddress,
     startSignUpWithPhoneNumber,
     startSignUpWithMissingLegalAccepted,
     startSignUpWithMissingLegalAcceptedAndUnverifiedFields,
+    startSignUpWithProtectCheck,
   };
 };
 
@@ -538,9 +603,9 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withEnterpriseSso = () => {
+  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean }) => {
     us.saml = { enabled: true };
-    us.enterprise_sso = { enabled: true };
+    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSSO ?? false };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {
@@ -589,6 +654,14 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.mfa = { required };
   };
 
+  const withEnumerationProtection = () => {
+    us.attack_protection = {
+      enumeration_protection: {
+        enabled: true,
+      },
+    };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -610,5 +683,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withLegalConsent,
     withWaitlistMode,
     withMfaRequired,
+    withEnumerationProtection,
   };
 };

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveServerUrl } from '../application';
+import { createAppRuntimeEnv, resolveServerUrl } from '../application';
+import { environmentConfig } from '../environment';
 
 describe('resolveServerUrl', () => {
   describe('with opts.serverUrl', () => {
@@ -46,6 +47,19 @@ describe('resolveServerUrl', () => {
 
     it('defaults when fallback is empty string', () => {
       expect(resolveServerUrl(undefined, '', 4567)).toBe('http://localhost:4567');
+    });
+  });
+});
+
+describe('createAppRuntimeEnv', () => {
+  it('passes configured falsey values through to spawned app processes', () => {
+    const env = environmentConfig()
+      .setEnvVariable('private', 'CI', 'false')
+      .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
+
+    expect(createAppRuntimeEnv(env)).toMatchObject({
+      CI: 'false',
+      CLERK_KEYLESS_DISABLED: 'false',
     });
   });
 });

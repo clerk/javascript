@@ -1,4 +1,4 @@
-import type { Serializable } from '@/types';
+import type { Serializable } from '../../types';
 
 const formatWarning = (msg: string) => {
   return `🔒 Clerk:\n${msg.trim()}\n(This notice only appears in development)`;
@@ -7,15 +7,32 @@ const formatWarning = (msg: string) => {
 const createMessageForDisabledOrganizations = (
   componentName:
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationSwitcher'
     | 'OrganizationList'
     | 'CreateOrganization'
-    | 'TaskChooseOrganization',
+    | 'TaskChooseOrganization'
+    | 'ConfigureSSO',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
   );
 };
+
+const createCannotRenderComponentWhenOrgDoesNotExist = (
+  componentName: 'OrganizationProfile' | 'InviteMembers' | 'ConfigureSSO',
+) => {
+  return formatWarning(
+    `<${componentName}/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  );
+};
+
+const createCannotRenderComponentWhenPermissionIsMissing = (componentName: 'InviteMembers', permission: string) => {
+  return formatWarning(
+    `<${componentName}/> cannot render unless the current user has the \`${permission}\` permission. Since the current user is missing this permission, this is no-op. Render it only for members who can manage memberships, for example by wrapping it in <Show when={{ permission: '${permission}' }}>.`,
+  );
+};
+
 const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
     `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
@@ -45,7 +62,8 @@ const warnings = {
     'The <SignIn/> component cannot render when a user has a pending task, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the task instead.',
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
-  cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
+  createCannotRenderComponentWhenOrgDoesNotExist,
+  createCannotRenderComponentWhenPermissionIsMissing,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:
@@ -53,7 +71,7 @@ const warnings = {
   cannotOpenCheckout:
     'The Checkout drawer cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenSignInOrSignUp:
-    'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
+    'The <SignIn/> and <SignUp/> modals are hidden because a user is already signed in and this application is configured for single-session mode. This is expected behavior — no action is needed. To allow rendering while signed in, enable multi-session mode in your Clerk Dashboard.',
   cannotRenderAPIKeysComponent:
     'The <APIKeys/> component cannot be rendered when API keys is disabled. Since API keys is disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenUnauthorized:
@@ -62,6 +80,14 @@ const warnings = {
     'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
   cannotRenderAPIKeysComponentForOrgWhenDisabled:
     'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
+  cannotRenderOAuthConsentComponentWhenUserDoesNotExist:
+    '<OAuthConsent/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenUserDoesNotExist:
+    '<ConfigureSSO/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenDisabled:
+    'The <ConfigureSSO/> component cannot be rendered when self-serve SSO is disabled. Visit `https://dashboard.clerk.com` to enable the feature. Since self-serve SSO is disabled, this is no-op.',
+  cannotRenderConfigureSSOComponentWhenEmailAddressDisabled:
+    'The <ConfigureSSO/> component cannot be rendered when email addresses are disabled on the instance. Visit `https://dashboard.clerk.com` to enable email addresses. Since email addresses are disabled, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

@@ -8,7 +8,7 @@ body:
       value: |
         ## Welcome 👋🏻
 
-        Thank you for taking the time to report an issue with Clerk's JavaScript packages. Please fill out the information below to help us resolve your issue faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord). We triage GitHub issues weekly, so it may take a week or so to get a response. If you have a more urgent need, please reach out to [support](https://clerk.com/support).
+        Thank you for taking the time to report an issue with Clerk's JavaScript packages. Please fill out the information below to help us resolve your issue faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord). We triage GitHub issues weekly, so it may take a week or so to get a response. If you have a more urgent need, please reach out to [support](https://clerk.com/contact/support).
   - type: checkboxes
     attributes:
       label: Preliminary Checks

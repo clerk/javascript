@@ -40,9 +40,14 @@ export const APIKeysTable = ({
       >
         <Thead>
           <Tr>
-            <Th>Name</Th>
-            <Th>Last used</Th>
-            {canManageAPIKeys && <Th sx={{ textAlign: 'end' }}>Actions</Th>}
+            <Th localizationKey={localizationKeys('apiKeys.tableHeader__name')} />
+            <Th localizationKey={localizationKeys('apiKeys.tableHeader__lastUsed')} />
+            {canManageAPIKeys && (
+              <Th
+                localizationKey={localizationKeys('apiKeys.tableHeader__actions')}
+                sx={{ textAlign: 'end' }}
+              />
+            )}
           </Tr>
         </Thead>
         <Tbody>

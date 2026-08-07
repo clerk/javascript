@@ -16,4 +16,5 @@ export * from './usePrefersReducedMotion';
 export * from './useSafeState';
 export * from './useScrollLock';
 export * from './useSearchInput';
+export * from './useSpinDelay';
 export * from './useTotalEnabledAuthMethods';

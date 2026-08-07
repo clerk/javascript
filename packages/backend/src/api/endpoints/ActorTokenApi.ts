@@ -28,7 +28,7 @@ type ActorTokenCreateParams = {
    */
   actor: ActorTokenActorCreateParams;
   /**
-   * Optional parameter to specify the life duration of the actor token in seconds.
+   * The lifetime of the actor token in seconds.
    *
    * @remarks
    * By default, the duration is 1 hour.

@@ -2,7 +2,8 @@ if (typeof window !== 'undefined' && typeof (window as any).global === 'undefine
   (window as any).global = window;
 }
 
-export * from './client';
+export * from '@clerk/react';
+export { ClerkProvider, SignIn, SignUp, OrganizationProfile, UserProfile, type WithClerkState } from './client';
 export { getToken } from '@clerk/shared/getToken';
 
 // Override Clerk React error thrower to show that errors come from @clerk/react-router

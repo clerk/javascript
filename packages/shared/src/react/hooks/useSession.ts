@@ -10,7 +10,7 @@ const hookName = `useSession`;
  * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/objects/session) object, as well as helpers for setting the active session.
  *
  * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in"]
+ * ["Loading", "Signed out", "Signed in"]
  *
  * @function
  *
@@ -49,7 +49,30 @@ const hookName = `useSession`;
  * </Tab>
  * <Tab>
  *
- * {@include ../../../docs/use-session.md#nextjs-01}
+ * ```tsx {{ filename: 'app/page.tsx' }}
+ * 'use client';
+ *
+ * import { useSession } from '@clerk/nextjs';
+ *
+ * export default function HomePage() {
+ *   const { isLoaded, session, isSignedIn } = useSession();
+ *
+ *   if (!isLoaded) {
+ *     // Handle loading state
+ *     return null;
+ *   }
+ *   if (!isSignedIn) {
+ *     // Handle signed out state
+ *     return null;
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <p>This session has been active since {session.lastActiveAt.toLocaleString()}</p>
+ *     </div>
+ *   );
+ * }
+ * ```
  *
  * </Tab>
  * </Tabs>

@@ -16,21 +16,48 @@ import {
   ukUA,
 } from '@clerk/localizations';
 import { dark } from '@clerk/ui/themes';
-import { describe, expectTypeOf, it } from 'vitest';
+import { render } from '@testing-library/react';
+import React from 'react';
+import { afterAll, beforeAll, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
-import type { ClerkProvider } from '../ClerkProvider';
+import type { ClerkProviderProps as GenericClerkProviderProps, Ui } from '../../types';
+import { ClerkProvider } from '../ClerkProvider';
+
+vi.mock('../../isomorphicClerk', () => {
+  let instance: any;
+  class IsomorphicClerk {
+    status = 'loading';
+    on = vi.fn();
+    off = vi.fn();
+    __internal_updateProps = vi.fn().mockResolvedValue(undefined);
+    static getOrCreateInstance() {
+      instance ??= new IsomorphicClerk();
+      return instance;
+    }
+    static clearInstance() {
+      instance = undefined;
+    }
+  }
+  return { IsomorphicClerk };
+});
 
 type ClerkProviderProps = Parameters<typeof ClerkProvider>[0];
+type CustomAppearance = {
+  options?: {
+    customFlag?: boolean;
+  };
+};
+const customUi = {} as Ui<CustomAppearance>;
 
 describe('ClerkProvider', () => {
   describe('Type tests', () => {
     describe('publishableKey', () => {
-      it('expects a publishableKey and children as the minimum accepted case', () => {
+      it('accepts an explicit publishableKey', () => {
         expectTypeOf({ publishableKey: 'test', children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
 
-      it('errors if no publishableKey', () => {
-        expectTypeOf({ children: '' }).not.toMatchTypeOf<ClerkProviderProps>();
+      it('accepts no explicit publishableKey', () => {
+        expectTypeOf({ children: '' }).toMatchTypeOf<ClerkProviderProps>();
       });
     });
   });
@@ -84,6 +111,19 @@ describe('ClerkProvider', () => {
       //   ...defaultProps,
       //   appearance: { elements: { nonExistentKey: '' } },
       // }).not.toMatchTypeOf<ClerkProviderProps>();
+    });
+
+    it('is driven by the passed ui object type', () => {
+      expectTypeOf({
+        ...defaultProps,
+        ui: customUi,
+        appearance: { options: { customFlag: true } },
+      }).toMatchTypeOf<GenericClerkProviderProps<typeof customUi>>();
+
+      expectTypeOf({
+        ...defaultProps,
+        appearance: { options: { customFlag: true } },
+      }).not.toMatchTypeOf<ClerkProviderProps>();
     });
   });
 
@@ -210,6 +250,47 @@ describe('ClerkProvider', () => {
         routerPush: () => {},
         routerReplace: () => {},
       }).toMatchTypeOf<ClerkProviderProps>();
+    });
+  });
+
+  describe('duplicate detection', () => {
+    const pk = 'pk_test_Y2xlcmsuY2xlcmsuZGV2JA';
+    const originalError = console.error;
+
+    beforeAll(() => {
+      console.error = vi.fn();
+    });
+
+    afterAll(() => {
+      console.error = originalError;
+    });
+
+    it('throws when a ClerkProvider is nested inside another ClerkProvider', () => {
+      expect(() =>
+        render(
+          <ClerkProvider publishableKey={pk}>
+            <ClerkProvider publishableKey={pk}>
+              <div />
+            </ClerkProvider>
+          </ClerkProvider>,
+        ),
+      ).toThrow(/multiple <ClerkProvider>/);
+    });
+
+    it('does not throw when a second React root mounts while the first is still mounted', () => {
+      const first = render(
+        <ClerkProvider publishableKey={pk}>
+          <div />
+        </ClerkProvider>,
+      );
+      expect(() =>
+        render(
+          <ClerkProvider publishableKey={pk}>
+            <div />
+          </ClerkProvider>,
+        ),
+      ).not.toThrow();
+      first.unmount();
     });
   });
 });

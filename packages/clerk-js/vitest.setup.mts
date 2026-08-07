@@ -10,8 +10,11 @@ configure({ asyncUtilTimeout: 5000 });
 
 // Track all timers created during tests to clean them up
 const activeTimers = new Set<ReturnType<typeof setTimeout>>();
+const activeIntervals = new Set<ReturnType<typeof setInterval>>();
 const originalSetTimeout = global.setTimeout;
 const originalClearTimeout = global.clearTimeout;
+const originalSetInterval = global.setInterval;
+const originalClearInterval = global.clearInterval;
 
 // Wrap setTimeout to track all timers
 global.setTimeout = ((callback: any, delay?: any, ...args: any[]) => {
@@ -28,15 +31,34 @@ global.clearTimeout = ((timerId?: ReturnType<typeof setTimeout>) => {
   }
 }) as typeof clearTimeout;
 
+// Wrap setInterval the same way so libraries like @formkit/auto-animate
+// (which polls via setInterval and calls requestAnimationFrame inside it)
+// cannot leak callbacks past the test environment teardown.
+global.setInterval = ((callback: any, delay?: any, ...args: any[]) => {
+  const intervalId = originalSetInterval(callback, delay, ...args);
+  activeIntervals.add(intervalId);
+  return intervalId;
+}) as typeof setInterval;
+
+global.clearInterval = ((intervalId?: ReturnType<typeof setInterval>) => {
+  if (intervalId) {
+    activeIntervals.delete(intervalId);
+    originalClearInterval(intervalId);
+  }
+}) as typeof clearInterval;
+
 beforeEach(() => {
   activeTimers.clear();
+  activeIntervals.clear();
 });
 
 afterEach(() => {
   cleanup();
-  // Clear all tracked timers to prevent post-test execution
+  // Clear all tracked timers/intervals to prevent post-test execution
   activeTimers.forEach(timerId => originalClearTimeout(timerId));
   activeTimers.clear();
+  activeIntervals.forEach(intervalId => originalClearInterval(intervalId));
+  activeIntervals.clear();
 });
 
 // Store the original method
@@ -78,11 +100,13 @@ if (typeof window !== 'undefined') {
   // Mock ResizeObserver
   window.ResizeObserver =
     window.ResizeObserver ||
-    vi.fn().mockImplementation(() => ({
-      disconnect: vi.fn(),
-      observe: vi.fn(),
-      unobserve: vi.fn(),
-    }));
+    (vi.fn().mockImplementation(function () {
+      return {
+        disconnect: vi.fn(),
+        observe: vi.fn(),
+        unobserve: vi.fn(),
+      };
+    }) as unknown as typeof ResizeObserver);
 
   // Mock matchMedia
   Object.defineProperty(window, 'matchMedia', {
@@ -278,10 +302,12 @@ vi.mock('@formkit/auto-animate', () => ({
 // Mock browser-tabs-lock to prevent window access errors in tests
 vi.mock('browser-tabs-lock', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      acquireLock: vi.fn().mockResolvedValue(true),
-      releaseLock: vi.fn().mockResolvedValue(true),
-    })),
+    default: vi.fn().mockImplementation(function () {
+      return {
+        acquireLock: vi.fn().mockResolvedValue(true),
+        releaseLock: vi.fn().mockResolvedValue(true),
+      };
+    }),
   };
 });
 

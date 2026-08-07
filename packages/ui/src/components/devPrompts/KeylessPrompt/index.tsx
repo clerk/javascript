@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useUser } from '@clerk/shared/react';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
@@ -360,6 +361,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
       css={css`
         ${CSS_RESET};
         position: fixed;
+        z-index: 2147483647;
         border-radius: ${isOpen ? '0.75rem' : '2.5rem'};
         background-color: #1f1f1f;
         box-shadow:
@@ -506,7 +508,7 @@ function KeylessPromptInternal(props: KeylessPromptProps) {
       </button>
       <div
         id={id}
-        {...(!isOpen && { inert: '' as any })}
+        {...inertProps(!isOpen)}
         css={css`
           ${CSS_RESET};
           display: grid;

@@ -129,74 +129,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       expect(tokenRequests.length).toBe(1);
     });
 
-    /**
-     * Test Flow:
-     * 1. Open two tabs with the same browser context (shared cookies)
-     * 2. Sign in on tab1, reload tab2 to pick up the session
-     * 3. Both tabs hydrate their token cache with the session token
-     * 4. Start counting /tokens requests, then wait for the timers to fire
-     * 5. Assert only 1 /tokens request was made (not 2)
-     */
-    test('multi-tab scheduled refreshes are deduped to a single request', async ({ context }) => {
-      test.setTimeout(90_000);
-
-      const page1 = await context.newPage();
-      const page2 = await context.newPage();
-
-      await page1.goto(app.serverUrl);
-      await page2.goto(app.serverUrl);
-
-      await page1.waitForFunction(() => (window as any).Clerk?.loaded);
-      await page2.waitForFunction(() => (window as any).Clerk?.loaded);
-
-      const u1 = createTestUtils({ app, page: page1 });
-      await u1.po.signIn.goTo();
-      await u1.po.signIn.setIdentifier(fakeUser.email);
-      await u1.po.signIn.continue();
-      await u1.po.signIn.setPassword(fakeUser.password);
-      await u1.po.signIn.continue();
-      await u1.po.expect.toBeSignedIn();
-
-      // eslint-disable-next-line playwright/no-wait-for-timeout
-      await page1.waitForTimeout(1000);
-
-      await page2.reload();
-      await page2.waitForFunction(() => (window as any).Clerk?.loaded);
-
-      const u2 = createTestUtils({ app, page: page2 });
-      await u2.po.expect.toBeSignedIn();
-
-      // Both tabs are now signed in and have hydrated their token caches
-      // via Session constructor -> #hydrateCache, each with an independent
-      // onRefresh timer that fires at ~43s (TTL 60s - 15s leeway - 2s lead).
-      // Start counting /tokens requests from this point.
-      const refreshRequests: string[] = [];
-      await context.route('**/v1/client/sessions/*/tokens*', async route => {
-        refreshRequests.push(route.request().url());
-        await route.continue();
-      });
-
-      // Wait for proactive refresh timers to fire.
-      // Default token TTL is 60s; onRefresh fires at 60 - 15 - 2 = 43s from iat.
-      // We wait 50s to give comfortable buffer, this includes the broadcast delay.
-      //
-      // Uses page.evaluate instead of page.waitForTimeout to avoid
-      // the global actionTimeout (10s) silently capping the wait.
-      await page1.evaluate(() => new Promise(resolve => setTimeout(resolve, 50_000)));
-
-      // Only one tab should have made a /tokens request; the other tab should have
-      // received the refreshed token via BroadcastChannel.
-      expect(refreshRequests.length).toBe(1);
-
-      // Both tabs should still have valid tokens after the refresh cycle
-      const [page1Token, page2Token] = await Promise.all([
-        page1.evaluate(() => (window as any).Clerk.session?.getToken()),
-        page2.evaluate(() => (window as any).Clerk.session?.getToken()),
-      ]);
-
-      expect(page1Token).toBeTruthy();
-      expect(page2Token).toBeTruthy();
-      expect(page1Token).toBe(page2Token);
-    });
+    // The previous "multi-tab scheduled refreshes are deduped to a single request"
+    // test relied on the proactive-refresh setTimeout firing within a 50s wall-clock
+    // window, which assumed JWT TTL = 60s. The dev test instance now issues 300s
+    // tokens, so the timer fires at ~283s and the test never reached it. The
+    // BroadcastChannel-based dedup it was checking is already covered by the
+    // "multi-tab token sharing works when clearing the cache" test above, which
+    // explicitly triggers a fetch via `getToken({ skipCache: true })`. The
+    // proactive-refresh timer scheduling itself (the math, the leeway, the
+    // re-registration on success) is best validated by unit tests that mock
+    // `setTimeout` rather than depending on real time in a real browser.
   },
 );

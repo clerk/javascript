@@ -1,0 +1,358 @@
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { axe } from '../../test-utils/axe';
+import { Popover } from './index';
+
+afterEach(() => cleanup());
+
+function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>> = {}) {
+  return render(
+    <Popover.Root {...props}>
+      <Popover.Trigger>Open popover</Popover.Trigger>
+      <Popover.Positioner data-testid='popover-positioner'>
+        <Popover.Popup data-testid='popover-popup'>
+          <Popover.Title data-testid='popover-title'>Popover Title</Popover.Title>
+          <Popover.Description data-testid='popover-description'>Some description</Popover.Description>
+          <p>Popover content</p>
+          <Popover.Close data-testid='popover-close'>Close</Popover.Close>
+        </Popover.Popup>
+      </Popover.Positioner>
+    </Popover.Root>,
+  );
+}
+
+describe('Popover', () => {
+  describe('open/close', () => {
+    it('opens on trigger click', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      await user.click(trigger);
+
+      expect(trigger).toHaveAttribute('data-open', '');
+      expect(document.querySelector('[data-testid="popover-popup"]')).toBeInTheDocument();
+    });
+
+    it('closes on trigger click when open', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      await user.click(trigger);
+      await user.click(trigger);
+
+      expect(trigger).toHaveAttribute('data-closed', '');
+    });
+
+    it('closes on Escape', async () => {
+      const user = userEvent.setup();
+      renderPopover({ defaultOpen: true });
+
+      await user.keyboard('{Escape}');
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      expect(trigger).toHaveAttribute('data-closed', '');
+    });
+
+    it('closes via Close button', async () => {
+      const user = userEvent.setup();
+      renderPopover({ defaultOpen: true });
+
+      const closeBtn = screen.getByRole('button', { name: 'Close' });
+      await user.click(closeBtn);
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      expect(trigger).toHaveAttribute('data-closed', '');
+    });
+
+    it('calls onOpenChange when toggled', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderPopover({ onOpenChange });
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      await user.click(trigger);
+
+      expect(onOpenChange).toHaveBeenCalledWith(true);
+    });
+
+    it('closes on outside click', async () => {
+      const user = userEvent.setup();
+      renderPopover({ defaultOpen: true });
+
+      expect(document.querySelector('[data-testid="popover-popup"]')).toBeInTheDocument();
+
+      await user.click(document.body);
+
+      expect(document.querySelector('[data-testid="popover-popup"]')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('controlled open', () => {
+    it('respects controlled open prop', () => {
+      renderPopover({ open: true });
+
+      expect(document.querySelector('[data-testid="popover-positioner"]')).toBeInTheDocument();
+    });
+
+    it('does not open when controlled open is false', async () => {
+      const user = userEvent.setup();
+      renderPopover({ open: false });
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+
+      expect(document.querySelector('[data-testid="popover-positioner"]')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('ARIA attributes', () => {
+    it('positioner has aria-labelledby linked to title', () => {
+      renderPopover({ defaultOpen: true });
+
+      const title = document.querySelector('[data-testid="popover-title"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+
+      expect(title).toHaveAttribute('id');
+      expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
+    });
+
+    it('positioner has aria-describedby linked to description', () => {
+      renderPopover({ defaultOpen: true });
+
+      const desc = document.querySelector('[data-testid="popover-description"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+
+      expect(desc).toHaveAttribute('id');
+      expect(positioner).toHaveAttribute('aria-describedby', desc?.getAttribute('id'));
+    });
+
+    it('trigger has role=button', () => {
+      renderPopover();
+      expect(screen.getByRole('button', { name: 'Open popover' })).toBeInTheDocument();
+    });
+
+    it('keeps positioner aria-labelledby/aria-describedby wired to the correct elements', () => {
+      // The primitive owns the ids on Title and Description (id is omitted from
+      // their public props) — the aria pairing must always resolve correctly.
+      renderPopover({ defaultOpen: true });
+
+      const title = document.querySelector('[data-testid="popover-title"]');
+      const desc = document.querySelector('[data-testid="popover-description"]');
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+
+      expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
+      expect(positioner).toHaveAttribute('aria-describedby', desc?.getAttribute('id'));
+      expect(title).toHaveTextContent('Popover Title');
+      expect(desc).toHaveTextContent('Some description');
+    });
+
+    it('omits aria-labelledby and aria-describedby when no Title or Description is rendered', () => {
+      // Title and Description are optional. When absent, the positioner must not
+      // emit dangling idrefs pointing at elements that were never rendered.
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner data-testid='popover-positioner'>
+            <Popover.Popup>
+              <p>Popover content</p>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).not.toHaveAttribute('aria-labelledby');
+      expect(positioner).not.toHaveAttribute('aria-describedby');
+    });
+
+    it('sets only aria-labelledby when a Title is rendered without a Description', () => {
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner data-testid='popover-positioner'>
+            <Popover.Popup>
+              <Popover.Title data-testid='popover-title'>Popover Title</Popover.Title>
+              <p>Popover content</p>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      const title = document.querySelector('[data-testid="popover-title"]');
+      expect(positioner).toHaveAttribute('aria-labelledby', title?.getAttribute('id'));
+      expect(positioner).not.toHaveAttribute('aria-describedby');
+    });
+  });
+
+  describe('animation lifecycle', () => {
+    it('positioner is not rendered when closed', () => {
+      renderPopover();
+      expect(document.querySelector('[data-testid="popover-positioner"]')).not.toBeInTheDocument();
+    });
+
+    it('applies data-open on popup when open', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+
+      const popup = document.querySelector('[data-testid="popover-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
+    });
+
+    it('positioner has data-side', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
+    });
+  });
+
+  describe('content rendering', () => {
+    it('renders children content when open', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+
+      expect(screen.getByText('Popover content')).toBeInTheDocument();
+      expect(screen.getByText('Popover Title')).toBeInTheDocument();
+      expect(screen.getByText('Some description')).toBeInTheDocument();
+    });
+  });
+
+  describe('placement', () => {
+    it('accepts custom placement', () => {
+      renderPopover({ defaultOpen: true, placement: 'top-start' });
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'top');
+    });
+
+    it('defaults to bottom placement', () => {
+      renderPopover({ defaultOpen: true });
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner).toHaveAttribute('data-side', 'bottom');
+    });
+  });
+
+  describe('focus management', () => {
+    it('moves focus into popover on open', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      // FloatingFocusManager schedules focus via requestAnimationFrame
+      await new Promise(r => requestAnimationFrame(r));
+
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      expect(positioner?.contains(document.activeElement)).toBe(true);
+    });
+
+    it('focuses the popup itself, not a control inside it, when opened with a pointer', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="popover-positioner"]'));
+    });
+
+    it('focuses the first tabbable element when opened with the keyboard', async () => {
+      renderPopover();
+
+      // A button handles Enter/Space itself, so keyboard activation reaches the popover
+      // as a click with no pointer behind it. userEvent stamps its synthetic keyboard
+      // click with a pointerType, which browsers do not.
+      fireEvent.click(screen.getByRole('button', { name: 'Open popover' }), { detail: 0 });
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+    });
+
+    it('focuses the first tabbable element on pointer open when initialFocus is "first"', async () => {
+      const user = userEvent.setup();
+      renderPopover({ initialFocus: 'first' });
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
+    });
+
+    it('returns focus to trigger on close via Escape', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      await user.click(trigger);
+      await user.keyboard('{Escape}');
+
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('returns focus to trigger on close via Close button', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      const trigger = screen.getByRole('button', { name: 'Open popover' });
+      await user.click(trigger);
+
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  describe('accessibility (axe)', () => {
+    it('has no violations when closed', async () => {
+      const { container } = renderPopover();
+      expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('has no violations when open', async () => {
+      renderPopover({ defaultOpen: true });
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+  });
+
+  describe('consumer ref forwarding', () => {
+    it('forwards a consumer ref on Trigger (host button shape)', () => {
+      const ref = createRef<HTMLButtonElement>();
+      render(
+        <Popover.Root>
+          <Popover.Trigger ref={ref}>Open popover</Popover.Trigger>
+        </Popover.Root>,
+      );
+
+      expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    });
+  });
+
+  describe('Arrow ref', () => {
+    it('merges a consumer ref with the internal arrow ref', () => {
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Arrow ref={ref} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      expect(ref.current).not.toBeNull();
+      expect(ref.current).toHaveAttribute('data-side');
+    });
+  });
+});

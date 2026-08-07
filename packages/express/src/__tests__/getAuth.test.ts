@@ -1,4 +1,5 @@
 import type { AuthenticatedMachineObject } from '@clerk/backend/internal';
+import type { Request as ExpressRequest } from 'express';
 import { describe, expect, it } from 'vitest';
 
 import { getAuth } from '../getAuth';
@@ -7,6 +8,16 @@ import { mockRequest, mockRequestWithAuth } from './helpers';
 describe('getAuth', () => {
   it('throws error if clerkMiddleware is not executed before getAuth', () => {
     expect(() => getAuth(mockRequest())).toThrow(/The "clerkMiddleware" should be registered before using "getAuth"/);
+  });
+
+  it('throws error if req.auth is a plain object set by another library (express-jwt style)', () => {
+    const req = { auth: { sub: 'attacker' } } as unknown as ExpressRequest;
+    expect(() => getAuth(req)).toThrow(/The "clerkMiddleware" should be registered before using "getAuth"/);
+  });
+
+  it('throws error if req.auth is a function set by another library', () => {
+    const req = { auth: () => ({ userId: 'attacker' }) } as unknown as ExpressRequest;
+    expect(() => getAuth(req)).toThrow(/The "clerkMiddleware" should be registered before using "getAuth"/);
   });
 
   it('returns auth from request for signed-out request', () => {

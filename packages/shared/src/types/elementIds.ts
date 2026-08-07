@@ -26,7 +26,22 @@ export type FieldId =
   | 'apiKeyExpirationDate'
   | 'apiKeyRevokeConfirmation'
   | 'apiKeySecret'
-  | 'web3WalletName';
+  | 'idpCertificate'
+  | 'idpEntityId'
+  | 'idpMetadata'
+  | 'idpMetadataUrl'
+  | 'idpSsoUrl'
+  | 'discoveryUrl'
+  | 'authUrl'
+  | 'tokenUrl'
+  | 'userInfoUrl'
+  | 'clientId'
+  | 'clientSecret'
+  | 'redirectUri'
+  | 'acsUrl'
+  | 'spEntityId'
+  | 'web3WalletName'
+  | 'domain';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -45,8 +60,24 @@ export type ProfileSectionId =
   | 'organizationDomains'
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
-  | 'paymentMethods';
-export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
+  | 'paymentMethods'
+  | 'sso'
+  | 'ssoStatus'
+  | 'enableSso'
+  | 'ssoDomain'
+  | 'ssoConfiguration'
+  | 'configureAgain'
+  | 'resetSso'
+  | 'testSsoUrl'
+  | 'testResults'
+  | 'accountCredits';
+export type ProfilePageId =
+  | 'account'
+  | 'security'
+  | 'organizationGeneral'
+  | 'organizationMembers'
+  | 'organizationSecurity'
+  | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =

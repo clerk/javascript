@@ -1,5 +1,11 @@
-import type { ClerkOptions } from '@clerk/backend';
+import type { ClerkClient, ClerkOptions } from '@clerk/backend';
 import type { ShouldProxyFn } from '@clerk/shared/proxy';
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    clerk: ClerkClient;
+  }
+}
 
 export const ALLOWED_HOOKS = ['onRequest', 'preHandler'] as const;
 

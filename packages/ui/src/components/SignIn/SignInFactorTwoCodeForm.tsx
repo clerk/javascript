@@ -14,6 +14,7 @@ import { localizationKeys, Text } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
@@ -84,6 +85,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'complete':
             if (isResettingPassword(res) && res.createdSessionId) {
@@ -128,6 +132,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={signIn.userData.imageUrl}
+      identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     >
       {isResettingPassword(signIn) && (

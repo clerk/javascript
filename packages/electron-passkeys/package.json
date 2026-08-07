@@ -1,0 +1,60 @@
+{
+  "name": "@clerk/electron-passkeys",
+  "version": "0.0.3",
+  "description": "Native passkey (WebAuthn) support for Clerk's Electron SDK",
+  "keywords": [
+    "clerk",
+    "electron",
+    "passkeys",
+    "webauthn",
+    "auth",
+    "authentication"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/electron-passkeys"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts --output-dir artifacts --npm-dir npm",
+    "build:debug": "napi build --platform --no-js --dts native.d.ts",
+    "build:native": "napi build --platform --release --no-js --dts native.d.ts",
+    "test": "node --test test/loader.test.cjs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0"
+  },
+  "optionalDependencies": {
+    "@clerk/electron-passkeys-darwin-arm64": "workspace:*",
+    "@clerk/electron-passkeys-darwin-x64": "workspace:*",
+    "@clerk/electron-passkeys-win32-arm64-msvc": "workspace:*",
+    "@clerk/electron-passkeys-win32-x64-msvc": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "napi": {
+    "binaryName": "electron-passkeys",
+    "targets": [
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc"
+    ]
+  }
+}

@@ -1,5 +1,10 @@
 import type { createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  ClerkRequest,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import type { ShouldProxyFn } from '@clerk/shared/proxy';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { Request as ExpressRequest } from 'express';
@@ -26,6 +31,10 @@ export interface FrontendApiProxyOptions {
    */
   path?: string;
 }
+
+export type ClerkMiddlewareOptionsCallback = (
+  req: ExpressRequest,
+) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
@@ -55,4 +64,6 @@ export type AuthenticateRequestParams = {
   clerkClient: ClerkClient;
   request: ExpressRequest;
   options?: ClerkMiddlewareOptions;
+  /** Prebuilt ClerkRequest, so callers that already converted the request can skip re-conversion. */
+  clerkRequest?: ClerkRequest;
 };

@@ -17,7 +17,7 @@ type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
  */
 export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue => {
   const contextOptions = useCheckoutContext();
-  const { for: forOrganization, planId, planPeriod } = options || contextOptions;
+  const { for: forOrganization, planId, planPeriod, seatsQuantity, priceId } = options || contextOptions;
   const organization = useOrganizationBase();
   const { isLoaded, user } = useUser();
   const clerk = useClerkInstanceContext();
@@ -33,8 +33,8 @@ export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue =>
   }
 
   const signal = useCallback(() => {
-    return clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization });
-  }, [user?.id, organization?.id, planId, planPeriod, forOrganization]);
+    return clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization, seatsQuantity, priceId });
+  }, [user?.id, organization?.id, planId, planPeriod, forOrganization, seatsQuantity, priceId]);
 
   const subscribe = useCallback(
     (callback: () => void) => {

@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import type { JwtPayload } from '@clerk/shared/types';
 
 import { constants } from '../constants';
@@ -338,7 +339,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // proceed with triggering handshake.
     const isRedirectLoop = handshakeService.checkAndTrackRedirectLoop(handshakeHeaders);
     if (isRedirectLoop) {
-      const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
+      const msg = getHandshakeRedirectLoopMessage(reason);
       console.log(msg);
       return signedOut({
         tokenType: TokenType.SessionToken,
@@ -349,6 +350,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     return handshake(authenticateContext, reason, message, handshakeHeaders);
+  }
+
+  function getHandshakeRedirectLoopMessage(reason: string): string {
+    if (reason === AuthErrorReason.SatelliteCookieNeedsSyncing) {
+      return `Clerk: Satellite-domain authentication resulted in an infinite redirect loop. Check that this request is using a configured primary or satellite domain for the production instance. For preview deployments, use a development/staging Clerk instance or a supported configured preview-domain setup.`;
+    }
+    return `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
   }
 
   /**
@@ -623,6 +631,17 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
+    // Machine JWTs pass verifyToken() but must not be accepted as session tokens (mirrors header path).
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (isMachineJwt(authenticateContext.sessionTokenInCookie!)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenIATBeforeClientUAT, '');
     }
@@ -635,7 +654,10 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
 
       if (!data.azp) {
-        console.warn(
+        // Warn once per process rather than per request: a single azp-less cookie
+        // token is reused across every authenticated request until it refreshes,
+        // so an unguarded console.warn floods production logs (see issue #8231).
+        logger.warnOnce(
           'Clerk: Session token from cookie is missing the azp claim. In a future version of Clerk, this token will be considered invalid. Please contact Clerk support if you see this warning.',
         );
       }

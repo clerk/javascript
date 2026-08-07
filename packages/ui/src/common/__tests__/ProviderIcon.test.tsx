@@ -56,7 +56,6 @@ describe('ProviderIcon', () => {
       );
 
       const icon = screen.getByLabelText('Apple icon');
-      const styles = window.getComputedStyle(icon);
 
       // Check that mask-image is applied (via inline styles)
       expect(icon).toHaveStyle({
@@ -94,6 +93,28 @@ describe('ProviderIcon', () => {
 
       const icon = screen.getByLabelText('OKX Wallet icon');
       expect(icon).toBeInTheDocument();
+    });
+
+    it('applies mask-image styles for supported providers (x)', async () => {
+      const { wrapper } = await createFixtures();
+
+      render(
+        <ProviderIcon
+          id='x'
+          iconUrl='https://example.com/x-icon.svg'
+          name='X / Twitter'
+        />,
+        { wrapper },
+      );
+
+      const icon = screen.getByLabelText('X / Twitter icon');
+      expect(icon).toBeInTheDocument();
+
+      // The mask-image path tints the icon with the foreground color so it stays
+      // visible in dark mode, instead of painting the raw (black) SVG as a background.
+      const styles = window.getComputedStyle(icon);
+      expect(styles.maskImage).toContain('https://example.com/x-icon.svg');
+      expect(styles.backgroundImage).not.toContain('https://example.com/x-icon.svg');
     });
 
     it('applies mask-image styles for supported providers (vercel)', async () => {
@@ -203,7 +224,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -220,7 +241,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );
@@ -239,7 +260,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -257,7 +278,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );

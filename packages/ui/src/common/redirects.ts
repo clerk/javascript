@@ -26,26 +26,6 @@ export function buildVerificationRedirectUrl({
   });
 }
 
-export function buildSSOCallbackURL(
-  ctx: Partial<SignInContextType | SignUpContextType>,
-  baseUrl: string | undefined = '',
-): string {
-  const { routing, authQueryString, path } = ctx;
-  // If the context contains an SSO callback URL, use it instead of building a new one, as it likely contains the
-  // combined flow path. However, if the routing is virtual, the callback URL from context will not have factored in
-  // baseUrl, so we fallback to buildRedirectUrl instead.
-  if (ctx.ssoCallbackUrl && ctx.isCombinedFlow && routing !== 'virtual') {
-    return ctx.ssoCallbackUrl;
-  }
-  return buildRedirectUrl({
-    routing,
-    baseUrl,
-    authQueryString,
-    path,
-    endpoint: SSO_CALLBACK_PATH_ROUTE,
-  });
-}
-
 type AuthQueryString = string | null | undefined;
 
 type BuildRedirectUrlParams = {

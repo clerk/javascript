@@ -161,7 +161,6 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     provider: 'enstall',
     strategy: 'oauth_enstall',
     name: 'Enstall',
-    docsUrl: 'https://clerk.com/docs/authentication/social-connections/enstall',
   },
   {
     provider: 'huggingface',

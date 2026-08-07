@@ -41,7 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     version: PACKAGE_VERSION,
     configKey: 'clerk',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '>=4.0.0',
     },
   },
   setup(options, nuxt) {
@@ -71,6 +71,8 @@ export default defineNuxtModule<ModuleOptions>({
           // prefetchUI config: can be false or undefined
           prefetchUI: options.prefetchUI,
           isSatellite: options.isSatellite,
+          // Listed explicitly so it can be overridden via NUXT_PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING.
+          unsafe_disableDevelopmentModeConsoleWarning: options.unsafe_disableDevelopmentModeConsoleWarning,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
@@ -132,10 +134,6 @@ export default defineNuxtModule<ModuleOptions>({
     // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
     addImports([
-      {
-        name: 'createRouteMatcher',
-        from: resolver.resolve('./runtime/client'),
-      },
       {
         name: 'updateClerkOptions',
         from: resolver.resolve('./runtime/client'),

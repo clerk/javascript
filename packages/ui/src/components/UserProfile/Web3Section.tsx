@@ -61,55 +61,61 @@ export const Web3Section = withCardStateProvider(
         >
           <ProfileSection.ItemList id='web3Wallets'>
             {sortIdentificationBasedOnVerification(user?.web3Wallets, user?.primaryWeb3WalletId).map(wallet => {
-              const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
+              const strategy = wallet.verification.strategy;
               const walletId = wallet.id;
+              const displayData = strategyToDisplayData[strategy as keyof typeof strategyToDisplayData] ?? null;
+              // We only display the Web3 wallet if it matches a known provider
+              // in displayData, or if it was added by an administrator using BAPI.
+              if (!displayData && strategy !== 'admin') {
+                return null;
+              }
               return (
-                strategyToDisplayData[strategy] && (
-                  <Fragment key={wallet.id}>
-                    <ProfileSection.Item
-                      key={walletId}
-                      id='web3Wallets'
-                      align='start'
-                    >
-                      <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
-                        {strategyToDisplayData[strategy].iconUrl && (
-                          <ProviderIcon
-                            id={strategyToDisplayData[strategy].id}
-                            iconUrl={strategyToDisplayData[strategy].iconUrl}
-                            name={strategyToDisplayData[strategy].name}
-                            alt={strategyToDisplayData[strategy].name}
-                          />
-                        )}
-                        <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                          <Flex
-                            gap={2}
-                            justify='start'
-                          >
-                            <Text>
-                              {strategyToDisplayData[strategy].name} ({shortenWeb3Address(wallet.web3Wallet)})
-                            </Text>
-                            {user?.primaryWeb3WalletId === walletId && (
-                              <Badge localizationKey={localizationKeys('badge__primary')} />
-                            )}
-                            {wallet.verification.status !== 'verified' && (
-                              <Badge localizationKey={localizationKeys('badge__unverified')} />
-                            )}
-                          </Flex>
-                        </Box>
-                      </Flex>
-                      <Web3WalletMenu
-                        walletId={walletId}
-                        isVerified={wallet.verification.status === 'verified'}
-                      />
-                    </ProfileSection.Item>
+                <Fragment key={wallet.id}>
+                  <ProfileSection.Item
+                    key={walletId}
+                    id='web3Wallets'
+                    align='start'
+                  >
+                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
+                      {displayData?.iconUrl && (
+                        <ProviderIcon
+                          id={displayData.id}
+                          iconUrl={displayData.iconUrl}
+                          name={displayData.name}
+                          alt={displayData.name}
+                        />
+                      )}
+                      <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                        <Flex
+                          gap={2}
+                          justify='start'
+                        >
+                          <Text>
+                            {displayData
+                              ? `${displayData.name} (${shortenWeb3Address(wallet.web3Wallet)})`
+                              : shortenWeb3Address(wallet.web3Wallet)}
+                          </Text>
+                          {user?.primaryWeb3WalletId === walletId && (
+                            <Badge localizationKey={localizationKeys('badge__primary')} />
+                          )}
+                          {wallet.verification.status !== 'verified' && (
+                            <Badge localizationKey={localizationKeys('badge__unverified')} />
+                          )}
+                        </Flex>
+                      </Box>
+                    </Flex>
+                    <Web3WalletMenu
+                      walletId={walletId}
+                      isVerified={wallet.verification.status === 'verified'}
+                    />
+                  </ProfileSection.Item>
 
-                    <Action.Open value={`remove-${walletId}`}>
-                      <Action.Card variant='destructive'>
-                        <RemoveWeb3WalletScreen walletId={wallet.id} />
-                      </Action.Card>
-                    </Action.Open>
-                  </Fragment>
-                )
+                  <Action.Open value={`remove-${walletId}`}>
+                    <Action.Card variant='destructive'>
+                      <RemoveWeb3WalletScreen walletId={wallet.id} />
+                    </Action.Card>
+                  </Action.Open>
+                </Fragment>
               );
             })}
           </ProfileSection.ItemList>

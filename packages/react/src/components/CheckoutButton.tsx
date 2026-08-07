@@ -50,6 +50,8 @@ export const CheckoutButton = withClerk(
     const {
       planId,
       planPeriod,
+      seatsQuantity,
+      priceId,
       for: _for,
       onSubscriptionComplete,
       newSubscriptionRedirectUrl,
@@ -84,6 +86,8 @@ export const CheckoutButton = withClerk(
       return clerk.__internal_openCheckout({
         planId,
         planPeriod,
+        seatsQuantity,
+        priceId,
         for: _for,
         onSubscriptionComplete,
         newSubscriptionRedirectUrl,

@@ -40,7 +40,7 @@ export class APIKeys implements APIKeysNamespace {
   }
 
   /**
-   * Retrieves a paginated list of API keys.
+   * Gets a paginated list of API keys.
    *
    * The subject (owner) is resolved in the following order:
    * 1. Explicit `subject` param (user or organization ID)

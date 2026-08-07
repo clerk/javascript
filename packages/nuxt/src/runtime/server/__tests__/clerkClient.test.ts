@@ -18,7 +18,6 @@ vi.mock('@clerk/backend', () => {
 
 import { createClerkClient } from '@clerk/backend';
 
-// @ts-expect-error: Nitro import. Handled by Nuxt.
 import { useRuntimeConfig } from '#imports';
 
 import { clerkClient } from '../clerkClient';

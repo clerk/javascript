@@ -208,12 +208,16 @@ export class StateProxy implements State {
         get canBeDiscarded() {
           return gateProperty(target, 'canBeDiscarded', false);
         },
+        get protectCheck() {
+          return gateProperty(target, 'protectCheck', null);
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
         sso: this.gateMethod(target, 'sso'),
         finalize: this.gateMethod(target, 'finalize'),
         reset: this.gateMethod(target, 'reset'),
+        submitProtectCheck: this.gateMethod(target, 'submitProtectCheck'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
         emailLink: this.wrapStruct(
@@ -320,6 +324,9 @@ export class StateProxy implements State {
         get canBeDiscarded() {
           return gateProperty(target, 'canBeDiscarded', false);
         },
+        get protectCheck() {
+          return gateProperty(target, 'protectCheck', null);
+        },
 
         create: gateMethod(target, 'create'),
         update: gateMethod(target, 'update'),
@@ -329,6 +336,7 @@ export class StateProxy implements State {
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
         reset: gateMethod(target, 'reset'),
+        submitProtectCheck: gateMethod(target, 'submitProtectCheck'),
 
         verifications: this.wrapStruct(
           () => target().verifications,

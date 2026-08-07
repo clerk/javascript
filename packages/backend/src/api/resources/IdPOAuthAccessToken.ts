@@ -19,8 +19,11 @@ export class IdPOAuthAccessToken {
     readonly revoked: boolean,
     readonly revocationReason: string | null,
     readonly expired: boolean,
+    /** The Unix timestamp (in milliseconds) when the access token expires. */
     readonly expiration: number | null,
+    /** The Unix timestamp (in milliseconds) when the access token was created. */
     readonly createdAt: number,
+    /** The Unix timestamp (in milliseconds) when the access token was last updated. */
     readonly updatedAt: number,
   ) {}
 
@@ -57,9 +60,9 @@ export class IdPOAuthAccessToken {
       false,
       null,
       payload.exp * 1000 <= Date.now() - clockSkewInMs,
-      payload.exp,
-      payload.iat,
-      payload.iat,
+      payload.exp * 1000, // milliseconds: expiration, converted from JWT exp claim
+      payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
+      payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
     );
   }
 }

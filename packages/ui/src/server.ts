@@ -1,8 +1,7 @@
+import { ClerkUI } from './entry';
 import type { Ui } from './internal';
 import { UI_BRAND } from './internal';
 import type { Appearance } from './internal/appearance';
-
-import { ClerkUI } from './entry';
 
 declare const PACKAGE_VERSION: string;
 

@@ -5,6 +5,7 @@ import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
+import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
 import { LastAuthenticationStrategyBadge } from './Badge';
@@ -180,10 +181,11 @@ const LastAuthenticationStrategyBadgeWithFormState = (
   );
 };
 
-const PlainInput = (props: CommonInputProps) => {
+const PlainInput = (props: CommonInputProps & { elementDescriptor?: ElementDescriptor }) => {
+  const { elementDescriptor, ...rest } = props;
   return (
-    <CommonInputWrapper {...props}>
-      <Field.Input />
+    <CommonInputWrapper {...rest}>
+      <Field.Input elementDescriptor={elementDescriptor} />
     </CommonInputWrapper>
   );
 };

@@ -1,5 +1,23 @@
 # @clerk/upgrade
 
+## 2.0.5
+
+### Patch Changes
+
+- Rename "Client Trust" to "Device Trust" in documentation strings and links. This is a naming change only — the `needs_client_trust` sign-in status, the `clientTrustState` property, and every other API value keep their existing names, so no integration changes are required. ([#9266](https://github.com/clerk/javascript/pull/9266)) by [@mwickett](https://github.com/mwickett)
+
+## 2.0.4
+
+### Patch Changes
+
+- Drop unused runtime dependencies ([#8753](https://github.com/clerk/javascript/pull/8753)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 2.0.3
+
+### Patch Changes
+
+- Removed unused generate-changelog script ([#8686](https://github.com/clerk/javascript/pull/8686)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 2.0.2
 
 ### Patch Changes

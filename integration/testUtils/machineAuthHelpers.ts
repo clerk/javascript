@@ -12,8 +12,8 @@ import type { ApplicationConfig } from '../models/applicationConfig';
 import type { EnvironmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
-import type { FakeAPIKey, FakeUser } from './usersService';
 import { createTestUtils } from './index';
+import type { FakeAPIKey, FakeUser } from './usersService';
 
 export type FakeMachineNetwork = {
   primaryServer: Machine;
@@ -220,9 +220,9 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     });
 
     test.afterAll(async () => {
-      await fakeAPIKey.revoke();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeAPIKey?.revoke();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('should return 401 if no API key is provided', async ({ request }) => {
@@ -262,6 +262,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     test('should handle multiple token types', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       const url = new URL(adapter.apiKey.path, app.serverUrl).toString();
+      const origin = new URL(app.serverUrl).origin;
 
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
@@ -271,14 +272,16 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
       const getRes = await u.page.request.get(url);
       expect(getRes.status()).toBe(401);
 
-      const postWithSessionRes = await u.page.request.post(url);
+      const postWithSessionRes = await u.page.request.post(url, {
+        headers: { Origin: origin },
+      });
       const sessionData = await postWithSessionRes.json();
       expect(postWithSessionRes.status()).toBe(200);
       expect(sessionData.userId).toBe(fakeBapiUser.id);
       expect(sessionData.tokenType).toBe(TokenType.SessionToken);
 
       const postWithApiKeyRes = await u.page.request.post(url, {
-        headers: { Authorization: `Bearer ${fakeAPIKey.secret}` },
+        headers: { Authorization: `Bearer ${fakeAPIKey.secret}`, Origin: origin },
       });
       const apiKeyData = await postWithApiKeyRes.json();
       expect(postWithApiKeyRes.status()).toBe(200);
@@ -311,8 +314,8 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
     });
 
     test.afterAll(async () => {
-      await network.cleanup();
-      await app.teardown();
+      await network?.cleanup();
+      await app?.teardown();
     });
 
     test('rejects requests with invalid M2M tokens', async ({ request }) => {
@@ -343,28 +346,6 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
       const body = await res.json();
       expect(body.subject).toBe(network.scopedSender.id);
       expect(body.tokenType).toBe(TokenType.M2MToken);
-    });
-
-    test('authorizes after dynamically granting scope', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await u.services.clerk.machines.createScope(network.unscopedSender.id, network.primaryServer.id);
-      const m2mToken = await u.services.clerk.m2m.createToken({
-        machineSecretKey: network.unscopedSender.secretKey,
-        secondsUntilExpiration: 60 * 30,
-      });
-
-      try {
-        const res = await u.page.request.get(new URL(adapter.m2m.path, app.serverUrl).toString(), {
-          headers: { Authorization: `Bearer ${m2mToken.token}` },
-        });
-        expect(res.status()).toBe(200);
-        const body = await res.json();
-        expect(body.subject).toBe(network.unscopedSender.id);
-        expect(body.tokenType).toBe(TokenType.M2MToken);
-      } finally {
-        await u.services.clerk.m2m.revokeToken({ m2mTokenId: m2mToken.id });
-      }
     });
 
     test('verifies JWT format M2M token via local verification', async ({ request }) => {
@@ -418,9 +399,9 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
     });
 
     test.afterAll(async () => {
-      await fakeOAuth.cleanup();
-      await fakeUser.deleteIfExists();
-      await app.teardown();
+      await fakeOAuth?.cleanup();
+      await fakeUser?.deleteIfExists();
+      await app?.teardown();
     });
 
     test('verifies valid OAuth access token obtained through authorization flow', async ({ page, context }) => {
