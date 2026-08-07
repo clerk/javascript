@@ -553,7 +553,7 @@ const OwnershipUpgradeNotice = ({
 
   return (
     <Flex
-      justify='end'
+      justify='start'
       sx={t => ({
         paddingInline: t.space.$4,
         paddingBottom: t.space.$4,
