@@ -87,8 +87,24 @@ const LogOut = glyph(
   />,
 );
 
+const AlertCircle = glyph(
+  <>
+    <circle
+      cx='8'
+      cy='8'
+      r='5.25'
+      {...strokeProps}
+    />
+    <path
+      d='M8 5.25V8.5M8 10.75H8.008'
+      {...strokeProps}
+    />
+  </>,
+);
+
 /** Runtime name → glyph map. `Icon`'s `name` prop is typed from these keys. */
 export const iconRegistry = {
+  'alert-circle': AlertCircle,
   'chevron-right': ChevronRight,
   'chevron-left': ChevronLeft,
   'chevron-down': ChevronDown,

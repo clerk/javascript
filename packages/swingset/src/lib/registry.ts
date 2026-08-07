@@ -25,6 +25,7 @@ import { Default as DestructiveDefault, meta as destructiveMeta } from '../stori
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
+import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Colors as HeadingColors,
@@ -200,6 +201,11 @@ const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: Tab
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
+const fieldModule: StoryModule = {
+  meta: fieldMeta,
+  Default: FieldDefault,
+};
+
 const iconModule: StoryModule = {
   meta: iconMeta,
   Default: IconDefault,
@@ -262,6 +268,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   tabsComponentModule,
   textModule,
+  fieldModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,
