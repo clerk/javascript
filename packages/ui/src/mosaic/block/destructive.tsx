@@ -90,9 +90,7 @@ export function Destructive({
                 value={confirmValue}
                 onChange={e => setConfirmValue(e.target.value)}
                 disabled={isDeleting}
-                sx={t => ({
-                  marginBlockStart: t.spacing(1),
-                })}
+                style={{ marginBlockStart: 'var(--cl-spacing)' }}
               />
             </Box>
             <Box

@@ -117,7 +117,7 @@ Two ways to style a part — both hit the same class + attributes:
 />
 ```
 
-Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
+Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
 
 State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 

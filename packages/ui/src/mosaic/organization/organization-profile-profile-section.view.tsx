@@ -120,7 +120,7 @@ export function OrganizationProfileProfileSectionView({
                 value={nameValue}
                 onChange={e => send({ type: 'TYPE_NAME', value: e.target.value })}
                 disabled={isSaving}
-                sx={t => ({ marginBlockStart: t.spacing(1) })}
+                style={{ marginBlockStart: 'var(--cl-spacing)' }}
               />
             </Box>
             {slugEnabled && (
@@ -138,7 +138,7 @@ export function OrganizationProfileProfileSectionView({
                   value={slugValue}
                   onChange={e => send({ type: 'TYPE_SLUG', value: e.target.value })}
                   disabled={isSaving}
-                  sx={t => ({ marginBlockStart: t.spacing(1) })}
+                  style={{ marginBlockStart: 'var(--cl-spacing)' }}
                 />
               </Box>
             )}

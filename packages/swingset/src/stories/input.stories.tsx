@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import type { InputProps } from '@clerk/ui/mosaic/components/input';
-import { Input, inputRecipe } from '@clerk/ui/mosaic/components/input';
+import { Input } from '@clerk/ui/mosaic/components/input';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,8 +10,16 @@ export { default as __source } from './input.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Input',
-  source: 'packages/ui/src/mosaic/components/input.tsx',
-  styles: inputRecipe,
+  source: 'packages/ui/src/mosaic/components/input/input.tsx',
+  styleEngine: 'stylex',
+  styles: {
+    _variants: {
+      size: { sm: {}, md: {}, lg: {} },
+    },
+    _defaultVariants: {
+      size: 'md',
+    },
+  },
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
@@ -40,6 +47,11 @@ export function Sizes(props: Record<string, unknown>) {
         {...knobsAsProps(props)}
         size='md'
         placeholder='Medium'
+      />
+      <Input
+        {...knobsAsProps(props)}
+        size='lg'
+        placeholder='Large'
       />
     </div>
   );

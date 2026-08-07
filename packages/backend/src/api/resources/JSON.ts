@@ -1029,14 +1029,27 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   avatar_url: string | null;
 }
 
-type BillingSubscriptionItemStatus =
+/**
+ * The possible lifecycle states of a Backend `BillingSubscriptionItem`.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type BillingSubscriptionItemStatus =
+  /** The Subscription Item is in the abandoned state. */
   | 'abandoned'
+  /** The Subscription Item is active. */
   | 'active'
+  /** The Subscription Item is canceled. */
   | 'canceled'
+  /** The Subscription Item has ended. */
   | 'ended'
+  /** The Subscription Item has expired. */
   | 'expired'
+  /** The Subscription Item is incomplete. */
   | 'incomplete'
+  /** The Subscription Item has a past-due payment. */
   | 'past_due'
+  /** The Subscription Item is upcoming. */
   | 'upcoming';
 
 /**

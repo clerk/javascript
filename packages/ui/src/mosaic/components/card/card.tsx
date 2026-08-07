@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { TextContext } from '../text';
 import { elevations, headerAlignments, styles } from './card.styles';
 
@@ -37,7 +38,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     props: {
       ...mergeStyleProps(
         themeProps('card-root', { alignment, elevation }),
-        stylex.props(styles.root, elevations[elevation]),
+        stylex.props(reset.base, styles.root, elevations[elevation]),
         className,
         style,
       ),
@@ -60,7 +61,7 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     props: {
       ...mergeStyleProps(
         themeProps('card-header', { alignment }),
-        stylex.props(styles.header, headerAlignments[alignment]),
+        stylex.props(reset.base, styles.header, headerAlignments[alignment]),
         className,
         style,
       ),
@@ -80,7 +81,7 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-content'), stylex.props(styles.content), className, style),
+      ...mergeStyleProps(themeProps('card-content'), stylex.props(reset.base, styles.content), className, style),
       ...rest,
     },
   });
@@ -96,7 +97,12 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-footer', { elevation }), stylex.props(styles.footer), className, style),
+      ...mergeStyleProps(
+        themeProps('card-footer', { elevation }),
+        stylex.props(reset.base, styles.footer),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
