@@ -15,6 +15,8 @@ import {
   DUMMY_CLERK_CLIENT_RESOURCE,
   DUMMY_CLERK_ENVIRONMENT_RESOURCE,
   EnvironmentResourceCache,
+  isDummyClient,
+  isDummyEnvironment,
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
@@ -239,15 +241,12 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
             // Persisting a dummy would make the next boot see a populated cache and skip recovery.
-            if (environment) {
-              const environmentSnapshot = environment.__internal_toSnapshot();
-              if (environmentSnapshot.display_config?.id !== DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id) {
-                void EnvironmentResourceCache.save(environmentSnapshot);
-              }
+            if (environment && !isDummyEnvironment(environment)) {
+              void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
 
             if (client) {
-              if (client.id !== DUMMY_CLERK_CLIENT_RESOURCE.id) {
+              if (!isDummyClient(client)) {
                 void ClientResourceCache.save(client.__internal_toSnapshot());
               }
               if (client.lastActiveSessionId) {
@@ -269,11 +268,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             const cachedEnvironment = await EnvironmentResourceCache.load();
             const cachedClient = await ClientResourceCache.load();
             // Installs that persisted a dummy before the save guard existed must still recover.
-            const environment =
-              cachedEnvironment?.display_config?.id === DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id
-                ? null
-                : cachedEnvironment;
-            const client = cachedClient?.id === DUMMY_CLERK_CLIENT_RESOURCE.id ? null : cachedClient;
+            const environment = isDummyEnvironment(cachedEnvironment) ? null : cachedEnvironment;
+            const client = isDummyClient(cachedClient) ? null : cachedClient;
             if (!environment || !client) {
               scheduleResourceRetry(3000);
             }

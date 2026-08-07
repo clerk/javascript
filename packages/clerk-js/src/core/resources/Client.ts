@@ -12,6 +12,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
+import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
@@ -145,7 +146,14 @@ export class Client extends BaseResource implements ClientResource {
       const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
       this.sessions = (data.sessions || []).map(s => {
         const session = new Session(s);
-        session.__internal_keepFreshestLastActiveToken(previousTokens.get(session.id));
+        const previousToken = previousTokens.get(session.id);
+        if (
+          previousToken &&
+          session.lastActiveToken &&
+          shouldKeepExistingLastActiveToken(previousToken, session.lastActiveToken)
+        ) {
+          session.lastActiveToken = previousToken;
+        }
         return session;
       });
 

@@ -45,11 +45,28 @@ const createUnavailableResourceCache = () => ({
   set: () => Promise.resolve(),
 });
 
-const createEnvironmentOnlyResourceCache = (environment: unknown) => () => ({
-  get: (key: string) =>
-    Promise.resolve(key.startsWith('__clerk_cache_environment') ? JSON.stringify(environment) : null),
-  set: () => Promise.resolve(),
-});
+const createResourceCacheStub =
+  ({
+    environment,
+    client,
+    set = () => Promise.resolve(),
+  }: {
+    environment?: unknown;
+    client?: unknown;
+    set?: (key: string, value: string) => Promise<void>;
+  }) =>
+  () => ({
+    get: (key: string) => {
+      if (environment && key.startsWith('__clerk_cache_environment')) {
+        return Promise.resolve(JSON.stringify(environment));
+      }
+      if (client && key.startsWith('__clerk_cache_client')) {
+        return Promise.resolve(JSON.stringify(client));
+      }
+      return Promise.resolve(null);
+    },
+    set,
+  });
 
 const loadCreateClerkInstance = async () => {
   const mod = await import('../createClerkInstance');
@@ -503,7 +520,7 @@ describe('createClerkInstance', () => {
       const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
       const clerk = getClerkInstance({
         publishableKey: 'pk_test_123',
-        __experimental_resourceCache: createEnvironmentOnlyResourceCache(cachedEnvironment),
+        __experimental_resourceCache: createResourceCacheStub({ environment: cachedEnvironment }),
       }) as unknown as MockClerk;
 
       const resources = await clerk.__internal_getCachedResources?.();
@@ -529,17 +546,9 @@ describe('createClerkInstance', () => {
       const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
       const clerk = getClerkInstance({
         publishableKey: 'pk_test_123',
-        __experimental_resourceCache: () => ({
-          get: (key: string) => {
-            if (key.startsWith('__clerk_cache_environment')) {
-              return Promise.resolve(JSON.stringify(cachedEnvironment));
-            }
-            if (key.startsWith('__clerk_cache_client')) {
-              return Promise.resolve(JSON.stringify(DUMMY_CLERK_CLIENT_RESOURCE));
-            }
-            return Promise.resolve(null);
-          },
-          set: () => Promise.resolve(),
+        __experimental_resourceCache: createResourceCacheStub({
+          environment: cachedEnvironment,
+          client: DUMMY_CLERK_CLIENT_RESOURCE,
         }),
       }) as unknown as MockClerk;
 
@@ -559,10 +568,7 @@ describe('createClerkInstance', () => {
       const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
       const clerk = getClerkInstance({
         publishableKey: 'pk_test_123',
-        __experimental_resourceCache: () => ({
-          get: () => Promise.resolve(null),
-          set,
-        }),
+        __experimental_resourceCache: createResourceCacheStub({ set }),
       }) as unknown as MockClerk;
 
       const listener = clerk.addListener.mock.calls[0]?.[0] as (payload: { client: unknown }) => void;
@@ -591,13 +597,11 @@ describe('createClerkInstance', () => {
       const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
       const clerk = getClerkInstance({
         publishableKey: 'pk_test_123',
-        __experimental_resourceCache: () => ({
-          get: () => Promise.resolve(null),
-          set,
-        }),
+        __experimental_resourceCache: createResourceCacheStub({ set }),
       }) as unknown as MockClerk;
 
       (clerk as unknown as { __internal_environment: unknown }).__internal_environment = {
+        displayConfig: { id: DUMMY_CLERK_ENVIRONMENT_RESOURCE.display_config.id },
         __internal_toSnapshot: () => ({
           object: 'environment',
           id: '',
@@ -610,6 +614,7 @@ describe('createClerkInstance', () => {
       expect(set).not.toHaveBeenCalledWith(expect.stringContaining('__clerk_cache_environment'), expect.any(String));
 
       (clerk as unknown as { __internal_environment: unknown }).__internal_environment = {
+        displayConfig: { id: 'display_config_real' },
         __internal_toSnapshot: () => ({
           object: 'environment',
           id: 'env_real',
@@ -634,17 +639,9 @@ describe('createClerkInstance', () => {
       const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
       const clerk = getClerkInstance({
         publishableKey: 'pk_test_123',
-        __experimental_resourceCache: () => ({
-          get: (key: string) => {
-            if (key.startsWith('__clerk_cache_environment')) {
-              return Promise.resolve(JSON.stringify(dummyEnvironmentSnapshot));
-            }
-            if (key.startsWith('__clerk_cache_client')) {
-              return Promise.resolve(JSON.stringify(cachedClient));
-            }
-            return Promise.resolve(null);
-          },
-          set: () => Promise.resolve(),
+        __experimental_resourceCache: createResourceCacheStub({
+          environment: dummyEnvironmentSnapshot,
+          client: cachedClient,
         }),
       }) as unknown as MockClerk;
 

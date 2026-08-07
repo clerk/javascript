@@ -2495,69 +2495,30 @@ describe('Session', () => {
         expect(session.lastActiveToken).toBeNull();
       });
 
-      it('constructor hydration adopts the token in the payload', () => {
+      it('a stale piggybacked client payload does not regress the rebuilt session token', () => {
         const high = createJwtWithOiat(NOW, NOW + 30);
         const low = createJwtWithOiat(NOW, NOW);
+        const higher = createJwtWithOiat(NOW, NOW + 60);
 
-        expect(
-          makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>).lastActiveToken?.getRawString(),
-        ).toBe(high);
-        expect(
-          makeSession({ last_active_token: tokenJSON(low) } as Partial<SessionJSON>).lastActiveToken?.getRawString(),
-        ).toBe(low);
-      });
-
-      it('a stale piggybacked client does not regress the active session token', async () => {
-        // Exercises the real path: fapi response -> _updateClient -> Client.fromJSON rebuild.
-        fetchSpy.mockRestore();
-
-        const high = createJwtWithOiat(NOW, NOW + 30);
-        const low = createJwtWithOiat(NOW, NOW);
-
-        const sessionJSON = (jwt: string) =>
-          ({
-            status: 'active',
-            id: 'session_1',
-            object: 'session',
-            user: createUser({}),
-            last_active_organization_id: null,
-            actor: null,
-            created_at: Date.now(),
-            updated_at: Date.now(),
-            last_active_token: tokenJSON(jwt),
-          }) as unknown as SessionJSON;
-
-        const clientJSON = (jwt: string) =>
+        const clientJSON = (lastActiveToken: ReturnType<typeof tokenJSON> | null) =>
           ({
             object: 'client',
             id: 'client_1',
             last_active_session_id: 'session_1',
-            sessions: [sessionJSON(jwt)],
+            sessions: [touchResponse(lastActiveToken).response],
           }) as any;
 
-        const client = Client.getOrCreateInstance().fromJSON(clientJSON(high));
-        const clerk: any = {
-          __internal_environment: { authConfig: { sessionMinter: true } },
-          client,
-          session: client.sessions[0],
-          getFapiClient: () => ({
-            request: vi.fn().mockResolvedValue({
-              status: 200,
-              payload: { response: sessionJSON(low), client: clientJSON(low) },
-            }),
-          }),
-        };
-        clerk.updateClient = (newClient: any) => {
-          clerk.client = newClient;
-          clerk.session = newClient.sessions.find((s: Session) => s.id === newClient.lastActiveSessionId);
-        };
-        BaseResource.clerk = clerk;
+        const client = Client.getOrCreateInstance().fromJSON(clientJSON(tokenJSON(high)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
 
-        expect(clerk.session.lastActiveToken?.getRawString()).toBe(high);
+        client.fromJSON(clientJSON(tokenJSON(low)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
 
-        await clerk.session.touch();
+        client.fromJSON(clientJSON(tokenJSON(higher)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(higher);
 
-        expect(clerk.session.lastActiveToken?.getRawString()).toBe(high);
+        client.fromJSON(clientJSON(null));
+        expect(client.sessions[0]?.lastActiveToken).toBeNull();
       });
     });
   });

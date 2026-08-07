@@ -259,7 +259,6 @@ function isForeignSessionlessClient(previousSnapshot: ClientStateSnapshot, refre
 async function refreshJsClientFromNativeState({
   clerkInstance,
   nativeDeviceToken,
-  nativeRefreshFromJsControllerRef,
   previousDeviceToken,
   rejectForeignSessionlessClient = false,
   reloadInitialResources,
@@ -270,7 +269,6 @@ async function refreshJsClientFromNativeState({
 }: {
   clerkInstance: SyncableClerkInstance;
   nativeDeviceToken: string | null;
-  nativeRefreshFromJsControllerRef?: MutableRefObject<NativeRefreshFromJsController | null>;
   previousDeviceToken?: string | null;
   rejectForeignSessionlessClient?: boolean;
   reloadInitialResources: boolean;
@@ -278,7 +276,7 @@ async function refreshJsClientFromNativeState({
   suppressDeviceTokenRollbackNotification?: boolean;
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
-}): Promise<boolean> {
+}): Promise<false | 'refreshed' | 'restored'> {
   const previousClientSnapshot = snapshotClientState(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
@@ -288,16 +286,13 @@ async function refreshJsClientFromNativeState({
 
     // On the 401 path a rollback is part of recovery, not an external rotation, so it must not
     // reopen the cooldown. The native-event path still notifies so native resyncs the restored token.
-    if (suppressDeviceTokenRollbackNotification) {
-      await syncNativeDeviceTokenToCache({
-        deviceToken: previousDeviceToken,
-        suppressTokenCacheNotificationsRef,
-        tokenCache,
-      });
-      return;
-    }
-
-    await syncDeviceTokenToCache(tokenCache, previousDeviceToken);
+    await syncNativeDeviceTokenToCache({
+      deviceToken: previousDeviceToken,
+      suppressTokenCacheNotificationsRef: suppressDeviceTokenRollbackNotification
+        ? suppressTokenCacheNotificationsRef
+        : undefined,
+      tokenCache,
+    });
   };
 
   let refreshedClient: ClientResource | null;
@@ -319,11 +314,6 @@ async function refreshJsClientFromNativeState({
   if (refreshedClient) {
     if (rejectForeignSessionlessClient && isForeignSessionlessClient(previousClientSnapshot, refreshedClient)) {
       await restorePreviousDeviceToken();
-      // The suppressed rollback write skips the listener that resyncs native, and JS keeps the
-      // restored client here, so native must be told about the restored token directly.
-      if (suppressDeviceTokenRollbackNotification && shouldSyncDeviceToken && previousDeviceToken !== undefined) {
-        nativeRefreshFromJsControllerRef?.current?.syncDeviceTokenToNative(previousDeviceToken);
-      }
       const restoredClient = previousClientSnapshot.restore?.();
       if (restoredClient) {
         clerkInstance.updateClient?.(restoredClient);
@@ -331,14 +321,14 @@ async function refreshJsClientFromNativeState({
           clerkInstance,
         });
       }
-      return true;
+      return 'restored';
     }
 
     clerkInstance.updateClient?.(refreshedClient);
     await reconcileJsActiveSessionFromClient({
       clerkInstance,
     });
-    return true;
+    return 'refreshed';
   }
 
   if (reloadInitialResources && typeof clerkInstance.__internal_reloadInitialResources === 'function') {
@@ -346,7 +336,7 @@ async function refreshJsClientFromNativeState({
     await reconcileJsActiveSessionFromClient({
       clerkInstance,
     });
-    return Boolean(getDefaultSignedInSession(clerkInstance.client));
+    return getDefaultSignedInSession(clerkInstance.client) ? 'refreshed' : false;
   }
 
   return false;
@@ -828,10 +818,9 @@ export function NativeClientSync({
               // Native may have already moved the server-side client to a new
               // active session. Refresh JS before allowing Clerk JS' stale-session
               // 401 path to collapse the whole client to signed out.
-              const didRecover = await refreshJsClientFromNativeState({
+              const result = await refreshJsClientFromNativeState({
                 clerkInstance,
                 nativeDeviceToken,
-                nativeRefreshFromJsControllerRef,
                 previousDeviceToken,
                 rejectForeignSessionlessClient: true,
                 reloadInitialResources: false,
@@ -839,7 +828,12 @@ export function NativeClientSync({
                 suppressTokenCacheNotificationsRef,
                 tokenCache,
               });
-              if (didRecover) {
+              // The suppressed rollback write skips the listener that resyncs native, so the
+              // restored token must be pushed to native from here.
+              if (result === 'restored' && previousDeviceToken !== undefined) {
+                nativeRefreshFromJsControllerRef.current?.syncDeviceTokenToNative(previousDeviceToken);
+              }
+              if (result) {
                 return;
               }
             } catch (error) {

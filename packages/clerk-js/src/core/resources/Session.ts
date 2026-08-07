@@ -51,29 +51,12 @@ import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../e
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenFreshness';
+import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 const focusedRefresh = (onRefresh: () => void): { onRefresh?: () => void } =>
   isTabFocused() === false ? {} : { onRefresh };
-
-// Mirrors the cookie guard: only a same session+org lastActiveToken is a comparable
-// freshness baseline, so a session or org switch always adopts the incoming token.
-// Without this, an org-switch token minted by a stale edge (lower oiat) would lose
-// to the previous org's token and pin lastActiveToken to the old org's claims.
-function shouldKeepExistingLastActiveToken(current: TokenResource | null | undefined, incoming: TokenResource) {
-  if (!current?.jwt) {
-    return false;
-  }
-  if (
-    tokenSid(current) !== tokenSid(incoming) ||
-    normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
-  ) {
-    return false;
-  }
-  return pickFreshestJwt(current, incoming) !== incoming;
-}
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -428,7 +411,6 @@ export class Session extends BaseResource implements SessionResource {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
 
-    // Responses are applied in place on a live session, so a piggybacked token can be staler than the one held.
     const incomingLastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
     if (!incomingLastActiveToken || !shouldKeepExistingLastActiveToken(this.lastActiveToken, incomingLastActiveToken)) {
       this.lastActiveToken = incomingLastActiveToken;
@@ -552,21 +534,6 @@ export class Session extends BaseResource implements SessionResource {
     if (token.jwt && !shouldKeepExistingLastActiveToken(this.lastActiveToken, token)) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
-    }
-  }
-
-  /**
-   * Carries a token forward from the Session instance this one replaces. A client payload rebuilds
-   * every session object, so without this a stale piggybacked token becomes the next mint seed.
-   *
-   * @internal
-   */
-  public __internal_keepFreshestLastActiveToken(previous: TokenResource | null | undefined): void {
-    if (!previous || !this.lastActiveToken) {
-      return;
-    }
-    if (shouldKeepExistingLastActiveToken(previous, this.lastActiveToken)) {
-      this.lastActiveToken = previous;
     }
   }
 
