@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.27.1
+
+### Patch Changes
+
+- Clarify that `ClientResource.cookieExpiresAt` is nullable, can change when Clerk refreshes the client cookie, and reflects the cookie Device Trust uses to recognize a browser. ([#9350](https://github.com/clerk/javascript/pull/9350)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
 ## 4.27.0
 
 ### Minor Changes
