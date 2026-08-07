@@ -14,6 +14,9 @@ type SavedCredential = {
   publicKey: string;
 };
 
+// Any valid base32 secret works — no test ever generates a code from it.
+const TOTP_SECRET = 'JBSWY3DPEHPK3PXP';
+
 // clerk-js gates WebAuthn behind isValidBrowser(), which bails when
 // navigator.webdriver is true, so mask it before installing the virtual authenticator.
 const installVirtualAuthenticator = async (context: BrowserContext) => {
@@ -120,18 +123,14 @@ test.describe('passkeys as a second factor @generic', () => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
+  let userId: string;
   let savedCredential: SavedCredential;
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({ fictionalEmail: true, withPassword: true, withPhoneNumber: true });
+    fakeUser = u.services.users.createFakeUser({ fictionalEmail: true, withPassword: true });
     const user = await u.services.users.createBapiUser(fakeUser);
-    // A passkey on its own never creates a 2FA requirement, so reserve the phone
-    // number for MFA to park the sign-in at needs_second_factor.
-    await u.services.clerk.phoneNumbers.updatePhoneNumber(user.phoneNumbers[0].id, {
-      verified: true,
-      reservedForSecondFactor: true,
-    });
+    userId = user.id;
   });
 
   test.afterAll(async () => {
@@ -150,12 +149,12 @@ test.describe('passkeys as a second factor @generic', () => {
     return u;
   };
 
-  test('registers a passkey for a user with two-factor enabled', async ({ page, context }) => {
+  test('registers a passkey, then enrolls the user in two-factor', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = await signInToSecondFactor(page, context);
-
-    await u.po.signIn.enterTestOtpCode();
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email!, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
     await u.po.userProfile.goTo();
@@ -167,6 +166,11 @@ test.describe('passkeys as a second factor @generic', () => {
     const credentials = await context.credentials.get();
     expect(credentials).toHaveLength(1);
     savedCredential = credentials[0];
+
+    // A passkey on its own never creates a 2FA requirement, so enroll TOTP to park
+    // later sign-ins at needs_second_factor. It has to happen after the passkey is
+    // registered, since the remaining tests never enter a TOTP code.
+    await u.services.clerk.users.updateUser(userId, { totpSecret: TOTP_SECRET });
   });
 
   test('offers the passkey as the starting second factor', async ({ page, context }) => {
@@ -174,7 +178,7 @@ test.describe('passkeys as a second factor @generic', () => {
 
     const u = await signInToSecondFactor(page, context);
 
-    // Passkey outranks the enrolled phone code once the backend advertises it.
+    // Passkey outranks the enrolled authenticator app once the backend advertises it.
     await expect(u.page.getByText('Use your passkey')).toBeVisible();
     // Seed only now: the start page's conditional-UI autofill would otherwise
     // answer with this credential and verify it as the first factor instead.
@@ -193,7 +197,7 @@ test.describe('passkeys as a second factor @generic', () => {
 
     const passkeyButton = u.page.getByRole('button', { name: /sign in with your passkey/i });
     await expect(passkeyButton).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /send sms code to/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /use your authenticator app/i })).toBeVisible();
 
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await passkeyButton.click();
