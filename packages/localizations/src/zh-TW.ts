@@ -732,6 +732,7 @@ export const zhTW: LocalizationResource = {
         },
         verifiedAtLabel: "驗證於 {{ date | shortDate('zh-TW') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '新增 {{domain}}',

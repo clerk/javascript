@@ -736,6 +736,7 @@ export const deDE: LocalizationResource = {
         },
         verifiedAtLabel: "Verifiziert am {{ date | shortDate('de-DE') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} hinzufügen',

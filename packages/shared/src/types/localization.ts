@@ -1442,6 +1442,7 @@ export type __internal_LocalizationResource = {
         expiredAtLabel: LocalizationValue<'date'>;
         expiredLabel: LocalizationValue;
         verifyAgainButton: LocalizationValue;
+        verifyAgainButtonTooltip__throttled: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
         txtRecord: {

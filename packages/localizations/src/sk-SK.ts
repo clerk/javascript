@@ -730,6 +730,7 @@ export const skSK: LocalizationResource = {
         },
         verifiedAtLabel: "Overené {{ date | shortDate('sk-SK') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Pridať {{domain}}',

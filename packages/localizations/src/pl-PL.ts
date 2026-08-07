@@ -730,6 +730,7 @@ export const plPL: LocalizationResource = {
         },
         verifiedAtLabel: "Zweryfikowano {{ date | shortDate('pl-PL') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Dodaj {{domain}}',

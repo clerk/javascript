@@ -733,6 +733,7 @@ export const koKR: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('ko-KR') }}에 확인됨",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} 추가',

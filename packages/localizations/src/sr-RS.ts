@@ -730,6 +730,7 @@ export const srRS: LocalizationResource = {
         },
         verifiedAtLabel: "Potvrđeno {{ date | shortDate('sr-RS') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Dodaj {{domain}}',

@@ -729,6 +729,7 @@ export const heIL: LocalizationResource = {
         },
         verifiedAtLabel: "אומת בתאריך {{ date | shortDate('he-IL') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'הוסף {{domain}}',

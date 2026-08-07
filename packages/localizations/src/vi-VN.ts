@@ -736,6 +736,7 @@ export const viVN: LocalizationResource = {
         },
         verifiedAtLabel: "Đã xác minh vào {{ date | shortDate('vi-VN') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Thêm {{domain}}',

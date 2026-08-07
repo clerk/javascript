@@ -737,6 +737,7 @@ export const hrHR: LocalizationResource = {
         },
         verifiedAtLabel: "Potvrđeno {{ date | shortDate('hr-HR') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Dodaj {{domain}}',

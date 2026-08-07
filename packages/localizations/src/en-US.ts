@@ -745,7 +745,8 @@ export const enUS: LocalizationResource = {
           valueLabel: 'Value',
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
-        verifyAgainButton: 'Verify again',
+        verifyAgainButton: 'Re-issue',
+        verifyAgainButtonTooltip__throttled: 'A new record was just issued. You can issue another one shortly.',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

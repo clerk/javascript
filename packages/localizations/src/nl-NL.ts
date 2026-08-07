@@ -730,6 +730,7 @@ export const nlNL: LocalizationResource = {
         },
         verifiedAtLabel: "Geverifieerd op {{ date | shortDate('nl-NL') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} toevoegen',

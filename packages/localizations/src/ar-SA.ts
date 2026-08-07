@@ -729,6 +729,7 @@ export const arSA: LocalizationResource = {
         },
         verifiedAtLabel: "تم التحقق في {{ date | shortDate('en-US') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'إضافة {{domain}}',

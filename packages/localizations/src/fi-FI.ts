@@ -736,6 +736,7 @@ export const fiFI: LocalizationResource = {
         },
         verifiedAtLabel: "Vahvistettu {{ date | shortDate('fi-FI') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Lisää {{domain}}',

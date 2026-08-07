@@ -36,6 +36,8 @@ import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
 
+const OWNERSHIP_VERIFICATION_RETRY_THROTTLE_MS = 5 * 60 * 1000;
+
 export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
   const {
@@ -81,14 +83,16 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
-  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource) => {
+  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource): Promise<boolean> => {
     card.setError(undefined);
 
     try {
       await prepareOwnershipVerification([domain]);
+      return true;
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
+      return false;
     }
   };
 
@@ -371,10 +375,23 @@ const DomainCard = ({
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
-  onPrepareOwnershipVerification: () => Promise<void>;
+  onPrepareOwnershipVerification: () => Promise<boolean>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isRetryThrottled, setIsRetryThrottled] = useState(false);
+
+  useEffect(() => {
+    if (!isRetryThrottled) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setIsRetryThrottled(false), OWNERSHIP_VERIFICATION_RETRY_THROTTLE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isRetryThrottled]);
+
   if (!domain.name) {
     return null;
   }
@@ -383,6 +400,21 @@ const DomainCard = ({
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
   const cardId = ownershipVerification?.status ?? 'unverified';
+
+  const handleVerificationRetry = () => {
+    setIsVerifying(true);
+    void onPrepareOwnershipVerification()
+      .then(setIsRetryThrottled)
+      .finally(() => setIsVerifying(false));
+  };
+
+  const retryButton = (
+    <VerificationRetryButton
+      isVerifying={isVerifying}
+      isThrottled={isRetryThrottled}
+      onClick={handleVerificationRetry}
+    />
+  );
 
   const removeButton = (
     <Button
@@ -472,7 +504,7 @@ const DomainCard = ({
             <ExpiredNotice
               key='expired'
               expiresAt={ownershipVerification?.expiresAt ?? null}
-              onPrepareOwnershipVerification={onPrepareOwnershipVerification}
+              retryButton={retryButton}
             />
           ) : ownershipVerification?.verifiedAt ? (
             <Text
@@ -488,6 +520,7 @@ const DomainCard = ({
             <TxtRecord
               key='unverified'
               ownershipVerification={ownershipVerification}
+              retryButton={retryButton}
             />
           )}
         </Animated>
@@ -498,18 +531,11 @@ const DomainCard = ({
 
 const ExpiredNotice = ({
   expiresAt,
-  onPrepareOwnershipVerification,
+  retryButton,
 }: {
   expiresAt: Date | null;
-  onPrepareOwnershipVerification: () => Promise<void>;
+  retryButton: JSX.Element;
 }): JSX.Element => {
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  const handleVerifyAgain = () => {
-    setIsVerifying(true);
-    void onPrepareOwnershipVerification().finally(() => setIsVerifying(false));
-  };
-
   return (
     <Col
       elementDescriptor={descriptors.configureSSOVerifyDomainCardExpired}
@@ -525,32 +551,62 @@ const ExpiredNotice = ({
         }
       />
 
-      <Button
-        variant='bordered'
-        colorScheme='secondary'
-        size='xs'
-        isLoading={isVerifying}
-        onClick={handleVerifyAgain}
-        sx={t => ({ alignSelf: 'flex-start', gap: t.space.$1x5 })}
-      >
-        <Icon
-          icon={RotateLeftRight}
-          size='sm'
-          colorScheme='neutral'
-        />
-        <Text
-          as='span'
-          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButton')}
-        />
-      </Button>
+      <Box sx={{ alignSelf: 'flex-start' }}>{retryButton}</Box>
     </Col>
+  );
+};
+
+const VerificationRetryButton = ({
+  isVerifying,
+  isThrottled,
+  onClick,
+}: {
+  isVerifying: boolean;
+  isThrottled: boolean;
+  onClick: () => void;
+}): JSX.Element => {
+  const button = (
+    <Button
+      variant='bordered'
+      colorScheme='secondary'
+      size='xs'
+      isLoading={isVerifying}
+      isDisabled={isThrottled}
+      onClick={onClick}
+      sx={t => ({ flexShrink: 0, gap: t.space.$1x5 })}
+    >
+      <Icon
+        icon={RotateLeftRight}
+        size='sm'
+        colorScheme='neutral'
+      />
+      <Text
+        as='span'
+        localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButton')}
+      />
+    </Button>
+  );
+
+  if (!isThrottled) {
+    return button;
+  }
+
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger>{button}</Tooltip.Trigger>
+      <Tooltip.Content
+        text={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButtonTooltip__throttled')}
+      />
+    </Tooltip.Root>
   );
 };
 
 const TxtRecord = ({
   ownershipVerification,
+  retryButton,
 }: {
   ownershipVerification: OrganizationDomainResource['ownershipVerification'];
+  retryButton: JSX.Element;
 }): JSX.Element => {
   return (
     <Col
@@ -604,6 +660,8 @@ const TxtRecord = ({
           copiedIcon={Checkmark}
           sx={{ flex: 1, minWidth: 0 }}
         />
+
+        {retryButton}
       </Flex>
     </Col>
   );

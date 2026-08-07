@@ -730,6 +730,7 @@ export const idID: LocalizationResource = {
         },
         verifiedAtLabel: "Diverifikasi pada {{ date | shortDate('id-ID') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Tambah {{domain}}',

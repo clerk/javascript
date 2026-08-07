@@ -731,6 +731,7 @@ export const esMX: LocalizationResource = {
         },
         verifiedAtLabel: "Verificado el {{ date | shortDate('es-MX') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Agregar {{domain}}',
