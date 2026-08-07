@@ -44,6 +44,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
 
   return (
     <Dialog.Root
+      closedBy='closerequest'
       open={isOpen}
       onOpenChange={open => {
         if (!open) {

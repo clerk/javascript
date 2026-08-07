@@ -18,18 +18,33 @@ import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { DialogContext, type DialogContextValue } from './dialog-context';
 
+/**
+ * Which gestures dismiss the dialog, mirroring the native `<dialog closedby>` attribute.
+ *
+ * - `any` — Escape and outside press
+ * - `closerequest` — Escape only
+ * - `none` — neither; the dialog closes only programmatically
+ *
+ * A single ordered enum rather than two booleans, so the fourth combination — outside press
+ * dismisses but Escape does not — stays unrepresentable. Dismissing by pointer but not by
+ * keyboard is not something to offer.
+ */
+export type DialogClosedBy = 'any' | 'closerequest' | 'none';
+
 export interface DialogProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** When true, the dialog traps focus and blocks interaction with the rest of the page. Default: true */
   modal?: boolean;
+  /** Which gestures dismiss the dialog. Default: `any` */
+  closedBy?: DialogClosedBy;
   children: ReactNode;
 }
 
 function DialogInner(props: DialogProps) {
   const nodeId = useFloatingNodeId();
-  const { modal = true, children } = props;
+  const { modal = true, closedBy = 'any', children } = props;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -54,6 +69,8 @@ function DialogInner(props: DialogProps) {
   const click = useClick(floatingContext);
   const dismiss = useDismiss(floatingContext, {
     outsidePressEvent: 'mousedown',
+    escapeKey: closedBy !== 'none',
+    outsidePress: closedBy === 'any',
   });
   const role = useRole(floatingContext);
 
