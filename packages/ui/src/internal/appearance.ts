@@ -348,6 +348,7 @@ export type ElementsConfig = {
 
   organizationSwitcherTrigger: WithOptions<'personal' | 'organization', 'open'>;
   organizationSwitcherTriggerIcon: WithOptions<never, 'open'>;
+  organizationSwitcherTriggerBadge: WithOptions<string>;
   organizationSwitcherPopoverRootBox: WithOptions;
   organizationSwitcherPopoverCard: WithOptions;
   organizationSwitcherPopoverMain: WithOptions;
