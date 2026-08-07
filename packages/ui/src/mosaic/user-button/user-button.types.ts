@@ -101,18 +101,18 @@ export interface UserButtonCallbacks {
 }
 
 /**
- * Which switchers the surface carries. `combined` is both; `orgs` is an organization switcher with
- * no account rows; `user` is an account switcher that never shows an organization, even when one
- * is active.
+ * Which switchers the surface carries. `combined` is both; `organization` is an organization
+ * switcher with no account rows; `user` is an account switcher that never shows an organization,
+ * even when one is active.
  */
-export type UserButtonMode = 'combined' | 'orgs' | 'user';
+export type UserButtonMode = 'combined' | 'organization' | 'user';
 
 /**
  * Which of the two switchers a `combined` surface leads with: the one named in the trigger and
  * headed in the popup. Both are still listed either way. The single-purpose modes have only one
  * thing to lead with, so they ignore it.
  */
-export type UserButtonModePriority = 'organizations' | 'user';
+export type UserButtonModePriority = 'organization' | 'user';
 
 /** Which switchers the surface carries, and which one it leads with. */
 export interface UserButtonModeProps {
@@ -126,7 +126,7 @@ export interface UserButtonModeProps {
    * Which switcher a `combined` surface leads with in the trigger and the popup's header. The other
    * one is still listed. Ignored by the single-purpose modes, which have only one thing to lead with.
    *
-   * @default 'organizations'
+   * @default 'organization'
    */
   modePriority?: UserButtonModePriority;
 }

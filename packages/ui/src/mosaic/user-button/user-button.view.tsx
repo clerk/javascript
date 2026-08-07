@@ -95,7 +95,7 @@ function workspace(organization: UserButtonMembership | undefined, session: User
  * data loads, so the placeholder can take the same corner the real trigger will.
  */
 function leadsWithOrganization(mode: UserButtonMode, modePriority: UserButtonModePriority): boolean {
-  return mode === 'combined' ? modePriority === 'organizations' : mode === 'orgs';
+  return mode === 'combined' ? modePriority === 'organization' : mode === 'organization';
 }
 
 /**
@@ -125,7 +125,7 @@ function showsOrganizations(data: UserButtonContextValue): boolean {
  * An org-only surface carries no account rows at all, not even the one it belongs to.
  */
 function showsAccounts(data: UserButtonContextValue): boolean {
-  return data.mode !== 'orgs' && data.additionalSessions.length > 0;
+  return data.mode !== 'organization' && data.additionalSessions.length > 0;
 }
 
 /**
@@ -842,7 +842,7 @@ function Footer() {
   // An org-only surface has no account menu to carry "Create organization", so it lands here
   // instead, in the slot the account-wide actions occupy everywhere else.
   const builtIn: ActionRowProps[] = [];
-  if (data.mode === 'orgs') {
+  if (data.mode === 'organization') {
     if (data.onCreateOrganization) {
       builtIn.push({
         id: 'createOrganization',
@@ -933,7 +933,7 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
   const {
     children,
     mode = 'combined',
-    modePriority = 'organizations',
+    modePriority = 'organization',
     open,
     defaultOpen,
     onOpenChange,

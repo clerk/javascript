@@ -283,7 +283,7 @@ export function Organizations(_args: Record<string, unknown>) {
   return (
     <UserButtonView
       {...prototype}
-      mode='orgs'
+      mode='organization'
     />
   );
 }
