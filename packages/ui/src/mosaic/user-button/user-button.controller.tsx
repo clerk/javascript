@@ -1,7 +1,7 @@
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
-import type { OrganizationResource, UserResource } from '@clerk/shared/types';
+import type { CustomPage, OrganizationResource, UserResource } from '@clerk/shared/types';
 
 import { populateParamFromObject } from '../../contexts/utils';
 import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
@@ -121,7 +121,15 @@ function toSession(sessionId: string, user: UserResource): UserButtonSession {
   };
 }
 
-export function useUserButtonController(options?: UserButtonControllerOptions): UserButtonController {
+/**
+ * @param userProfileCustomPages - The consumer's custom pages, already bridged into clerk-js's
+ *   DOM-callback form. The container owns that conversion because it is the layer that can render
+ *   the portals behind it, so they arrive here ready to forward and stay out of the public options.
+ */
+export function useUserButtonController(
+  options?: UserButtonControllerOptions,
+  userProfileCustomPages?: CustomPage[],
+): UserButtonController {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const { isLoaded: isOrgLoaded, organization } = useOrganization();
@@ -136,7 +144,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer }),
+    openModal: () => clerk.openUserProfile({ getContainer, customPages: userProfileCustomPages }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
