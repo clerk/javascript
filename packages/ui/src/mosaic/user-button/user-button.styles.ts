@@ -66,6 +66,18 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     textAlign: 'center',
   },
+
+  // Matches the trigger's ring, so the two focusable things the surface owns focus alike.
+  brandingLink: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    outline: {
+      default: 'none',
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+    },
+    color: 'inherit',
+    display: 'inline-flex',
+    outlineOffset: '2px',
+  },
 });
 
 // The trigger takes the corner of the workspace mark it carries: round for a person, squared for
