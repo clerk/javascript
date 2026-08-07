@@ -1,0 +1,43 @@
+{
+  "name": "@clerk/expo-google-signin",
+  "version": "1.0.0",
+  "description": "Native Google Sign-In module to be used with Clerk for Expo",
+  "keywords": [
+    "react-native",
+    "expo",
+    "google-signin",
+    "clerk"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo-google-signin"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "files": [
+    "android",
+    "ios",
+    "expo-module.config.json",
+    "app.plugin.js",
+    "app.plugin.d.ts"
+  ],
+  "scripts": {
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "^54.0.4",
+    "expo": "~54.0.36"
+  },
+  "peerDependencies": {
+    "expo": ">=54 <58"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

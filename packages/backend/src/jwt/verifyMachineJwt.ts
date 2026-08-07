@@ -11,7 +11,7 @@ import type { MachineTokenReturnType } from '../jwt/types';
 import { verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
-import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
+import { JWT_CATEGORY_M2M_TOKEN, OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
@@ -86,6 +86,23 @@ export async function verifyM2MJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
+  // Reject JWTs of another class (e.g. session, jwt-template) signed by the same
+  // instance key. Absent `cat` is still accepted during the rollout window; tighten
+  // to strict equality once pre-rollout M2M JWTs have expired (USER-5437).
+  const cat = decoded.header.cat;
+  if (cat !== undefined && cat !== JWT_CATEGORY_M2M_TOKEN) {
+    return {
+      data: undefined,
+      tokenType: TokenType.M2MToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: 'Invalid M2M JWT category.',
+        }),
+      ],
+    };
+  }
+
   const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, options);
 
   if ('error' in result) {

@@ -5,6 +5,7 @@ import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { toNegativeAmount } from '@/ui/utils/billing';
 import { getPlanSeatLimit, getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
@@ -281,7 +282,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
         {paymentAttempt.totals?.discounts?.proration && paymentAttempt.totals.discounts.proration.amount.amount > 0 && (
           <LineItems.Group variant='tertiary'>
             <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
-            <LineItems.Description text={`- ${$(paymentAttempt.totals.discounts.proration.amount)}`} />
+            <LineItems.Description text={$(toNegativeAmount(paymentAttempt.totals.discounts.proration.amount))} />
           </LineItems.Group>
         )}
         {subscriptionItem.credits &&
@@ -289,7 +290,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           subscriptionItem.credits.proration.amount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.prorationCredit')} />
-              <LineItems.Description text={`- ${$(subscriptionItem.credits.proration.amount)}`} />
+              <LineItems.Description text={$(toNegativeAmount(subscriptionItem.credits.proration.amount))} />
             </LineItems.Group>
           )}
         {subscriptionItem.credits &&
@@ -297,7 +298,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           subscriptionItem.credits.payer.appliedAmount.amount > 0 && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.accountCredit')} />
-              <LineItems.Description text={`- ${$(subscriptionItem.credits.payer.appliedAmount)}`} />
+              <LineItems.Description text={$(toNegativeAmount(subscriptionItem.credits.payer.appliedAmount))} />
             </LineItems.Group>
           )}
       </LineItems.Root>

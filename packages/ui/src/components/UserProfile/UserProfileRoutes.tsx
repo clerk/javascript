@@ -37,6 +37,12 @@ const PaymentAttemptPage = lazy(() =>
   })),
 );
 
+const CreditHistoryPage = lazy(() =>
+  import(/* webpackChunkName: "credit-history-page"*/ '../AccountCredits').then(module => ({
+    default: module.CreditHistoryPage,
+  })),
+);
+
 export const UserProfileRoutes = () => {
   const { pages, shouldShowBilling, apiKeysProps } = useUserProfileContext();
   const { apiKeysSettings, commerceSettings } = useEnvironment();
@@ -103,6 +109,11 @@ export const UserProfileRoutes = () => {
               <Route path='payment-attempt/:paymentAttemptId'>
                 <Suspense fallback={''}>
                   <PaymentAttemptPage />
+                </Suspense>
+              </Route>
+              <Route path='credit-history'>
+                <Suspense fallback={''}>
+                  <CreditHistoryPage />
                 </Suspense>
               </Route>
             </Switch>

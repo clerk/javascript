@@ -1,6 +1,7 @@
 import type {
   EmailAddressResource,
   EnterpriseConnectionResource,
+  EnterpriseOAuthConfigResource,
   OrganizationDomainResource,
   SamlAccountConnectionResource,
   UserResource,
@@ -23,6 +24,14 @@ const makeSamlConnection = (overrides: Partial<SamlAccountConnectionResource> = 
     idpMetadataUrl: '',
     ...overrides,
   }) as SamlAccountConnectionResource;
+
+const makeOauthConfig = (overrides: Partial<EnterpriseOAuthConfigResource> = {}): EnterpriseOAuthConfigResource =>
+  ({
+    id: 'oauth_1',
+    name: 'oidc',
+    clientId: '',
+    ...overrides,
+  }) as EnterpriseOAuthConfigResource;
 
 const makeConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
   ({
@@ -48,6 +57,14 @@ const fullyConfiguredSaml = makeSamlConnection({
   idpCertificate: 'CERT',
   idpMetadataUrl: 'https://idp.example.com/metadata',
 });
+
+const configuredOidc = makeOauthConfig({
+  clientId: 'client_abc',
+  discoveryUrl: 'https://idp.example.com/.well-known/openid-configuration',
+});
+
+const makeOidcConnection = (overrides: Partial<EnterpriseConnectionResource> = {}): EnterpriseConnectionResource =>
+  makeConnection({ provider: 'oauth_custom_acme', samlConnection: null, oauthConfig: configuredOidc, ...overrides });
 
 // Builds the entity with sensible defaults; each test overrides what it cares
 // about.
@@ -78,6 +95,11 @@ describe('organizationEnterpriseConnection', () => {
     });
     it('connection → its provider', () => {
       expect(derive({ connection: makeConnection({ provider: 'saml_custom' }) }).provider).toBe('saml_custom');
+    });
+    it('carries a custom OIDC key verbatim', () => {
+      expect(derive({ connection: makeConnection({ provider: 'oauth_custom_clerk_dev' }) }).provider).toBe(
+        'oauth_custom_clerk_dev',
+      );
     });
   });
 
@@ -120,6 +142,36 @@ describe('organizationEnterpriseConnection', () => {
             samlConnection: makeSamlConnection({ idpSsoUrl: 'https://idp.example.com/sso' }),
           }),
         }).hasMinimumConfiguration,
+      ).toBe(false);
+    });
+    it('oidc client id and discovery URL present → true', () => {
+      expect(derive({ connection: makeOidcConnection() }).hasMinimumConfiguration).toBe(true);
+    });
+    it('oidc client id without endpoints → false', () => {
+      expect(
+        derive({ connection: makeOidcConnection({ oauthConfig: makeOauthConfig({ clientId: 'client_abc' }) }) })
+          .hasMinimumConfiguration,
+      ).toBe(false);
+    });
+    it('oidc client id with manual authorization and token URLs → true', () => {
+      expect(
+        derive({
+          connection: makeOidcConnection({
+            oauthConfig: makeOauthConfig({
+              clientId: 'client_abc',
+              authUrl: 'https://idp.example.com/authorize',
+              tokenUrl: 'https://idp.example.com/token',
+            }),
+          }),
+        }).hasMinimumConfiguration,
+      ).toBe(true);
+    });
+    it('oidc without oauth config → false', () => {
+      expect(derive({ connection: makeOidcConnection({ oauthConfig: null }) }).hasMinimumConfiguration).toBe(false);
+    });
+    it('oidc with empty client id → false', () => {
+      expect(
+        derive({ connection: makeOidcConnection({ oauthConfig: makeOauthConfig() }) }).hasMinimumConfiguration,
       ).toBe(false);
     });
   });
@@ -197,6 +249,17 @@ describe('organizationEnterpriseConnection', () => {
         }).status,
       ).toBe('active');
     });
+    it('oidc configured + successfully tested + not active → inactive', () => {
+      expect(
+        derive({
+          connection: makeOidcConnection({ active: false }),
+          hasSuccessfulTestRun: true,
+        }).status,
+      ).toBe('inactive');
+    });
+    it('active oidc connection → active', () => {
+      expect(derive({ connection: makeOidcConnection({ active: true }) }).status).toBe('active');
+    });
   });
 
   it('is pure: identical inputs produce a deep-equal entity', () => {
@@ -247,8 +310,55 @@ describe('isEnterpriseConnectionConfigured', () => {
   it('idpSsoUrl + idpEntityId present → true', () => {
     expect(isEnterpriseConnectionConfigured(makeConnection({ samlConnection: fullyConfiguredSaml }))).toBe(true);
   });
+  it('oidc with no oauth config → false', () => {
+    expect(isEnterpriseConnectionConfigured(makeOidcConnection({ oauthConfig: null }))).toBe(false);
+  });
+  it('oidc with empty client id → false', () => {
+    expect(isEnterpriseConnectionConfigured(makeOidcConnection({ oauthConfig: makeOauthConfig() }))).toBe(false);
+  });
+  it('oidc with client id and discovery URL present → true', () => {
+    expect(isEnterpriseConnectionConfigured(makeOidcConnection())).toBe(true);
+  });
+  it('oidc with client id but no endpoints → false', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeOidcConnection({ oauthConfig: makeOauthConfig({ clientId: 'client_abc' }) }),
+      ),
+    ).toBe(false);
+  });
+  it('oidc with client id and manual authorization and token URLs → true', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeOidcConnection({
+          oauthConfig: makeOauthConfig({
+            clientId: 'client_abc',
+            authUrl: 'https://idp.example.com/authorize',
+            tokenUrl: 'https://idp.example.com/token',
+          }),
+        }),
+      ),
+    ).toBe(true);
+  });
+  it('branches on provider: an oidc connection is not satisfied by saml fields', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeOidcConnection({ oauthConfig: makeOauthConfig(), samlConnection: fullyConfiguredSaml }),
+      ),
+    ).toBe(false);
+  });
+  it('branches on provider: a saml connection is not satisfied by oauth fields', () => {
+    expect(
+      isEnterpriseConnectionConfigured(
+        makeConnection({ provider: 'saml_okta', samlConnection: null, oauthConfig: configuredOidc }),
+      ),
+    ).toBe(false);
+  });
   it('matches the derived `hasMinimumConfiguration` field', () => {
     const connection = makeConnection({ samlConnection: fullyConfiguredSaml });
+    expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
+  });
+  it('matches the derived `hasMinimumConfiguration` field for oidc', () => {
+    const connection = makeOidcConnection();
     expect(isEnterpriseConnectionConfigured(connection)).toBe(derive({ connection }).hasMinimumConfiguration);
   });
 });
@@ -288,7 +398,7 @@ describe('connectionBackingEmail', () => {
   const email = (id: string, status: 'verified' | 'unverified'): EmailAddressResource =>
     ({ id, emailAddress: `${id}@acme.com`, verification: { status } }) as EmailAddressResource;
 
-  const makeUser = (overrides: Partial<UserResource>): UserResource => overrides as UserResource;
+  const makeUser = (overrides: Partial<UserResource>): UserResource => overrides;
 
   it('returns the primary email when one is present', () => {
     const primary = email('primary', 'verified');

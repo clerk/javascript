@@ -1,13 +1,15 @@
 import { defineConfig } from 'tsdown';
 
-export default defineConfig(overrideOptions => {
-  const shouldPublish = !!overrideOptions.env?.publish;
+export default defineConfig(({ env, watch }) => {
+  const shouldPublish = !!env?.publish;
 
   return {
     entry: ['src/*.ts'],
     format: ['cjs', 'esm'],
     fixedExtension: false,
-    clean: true,
+    // Keep the previous build in place during watch rebuilds so downstream
+    // dev servers never resolve package exports against an empty dist.
+    clean: !watch,
     minify: false,
     sourcemap: true,
     dts: true,

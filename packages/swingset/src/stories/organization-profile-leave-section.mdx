@@ -1,0 +1,16 @@
+import * as OrganizationProfileLeaveSectionStories from './organization-profile-leave-section.stories';
+
+# Organization Profile Leave Section
+
+A section that owns the open/leaving state and wires the `Destructive` block to the leave-organization flow.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileLeaveSectionStories}
+  composition={[
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  ]}
+/>

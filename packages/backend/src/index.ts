@@ -67,8 +67,10 @@ export type {
   EmailJSON,
   EmailAddressJSON,
   EnterpriseConnectionJSON,
+  EnterpriseConnectionCustomAttributeJSON,
   EnterpriseConnectionOauthConfigJSON,
   EnterpriseConnectionSamlConnectionJSON,
+  EnterpriseConnectionSamlConnectionLoginHintJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
   InstanceJSON,
@@ -111,6 +113,7 @@ export type {
   BillingPlanJSON,
   BillingSubscriptionJSON,
   BillingSubscriptionItemJSON,
+  BillingSubscriptionItemStatus,
 } from './api/resources/JSON';
 
 /**
@@ -128,8 +131,10 @@ export type {
   Domain,
   EmailAddress,
   EnterpriseConnection,
+  EnterpriseConnectionCustomAttribute,
   EnterpriseConnectionOauthConfig,
   EnterpriseConnectionSamlConnection,
+  EnterpriseConnectionSamlConnectionLoginHint,
   ExternalAccount,
   Feature,
   Instance,

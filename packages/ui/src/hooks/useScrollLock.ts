@@ -41,7 +41,9 @@ function enableScrollLock() {
     Object.assign(bodyStyle, {
       position: 'fixed',
       top: `${-(scrollY - Math.floor(offsetTop))}px`,
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- mirrors physical viewport scroll offsets, which are not direction-aware
       left: `${-(scrollX - Math.floor(offsetLeft))}px`,
+      // eslint-disable-next-line custom-rules/no-physical-css-properties -- pairs with the physical `left` above
       right: '0',
     });
   }
@@ -56,7 +58,9 @@ function enableScrollLock() {
       Object.assign(bodyStyle, {
         position: '',
         top: '',
+        // eslint-disable-next-line custom-rules/no-physical-css-properties -- resets the physical properties set above
         left: '',
+        // eslint-disable-next-line custom-rules/no-physical-css-properties -- resets the physical properties set above
         right: '',
       });
       window.scrollTo(scrollX, scrollY);

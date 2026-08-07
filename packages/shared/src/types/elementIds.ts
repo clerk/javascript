@@ -31,6 +31,13 @@ export type FieldId =
   | 'idpMetadata'
   | 'idpMetadataUrl'
   | 'idpSsoUrl'
+  | 'discoveryUrl'
+  | 'authUrl'
+  | 'tokenUrl'
+  | 'userInfoUrl'
+  | 'clientId'
+  | 'clientSecret'
+  | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'
   | 'web3WalletName'
@@ -62,7 +69,8 @@ export type ProfileSectionId =
   | 'configureAgain'
   | 'resetSso'
   | 'testSsoUrl'
-  | 'testResults';
+  | 'testResults'
+  | 'accountCredits';
 export type ProfilePageId =
   | 'account'
   | 'security'

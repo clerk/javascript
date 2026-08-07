@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Props for {@link DialogClose}. */
@@ -15,15 +15,15 @@ export const DialogClose = React.forwardRef<HTMLButtonElement, DialogCloseProps>
 
   const defaultProps = {
     type: 'button' as const,
-    ref,
     onClick() {
       setOpen(false);
     },
   } satisfies DefaultProps<'button'>;
 
-  return renderElement({
+  return useRender({
     defaultTagName: 'button',
     render,
+    ref,
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
 });

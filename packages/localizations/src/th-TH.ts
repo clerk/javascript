@@ -63,6 +63,7 @@ export const thTH: LocalizationResource = {
   badge__canceledEndsAt: "ถูกยกเลิก • สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__currentPlan: 'แผนปัจจุบัน',
   badge__default: 'ค่าเริ่มต้น',
+  badge__deprovisioned: undefined,
   badge__endsAt: "สิ้นสุด {{ date | shortDate('th-TH') }}",
   badge__expired: 'หมดอายุ',
   badge__freeTrial: 'ทดลองใช้ฟรี',
@@ -220,37 +221,128 @@ export const thTH: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
           required: undefined,
         },
       },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -260,7 +352,6 @@ export const thTH: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -301,7 +392,6 @@ export const thTH: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -349,7 +439,6 @@ export const thTH: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -386,7 +475,6 @@ export const thTH: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -416,6 +504,8 @@ export const thTH: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -435,21 +525,17 @@ export const thTH: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -497,7 +583,6 @@ export const thTH: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -529,7 +614,6 @@ export const thTH: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -570,7 +654,6 @@ export const thTH: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -617,37 +700,12 @@ export const thTH: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
       },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
+      unsupportedProvider: {
+        description: undefined,
         title: undefined,
       },
     },
@@ -660,8 +718,11 @@ export const thTH: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'ยังไม่ได้ยืนยัน',
         badge__verified: 'ยืนยันแล้ว',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -671,6 +732,7 @@ export const thTH: LocalizationResource = {
           valueLabel: 'ค่า',
         },
         verifiedAtLabel: "ยืนยันเมื่อ {{ date | shortDate('th-TH') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'เพิ่ม {{domain}}',
@@ -698,6 +760,10 @@ export const thTH: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'ผู้ให้บริการ SAML แบบกำหนดเอง',
         google: undefined,
@@ -899,6 +965,15 @@ export const thTH: LocalizationResource = {
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'ไม่มีประวัติการชำระเงิน',
         notFound: 'ไม่พบความพยายามในการชำระเงิน',
@@ -1097,6 +1172,9 @@ export const thTH: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1224,6 +1302,9 @@ export const thTH: LocalizationResource = {
       title: 'ต้องการการยืนยัน',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'เพิ่มบัญชี',
@@ -1306,6 +1387,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บที่เปิดใหม่เพื่อดำเนินการต่อ',
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
@@ -1366,6 +1451,12 @@ export const thTH: LocalizationResource = {
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'เพื่อดำเนินการต่อ โปรดใส่รหัสยืนยันที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ตรวจสอบโทรศัพท์ของคุณ',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'รีเซ็ตรหัสผ่าน',
@@ -1471,6 +1562,12 @@ export const thTH: LocalizationResource = {
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'ใส่รหัสยืนยันที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ยืนยันโทรศัพท์ของคุณ',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'เข้าสู่ระบบ',
@@ -1610,6 +1707,7 @@ export const thTH: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1679,6 +1777,14 @@ export const thTH: LocalizationResource = {
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
     web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
@@ -1730,9 +1836,9 @@ export const thTH: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
-    label__userButtonPopover: 'แผงบัญชี',
     label__accountActions: 'การดำเนินการบัญชี',
     label__activeSessions: 'เซสชันที่ใช้งานอยู่',
+    label__userButtonPopover: 'แผงบัญชี',
   },
   userProfile: {
     apiKeysPage: {
@@ -1754,6 +1860,15 @@ export const thTH: LocalizationResource = {
       title__codelist: 'รหัสสำรอง',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'ไม่มีประวัติการชำระเงิน',
         notFound: 'ไม่พบความพยายามในการชำระเงิน',

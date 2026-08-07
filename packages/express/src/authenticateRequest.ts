@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import type { RequestState } from '@clerk/backend/internal';
+import type { ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, stripTrailingSlashes } from '@clerk/backend/proxy';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -51,7 +51,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     ...restOptions
   } = options || {};
 
-  const clerkRequest = createClerkRequest(incomingMessageToRequest(request));
+  const clerkRequest = opts.clerkRequest ?? createClerkRequest(incomingMessageToRequest(request));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
 
   const secretKey = secretKeyInput || env.secretKey;
@@ -163,13 +163,28 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
       );
     }
 
+    // Node accepts request targets/methods (`//`, TRACE) the fetch spec cannot represent; reject those instead of 500ing.
+    let clerkRequest: ClerkRequest;
+    try {
+      clerkRequest = createClerkRequest(incomingMessageToRequest(request));
+    } catch {
+      response.status(400).end();
+      return;
+    }
+
     const env = { ...loadApiEnv(), ...loadClientEnv() };
     const publishableKey = options.publishableKey || env.publishableKey;
     const secretKey = options.secretKey || env.secretKey;
 
     // Handle Frontend API proxy requests early, before authentication
     if (frontendApiProxy) {
-      const requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      let requestUrl: URL;
+      try {
+        requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      } catch {
+        response.status(400).end();
+        return;
+      }
       const isEnabled =
         typeof frontendApiProxy.enabled === 'function'
           ? frontendApiProxy.enabled(requestUrl)
@@ -177,7 +192,13 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
 
       if (isEnabled && (requestUrl.pathname === proxyPath || requestUrl.pathname.startsWith(proxyPath + '/'))) {
         // Convert Express request to Fetch API Request
-        const proxyRequest = requestToProxyRequest(request);
+        let proxyRequest: Request;
+        try {
+          proxyRequest = requestToProxyRequest(request);
+        } catch {
+          response.status(400).end();
+          return;
+        }
 
         // Call the core proxy function
         const proxyResponse = await clerkFrontendApiProxy(proxyRequest, {
@@ -220,7 +241,13 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
     // against the request's public origin (from x-forwarded-* headers).
     let resolvedOptions = options;
     if (frontendApiProxy && !options.proxyUrl) {
-      const requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      let requestUrl: URL;
+      try {
+        requestUrl = new URL(request.originalUrl || request.url, `http://${request.headers.host}`);
+      } catch {
+        response.status(400).end();
+        return;
+      }
       const isProxyEnabled =
         typeof frontendApiProxy.enabled === 'function'
           ? frontendApiProxy.enabled(requestUrl)
@@ -235,6 +262,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         clerkClient,
         request,
         options: resolvedOptions,
+        clerkRequest,
       });
 
       const err = setResponseHeaders(requestState, response);

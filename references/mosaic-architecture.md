@@ -6,7 +6,7 @@ Mosaic is the next-generation design system for Clerk's UI components, replacing
 
 Mosaic uses Emotion for CSS-in-JS but delivers theme tokens via its own React context (not Emotion's `ThemeProvider`). This avoids type conflicts with the existing system's `InternalTheme` augmentation on Emotion's global `Theme` interface.
 
-The public styling contract is **data attributes** (`data-cl-slot`, `data-cl-<state>`, `data-cl-<variant>`), the same convention shipping in `@clerk/headless`. There is no classname derivation, no `__state` concatenation, and no central appearance-key registry. Components are authored with **slot recipes** (`defineSlotRecipe`), which own variants, slot identity, state→attribute mapping, and the appearance cascade in one place.
+The public styling contract is a **stable per-slot class** plus **`data-<axis>` attributes**: a part emits `class="cl-<slot>"` for its identity (`.cl-button`, `.cl-item`) and `data-<axis>="<value>"` / presence `data-<state>` for its variants and state. Consumers target those, never StyleX's hashed atoms; tokens ship as overridable `--cl-*` custom properties. Newer components are authored with **StyleX** (`stylex.create` + the `themeProps`/`mergeStyleProps` helpers in `props.ts`). The slot-recipe engine described further below (`defineSlotRecipe`, `useRecipe`, and its older `data-cl-slot`/`data-cl-*` attribute contract) is the legacy authoring path still used by un-migrated components during the migration.
 
 Once migration is complete, the old system is removed and Mosaic becomes the sole design system.
 
@@ -86,50 +86,44 @@ What we keep: `css` prop (with plain objects), `keyframes`, `Global`, style seri
 
 ## Public styling API
 
-Every Mosaic part is targetable through stable data attributes — no classnames or registry keys to learn. A styled element emits:
+Every Mosaic part carries a **stable class** and reflects its variants and state as **data attributes** — no hashed classnames or registry keys to learn. `themeProps(slot, variants)` (in `props.ts`) emits:
 
-- `data-cl-slot="<slotId>"` — the slot identity
-- `data-cl-<state>` — boolean state, presence-only (`data-cl-disabled=""`); omitted when the state is false
-- `data-cl-<axis>="<value>"` — the resolved variant (`data-cl-size="sm"`); boolean variant axes use presence semantics like state
+- `class="cl-<slot>"` — the slot identity (`.cl-button`, `.cl-item`, `.cl-item-title`)
+- `data-<axis>="<value>"` — the resolved variant (`data-variant="outline"`, `data-size="sm"`)
+- `data-<state>` — boolean state or boolean variant, presence-only (`data-interactive=""`); omitted when the value is false/null
 
-Defaults are emitted too, so e.g. `data-cl-size="md"` vs `"sm"` is always distinguishable.
+Consumers target the class and its attributes, never StyleX's hashed `x…` atoms.
 
-Three ways to style a part — all target the **same** attributes:
+Two ways to style a part — both hit the same class + attributes:
 
 ```css
 /* 1. Plain CSS / stylesheet */
-[data-cl-slot='button'] {
+.cl-button {
   border-radius: 8px;
 }
-[data-cl-slot='button'][data-cl-size='sm'] {
+.cl-button[data-size='sm'] {
   border-radius: 4px;
 }
-[data-cl-slot='button'][data-cl-disabled] {
-  opacity: 0.4;
+.cl-item[data-interactive] {
+  background-color: var(--cl-color-card);
 }
 ```
 
 ```tsx
-// 2. appearance.elements — keyed by slot id; state/variant via nested conditions or attr selectors
-appearance={{
-  elements: {
-    button: {
-      color: 'lime',
-      _disabled: { opacity: 0.4 },                 // condition key
-      "&[data-cl-size='sm']": { borderRadius: 4 }, // raw attr selector
-    },
-  },
-}}
+// 2. className / style props — merged onto the element by `mergeStyleProps`, applied last so they win
+<Button
+  className='MyButton'
+  style={{ borderRadius: 12 }}
+/>
 ```
 
-```tsx
-// 3. className / css escape hatch — still merged onto the element
-<Button className='MyButton' />
-```
+Tokens are a third, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
 
-State styling uses real attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
+State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 
 ## Appearance & cascade
+
+> Legacy authoring path. `appearance.elements` + the slot cascade belong to the Emotion slot-recipe engine. StyleX components style via the class + `data-<axis>` contract above and `className`/`style`; they do not read `appearance.elements`.
 
 `MosaicProvider` takes `appearance` + `scope`:
 
@@ -165,6 +159,8 @@ Resolved once into `MosaicTheme` via `resolveVariables`.
 Scope keys (`signIn`, `userButton`, …) live **inside** `elements`, keyed by flow, holding slot→style maps only. They never carry `variables`. `parseMosaicAppearance(appearance, scope)` strips scope keys out of the global layer and appends the scoped layer, returning `[global, scoped]` — so scoping falls out of layer order and the resolver (`resolveSlotCss`) needs no special-casing. Standalone (no provider/appearance) degrades to pure recipe styles.
 
 ## Slot recipes
+
+> Legacy authoring path, still used by un-migrated components. New components use StyleX (`stylex.create` + `themeProps`); see `references/stylex.md`. The slot identity here is the `data-cl-slot` attribute, which the StyleX contract replaces with the `.cl-<slot>` class.
 
 `defineSlotRecipe` (`slot-recipe.ts`) is the single authoring primitive. One recipe owns _variants_, _slot identity_ (`data-cl-slot`), _state→attribute mapping_, and the _appearance cascade_. It absorbs the old `cva` variant-merge engine — `cva.ts` is gone.
 
@@ -373,10 +369,10 @@ view
 Flow slices should be split by role:
 
 ```text
-delete-organization-machine.ts       // pure state machine
-delete-organization-controller.tsx    // Clerk/mock adapter + actor wiring
-delete-organization-view.tsx          // view-only rendering
-delete-organization.tsx               // thin composition wrapper
+delete-organization.machine.ts        // pure state machine
+delete-organization.controller.tsx     // Clerk/mock adapter + actor wiring
+delete-organization.view.tsx           // view-only rendering
+delete-organization.tsx                // thin composition wrapper
 ```
 
 The exported component composes the controller and view:
@@ -384,7 +380,11 @@ The exported component composes the controller and view:
 ```tsx
 export function DeleteOrganization() {
   const controller = useDeleteOrganizationController();
-  if (controller.status === 'loading') return <SectionSkeleton />;
+  // Render nothing until the controller is ready (mirrors the legacy sections,
+  // which gate their own visibility and show no skeleton).
+  if (controller.status !== 'ready') {
+    return null;
+  }
 
   return (
     <DeleteOrganizationView
@@ -523,6 +523,13 @@ To migrate a component from the old system to Mosaic:
 6. Update token references — e.g. `theme.colors.$primary500` → `theme.color.primary`.
 7. Ensure the component is inside a `MosaicProvider` in the tree.
 
+The steps above cover the **styling** migration (recipes + tokens). For **flow**
+components — where the legacy component also fuses data-fetching and flow logic —
+splitting that logic into the machine/controller/view layers and verifying no
+implicit behavior is dropped is its own end-to-end workflow. See the `mosaic`
+Claude Code skill (`.claude/skills/mosaic/`), in particular its
+`references/migration.md`.
+
 ## Files
 
 | File                                              | Purpose                                                                     |
@@ -536,9 +543,9 @@ To migrate a component from the old system to Mosaic:
 | `src/mosaic/resolveSlot.ts`                       | Pure per-slot appearance-layer resolver (`resolveSlotCss`)                  |
 | `src/mosaic/conditions.ts`                        | Condition vocabulary (`_hover`, …) + `expandConditions`                     |
 | `src/mosaic/machine/`                             | State-machine runtime (`createMachine`, `createActor`, `useMachine`)        |
-| `src/mosaic/sections/*-machine.ts`                | Pure flow rules for Mosaic sections                                         |
-| `src/mosaic/sections/*-controller.tsx`            | Clerk/mock data adapters and actor wiring for Mosaic sections               |
-| `src/mosaic/sections/*-view.tsx`                  | Clerk-free view modules that render snapshots and send events               |
+| `src/mosaic/<feature>/*-machine.ts`               | Pure flow rules for a Mosaic feature (e.g. `organization/`)                 |
+| `src/mosaic/<feature>/*-controller.tsx`           | Clerk/mock data adapters and actor wiring for a Mosaic feature              |
+| `src/mosaic/<feature>/*-view.tsx`                 | Clerk-free view modules that render snapshots and send events               |
 | `src/mosaic/__tests__/slot-recipe.test.ts`        | Recipe resolution, attrs, conditions, `useSlot`/`slot` specs                |
 | `src/mosaic/__tests__/resolveSlot.test.ts`        | Appearance-layer resolution specs                                           |
 | `src/mosaic/__tests__/MosaicProvider.test.tsx`    | Appearance/scope parsing + theme-from-variables specs                       |

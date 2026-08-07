@@ -1,4 +1,4 @@
-import { type ComponentProps, type RenderProp, renderElement } from '@clerk/headless/utils';
+import { type ComponentProps, useRender } from '@clerk/headless/utils';
 import React from 'react';
 
 /**
@@ -9,11 +9,9 @@ import React from 'react';
  *
  * Accepts render prop with any element type — styling passes along regardless of what's rendered.
  */
-export type BoxProps = Omit<ComponentProps<'div'>, 'render'> & {
-  render?: RenderProp<React.HTMLAttributes<HTMLElement>>;
-};
+export type BoxProps = ComponentProps<'div'>;
 
 export const Box = React.forwardRef<HTMLElement, BoxProps>(function Box(props, ref) {
   const { render, ...rest } = props;
-  return renderElement({ defaultTagName: 'div', render, props: { ...rest, ref } });
+  return useRender({ defaultTagName: 'div', render, ref, props: rest });
 });

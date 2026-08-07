@@ -14,6 +14,10 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
     firstFactorUrl: '../factor-one',
     secondFactorUrl: '../factor-two',
     resetPasswordUrl: '../reset-password',
+    signInProtectCheckUrl: '../protect-check',
+    // Absolute + combined-flow-aware (see SignIn context), so it stays correct regardless of the
+    // callback route's depth.
+    signUpProtectCheckUrl: ctx.signUpProtectCheckUrl,
     unsafeMetadata: ctx.unsafeMetadata,
   };
 }
@@ -24,6 +28,7 @@ export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType):
     firstFactorUrl: 'factor-one',
     secondFactorUrl: 'factor-two',
     resetPasswordUrl: 'reset-password',
+    signInProtectCheckUrl: 'protect-check',
   };
 }
 
@@ -37,6 +42,7 @@ export function buildSignUpOAuthCallbackParams(ctx: SignUpContextType): HandleOA
     continueSignUpUrl: '../continue',
     verifyEmailAddressUrl: '../verify-email-address',
     verifyPhoneNumberUrl: '../verify-phone-number',
+    signUpProtectCheckUrl: '../protect-check',
     unsafeMetadata: ctx.unsafeMetadata,
   };
 }
@@ -47,5 +53,6 @@ export function buildSignUpOAuthTransportCallbackParams(ctx: SignUpContextType):
     continueSignUpUrl: 'continue',
     verifyEmailAddressUrl: 'verify-email-address',
     verifyPhoneNumberUrl: 'verify-phone-number',
+    signUpProtectCheckUrl: 'protect-check',
   };
 }

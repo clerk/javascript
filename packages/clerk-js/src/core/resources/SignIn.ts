@@ -30,6 +30,7 @@ import type {
   PhoneCodeFactor,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  ProtectCheckResource,
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
@@ -53,6 +54,7 @@ import type {
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureSubmitProtectCheckParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
   SignInFutureWeb3Params,
@@ -98,6 +100,16 @@ import {
 import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
+/**
+ * Terminal states for email-link verification polling: `verified` (success), `expired`
+ * (link timed out), or `transferable` (`signUpIfMissing` flows — the address was verified
+ * but no user exists, so the caller transfers to sign-up). Shared by the legacy
+ * `createEmailLinkFlow` poll and `SignInFuture.waitForEmailLinkVerification` so the two
+ * loops can't drift apart.
+ */
+const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
+  status === 'verified' || status === 'expired' || status === 'transferable';
+
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
 
@@ -112,6 +124,7 @@ export class SignIn extends BaseResource implements SignInResource {
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
+  protectCheck: ProtectCheckResource | null = null;
 
   /**
    * The current status of the sign-in process.
@@ -152,6 +165,14 @@ export class SignIn extends BaseResource implements SignInResource {
    * of `SignIn`.
    */
   __internal_basePost = this._basePost.bind(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
+  __internal_basePatch = this._basePatch.bind(this);
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -254,6 +275,23 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
+      coalesce: true,
+    });
+  };
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-in.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to the updated `SignIn` resource (gate cleared, a chained
+   * challenge, or the completed flow).
+   */
+  submitProtectCheck = (params: { proofToken: string }): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.submitProtectCheck', { id: this.id });
+    return this._basePatch({
+      action: 'protect_check',
+      body: { proof_token: params.proofToken },
     });
   };
 
@@ -307,8 +345,7 @@ export class SignIn extends BaseResource implements SignInResource {
         void run(() => {
           return this.reload()
             .then(res => {
-              const status = res[verificationKey].status;
-              if (status === 'verified' || status === 'expired') {
+              if (isTerminalEmailLinkVerificationStatus(res[verificationKey].status)) {
                 stop();
                 resolve(res);
               }
@@ -329,6 +366,7 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
+      coalesce: true,
     });
   };
 
@@ -606,6 +644,15 @@ export class SignIn extends BaseResource implements SignInResource {
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
       this.clientTrustState = data.client_trust_state ?? undefined;
+      this.protectCheck = data.protect_check
+        ? {
+            status: data.protect_check.status,
+            token: data.protect_check.token,
+            sdkUrl: data.protect_check.sdk_url,
+            expiresAt: data.protect_check.expires_at,
+            uiHints: data.protect_check.ui_hints,
+          }
+        : null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -666,6 +713,15 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier: this.identifier,
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
+      protect_check: this.protectCheck
+        ? {
+            status: this.protectCheck.status,
+            token: this.protectCheck.token,
+            sdk_url: this.protectCheck.sdkUrl,
+            ...(this.protectCheck.expiresAt !== undefined && { expires_at: this.protectCheck.expiresAt }),
+            ...(this.protectCheck.uiHints !== undefined && { ui_hints: this.protectCheck.uiHints }),
+          }
+        : null,
     };
   }
 }
@@ -795,6 +851,26 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
+  get protectCheck() {
+    return this.#resource.protectCheck;
+  }
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-in.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
+   */
+  async submitProtectCheck(params: SignInFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePatch({
+        action: 'protect_check',
+        body: { proof_token: params.proofToken },
+      });
+    });
+  }
+
   get canBeDiscarded() {
     return this.#canBeDiscarded;
   }
@@ -818,6 +894,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'reset_password_email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -861,6 +938,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'reset_password_phone_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1018,6 +1096,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId: emailCodeFactor.emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1070,6 +1149,7 @@ class SignInFuture implements SignInFutureResource {
           strategy: 'email_link',
         },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1081,8 +1161,7 @@ class SignInFuture implements SignInFutureResource {
         void run(async () => {
           try {
             const res = await this.#resource.__internal_baseGet();
-            const status = res.firstFactorVerification.status;
-            if (status === 'verified' || status === 'expired') {
+            if (isTerminalEmailLinkVerificationStatus(res.firstFactorVerification.status)) {
               stop();
               resolve(res);
             }
@@ -1122,6 +1201,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId: phoneCodeFactor.phoneNumberId, strategy: 'phone_code', channel },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1187,6 +1267,7 @@ class SignInFuture implements SignInFutureResource {
             strategy: 'enterprise_sso',
           },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1254,6 +1335,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
 
       const { message } = this.firstFactorVerification;
@@ -1325,6 +1407,7 @@ class SignInFuture implements SignInFutureResource {
         await this.#resource.__internal_basePost({
           body: { strategy: 'passkey' },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1377,6 +1460,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'phone_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
@@ -1403,6 +1487,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'email_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }

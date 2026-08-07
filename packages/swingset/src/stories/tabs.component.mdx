@@ -47,12 +47,12 @@ them onto your element.
 | `Tabs.List`      | `tabs-list`      | `role="tablist"` container; anchors the indicator            |
 | `Tabs.Tab`       | `tabs-tab`       | Selectable tab with roving-tabindex keyboard navigation      |
 | `Tabs.Trigger`   | `tabs-trigger`   | Click-only tab (no keyboard roving)                          |
-| `Tabs.Panel`     | `tabs-panel`     | `role="tabpanel"`; hidden via `data-cl-hidden` when inactive |
+| `Tabs.Panel`     | `tabs-panel`     | `role="tabpanel"`; hidden via `data-hidden` when inactive    |
 | `Tabs.Indicator` | `tabs-indicator` | Sliding underline tracking the active tab (positions inline) |
 
 ## Styling
 
 Each styled part is themed by the Mosaic tabs recipe and stays targetable through its
-`data-cl-slot` plus the state attributes the primitive emits (`data-cl-selected`,
-`data-cl-disabled` on tabs; `data-cl-hidden` on panels). Override per slot through
+`data-cl-slot` plus the state attributes the primitive emits (`data-selected`,
+`data-disabled` on tabs; `data-hidden` on panels). Override per slot through
 `appearance.elements` — e.g. `{ 'tabs-tab': { fontWeight: 600 } }`.

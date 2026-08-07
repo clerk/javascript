@@ -1,4 +1,4 @@
-import { protocol } from 'electron';
+import { app, protocol } from 'electron';
 
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
@@ -19,6 +19,21 @@ function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridge
   }
 }
 
+function buildUserAgentFallback(defaultUserAgent: string, productToken: string): string {
+  const platformCommentStart = defaultUserAgent.indexOf('(');
+  const platformCommentEnd = defaultUserAgent.indexOf(')', platformCommentStart + 1);
+
+  if (platformCommentStart === -1 || platformCommentEnd === -1) {
+    return productToken;
+  }
+
+  const platformComment = defaultUserAgent.slice(platformCommentStart, platformCommentEnd + 1);
+
+  // Clerk's session activity parser preserves the platform comment and treats the
+  // token after Gecko as the app/browser name.
+  return `Mozilla/5.0 ${platformComment} Gecko/20100101 ${productToken}`;
+}
+
 /**
  * Creates the Clerk bridge for Electron's main process.
  *
@@ -33,37 +48,105 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
     );
   }
 
-  const cleanupTokenPersistence = setupTokenCacheIpcHandlers(options.storage);
-  let cleanupOAuthTransport: (() => void) | undefined;
-  const passkeys = options.passkeys ? setupPasskeysMain() : null;
+  let ownsSingleInstanceLock = false;
 
   if (options.renderer) {
     assertValidRendererOriginConfig(options.renderer);
 
-    protocol.registerSchemesAsPrivileged([
-      {
-        scheme: options.renderer.scheme,
-        privileges: {
-          standard: true,
-          secure: true,
-          supportFetchAPI: true,
-          corsEnabled: true,
-          stream: true,
-          ...options.renderer.privileges,
-        },
-      },
-    ]);
-
-    cleanupOAuthTransport = setupOAuthTransportIpcHandlers({
-      renderer: options.renderer,
-    });
+    // macOS routes deep links to the running instance through `open-url`, so the lock is only needed
+    // where `second-instance` is the delivery path.
+    if (process.platform !== 'darwin' && !app.hasSingleInstanceLock()) {
+      if (options.manageSingleInstanceLock === false) {
+        console.warn(
+          "Clerk: manageSingleInstanceLock is false but the application does not hold Electron's single-instance lock. OAuth deep-link callbacks cannot be delivered on Windows or Linux until it is acquired.",
+        );
+      } else if (!app.requestSingleInstanceLock()) {
+        app.quit();
+        return { cleanup() {}, isPrimaryInstance: false };
+      } else {
+        ownsSingleInstanceLock = true;
+      }
+    }
   }
 
-  return {
-    cleanup() {
-      cleanupTokenPersistence();
-      cleanupOAuthTransport?.();
-      passkeys?.cleanup();
-    },
+  const releaseSingleInstanceLock = (): void => {
+    if (!ownsSingleInstanceLock) {
+      return;
+    }
+
+    ownsSingleInstanceLock = false;
+    app.releaseSingleInstanceLock();
   };
+
+  const teardowns: Array<() => void> = [];
+  const runTeardowns = (): void => {
+    const errors: unknown[] = [];
+
+    while (teardowns.length > 0) {
+      try {
+        teardowns.pop()?.();
+      } catch (err) {
+        errors.push(err);
+      }
+    }
+
+    if (errors.length > 0) {
+      throw errors[0];
+    }
+  };
+
+  try {
+    teardowns.push(setupTokenCacheIpcHandlers(options.storage));
+
+    if (options.passkeys) {
+      const passkeys = setupPasskeysMain();
+      teardowns.push(() => passkeys.cleanup());
+    }
+
+    if (options.userAgent) {
+      app.userAgentFallback = buildUserAgentFallback(app.userAgentFallback, options.userAgent);
+    }
+
+    if (options.renderer) {
+      protocol.registerSchemesAsPrivileged([
+        {
+          scheme: options.renderer.scheme,
+          privileges: {
+            standard: true,
+            secure: true,
+            supportFetchAPI: true,
+            corsEnabled: true,
+            stream: true,
+            ...options.renderer.privileges,
+          },
+        },
+      ]);
+
+      teardowns.push(
+        setupOAuthTransportIpcHandlers({
+          renderer: options.renderer,
+        }),
+      );
+    }
+
+    return {
+      isPrimaryInstance: true,
+      cleanup() {
+        try {
+          runTeardowns();
+        } finally {
+          releaseSingleInstanceLock();
+        }
+      },
+    };
+  } catch (err) {
+    try {
+      runTeardowns();
+    } catch {
+      // The initialization error is the one worth surfacing.
+    }
+
+    releaseSingleInstanceLock();
+    throw err;
+  }
 }

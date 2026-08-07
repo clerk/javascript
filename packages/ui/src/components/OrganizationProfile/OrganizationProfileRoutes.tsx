@@ -37,6 +37,12 @@ const OrganizationPaymentAttemptPage = lazy(() =>
   })),
 );
 
+const CreditHistoryPage = lazy(() =>
+  import(/* webpackChunkName: "credit-history-page"*/ '../AccountCredits').then(module => ({
+    default: module.CreditHistoryPage,
+  })),
+);
+
 const OrganizationSecurityPage = lazy(() =>
   import(/* webpackChunkName: "op-security-page"*/ './OrganizationSecurityPage').then(module => ({
     default: module.OrganizationSecurityPage,
@@ -131,6 +137,11 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
                 <Route path='payment-attempt/:paymentAttemptId'>
                   <Suspense fallback={''}>
                     <OrganizationPaymentAttemptPage />
+                  </Suspense>
+                </Route>
+                <Route path='credit-history'>
+                  <Suspense fallback={''}>
+                    <CreditHistoryPage />
                   </Suspense>
                 </Route>
               </Switch>

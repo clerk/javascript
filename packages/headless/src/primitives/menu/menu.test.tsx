@@ -3,57 +3,22 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Popover } from '../popover';
 import { Menu } from './index';
 
 afterEach(() => cleanup());
 
 describe('Menu', () => {
-  describe('slot attributes', () => {
-    it('renders trigger with data-cl-slot', () => {
-      render(
-        <Menu.Root>
-          <Menu.Trigger>Actions</Menu.Trigger>
-          <Menu.Positioner>
-            <Menu.Popup>
-              <Menu.Item label='Cut'>Cut</Menu.Item>
-            </Menu.Popup>
-          </Menu.Positioner>
-        </Menu.Root>,
-      );
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-slot', 'menu-trigger');
-    });
-
-    it('renders all parts with correct slot attributes when open', async () => {
-      const user = userEvent.setup();
-      render(
-        <Menu.Root>
-          <Menu.Trigger>Actions</Menu.Trigger>
-          <Menu.Positioner>
-            <Menu.Popup>
-              <Menu.Item label='Cut'>Cut</Menu.Item>
-              <Menu.Separator />
-              <Menu.Item label='Paste'>Paste</Menu.Item>
-            </Menu.Popup>
-          </Menu.Positioner>
-        </Menu.Root>,
-      );
-
-      await user.click(screen.getByText('Actions'));
-
-      expect(document.querySelector('[data-cl-slot="menu-positioner"]')).toBeInTheDocument();
-      expect(document.querySelector('[data-cl-slot="menu-popup"]')).toBeInTheDocument();
-      expect(document.querySelectorAll('[data-cl-slot="menu-item"]')).toHaveLength(2);
-      expect(document.querySelector('[data-cl-slot="menu-separator"]')).toBeInTheDocument();
-    });
-  });
-
   describe('ARIA attributes', () => {
     it('keeps the trigger/menu aria-controls pairing intact when a custom id is passed to the positioner', async () => {
       const user = userEvent.setup();
       render(
         <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
-          <Menu.Positioner id='consumer-custom-id'>
+          <Menu.Positioner
+            id='consumer-custom-id'
+            data-testid='menu-positioner'
+          >
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
@@ -64,7 +29,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
 
       const trigger = screen.getByText('Actions');
-      const positioner = document.querySelector('[data-cl-slot="menu-positioner"]');
+      const positioner = document.querySelector('[data-testid="menu-positioner"]');
 
       // The menu id is owned by floating-ui: a consumer-supplied id must not
       // override it, or the trigger's aria-controls pairing would silently break.
@@ -90,7 +55,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
 
       expect(screen.getByText('Cut')).toBeInTheDocument();
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
     it('closes on trigger click when open', async () => {
@@ -109,7 +74,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
       await user.click(screen.getByText('Actions'));
 
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
     });
 
     it('closes on Escape', async () => {
@@ -128,7 +93,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
       await user.keyboard('{Escape}');
 
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
     });
 
     it('closes when item is clicked', async () => {
@@ -154,7 +119,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Cut'));
 
       expect(onClick).toHaveBeenCalledTimes(1);
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
     });
 
     it('does not close on item click when closeOnClick=false', async () => {
@@ -178,7 +143,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
       await user.click(screen.getByText('Toggle'));
 
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
     it('calls onOpenChange', async () => {
@@ -249,7 +214,7 @@ describe('Menu', () => {
   });
 
   describe('disabled items', () => {
-    it('marks disabled item with data-cl-disabled', async () => {
+    it('marks disabled item with data-disabled', async () => {
       const user = userEvent.setup();
       render(
         <Menu.Root>
@@ -269,7 +234,7 @@ describe('Menu', () => {
 
       await user.click(screen.getByText('Actions'));
 
-      expect(document.querySelector('[data-cl-slot="menu-item"]')).toHaveAttribute('data-cl-disabled', '');
+      expect(screen.getByRole('menuitem', { name: 'Cut' })).toHaveAttribute('data-disabled', '');
     });
 
     it('disabled item has aria-disabled', async () => {
@@ -292,7 +257,7 @@ describe('Menu', () => {
 
       await user.click(screen.getByText('Actions'));
 
-      expect(document.querySelector('[data-cl-slot="menu-item"]')).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('menuitem', { name: 'Cut' })).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('does not close menu when clicking disabled item', async () => {
@@ -316,7 +281,7 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
       await user.click(screen.getByText('Cut'));
 
-      expect(screen.getByText('Actions')).toHaveAttribute('data-cl-open', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
     it('does not fire the consumer onClick when clicking a disabled item', async () => {
@@ -365,7 +330,7 @@ describe('Menu', () => {
       await new Promise(r => requestAnimationFrame(r));
       await user.keyboard('{ArrowDown}');
 
-      expect(screen.getByText('Cut')).toHaveAttribute('data-cl-active', '');
+      expect(screen.getByText('Cut')).toHaveAttribute('data-active', '');
     });
 
     it('navigates items with ArrowUp from last to first', async () => {
@@ -386,7 +351,7 @@ describe('Menu', () => {
       await new Promise(r => requestAnimationFrame(r));
       await user.keyboard('{ArrowDown}{ArrowUp}');
 
-      expect(screen.getByText('Cut')).toHaveAttribute('data-cl-active', '');
+      expect(screen.getByText('Cut')).toHaveAttribute('data-active', '');
     });
 
     it('Home moves to first item', async () => {
@@ -408,7 +373,7 @@ describe('Menu', () => {
       await new Promise(r => requestAnimationFrame(r));
       await user.keyboard('{ArrowDown}{ArrowDown}{Home}');
 
-      expect(screen.getByText('Cut')).toHaveAttribute('data-cl-active', '');
+      expect(screen.getByText('Cut')).toHaveAttribute('data-active', '');
     });
 
     it('End moves to last item', async () => {
@@ -430,11 +395,50 @@ describe('Menu', () => {
       await new Promise(r => requestAnimationFrame(r));
       await user.keyboard('{End}');
 
-      expect(screen.getByText('Paste')).toHaveAttribute('data-cl-active', '');
+      expect(screen.getByText('Paste')).toHaveAttribute('data-active', '');
     });
   });
 
   describe('focus management', () => {
+    it('focuses the menu itself, not an item, when opened with a pointer', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner data-testid='menu-positioner'>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="menu-positioner"]'));
+    });
+
+    it('focuses the first item when opened with the keyboard', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      screen.getByText('Actions').focus();
+      await user.keyboard('{Enter}');
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByText('Cut'));
+    });
+
     it('returns focus to trigger on close via Escape', async () => {
       const user = userEvent.setup();
       render(
@@ -593,7 +597,34 @@ describe('Menu', () => {
 
       const shareTrigger = screen.getByText('Share');
       expect(shareTrigger).toHaveAttribute('role', 'menuitem');
-      expect(shareTrigger).toHaveAttribute('data-cl-slot', 'menu-trigger');
+    });
+
+    it('leaves a trigger inside a popover as a plain button', async () => {
+      const user = userEvent.setup();
+      render(
+        <Popover.Root>
+          <Popover.Trigger>Account</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Menu.Root>
+                <Menu.Trigger>Actions</Menu.Trigger>
+                <Menu.Positioner>
+                  <Menu.Popup>
+                    <Menu.Item label='Sign out'>Sign out</Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByText('Account'));
+
+      // A popover is not a menu, so its children are not menu items. Only the floating tree is
+      // shared, and that is dismissal plumbing rather than menu hierarchy.
+      expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+      expect(screen.getByText('Actions')).not.toHaveAttribute('role');
     });
 
     it('opens submenu via controlled open prop', () => {
@@ -658,7 +689,7 @@ describe('Menu', () => {
       render(
         <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
-          <Menu.Positioner>
+          <Menu.Positioner data-testid='menu-positioner'>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
@@ -666,15 +697,15 @@ describe('Menu', () => {
         </Menu.Root>,
       );
 
-      expect(document.querySelector('[data-cl-slot="menu-positioner"]')).not.toBeInTheDocument();
+      expect(document.querySelector('[data-testid="menu-positioner"]')).not.toBeInTheDocument();
     });
 
-    it('has data-cl-side when open', async () => {
+    it('has data-side when open', async () => {
       const user = userEvent.setup();
       render(
         <Menu.Root>
           <Menu.Trigger>Actions</Menu.Trigger>
-          <Menu.Positioner>
+          <Menu.Positioner data-testid='menu-positioner'>
             <Menu.Popup>
               <Menu.Item label='Cut'>Cut</Menu.Item>
             </Menu.Popup>
@@ -684,7 +715,7 @@ describe('Menu', () => {
 
       await user.click(screen.getByText('Actions'));
 
-      expect(document.querySelector('[data-cl-slot="menu-positioner"]')).toHaveAttribute('data-cl-side');
+      expect(document.querySelector('[data-testid="menu-positioner"]')).toHaveAttribute('data-side');
     });
   });
 

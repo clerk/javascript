@@ -185,6 +185,12 @@ describe('OrganizationAPI', () => {
     });
   });
 
+  describe('deleteOrganization', () => {
+    it('throws an error when the organization ID is missing', async () => {
+      await expect(apiClient.organizations.deleteOrganization('')).rejects.toThrow('A valid resource ID is required.');
+    });
+  });
+
   describe('createOrganizationInvitationBulk', () => {
     const mockInvitation = {
       object: 'organization_invitation',

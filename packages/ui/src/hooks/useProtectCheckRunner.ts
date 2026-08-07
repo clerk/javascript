@@ -1,0 +1,306 @@
+import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import type { ProtectCheckResource } from '@clerk/shared/types';
+import React from 'react';
+import { flushSync } from 'react-dom';
+
+import { useCardState } from '@/ui/elements/contexts';
+import { handleError } from '@/ui/utils/errorHandler';
+
+/**
+ * A plain GET reload does not re-mint a protect_check challenge server-side, so an expired
+ * challenge would otherwise reload → still expired → reload again, forever. Cap the attempts
+ * and surface an error instead of spinning silently.
+ *
+ * NOTE: who re-mints an expired challenge on read (FAPI vs. re-running the gated step) is still
+ * being decided with the clerk_go team; this cap is the defensive floor until that lands.
+ */
+const MAX_EXPIRED_RELOADS = 2;
+
+/** Upper bound on how long we wait for the challenge SDK to settle before failing loud. */
+const PROTECT_CHECK_SCRIPT_TIMEOUT_MS = 60_000;
+
+export interface ProtectCheckRunnerParams<TResource> {
+  /**
+   * Reads the current protect_check off the resource. Called fresh on each effect run because
+   * `fromJSON` mints a new object on every resource update — we key the effect on the token, not
+   * this reference, so an unrelated refresh doesn't restart the challenge under the user.
+   */
+  getProtectCheck: () => ProtectCheckResource | null | undefined;
+  /** Returns the live resource, used to route after a reload (which mutates it in place). */
+  getResource: () => TResource;
+  /** Reloads the underlying resource (GET) to pick up fresh server state. */
+  reload: () => Promise<unknown>;
+  /** Submits the proof token; resolves to the updated resource. */
+  submitProtectCheck: (params: { proofToken: string }) => Promise<TResource>;
+  /**
+   * Continues the flow once the gate clears (or a chained challenge / already-resolved is
+   * detected). Receives the resource to route on (the `submitProtectCheck` result, or the live
+   * resource after a reload) and must finalize (`setActive`) the `complete` case itself.
+   * `isCancelled` lets the continuation bail if the component unmounted mid-await.
+   */
+  onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
+}
+
+export interface ProtectCheckRunner {
+  containerRef: React.MutableRefObject<HTMLDivElement | null>;
+  isRunning: boolean;
+  /**
+   * Whether the challenge script has signalled (via the `setWidgetVisible` init callback) that
+   * it is showing a widget in the container. While true, the widget owns the progress UI —
+   * callers should hide their own spinner and give the container layout space.
+   */
+  isWidgetVisible: boolean;
+  /** Whether the card is currently showing a (recoverable) error. */
+  hasError: boolean;
+  /** Clears the error and re-runs the challenge from scratch. */
+  retry: () => void;
+}
+
+/**
+ * Shared driver for the `<SignInProtectCheck />` and `<SignUpProtectCheck />` cards. Both run the
+ * exact same lifecycle — load + execute the Protect SDK, submit the proof token, continue the flow
+ * — so the abort/cancel/expiry/timeout/no-RHC handling lives here once instead of being duplicated
+ * (and drifting) across the two components.
+ *
+ * Must be called from within a `CardStateProvider`.
+ */
+export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
+  const card = useCardState();
+
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const isRunningRef = React.useRef(false);
+  const reloadCountRef = React.useRef(0);
+  const [isRunning, setIsRunning] = React.useState(false);
+  const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
+  const [retryNonce, setRetryNonce] = React.useState(0);
+
+  // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
+  // (e.g. an expired-challenge reload that advances the flow) flips the token dependency and
+  // re-runs/cancels the main effect — but that re-run is exactly our cue to route, so the routing
+  // must key on actual unmount, not on the effect's cancel flag.
+  const mountedRef = React.useRef(true);
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Keep the latest callbacks without re-running the effect when the caller re-renders.
+  const paramsRef = React.useRef(params);
+  paramsRef.current = params;
+
+  const token = params.getProtectCheck()?.token;
+
+  React.useEffect(() => {
+    const { getProtectCheck, getResource, reload, submitProtectCheck, onResolved } = paramsRef.current;
+    const protectCheck = getProtectCheck();
+    if (!protectCheck || isRunningRef.current) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    let cancelled = false;
+    // Routing after the gate clears must survive the effect re-run that
+    // clearing `protectCheck` triggers — that re-run is our cue to route, not a
+    // reason to bail. So the onResolved paths below key on REAL unmount, not the
+    // effect's per-run `cancelled` flag (which the re-run's cleanup sets). Same
+    // rationale the expired-reload path already relies on above.
+    const isUnmounted = () => !mountedRef.current;
+
+    const cleanup = () => {
+      cancelled = true;
+      abortController.abort();
+      // Reset the guard so the next mount / token change / retry can re-run; this is what makes
+      // chained challenges work correctly across re-renders.
+      isRunningRef.current = false;
+    };
+
+    const failWith = (code: string, message: string) => {
+      isRunningRef.current = false;
+      setIsRunning(false);
+      handleError(new ClerkRuntimeError(message, { code }), [], card.setError);
+    };
+
+    // The script owns the widget-visibility decision: it receives this callback in its init
+    // payload (as `setWidgetVisible`) and calls it right before revealing UI in the container,
+    // and again with `false` once its widget is done. flushSync so the returned promise only
+    // resolves after the change is committed to the DOM — the caller's spinner is genuinely
+    // gone when the script reveals its widget, with no frame of overlap (same guarantee
+    // BaseRouter relies on flushSync for). Scoped to THIS run: the abort contract is
+    // best-effort, so a zombie script from a timed-out, retried, or superseded run can still
+    // call it late — those signals must not flip visibility under the active run.
+    const setWidgetVisible = (visible: boolean): Promise<void> => {
+      if (cancelled || abortController.signal.aborted || !mountedRef.current) {
+        return Promise.resolve();
+      }
+      flushSync(() => setIsWidgetVisibleState(visible));
+      return Promise.resolve();
+    };
+
+    // Fail closed in no-RHC builds (chrome extension / clerk.no-rhc.js): the gate requires a
+    // remote `import(sdk_url)` we must not perform there. This guard MUST live in the component
+    // layer — `executeProtectCheck` is in `@clerk/shared`, compiled once with the flag hard-coded
+    // `false`, so a guard there would never trip.
+    if (__BUILD_DISABLE_RHC__) {
+      failWith(
+        ERROR_CODES.PROTECT_CHECK_UNSUPPORTED_ENVIRONMENT,
+        'Protect verification is not supported in this environment',
+      );
+      return;
+    }
+
+    // Expired challenge: reload once to pick up a fresh challenge if the server minted one, but
+    // cap the attempts (see MAX_EXPIRED_RELOADS) so a server that returns the same expired
+    // challenge on read can't spin us forever.
+    if (protectCheck.expiresAt !== undefined && protectCheck.expiresAt < Date.now()) {
+      if (reloadCountRef.current >= MAX_EXPIRED_RELOADS) {
+        failWith(ERROR_CODES.PROTECT_CHECK_TIMED_OUT, 'Protect verification expired');
+        return;
+      }
+      reloadCountRef.current += 1;
+      isRunningRef.current = true;
+      setIsRunning(true);
+      void (async () => {
+        try {
+          await reload();
+          if (!mountedRef.current) {
+            return;
+          }
+          const refreshed = getProtectCheck();
+          const stillExpired = !!refreshed && refreshed.expiresAt !== undefined && refreshed.expiresAt < Date.now();
+          if (stillExpired) {
+            // The server didn't re-mint on read. Don't sit on a spinner — fail loud so the user
+            // gets a retry instead of an indefinite wait.
+            failWith(ERROR_CODES.PROTECT_CHECK_TIMED_OUT, 'Protect verification expired');
+          } else if (!refreshed) {
+            // The reload cleared the gate or completed the flow. Route on the refreshed live
+            // resource so the flow continues (and a completed sign-in still gets `setActive`)
+            // instead of the route guard bouncing the user back to flow start. Keyed on mount (not
+            // `cancelled`): clearing protectCheck re-runs/cancels this effect, and that re-run is
+            // our signal to route — it must not abort the routing.
+            await onResolved(getResource(), () => !mountedRef.current);
+          }
+          // Otherwise the server re-minted a fresh, non-expired challenge whose new token
+          // re-triggers this effect (keyed on the token), which then runs it.
+        } catch (err: any) {
+          if (mountedRef.current) {
+            handleError(err, [], card.setError);
+          }
+        } finally {
+          if (mountedRef.current) {
+            isRunningRef.current = false;
+            setIsRunning(false);
+          }
+        }
+      })();
+      return cleanup;
+    }
+
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    // This run owns the container outright: drop anything a previous run left behind (a solved or
+    // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
+    // second widget under a stale one. Reset visibility in the same breath — the container is
+    // empty by construction here, and waiting on the observer callback would leave the state
+    // stale for a scheduling-dependent window (especially on the MutationObserver fallback).
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+    setIsWidgetVisibleState(false);
+
+    isRunningRef.current = true;
+    setIsRunning(true);
+
+    const runChallenge = async () => {
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      try {
+        // Load the Protect SDK loader lazily, gated on the same compile-time flag as the
+        // fail-closed guard above. In no-RHC builds `__BUILD_DISABLE_RHC__` is `true`, so this
+        // branch (and the dynamic `import()` below it) is dead-code-eliminated — the loader and
+        // its remote `import(sdk_url)` are tree-shaken out of those bundles entirely rather than
+        // merely shipped-but-unused.
+        if (__BUILD_DISABLE_RHC__) {
+          return;
+        }
+        const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
+        const proofToken = await Promise.race([
+          executeProtectCheck(protectCheck, container, { signal: abortController.signal, setWidgetVisible }),
+          new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => {
+              // Stop the (possibly hung) SDK and surface a retryable timeout error.
+              abortController.abort();
+              reject(
+                new ClerkRuntimeError('Protect verification timed out', {
+                  code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT,
+                }),
+              );
+            }, PROTECT_CHECK_SCRIPT_TIMEOUT_MS);
+          }),
+        ]);
+        if (cancelled) {
+          return;
+        }
+
+        let updatedResource: TResource;
+        try {
+          updatedResource = await submitProtectCheck({ proofToken });
+        } catch (err) {
+          if (cancelled) {
+            return;
+          }
+          // `protect_check_already_resolved` is retry-safe: the server's state has already moved
+          // past this gate. Reload to clear the stale local protectCheck, then continue routing on
+          // the refreshed live resource.
+          if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
+            await reload();
+            if (isUnmounted()) {
+              return;
+            }
+            await onResolved(getResource(), isUnmounted);
+            return;
+          }
+          throw err;
+        }
+        if (isUnmounted()) {
+          return;
+        }
+        await onResolved(updatedResource, isUnmounted);
+      } catch (err: any) {
+        if (cancelled) {
+          return;
+        }
+        handleError(err, [], card.setError);
+      } finally {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        if (!cancelled) {
+          isRunningRef.current = false;
+          setIsRunning(false);
+        }
+      }
+    };
+
+    void runChallenge();
+    return cleanup;
+    // Keyed on the challenge token (a primitive) rather than the protectCheck object: an unrelated
+    // resource refresh keeps the same token and must NOT restart the challenge, while a genuine
+    // chained challenge carries a new token and re-runs. `retryNonce` re-runs on manual retry.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, retryNonce]);
+
+  const retry = React.useCallback(() => {
+    card.setError('');
+    reloadCountRef.current = 0;
+    isRunningRef.current = false;
+    setRetryNonce(n => n + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { containerRef, isRunning, isWidgetVisible, hasError: !!card.error, retry };
+}

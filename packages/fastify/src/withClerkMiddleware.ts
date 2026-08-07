@@ -31,10 +31,15 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
     // Handle Frontend API proxy requests and auto-derive proxyUrl
     let resolvedProxyUrl = options.proxyUrl;
     if (frontendApiProxy) {
-      const requestUrl = new URL(
-        fastifyRequest.url,
-        `${fastifyRequest.protocol}://${fastifyRequest.hostname || 'localhost'}`,
-      );
+      let requestUrl: URL;
+      try {
+        requestUrl = new URL(
+          fastifyRequest.url,
+          `${fastifyRequest.protocol}://${fastifyRequest.hostname || 'localhost'}`,
+        );
+      } catch {
+        return reply.code(400).send();
+      }
       const isEnabled =
         typeof frontendApiProxy.enabled === 'function'
           ? frontendApiProxy.enabled(requestUrl)
@@ -42,7 +47,12 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
 
       if (isEnabled) {
         if (requestUrl.pathname === proxyPath || requestUrl.pathname.startsWith(proxyPath + '/')) {
-          const proxyRequest = requestToProxyRequest(fastifyRequest);
+          let proxyRequest: Request;
+          try {
+            proxyRequest = requestToProxyRequest(fastifyRequest);
+          } catch {
+            return reply.code(400).send();
+          }
 
           const proxyResponse = await clerkFrontendApiProxy(proxyRequest, {
             proxyPath,
@@ -84,7 +94,13 @@ export const withClerkMiddleware = (options: ClerkFastifyOptions) => {
       }
     }
 
-    const req = fastifyRequestToRequest(fastifyRequest);
+    // Node accepts request targets/methods (`//`, TRACE) the fetch spec cannot represent; reject those instead of 500ing.
+    let req: Request;
+    try {
+      req = fastifyRequestToRequest(fastifyRequest);
+    } catch {
+      return reply.code(400).send();
+    }
 
     const requestState = await clerkClient.authenticateRequest(req, {
       ...options,

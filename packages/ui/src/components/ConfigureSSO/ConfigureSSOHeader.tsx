@@ -1,4 +1,5 @@
 import { Flex, useLocalizations } from '@/customizables';
+import { useUnsafeModalContext } from '@/elements/Modal';
 import { mqu } from '@/styledSystem';
 
 import { ProfileCardHeader } from './elements/ProfileCard';
@@ -12,6 +13,8 @@ type ConfigureSSOHeaderProps = {
 export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Element => {
   const { activeSteps, currentIndex, goToStep } = useWizard();
   const { t } = useLocalizations();
+  const { toggle } = useUnsafeModalContext();
+  const isModal = Boolean(toggle);
 
   // Breadcrumb membership = labelled steps. `select-provider` has no label, so
   // it is absent from the visual stepper while remaining a real navigable step.
@@ -22,7 +25,14 @@ export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Elem
     <ProfileCardHeader>
       {title}
 
-      <Flex sx={title ? { marginInlineStart: 'auto', [mqu.md]: { marginInlineStart: 0 } } : undefined}>
+      <Flex
+        sx={t => ({
+          ...(title ? { marginInlineStart: 'auto', [mqu.md]: { marginInlineStart: 0 } } : {}),
+          // Reserve room for the card's absolute close button (modal only) so the
+          // stepper doesn't render under it. Steps wrap when space is tight.
+          ...(isModal ? { marginInlineEnd: t.space.$10 } : {}),
+        })}
+      >
         <Stepper>
           {visibleSteps.map((step, index) => {
             const isCurrent = index === currentVisibleIndex;

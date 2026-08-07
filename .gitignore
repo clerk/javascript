@@ -2,6 +2,7 @@
 
 # compiled output
 dist
+dist-mosaic
 tmp
 out-tsc
 out
@@ -113,3 +114,5 @@ CLAUDE.local.md
 
 # Git worktrees
 .worktrees
+# Claude Code creates agent worktrees here
+.claude/worktrees

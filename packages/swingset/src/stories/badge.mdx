@@ -1,0 +1,46 @@
+import * as BadgeStories from './badge.stories';
+
+# Badge
+
+Badge labels the status or category of the thing next to it. It renders a `span` by default and forwards a ref to the underlying element; use the `render` prop when the badge belongs in a different element, such as a link. Its `color` carries meaning, so keep the label itself self-describing for anyone who can't see it.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={BadgeStories}
+/>
+
+## Props
+
+<PropTable
+  meta={BadgeStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+<Usage
+  component='Badge'
+  module='@clerk/ui/mosaic/components/badge'
+>
+  Badge Label
+</Usage>
+
+---
+
+## Examples
+
+### Colors
+
+<Story
+  name='Colors'
+  storyModule={BadgeStories}
+/>
+
+### With an icon
+
+<Story
+  name='WithIcon'
+  storyModule={BadgeStories}
+/>

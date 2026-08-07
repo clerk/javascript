@@ -1,0 +1,22 @@
+# Sign in via the native AuthView, restart WITHOUT clearing state, and assert
+# the session is restored from secure-store with no re-auth (bridge + token
+# cache persistence).
+appId: com.clerk.exponativebuildfixture
+name: Session persists across app restart
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: 'signed in'
+    timeout: 45000
+- assertVisible:
+    id: 'user-id'
+# Leave the app signed out for whichever flow runs next.
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml

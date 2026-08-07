@@ -1,11 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus, events } from '../../events';
+import { Environment } from '../../resources/Environment';
 
 const mocks = vi.hoisted(() => ({
   sessionCookie: { set: vi.fn(), remove: vi.fn(), get: vi.fn() },
   clientUatCookie: { set: vi.fn(), remove: vi.fn(), get: vi.fn(() => 0) },
   activeContextCookie: { set: vi.fn(), remove: vi.fn(), get: vi.fn<() => string | undefined>(() => undefined) },
+  devBrowser: {
+    clear: vi.fn(),
+    setup: vi.fn(() => Promise.resolve()),
+    getDevBrowser: vi.fn(() => 'deadbeef'),
+    refreshCookies: vi.fn(),
+  },
   inCrossOriginIframe: vi.fn(() => false),
 }));
 
@@ -13,14 +20,7 @@ vi.mock('../cookies/session', () => ({ createSessionCookie: () => mocks.sessionC
 vi.mock('../cookies/clientUat', () => ({ createClientUatCookie: () => mocks.clientUatCookie }));
 vi.mock('../cookies/activeContext', () => ({ createActiveContextCookie: () => mocks.activeContextCookie }));
 vi.mock('../cookieSuffix', () => ({ getCookieSuffix: vi.fn(() => Promise.resolve('suffix')) }));
-vi.mock('../devBrowser', () => ({
-  createDevBrowser: () => ({
-    clear: vi.fn(),
-    setup: vi.fn(() => Promise.resolve()),
-    getDevBrowser: vi.fn(() => 'deadbeef'),
-    refreshCookies: vi.fn(),
-  }),
-}));
+vi.mock('../devBrowser', () => ({ createDevBrowser: () => mocks.devBrowser }));
 vi.mock('@clerk/shared/internal/clerk-js/runtime', async importOriginal => {
   const actual = await importOriginal<Record<string, unknown>>();
   return { ...actual, inCrossOriginIframe: () => mocks.inCrossOriginIframe() };
@@ -58,6 +58,7 @@ describe('AuthCookieService session cookie refresh', () => {
     mocks.inCrossOriginIframe.mockReturnValue(false);
     mocks.activeContextCookie.get.mockReturnValue(undefined);
     getToken.mockResolvedValue('fresh-jwt');
+    Environment.getInstance().partitionedCookies = false;
     setFocus(true);
     setVisibility('visible');
   });
@@ -135,5 +136,17 @@ describe('AuthCookieService session cookie refresh', () => {
     await vi.waitFor(() => expect(mocks.sessionCookie.set).toHaveBeenCalledWith('jwt-on-visible'));
 
     expect(getToken).toHaveBeenCalled();
+  });
+
+  it('rewrites the session cookie after partitioned cookies resolve', async () => {
+    service = await createService();
+    getToken.mockResolvedValue('jwt-after-environment');
+    Environment.getInstance().partitionedCookies = true;
+    mocks.sessionCookie.set.mockClear();
+
+    eventBus.emit(events.EnvironmentUpdate, null);
+
+    await vi.waitFor(() => expect(mocks.sessionCookie.set).toHaveBeenCalledWith('jwt-after-environment'));
+    expect(mocks.devBrowser.refreshCookies).toHaveBeenCalled();
   });
 });

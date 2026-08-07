@@ -94,4 +94,53 @@ describe('getClerkUIEntryChunk', () => {
     const loadClerkUIScriptCall = mockLoadClerkUIScript.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(loadClerkUIScriptCall?.__internal_clerkUIUrl).toBeUndefined();
   });
+
+  it('does not pass a ClerkUI promise when prefetchUI is false', async () => {
+    const mockLoad = vi.fn().mockResolvedValue(undefined);
+
+    mockLoadClerkJSScript.mockImplementation(() => {
+      (window as any).Clerk = {
+        load: mockLoad,
+        addListener: vi.fn(),
+      };
+      return Promise.resolve(null);
+    });
+
+    const { createClerkInstance } = await import('../create-clerk-instance');
+
+    await createClerkInstance({
+      publishableKey: 'pk_test_xxx',
+      prefetchUI: false,
+    });
+
+    expect(mockLoadClerkUIScript).not.toHaveBeenCalled();
+    const loadCall = mockLoad.mock.calls[0]?.[0] as Record<string, any>;
+    expect(loadCall.ui.ClerkUI).toBeUndefined();
+  });
+
+  it('does not pass a ClerkUI promise when ui is a marker object without a constructor', async () => {
+    const mockLoad = vi.fn().mockResolvedValue(undefined);
+
+    mockLoadClerkJSScript.mockImplementation(() => {
+      (window as any).Clerk = {
+        load: mockLoad,
+        addListener: vi.fn(),
+      };
+      return Promise.resolve(null);
+    });
+
+    const { createClerkInstance } = await import('../create-clerk-instance');
+
+    await createClerkInstance({
+      publishableKey: 'pk_test_xxx',
+      ui: {
+        __brand: '__clerkUI',
+        version: '1.2.3',
+      },
+    } as any);
+
+    expect(mockLoadClerkUIScript).not.toHaveBeenCalled();
+    const loadCall = mockLoad.mock.calls[0]?.[0] as Record<string, any>;
+    expect(loadCall.ui.ClerkUI).toBeUndefined();
+  });
 });

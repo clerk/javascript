@@ -1,5 +1,312 @@
 # @clerk/ui
 
+## 1.29.1
+
+### Patch Changes
+
+- Hide the “Use another method” action during Device Trust and second-factor verification when no alternative verification method is available. ([#9355](https://github.com/clerk/javascript/pull/9355)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+  - @clerk/localizations@4.14.2
+
+## 1.29.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Ensure drawers opened from modals render above the modal and its backdrop. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep invitation email pills consistently spaced when they wrap across multiple rows. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+  - @clerk/localizations@4.14.1
+
+## 1.28.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+### Patch Changes
+
+- fix(ui): Avoid races between email link tabs when using sign up if missing ([#9328](https://github.com/clerk/javascript/pull/9328)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+  - @clerk/localizations@4.14.0
+
+## 1.27.2
+
+### Patch Changes
+
+- Enable self-serve OIDC configuration for every application. Organization admins can now select an OIDC provider in the `<OrganizationProfile />` Security tab without the `experimental.oidcSelfServe` option, and existing OIDC connections open their configuration steps instead of the unsupported-provider state. The `experimental.oidcSelfServe` option no longer does anything and can be removed from `<ClerkProvider />` and `Clerk.load()`. ([#9288](https://github.com/clerk/javascript/pull/9288)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+  - @clerk/localizations@4.13.10
+
+## 1.27.1
+
+### Patch Changes
+
+- Prevent phone number and multi-email fields from crashing when they receive paste events without clipboard data. ([#9274](https://github.com/clerk/javascript/pull/9274)) by [@brkalow](https://github.com/brkalow)
+
+## 1.27.0
+
+### Minor Changes
+
+- Add a new Mosaic `Avatar` compound component (StyleX). `Avatar.Root` owns `shape` (`circle` | `square`) and `size` (`lg` | `md` | `sm` | `xs`); compose `Avatar.Image` (renders once the image loads) and `Avatar.Fallback` (shown while the image is pending or has failed, with an optional `delayMs`) inside it. ([#9230](https://github.com/clerk/javascript/pull/9230)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add support for configuring custom OpenID Connect enterprise connections through the Organization Profile. ([#9200](https://github.com/clerk/javascript/pull/9200)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Expose whether an organization member has been deprovisioned, and mark deprovisioned members as inactive in the Organization Profile. ([#9202](https://github.com/clerk/javascript/pull/9202)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/localizations@4.13.9
+  - @clerk/shared@4.25.9
+
+## 1.26.1
+
+### Patch Changes
+
+- Fix an issue where Clerk's ticket query parameters were not removed from the URL when completing a sign-up that was missing requirements. ([#9255](https://github.com/clerk/javascript/pull/9255)) by [@dstaley](https://github.com/dstaley)
+
+## 1.26.0
+
+### Minor Changes
+
+- Expose composable `UserProfile` and `OrganizationProfile` subcomponents from `@clerk/ui/experimental` ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix `OrganizationProfileGeneralPanel` (from `@clerk/ui/experimental`) throwing "CardState not found" when opening the leave-organization or delete-organization confirmation in its default, no-children page mode. The panel now provides the same root `CardStateProvider` that a mounted `<OrganizationProfile />` supplies. ([#9243](https://github.com/clerk/javascript/pull/9243)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+  - @clerk/localizations@4.13.8
+
+## 1.25.8
+
+### Patch Changes
+
+- Use logical CSS properties for the organization members footer and the MFA setup task header, so both lay out correctly in right-to-left locales. ([#9218](https://github.com/clerk/javascript/pull/9218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+  - @clerk/localizations@4.13.7
+
+## 1.25.7
+
+### Patch Changes
+
+- Ensure the keyless prompt renders above application content by setting an explicit `z-index`. ([#9211](https://github.com/clerk/javascript/pull/9211)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The OAuth consent screen now shows a recognizable brand mark for well-known OAuth clients (Claude, ChatGPT) when the requesting application has not uploaded its own logo. ([#9158](https://github.com/clerk/javascript/pull/9158)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.25.6
+
+### Patch Changes
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+  - @clerk/localizations@4.13.6
+
+## 1.25.5
+
+### Patch Changes
+
+- Fix pressing `Escape` while a `Select` is open inside a `Drawer` (for example the payment method picker in Checkout) dismissing the entire Drawer. `Escape` now closes only the open `Select` and leaves the Drawer open. The `Select` now wires up its floating interaction props so it handles `Escape` itself, and the `Drawer` roots a floating tree so nested floating elements are recognized as its children. ([#9176](https://github.com/clerk/javascript/pull/9176)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve `Select` keyboard and screen reader support by routing navigation through floating-ui's interaction hooks. Pressing `ArrowUp`/`ArrowDown` on a focused, closed `Select` now opens the listbox, and the active option is announced via `aria-activedescendant`. The searchable variant (for example the `PhoneInput` country picker) now exposes a proper combobox: its input is marked `role="combobox"` with `aria-controls`, `aria-autocomplete="list"`, and `aria-activedescendant`, while the plain variant keeps its listbox semantics. ([#9179](https://github.com/clerk/javascript/pull/9179)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+  - @clerk/localizations@4.13.5
+
+## 1.25.4
+
+### Patch Changes
+
+- Reduce layout shift while loading the organization and billing UI. The domain list, billing subscription section, and payment methods now reserve their loaded height while data is fetched, and the subscription section shows a loading indicator instead of rendering nothing. ([#9169](https://github.com/clerk/javascript/pull/9169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve phone input country selector and menu item styling, refining hover and focus states, spacing, and scroll padding. ([#9161](https://github.com/clerk/javascript/pull/9161)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix table row hover styling so the rounded bottom corners are only applied to the last row, matching the table's border radius. Previously any hovered row showed a stray corner radius. ([#9170](https://github.com/clerk/javascript/pull/9170)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Headings now use `text-wrap: balance` and body text uses `text-wrap: pretty` to reduce widows and orphans when text wraps across lines. This is a progressive enhancement that falls back to normal wrapping in browsers without support. ([#9157](https://github.com/clerk/javascript/pull/9157)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+  - @clerk/localizations@4.13.4
+
+## 1.25.3
+
+### Patch Changes
+
+- Fix small actions button border radius to ensure consistency. ([#9146](https://github.com/clerk/javascript/pull/9146)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Reduce the organization avatar's border radius in the `OrganizationSwitcher` trigger so it stays proportional at the smaller trigger size. ([#9148](https://github.com/clerk/javascript/pull/9148)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Set `box-sizing: border-box` on the spinner so its border no longer changes the rendered size and causes a layout shift. ([#9147](https://github.com/clerk/javascript/pull/9147)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+  - @clerk/localizations@4.13.3
+
+## 1.25.2
+
+### Patch Changes
+
+- Add a clear button to search inputs for quickly resetting the current query. It appears in the `<APIKeys />` search and the `<OrganizationProfile />` members search. ([#9098](https://github.com/clerk/javascript/pull/9098)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Search inputs now expose a shared `searchInput` appearance element (layered alongside any existing component-specific element), and the clear button is themeable via the new shared `searchInputClearButton` element. The clear button's label can be customized with the new shared `searchInput.action__clear` localization key.
+
+- Fix org invitation and request action descriptions alignment. ([#9118](https://github.com/clerk/javascript/pull/9118)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Polish the `<OrganizationSwitcher />`: ([#9112](https://github.com/clerk/javascript/pull/9112)) by [@maxyinger](https://github.com/maxyinger)
+  - Decode avatar images synchronously so a freshly mounted avatar (e.g. when the popover opens) paints on its first frame instead of briefly flashing the avatar background.
+  - Highlight the trigger while its popover is open.
+  - Align the "Create organization" action's height with the other rows for a consistent list.
+
+- Increase the default height of buttons and inputs by 2px for larger, easier-to-tap touch targets, especially on mobile. ([#9061](https://github.com/clerk/javascript/pull/9061)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/localizations@4.13.2
+  - @clerk/shared@4.25.2
+
+## 1.25.1
+
+### Patch Changes
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+  - @clerk/localizations@4.13.1
+
+## 1.25.0
+
+### Minor Changes
+
+- Add support for Clerk Protect mid-flow SDK challenges (`protect_check`) on both sign-up and sign-in. ([#8329](https://github.com/clerk/javascript/pull/8329)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  When the Protect antifraud service issues a challenge, responses now carry a `protectCheck` field
+  with `{ status, token, sdkUrl, expiresAt?, uiHints? }`. Clients resolve the gate by loading the
+  SDK at `sdkUrl`, executing the challenge, and submitting the resulting proof token via
+  `signUp.submitProtectCheck({ proofToken })` or `signIn.submitProtectCheck({ proofToken })`. The
+  response may carry a chained challenge, which the SDK resolves iteratively.
+
+  Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union. **Upgrading this
+  package is type-only and does not change runtime behavior**: the server returns the new status
+  (and the `protectCheck` field) only for instances where Protect mid-flow challenges have been
+  explicitly enabled — the feature is off by default and is not enabled for existing instances by
+  upgrading. The server additionally only emits the new status value to SDK versions that
+  understand it, so older clients never receive an unknown status.
+
+  If an exhaustive `switch` on `signIn.status` flags the new value after upgrading, handle it by
+  running the challenge described by `protectCheck` and submitting the proof via
+  `submitProtectCheck()`. Clients should treat the `protectCheck` field as the authoritative gate
+  signal and fall back to the status value for defense in depth.
+
+  The pre-built `<SignIn />` and `<SignUp />` components handle the gate automatically by routing
+  to a new `protect-check` route that runs the challenge SDK and resumes the flow on completion.
+
+### Patch Changes
+
+- Fix the payment method form getting stuck in a loading state after a failed card setup. Non-validation errors such as 3DS authentication failures are now displayed. ([#9080](https://github.com/clerk/javascript/pull/9080)) by [@aeliox](https://github.com/aeliox)
+
+- Fix the organization profile modal close button overlapping the SSO configuration wizard's step header. ([#9089](https://github.com/clerk/javascript/pull/9089)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Enlarge the show/hide password toggle button's hit area with added padding and rounded corners, making it easier to tap and giving it a clearer hover/focus target. ([#9096](https://github.com/clerk/javascript/pull/9096)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Polish the Protect check card: the loading spinner now hides while a challenge widget (e.g. Turnstile) is visible instead of spinning alongside it, only appears after a short delay so near-instant checks never flash it, and the card no longer reserves empty space above the spinner before a widget has rendered. ([#9099](https://github.com/clerk/javascript/pull/9099)) by [@mwickett](https://github.com/mwickett)
+
+- Fix standalone `<SignUp />` Protect checks so the verification card stays mounted while a solved challenge routes to the next step, while stale direct visits to the protect-check route return to the start of the sign-up flow. ([#9082](https://github.com/clerk/javascript/pull/9082)) by [@mwickett](https://github.com/mwickett)
+
+- Fix tooltips rendering behind modals (for example on the organization profile Security page). Tooltips now layer above modal content, and pressing Escape or clicking outside while a tooltip is open inside a modal closes only the tooltip instead of also dismissing the modal. ([#9093](https://github.com/clerk/javascript/pull/9093)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+  - @clerk/localizations@4.13.0
+
+## 1.24.2
+
+### Patch Changes
+
+- Fix the checked checkbox appearing as a blank filled box in dark themes. The checkmark now uses the `colorPrimaryForeground` theme color, so it stays legible against the checkbox background across light, dark, and custom themes. ([#9074](https://github.com/clerk/javascript/pull/9074)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- On the Test step of the self-serve SSO configuration flow, clicking Continue now re-checks for a successful test run before blocking, so a successful run completed in a separate browser tab is recognized without first clicking Refresh logs. ([#9046](https://github.com/clerk/javascript/pull/9046)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Use locale and currency aware formatting for negative money amounts ([#9064](https://github.com/clerk/javascript/pull/9064)) by [@dstaley](https://github.com/dstaley)
+
+- Fix icon-only social buttons rendering taller than the ones with text. They now size to the same height as the text (block) buttons across all appearance spacing and font-size settings, keeping every social button in a row consistent. ([#9058](https://github.com/clerk/javascript/pull/9058)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Stop `truncateWithEndVisible` from splitting characters outside the BMP (such as CJK Extension B kanji and emoji) into a broken replacement character when truncating to a very small width. The short-width fallback now slices by code point, matching the main truncation path. ([#9047](https://github.com/clerk/javascript/pull/9047)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+  - @clerk/localizations@4.12.1
+
+## 1.24.1
+
+### Patch Changes
+
+- Add an accessible name to the API Keys search input so screen readers announce it correctly. ([#9055](https://github.com/clerk/javascript/pull/9055)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.24.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix `<UserButton />` session actions alignment. ([#9034](https://github.com/clerk/javascript/pull/9034)) by [@andrewtam](https://github.com/andrewtam)
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/localizations@4.12.0
+  - @clerk/shared@4.23.0
+
+## 1.23.1
+
+### Patch Changes
+
+- UserProfile should show attributes enabled for sign in ([#8042](https://github.com/clerk/javascript/pull/8042)) by [@dmoerner](https://github.com/dmoerner)
+
+- Fix missing redirect URL protocol validation for Clerk UI browser navigations, including the multi-session add-account flow. ([#8961](https://github.com/clerk/javascript/pull/8961)) by [@jacekradko](https://github.com/jacekradko)
+
+  Internal browser navigations now consistently honor configured redirect protocols and fail closed across mixed ClerkJS/UI bundle versions.
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+  - @clerk/localizations@4.11.1
+
 ## 1.23.0
 
 ### Minor Changes
