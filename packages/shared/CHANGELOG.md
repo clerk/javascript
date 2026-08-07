@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.27.2
+
+### Patch Changes
+
+- Make OAuth consent screens clearly identify private metadata as potentially sensitive information set by the Clerk application. ([#9226](https://github.com/clerk/javascript/pull/9226)) by [@jescalan](https://github.com/jescalan)
+
 ## 4.27.1
 
 ### Patch Changes
