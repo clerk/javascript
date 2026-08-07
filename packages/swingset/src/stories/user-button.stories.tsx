@@ -265,13 +265,13 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   );
 }
 
-export function WithoutPlanBadge(_args: Record<string, unknown>) {
+export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   return (
     <UserButtonView
       {...prototype}
-      renderPlanBadge={false}
+      renderTriggerBadge={false}
     />
   );
 }
