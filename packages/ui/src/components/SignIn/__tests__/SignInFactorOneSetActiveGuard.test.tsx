@@ -7,6 +7,7 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
 import { SignInFactorOne } from '../SignInFactorOne';
+import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -114,5 +115,45 @@ describe('SignIn setActive guard', () => {
     render(<SignInFactorOne />, { wrapper });
 
     await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'));
+  });
+
+  it('still bounces if another session is activated before the sign-in is abandoned', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withMultiSessionMode();
+      f.withEmailAddress();
+      f.withPreferredSignInStrategy({ strategy: 'otp' });
+      f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+    });
+
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+    const { rerender } = render(<SignInFactorOne />, { wrapper });
+
+    fixtures.clerk.__internal_setActiveInProgress = true;
+    rerender(<SignInFactorOne />);
+
+    fixtures.clerk.__internal_setActiveInProgress = false;
+    (fixtures.signIn as any).status = 'needs_identifier';
+    rerender(<SignInFactorOne />);
+
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 1000 });
+  });
+
+  it('still bounces factor two if another session is activated before the sign-in returns to factor one', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withMultiSessionMode();
+      f.startSignInFactorTwo();
+    });
+
+    fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+    const { rerender } = render(<SignInFactorTwo />, { wrapper });
+
+    fixtures.clerk.__internal_setActiveInProgress = true;
+    rerender(<SignInFactorTwo />);
+
+    fixtures.clerk.__internal_setActiveInProgress = false;
+    (fixtures.signIn as any).status = 'needs_first_factor';
+    rerender(<SignInFactorTwo />);
+
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 1000 });
   });
 });
