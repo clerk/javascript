@@ -746,6 +746,8 @@ export const enUS: LocalizationResource = {
         },
         verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
         verifyAgainButton: 'Verify again',
+        verifyAgainButtonTooltip__throttled:
+          'DNS changes take a few minutes to propagate. You can check again in {{countdown}}.',
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Add {{domain}}',

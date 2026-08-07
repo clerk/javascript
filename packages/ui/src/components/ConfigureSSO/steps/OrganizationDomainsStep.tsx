@@ -26,7 +26,7 @@ import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { Tooltip } from '@/elements/Tooltip';
 import { Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
-import { common } from '@/styledSystem';
+import { common, type ThemableCssProp } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
 
@@ -83,14 +83,16 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
-  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource) => {
+  const handlePrepareOwnershipVerification = async (domain: OrganizationDomainResource): Promise<boolean> => {
     card.setError(undefined);
 
     try {
       await prepareOwnershipVerification([domain]);
+      return true;
     } catch (err: any) {
       const apiError = getFieldError(err) ?? getGlobalError(err);
       card.setError(apiError);
+      return false;
     }
   };
 
@@ -364,6 +366,38 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
   );
 };
 
+const getRetryCooldownMs = (retryThrottledUntil: number | null): number =>
+  retryThrottledUntil ? Math.max(0, retryThrottledUntil - Date.now()) : 0;
+
+const formatRetryCooldown = (remainingMs: number): string => {
+  const totalSeconds = Math.ceil(remainingMs / 1000);
+  return `${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60).toString().padStart(2, '0')}`;
+};
+
+const useRetryCooldown = (retryThrottledUntil: number | null): number => {
+  const [remainingMs, setRemainingMs] = useState(() => getRetryCooldownMs(retryThrottledUntil));
+
+  useEffect(() => {
+    setRemainingMs(getRetryCooldownMs(retryThrottledUntil));
+
+    if (!retryThrottledUntil) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      const remaining = getRetryCooldownMs(retryThrottledUntil);
+      setRemainingMs(remaining);
+      if (remaining === 0) {
+        window.clearInterval(intervalId);
+      }
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [retryThrottledUntil]);
+
+  return remainingMs;
+};
+
 const DomainCard = ({
   domain,
   onRemove,
@@ -373,16 +407,12 @@ const DomainCard = ({
 }: {
   domain: OrganizationDomainResource;
   onRemove: () => void;
-  onPrepareOwnershipVerification: () => Promise<void>;
+  onPrepareOwnershipVerification: () => Promise<boolean>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
 }): JSX.Element | null => {
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isVerificationRetryThrottled, setIsVerificationRetryThrottled] = useState(false);
-  const retryTimerRef = useRef<number | undefined>(undefined);
-  const isVerificationRetryThrottledRef = useRef(false);
-
-  useEffect(() => () => window.clearTimeout(retryTimerRef.current), []);
+  const [retryThrottledUntil, setRetryThrottledUntil] = useState<number | null>(null);
 
   if (!domain.name) {
     return null;
@@ -394,18 +424,18 @@ const DomainCard = ({
   const cardId = ownershipVerification?.status ?? 'unverified';
 
   const handleVerificationRetry = () => {
-    if (isVerificationRetryThrottledRef.current) {
+    if (isVerifying || getRetryCooldownMs(retryThrottledUntil) > 0) {
       return;
     }
 
-    isVerificationRetryThrottledRef.current = true;
-    setIsVerificationRetryThrottled(true);
-    retryTimerRef.current = window.setTimeout(() => {
-      isVerificationRetryThrottledRef.current = false;
-      setIsVerificationRetryThrottled(false);
-    }, OWNERSHIP_VERIFICATION_RETRY_THROTTLE_MS);
     setIsVerifying(true);
-    void onPrepareOwnershipVerification().finally(() => setIsVerifying(false));
+    void onPrepareOwnershipVerification()
+      .then(didPrepare => {
+        if (didPrepare) {
+          setRetryThrottledUntil(Date.now() + OWNERSHIP_VERIFICATION_RETRY_THROTTLE_MS);
+        }
+      })
+      .finally(() => setIsVerifying(false));
   };
 
   const removeButton = (
@@ -497,7 +527,7 @@ const DomainCard = ({
               key='expired'
               expiresAt={ownershipVerification?.expiresAt ?? null}
               isVerifying={isVerifying}
-              isVerificationRetryThrottled={isVerificationRetryThrottled}
+              retryThrottledUntil={retryThrottledUntil}
               onVerificationRetry={handleVerificationRetry}
             />
           ) : ownershipVerification?.verifiedAt ? (
@@ -515,7 +545,7 @@ const DomainCard = ({
               key='unverified'
               ownershipVerification={ownershipVerification}
               isVerifying={isVerifying}
-              isVerificationRetryThrottled={isVerificationRetryThrottled}
+              retryThrottledUntil={retryThrottledUntil}
               onVerificationRetry={handleVerificationRetry}
             />
           )}
@@ -528,12 +558,12 @@ const DomainCard = ({
 const ExpiredNotice = ({
   expiresAt,
   isVerifying,
-  isVerificationRetryThrottled,
+  retryThrottledUntil,
   onVerificationRetry,
 }: {
   expiresAt: Date | null;
   isVerifying: boolean;
-  isVerificationRetryThrottled: boolean;
+  retryThrottledUntil: number | null;
   onVerificationRetry: () => void;
 }): JSX.Element => {
   return (
@@ -553,8 +583,9 @@ const ExpiredNotice = ({
 
       <VerificationRetryButton
         isVerifying={isVerifying}
-        isThrottled={isVerificationRetryThrottled}
+        retryThrottledUntil={retryThrottledUntil}
         onClick={onVerificationRetry}
+        sx={{ alignSelf: 'flex-start' }}
       />
     </Col>
   );
@@ -562,14 +593,19 @@ const ExpiredNotice = ({
 
 const VerificationRetryButton = ({
   isVerifying,
-  isThrottled,
+  retryThrottledUntil,
   onClick,
+  sx,
 }: {
   isVerifying: boolean;
-  isThrottled: boolean;
+  retryThrottledUntil: number | null;
   onClick: () => void;
+  sx?: ThemableCssProp;
 }): JSX.Element => {
-  return (
+  const remainingMs = useRetryCooldown(retryThrottledUntil);
+  const isThrottled = remainingMs > 0;
+
+  const button = (
     <Button
       variant='bordered'
       colorScheme='secondary'
@@ -577,7 +613,7 @@ const VerificationRetryButton = ({
       isLoading={isVerifying}
       isDisabled={isThrottled}
       onClick={onClick}
-      sx={t => ({ alignSelf: 'flex-start', gap: t.space.$1x5 })}
+      sx={[t => ({ flexShrink: 0, gap: t.space.$1x5 }), sx]}
     >
       <Icon
         icon={RotateLeftRight}
@@ -590,17 +626,32 @@ const VerificationRetryButton = ({
       />
     </Button>
   );
+
+  if (!isThrottled) {
+    return button;
+  }
+
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger>{button}</Tooltip.Trigger>
+      <Tooltip.Content
+        text={localizationKeys('configureSSO.organizationDomainsStep.domainCard.verifyAgainButtonTooltip__throttled', {
+          countdown: formatRetryCooldown(remainingMs),
+        })}
+      />
+    </Tooltip.Root>
+  );
 };
 
 const TxtRecord = ({
   ownershipVerification,
   isVerifying,
-  isVerificationRetryThrottled,
+  retryThrottledUntil,
   onVerificationRetry,
 }: {
   ownershipVerification: OrganizationDomainResource['ownershipVerification'];
   isVerifying: boolean;
-  isVerificationRetryThrottled: boolean;
+  retryThrottledUntil: number | null;
   onVerificationRetry: () => void;
 }): JSX.Element => {
   return (
@@ -655,13 +706,13 @@ const TxtRecord = ({
           copiedIcon={Checkmark}
           sx={{ flex: 1, minWidth: 0 }}
         />
-      </Flex>
 
-      <VerificationRetryButton
-        isVerifying={isVerifying}
-        isThrottled={isVerificationRetryThrottled}
-        onClick={onVerificationRetry}
-      />
+        <VerificationRetryButton
+          isVerifying={isVerifying}
+          retryThrottledUntil={retryThrottledUntil}
+          onClick={onVerificationRetry}
+        />
+      </Flex>
     </Col>
   );
 };

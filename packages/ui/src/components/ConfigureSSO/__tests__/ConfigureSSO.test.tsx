@@ -201,23 +201,77 @@ describe('ConfigureSSO', () => {
       mockOrganizationDomains(fixtures, [expiredDomain]);
       fixtures.clerk.organization?.prepareOwnershipVerification.mockResolvedValue({ data: [expiredDomain] } as any);
 
-      const { findByRole } = render(<ConfigureSSO />, { wrapper });
-      const verifyAgainButton = await findByRole('button', { name: /verify again/i });
+      const { findByRole, getByRole } = render(<ConfigureSSO />, { wrapper });
+      await findByRole('button', { name: /verify again/i });
 
       vi.useFakeTimers();
       await act(() => {
-        verifyAgainButton.click();
+        getByRole('button', { name: /verify again/i }).click();
         return Promise.resolve();
       });
 
       expect(fixtures.clerk.organization?.prepareOwnershipVerification).toHaveBeenCalledWith([expiredDomain.id]);
-      expect(verifyAgainButton).toBeDisabled();
+      expect(getByRole('button', { name: /verify again/i })).toBeDisabled();
 
       act(() => {
         vi.advanceTimersByTime(5 * 60 * 1000);
       });
 
-      expect(verifyAgainButton).not.toBeDisabled();
+      expect(getByRole('button', { name: /verify again/i })).not.toBeDisabled();
+    });
+
+    it('surfaces the remaining cooldown while a domain verification retry is throttled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [expiredDomain]);
+      fixtures.clerk.organization?.prepareOwnershipVerification.mockResolvedValue({ data: [expiredDomain] } as any);
+
+      const { findByRole, getByRole, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
+      await userEvent.click(await findByRole('button', { name: /verify again/i }));
+
+      const throttledButton = await waitFor(() => {
+        const button = getByRole('button', { name: /verify again/i });
+        expect(button).toBeDisabled();
+        return button;
+      });
+
+      await userEvent.hover(throttledButton.parentElement as HTMLElement);
+      await findByText(/you can check again in \d:\d{2}/i);
+    });
+
+    it('does not throttle domain verification retries when the request fails', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [expiredDomain]);
+      fixtures.clerk.organization?.prepareOwnershipVerification.mockRejectedValue(new Error('nope'));
+
+      const { findByRole, getByRole } = render(<ConfigureSSO />, { wrapper });
+      await findByRole('button', { name: /verify again/i });
+
+      await act(() => {
+        getByRole('button', { name: /verify again/i }).click();
+        return Promise.resolve();
+      });
+
+      expect(getByRole('button', { name: /verify again/i })).not.toBeDisabled();
     });
 
     it('short-circuits to the activate step for an active connection', async () => {
