@@ -9,6 +9,7 @@ const componentImportPaths = {
   CreateOrganization: () => import(/* webpackChunkName: "createorganization" */ './../components/CreateOrganization'),
   OrganizationProfile: () =>
     import(/* webpackChunkName: "organizationprofile" */ './../components/OrganizationProfile'),
+  InviteMembers: () => import(/* webpackChunkName: "invitemembers" */ './../components/InviteMembers'),
   OrganizationSwitcher: () =>
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
@@ -88,6 +89,10 @@ export const OrganizationProfile = lazy(() =>
 
 export const OrganizationProfileModal = lazy(() =>
   componentImportPaths.OrganizationProfile().then(module => ({ default: module.OrganizationProfileModal })),
+);
+
+export const InviteMembersModal = lazy(() =>
+  componentImportPaths.InviteMembers().then(module => ({ default: module.InviteMembersModal })),
 );
 
 export const OrganizationSwitcher = lazy(() =>
@@ -175,6 +180,7 @@ export const ClerkComponents = {
   SignUpModal,
   UserProfileModal,
   OrganizationProfileModal,
+  InviteMembersModal,
   CreateOrganizationModal,
   UserVerificationModal,
   GoogleOneTap,

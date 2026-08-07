@@ -1391,6 +1391,10 @@ export const esUY: LocalizationResource = {
         subtitleNewTab: 'Volvé a la nueva pestaña para continuar',
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',

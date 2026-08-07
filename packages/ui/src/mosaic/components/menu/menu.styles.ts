@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // Positioning is applied inline by the headless positioner; this only clears the
@@ -20,7 +20,6 @@ export const styles = stylex.create({
     boxShadow: `0 12px 12px -7px oklch(0.2046 0 0 / 12%),
                 0 24px 24px -10px oklch(0.2046 0 0 / 4%),
                 0 0 0 1px oklch(0.2046 0 0 / 4%)`,
-    boxSizing: 'border-box',
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
@@ -63,11 +62,9 @@ export const styles = stylex.create({
         ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
-    boxSizing: 'border-box',
-    color: 'inherit',
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
-    fontFamily: 'inherit',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
