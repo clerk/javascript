@@ -4,11 +4,12 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 import { isNativeSupported } from '../utils/native-module';
+import type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
 
 /**
  * Props for the UserProfileView component.
  */
-export interface UserProfileViewProps {
+export interface UserProfileViewProps extends EmbeddedNavigationProps {
   /**
    * Whether the inline profile view shows a dismiss button.
    *
@@ -39,6 +40,9 @@ export interface UserProfileViewProps {
  *
  * To present the profile, render it inside your own `Modal`, sheet, or route.
  *
+ * To push the profile onto your own navigation stack, hide the route's header and
+ * pass `onHostBack` so Clerk's own chrome takes over.
+ *
  * Sign-out is detected automatically and synced with the JS SDK. Use `useAuth()` in a
  * `useEffect` to react to sign-out.
  *
@@ -60,7 +64,7 @@ export interface UserProfileViewProps {
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({ isDismissible = true, style, onDismiss }: UserProfileViewProps) {
+export function UserProfileView({ isDismissible = true, style, onDismiss, onHostBack }: UserProfileViewProps) {
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -86,7 +90,9 @@ export function UserProfileView({ isDismissible = true, style, onDismiss }: User
     <NativeClerkUserProfileView
       style={[styles.container, style]}
       isDismissible={isDismissible}
+      hostBackButton={!!onHostBack}
       onProfileEvent={handleProfileEvent}
+      onHostBack={onHostBack ? () => onHostBack() : undefined}
     />
   );
 }

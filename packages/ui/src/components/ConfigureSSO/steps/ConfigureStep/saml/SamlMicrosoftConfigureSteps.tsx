@@ -34,15 +34,15 @@ import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
+  IdentityProviderConfigurationModes,
+  type SamlIdpConfigurationMode,
+} from '../shared/IdentityProviderConfigurationModes';
+import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
   IdentityProviderConfigurationForm,
   type IdentityProviderConfigurationFormProps,
 } from './shared/IdentityProviderConfigurationForm';
-import {
-  IdentityProviderConfigurationModes,
-  type IdpConfigurationMode,
-} from './shared/IdentityProviderConfigurationModes';
 
 const MICROSOFT_STEPS: WizardStepConfig[] = [
   { id: 'create-app' },
@@ -636,7 +636,7 @@ const SamlMicrosoftAttributeMappingStep = (): JSX.Element => {
   );
 };
 
-const MICROSOFT_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+const MICROSOFT_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly SamlIdpConfigurationMode[];
 
 const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
@@ -655,7 +655,7 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
   );
   const existingCertPresent = Boolean(samlConnection?.idpCertificate);
 
-  const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
+  const [mode, setMode] = React.useState<SamlIdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 

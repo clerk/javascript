@@ -1,3 +1,5 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
 package expo.modules.clerk
 
 import android.content.Context
@@ -15,10 +17,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.clerk.api.Clerk
+import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
 import com.clerk.ui.auth.AuthMode
 import com.clerk.ui.auth.AuthView
+import com.clerk.ui.navigation.ClerkHostBackActionProvider
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -38,6 +42,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   var mode: String? = null
   var logoView: View? = null
     private set
+  var hostBackButton: Boolean = false
 
   private var logoWidth = 0
   private var logoHeight = 0
@@ -53,6 +58,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
     }
 
   private val onAuthEvent by EventDispatcher()
+  private val onHostBack by EventDispatcher()
 
   init {
     // At cold start, ClerkExpoModule.configure() may run before React's
@@ -83,8 +89,17 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
   @Composable
   override fun Content() {
-    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, activity: $activity")
+    debugLog(TAG, "setupView - mode: $mode, isDismissible: $isDismissible, hostBackButton: $hostBackButton, activity: $activity")
 
+    if (hostBackButton) {
+      ClerkHostBackActionProvider(onHostBack = { onHostBack(mapOf()) }) { AuthContent() }
+    } else {
+      AuthContent()
+    }
+  }
+
+  @Composable
+  private fun AuthContent() {
     AuthView(
       modifier = Modifier.fillMaxSize(),
       clerkTheme = authTheme(),
@@ -167,7 +182,7 @@ class ClerkAuthViewModule : Module() {
     Name("ClerkAuthView")
 
     View(ClerkAuthNativeView::class) {
-      Events("onAuthEvent")
+      Events("onAuthEvent", "onHostBack")
 
       GroupView<ClerkAuthNativeView> {
         AddChildView<View> { parent, child, _ ->
@@ -201,10 +216,13 @@ class ClerkAuthViewModule : Module() {
         view.logoMaxHeight = logoMaxHeight
       }
 
+      Prop("hostBackButton") { view: ClerkAuthNativeView, hostBackButton: Boolean ->
+        view.hostBackButton = hostBackButton
+      }
+
       OnViewDidUpdateProps { view: ClerkAuthNativeView ->
         view.setupView()
       }
-
     }
   }
 }

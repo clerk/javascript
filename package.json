@@ -86,7 +86,7 @@
     "@eslint/js": "9.31.0",
     "@faker-js/faker": "^9.9.0",
     "@octokit/rest": "^20.1.2",
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.62.1",
     "@stylexjs/eslint-plugin": "0.19.0",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",

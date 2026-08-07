@@ -46,6 +46,14 @@ import {
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as ItemDefault,
+  Group as ItemGroup,
+  Interactive as ItemInteractive,
+  meta as itemMeta,
+  Scrolling as ItemScrolling,
+} from '../stories/item.stories';
+import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
@@ -80,7 +88,22 @@ import {
   meta as organizationProfileProfileSectionMeta,
 } from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Alignment as PopoverComponentAlignment,
+  Default as PopoverComponentDefault,
+  meta as popoverComponentMeta,
+  Placement as PopoverComponentPlacement,
+} from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Default as ScrollAreaDefault,
+  Gutter as ScrollAreaGutter,
+  HoverReveal as ScrollAreaHoverReveal,
+  meta as scrollAreaMeta,
+  NotScrollable as ScrollAreaNotScrollable,
+  ShadowIndicators as ScrollAreaShadowIndicators,
+  ThemedScrollbar as ScrollAreaThemedScrollbar,
+} from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -149,12 +172,29 @@ const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, 
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const popoverComponentModule: StoryModule = {
+  meta: popoverComponentMeta,
+  Default: PopoverComponentDefault,
+  Placement: PopoverComponentPlacement,
+  Alignment: PopoverComponentAlignment,
+};
+
+const itemModule: StoryModule = {
+  meta: itemMeta,
+  Default: ItemDefault,
+  Interactive: ItemInteractive,
+  Group: ItemGroup,
+  Scrolling: ItemScrolling,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
   Sizes: HeadingSizes,
   Colors: HeadingColors,
 };
+
+const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
@@ -184,6 +224,16 @@ const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const scrollAreaModule: StoryModule = {
+  meta: scrollAreaMeta,
+  Default: ScrollAreaDefault,
+  NotScrollable: ScrollAreaNotScrollable,
+  Gutter: ScrollAreaGutter,
+  HoverReveal: ScrollAreaHoverReveal,
+  ThemedScrollbar: ScrollAreaThemedScrollbar,
+  ShadowIndicators: ScrollAreaShadowIndicators,
+};
+
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
@@ -204,9 +254,12 @@ export const registry: StoryModule[] = [
   buttonModule,
   cardComponentModule,
   inputModule,
+  itemModule,
   dialogComponentModule,
   headingModule,
   iconModule,
+  menuComponentModule,
+  popoverComponentModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.
@@ -222,6 +275,8 @@ export const registry: StoryModule[] = [
   selectModule,
   tabsModule,
   tooltipModule,
+  // Styles — atomic styles that ship as StyleX atoms rather than components.
+  scrollAreaModule,
   // Hooks — alphabetical within the group.
   useDataTableModule,
 ];
