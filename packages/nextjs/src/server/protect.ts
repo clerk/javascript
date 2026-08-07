@@ -2,8 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticatedMachineObject,
   AuthenticateRequestOptions,
-  InferAuthObjectFromToken,
-  InferAuthObjectFromTokenArray,
+  InferAuthObject,
   RedirectFun,
   SignedInAuthObject,
 } from '@clerk/backend/internal';
@@ -63,7 +62,7 @@ export interface AuthProtect {
    */
   <T extends TokenType>(
     options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>>;
+  ): Promise<InferAuthObject<T, SignedInAuthObject, AuthenticatedMachineObject>>;
 
   /**
    * @example
@@ -71,7 +70,7 @@ export interface AuthProtect {
    */
   <T extends TokenType[]>(
     options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
+  ): Promise<InferAuthObject<T[number], SignedInAuthObject, AuthenticatedMachineObject>>;
 
   /**
    * @example

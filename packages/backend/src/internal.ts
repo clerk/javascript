@@ -10,6 +10,7 @@ export { debugRequestState } from './tokens/request';
 export type {
   AuthenticateRequestOptions,
   OrganizationSyncOptions,
+  InferAuthObject,
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
   GetAuthFn,

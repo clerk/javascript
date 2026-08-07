@@ -171,30 +171,39 @@ export type OrganizationSyncTarget =
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
 /**
+ * Maps an accepted token type to its auth object. Distributes over `T`, so a union
+ * of token types resolves to the union of their auth objects: session tokens
+ * resolve to `SessionType`, and each machine token selects the members of
+ * `MachineType` carrying its `tokenType` discriminant.
+ */
+export type InferAuthObject<
+  T extends TokenType,
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = T extends SessionTokenType ? SessionType : Extract<MachineType, { tokenType: T }>;
+
+// Both deprecated delegates are unused in-repo but imported by published 3.x SDK dists, so they must exist until the next major.
+/**
  * Infers auth object type from an array of token types.
- * - Session token only -> SessionType
- * - Mixed tokens -> SessionType | MachineType
- * - Machine tokens only -> MachineType
+ *
+ * @deprecated Use `InferAuthObject` with `T[number]` instead. Will be removed in the next major version.
  */
 export type InferAuthObjectFromTokenArray<
   T extends readonly TokenType[],
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = SessionTokenType extends T[number]
-  ? T[number] extends SessionTokenType
-    ? SessionType
-    : SessionType | (MachineType & { tokenType: Exclude<T[number], SessionTokenType> })
-  : MachineType & { tokenType: Exclude<T[number], SessionTokenType> };
+> = InferAuthObject<T[number], SessionType, MachineType>;
 
 /**
  * Infers auth object type from a single token type.
- * Returns SessionType for session tokens, or MachineType for machine tokens.
+ *
+ * @deprecated Use `InferAuthObject` instead. Will be removed in the next major version.
  */
 export type InferAuthObjectFromToken<
   T extends TokenType,
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: Exclude<T, SessionTokenType> };
+> = InferAuthObject<T, SessionType, MachineType>;
 
 export type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
 export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = T extends any
@@ -219,7 +228,7 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
   ): MaybePromise<
-    | InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InferAuthObject<T[number], SessionAuthObject, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
     | InvalidTokenAuthObject,
     ReturnsPromise
   >;
@@ -232,7 +241,7 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
     req: RequestType,
     options: AuthOptions & { acceptsToken: T },
   ): MaybePromise<
-    InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    InferAuthObject<T, SessionAuthObject, MachineAuthObject<Exclude<T, SessionTokenType>>>,
     ReturnsPromise
   >;
 
@@ -266,7 +275,7 @@ export interface GetAuthFnNoRequest<
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
   ): MaybePromise<
-    | InferAuthObjectFromTokenArray<T, SessionAuthType, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InferAuthObject<T[number], SessionAuthType, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
     | InvalidTokenAuthObject,
     ReturnsPromise
   >;
@@ -277,10 +286,7 @@ export interface GetAuthFnNoRequest<
    */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): MaybePromise<
-    InferAuthObjectFromToken<T, SessionAuthType, MachineAuthObject<Exclude<T, SessionTokenType>>>,
-    ReturnsPromise
-  >;
+  ): MaybePromise<InferAuthObject<T, SessionAuthType, MachineAuthObject<Exclude<T, SessionTokenType>>>, ReturnsPromise>;
 
   /**
    * @example

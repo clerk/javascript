@@ -39,7 +39,7 @@ type ToAuth<T extends TokenType | null, Authenticated extends boolean> = T exten
       ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType | null>>
       : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType | null>>;
 
-export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
+type AuthenticatedStateFor<T extends TokenType> = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
@@ -62,7 +62,11 @@ export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   toAuth: ToAuth<T, true>;
 };
 
-export type UnauthenticatedState<T extends TokenType | null = SessionTokenType> = {
+export type AuthenticatedState<T extends TokenType = SessionTokenType> = T extends any
+  ? AuthenticatedStateFor<T>
+  : never;
+
+type UnauthenticatedStateFor<T extends TokenType | null> = {
   status: typeof AuthStatus.SignedOut;
   reason: AuthReason;
   message: string;
@@ -84,6 +88,10 @@ export type UnauthenticatedState<T extends TokenType | null = SessionTokenType> 
   token: null;
   toAuth: ToAuth<T, false>;
 };
+
+export type UnauthenticatedState<T extends TokenType | null = SessionTokenType> = T extends any
+  ? UnauthenticatedStateFor<T>
+  : never;
 
 export type HandshakeState = Omit<UnauthenticatedState<SessionTokenType>, 'status' | 'toAuth' | 'tokenType'> & {
   tokenType: SessionTokenType;
@@ -160,7 +168,7 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
     return authenticatedMachineObject(params.tokenType, token, machineData, authenticateContext);
   }) as ToAuth<T, true>;
 
-  return {
+  const state: AuthenticatedStateFor<T> = {
     status: AuthStatus.SignedIn,
     reason: null,
     message: null,
@@ -179,6 +187,7 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
     headers,
     token,
   };
+  return state as AuthenticatedState<T>;
 }
 
 type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
@@ -197,7 +206,7 @@ export function signedOut<T extends TokenType>(params: SignedOutParams & { token
     return unauthenticatedMachineObject(tokenType, { reason, message, headers });
   }) as ToAuth<T, false>;
 
-  return withDebugHeaders({
+  const state: UnauthenticatedStateFor<T> = {
     status: AuthStatus.SignedOut,
     reason,
     message,
@@ -215,7 +224,8 @@ export function signedOut<T extends TokenType>(params: SignedOutParams & { token
     toAuth,
     headers,
     token: null,
-  });
+  };
+  return withDebugHeaders(state) as UnauthenticatedState<T>;
 }
 
 export function handshake(
