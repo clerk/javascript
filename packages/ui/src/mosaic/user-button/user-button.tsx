@@ -1,12 +1,13 @@
 'use client';
 
 import type { ReactElement } from 'react';
-import { useState } from 'react';
 
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useSpinDelay } from '../hooks/useSpinDelay';
-import type { UserButtonController, UserButtonControllerOptions } from './user-button.controller';
+import { useMachine } from '../machine/useMachine';
+import type { UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
+import { userButtonMachine } from './user-button.machine';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonView } from './user-button.view';
@@ -20,12 +21,6 @@ export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   UserButtonModeProps;
-
-/** The one action in flight: which affordance owns it, and what the surface froze on to run it. */
-interface PendingAction {
-  key: string;
-  snapshot: Extract<UserButtonController, { status: 'ready' }>;
-}
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an
@@ -88,8 +83,9 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     ...options
   } = props;
   const controller = useUserButtonController(options);
-  const [open, setOpen] = useState(false);
-  const [action, setAction] = useState<PendingAction | null>(null);
+  // The popover's open state and the one action in flight are the same flow: an action that ends the
+  // interaction closes the surface, so they settle together or not at all.
+  const [{ value, context }, send] = useMachine(userButtonMachine);
 
   // Organizations off at the instance leaves nothing for an organization surface to lead with or
   // list, so the button is the account's whatever mode asked for. clerk-js withholds its own
@@ -99,7 +95,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
 
   // Every action here is a network round trip, so there is nothing to debounce and the click gets
   // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
-  const displayPendingKey = useSpinDelay(action?.key ?? null, { delay: 0 });
+  const displayPendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
 
   // Nothing stands in for the button until Clerk answers: while it is loading, a signed-out visitor
   // is indistinguishable from a session still resolving, so anything rendered here is a button
@@ -109,7 +105,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     return null;
   }
 
-  const close = () => setOpen(false);
+  const close = () => send({ type: 'CLOSE' });
 
   // A custom action is the app's to run, and whatever it opens takes over from here, so the popover
   // goes with it. A link navigates away on its own.
@@ -125,25 +121,22 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       : item,
   );
 
-  // Wraps a one-shot callback: block re-entry while busy, key the in-flight action for the view, and
-  // always clear busy so a rejection cannot leave the UI hanging. Only an action that ends the
-  // interaction closes the surface; the rest resolve into a popover that re-renders around the
-  // result, so you can see what you just did.
+  // Hands a one-shot callback to the machine, keyed by the affordance that owns it and carrying the
+  // controller to freeze on. Re-entry, clearing busy, and closing on success are all the machine's.
   const runAction = <Args extends unknown[]>(
     keyFor: (...args: Args) => string,
     fn: ((...args: Args) => void | Promise<unknown>) | undefined,
     closeOnSuccess = false,
   ) =>
     fn
-      ? (...args: Args) => {
-          if (action) {
-            return;
-          }
-          setAction({ key: keyFor(...args), snapshot: controller });
-          void Promise.resolve(fn(...args))
-            .then(closeOnSuccess ? close : () => {}, () => {})
-            .finally(() => setAction(null));
-        }
+      ? (...args: Args) =>
+          send({
+            type: 'RUN',
+            key: keyFor(...args),
+            frozen: controller,
+            run: async () => fn(...args),
+            closeOnSuccess,
+          })
       : undefined;
 
   // A modal or another page takes over from here, so there is nothing left for the popover to show;
@@ -156,10 +149,8 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
         }
       : undefined;
 
-  // `setActive` swaps the active organization while its promise is still in flight, so the live
-  // controller would rearrange the popup mid-action: the header renaming itself, the check jumping
-  // rows, Invite coming and going as the permission is re-read. Rendering the snapshot the action
-  // started from holds it all still, and the result lands in one step when the action settles.
+  // Rendering the controller the action froze on holds the popup still while it runs; the result
+  // lands in one step when it settles. See `frozen` in the machine for why.
   const {
     status: _status,
     onSelectOrganization,
@@ -174,7 +165,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     onCreateOrganization,
     onAddAccount,
     ...data
-  } = action?.snapshot ?? controller;
+  } = context.frozen ?? controller;
 
   return (
     <UserButtonView
@@ -185,8 +176,8 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       modePriority={modePriority}
       customMenuItems={menuItems}
       menuItemOrder={menuItemOrder}
-      open={open}
-      onOpenChange={setOpen}
+      open={value !== 'closed'}
+      onOpenChange={next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' })}
       pendingKey={displayPendingKey}
       onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
       onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
