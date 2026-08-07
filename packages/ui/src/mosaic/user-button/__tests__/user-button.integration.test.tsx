@@ -429,7 +429,6 @@ describe('UserButton (connected)', () => {
     const act = await open();
     await act.click(accountMenu());
 
-    // The menu is still there; it is only this one item that has nothing to offer.
     expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Create organization' })).toBeNull();
   });
@@ -455,9 +454,7 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  // `setActive` swaps the active organization while its promise is still in flight, so live data
-  // would rearrange the surface under the pointer: the header renaming itself, the check jumping
-  // rows, and Invite appearing or leaving as the permission is re-read.
+  // `setActive` swaps the active organization mid-flight. See `frozen` in the machine.
   it('holds the surface on the data it started with until the action settles', async () => {
     const deferred = createDeferred();
     setActive.mockReturnValueOnce(deferred.promise);
@@ -490,7 +487,6 @@ describe('UserButton (connected)', () => {
 
     await act.click(screen.getByRole('button', { name: 'Join' }));
 
-    // The button you pressed is what reports the action, so it is still there to read.
     const join = screen.getByRole('button', { name: 'Join' });
     expect(join).toHaveAttribute('aria-busy', 'true');
     expect(within(join).getByRole('progressbar')).toBeInTheDocument();
