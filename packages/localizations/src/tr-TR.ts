@@ -1387,6 +1387,10 @@ export const trTR: LocalizationResource = {
         subtitleNewTab: 'Devam etmek için yeni açılmış sekmeye dönün',
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',

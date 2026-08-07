@@ -9,10 +9,10 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUIConstructor } from '@clerk/shared/ui';
-import type { Appearance, Ui } from '@clerk/ui/internal';
+import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 
 type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
-  appearance?: Appearance<TUi>;
+  appearance?: ExtractAppearanceType<TUi, Appearance>;
 };
 
 type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
@@ -29,7 +29,7 @@ type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   | 'appearance'
 > &
   MultiDomainAndOrProxyPrimitives & {
-    appearance?: Appearance<TUi>;
+    appearance?: ExtractAppearanceType<TUi, Appearance>;
     /**
      * Controls prefetching of the `@clerk/ui` script.
      * - `false` - Skip prefetching the UI (for custom UIs using Control Components)

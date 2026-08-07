@@ -1,0 +1,138 @@
+import * as MenuStories from './menu.component.stories';
+
+# Menu
+
+The Mosaic `Menu` — the styled Mosaic component composed from the `@clerk/headless` menu primitive
+and themed with StyleX. It inherits the primitive's positioning, typeahead, roving keyboard
+navigation, and ARIA wiring, and adds the trigger, popup surface, and item styling.
+
+## Example
+
+Click the trigger, then use the arrow keys or type to move between items.
+
+<Story
+  name='Default'
+  storyModule={MenuStories}
+/>
+
+## Usage
+
+```tsx
+import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Menu } from '@clerk/ui/mosaic/components/menu';
+
+<Menu.Root>
+  <Menu.Trigger />
+  <Menu.Content>
+    <Menu.Item label='Add workspace'>
+      <Icon name='plus' />
+      Add workspace
+    </Menu.Item>
+    <Menu.Item
+      label='Sign out'
+      onClick={signOut}
+    >
+      <Icon name='log-out' />
+      Sign out
+    </Menu.Item>
+    <Menu.Item
+      label='Delete user'
+      color='negative'
+      onClick={deleteUser}
+    >
+      <Icon name='close' />
+      Delete user
+    </Menu.Item>
+  </Menu.Content>
+</Menu.Root>;
+```
+
+`Menu.Content` composes the portal, positioner, and popup, so items are the only children you write.
+
+### Trigger
+
+With no children, `Menu.Trigger` renders a square ghost `Button` holding an ellipsis glyph. Pass
+children for a labelled trigger, or `render` to supply your own element — it receives the computed
+props (ARIA attributes, click and keyboard handlers) to spread.
+
+```tsx
+<Menu.Trigger>Actions</Menu.Trigger>
+
+<Menu.Trigger render={props => <Avatar {...props} />} />
+```
+
+### Items
+
+`label` drives typeahead and is used as the visible text when `children` is omitted. Render an icon
+and text together as children. Use `color='negative'` for destructive actions; the color is
+inherited by the children. `disabled` items are skipped by keyboard navigation and their `onClick`
+never fires. Activating an item closes the menu; pass `closeOnClick={false}` to keep it open.
+
+```tsx
+<Menu.Item
+  label='Delete'
+  color='negative'
+>
+  <Icon name='close' />
+  Delete
+</Menu.Item>
+```
+
+### Placement
+
+`Menu.Root` takes `placement` and `sideOffset`; the popup flips and shifts automatically to stay in
+view, and its `max-height` tracks the available space so long menus scroll rather than overflow.
+
+```tsx
+<Menu.Root
+  placement='bottom-end'
+  sideOffset={8}
+>
+  …
+</Menu.Root>;
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Menu.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  …
+</Menu.Root>;
+```
+
+## Parts
+
+| Part             | Slot                             | Description                                                           |
+| ---------------- | -------------------------------- | --------------------------------------------------------------------- |
+| `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.  |
+| `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis. |
+| `Menu.Content`   | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                    |
+| `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.           |
+| `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                           |
+
+## Styling
+
+Unlike the slot-recipe components, the Mosaic menu is themed with **StyleX**. Each styled part
+carries a stable `.cl-<slot>` class (the slots above) alongside the StyleX atoms. Consumers never
+target the hashed atomic classes — override by targeting the `.cl-*` slot from a CSS layer that wins
+over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-menu-popup {
+    border-radius: 20px;
+  }
+}
+```
+
+The popup's enter/exit transition is driven off its own `data-starting-style` /`data-ending-style`
+attributes and is disabled under `prefers-reduced-motion: reduce`. Item hover state is gated behind
+`@media (hover: hover)`, and the keyboard-active item is styled off `data-active`, so pointer and
+keyboard highlighting stay in sync.

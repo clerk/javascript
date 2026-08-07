@@ -113,6 +113,7 @@ export type {
   BillingPlanJSON,
   BillingSubscriptionJSON,
   BillingSubscriptionItemJSON,
+  BillingSubscriptionItemStatus,
 } from './api/resources/JSON';
 
 /**

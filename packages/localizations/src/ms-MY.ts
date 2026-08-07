@@ -1400,6 +1400,10 @@ export const msMY: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab yang baru dibuka untuk meneruskan',
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Gunakan pautan pengesahan yang dihantar ke e-mel anda',

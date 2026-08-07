@@ -1391,6 +1391,10 @@ export const beBY: LocalizationResource = {
         subtitleNewTab: 'Верніцеся на толькі што адчыненую ўкладку, каб працягнуць',
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',

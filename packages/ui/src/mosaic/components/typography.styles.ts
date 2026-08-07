@@ -1,10 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontFamilyVars, typeScaleVars } from '../tokens.stylex';
 
 export type TypographySize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
 
 export type TypographyColor = 'primary' | 'neutral' | 'warning' | 'negative' | 'positive';
+
+export const styles = stylex.create({
+  base: {
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
+  },
+});
 
 export const sizes = stylex.create({
   xs: {
@@ -42,4 +48,21 @@ export const colors = stylex.create({
   warning: { color: colorVars['--cl-color-warning'] },
   negative: { color: colorVars['--cl-color-negative'] },
   positive: { color: colorVars['--cl-color-positive'] },
+});
+
+// Text truncation, composed by any component that clamps copy.
+export const truncationStyles = stylex.create({
+  // Single-line ellipsis.
+  singleLine: {
+    overflow: 'hidden',
+    display: 'block',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  // Multi-line clamp base; the caller sets `-webkit-line-clamp` via inline style.
+  multiLine: {
+    overflow: 'hidden',
+    WebkitBoxOrient: 'vertical',
+    display: '-webkit-box',
+  },
 });

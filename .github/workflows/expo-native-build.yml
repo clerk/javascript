@@ -27,7 +27,7 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_RUNNER_VERSION: '1.1.21'
+  MAESTRO_VERSION: '2.8.0'
 
 jobs:
   native-build:
@@ -214,33 +214,32 @@ jobs:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
-      - name: Cache maestro-runner
+      - name: Cache maestro CLI
         if: steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.maestro-runner
-          key: maestro-runner-${{ runner.os }}-${{ runner.arch }}-${{ env.MAESTRO_RUNNER_VERSION }}
+          path: ~/.maestro
+          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
 
-      - name: Install maestro-runner
+      - name: Install maestro CLI
         if: steps.keys.outputs.pk != ''
         run: |
           set -o pipefail
-          if [ -x "$HOME/.maestro-runner/bin/maestro-runner" ]; then
-            echo "Using cached maestro-runner"
+          if [ -x "$HOME/.maestro/bin/maestro" ]; then
+            echo "Using cached Maestro"
           else
             installed=0
             for i in 1 2 3; do
-              if curl -fsSL --retry 3 --retry-delay 5 "https://open.devicelab.dev/install/maestro-runner" |
-                bash -s -- --version "$MAESTRO_RUNNER_VERSION"; then
-                if [ -x "$HOME/.maestro-runner/bin/maestro-runner" ]; then installed=1; break; fi
+              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
+                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
               fi
-              echo "maestro-runner install attempt $i failed (or binary missing); retrying"
+              echo "Maestro install attempt $i failed (or binary missing); retrying"
               sleep 5
             done
-            [ "$installed" = 1 ] || { echo "::error::maestro-runner install failed after 3 attempts"; exit 1; }
+            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
           fi
-          echo "$HOME/.maestro-runner/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro-runner/bin/maestro-runner" --version
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          "$HOME/.maestro/bin/maestro" --version
 
       - name: Boot iOS simulator
         id: sim
@@ -281,16 +280,10 @@ jobs:
       - name: Run iOS e2e (Maestro)
         id: run_e2e_ios
         if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
-        # Burn-in: e2e cannot fail the check yet. Flip to hard-fail in a
-        # follow-up once the suite has proven quiet.
-        continue-on-error: true
         working-directory: ${{ env.FIXTURE_DIR }}
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          MAESTRO_DEVICE: ${{ steps.sim.outputs.udid }}
-          MAESTRO_DRIVER: wda
-          MAESTRO_PLATFORM: ios
           SIM_UDID: ${{ steps.sim.outputs.udid }}
         run: |
           echo "Using simulator $SIM_UDID"
@@ -349,13 +342,10 @@ jobs:
       - name: Run Android e2e (Maestro)
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         env:
           CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-          MAESTRO_DRIVER: devicelab
-          MAESTRO_PLATFORM: android
         with:
           api-level: 34
           target: google_apis
@@ -383,7 +373,7 @@ jobs:
 
       # Test reports record flow env (and typed input) in plaintext;
       # add-mask only covers step logs, not artifact contents.
-      - name: Scrub test credentials from maestro-runner reports
+      - name: Scrub test credentials from Maestro debug output
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
@@ -395,7 +385,7 @@ jobs:
             \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload maestro-runner artifacts on e2e failure
+      - name: Upload Maestro artifacts on e2e failure
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -413,5 +403,5 @@ jobs:
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
           echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::warning::Maestro e2e failed (burn-in mode: not failing the job). See the maestro-${{ matrix.platform }} artifact."
+            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
           fi

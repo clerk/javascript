@@ -349,6 +349,8 @@ describe('Clerk singleton', () => {
         const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0][0]);
         expect(redirectUrl.pathname).toEqual('/v1/client/touch');
         expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
+        // A second navigate would supersede the touch hop and abort it before it completes.
+        expect(sut.navigate).toHaveBeenCalledTimes(1);
       });
 
       it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
@@ -1169,6 +1171,13 @@ describe('Clerk singleton', () => {
     const mockSession1 = { id: '1', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession2 = { id: '2', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession3 = { id: '3', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
+    // Sign-out consults these to decide whether to route the redirect through
+    // /v1/client/touch. Default to "no refresh needed" so the existing cases
+    // assert against the plain redirect URL.
+    const clientTouchDefaults = {
+      isEligibleForTouch: () => false,
+      buildTouchUrl: () => 'https://clerk.example.com/v1/client/touch',
+    };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
@@ -1198,6 +1207,7 @@ describe('Clerk singleton', () => {
     it('signs out all sessions if no sessionId is passed and multiple sessions have authenticated status', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          ...clientTouchDefaults,
           signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
@@ -1221,6 +1231,7 @@ describe('Clerk singleton', () => {
       async status => {
         mockClientFetch.mockReturnValue(
           Promise.resolve({
+            ...clientTouchDefaults,
             signedInSessions: [{ ...mockSession1, status }],
             sessions: [{ ...mockSession1, status }],
             destroy: mockClientDestroy,
@@ -1244,6 +1255,7 @@ describe('Clerk singleton', () => {
     it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          ...clientTouchDefaults,
           signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
@@ -1264,6 +1276,7 @@ describe('Clerk singleton', () => {
     it('removes and signs out the session that corresponds to the passed sessionId if it is the current', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          ...clientTouchDefaults,
           signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
@@ -1284,6 +1297,7 @@ describe('Clerk singleton', () => {
     it('removes and signs out the session and redirects to the provided redirectUrl ', async () => {
       mockClientFetch.mockReturnValue(
         Promise.resolve({
+          ...clientTouchDefaults,
           signedInSessions: [mockSession1, mockSession2, mockSession3],
           sessions: [mockSession1, mockSession2, mockSession3],
           destroy: mockClientDestroy,
@@ -1298,6 +1312,40 @@ describe('Clerk singleton', () => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
+      });
+    });
+
+    it('routes the redirect through /v1/client/touch when the client cookie is close to expiring', async () => {
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+          isEligibleForTouch: () => true,
+          // Encodes the nested URL the way the real Client.buildTouchUrl() does, so a
+          // destination carrying its own query or hash survives the round trip.
+          buildTouchUrl: ({ redirectUrl }: { redirectUrl: URL }) => {
+            const touchUrl = new URL('https://clerk.example.com/v1/client/touch');
+            touchUrl.searchParams.set('redirect_url', redirectUrl.toString());
+            return touchUrl.toString();
+          },
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = vi.fn();
+      await sut.load();
+      await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
+
+      await waitFor(() => {
+        expect(mockClientRemoveSessions).toHaveBeenCalled();
+        const navigatedTo = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0][0]);
+        expect(navigatedTo.pathname).toEqual('/v1/client/touch');
+        // The user still lands on the original destination, via the touch redirect.
+        expect(navigatedTo.searchParams.get('redirect_url')).toEqual(
+          new URL('/after-sign-out?tab=security#settings', mockWindowLocation.href).toString(),
+        );
       });
     });
   });

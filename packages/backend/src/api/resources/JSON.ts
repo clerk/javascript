@@ -1,4 +1,12 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
+import type {
+  BillingPerUnitTotalJSON,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionItemSeatsJSON,
+  BillingTotalsJSON as SharedBillingTotalsJSON,
+  LastAuthenticationStrategy,
+  SignUpStatus,
+  VerificationStatus,
+} from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,
@@ -1021,14 +1029,27 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   avatar_url: string | null;
 }
 
-type BillingSubscriptionItemStatus =
+/**
+ * The possible lifecycle states of a Backend `BillingSubscriptionItem`.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type BillingSubscriptionItemStatus =
+  /** The Subscription Item is in the abandoned state. */
   | 'abandoned'
+  /** The Subscription Item is active. */
   | 'active'
+  /** The Subscription Item is canceled. */
   | 'canceled'
+  /** The Subscription Item has ended. */
   | 'ended'
+  /** The Subscription Item has expired. */
   | 'expired'
+  /** The Subscription Item is incomplete. */
   | 'incomplete'
+  /** The Subscription Item has a past-due payment. */
   | 'past_due'
+  /** The Subscription Item is upcoming. */
   | 'upcoming';
 
 /**
@@ -1036,25 +1057,25 @@ type BillingSubscriptionItemStatus =
  */
 export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
+  instance_id: string;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
   payer_id?: string;
+  price_id?: string;
   period_start: number;
   period_end: number | null;
-  is_free_trial?: boolean;
+  is_free_trial: boolean;
   ended_at: number | null;
   created_at: number;
   updated_at: number;
   canceled_at: number | null;
   past_due_at: number | null;
-  lifetime_paid: BillingMoneyAmountJSON | null;
-  next_payment?: {
-    amount: number;
-    date: number;
-  } | null;
-  amount: BillingMoneyAmountJSON;
+  lifetime_paid?: BillingMoneyAmountJSON | null;
+  next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+  amount?: BillingMoneyAmountJSON | null;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
+  seats?: BillingSubscriptionItemSeatsJSON;
 }
 
 /**
@@ -1157,6 +1178,7 @@ export interface BillingSubscriptionWebhookEventJSON extends ClerkResourceJSON {
 
 export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscription;
+  instance_id: string;
   status: 'active' | 'past_due' | 'canceled' | 'ended' | 'abandoned' | 'incomplete';
   payer_id: string;
   created_at: number;
@@ -1167,6 +1189,8 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   next_payment?: {
     date: number;
     amount: BillingMoneyAmountJSON;
+    per_unit_totals?: BillingPerUnitTotalJSON[];
+    totals?: SharedBillingTotalsJSON;
   };
   eligible_for_free_trial?: boolean;
 }

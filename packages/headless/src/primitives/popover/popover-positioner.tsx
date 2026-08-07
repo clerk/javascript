@@ -3,7 +3,7 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
+import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../../utils';
 import { usePopoverContext } from './popover-context';
 
 export type PopoverPositionerProps = ComponentProps<'div'>;
@@ -19,6 +19,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       placement,
       getFloatingProps,
       modal,
+      initialFocus,
+      returnFocusRef,
       labelId,
       descriptionId,
       hasTitle,
@@ -56,6 +58,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       <FloatingFocusManager
         context={floatingContext}
         modal={modal}
+        initialFocus={initialFocus === 'first' || isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        returnFocus={returnFocusRef}
       >
         {element}
       </FloatingFocusManager>

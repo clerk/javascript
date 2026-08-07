@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { colors, styles } from './badge.styles';
 
 export type BadgeProps = MosaicComponentProps<'span'> & {
@@ -37,7 +38,12 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Mosa
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('badge', { color }), stylex.props(styles.base, colors[color]), className, style),
+      ...mergeStyleProps(
+        themeProps('badge', { color }),
+        stylex.props(reset.base, styles.base, colors[color]),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
