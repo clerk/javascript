@@ -167,42 +167,13 @@ describe('userProfileProps — a navigation entry either has content or goes som
 
 describe('trigger flags', () => {
   test('both are booleans', () => {
-    accept({ renderTriggerLabel: false, renderPlanBadge: false });
+    accept({ renderTriggerLabel: false, renderTriggerBadge: false });
   });
 
   test('a truthy value of another type is rejected', () => {
     // @ts-expect-error — `renderTriggerLabel` is a boolean, not a label
     accept({ renderTriggerLabel: 'Acme' });
-  });
-});
-
-describe('renderPlanBadge as a renderer', () => {
-  test('names the plan itself, synchronously or not', () => {
-    accept({ renderPlanBadge: () => ({ name: 'Enterprise' }) });
-    accept({ renderPlanBadge: () => ({ name: 'Enterprise', slug: 'plan_enterprise' }) });
-    accept({ renderPlanBadge: async () => ({ name: 'Enterprise', slug: 'plan_enterprise' }) });
-  });
-
-  test('declining a badge is a null return, not undefined', () => {
-    accept({ renderPlanBadge: () => null });
-    // @ts-expect-error — return `null` to draw no badge; `undefined` reads as a forgotten return
-    accept({ renderPlanBadge: () => undefined });
-  });
-
-  test('a bare label is not a badge', () => {
-    // @ts-expect-error — the renderer returns `{ name }`, not the name itself
-    accept({ renderPlanBadge: () => 'Enterprise' });
-  });
-
-  test('name is required, and slug is a string', () => {
-    // @ts-expect-error — `name` is what the badge renders, so it is required
-    accept({ renderPlanBadge: () => ({ slug: 'plan_enterprise' }) });
-    // @ts-expect-error — `slug` identifies the plan as a string
-    accept({ renderPlanBadge: () => ({ name: 'Enterprise', slug: 42 }) });
-  });
-
-  test('the renderer takes no arguments', () => {
-    // @ts-expect-error — nothing is passed in; read what you need from your own data
-    accept({ renderPlanBadge: (organizationId: string) => ({ name: organizationId }) });
+    // @ts-expect-error — the badge names the active organization's plan; it is not yours to supply
+    accept({ renderTriggerBadge: () => ({ name: 'Enterprise' }) });
   });
 });
