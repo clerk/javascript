@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.29.1
+
+### Patch Changes
+
+- Hide the “Use another method” action during Device Trust and second-factor verification when no alternative verification method is available. ([#9355](https://github.com/clerk/javascript/pull/9355)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+  - @clerk/localizations@4.14.2
+
 ## 1.29.0
 
 ### Minor Changes
