@@ -320,8 +320,6 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('active-name')).toHaveTextContent('alice@example.com');
   });
 
-  // The identifier is what the account is addressed by, so it follows Clerk's own precedence
-  // rather than reaching for the email: an account with no email still has something to show.
   it('identifies the active account by username, then email, then phone, then wallet', () => {
     const { rerender } = render(<Harness />);
     expect(screen.getByTestId('active-identifier')).toHaveTextContent('alice');
@@ -354,7 +352,6 @@ describe('useUserButtonController', () => {
     expect(activeOrganization()).toBeNull();
   });
 
-  // The trigger names it, so waiting on the list it belongs to would show the wrong workspace first.
   it('names the active organization from the organization itself, not the membership list', () => {
     userMemberships = list([], 0, false, true);
     render(<Harness />);
@@ -381,8 +378,8 @@ describe('useUserButtonController', () => {
     expect(screen.getByTestId('has-orgs')).toHaveTextContent('true');
   });
 
-  // The surface decides whether to carry a workspace section at all from this, so waiting on the
-  // list would open a section under every personal-only account and then take it away again.
+  // Waiting on the list would open a workspace section under every personal-only account, then
+  // take it away again.
   it('answers hasOrganizations from the user resource before any list has loaded', () => {
     userMemberships = list([], 0, false, true);
     user = { ...(user as FakeUser), organizationMemberships: [{ id: 'orgmem_1' }] };
@@ -422,7 +419,6 @@ describe('useUserButtonController', () => {
     });
   });
 
-  // Accepting is all an invitation row offers, and an accepted one lists as the workspace it joined.
   it('lists invitations still open to the account, dropping the revoked and expired ones', () => {
     userInvitations = list(
       [
@@ -473,8 +469,8 @@ describe('useUserButtonController', () => {
     expect(setActive).toHaveBeenCalledWith({ organization: 'org_9', redirectUrl: '/o/Other' });
   });
 
-  // `null` is Clerk's own name for the personal workspace. There is no organization to resolve a
-  // redirect against, so `afterSelectOrganizationUrl` has nothing to say about it.
+  // `null` is Clerk's own name for the personal workspace, and there is no organization for
+  // `afterSelectOrganizationUrl` to resolve against.
   it('selects the personal workspace by clearing the active organization', () => {
     render(<Harness afterSelectOrganizationUrl='/orgs/:id' />);
 
@@ -482,8 +478,6 @@ describe('useUserButtonController', () => {
     expect(setActive).toHaveBeenCalledWith({ organization: null, redirectUrl: undefined });
   });
 
-  // Its own redirect, resolved against the user the way an organization's is resolved against the
-  // organization.
   it('redirects the personal workspace to the configured afterSelectPersonalUrl', () => {
     const { rerender } = render(<Harness afterSelectPersonalUrl='/u/:id' />);
 
