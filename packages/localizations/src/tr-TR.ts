@@ -730,6 +730,7 @@ export const trTR: LocalizationResource = {
         },
         verifiedAtLabel: "{{ date | shortDate('tr-TR') }} tarihinde doğrulandı",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} ekle',

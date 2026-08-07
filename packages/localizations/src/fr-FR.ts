@@ -738,6 +738,7 @@ export const frFR: LocalizationResource = {
         },
         verifiedAtLabel: "Vérifié le {{ date | shortDate('fr-FR') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Ajouter {{domain}}',

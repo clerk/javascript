@@ -738,6 +738,7 @@ export const ptPT: LocalizationResource = {
         },
         verifiedAtLabel: "Verificado em {{ date | shortDate('pt-PT') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Adicionar {{domain}}',

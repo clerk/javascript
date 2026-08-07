@@ -738,6 +738,7 @@ export const msMY: LocalizationResource = {
         },
         verifiedAtLabel: "Disahkan pada {{ date | shortDate('ms-MY') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Tambah {{domain}}',

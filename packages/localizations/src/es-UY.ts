@@ -730,6 +730,7 @@ export const esUY: LocalizationResource = {
         },
         verifiedAtLabel: "Verificado el {{ date | shortDate('es-UY') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Agregar {{domain}}',

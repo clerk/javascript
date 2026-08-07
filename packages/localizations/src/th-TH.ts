@@ -733,6 +733,7 @@ export const thTH: LocalizationResource = {
         },
         verifiedAtLabel: "ยืนยันเมื่อ {{ date | shortDate('th-TH') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'เพิ่ม {{domain}}',

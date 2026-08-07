@@ -730,6 +730,7 @@ export const ukUA: LocalizationResource = {
         },
         verifiedAtLabel: "Підтверджено {{ date | shortDate('uk-UA') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Додати {{domain}}',

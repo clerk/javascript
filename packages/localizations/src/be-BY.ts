@@ -730,6 +730,7 @@ export const beBY: LocalizationResource = {
         },
         verifiedAtLabel: "Пацверджана {{ date | shortDate('be-BY') }}",
         verifyAgainButton: undefined,
+        verifyAgainButtonTooltip__throttled: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Дадаць {{domain}}',
