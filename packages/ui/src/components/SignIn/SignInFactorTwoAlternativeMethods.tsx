@@ -12,6 +12,7 @@ import { backupCodePrefFactorComparator } from '@/utils/factorSorting';
 import { formatSafeIdentifier } from '@/utils/formatSafeIdentifier';
 
 import { HavingTrouble } from './HavingTrouble';
+import { isOfferableSecondFactor } from './utils';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -56,17 +57,20 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
           >
             <Col gap={2}>
               {supportedSecondFactors &&
-                supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
-                  <ArrowBlockButton
-                    textLocalizationKey={getButtonLabel(factor)}
-                    elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                    textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                    arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                    key={i}
-                    isDisabled={card.isLoading}
-                    onClick={() => onFactorSelected(factor)}
-                  />
-                ))}
+                supportedSecondFactors
+                  .filter(isOfferableSecondFactor)
+                  .sort(backupCodePrefFactorComparator)
+                  .map((factor, i) => (
+                    <ArrowBlockButton
+                      textLocalizationKey={getButtonLabel(factor)}
+                      elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                      textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                      arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                      key={i}
+                      isDisabled={card.isLoading}
+                      onClick={() => onFactorSelected(factor)}
+                    />
+                  ))}
             </Col>
             <Card.Action elementId='alternativeMethods'>
               {onBackLinkClick && (
@@ -111,6 +115,8 @@ export function getButtonLabel(factor: SignInSecondFactor): LocalizationKey {
       return localizationKeys('signIn.alternativeMethods.blockButton__emailLink', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
+    case 'passkey':
+      return localizationKeys('signIn.alternativeMethods.blockButton__passkey');
     default:
       ((_: never) => _)(factor);
       throw new Error('Invalid sign in strategy');

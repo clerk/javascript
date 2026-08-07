@@ -1278,6 +1278,11 @@ export const enGB: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter your current password to continue',
@@ -1425,6 +1430,10 @@ export const enGB: LocalizationResource = {
     passkey: {
       subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
       title: 'Use your passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Use another method',

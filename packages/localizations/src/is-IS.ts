@@ -1289,6 +1289,11 @@ export const isIS: LocalizationResource = {
         'Að nota lykilinn þinn staðfestir auðkenni þitt. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.',
       title: 'Nota lykilinn þinn',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Nota aðra aðferð',
       subtitle: 'Sláðu inn núverandi lykilorð til að halda áfram',
@@ -1437,6 +1442,10 @@ export const isIS: LocalizationResource = {
       subtitle:
         'Að nota lykilinn þinn staðfestir að þú ert það. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.',
       title: 'Nota lykilinn þinn',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Nota aðra aðferð',

@@ -1268,6 +1268,11 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1410,6 +1415,10 @@ export const zhCN: LocalizationResource = {
       title: '无法登录',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },

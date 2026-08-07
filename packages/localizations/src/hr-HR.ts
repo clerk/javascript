@@ -1288,6 +1288,11 @@ export const hrHR: LocalizationResource = {
         'Korištenje vašeg pristupnog ključa potvrđuje vaš identitet. Vaš uređaj može tražiti otisak prsta, prepoznavanje lica ili zaključavanje zaslona.',
       title: 'Koristite svoj pristupni ključ',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Koristite drugu metodu',
       subtitle: 'Unesite svoju trenutnu lozinku za nastavak',
@@ -1436,6 +1441,10 @@ export const hrHR: LocalizationResource = {
       subtitle:
         'Korištenje vašeg pristupnog ključa potvrđuje da ste to vi. Vaš uređaj može tražiti otisak prsta, prepoznavanje lica ili zaključavanje zaslona.',
       title: 'Koristite svoj pristupni ključ',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Koristite drugu metodu',

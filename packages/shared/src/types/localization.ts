@@ -576,6 +576,10 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    passkeyMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -654,6 +658,11 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
     };
     passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
+    };
+    passkeyMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       blockButton__passkey: LocalizationValue;

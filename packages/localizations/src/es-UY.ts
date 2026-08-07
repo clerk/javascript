@@ -1282,6 +1282,11 @@ export const esUY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Usar otro método',
       subtitle: 'Ingresá tu contraseña para continuar',
@@ -1430,6 +1435,10 @@ export const esUY: LocalizationResource = {
       subtitle:
         'Usar tu clave de acceso confirma que sos vos. Tu dispositivo puede solicitar tu huella, rostro o bloqueo de pantalla.',
       title: 'Usar tu clave de acceso',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usar otro método',

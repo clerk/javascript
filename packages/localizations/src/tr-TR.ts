@@ -1278,6 +1278,11 @@ export const trTR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Şifremi unuttum',
       subtitle: 'Şifrenizi girerek devam edebilirsiniz.',
@@ -1426,6 +1431,10 @@ export const trTR: LocalizationResource = {
       subtitle:
         'Geçiş anahtarınızı kullanarak siz olduğunuzu onaylayın. Cihazınız parmak izinizi, yüzünüzü veya ekran kilidinizi isteyebilir.',
       title: 'Geçiş anahtarınızı kullanın',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Başka bir yöntem kullan',

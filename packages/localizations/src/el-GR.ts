@@ -1285,6 +1285,11 @@ export const elGR: LocalizationResource = {
         'Η χρήση του passkey σας επαληθεύει ότι είστε εσείς. Η συσκευή σας μπορεί να ζητήσει το δακτυλικό σας αποτύπωμα, την αναγνώριση προσώπου ή το PIN οθόνης.',
       title: 'Χρησιμοποιήστε το passkey σας',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Χρησιμοποιήστε άλλη μέθοδο',
       subtitle: 'για να συνεχίσετε',
@@ -1434,6 +1439,10 @@ export const elGR: LocalizationResource = {
       subtitle:
         'Η χρήση του passkey σας επιβεβαιώνει την ταυτότητά σας. Η συσκευή σας μπορεί να ζητήσει δακτυλικό αποτύπωμα, αναγνώριση προσώπου ή κλείδωμα οθόνης.',
       title: 'Χρησιμοποιήστε το passkey σας',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Χρήση άλλης μεθόδου',

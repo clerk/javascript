@@ -1287,6 +1287,11 @@ export const itIT: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Reimposta la password',
       subtitle: 'Inserisci la tua password per continuare.',
@@ -1433,6 +1438,10 @@ export const itIT: LocalizationResource = {
     passkey: {
       subtitle: 'Usa una passkey per un accesso più sicuro e rapido.',
       title: 'Autenticazione tramite passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usa un altro metodo',

@@ -1295,6 +1295,11 @@ export const frFR: LocalizationResource = {
         "L'utilisation de votre clé de sécurité confirme votre identité. Votre appareil peut vous demander votre empreinte digitale, votre visage ou votre code de sécurité.",
       title: 'Utiliser votre clé de sécurité',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Réinitialiser le mot de passe',
       subtitle: 'Entrez votre mot de passe pour continuer.',
@@ -1441,6 +1446,10 @@ export const frFR: LocalizationResource = {
     passkey: {
       subtitle: 'Utilisez une clé de sécurité pour continuer.',
       title: 'Clé de sécurité',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utiliser une autre méthode',

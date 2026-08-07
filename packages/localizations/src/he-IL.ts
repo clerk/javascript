@@ -1272,6 +1272,11 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'השתמש בשיטה אחרת',
       subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
@@ -1414,6 +1419,10 @@ export const heIL: LocalizationResource = {
       title: 'לא ניתן להתחבר',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },
