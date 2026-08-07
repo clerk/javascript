@@ -61,5 +61,31 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
       // Sign in again with a now "known" device
       await u.po.expect.toBeSignedIn();
     });
+
+    test('can navigate back to the sign-in start from the client trust step', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // Sign in with email and password on a new device to reach the client-trust step.
+      await u.po.signIn.goTo();
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.setPassword(fakeUser.password);
+      await u.po.signIn.continue();
+
+      await u.page.waitForURL(/\/sign-in\/client-trust/);
+      await expect(u.page.getByText("You're signing in from a new device.")).toBeVisible();
+
+      // The only verification method here is the same identifier, so a user who cannot
+      // complete it (e.g. wants social instead) needs a way out. "Back" abandons the
+      // attempt and returns to the sign-in start.
+      const back = u.page.getByRole('link', { name: /^back$/i });
+      await expect(back).toBeVisible();
+      await back.click();
+
+      // Back on the sign-in start, where another sign-in method can be chosen.
+      await u.page.waitForURL(url => !/\/sign-in\/client-trust/.test(url.href));
+      await expect(u.po.signIn.getIdentifierInput()).toBeVisible();
+      await u.po.expect.toBeSignedOut();
+    });
   },
 );
