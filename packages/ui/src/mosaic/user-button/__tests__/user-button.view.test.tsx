@@ -593,6 +593,16 @@ describe('UserButtonView, the foot', () => {
 
     expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
   });
+
+  // The logo names the link, so the mark is what a screen reader reaches rather than an unnamed link.
+  it('sends the branding logo to Clerk, in a tab of its own', () => {
+    renderView();
+
+    const logo = screen.getByRole('link', { name: 'Clerk' });
+    expect(logo).toHaveAttribute('href', 'https://go.clerk.com/components');
+    expect(logo).toHaveAttribute('target', '_blank');
+    expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });
 
 // Rows carry avatars, and an avatar's load state dies with the element it hangs off. Swapping a

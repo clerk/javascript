@@ -21,6 +21,7 @@ import { truncationStyles } from '../components/typography.styles';
 import type { IconName } from '../icons/registry';
 import { fontWeightVars } from '../tokens.stylex';
 import { arrangeMenuRows } from './user-button.menu';
+import { fill, plural, userButtonBase as m } from './user-button.messages';
 import { styles, triggerShapes } from './user-button.styles';
 import type {
   UserButtonBusyState,
@@ -90,10 +91,7 @@ function workspace(organization: UserButtonMembership | undefined, session: User
   return { name: session.name, imageUrl: session.imageUrl, shape: 'circle' };
 }
 
-/**
- * Whether the surface leads with an organization, which its mode settles on its own — before any
- * data loads, so the placeholder can take the same corner the real trigger will.
- */
+/** Whether the surface leads with an organization. `combined` asks `modePriority`; the other two already know. */
 function leadsWithOrganization(mode: UserButtonMode, modePriority: UserButtonModePriority): boolean {
   return mode === 'combined' ? modePriority === 'organization' : mode === 'organization';
 }
@@ -140,7 +138,7 @@ function showsAccountsHeading(data: UserButtonContextValue): boolean {
 function membershipSubtitle(membership: UserButtonMembership): string {
   const parts: string[] = [];
   if (membership.membersCount !== undefined) {
-    parts.push(`${membership.membersCount} ${membership.membersCount === 1 ? 'member' : 'members'}`);
+    parts.push(plural(m.workspaces.members, membership.membersCount));
   }
   if (membership.planLabel) {
     parts.push(membership.planLabel);
@@ -364,23 +362,23 @@ function Header() {
 
   const actions: HeaderAction[] = [];
   if (invitable && data.onInviteMembers) {
-    actions.push({ label: 'Invite', onClick: data.onInviteMembers });
+    actions.push({ label: m.manage.invite, onClick: data.onInviteMembers });
   }
   // Every other surface hangs "Sign out" off the account's own row. An account-only one has no such
   // row, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
   if (data.mode === 'user' && signOutSession) {
     actions.push({
-      label: 'Sign out',
+      label: m.accounts.signOut,
       onClick: () => signOutSession(sessionId),
       busyKey: userButtonBusyKeys.signOutSession(sessionId),
     });
   }
   if (organization) {
     if (data.onManageOrganization) {
-      actions.push({ label: 'Manage organization', icon: 'cog', onClick: data.onManageOrganization });
+      actions.push({ label: m.manage.organization, icon: 'cog', onClick: data.onManageOrganization });
     }
   } else if (data.onManageAccount) {
-    actions.push({ label: 'Manage account', icon: 'cog', onClick: data.onManageAccount });
+    actions.push({ label: m.manage.account, icon: 'cog', onClick: data.onManageAccount });
   }
 
   return (
@@ -458,14 +456,14 @@ function ActiveAccountRow() {
 
   const actions: AccountAction[] = [];
   if (data.onCreateOrganization) {
-    actions.push({ label: 'Create organization', onClick: data.onCreateOrganization });
+    actions.push({ label: m.manage.createOrganization, onClick: data.onCreateOrganization });
   }
   if (data.onManageAccount) {
-    actions.push({ label: 'Manage account', onClick: data.onManageAccount });
+    actions.push({ label: m.manage.account, onClick: data.onManageAccount });
   }
   if (signOutSession) {
     actions.push({
-      label: 'Sign out',
+      label: m.accounts.signOut,
       color: 'negative',
       onClick: () => signOutSession(sessionId),
     });
@@ -540,7 +538,7 @@ function PersonalRow() {
 
   return (
     <WorkspaceRow
-      name='Personal account'
+      name={m.workspaces.personal}
       imageUrl={imageUrl}
       shape={shape}
       active={!data.activeOrganization}
@@ -655,7 +653,7 @@ function PendingRows() {
             busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
             name={i.organizationName}
             imageUrl={i.imageUrl}
-            actionLabel='Accept'
+            actionLabel={m.workspaces.accept}
             onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
           />
         ),
@@ -666,9 +664,9 @@ function PendingRows() {
           busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
           name={s.name}
           imageUrl={s.imageUrl}
-          actionLabel='Join'
+          actionLabel={m.workspaces.join}
           // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
-          note={s.status === 'accepted' ? 'Requested' : undefined}
+          note={s.status === 'accepted' ? m.workspaces.requested : undefined}
           onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
         />
       ))}
@@ -730,7 +728,7 @@ function WorkspaceListLoadingRow() {
         <Spinner size='sm' />
       </Item.Media>
       <Item.Content>
-        <Item.Description>Loading organizations…</Item.Description>
+        <Item.Description>{m.workspaces.loading}</Item.Description>
       </Item.Content>
     </Item.Root>
   );
@@ -785,16 +783,16 @@ function AccountsHeading() {
 
   const actions: AccountAction[] = [];
   if (data.onAddAccount) {
-    actions.push({ label: 'Add account', onClick: data.onAddAccount });
+    actions.push({ label: m.accounts.add, onClick: data.onAddAccount });
   }
 
   return (
     <Item.Root size='xs'>
       <Item.Content>
-        <Item.Label>Accounts</Item.Label>
+        <Item.Label>{m.accounts.heading}</Item.Label>
       </Item.Content>
       <ActionMenu
-        label='Account actions'
+        label={m.accounts.menu}
         actions={actions}
       />
     </Item.Root>
@@ -852,7 +850,7 @@ function Footer() {
             size='sm'
           />
         ),
-        label: 'Create organization',
+        label: m.manage.createOrganization,
         onClick: data.onCreateOrganization,
       });
     }
@@ -868,7 +866,7 @@ function Footer() {
             size='sm'
           />
         ),
-        label: 'Add account',
+        label: m.accounts.add,
         onClick: data.onAddAccount,
       });
     }
@@ -881,7 +879,7 @@ function Footer() {
             size='sm'
           />
         ),
-        label: 'Sign out of all accounts',
+        label: m.accounts.signOutAll,
         onClick: data.onSignOutAll,
         busyKey: userButtonBusyKeys.signOutAll(),
       });
@@ -906,7 +904,15 @@ function Footer() {
         </>
       ) : null}
       <div {...stylex.props(styles.branding)}>
-        Secured by <ClerkLogo height={14} />
+        {m.branding.securedBy}{' '}
+        <a
+          href='https://go.clerk.com/components'
+          target='_blank'
+          rel='noopener noreferrer'
+          {...stylex.props(styles.brandingLink)}
+        >
+          <ClerkLogo height={14} />
+        </a>
       </div>
     </>
   );
@@ -982,7 +988,7 @@ export function UserButtonTrigger({
 
   return (
     <Popover.Trigger
-      aria-label={`Open account menu for ${name}`}
+      aria-label={fill(m.trigger.open, { name })}
       {...stylex.props(styles.trigger, renderTriggerLabel ? styles.triggerLabelled : null, triggerShapes[shape])}
     >
       <WorkspaceAvatar
@@ -1004,7 +1010,7 @@ export function UserButtonTrigger({
 /** The popover surface: header, workspace list, additional accounts, and footer. */
 export function UserButtonPopup(): ReactElement {
   return (
-    <Popover.Popup aria-label='Account'>
+    <Popover.Popup aria-label={m.popup.label}>
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
       <Card.Root style={{ rowGap: 0 }}>
         <Header />

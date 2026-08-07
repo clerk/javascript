@@ -5,6 +5,8 @@ export function ClerkLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
     <svg
       viewBox='0 0 441 128'
       fill='none'
+      role='img'
+      aria-label='Clerk'
       {...props}
     >
       <path
