@@ -90,7 +90,6 @@ const workspaceList = () => groups().find(group => scrollClasses.every(name => g
 const accountsList = () =>
   groups().find(group => group !== workspaceList() && titles(group).some(title => title.includes('@')));
 
-// `user` is an account switcher that never shows an organization, even when one is active.
 describe('UserButtonView, user mode', () => {
   function renderUserMode(props: Partial<UserButtonProps> = {}) {
     return renderView({
@@ -113,7 +112,6 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByText('Foundry')).toBeNull();
   });
 
-  // A nameless account is titled by its identifier, so repeating it underneath says nothing.
   it('drops the identifier line when it would only repeat the title', () => {
     renderUserMode({ activeSession: { ...alice, name: 'alice@example.com' } });
 
@@ -129,9 +127,6 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByText('Gamma')).toBeNull();
   });
 
-  // Every other surface hangs "Sign out" off the account's own row; this one has no such row, so it
-  // takes the labelled slot beside the gear. Inviting belongs to an organization, which is not what
-  // this surface is about.
   it('signs out of the account from the header, beside the gear', async () => {
     const onSignOutSession = vi.fn();
     renderUserMode({ onSignOutSession });
@@ -151,8 +146,6 @@ describe('UserButtonView, user mode', () => {
     expect(button.querySelector('.cl-spinner')).not.toBeNull();
   });
 
-  // With nothing above them to be told apart from, the account rows stand alone: no heading, and
-  // the account you are already on is not somewhere else to go.
   it('lists only the accounts to switch to, with no heading above them', () => {
     renderUserMode();
 
@@ -168,7 +161,6 @@ describe('UserButtonView, user mode', () => {
   });
 });
 
-// `orgs` is an organization switcher with no account rows at all.
 describe('UserButtonView, orgs mode', () => {
   function renderOrgsMode(props: Partial<UserButtonProps> = {}) {
     return renderView({
@@ -190,8 +182,6 @@ describe('UserButtonView, orgs mode', () => {
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
   });
 
-  // The account is all there is to head it with, and it is not an organization, so there is nobody
-  // to invite and the gear manages the account instead.
   it('falls back to the account in the header where no organization is active', () => {
     renderOrgsMode({ activeOrganization: null });
 
@@ -215,8 +205,6 @@ describe('UserButtonView, orgs mode', () => {
     expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
   });
 
-  // No account menu to carry "Create organization", so it lands at the foot, in the slot the
-  // account-wide actions occupy elsewhere. Those actions themselves have no place here.
   it('takes "Create organization" at the foot, in place of the account actions', () => {
     renderOrgsMode();
 
@@ -226,8 +214,6 @@ describe('UserButtonView, orgs mode', () => {
   });
 });
 
-// `combined` is both switchers at once, so it is the only surface that has to decide which one
-// leads and where the account-wide actions live.
 describe('UserButtonView, combined mode', () => {
   function renderCombined(props: Partial<UserButtonProps> = {}) {
     return renderView({
@@ -253,8 +239,6 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
   });
 
-  // The row heads the workspaces that belong to the account, the way the "Accounts" heading heads
-  // the other accounts, and carries the account-wide actions the header has no room for.
   it('heads the workspace list with the active account and its own actions', async () => {
     const onSignOutSession = vi.fn();
     const act = userEvent.setup();
@@ -275,8 +259,6 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
   });
 
-  // Under a heading the group reads as the full set of accounts, so the one you are on is listed
-  // and checked rather than left out.
   it('heads the other accounts under "Accounts", listing the one it is on', () => {
     renderCombined();
 
@@ -301,8 +283,6 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
   });
 
-  // One account means no heading to hang it off, so "Add account" falls back to the foot, the same
-  // slot the account-only surface carries it in.
   it('takes "Add account" at the foot where there is no heading to carry it', () => {
     renderCombined({ additionalSessions: [] });
 
@@ -311,8 +291,6 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
   });
 
-  // The account row is not the workspace list's to withhold: an account with no organizations still
-  // needs somewhere to manage and sign out of the one it is signed in as.
   it('keeps the account row with no organizations to head', () => {
     renderCombined({ hasOrganizations: false, activeOrganization: null, memberships: [] });
 
@@ -334,19 +312,15 @@ describe('UserButtonView, the workspace list', () => {
     });
   }
 
-  // The order the existing OrganizationSwitcher lists these in: what is on offer leads, since it is
-  // the one row that goes away if it is not acted on, and invitations lead the suggestions since
-  // accepting one joins where a suggestion only files a request.
+  // Accepting an invitation joins; a suggestion only files a request, so invitations lead.
   it('leads with the invitations, then the suggestions, then the workspaces held', () => {
     renderList({ invitations: [gamma], suggestions: [beta] });
 
     expect(titles(workspaceList())).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
   });
 
-  // The one surface in the popup that scrolls, so it takes the shared scroll area rather than a
-  // bare `overflow-y` of its own. `auto` rather than `stable`: a reserved gutter insets the rows
-  // whether or not the list overflows, leaving short lists with their avatars and icons off the
-  // edge the header and footer align to. Every list assertion here is found through these classes.
+  // `auto` rather than `stable`: a reserved gutter would inset short lists off the edge the header
+  // and footer align to.
   it('scrolls through the shared scroll area, at an automatic gutter', () => {
     renderList();
 
@@ -402,7 +376,6 @@ describe('UserButtonView, the workspace list', () => {
       expect(titles(workspaceList())).not.toContain('Alice Smith');
     });
 
-    // The same contract every workspace row follows: what is already selected is not a button.
     it('checks it, and offers no switch, where it is what is active', () => {
       renderList({ activeOrganization: null });
 
@@ -418,9 +391,8 @@ describe('UserButtonView, the workspace list', () => {
       expect(row.querySelector('.cl-spinner')).not.toBeNull();
     });
 
-    // An instance that requires an organization has no personal workspace to return to, so the row
-    // would stand there and do nothing. It is withheld rather than stood down: this is not a moment
-    // where the switch is unavailable, it is a surface where the workspace does not exist.
+    // Withheld rather than stood down: the workspace does not exist here, so there is no switch to
+    // make available later.
     it('stays out of a surface that has no personal workspace', () => {
       renderList({ hidePersonal: true, memberships: [foundry, otherCo] });
 
@@ -467,7 +439,6 @@ describe('UserButtonView, the workspace list', () => {
       expect(within(accept).getByRole('progressbar')).toBeInTheDocument();
     });
 
-    // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
     it('reports an accepted suggestion instead of offering to join it again', () => {
       renderList({ suggestions: [{ ...beta, status: 'accepted' }] });
 
@@ -475,8 +446,6 @@ describe('UserButtonView, the workspace list', () => {
       expect(screen.getByText('Requested')).toBeInTheDocument();
     });
 
-    // Accepting an invitation joins the organization, so an accepted one is a workspace like any
-    // other: click the row to switch to it.
     it('lists an accepted invitation as a workspace to switch to', async () => {
       const onSelectOrganization = vi.fn();
       renderList({ invitations: [{ ...gamma, status: 'accepted' }], onSelectOrganization });
@@ -555,7 +524,7 @@ describe('UserButtonView, the foot', () => {
   const footLabels = () =>
     Array.from(groups().at(-1)?.querySelectorAll('.cl-item-label') ?? []).map(node => node.textContent ?? '');
 
-  // The app's own actions lead, the way the existing UserButton lists them above "Add account".
+  // The order the existing UserButton lists them in, above "Add account".
   it('leads with the custom rows', () => {
     renderView({ customMenuItems: [action(), support] });
 
@@ -597,8 +566,6 @@ describe('UserButtonView, the foot', () => {
     expect(footLabels()).toEqual(['Sign out of all accounts', 'Terms of service']);
   });
 
-  // "Add account" is a row only where no Accounts heading carries it, so this is the one surface
-  // whose foot has both account-wide actions to order.
   it('orders "Add account" where the foot is what carries it', () => {
     renderView({ additionalSessions: [], customMenuItems: [action()], menuItemOrder: ['addAccount', 'terms'] });
 
@@ -617,8 +584,6 @@ describe('UserButtonView, the foot', () => {
     expect(screen.getByRole('button', { name: 'Terms of service' })).toBeDisabled();
   });
 
-  // A link is the browser's navigation rather than one of the surface's one-shot actions, so it has
-  // nothing to wait behind.
   it('leaves a custom link followable while another action runs', () => {
     renderView({ customMenuItems: [support], pendingKey: userButtonBusyKeys.switchSession('sess_9') });
 
@@ -729,8 +694,6 @@ describe('UserButtonTrigger', () => {
     expect(screen.queryByText('Pro')).toBeNull();
   });
 
-  // The corner follows the workspace mark, so a labelled trigger is a pill for a person and a
-  // squared-off block for an organization rather than a pill either way.
   it('takes its corner from the workspace it names, labelled or not', () => {
     const corner = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);
@@ -745,7 +708,6 @@ describe('UserButtonTrigger', () => {
     );
   });
 
-  // The active organization arrives on its own, ahead of the list it belongs to.
   it('names the active organization before its membership list has loaded', () => {
     renderTrigger({ mode: 'orgs', memberships: [], hasOrganizations: false, organizationsLoading: true });
 

@@ -59,9 +59,8 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
-// A plain size scale, so nesting a smaller step inside a larger one reads off the
-// name. `md` is 6px rather than a 4/8/12 step: it is the control radius (button,
-// avatar square), and neither neighbour sits right on a control.
+// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
+// square), and neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
