@@ -183,7 +183,7 @@ describe('ConfigureSSO', () => {
 
       const { findByRole } = render(<ConfigureSSO />, { wrapper });
 
-      await findByRole('button', { name: /verify again/i });
+      await findByRole('button', { name: /re-issue/i });
     });
 
     it('throttles domain verification retries for five minutes', async () => {
@@ -202,22 +202,22 @@ describe('ConfigureSSO', () => {
       fixtures.clerk.organization?.prepareOwnershipVerification.mockResolvedValue({ data: [expiredDomain] } as any);
 
       const { findByRole, getByRole } = render(<ConfigureSSO />, { wrapper });
-      await findByRole('button', { name: /verify again/i });
+      await findByRole('button', { name: /re-issue/i });
 
       vi.useFakeTimers();
       await act(() => {
-        getByRole('button', { name: /verify again/i }).click();
+        getByRole('button', { name: /re-issue/i }).click();
         return Promise.resolve();
       });
 
       expect(fixtures.clerk.organization?.prepareOwnershipVerification).toHaveBeenCalledWith([expiredDomain.id]);
-      expect(getByRole('button', { name: /verify again/i })).toBeDisabled();
+      expect(getByRole('button', { name: /re-issue/i })).toBeDisabled();
 
       act(() => {
         vi.advanceTimersByTime(5 * 60 * 1000);
       });
 
-      expect(getByRole('button', { name: /verify again/i })).not.toBeDisabled();
+      expect(getByRole('button', { name: /re-issue/i })).not.toBeDisabled();
     });
 
     it('explains the cooldown while a domain verification retry is throttled', async () => {
@@ -236,16 +236,16 @@ describe('ConfigureSSO', () => {
       fixtures.clerk.organization?.prepareOwnershipVerification.mockResolvedValue({ data: [expiredDomain] } as any);
 
       const { findByRole, getByRole, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
-      await userEvent.click(await findByRole('button', { name: /verify again/i }));
+      await userEvent.click(await findByRole('button', { name: /re-issue/i }));
 
       const throttledButton = await waitFor(() => {
-        const button = getByRole('button', { name: /verify again/i });
+        const button = getByRole('button', { name: /re-issue/i });
         expect(button).toBeDisabled();
         return button;
       });
 
       await userEvent.hover(throttledButton.parentElement as HTMLElement);
-      await findByText(/you can check again shortly/i);
+      await findByText(/you can issue another one shortly/i);
     });
 
     it('does not throttle domain verification retries when the request fails', async () => {
@@ -264,14 +264,14 @@ describe('ConfigureSSO', () => {
       fixtures.clerk.organization?.prepareOwnershipVerification.mockRejectedValue(new Error('nope'));
 
       const { findByRole, getByRole } = render(<ConfigureSSO />, { wrapper });
-      await findByRole('button', { name: /verify again/i });
+      await findByRole('button', { name: /re-issue/i });
 
       await act(() => {
-        getByRole('button', { name: /verify again/i }).click();
+        getByRole('button', { name: /re-issue/i }).click();
         return Promise.resolve();
       });
 
-      expect(getByRole('button', { name: /verify again/i })).not.toBeDisabled();
+      expect(getByRole('button', { name: /re-issue/i })).not.toBeDisabled();
     });
 
     it('short-circuits to the activate step for an active connection', async () => {

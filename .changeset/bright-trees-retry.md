@@ -4,4 +4,4 @@
 '@clerk/shared': patch
 ---
 
-Allow self-serve SSO domain verification TXT records to be regenerated while verification is pending. Each successful retry starts a five-minute cooldown, explained on the disabled retry button.
+Add a "Re-issue" action to pending self-serve SSO domains, which issues a fresh TXT record when the published one is stale. Each successful re-issue starts a five-minute cooldown, explained on the disabled button.
