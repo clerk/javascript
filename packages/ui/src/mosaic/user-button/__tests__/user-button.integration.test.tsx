@@ -1,5 +1,6 @@
 import type * as SharedReact from '@clerk/shared/react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import type { CustomPage } from '@clerk/shared/types';
+import { act as reactAct, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -85,6 +86,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
         displayConfig: { afterSwitchSessionUrl: '/after-switch' },
         authConfig: { singleSessionMode },
         organizationSettings: { enabled: organizationsEnabled },
+        commerceSettings: { billing: { user: { enabled: false } } },
+        apiKeysSettings: { user_api_keys_enabled: false },
       },
     }),
   };
@@ -389,6 +392,48 @@ describe('UserButton (connected)', () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(popup()).toBeNull());
+  });
+
+  // The whole round trip for a custom page: the prop a consumer writes, through the bridge, out to
+  // the callbacks clerk-js is handed, and back into the element clerk-js renders for the page. The
+  // popover has closed by then, so this also covers the portals outliving what opened them.
+  it('renders a custom page into the element the opened profile hands back', async () => {
+    renderUserButton({
+      userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
+    });
+    const act = await open();
+
+    await accountAction(act, 'Manage account');
+    await waitFor(() => expect(popup()).toBeNull());
+
+    const { customPages } = openUserProfile.mock.calls[0][0];
+    expect(customPages).toHaveLength(1);
+    expect(customPages[0]).toMatchObject({ label: 'Terms', url: 'terms' });
+
+    // Stands in for clerk-js's `ExternalElementMounter`, which renders this `div` where the page goes.
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    reactAct(() => {
+      customPages[0].mount(el);
+    });
+
+    expect(within(el).getByText('Terms body')).toBeInTheDocument();
+  });
+
+  it('opens the profile with its pages in the order it was given', async () => {
+    renderUserButton({
+      userProfileProps: {
+        customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }],
+        pageOrder: ['account', 'terms'],
+      },
+    });
+    const act = await open();
+
+    await accountAction(act, 'Manage account');
+    await waitFor(() => expect(popup()).toBeNull());
+
+    const { customPages } = openUserProfile.mock.calls[0][0];
+    expect(customPages.map((page: CustomPage) => page.label)).toEqual(['account', 'Terms', 'security']);
   });
 
   it('inviting members opens the InviteMembers modal and closes the popover', async () => {
