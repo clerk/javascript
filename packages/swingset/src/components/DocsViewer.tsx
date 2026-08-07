@@ -15,6 +15,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
     'organization-profile-profile-section': dynamic(
       () => import('../stories/organization-profile-profile-section.mdx'),
     ),
