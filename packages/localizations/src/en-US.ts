@@ -657,10 +657,10 @@ export const enUS: LocalizationResource = {
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
-        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
-        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         ownershipLabel: 'Ownership',
         proveOwnershipButton: 'Prove ownership',
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
           hostLabel: 'Host / Name',
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
@@ -679,8 +679,8 @@ export const enUS: LocalizationResource = {
       formFieldLabel__domain: 'Domain',
       removeDomainDialog: {
         cancelButton: 'Cancel',
-        removeFromSSOButton: 'Remove from SSO',
         removeButton: 'Remove domain',
+        removeFromSSOButton: 'Remove from SSO',
         subtitle__active:
           "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",

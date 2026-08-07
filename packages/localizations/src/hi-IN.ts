@@ -643,11 +643,14 @@ export const hiIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'असत्यापित',
         badge__verified: 'सत्यापित',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -670,9 +673,12 @@ export const hiIN: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'अपने संगठन द्वारा साइन इन के लिए उपयोग किए जाने वाले डोमेन का स्वामित्व जोड़ें और सत्यापित करें।',
       title: 'SSO डोमेन जोड़ें',

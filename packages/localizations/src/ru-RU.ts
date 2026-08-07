@@ -637,11 +637,14 @@ export const ruRU: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'Не подтверждён',
         badge__verified: 'Подтверждён',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -664,9 +667,12 @@ export const ruRU: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'Добавьте и подтвердите право собственности на домены, которые ваша организация использует для входа.',
       title: 'Добавить домены SSO',

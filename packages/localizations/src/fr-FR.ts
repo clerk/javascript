@@ -645,11 +645,14 @@ export const frFR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'Non vérifié',
         badge__verified: 'Vérifié',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -672,9 +675,12 @@ export const frFR: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'Ajoutez et vérifiez la propriété des domaines que votre organisation utilise pour se connecter.',
       title: 'Ajouter des domaines SSO',

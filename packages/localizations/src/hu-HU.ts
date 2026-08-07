@@ -644,11 +644,14 @@ export const huHU: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'Nincs igazolva',
         badge__verified: 'Igazolva',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -671,9 +674,12 @@ export const huHU: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle:
         'Adja hozzá és igazolja azon tartományok tulajdonjogát, amelyeket szervezete a bejelentkezéshez használ.',

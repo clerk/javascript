@@ -644,11 +644,14 @@ export const jaJP: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: '未確認',
         badge__verified: '確認済み',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -671,9 +674,12 @@ export const jaJP: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: '組織がサインインに使用するドメインを追加し、所有権を確認します。',
       title: 'SSO ドメインを追加',
