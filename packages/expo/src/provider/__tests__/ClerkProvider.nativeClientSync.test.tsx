@@ -1378,6 +1378,57 @@ describe('ClerkProvider native client sync', () => {
     expect(originalHandleUnauthenticated).toHaveBeenCalledTimes(1);
   });
 
+  test('pushes the restored device token back to native when recovery rejects a foreign client', async () => {
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const foreignClient = {
+      id: 'client_foreign',
+      signedInSessions: [],
+      lastActiveSessionId: null,
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: vi.fn().mockResolvedValue(foreignClient),
+    };
+    mocks.clerkInstance.session = activeSession;
+    mocks.tokenCache.getToken.mockResolvedValue('js-device-token');
+    mocks.getClientToken.mockResolvedValue('js-device-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    // Native rotates to a foreign token between bootstrap and the 401.
+    mocks.getClientToken.mockResolvedValue('native-device-token');
+    mocks.syncClientStateFromJs.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith('js-device-token', expect.any(String), false, true);
+    });
+    expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
+  });
+
   test('refreshes native from the server after the JS client changes', async () => {
     mocks.tokenCache.getToken.mockResolvedValue(null);
 

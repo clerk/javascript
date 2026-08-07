@@ -242,7 +242,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
 
-            if (client) {
+            // Persisting the dummy would make the next boot see a populated cache and skip recovery.
+            if (client && client.id !== DUMMY_CLERK_CLIENT_RESOURCE.id) {
               void ClientResourceCache.save(client.__internal_toSnapshot());
               if (client.lastActiveSessionId) {
                 const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
@@ -261,7 +262,9 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             environment: EnvironmentJSONSnapshot | null;
           }> => {
             const environment = await EnvironmentResourceCache.load();
-            const client = await ClientResourceCache.load();
+            const cachedClient = await ClientResourceCache.load();
+            // Installs that persisted the dummy before the save guard existed must still recover.
+            const client = cachedClient?.id === DUMMY_CLERK_CLIENT_RESOURCE.id ? null : cachedClient;
             if (!environment || !client) {
               scheduleResourceRetry(3000);
             }
