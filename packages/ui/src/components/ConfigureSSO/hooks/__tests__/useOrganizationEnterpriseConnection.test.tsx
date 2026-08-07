@@ -203,8 +203,6 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
-    // `name` is derived by FAPI, so it is not sent from the client; only
-    // ownership-verified domains are valid SSO connection domains.
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
       domains: ['acme.com'],

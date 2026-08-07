@@ -677,6 +677,7 @@ export const taIN: LocalizationResource = {
         removeButton: undefined,
         removeFromSSOButton: undefined,
         subtitle__active: undefined,
+        subtitle__activePreserveAffiliation: undefined,
         subtitle__inactive: undefined,
         subtitle__preserveAffiliation: undefined,
         title: undefined,

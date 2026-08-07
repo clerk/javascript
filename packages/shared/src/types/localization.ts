@@ -1446,6 +1446,7 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         title__preserveAffiliation: LocalizationValue;
         subtitle__active: LocalizationValue<'domain'>;
+        subtitle__activePreserveAffiliation: LocalizationValue<'domain'>;
         subtitle__inactive: LocalizationValue<'domain'>;
         subtitle__preserveAffiliation: LocalizationValue<'domain'>;
         cancelButton: LocalizationValue;

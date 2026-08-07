@@ -449,21 +449,29 @@ const DomainCard = ({
           {isAffiliationVerified && (
             <>
               <Text
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardAffiliationLabel}
+                elementId={descriptors.configureSSOVerifyDomainCardAffiliationLabel.setId(cardId)}
                 as='span'
                 colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.affiliationLabel')}
                 sx={t => ({ fontSize: t.fontSizes.$xs })}
               />
               <Badge
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardAffiliationBadge}
+                elementId={descriptors.configureSSOVerifyDomainCardAffiliationBadge.setId(cardId)}
                 colorScheme='success'
                 localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__verified')}
               />
               <Icon
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardOwnershipArrow}
+                elementId={descriptors.configureSSOVerifyDomainCardOwnershipArrow.setId(cardId)}
                 icon={ArrowRight}
                 size='sm'
                 colorScheme='neutral'
               />
               <Text
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardOwnershipLabel}
+                elementId={descriptors.configureSSOVerifyDomainCardOwnershipLabel.setId(cardId)}
                 as='span'
                 colorScheme='secondary'
                 localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.ownershipLabel')}

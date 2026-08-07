@@ -24,10 +24,6 @@ export type UseOrganizationDomainsParams = {
    * Filter the returned domains by enrollment mode.
    */
   enrollmentMode?: OrganizationEnrollmentMode;
-  /**
-   * Enrollment mode assigned to domains created through this hook. Defaults to
-   * `enrollmentMode`, so filtering and creation retain their existing behavior.
-   */
   createEnrollmentMode?: OrganizationEnrollmentMode;
   /**
    * Invoked from the ownership-verification poll whenever an `attempt` resolves

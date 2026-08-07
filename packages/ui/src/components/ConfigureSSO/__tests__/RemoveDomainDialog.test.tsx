@@ -90,6 +90,20 @@ describe('RemoveDomainDialog', () => {
     expect(screen.getByRole('heading', { name: 'Remove from SSO' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Remove from SSO' })).toBeInTheDocument();
     expect(screen.getByText(/existing affiliation verification will remain active/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Users won't be able to sign-in/i)).not.toBeInTheDocument();
+  });
+
+  it('warns about sign-in impact while preserving affiliation when the connection is active', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    renderDialog(wrapper, { domain: 'acme.com', isConnectionActive: true, preserveAffiliationVerification: true });
+
+    expect(screen.getByRole('heading', { name: 'Remove from SSO' })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Users won't be able to sign-in with acme\.com anymore, but its existing affiliation verification will remain active/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('invokes onClose when Cancel is clicked', async () => {

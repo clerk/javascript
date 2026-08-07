@@ -683,6 +683,8 @@ export const enUS: LocalizationResource = {
         removeFromSSOButton: 'Remove from SSO',
         subtitle__active:
           "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__activePreserveAffiliation:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore, but its existing affiliation verification will remain active.",
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
         subtitle__preserveAffiliation:
           "You're about to remove {{domain}} from this enterprise connection. Its existing affiliation verification will remain active.",

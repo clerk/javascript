@@ -46,17 +46,15 @@ const RemoveDomainDialogContent = withCardStateProvider((props: RemoveDomainDial
   const { onClose, onRemove } = props;
   const card = useCardState();
 
-  const subtitle = props.preserveAffiliationVerification
-    ? localizationKeys('configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__preserveAffiliation', {
-        domain: props.domain,
-      })
+  const subtitleKey = props.preserveAffiliationVerification
+    ? props.isConnectionActive
+      ? 'configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__activePreserveAffiliation'
+      : 'configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__preserveAffiliation'
     : props.isConnectionActive
-      ? localizationKeys('configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__active', {
-          domain: props.domain,
-        })
-      : localizationKeys('configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__inactive', {
-          domain: props.domain,
-        });
+      ? 'configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__active'
+      : 'configureSSO.organizationDomainsStep.removeDomainDialog.subtitle__inactive';
+
+  const subtitle = localizationKeys(subtitleKey, { domain: props.domain });
 
   const onSubmit = async () => {
     try {
