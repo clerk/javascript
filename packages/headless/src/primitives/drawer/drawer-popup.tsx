@@ -24,6 +24,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     getFloatingProps,
     floatingContext,
     modal,
+    returnFocusRef,
     labelId,
     descriptionId,
     mounted,
@@ -107,6 +108,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
       modal={modal}
       outsideElementsInert={modal}
       initialFocus={autoFocus ? undefined : popupRef}
+      returnFocus={returnFocusRef}
     >
       {element}
     </FloatingFocusManager>

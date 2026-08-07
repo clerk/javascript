@@ -71,10 +71,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {components.map(({ mod, componentSlug }) => {
                   const href = `/${groupSlug}/${componentSlug}`;
-                  // Hooks (e.g. `useDataTable`) are called, not rendered — show `useX()` rather
-                  // than JSX `<useX />`. Everything else is a component.
-                  const isHook = /^use[A-Z]/.test(mod.meta.title);
-                  const usage = isHook ? `${mod.meta.title}()` : `<${mod.meta.title} />`;
+                  // How an entry is USED differs by layer, so the label follows the layer rather
+                  // than a guess at the title: hooks are called, atomic styles are a set of
+                  // exports with no single call form worth privileging, and everything else is a
+                  // component rendered as JSX.
+                  const usage =
+                    mod.meta.group === 'Hooks'
+                      ? `${mod.meta.title}()`
+                      : mod.meta.group === 'Styles'
+                        ? mod.meta.title
+                        : `<${mod.meta.title} />`;
                   return (
                     <SidebarMenuItem key={mod.meta.title}>
                       <SidebarMenuButton

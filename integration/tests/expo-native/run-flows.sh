@@ -15,8 +15,11 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-command -v maestro-runner >/dev/null 2>&1 || {
-  echo "maestro-runner is required: https://devicelab.dev/open-source/maestro-runner/docs/getting-started"
+# Runs the official maestro CLI. maestro-runner was tried and reverted: its
+# drivers mangle typed text and resolve text selectors by substring, so
+# tapOn 'Continue' hits the 'Continue to <app>' title instead of the button.
+command -v maestro >/dev/null 2>&1 || {
+  echo "maestro is required: https://docs.maestro.dev"
   exit 1
 }
 
@@ -30,10 +33,9 @@ run_flow() {
   shift
   local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
 
-  maestro-runner test \
-    --output "$output_root/$output_name" \
-    --flatten \
-    --artifacts on-failure \
+  maestro test \
+    --debug-output "$output_root/$output_name" \
+    --flatten-debug-output \
     "$@"
 }
 
@@ -90,8 +92,8 @@ for flow in flows/*.yaml; do
   flow_result=failed
   for attempt in 1 2; do
     if run_flow "${flow##*/}-attempt-$attempt" \
-      --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-      --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
+      -e CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+      -e CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
       "$flow"; then
       flow_result=passed
       break

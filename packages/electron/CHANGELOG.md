@@ -1,5 +1,51 @@
 # @clerk/electron
 
+## 0.0.27
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df), [`58d8ff5`](https://github.com/clerk/javascript/commit/58d8ff50b121ebf42744ba32302da6b22e90b704)]:
+  - @clerk/shared@4.27.0
+  - @clerk/clerk-js@6.27.0
+  - @clerk/react@6.13.0
+
+## 0.0.26
+
+### Patch Changes
+
+- Updated dependencies [[`bbe51ff`](https://github.com/clerk/javascript/commit/bbe51ffc343a878022c5863796450d6d97069ea0), [`bf1b62a`](https://github.com/clerk/javascript/commit/bf1b62a552f005bc3258c4e48b6a205eeca5fed5), [`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e), [`7f0cac8`](https://github.com/clerk/javascript/commit/7f0cac8d92496efda67fd434eb16bf2bd61e897e)]:
+  - @clerk/react@6.12.11
+  - @clerk/clerk-js@6.26.0
+  - @clerk/shared@4.26.0
+
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/clerk-js@6.25.13
+  - @clerk/shared@4.25.10
+  - @clerk/react@6.12.10
+
+## 0.0.24
+
+### Patch Changes
+
+- Forward OAuth deep-link callbacks to the primary Electron process on Windows and Linux, and bring the ([#9278](https://github.com/clerk/javascript/pull/9278)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+  signing-in window to the front when the callback arrives.
+
+  Delivering those callbacks requires Electron's single-instance lock, so `createClerkBridge` now
+  acquires it on Windows and Linux whenever `renderer` is configured, and quits secondary processes
+  after forwarding their arguments. Applications that previously ran side-by-side instances on those
+  platforms will become single-instance. macOS is unaffected. Two new escape hatches: the returned
+  bridge exposes `isPrimaryInstance` so the application can stop its own bootstrap in a secondary
+  process, and `manageSingleInstanceLock: false` leaves the lock to applications that manage it
+  themselves.
+
+- Updated dependencies []:
+  - @clerk/react@6.12.9
+
 ## 0.0.23
 
 ### Patch Changes

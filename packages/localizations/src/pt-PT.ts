@@ -1398,6 +1398,10 @@ export const ptPT: LocalizationResource = {
         subtitleNewTab: 'Regresse ao novo separador que foi aberto para continuar',
         titleNewTab: 'Sessão iniciada noutro separador',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Utilize a ligação de verificação enviada para o seu e-mail',

@@ -1397,6 +1397,10 @@ export const ptBR: LocalizationResource = {
         subtitleNewTab: 'Retorne para a nova aba que foi aberta para continuar',
         titleNewTab: 'Conectado em outra aba',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Use o link de verificação enviado para o seu e-mail',

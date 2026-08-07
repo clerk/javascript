@@ -69,7 +69,7 @@ export function OrganizationProfileDomainsSectionRemoveView({
                 Cancel
               </Button>
               <Button
-                intent='destructive'
+                color='negative'
                 type='button'
                 disabled={isDeleting}
                 onClick={() => send({ type: 'CONFIRM' })}
