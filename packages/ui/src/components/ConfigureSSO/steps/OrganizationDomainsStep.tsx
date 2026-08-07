@@ -552,9 +552,9 @@ const OwnershipUpgradeNotice = ({
   };
 
   return (
-    <Col
+    <Flex
+      justify='end'
       sx={t => ({
-        alignItems: 'center',
         paddingInline: t.space.$4,
         paddingBottom: t.space.$4,
         paddingTop: t.space.$2,
@@ -563,17 +563,16 @@ const OwnershipUpgradeNotice = ({
       <Button
         variant='bordered'
         colorScheme='secondary'
-        size='lg'
+        size='xs'
         isLoading={isPreparing}
         onClick={handleProveOwnership}
-        sx={t => ({ minWidth: t.sizes.$48 })}
       >
         <Text
           as='span'
           localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.proveOwnershipButton')}
         />
       </Button>
-    </Col>
+    </Flex>
   );
 };
 
