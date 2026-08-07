@@ -220,7 +220,7 @@ describe('ConfigureSSO', () => {
       expect(getByRole('button', { name: /verify again/i })).not.toBeDisabled();
     });
 
-    it('surfaces the remaining cooldown while a domain verification retry is throttled', async () => {
+    it('explains the cooldown while a domain verification retry is throttled', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });
         f.withEmailAddress();
@@ -245,7 +245,7 @@ describe('ConfigureSSO', () => {
       });
 
       await userEvent.hover(throttledButton.parentElement as HTMLElement);
-      await findByText(/you can check again in \d:\d{2}/i);
+      await findByText(/you can check again shortly/i);
     });
 
     it('does not throttle domain verification retries when the request fails', async () => {
