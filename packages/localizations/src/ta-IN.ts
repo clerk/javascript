@@ -722,11 +722,14 @@ export const taIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'சரிபார்க்கப்படவில்லை',
         badge__verified: 'சரிபார்க்கப்பட்டது',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -749,9 +752,13 @@ export const taIN: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
+        subtitle__activePreserveAffiliation: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'உங்கள் நிறுவனம் உள்நுழைய பயன்படுத்தும் டொமைன்களின் உரிமையைச் சேர்த்து சரிபார்க்கவும்.',
       title: 'SSO டொமைன்களைச் சேர்க்கவும்',

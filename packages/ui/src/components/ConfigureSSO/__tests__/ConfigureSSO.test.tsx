@@ -23,6 +23,15 @@ const unverifiedDomain = {
   ownershipVerification: { status: 'unverified', strategy: 'txt' },
 } as any;
 
+const affiliationVerifiedDomain = {
+  id: 'dmn_affiliation_verified',
+  name: 'legacy.example',
+  organizationId: 'Org1',
+  enrollmentMode: 'manual_invitation',
+  affiliationVerification: { status: 'verified', strategy: 'email_code' },
+  ownershipVerification: null,
+} as any;
+
 const mockOrganizationDomains = (fixtures: any, domains: any[]) =>
   fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: domains, total_count: domains.length } as any);
 
@@ -117,6 +126,33 @@ describe('ConfigureSSO', () => {
   });
 
   describe('state machine mounts on the right step', () => {
+    it('starts ownership verification for an existing affiliation-verified domain', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+        });
+      });
+
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      mockOrganizationDomains(fixtures, [affiliationVerifiedDomain]);
+
+      const { findByRole, findByText, userEvent } = render(<ConfigureSSO />, { wrapper });
+
+      await findByText('Affiliation');
+      await findByText('legacy.example');
+      await findByText('Ownership');
+      await userEvent.click(await findByRole('button', { name: /prove ownership/i }));
+
+      expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledWith(undefined);
+      expect(fixtures.clerk.organization?.prepareOwnershipVerification).toHaveBeenCalledWith([
+        affiliationVerifiedDomain.id,
+      ]);
+    });
+
     it('mounts on select-provider when all organization domains are verified and there is no connection', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEnterpriseSso({ selfServeSSO: true });

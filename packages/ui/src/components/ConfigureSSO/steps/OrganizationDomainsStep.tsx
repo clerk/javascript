@@ -25,7 +25,7 @@ import { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
 import { Tooltip } from '@/elements/Tooltip';
-import { Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
+import { ArrowRight, Checkmark, Clipboard, Close, RotateLeftRight } from '@/icons';
 import { common } from '@/styledSystem';
 import { useFormControl } from '@/ui/utils/useFormControl';
 import { getFieldError, getGlobalError } from '@/utils/errorHandler';
@@ -35,6 +35,9 @@ import { areAllOrganizationDomainsVerified } from '../domain/organizationEnterpr
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard/WizardContext';
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
+
+const hasVerifiedAffiliation = (domain: OrganizationDomainResource): boolean =>
+  (domain.affiliationVerification ?? domain.verification)?.status === 'verified';
 
 export const OrganizationDomainsStep = (): JSX.Element => {
   const { t } = useLocalizations();
@@ -96,6 +99,11 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     if (enterpriseConnection) {
       const domains = enterpriseConnection.domains.filter(name => name !== domain.name);
       await updateConnection(enterpriseConnection.id, { domains });
+    }
+
+    if (hasVerifiedAffiliation(domain)) {
+      await revalidate();
+      return;
     }
 
     await domain.delete();
@@ -164,11 +172,12 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                   const isVerified = domain.ownershipVerification?.status === 'verified';
                   const isLastVerifiedDomain = isVerified && verifiedDomainCount === 1;
                   const isRemoveDisabled = lockLastVerifiedDomain && isLastVerifiedDomain;
+                  const canRemove = domain.enrollmentMode === 'enterprise_sso' || Boolean(enterpriseConnection);
                   return (
                     <DomainCard
                       key={domain.id}
                       domain={domain}
-                      onRemove={() => setDomainToRemove(domain)}
+                      onRemove={canRemove ? () => setDomainToRemove(domain) : undefined}
                       onPrepareOwnershipVerification={() => handlePrepareOwnershipVerification(domain)}
                       isRemoveDisabled={isRemoveDisabled}
                       removeDisabledTooltip={lastVerifiedDomainTooltip}
@@ -198,6 +207,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
           onClose={() => setDomainToRemove(null)}
           domain={domainToRemove.name}
           isConnectionActive={Boolean(enterpriseConnection?.active)}
+          preserveAffiliationVerification={hasVerifiedAffiliation(domainToRemove)}
           onRemove={() => handleRemoveDomain(domainToRemove)}
           contentRef={contentRef}
         />
@@ -370,7 +380,7 @@ const DomainCard = ({
   removeDisabledTooltip,
 }: {
   domain: OrganizationDomainResource;
-  onRemove: () => void;
+  onRemove?: () => void;
   onPrepareOwnershipVerification: () => Promise<void>;
   isRemoveDisabled?: boolean;
   removeDisabledTooltip?: ReturnType<typeof localizationKeys>;
@@ -382,9 +392,11 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
+  const hasOwnershipVerification = Boolean(ownershipVerification);
+  const isAffiliationVerified = hasVerifiedAffiliation(domain);
   const cardId = ownershipVerification?.status ?? 'unverified';
 
-  const removeButton = (
+  const removeButton = onRemove ? (
     <Button
       elementDescriptor={descriptors.configureSSOVerifyDomainCardRemoveButton}
       variant='ghost'
@@ -399,7 +411,7 @@ const DomainCard = ({
         sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
       />
     </Button>
-  );
+  ) : null;
 
   return (
     <Col
@@ -434,6 +446,40 @@ const DomainCard = ({
             {domain.name}
           </Text>
 
+          {isAffiliationVerified && (
+            <>
+              <Text
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardAffiliationLabel}
+                elementId={descriptors.configureSSOVerifyDomainCardAffiliationLabel.setId(cardId)}
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.affiliationLabel')}
+                sx={t => ({ fontSize: t.fontSizes.$xs })}
+              />
+              <Badge
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardAffiliationBadge}
+                elementId={descriptors.configureSSOVerifyDomainCardAffiliationBadge.setId(cardId)}
+                colorScheme='success'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.badge__verified')}
+              />
+              <Icon
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardOwnershipArrow}
+                elementId={descriptors.configureSSOVerifyDomainCardOwnershipArrow.setId(cardId)}
+                icon={ArrowRight}
+                size='sm'
+                colorScheme='neutral'
+              />
+              <Text
+                elementDescriptor={descriptors.configureSSOVerifyDomainCardOwnershipLabel}
+                elementId={descriptors.configureSSOVerifyDomainCardOwnershipLabel.setId(cardId)}
+                as='span'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.ownershipLabel')}
+                sx={t => ({ fontSize: t.fontSizes.$xs })}
+              />
+            </>
+          )}
+
           <Badge
             elementDescriptor={descriptors.configureSSOVerifyDomainCardBadge}
             elementId={descriptors.configureSSOVerifyDomainCardBadge.setId(cardId)}
@@ -447,7 +493,7 @@ const DomainCard = ({
             }
           />
 
-          {!isVerified && !isExpired && (
+          {!isVerified && !isExpired && hasOwnershipVerification && (
             <Spinner
               size='xs'
               colorScheme='neutral'
@@ -456,7 +502,7 @@ const DomainCard = ({
           )}
         </Flex>
 
-        {isRemoveDisabled && removeDisabledTooltip ? (
+        {removeButton && isRemoveDisabled && removeDisabledTooltip ? (
           <Tooltip.Root>
             <Tooltip.Trigger>{removeButton}</Tooltip.Trigger>
             <Tooltip.Content text={removeDisabledTooltip} />
@@ -468,7 +514,12 @@ const DomainCard = ({
 
       <Box sx={{ overflow: 'hidden' }}>
         <Animated>
-          {isExpired ? (
+          {!hasOwnershipVerification ? (
+            <OwnershipUpgradeNotice
+              key='prove-ownership'
+              onPrepareOwnershipVerification={onPrepareOwnershipVerification}
+            />
+          ) : isExpired ? (
             <ExpiredNotice
               key='expired'
               expiresAt={ownershipVerification?.expiresAt ?? null}
@@ -493,6 +544,43 @@ const DomainCard = ({
         </Animated>
       </Box>
     </Col>
+  );
+};
+
+const OwnershipUpgradeNotice = ({
+  onPrepareOwnershipVerification,
+}: {
+  onPrepareOwnershipVerification: () => Promise<void>;
+}): JSX.Element => {
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  const handleProveOwnership = () => {
+    setIsPreparing(true);
+    void onPrepareOwnershipVerification().finally(() => setIsPreparing(false));
+  };
+
+  return (
+    <Flex
+      justify='start'
+      sx={t => ({
+        paddingInline: t.space.$4,
+        paddingBottom: t.space.$4,
+        paddingTop: t.space.$2,
+      })}
+    >
+      <Button
+        variant='bordered'
+        colorScheme='secondary'
+        size='xs'
+        isLoading={isPreparing}
+        onClick={handleProveOwnership}
+      >
+        <Text
+          as='span'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.proveOwnershipButton')}
+        />
+      </Button>
+    </Flex>
   );
 };
 

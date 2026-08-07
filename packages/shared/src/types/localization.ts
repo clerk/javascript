@@ -1444,6 +1444,9 @@ export type __internal_LocalizationResource = {
         verifyAgainButton: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
         removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
+        affiliationLabel: LocalizationValue;
+        ownershipLabel: LocalizationValue;
+        proveOwnershipButton: LocalizationValue;
         txtRecord: {
           instructions: LocalizationValue;
           typeLabel: LocalizationValue;
@@ -1453,10 +1456,14 @@ export type __internal_LocalizationResource = {
       };
       removeDomainDialog: {
         title: LocalizationValue;
+        title__preserveAffiliation: LocalizationValue;
         subtitle__active: LocalizationValue<'domain'>;
+        subtitle__activePreserveAffiliation: LocalizationValue<'domain'>;
         subtitle__inactive: LocalizationValue<'domain'>;
+        subtitle__preserveAffiliation: LocalizationValue<'domain'>;
         cancelButton: LocalizationValue;
         removeButton: LocalizationValue;
+        removeFromSSOButton: LocalizationValue;
       };
     };
     testConfigurationStep: {

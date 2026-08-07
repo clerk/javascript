@@ -723,6 +723,10 @@ export type ElementsConfig = {
   configureSSOVerifyDomainSuggestion: WithOptions;
   configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
   configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardAffiliationLabel: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardAffiliationBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardOwnershipArrow: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardOwnershipLabel: WithOptions<'verified' | 'unverified' | 'expired'>;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
