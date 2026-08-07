@@ -1,0 +1,28 @@
+{
+  "name": "@clerk/example-oauth-scope-hono",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "client": "tsx src/client.ts",
+    "sdk:build": "pnpm --dir ../.. --filter @clerk/hono... build",
+    "server": "tsx src/server.ts",
+    "server:watch": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/hono": "link:../../packages/hono",
+    "@hono/node-server": "1.19.17",
+    "dotenv": "^16.5.0",
+    "hono": "4.12.27"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "tsx": "^4.20.6",
+    "typescript": "^6.0.3"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24.15.0"
+  }
+}
