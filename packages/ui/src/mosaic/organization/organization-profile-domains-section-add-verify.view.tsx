@@ -88,7 +88,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                     disabled={isBusy}
                     placeholder='example.com'
                     onChange={e => send({ type: 'TYPE_NAME', value: e.target.value })}
-                    sx={t => ({ marginBlockStart: t.spacing(1) })}
+                    style={{ marginBlockStart: 'var(--cl-spacing)' }}
                   />
                 </Box>
                 <Actions
@@ -167,7 +167,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                     value={draftCode}
                     disabled={isBusy}
                     onChange={e => send({ type: 'TYPE_CODE', value: e.target.value })}
-                    sx={t => ({ marginBlockStart: t.spacing(1) })}
+                    style={{ marginBlockStart: 'var(--cl-spacing)' }}
                   />
                 </Box>
                 <Box sx={t => ({ marginBlockStart: t.spacing(2), display: 'flex', columnGap: t.spacing(2) })}>

@@ -90,7 +90,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
@@ -388,7 +388,19 @@ function SignInStartInternal(): JSX.Element {
       } as any);
     }
     try {
-      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
+      // On top of the context-level preconditions, sign-up-if-missing only
+      // supports identifiers that can be verified out-of-band.
+      const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+      const signUpAttribute = getSignUpAttributeFromIdentifier(identifierField);
+      const shouldSignUpIfMissing = signUpIfMissingEnabled && signUpAttribute !== 'username' && !hasPassword;
+
+      const res = await safePasswordSignInForEnterpriseSSOInstance(
+        signIn.create({
+          ...buildSignInParams(fields),
+          ...(shouldSignUpIfMissing && { signUpIfMissing: true }),
+        }),
+        fields,
+      );
 
       if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
         return;

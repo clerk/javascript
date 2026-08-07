@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { truncationStyles } from '../typography.styles';
 import { itemScope } from './item.markers.stylex';
 import * as slots from './item.styles';
@@ -50,7 +51,7 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
     props: {
       ...mergeStyleProps(
         themeProps('item', { interactive, size }),
-        stylex.props(itemScope, slots.item.base, slots.item[size], interactive && slots.item.interactive),
+        stylex.props(reset.base, itemScope, slots.item.base, slots.item[size], interactive && slots.item.interactive),
         className,
         style,
       ),
@@ -78,7 +79,7 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     props: {
       ...mergeStyleProps(
         themeProps('item-media', { size }),
-        stylex.props(slots.media.base, slots.media[size]),
+        stylex.props(reset.base, slots.media.base, slots.media[size]),
         className,
         style,
       ),
@@ -97,7 +98,7 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-content'), stylex.props(slots.content.base), className, style),
+      ...mergeStyleProps(themeProps('item-content'), stylex.props(reset.base, slots.content.base), className, style),
       ...rest,
     },
   });
@@ -115,7 +116,7 @@ const Title = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     props: {
       ...mergeStyleProps(
         themeProps('item-title'),
-        stylex.props(slots.title.base, truncationStyles.singleLine),
+        stylex.props(reset.base, slots.title.base, truncationStyles.singleLine),
         className,
         style,
       ),
@@ -136,7 +137,7 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
     props: {
       ...mergeStyleProps(
         themeProps('item-description'),
-        stylex.props(slots.description.base, truncationStyles.singleLine),
+        stylex.props(reset.base, slots.description.base, truncationStyles.singleLine),
         className,
         style,
       ),
@@ -161,7 +162,7 @@ const Label = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     props: {
       ...mergeStyleProps(
         themeProps('item-label'),
-        stylex.props(slots.label.base, truncationStyles.singleLine),
+        stylex.props(reset.base, slots.label.base, truncationStyles.singleLine),
         className,
         style,
       ),
@@ -180,7 +181,7 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-actions'), stylex.props(slots.actions.base), className, style),
+      ...mergeStyleProps(themeProps('item-actions'), stylex.props(reset.base, slots.actions.base), className, style),
       ...rest,
     },
   });
@@ -196,7 +197,7 @@ const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-group'), stylex.props(slots.group.base), className, style),
+      ...mergeStyleProps(themeProps('item-group'), stylex.props(reset.base, slots.group.base), className, style),
       ...rest,
     },
   });
@@ -212,7 +213,12 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-separator'), stylex.props(slots.separator.base), className, style),
+      ...mergeStyleProps(
+        themeProps('item-separator'),
+        stylex.props(reset.base, slots.separator.base),
+        className,
+        style,
+      ),
       ...rest,
     },
   });

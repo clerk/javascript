@@ -14,6 +14,7 @@ import {
 import { type ReactNode, useId, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { DialogContext, type DialogContextValue } from './dialog-context';
 
@@ -43,6 +44,8 @@ function DialogInner(props: DialogProps) {
     onOpenChange: setOpen,
   });
 
+  const returnFocusRef = useReturnFocus(floatingContext);
+
   const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
@@ -65,6 +68,7 @@ function DialogInner(props: DialogProps) {
       getReferenceProps,
       getFloatingProps,
       popupRef,
+      returnFocusRef,
       modal,
       labelId,
       descriptionId,
@@ -78,6 +82,7 @@ function DialogInner(props: DialogProps) {
       refs,
       getReferenceProps,
       getFloatingProps,
+      returnFocusRef,
       modal,
       labelId,
       descriptionId,

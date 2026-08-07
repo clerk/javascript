@@ -1,5 +1,38 @@
 # Change Log
 
+## 3.16.1
+
+### Patch Changes
+
+- Use a root-relative link (`/contact/support`) for the `passwordHasher` "contact support" reference so the generated API reference renders it as an internal same-tab link instead of an external one. ([#9347](https://github.com/clerk/javascript/pull/9347)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
+## 3.16.0
+
+### Minor Changes
+
+- Add `clerkClient.users.removePassword(userId, params?)` to remove a user's password through the Backend API. Password removal is allowed even when the user has no alternate sign-in method configured. Existing sessions remain active by default; pass `{ signOutOfOtherSessions: true }` to revoke them. ([#9326](https://github.com/clerk/javascript/pull/9326)) by [@joshrowley](https://github.com/joshrowley)
+
+### Patch Changes
+
+- Improve generated API reference links, expose `BillingSubscriptionItemStatus`, and clarify the `createUser()` identification status documentation. ([#9340](https://github.com/clerk/javascript/pull/9340)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+
+## 3.15.1
+
+### Patch Changes
+
+- Add the optional `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` parameters to `CreateUserParams`. The Backend API has supported these arrays on `POST /v1/users` since they shipped, but `createUser()` had no way to pass them, so every email address and phone number was necessarily created verified. Each array runs parallel to `emailAddress` / `phoneNumber` — one item per identifier, applied by position — and an item set to `'reserved'` creates that identifier unverified but still usable for sign-in and locked so no other user can claim it. ([#9305](https://github.com/clerk/javascript/pull/9305)) by [@dmoerner](https://github.com/dmoerner)
+
+  The `createUser()` documentation is corrected accordingly: it stated unconditionally that created email addresses and phone numbers are automatically verified, which is only the default.
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
 ## 3.15.0
 
 ### Minor Changes

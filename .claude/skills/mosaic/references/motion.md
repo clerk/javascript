@@ -7,9 +7,9 @@ rather than eyeball it.
 
 | Token                   | Value                                   | For                         |
 | ----------------------- | --------------------------------------- | --------------------------- |
-| `--cl-duration-instant` | `0s`                                    | press feedback              |
-| `--cl-duration-fast`    | `0.1s`                                  | exits, hover                |
-| `--cl-duration-base`    | `0.15s`                                 | entrances                   |
+| `--cl-duration-instant` | `0s`                                    | hover and press arrival     |
+| `--cl-duration-fast`    | `0.1s`                                  | exits                       |
+| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit       |
 | `--cl-duration-slow`    | `0.25s`                                 | larger surfaces             |
 | `--cl-duration-slower`  | `0.35s`                                 | —                           |
 | `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out) |
@@ -84,6 +84,163 @@ opacity-at-overshoot-peak from 0.78 to 1.00.
 
 **Exits land together.** Do _not_ split them going out. Matching durations are
 what stop an exit reading as a lingering ghost.
+
+## Color and state changes (hover, press)
+
+A state change that only recolors — background, border, text, opacity — takes
+**`linear`, always**. Nothing moves, so there is nothing for an ease to sell:
+color interpolation is already perceptually non-uniform, an ease on top just drags
+the midpoint, and `--cl-ease-default`'s overshoot would extrapolate past the target
+color. Reserve the curves for geometry.
+
+**The arrival is always `0s`. Only the exit is a judgement call**, and what decides
+it is whether a pointer traverses the element on its way somewhere else:
+
+| the highlight sits on…                                             | in   | out     |
+| ------------------------------------------------------------------ | ---- | ------- |
+| an isolated control — button, card, standalone target              | `0s` | `0.15s` |
+| a traversed collection — menu item, list/table row, palette result | `0s` | `0s`    |
+
+**Why the arrival never varies:** it follows from **who caused the change**. You
+moved the pointer, so the highlight is confirmation of your own act, and any
+duration on it is latency between doing and being told. It is the same reason a
+press lands instantly.
+
+**Why the exit does vary:** leaving carries no information, so on an isolated
+control 0.15s costs nothing and takes the hard edge off. Across a collection that
+same fade becomes a comet trail — a wake of dimming rows strung out behind a fast
+sweep, which is the arrival's ambiguity re-introduced from the other side. Rows
+leave instantly for the same reason they arrive instantly.
+
+Note the axis is traversal, not element type. A button in a toolbar that the
+pointer sweeps across follows the collection row, not the button row.
+
+**The mechanic:** the duration an element carries in a given state governs the
+transition _into_ that state. So the asymmetry falls out of one declaration per
+state — no doubled values, no JS:
+
+```ts
+transitionProperty: 'background-color, border-color, color, opacity',
+transitionTimingFunction: 'linear',
+transitionDuration: {
+  default: durationVars['--cl-duration-base'], // 0.15s — leaving hover or press
+  ':enabled:active': durationVars['--cl-duration-instant'],
+  ':enabled:hover': durationVars['--cl-duration-instant'],
+},
+```
+
+The bare `:hover` is safe here only because hover and press carry the same value:
+both match during a press, so which one wins does not matter. Give them different
+durations and the hover branch needs `:not(:active)`, since the two are equal
+specificity and the winner comes down to how StyleX orders them.
+
+Keep the duration itself outside `@media (hover: hover)` either way. A duration is
+inert on its own — it times an appearance, and if that appearance is media-guarded
+then nothing transitions on a touch device regardless. Wrapping it buys nothing and
+costs the `:not(:active)` guard, because the at-rule doubles the class and outranks
+`:active` (see `stylex.md`).
+
+Worked examples: `button.styles.ts` for the isolated control, `item.styles.ts` for
+the traversed collection — which declares no `transition` at all, since both of its
+durations are `0s`.
+
+### Children need the timing handed to them
+
+**Transitions do not inherit.** A child that recolors along with its container — a
+`Button`'s `Icon`, anything reading a `--_cl-*` color the parent branches per state —
+animates on _its own_ `transition-duration`, not the parent's. Give the parent one
+timing and the child another and the child visibly trails it; at `0s` in, a child
+still on `0.1s` reads as the icon lagging the button by a tenth of a second.
+
+Hand the duration down the same way the color goes down, so one declaration governs
+both and they cannot drift apart:
+
+```ts
+// container: alongside `--_cl-icon-color`, on the same conditions
+'--_cl-icon-duration': { default: base, ':enabled:active': instant, ':enabled:hover': instant },
+
+// child: read it, defaulting to instant
+transitionDuration: `var(--_cl-icon-duration, ${durationVars['--cl-duration-instant']})`,
+```
+
+**The child's default is `instant`, not a middling fade.** The arrival never varies,
+so any non-zero default is wrong for every container at once; the exit is the only
+contextual half, and a container that wants one opts in through the var. That also
+makes the standalone default correct for a traversed collection with no work — a row
+gets `0s` both ways by doing nothing. The `transitionProperty` and
+`transitionTimingFunction` still have to be declared even though the default duration
+makes them inert, since they are what the var has to animate once a container sets it.
+
+### A keyword cannot tween — reach for its color-valued sibling
+
+Some properties that read as visual are discrete keywords, so they flip between
+frames no matter what duration you set. `text-decoration-line` is the one that bites:
+toggling `none` → `underline` on hover gives an instant arrival, which is right by
+accident, and an instant exit, which is not.
+
+Draw the thing permanently and animate the color instead:
+
+```ts
+textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+textDecorationLine: 'underline',
+// and add `text-decoration-color` to the shared `transitionProperty`
+```
+
+It costs nothing — a transparent decoration paints nothing and never participates in
+layout — and it keeps the change a **color**, so the rule above applies unaltered
+rather than needing a curve. Verified in Chrome and Safari; where a browser declines
+to interpolate it, the failure is graceful, since it snaps exactly as it does today.
+
+Prefer this to the other animatable decoration properties.
+`text-decoration-thickness` from `0` renders unreliably at sub-pixel values, and
+`text-underline-offset` makes the underline _slide_, which is movement — that breaks
+the "nothing moves" premise the linear curve rests on.
+
+### Three things that look like this and are not
+
+- **An element arriving** — tooltip, popover, dropdown, anything that mounts on
+  hover. That is an entrance, not a state change; it gets a real duration and a
+  curve. The rest of this file applies instead.
+- **System-driven changes** — going disabled, a loading dim, a validation color.
+  Instant only reads as confirmation when the user just acted; when the system
+  acted it reads as a flash. Keep those symmetric and on the duration scale.
+- **Anything moving alongside the color** — a sliding thumb, a drawing check. The
+  color has to take the movement's duration or the two desync. "Nothing moves" is
+  the premise that licenses both the linear curve and the instant arrival.
+
+### Why the arrival must be `0s`, seen most clearly in dense collections
+
+Menu items, list and table rows, command-palette results — anywhere a pointer
+crosses many targets on its way somewhere — is where a non-zero fade-in stops being
+a question of taste. The highlight's job there is to answer _which row am I on_, and
+a transition makes it unable to. Mosaic `Item` rows are 52px, so at ordinary pointer
+speeds a 100ms fade leaves several rows partly lit at once, the brightest of them
+trailing behind the cursor:
+
+| pointer speed | ms/row | rows mid-transition |
+| ------------- | ------ | ------------------- |
+| 300 px/s      | 173    | 0.6                 |
+| 600 px/s      | 87     | 1.2                 |
+| 900 px/s      | 58     | 1.7                 |
+| 1200 px/s     | 43     | 2.3                 |
+| 2000 px/s     | 26     | 3.8                 |
+
+Users report this as lag, and they are describing it accurately — the highlight is
+behind the pointer. It is a legibility failure, not a matter of polish, and no
+duration short enough to fix it is long enough to be worth having. Instant tracking
+is also what platform menus have always done.
+
+An isolated button never fails this visibly, but the arrival is the same rule either
+way; there is no button-versus-row split on the way in.
+
+The same arithmetic sizes the comet trail: a 0.15s exit is a longer fade than the
+0.1s modelled above, so it strings out proportionally more rows behind the pointer.
+That is why the exit collapses to `0s` here even though it stays at 0.15s on a
+button.
+
+`Item` declares no `transition` at all, which is `0s` in both directions and is
+correct on both counts — instant arrival, and no exit to trail the pointer. Leave it
+that way; do not "improve" it by porting a button's 0.15s exit onto rows.
 
 ## Small deltas constrain the curve (the dead-frame test)
 

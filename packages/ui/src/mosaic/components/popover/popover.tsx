@@ -5,6 +5,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../reset.styles';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg';
@@ -123,7 +124,7 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
   return (
     <Primitive.Positioner
       ref={setNode}
-      {...mergeStyleProps(themeProps('popover-positioner'), stylex.props(styles.positioner))}
+      {...mergeStyleProps(themeProps('popover-positioner'), stylex.props(reset.base, styles.positioner))}
       {...rest}
     >
       {children}
@@ -168,7 +169,7 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
           ref={ref}
           {...mergeStyleProps(
             themeProps('popover-popup', { size }),
-            stylex.props(styles.popup, sizes[size]),
+            stylex.props(reset.base, styles.popup, sizes[size]),
             className,
             style,
           )}

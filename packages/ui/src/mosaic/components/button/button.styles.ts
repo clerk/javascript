@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import {
   colorVars,
   durationVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
   space,
@@ -57,6 +58,11 @@ const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negativ
 // Both selectors are written out per cell rather than hoisted to a const: `@stylexjs/sort-keys`
 // reads a computed key as its identifier name and fails the ordering.
 //
+// `:active` also excludes `[data-pending]`, which `SubmitButton` sets while its action runs. That
+// button drops its pointer events, which is enough for the pointer, but a focused button still
+// takes `:active` from the keyboard — space and enter — and a pending button shouldn't flash a
+// pressed fill for a press it ignores.
+//
 // `[data-open]` takes the pressed fill too, so a button acting as a disclosure trigger stays
 // visibly engaged for as long as its surface is open. Disclosure primitives set it on the
 // trigger (`popover-trigger.tsx` and friends); a plain button never carries it. It is excluded
@@ -65,6 +71,13 @@ const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negativ
 
 export const styles = stylex.create({
   base: {
+    // Handed to `Icon`, which needs its own copy: transitions don't inherit, so without this
+    // the icon would still be catching up 0.1s after the button itself has landed.
+    '--_cl-icon-duration': {
+      default: durationVars['--cl-duration-base'],
+      ':enabled:active': durationVars['--cl-duration-instant'],
+      ':enabled:hover': durationVars['--cl-duration-instant'],
+    },
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-control'],
     borderStyle: 'solid',
@@ -77,22 +90,23 @@ export const styles = stylex.create({
     alignItems: 'center',
     // Strips UA control styling so what's below is the whole appearance, not an override.
     appearance: 'none',
-    boxSizing: 'border-box',
     cursor: 'pointer',
     display: 'inline-flex',
     // A button is sized by its own axis, not by whatever row it lands in.
     flexShrink: 0,
-    fontFamily: 'inherit',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     outlineOffset: '2px',
-    // The press reads as contact, not a fade, so it lands instantly. Release falls back to
-    // `fast` — `:active` stops matching as the color heads back. Instant press, soft settle.
+    // The duration a state carries governs the transition INTO it, so one declaration per
+    // state gives an instant arrival and a 0.15s settle out. Instant because a hover or a
+    // press confirms something the user just did, and confirmation cannot lag; see `motion.md`.
     transitionDuration: {
-      default: durationVars['--cl-duration-fast'],
+      default: durationVars['--cl-duration-base'],
       ':enabled:active': durationVars['--cl-duration-instant'],
+      ':enabled:hover': durationVars['--cl-duration-instant'],
     },
-    transitionProperty: 'background-color, border-color, color, opacity',
+    transitionProperty: 'background-color, border-color, color, opacity, text-decoration-color',
     // Linear, not `--cl-ease-default`: nothing here moves. An ease on already non-uniform
     // color interpolation just drags the midpoint, and the house curve's overshoot would
     // extrapolate past the target color.
@@ -179,7 +193,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: colorVars['--cl-color-primary'],
-      ':enabled:active': primaryActive,
+      ':enabled:not([data-pending]):active': primaryActive,
       ':enabled[data-open]': primaryActive,
       '@media (hover: hover)': {
         default: null,
@@ -199,7 +213,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: neutralStep0,
-      ':enabled:active': neutralStep2,
+      ':enabled:not([data-pending]):active': neutralStep2,
       ':enabled[data-open]': neutralStep2,
       '@media (hover: hover)': {
         default: null,
@@ -219,7 +233,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: colorVars['--cl-color-negative'],
-      ':enabled:active': negativeActive,
+      ':enabled:not([data-pending]):active': negativeActive,
       ':enabled[data-open]': negativeActive,
       '@media (hover: hover)': {
         default: null,
@@ -244,7 +258,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': neutralStep1,
+      ':enabled:not([data-pending]):active': neutralStep1,
       ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
@@ -265,7 +279,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': neutralStep1,
+      ':enabled:not([data-pending]):active': neutralStep1,
       ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
@@ -286,7 +300,7 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': neutralStep1,
+      ':enabled:not([data-pending]):active': neutralStep1,
       ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
@@ -307,7 +321,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': neutralStep1,
+      ':enabled:not([data-pending]):active': neutralStep1,
       ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
@@ -327,7 +341,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': neutralStep1,
+      ':enabled:not([data-pending]):active': neutralStep1,
       ':enabled[data-open]': neutralStep1,
       '@media (hover: hover)': {
         default: null,
@@ -349,7 +363,7 @@ export const variants = stylex.create({
     },
     backgroundColor: {
       default: 'transparent',
-      ':enabled:active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':enabled:not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
       ':enabled[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-faded']}, ${colorVars['--cl-color-negative']} 8%)`,
       '@media (hover: hover)': {
         default: null,
@@ -361,6 +375,10 @@ export const variants = stylex.create({
 
   // link opts out of the box the size axis sets — it reads as text, not a control. Per-side
   // zeros for the same reason `shapeSquare` uses them.
+  //
+  // The underline is always drawn and only its color moves: `text-decoration-line` is a keyword,
+  // so toggling it cannot tween and the exit would snap where every other property fades. A
+  // transparent decoration paints nothing and never participates in layout.
   'link-primary': {
     '--_cl-icon-color': {
       default: iconFadedNeutral,
@@ -373,7 +391,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-primary'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -389,7 +408,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-neutral-foreground'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },
@@ -405,7 +425,8 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationLine: { default: 'none', ':enabled:hover': 'underline' },
+    textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
+    textDecorationLine: 'underline',
     textUnderlineOffset: '2px',
     height: 'auto',
   },

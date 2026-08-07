@@ -57,6 +57,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
   },
+  styles: {
+    // Atomic styles — shipped as StyleX atoms rather than components.
+    'scroll-area': dynamic(() => import('../stories/scroll-area.mdx')),
+  },
   hooks: {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),

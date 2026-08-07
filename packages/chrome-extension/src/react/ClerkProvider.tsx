@@ -7,7 +7,12 @@ import React from 'react';
 import { createClerkClient } from '../internal/clerk';
 import type { StorageCache } from '../internal/utils/storage';
 
-type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
+type ChromeExtensionClerkProviderProps = Omit<ClerkReactProviderProps, 'publishableKey'> & {
+  /**
+   * Your Clerk Publishable Key, available in the [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys).
+   * Required for Chrome Extensions, which cannot use `@clerk/react`'s environment-variable fallback.
+   */
+  publishableKey: string;
   /**
    * @experimental
    * @description Enables the listener to sync host cookies on changes.

@@ -13,6 +13,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { reset } from '../reset.styles';
 import { styles } from './menu.styles';
 
 export type { MenuProps, MenuSeparatorProps };
@@ -62,10 +63,12 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(fu
 ) {
   return (
     <Primitive.Portal root={portalRoot}>
-      <Primitive.Positioner {...mergeStyleProps(themeProps('menu-positioner'), stylex.props(styles.positioner))}>
+      <Primitive.Positioner
+        {...mergeStyleProps(themeProps('menu-positioner'), stylex.props(reset.base, styles.positioner))}
+      >
         <Primitive.Popup
           ref={ref}
-          {...mergeStyleProps(themeProps('menu-popup'), stylex.props(styles.popup), className, style)}
+          {...mergeStyleProps(themeProps('menu-popup'), stylex.props(reset.base, styles.popup), className, style)}
           {...rest}
         >
           {children}
@@ -91,7 +94,7 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
       label={label}
       {...mergeStyleProps(
         themeProps('menu-item', { color }),
-        stylex.props(styles.item, color === 'negative' && styles.itemNegative),
+        stylex.props(reset.base, styles.item, color === 'negative' && styles.itemNegative),
         className,
         style,
       )}
@@ -106,7 +109,7 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
 export function MenuSeparator({ className, style, ...rest }: MenuSeparatorProps): React.ReactElement {
   return (
     <Primitive.Separator
-      {...mergeStyleProps(themeProps('menu-separator'), stylex.props(styles.separator), className, style)}
+      {...mergeStyleProps(themeProps('menu-separator'), stylex.props(reset.base, styles.separator), className, style)}
       {...rest}
     />
   );

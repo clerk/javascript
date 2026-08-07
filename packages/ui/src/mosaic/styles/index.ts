@@ -10,14 +10,16 @@ export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
-export { Button } from '../components/button';
-export type { ButtonProps } from '../components/button';
+export { Button, SubmitButton } from '../components/button';
+export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export { Input } from '../components/input';
+export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
@@ -28,6 +30,10 @@ export type {
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
+export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
+export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Spinner } from '../components/spinner';
+export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
 
@@ -46,8 +52,11 @@ import {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
+  scrollbarVars,
+  scrollFadeVars,
   space,
   spacingVars,
   targetVars,
@@ -58,8 +67,11 @@ export {
   colorVars,
   durationVars,
   easingVars,
+  fontFamilyVars,
   fontWeightVars,
   radiusVars,
+  scrollbarVars,
+  scrollFadeVars,
   space,
   spacingVars,
   targetVars,
@@ -72,8 +84,11 @@ export {
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;
+export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
 export type RadiusVarName = keyof typeof radiusVars;
+export type ScrollbarVarName = keyof typeof scrollbarVars;
+export type ScrollFadeVarName = keyof typeof scrollFadeVars;
 export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;

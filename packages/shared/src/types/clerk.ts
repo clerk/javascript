@@ -557,6 +557,18 @@ export interface Clerk {
   closeOrganizationProfile: () => void;
 
   /**
+   * Opens a modal containing the organization invite-members form.
+   *
+   * @param props - Optional props that will be passed to the invite-members modal.
+   */
+  openInviteMembers: (props?: InviteMembersModalProps) => void;
+
+  /**
+   * Closes the invite-members modal.
+   */
+  closeInviteMembers: () => void;
+
+  /**
    * Opens the Clerk CreateOrganization modal.
    *
    * @param props - Optional props that will be passed to the CreateOrganization component.
@@ -1460,7 +1472,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
@@ -1880,6 +1892,7 @@ export type __internal_EnableOrganizationsPromptProps = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'useOrganizationList'
     | 'useOrganization';
@@ -1890,6 +1903,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
@@ -2088,6 +2102,23 @@ export type OrganizationProfileProps = RoutingOptions & {
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
+
+/** @generateWithEmptyComment */
+export type InviteMembersProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
+  appearance?: OrganizationProfileProps['appearance'];
+};
+
+export type InviteMembersModalProps = InviteMembersProps & {
   /**
    * Function that returns the container element where portals should be rendered.
    * This allows Clerk components to render inside external dialogs/popovers
@@ -2737,6 +2768,11 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'initialValues'
     | 'oauthFlow'
   >;
+
+/**
+ * The invite-members form is only available as a modal, so there is no `mode` prop.
+ */
+export type InviteMembersButtonProps = InviteMembersProps;
 
 /** @generateWithEmptyComment */
 export type TaskChooseOrganizationProps = {

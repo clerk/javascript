@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // root — clips its parts to the shape/size; fill comes from the image or fallback
@@ -8,10 +8,9 @@ export const styles = stylex.create({
     overflow: 'hidden',
     alignItems: 'center',
     aspectRatio: '1 / 1',
-    boxSizing: 'border-box',
     display: 'inline-flex',
     flexShrink: 0,
-    fontFamily: 'inherit',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     lineHeight: 1,
@@ -36,7 +35,6 @@ export const styles = stylex.create({
     backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
     color: colorVars['--cl-color-neutral'],
     display: 'flex',
-    fontSize: 'inherit',
     justifyContent: 'center',
     height: '100%',
     width: '100%',
