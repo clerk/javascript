@@ -38,6 +38,11 @@ const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 /** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
 const MAX_TOKEN_LENGTH = 4_096;
+/**
+ * The shape of a mint: `v<n>.<payload>.<mac>`, base64url. Version-agnostic on purpose — the server
+ * may mint a version this build predates, and only the server can judge a token either way.
+ */
+const TOKEN_SHAPE = /^v\d+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 /** How long a settled, tokenless acquisition is reused before a fresh run is allowed. */
 const REACQUIRE_COOLDOWN_MS = 30 * 1_000;
 /** Bounds we hold the server-supplied `retry_in_ms` to. */
@@ -245,9 +250,14 @@ function readStoredToken(key: string, marginMs: number): StoredToken | null {
 /**
  * The store is writable by anything running on the origin, so a value that could not have come
  * from a mint of ours is discarded rather than trusted to suppress the loaders.
+ *
+ * The shape check is hygiene, not a security boundary: only the server can tell a real token from a
+ * well-formed forgery, and anything that can write the store can send the same values to the API
+ * directly. What it buys is that a corrupt or truncated entry starts a fresh run immediately
+ * instead of suppressing acquisition until it expires.
  */
 function validateToken(token: unknown, exp: unknown, marginMs: number): { token: string; exp: number } | null {
-  if (typeof token !== 'string' || !token || token.length > MAX_TOKEN_LENGTH) {
+  if (typeof token !== 'string' || token.length > MAX_TOKEN_LENGTH || !TOKEN_SHAPE.test(token)) {
     return null;
   }
   if (typeof exp !== 'number' || !Number.isFinite(exp)) {

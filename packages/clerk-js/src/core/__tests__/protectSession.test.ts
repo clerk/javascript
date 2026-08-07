@@ -383,6 +383,39 @@ describe('ProtectSession inline token', () => {
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
   });
 
+  it('ignores a planted value that could never have been a mint', async () => {
+    localStorage.setItem(
+      '__clerk_protect_st',
+      JSON.stringify({ token: 'not-a-token', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
+    );
+
+    const { session: created, injected } = session([loader()]);
+    // Shape alone proves nothing — only the server can tell a mint from a well-formed forgery —
+    // but a corrupt entry must start a fresh run rather than suppress acquisition until it expires.
+    expect(created?.hasFreshToken()).toBe(false);
+
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('reuses a mint whose version this build predates', async () => {
+    localStorage.setItem(
+      '__clerk_protect_st',
+      JSON.stringify({ token: 'v9.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
+    );
+
+    // The shape check must not pin a version. The server may mint ahead of this build, and
+    // rejecting that here would re-run the loader on every page load until the SDK caught up.
+    const { session: created, elements } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(true);
+    created?.start();
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v9.cached.mac' });
+    expect(elements).toHaveLength(0);
+  });
+
   it('reports nothing at all for a loader that carries no correlation id', async () => {
     const { session: created, elements } = session([loader({ attributes: { 'data-pid': '{pid}' } })]);
 
