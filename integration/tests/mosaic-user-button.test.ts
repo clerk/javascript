@@ -82,6 +82,41 @@ export default function Page() {
   );
 }`;
 
+// `pageOrder` names one custom page and nothing else, so `useCustomPages` sends every built-in
+// behind it. clerk-js puts any page it was not asked to move ahead of everything it was, which is
+// what makes the nav order readable as an assertion about the built-in list itself.
+const pageOrderPage = () => `'use client';
+import { UserButton } from '@clerk/nextjs/experimental/mosaic';
+
+export default function Page() {
+  return (
+    <UserButton
+      userProfileProps={{
+        customPages: [
+          {
+            path: 'usage',
+            label: 'Usage',
+            content: <p data-testid='mosaic-custom-page'>Mosaic custom page</p>,
+          },
+        ],
+        pageOrder: ['usage'],
+      }}
+    />
+  );
+}`;
+
+// A URL is the whole opt-in to navigation, so this passes one and nothing else.
+const routedPage = () => `'use client';
+import { UserButton } from '@clerk/nextjs/experimental/mosaic';
+
+export default function Page() {
+  return <UserButton userProfileUrl='/account' />;
+}`;
+
+const accountPage = () => `export default function Page() {
+  return <h1>Routed account page</h1>;
+}`;
+
 // The shared template's route answers with `userId` alone; the organization assertions need the
 // rest of the auth object.
 const meRoute = () => `import { auth } from '@clerk/nextjs/server';
@@ -117,6 +152,9 @@ test.describe('Mosaic UserButton @nextjs', () => {
       // be enough. The absence of that line is what the last test in this file asserts.
       .addFile('src/app/layout.tsx', layout)
       .addFile('src/app/mosaic/page.tsx', mosaicPage)
+      .addFile('src/app/mosaic-page-order/page.tsx', pageOrderPage)
+      .addFile('src/app/mosaic-routed/page.tsx', routedPage)
+      .addFile('src/app/account/page.tsx', accountPage)
       .addFile('src/app/api/me/route.ts', meRoute)
       .commit();
     cleanup.push(() => app.teardown());
@@ -313,6 +351,84 @@ test.describe('Mosaic UserButton @nextjs', () => {
     // The Mosaic tree portals this node into a container clerk-js owns.
     await page.getByRole('button', { name: 'Usage' }).click();
     await expect(page.getByTestId('mosaic-custom-page')).toBeVisible();
+  });
+
+  /**
+   * `useUserProfilePages` hardcodes the profile's own page list and says so: it mirrors clerk-js
+   * rather than reading from it, because the profile is not mounted at the point the order has to be
+   * decided. Nothing else at any level asserts the mirror is accurate — the vitest suite checks the
+   * order is forwarded, against a list it also supplies. This is the only place the two can be
+   * compared, and it catches drift in both directions without knowing the instance's configuration:
+   *
+   * - a built-in the mirror does not name is one clerk-js was not asked to move, so it lands ahead
+   *   of the custom page;
+   * - a built-in the mirror names but clerk-js does not have fails `isValidPageItem`, is dropped,
+   *   and logs `Invalid custom page data`.
+   */
+  test('orders the profile around a custom page, so the built-in list has to match clerk-js', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+    await context.clearCookies();
+
+    const invalidPageErrors: string[] = [];
+    page.on('console', message => {
+      if (message.type() === 'error' && message.text().includes('Invalid custom page data')) {
+        invalidPageErrors.push(message.text());
+      }
+    });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/mosaic-page-order');
+    await u.po.mosaicUserButton.waitForMounted();
+
+    await u.po.mosaicUserButton.toggleTrigger();
+    await u.po.mosaicUserButton.waitForPopover();
+    await u.po.mosaicUserButton.triggerManageAccount(fakeUser.email);
+    await u.po.userProfile.waitForUserProfileModal();
+    await u.po.userProfile.waitForMounted();
+
+    // Only the named page leads. Anything else here is a page the profile brings that the mirror
+    // does not know about, so ordering a custom page after a built-in would silently misplace it.
+    const navItems = page.locator('.cl-navbarButton');
+    await expect(navItems.first()).toHaveText('Usage');
+    // More than the custom page, or the built-ins were all dropped and there is nothing to order.
+    expect(await navItems.count()).toBeGreaterThan(1);
+
+    expect(invalidPageErrors, 'the mirror named a page clerk-js does not have').toEqual([]);
+  });
+
+  /**
+   * `openOrNavigate` decides between a modal and a route for all three profile surfaces, and it is
+   * the widest configuration branch in the controller. The vitest suite covers every combination by
+   * asserting `navigate` was called with a string. Nothing asserts the app actually lands there.
+   */
+  test('a userProfileUrl routes to the app page instead of opening the modal', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await context.clearCookies();
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/mosaic-routed');
+    await u.po.mosaicUserButton.waitForMounted();
+
+    await u.po.mosaicUserButton.toggleTrigger();
+    await u.po.mosaicUserButton.waitForPopover();
+    await u.po.mosaicUserButton.triggerManageAccount(fakeUser.email);
+
+    await page.waitForURL(new URL('/account', app.serverUrl).toString());
+    await expect(page.getByRole('heading', { name: 'Routed account page' })).toBeVisible();
+
+    // Routing and the modal are the two halves of one decision, so the modal not opening is half the
+    // assertion. The popover goes with it: it would otherwise sit over the page it just opened.
+    await expect(page.locator('.cl-modalContent')).toHaveCount(0);
+    await u.po.mosaicUserButton.waitForPopoverClosed();
   });
 
   // The Mosaic bundle is inlined into @clerk/react at build time. If it ever regresses to importing
