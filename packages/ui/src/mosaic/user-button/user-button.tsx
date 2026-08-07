@@ -44,7 +44,7 @@ export type UserButtonProps = UserButtonControllerOptions &
  * `mode` narrows the menu to one switcher, and `modePriority` picks which one a combined menu leads
  * with — in its header, and in the trigger beside the avatar. The other one is still listed.
  * ```tsx
- * <UserButton mode='orgs' />
+ * <UserButton mode='organization' />
  * <UserButton mode='user' />
  * <UserButton modePriority='user' />
  * ```
