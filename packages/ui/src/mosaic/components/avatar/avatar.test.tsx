@@ -5,14 +5,21 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Avatar } from './avatar';
 
 // jsdom never fires load/error on images, so drive `new window.Image()` manually.
-// Each instance resolves to the outcome keyed by its `src`.
+// Each instance resolves to the outcome keyed by its `src`. A `cached` src reports `complete`
+// the moment it is assigned, the way a browser does for an image it already holds.
 type Outcome = 'load' | 'error';
 let outcomes: Record<string, Outcome> = {};
+let cached = new Set<string>();
 
 class MockImage {
+  complete = false;
   onload: (() => void) | null = null;
   onerror: (() => void) | null = null;
   set src(value: string) {
+    if (cached.has(value)) {
+      this.complete = true;
+      return;
+    }
     queueMicrotask(() => {
       if (outcomes[value] === 'error') {
         this.onerror?.();
@@ -27,6 +34,7 @@ vi.stubGlobal('Image', MockImage);
 
 afterEach(() => {
   outcomes = {};
+  cached = new Set();
 });
 
 describe('Mosaic Avatar', () => {
@@ -84,6 +92,77 @@ describe('Mosaic Avatar', () => {
     const img = await screen.findByRole('img', { name: 'Alex' });
     expect(img).toHaveClass('cl-avatar-image');
     expect(img).toHaveAttribute('src', 'https://example.com/a.png');
+    expect(screen.queryByText('CN')).not.toBeInTheDocument();
+  });
+
+  it('renders the image undraggable, and lets a consumer opt back in', async () => {
+    outcomes['https://example.com/a.png'] = 'load';
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+        />
+      </Avatar.Root>,
+    );
+    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'false');
+
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+          draggable
+        />
+      </Avatar.Root>,
+    );
+    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'true');
+  });
+
+  // The rows this sits in remount whenever they change shape, and the header swaps between
+  // organizations that are already on screen. Either one re-resolves an image the browser already
+  // holds, so anything short of resolving before the first paint reads as the avatar disappearing.
+  it('shows a cached image without a pass through the fallback', () => {
+    cached.add('https://example.com/cached.png');
+    render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/cached.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+
+    expect(screen.getByRole('img', { name: 'Alex' })).toBeInTheDocument();
+    expect(screen.queryByText('CN')).not.toBeInTheDocument();
+  });
+
+  it('swaps straight to a cached image rather than falling back between the two', async () => {
+    outcomes['https://example.com/a.png'] = 'load';
+    cached.add('https://example.com/b.png');
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    await screen.findByRole('img', { name: 'Alex' });
+
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/b.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+
+    expect(screen.getByRole('img', { name: 'Alex' })).toHaveAttribute('src', 'https://example.com/b.png');
     expect(screen.queryByText('CN')).not.toBeInTheDocument();
   });
 

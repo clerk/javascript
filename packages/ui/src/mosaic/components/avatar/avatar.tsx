@@ -61,18 +61,28 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
   const { status, onStatusChange } = useAvatarContext('Avatar.Image');
 
   // Preload `src` and report status to the root, so the fallback shows until the image resolves.
-  React.useEffect(() => {
+  // A layout effect, because it also has to catch the case below before anything is painted.
+  React.useLayoutEffect(() => {
     if (!src) {
       onStatusChange('error');
       return;
     }
 
-    let active = true;
     const image = new window.Image();
+    image.src = src;
+
+    // An image the browser already holds is complete the moment it is asked for. Resolving it here
+    // rather than off an event keeps a remount (a row changing shape) or a swap between two avatars
+    // already on screen from dropping to the initials and back for a frame.
+    if (image.complete) {
+      onStatusChange('loaded');
+      return;
+    }
+
+    let active = true;
     onStatusChange('loading');
     image.onload = () => active && onStatusChange('loaded');
     image.onerror = () => active && onStatusChange('error');
-    image.src = src;
 
     return () => {
       active = false;
@@ -88,6 +98,9 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
       ref={ref}
       src={src}
       alt={alt}
+      // An avatar is an identity mark, not content to pull out of the page — dragging one
+      // only ever produces a stray ghost image mid-interaction.
+      draggable={false}
       {...mergeStyleProps(themeProps('avatar-image'), stylex.props(reset.base, styles.image), className, style)}
       {...rest}
     />

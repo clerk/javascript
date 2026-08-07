@@ -1,18 +1,23 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { itemScope } from './item.markers.stylex';
 
 export const item = stylex.create({
   base: {
-    borderRadius: radiusVars['--cl-radius-element'],
+    // The icon in `Item.Media` rides the row's text strength rather than its own, the way
+    // `Button` does it. `Icon` reads the var (`icon.styles.ts`) — StyleX can't emit a descendant
+    // rule, so the value crosses the element boundary as a custom property. It is restated in
+    // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
+    // last style that declares it, so the two can't merge.
+    '--_cl-icon-color': colorVars['--cl-color-neutral-faded'],
+    borderRadius: radiusVars['--cl-radius-lg'],
     outline: {
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
     paddingInline: space['2'],
     alignItems: 'center',
-    color: colorVars['--cl-color-card-foreground'],
+    color: colorVars['--cl-color-neutral-faded'],
     display: 'flex',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -22,8 +27,16 @@ export const item = stylex.create({
     width: '100%',
   },
 
-  // interactive rows (rendered as a link/button via `render`) gain hover + cursor
+  // interactive rows (rendered as a link/button via `render`) gain hover + cursor. Only these
+  // promote on hover: a static row is not pointing at anything, so its icon and label hold.
   interactive: {
+    '--_cl-icon-color': {
+      default: colorVars['--cl-color-neutral-faded'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover': colorVars['--cl-color-neutral'],
+      },
+    },
     backgroundColor: {
       default: null,
       ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
@@ -31,7 +44,20 @@ export const item = stylex.create({
         ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
+    color: {
+      default: colorVars['--cl-color-neutral-faded'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover': colorVars['--cl-color-neutral'],
+      },
+    },
     cursor: 'pointer',
+    // A row that is standing down while another action runs keeps its place and its look, but
+    // stops answering the pointer — one declaration takes the cursor and the hover states with it.
+    pointerEvents: {
+      default: null,
+      ':disabled': 'none',
+    },
   },
 
   xs: {
@@ -87,12 +113,6 @@ export const description = stylex.create({
 
 export const label = stylex.create({
   base: {
-    // keyed to the row's hover, not the text's, so pointing anywhere in the row promotes the label
-    color: {
-      default: null,
-      [stylex.when.ancestor(':not(:hover)', itemScope)]: colorVars['--cl-color-neutral-faded'],
-      [stylex.when.ancestor(':hover', itemScope)]: colorVars['--cl-color-neutral'],
-    },
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],

@@ -11,7 +11,7 @@ export const styles = stylex.create({
   },
 
   popup: {
-    borderRadius: radiusVars['--cl-radius-element'],
+    borderRadius: radiusVars['--cl-radius-lg'],
     gap: space['0.5'],
     outline: 'none',
     paddingBlock: space['0.5'],
