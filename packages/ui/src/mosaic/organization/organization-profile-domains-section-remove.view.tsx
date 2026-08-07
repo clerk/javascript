@@ -35,8 +35,8 @@ export function OrganizationProfileDomainsSectionRemoveView({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title render={p => <Heading {...p} />}>Remove domain</Dialog.Title>
-            <Dialog.Description render={p => <Text {...p} />}>
+            <Dialog.Title render={<Heading />}>Remove domain</Dialog.Title>
+            <Dialog.Description render={<Text />}>
               The domain &quot;{domainName}&quot; and its enrollment settings will be removed. Members already in the
               organization keep their access.
             </Dialog.Description>
@@ -69,7 +69,7 @@ export function OrganizationProfileDomainsSectionRemoveView({
                 Cancel
               </Button>
               <Button
-                intent='destructive'
+                color='negative'
                 type='button'
                 disabled={isDeleting}
                 onClick={() => send({ type: 'CONFIRM' })}

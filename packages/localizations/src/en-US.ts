@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__deprovisioned: 'Deprovisioned',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__freeTrial: 'Free trial',
@@ -237,6 +238,81 @@ export const enUS: LocalizationResource = {
         badges: {
           optional: 'Optional',
           required: 'Required',
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          headerSubtitle: 'Add your application credentials',
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          headerSubtitle: 'Add your identity provider’s endpoints',
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+        redirectUriStep: {
+          claims: {
+            description: 'Ensure your ID token includes the following claims:',
+            table: {
+              columns: {
+                attribute: 'Clerk attribute',
+                claim: 'ID token claim',
+              },
+              rows: {
+                email: {
+                  attribute: 'Primary email',
+                },
+                firstName: {
+                  attribute: 'First name',
+                },
+                lastName: {
+                  attribute: 'Last name',
+                },
+                subject: {
+                  attribute: 'External user ID',
+                },
+              },
+            },
+          },
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {
@@ -639,6 +715,11 @@ export const enUS: LocalizationResource = {
         },
         mainHeaderTitle: 'Configure Okta Workforce',
       },
+      unsupportedProvider: {
+        description:
+          'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
+        title: 'Unsupported provider',
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
@@ -694,6 +775,10 @@ export const enUS: LocalizationResource = {
       title: 'Reset connection',
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: 'OpenID Connect (OIDC)',
+        oidcProvider: 'OIDC Provider',
+      },
       saml: {
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
@@ -1332,6 +1417,10 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to original tab to continue',
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
+      },
+      verifiedTransferable: {
+        subtitle: 'Return to original tab to continue',
+        title: 'Email verified',
       },
     },
     emailLinkMfa: {

@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
 import { useDrawerContext } from './drawer-context';
 
@@ -24,6 +24,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     getFloatingProps,
     floatingContext,
     modal,
+    returnFocusRef,
     labelId,
     descriptionId,
     mounted,
@@ -36,12 +37,6 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     isNested,
     nestedOpenCount,
   } = useDrawerContext();
-
-  // floating-ui types `setFloating` as a method signature, but at runtime it's
-  // a stable callback that doesn't use `this`, so the unbound-method check is a
-  // false positive here.
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const combinedRef = useMergeRefs([popupRef, refs.setFloating, ref]);
 
   // The nested-child count is a raw CSS input for the styled stack math. Written
   // imperatively (a `--*` custom property) rather than via React inline style.
@@ -58,12 +53,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     popupRef.current?.style.setProperty(DrawerCssVars.snapOffset, `${snapRestOffset}px`);
   }, [popupRef, snapRestOffset]);
 
-  if (!mounted) {
-    return null;
-  }
-
   const ownProps = {
-    ref: combinedRef,
     tabIndex: -1,
     'aria-labelledby': labelId,
     'aria-describedby': descriptionId,
@@ -88,26 +78,39 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
     nestedOpen: nestedOpenCount > 0,
   };
 
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    enabled: mounted,
+    // floating-ui types `setFloating` as a method signature, but at runtime it's
+    // a stable callback that doesn't use `this`, so the unbound-method check is a
+    // false positive here.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    ref: [popupRef, refs.setFloating, ref],
+    state,
+    stateAttributesMapping: {
+      swiping: (v): Record<string, string> | null => (v ? { [DrawerAttrs.swiping]: '' } : null),
+      snap: (v): Record<string, string> | null => (v === null ? null : { [DrawerAttrs.snap]: String(v) }),
+      expanded: (v): Record<string, string> | null => (v ? { [DrawerAttrs.expanded]: '' } : null),
+      nested: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nested]: '' } : null),
+      nestedOpen: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nestedOpen]: '' } : null),
+    },
+    props: mergeProps<'div'>(defaultProps, otherProps),
+  });
+
+  if (!element) {
+    return null;
+  }
+
   return (
     <FloatingFocusManager
       context={floatingContext}
       modal={modal}
       outsideElementsInert={modal}
       initialFocus={autoFocus ? undefined : popupRef}
+      returnFocus={returnFocusRef}
     >
-      {renderElement({
-        defaultTagName: 'div',
-        render,
-        state,
-        stateAttributesMapping: {
-          swiping: (v): Record<string, string> | null => (v ? { [DrawerAttrs.swiping]: '' } : null),
-          snap: (v): Record<string, string> | null => (v === null ? null : { [DrawerAttrs.snap]: String(v) }),
-          expanded: (v): Record<string, string> | null => (v ? { [DrawerAttrs.expanded]: '' } : null),
-          nested: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nested]: '' } : null),
-          nestedOpen: (v): Record<string, string> | null => (v ? { [DrawerAttrs.nestedOpen]: '' } : null),
-        },
-        props: mergeProps<'div'>(defaultProps, otherProps),
-      })}
+      {element}
     </FloatingFocusManager>
   );
 });

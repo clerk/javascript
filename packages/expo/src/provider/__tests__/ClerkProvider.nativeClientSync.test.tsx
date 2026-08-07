@@ -26,6 +26,7 @@ const mocks = vi.hoisted(() => {
         }
       | undefined,
     clerkInstance: {
+      __internal_setActiveInProgress: false,
       __internal_reloadInitialResources: vi.fn(),
       addListener: vi.fn(),
       addOnLoaded: vi.fn(),
@@ -135,6 +136,7 @@ describe('ClerkProvider native client sync', () => {
     mocks.tokenCache.saveToken.mockResolvedValue(undefined);
     mocks.tokenCache.clearToken.mockResolvedValue(undefined);
     mocks.clerkOptions = undefined;
+    mocks.clerkInstance.__internal_setActiveInProgress = false;
     mocks.clerkInstance.__internal_reloadInitialResources.mockResolvedValue(undefined);
     mocks.clerkInstance.addOnLoaded = vi.fn();
     mocks.clerkInstance.client = undefined;
@@ -807,6 +809,86 @@ describe('ClerkProvider native client sync', () => {
     expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
   });
 
+  test('rejects a foreign sessionless client when refreshing mutates the JS client in place', async () => {
+    const signedInSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalUpdateClient = mocks.clerkInstance.updateClient;
+
+    const client = {
+      id: 'client_1',
+      sessions: [signedInSession],
+      lastActiveSessionId: 'session_1' as string | null,
+      get signedInSessions() {
+        return this.sessions;
+      },
+      __internal_toSnapshot() {
+        return {
+          id: this.id,
+          sessions: this.sessions,
+          last_active_session_id: this.lastActiveSessionId,
+        };
+      },
+      fromJSON(snapshot: { id: string; sessions: (typeof signedInSession)[]; last_active_session_id: string | null }) {
+        this.id = snapshot.id;
+        this.sessions = snapshot.sessions;
+        this.lastActiveSessionId = snapshot.last_active_session_id;
+        return this;
+      },
+      fetch() {
+        this.id = 'client_2';
+        this.sessions = [];
+        this.lastActiveSessionId = null;
+        return Promise.resolve(this);
+      },
+    };
+    const restoreClient = vi.spyOn(client, 'fromJSON');
+
+    mocks.clerkInstance.client = client;
+    mocks.clerkInstance.session = signedInSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+
+    originalUpdateClient.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: null,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(restoreClient).toHaveBeenCalled();
+    });
+
+    expect(client.id).toBe('client_1');
+    expect(client.sessions).toEqual([signedInSession]);
+    expect(client.signedInSessions).toEqual([signedInSession]);
+    expect(client.lastActiveSessionId).toBe('session_1');
+    expect(originalUpdateClient).toHaveBeenCalledWith(client);
+    expect(mocks.clerkInstance.session).toBe(signedInSession);
+  });
+
   test('keeps the remaining JS session when the old active session becomes unauthenticated', async () => {
     const removedSession = {
       id: 'session_1',
@@ -924,6 +1006,55 @@ describe('ClerkProvider native client sync', () => {
       signedInSessions: [remainingSession],
       lastActiveSessionId: 'session_2',
     });
+  });
+
+  test('does not start fallback activation during an explicit session transition', async () => {
+    const removedSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const replacementSession = {
+      id: 'session_2',
+      status: 'active',
+      user: { id: 'user_2' },
+    };
+    const replacementClient = {
+      signedInSessions: [replacementSession],
+      lastActiveSessionId: 'session_2',
+    };
+    const originalUpdateClient = mocks.clerkInstance.updateClient;
+
+    mocks.clerkInstance.client = {
+      signedInSessions: [removedSession],
+      lastActiveSessionId: 'session_1',
+    };
+    mocks.clerkInstance.session = removedSession;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.clerkInstance.updateClient).not.toBe(originalUpdateClient);
+    });
+
+    originalUpdateClient.mockClear();
+    mocks.clerkInstance.setActive.mockClear();
+    mocks.clerkInstance.__internal_setActiveInProgress = true;
+
+    act(() => {
+      mocks.clerkInstance.updateClient(replacementClient);
+    });
+
+    expect(originalUpdateClient).toHaveBeenCalledOnce();
+    expect(originalUpdateClient).toHaveBeenCalledWith(replacementClient, {
+      __internal_dangerouslySkipEmit: true,
+    });
+    expect(mocks.clerkInstance.setActive).not.toHaveBeenCalled();
   });
 
   test('keeps follow-up client updates suppressed while reconciling a removed active session', async () => {
@@ -1301,5 +1432,362 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() => {
       expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(null, expect.any(String), false, true);
     });
+  });
+
+  test('rejects a foreign session-less native client and restores the signed-in JS token', async () => {
+    const jsDeviceToken = 'js-device-token';
+    const nativeDeviceToken = 'native-device-token';
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const foreignClient = {
+      id: 'client_foreign',
+      signedInSessions: [],
+      lastActiveSessionId: null,
+    };
+    const updateClient = mocks.clerkInstance.updateClient;
+
+    mocks.tokenCache.getToken.mockResolvedValue(jsDeviceToken);
+    mocks.getClientToken.mockResolvedValue(jsDeviceToken);
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: vi.fn().mockResolvedValue(foreignClient),
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken);
+    });
+
+    mocks.syncClientStateFromJs.mockClear();
+    mocks.tokenCache.saveToken.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: nativeDeviceToken,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, jsDeviceToken);
+    });
+    expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, nativeDeviceToken);
+    expect(updateClient).not.toHaveBeenCalledWith(foreignClient);
+    expect(mocks.clerkInstance.session).toBe(activeSession);
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(jsDeviceToken, expect.any(String), false, true);
+    });
+  });
+
+  test('restores the signed-in JS token when native client verification fails', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const jsDeviceToken = 'js-device-token';
+    const nativeDeviceToken = 'native-device-token';
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+
+    mocks.tokenCache.getToken.mockResolvedValue(jsDeviceToken);
+    mocks.getClientToken.mockResolvedValue(jsDeviceToken);
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: vi.fn().mockRejectedValue(new Error('verification failed')),
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken);
+    });
+
+    mocks.syncClientStateFromJs.mockClear();
+    mocks.tokenCache.saveToken.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: nativeDeviceToken,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, jsDeviceToken);
+    });
+    expect(mocks.clerkInstance.session).toBe(activeSession);
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(jsDeviceToken, expect.any(String), false, true);
+    });
+
+    consoleError.mockRestore();
+  });
+
+  test('does not replace a signed-in JS token when the native client cannot be verified', async () => {
+    const jsDeviceToken = 'js-device-token';
+    const nativeDeviceToken = 'native-device-token';
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+
+    mocks.tokenCache.getToken.mockResolvedValue(jsDeviceToken);
+    mocks.getClientToken.mockResolvedValue(jsDeviceToken);
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken);
+    });
+
+    mocks.syncClientStateFromJs.mockClear();
+    mocks.tokenCache.saveToken.mockClear();
+    mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: nativeDeviceToken,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(jsDeviceToken, expect.any(String), false, true);
+    });
+    expect(mocks.tokenCache.saveToken).not.toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, nativeDeviceToken);
+    expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.session).toBe(activeSession);
+  });
+
+  test('applies a session-less native response when it belongs to the current JS client', async () => {
+    const jsDeviceToken = 'js-device-token';
+    const nativeDeviceToken = 'native-device-token';
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const signedOutClient = {
+      id: 'client_shared',
+      signedInSessions: [],
+      lastActiveSessionId: null,
+    };
+    const updateClient = mocks.clerkInstance.updateClient;
+
+    mocks.tokenCache.getToken.mockResolvedValue(jsDeviceToken);
+    mocks.getClientToken.mockResolvedValue(jsDeviceToken);
+    mocks.clerkInstance.client = {
+      id: 'client_shared',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: vi.fn().mockResolvedValue(signedOutClient),
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken);
+    });
+
+    mocks.tokenCache.saveToken.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: nativeDeviceToken,
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(updateClient).toHaveBeenCalledWith(signedOutClient);
+    });
+    expect(mocks.tokenCache.saveToken).not.toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, jsDeviceToken);
+    expect(mocks.clerkInstance.session).toBeNull();
+  });
+
+  test('rejects a foreign session-less native client during unauthenticated recovery', async () => {
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const foreignClient = {
+      id: 'client_foreign',
+      signedInSessions: [],
+      lastActiveSessionId: null,
+    };
+    const updateClient = mocks.clerkInstance.updateClient;
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+
+    mocks.tokenCache.getToken.mockResolvedValue('js-device-token');
+    mocks.getClientToken.mockResolvedValue('js-device-token');
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: vi.fn().mockResolvedValue(foreignClient),
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'js-device-token');
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    mocks.getClientToken.mockResolvedValue('ghost-device-token');
+    mocks.tokenCache.saveToken.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(updateClient).not.toHaveBeenCalledWith(foreignClient);
+    expect(mocks.clerkInstance.session).toBe(activeSession);
+    expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
+    expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'ghost-device-token');
+    expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'js-device-token');
+  });
+
+  test('skips native adoption when the cached device token read times out while signed in', async () => {
+    const activeSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const fetchClient = vi.fn().mockResolvedValue({
+      id: 'client_foreign',
+      signedInSessions: [],
+      lastActiveSessionId: null,
+    });
+
+    mocks.tokenCache.getToken.mockResolvedValue('js-device-token');
+    mocks.getClientToken.mockResolvedValue('js-device-token');
+    mocks.clerkInstance.client = {
+      id: 'client_js',
+      signedInSessions: [activeSession],
+      lastActiveSessionId: activeSession.id,
+      fetch: fetchClient,
+    };
+    mocks.clerkInstance.session = activeSession;
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'js-device-token');
+    });
+
+    mocks.tokenCache.getToken.mockImplementation(() => new Promise(() => {}));
+    mocks.tokenCache.saveToken.mockClear();
+    mocks.tokenCache.clearToken.mockClear();
+
+    mocks.nativeClientEvent = {
+      issuedAt: 1,
+      changed: {
+        client: true,
+        deviceToken: true,
+      },
+      deviceToken: 'native-device-token',
+    };
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 1_200));
+    });
+
+    expect(mocks.tokenCache.saveToken).not.toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-device-token');
+    expect(mocks.tokenCache.clearToken).not.toHaveBeenCalled();
+    expect(fetchClient).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.session).toBe(activeSession);
   });
 });

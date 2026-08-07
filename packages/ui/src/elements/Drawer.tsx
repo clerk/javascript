@@ -181,6 +181,7 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
       sx={[
         t => ({
           inset: 0,
+          zIndex: t.zIndices.$modal,
           backgroundColor: colors.setAlpha(t.colors.$colorBackground, 0.28),
         }),
         props.sx,
@@ -267,9 +268,8 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           insetInline: 0,
           pointerEvents: 'none',
           isolation: 'isolate',
-          // When drawer is within the profile components, we need to ensure it is above the drawer
-          // renders above the profile close button
-          zIndex: strategy === 'absolute' ? t.zIndices.$modal : undefined,
+          // Drawers and modals share a stacking level so their render order determines which is on top.
+          zIndex: t.zIndices.$modal,
         })}
         elementDescriptor={descriptors.drawerRoot}
       >

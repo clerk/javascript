@@ -5,7 +5,7 @@ awareness, and nesting. Built on the same Floating UI infrastructure as `Dialog`
 trap, scroll lock, dismiss, `FloatingTree` nesting, enter/exit transitions) with a hand-rolled
 pointer/transform drag engine layered on top.
 
-The headless layer emits **raw** CSS custom properties and `data-cl-*` attributes and ships **zero
+The headless layer emits **raw** CSS custom properties and `data-*` attributes and ships **zero
 CSS**. The styled (mosaic) layer composes the actual `transform` / `opacity` / `calc()` chains from
 those inputs.
 
@@ -170,20 +170,20 @@ properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` i
 
 ### Data attributes
 
-| Attribute                                         | Applies to                         | Meaning                         |
-| ------------------------------------------------- | ---------------------------------- | ------------------------------- |
-| `data-cl-open` / `data-cl-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state                      |
-| `data-cl-starting-style` / `data-cl-ending-style` | Backdrop, Viewport, Popup          | Enter / exit transition phase   |
-| `data-cl-swiping`                                 | Popup, Backdrop                    | A drag is in progress           |
-| `data-cl-snap`                                    | Popup                              | Active snap index               |
-| `data-cl-expanded`                                | Popup                              | Resting at the full-height snap |
-| `data-cl-nested`                                  | Popup                              | This drawer is itself nested    |
-| `data-cl-nested-drawer-open`                      | Popup                              | A nested child is open          |
-| `data-cl-nested-drawer-swiping`                   | Popup                              | A nested child is being dragged |
-| `data-cl-drawer-handle`                           | Handle                             | Grip / `handleOnly` hit-test    |
-| `data-cl-drawer-no-drag`                          | (consumer-set)                     | Opt a subtree out of dragging   |
+| Attribute                                   | Applies to                         | Meaning                         |
+| ------------------------------------------- | ---------------------------------- | ------------------------------- |
+| `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state                      |
+| `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Enter / exit transition phase   |
+| `data-swiping`                              | Popup, Backdrop                    | A drag is in progress           |
+| `data-snap`                                 | Popup                              | Active snap index               |
+| `data-expanded`                             | Popup                              | Resting at the full-height snap |
+| `data-nested`                               | Popup                              | This drawer is itself nested    |
+| `data-nested-drawer-open`                   | Popup                              | A nested child is open          |
+| `data-nested-drawer-swiping`                | Popup                              | A nested child is being dragged |
+| `data-drawer-handle`                        | Handle                             | Grip / `handleOnly` hit-test    |
+| `data-drawer-no-drag`                       | (consumer-set)                     | Opt a subtree out of dragging   |
 
-Slot identity (`data-cl-slot`) is applied by the styled (mosaic) layer, not by the headless parts.
+The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
 ### Nested drawer animation (styled-layer recipe)
 
@@ -192,30 +192,30 @@ displacement constant. `--cl-drawer-nested-drag-progress` is `0` at the scaled-b
 full size, so the same var drives both the enter/exit scale-back and the live drag coupling:
 
 ```css
-[data-cl-slot='drawer-popup'] {
+.cl-drawer-popup {
   --rest-scale: calc((100vw - 16px) / 100vw); /* vaul's NESTED_DISPLACEMENT = 16px */
   transform-origin: center top;
   transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* A child is open: scale = lerp(rest-scale, 1, progress); translateY = lerp(-16px, 0, progress). */
-[data-cl-slot='drawer-popup'][data-cl-nested-drawer-open] {
+.cl-drawer-popup[data-nested-drawer-open] {
   --p: var(--cl-drawer-nested-drag-progress);
   transform: translateY(calc(-16px * (1 - var(--p))))
     scale(calc(var(--rest-scale) + (1 - var(--rest-scale)) * var(--p)));
 }
 
 /* While the child drags, follow the finger 1:1 (no animation). */
-[data-cl-slot='drawer-popup'][data-cl-nested-drawer-swiping] {
+.cl-drawer-popup[data-nested-drawer-swiping] {
   transition: none;
 }
 ```
 
 Lifecycle of the driving signals (all handled by the headless layer):
 
-- **Child opens** → `data-cl-nested-drawer-open` is set and `--cl-drawer-nested-drag-progress` is
+- **Child opens** → `data-nested-drawer-open` is set and `--cl-drawer-nested-drag-progress` is
   reset to `0`, so the parent animates from full to the scaled-back rest.
-- **Child drags** → `data-cl-nested-drawer-swiping` is set and progress tracks the drag `0..1`, so the
+- **Child drags** → `data-nested-drawer-swiping` is set and progress tracks the drag `0..1`, so the
   parent follows the finger back toward full.
 - **Child releases** → swiping clears and progress settles to `0` (child stays open) or `1` (child
   dismisses). The dismiss target matches the open-count dropping, so the scale animates in one
@@ -230,9 +230,9 @@ Lifecycle of the driving signals (all handled by the headless layer):
 - **`Drawer.Handle` is presentational** (no ARIA role). Keyboard users dismiss via `Escape` /
   `Drawer.Close`; add your own `role` / `aria-*` (via props or `render`) if you need it announced.
 - **Drag never hijacks form controls.** `shouldDrag` excludes `<select>`, native `range` inputs,
-  `[role="slider"]` thumbs, `[data-cl-drawer-no-drag]` subtrees, active text selections (DOM,
+  `[role="slider"]` thumbs, `[data-drawer-no-drag]` subtrees, active text selections (DOM,
   `contenteditable`, and focused `input` / `textarea` selection handles), and inner content scrolled
-  away from the top. Use `data-cl-drawer-no-drag` for any other custom draggable.
+  away from the top. Use `data-drawer-no-drag` for any other custom draggable.
 - **Nested overlays don't dismiss the drawer.** A `Select` / `Autocomplete` / `Menu` opened inside the
   sheet joins the same `FloatingTree`, so a press in its portal counts as inside.
 - **Nested drawers** stack automatically (shared `FloatingTree`) and drive the parent's scale-back

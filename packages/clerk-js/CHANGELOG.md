@@ -1,5 +1,125 @@
 # Change Log
 
+## 6.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
+## 6.27.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+
+## 6.26.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+### Patch Changes
+
+- Recover from partitioned-cookie startup races by removing stale non-partitioned cookies when partitioned cookies become available. ([#9286](https://github.com/clerk/javascript/pull/9286)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Complete the Safari ITP cookie refresh when `setActive({ redirectUrl })` navigates. ([#9308](https://github.com/clerk/javascript/pull/9308)) by [@dmoerner](https://github.com/dmoerner)
+
+  Safari's ITP caps the client cookie at 7 days when it is re-issued from a fetch, so `setActive()` routes its redirect through `/v1/client/touch` to restore the full lifetime. That navigation was immediately followed by a second one to the undecorated redirect URL, which superseded it and aborted the touch request before it completed, leaving the cookie capped.
+
+  This applies to flows that pass `redirectUrl` without a `navigate` callback — email link sign-in, the password reset success screen, the OAuth popup flow, and direct `setActive({ session, redirectUrl })` calls — in apps where Clerk performs a full page navigation rather than handing off to a router. Users still landed on the correct page, so the only symptom was Safari sessions ending after 7 days and returning devices being challenged as if they were new.
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
+## 6.25.13
+
+### Patch Changes
+
+- Enable self-serve OIDC configuration for every application. Organization admins can now select an OIDC provider in the `<OrganizationProfile />` Security tab without the `experimental.oidcSelfServe` option, and existing OIDC connections open their configuration steps instead of the unsupported-provider state. The `experimental.oidcSelfServe` option no longer does anything and can be removed from `<ClerkProvider />` and `Clerk.load()`. ([#9288](https://github.com/clerk/javascript/pull/9288)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
+## 6.25.12
+
+### Patch Changes
+
+- Apply the Safari ITP cookie refresh on sign-out. ([#9254](https://github.com/clerk/javascript/pull/9254)) by [@dmoerner](https://github.com/dmoerner)
+
+  Signing out re-issues the client cookie from a fetch, which Safari's ITP caps at 7 days. The client outlives sign-out, and it is what Client Trust uses to recognize a known device, so the cap meant a user who signed out and came back more than a week later was treated as being on a new device and challenged for a second factor.
+
+  `signOut()` now routes its redirect through `/v1/client/touch` when the client cookie is close to expiring, the same workaround `setActive()` already applies after sign-in. The redirect is left unchanged when no refresh is needed.
+
+  This covers `signOut()` calls that navigate to a redirect URL, including `<UserButton />` and `<SignOutButton />`. Passing your own callback to `signOut(callback)` still navigates on your behalf and is not decorated.
+
+## 6.25.11
+
+### Patch Changes
+
+- Add support for configuring custom OpenID Connect enterprise connections through the Organization Profile. ([#9200](https://github.com/clerk/javascript/pull/9200)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Expose whether an organization member has been deprovisioned, and mark deprovisioned members as inactive in the Organization Profile. ([#9202](https://github.com/clerk/javascript/pull/9202)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+
+## 6.25.10
+
+### Patch Changes
+
+- Prevent overlapping verification preparations from triggering duplicate verification sends during sign-in, sign-up, and when verifying an email address, phone number, or web3 wallet from the user profile. ([#9225](https://github.com/clerk/javascript/pull/9225)) by [@tmilewski](https://github.com/tmilewski)
+
+## 6.25.9
+
+### Patch Changes
+
+- Fix the standalone `<APIKeys />` component failing to render when an organization is active and user API keys are disabled but organization API keys are enabled. The component now correctly checks the user API keys setting only when no organization is active. ([#9247](https://github.com/clerk/javascript/pull/9247)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bias proactive session token refresh ownership toward the focused browser tab and poll more often while focused in multi-tab apps. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- When running in a browser context, session token requests now include a `tab_state` parameter (`focused`, `visible`, or `hidden`) so the backend can distinguish foreground from background token refreshes. The parameter is omitted in environments without a document, such as extension service workers. ([#9215](https://github.com/clerk/javascript/pull/9215)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 6.25.8
+
+### Patch Changes
+
+- Internal plumbing to support `@clerk/ui` composed `UserProfile` / `OrganizationProfile` subcomponents. ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+
+## 6.25.7
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
 ## 6.25.6
 
 ### Patch Changes

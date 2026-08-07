@@ -14,6 +14,7 @@ function Harness(props: Partial<React.ComponentProps<typeof Otp.Root>> & { lengt
   return (
     <Otp.Root
       length={length}
+      data-testid='otp-root'
       {...rootProps}
     >
       <Slots />
@@ -29,6 +30,7 @@ function Slots() {
         <Otp.Input
           key={slot.index}
           index={slot.index}
+          data-testid='otp-input'
         />
       ))}
     </>
@@ -36,29 +38,29 @@ function Slots() {
 }
 
 function inputs() {
-  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-cl-slot="otp-input"]'));
+  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-testid="otp-input"]'));
 }
 
 describe('Otp', () => {
   describe('slot attributes', () => {
     it('renders the root and one input per slot', () => {
       render(<Harness length={4} />);
-      expect(document.querySelector('[data-cl-slot="otp-root"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="otp-root"]')).toBeInTheDocument();
       expect(inputs()).toHaveLength(4);
     });
 
     it('marks the root empty until a character is entered, then complete when full', async () => {
       const user = userEvent.setup();
       render(<Harness length={2} />);
-      const root = document.querySelector('[data-cl-slot="otp-root"]');
-      expect(root).toHaveAttribute('data-cl-empty', '');
+      const root = document.querySelector('[data-testid="otp-root"]');
+      expect(root).toHaveAttribute('data-empty', '');
 
       await user.type(inputs()[0], '1');
-      expect(root).not.toHaveAttribute('data-cl-empty');
-      expect(root).not.toHaveAttribute('data-cl-complete');
+      expect(root).not.toHaveAttribute('data-empty');
+      expect(root).not.toHaveAttribute('data-complete');
 
       await user.type(inputs()[1], '2');
-      expect(root).toHaveAttribute('data-cl-complete', '');
+      expect(root).toHaveAttribute('data-complete', '');
     });
 
     it('marks a filled input and the active input', async () => {
@@ -69,11 +71,11 @@ describe('Otp', () => {
           defaultValue='1'
         />,
       );
-      expect(inputs()[0]).toHaveAttribute('data-cl-filled', '');
-      expect(inputs()[1]).not.toHaveAttribute('data-cl-filled');
+      expect(inputs()[0]).toHaveAttribute('data-filled', '');
+      expect(inputs()[1]).not.toHaveAttribute('data-filled');
 
       await user.click(inputs()[1]);
-      expect(inputs()[1]).toHaveAttribute('data-cl-active', '');
+      expect(inputs()[1]).toHaveAttribute('data-active', '');
     });
   });
 
@@ -408,7 +410,7 @@ describe('Otp', () => {
       for (const input of inputs()) {
         expect(input).toBeDisabled();
       }
-      expect(document.querySelector('[data-cl-slot="otp-root"]')).toHaveAttribute('data-cl-disabled', '');
+      expect(document.querySelector('[data-testid="otp-root"]')).toHaveAttribute('data-disabled', '');
 
       await user.type(inputs()[0], '1');
       expect(onValueChange).not.toHaveBeenCalled();
@@ -424,14 +426,14 @@ describe('Otp', () => {
           defaultValue='1234'
         />,
       );
-      const hidden = document.querySelector<HTMLInputElement>('[data-cl-slot="otp-hidden-input"]');
+      const hidden = document.querySelector<HTMLInputElement>('input[aria-hidden="true"]');
       expect(hidden).toHaveAttribute('name', 'code');
       expect(hidden).toHaveValue('1234');
     });
 
     it('omits the hidden input when no name is given', () => {
       render(<Harness length={4} />);
-      expect(document.querySelector('[data-cl-slot="otp-hidden-input"]')).not.toBeInTheDocument();
+      expect(document.querySelector('input[aria-hidden="true"]')).not.toBeInTheDocument();
     });
   });
 
@@ -495,7 +497,7 @@ describe('Otp', () => {
         </Otp.Root>,
       );
       const custom = screen.getByTestId('custom');
-      expect(custom).toHaveAttribute('data-cl-slot', 'otp-input');
+      expect(custom).toBeInTheDocument();
     });
   });
 
@@ -507,6 +509,7 @@ describe('Otp', () => {
           <Otp.Input
             index={0}
             ref={ref}
+            data-testid='otp-input'
           />
         </Otp.Root>,
       );

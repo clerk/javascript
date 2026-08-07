@@ -5,9 +5,13 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   private var currentMode: String = "signInOrUp"
   private var currentDismissible: Bool = true
   private var currentLogoMaxHeight: CGFloat?
+  private let logoState = ClerkInlineAuthLogoState()
+  private var logoBoundsObservation: NSKeyValueObservation?
+  private var currentHostBackButton: Bool = false
   private var didSendDismiss = false
 
   let onAuthEvent = EventDispatcher()
+  let onHostBack = EventDispatcher()
 
   func setMode(_ mode: String?) {
     let newMode = mode ?? "signInOrUp"
@@ -26,6 +30,13 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
   func setLogoMaxHeight(_ logoMaxHeight: CGFloat?) {
     guard logoMaxHeight != currentLogoMaxHeight else { return }
     currentLogoMaxHeight = logoMaxHeight
+    setNeedsHostedViewUpdate()
+  }
+
+  func setHostBackButton(_ hostBackButton: Bool?) {
+    let newHostBackButton = hostBackButton ?? false
+    guard newHostBackButton != currentHostBackButton else { return }
+    currentHostBackButton = newHostBackButton
     setNeedsHostedViewUpdate()
   }
 
@@ -48,11 +59,64 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
     sendDismissIfNeeded()
   }
 
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    guard let logoView = logoState.content?.view else { return }
+    logoState.updateSize(for: logoView)
+  }
+
+#if RCT_NEW_ARCH_ENABLED
+  override public func mountChildComponentView(_ childComponentView: UIView, index: Int) {
+    setLogoView(childComponentView)
+  }
+
+  override public func unmountChildComponentView(_ childComponentView: UIView, index: Int) {
+    removeLogoView(childComponentView)
+  }
+#else
+  override public func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    super.insertReactSubview(subview, at: atIndex)
+    setLogoView(subview)
+  }
+
+  override public func removeReactSubview(_ subview: UIView!) {
+    removeLogoView(subview)
+    super.removeReactSubview(subview)
+  }
+
+  override public func didUpdateReactSubviews() {}
+#endif
+
+  private func setLogoView(_ view: UIView) {
+    guard logoState.content?.view !== view else { return }
+    logoBoundsObservation = nil
+    logoState.setView(view)
+    logoBoundsObservation = view.observe(\.bounds, options: [.new]) { [weak self, weak view] _, _ in
+      DispatchQueue.main.async { [weak self, weak view] in
+        guard let self, let view, self.logoState.content?.view === view else { return }
+        self.logoState.updateSize(for: view)
+      }
+    }
+  }
+
+  private func removeLogoView(_ view: UIView) {
+    guard logoState.content?.view === view else { return }
+    logoBoundsObservation = nil
+    view.removeFromSuperview()
+    logoState.removeView(view)
+  }
+
   override func makeHostedController() -> UIViewController? {
+    let hostBackAction: (() -> Void)? = currentHostBackButton
+      ? { [weak self] in self?.onHostBack([:]) }
+      : nil
+
     return ClerkNativeBridge.shared.makeAuthViewController(
       mode: currentMode,
       dismissible: currentDismissible,
+      logoState: logoState,
       logoMaxHeight: currentLogoMaxHeight,
+      hostBackAction: hostBackAction,
       onEvent: { [weak self] event, _ in
         if event == .dismissed {
           self?.sendDismissIfNeeded()
@@ -67,7 +131,7 @@ public class ClerkAuthViewModule: Module {
     Name("ClerkAuthView")
 
     View(ClerkAuthNativeView.self) {
-      Events("onAuthEvent")
+      Events("onAuthEvent", "onHostBack")
 
       Prop("mode") { (view: ClerkAuthNativeView, mode: String?) in
         view.setMode(mode)
@@ -80,6 +144,11 @@ public class ClerkAuthViewModule: Module {
       Prop("logoMaxHeight") { (view: ClerkAuthNativeView, logoMaxHeight: CGFloat?) in
         view.setLogoMaxHeight(logoMaxHeight)
       }
+
+      Prop("hostBackButton") { (view: ClerkAuthNativeView, hostBackButton: Bool?) in
+        view.setHostBackButton(hostBackButton)
+      }
+
     }
   }
 }

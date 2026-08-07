@@ -55,7 +55,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
         <Dialog.Backdrop />
         <Dialog.Viewport>
           <Dialog.Popup>
-            <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
+            <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
 
             {error && (
               <Box
@@ -88,7 +88,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                     disabled={isBusy}
                     placeholder='example.com'
                     onChange={e => send({ type: 'TYPE_NAME', value: e.target.value })}
-                    sx={t => ({ marginBlockStart: t.spacing(1) })}
+                    style={{ marginBlockStart: 'var(--cl-spacing)' }}
                   />
                 </Box>
                 <Actions
@@ -130,7 +130,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                     />
                     <Text
                       render={p => <span {...p} />}
-                      intent='mutedForeground'
+                      color='neutral'
                     >
                       @{domainName}
                     </Text>
@@ -154,7 +154,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                   })
                 }
               >
-                <Dialog.Description render={p => <Text {...p} />}>
+                <Dialog.Description render={<Text />}>
                   Enter the verification code sent to {draftEmail}@{domainName}.
                 </Dialog.Description>
                 <Box
@@ -167,7 +167,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                     value={draftCode}
                     disabled={isBusy}
                     onChange={e => send({ type: 'TYPE_CODE', value: e.target.value })}
-                    sx={t => ({ marginBlockStart: t.spacing(1) })}
+                    style={{ marginBlockStart: 'var(--cl-spacing)' }}
                   />
                 </Box>
                 <Box sx={t => ({ marginBlockStart: t.spacing(2), display: 'flex', columnGap: t.spacing(2) })}>
@@ -208,7 +208,7 @@ export function OrganizationProfileDomainsSectionAddVerifyView({
                   })
                 }
               >
-                <Dialog.Description render={p => <Text {...p} />}>
+                <Dialog.Description render={<Text />}>
                   Choose how users from this domain can join the organization.
                 </Dialog.Description>
                 <Box sx={t => ({ display: 'flex', flexDirection: 'column', gap: t.spacing(2) })}>

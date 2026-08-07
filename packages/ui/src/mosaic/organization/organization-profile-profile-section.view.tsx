@@ -93,7 +93,7 @@ export function OrganizationProfileProfileSectionView({
             </Button>
           )}
         >
-          <Dialog.Title render={p => <Heading {...p} />}>Update profile</Dialog.Title>
+          <Dialog.Title render={<Heading />}>Update profile</Dialog.Title>
           {error && (
             <Box
               role='alert'
@@ -120,7 +120,7 @@ export function OrganizationProfileProfileSectionView({
                 value={nameValue}
                 onChange={e => send({ type: 'TYPE_NAME', value: e.target.value })}
                 disabled={isSaving}
-                sx={t => ({ marginBlockStart: t.spacing(1) })}
+                style={{ marginBlockStart: 'var(--cl-spacing)' }}
               />
             </Box>
             {slugEnabled && (
@@ -138,7 +138,7 @@ export function OrganizationProfileProfileSectionView({
                   value={slugValue}
                   onChange={e => send({ type: 'TYPE_SLUG', value: e.target.value })}
                   disabled={isSaving}
-                  sx={t => ({ marginBlockStart: t.spacing(1) })}
+                  style={{ marginBlockStart: 'var(--cl-spacing)' }}
                 />
               </Box>
             )}

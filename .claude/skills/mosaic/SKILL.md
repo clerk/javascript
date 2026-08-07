@@ -44,7 +44,9 @@ this skill is the _how-to_.
 
 | You are…                                                             | Read                                                   |
 | -------------------------------------------------------------------- | ------------------------------------------------------ |
+| Building on / authoring a headless primitive (`@clerk/headless`)     | `references/headless.md`                               |
 | Styling a component with StyleX (tokens, `stylex.create`, CSS build) | `references/stylex.md`                                 |
+| Building an enter/exit transition, or any motion that reads as wrong | `references/motion.md`                                 |
 | Styling a component the legacy way (slot recipes, `useRecipe`)       | `references/styling.md`                                |
 | Authoring or debugging a state machine, or wiring one to React       | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the controller (Clerk adapter, permissions, revalidate)      | `references/controllers.md`                            |

@@ -1,5 +1,91 @@
 # Change Log
 
+## 3.16.1
+
+### Patch Changes
+
+- Use a root-relative link (`/contact/support`) for the `passwordHasher` "contact support" reference so the generated API reference renders it as an internal same-tab link instead of an external one. ([#9347](https://github.com/clerk/javascript/pull/9347)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
+## 3.16.0
+
+### Minor Changes
+
+- Add `clerkClient.users.removePassword(userId, params?)` to remove a user's password through the Backend API. Password removal is allowed even when the user has no alternate sign-in method configured. Existing sessions remain active by default; pass `{ signOutOfOtherSessions: true }` to revoke them. ([#9326](https://github.com/clerk/javascript/pull/9326)) by [@joshrowley](https://github.com/joshrowley)
+
+### Patch Changes
+
+- Improve generated API reference links, expose `BillingSubscriptionItemStatus`, and clarify the `createUser()` identification status documentation. ([#9340](https://github.com/clerk/javascript/pull/9340)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+
+## 3.15.1
+
+### Patch Changes
+
+- Add the optional `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` parameters to `CreateUserParams`. The Backend API has supported these arrays on `POST /v1/users` since they shipped, but `createUser()` had no way to pass them, so every email address and phone number was necessarily created verified. Each array runs parallel to `emailAddress` / `phoneNumber` — one item per identifier, applied by position — and an item set to `'reserved'` creates that identifier unverified but still usable for sign-in and locked so no other user can claim it. ([#9305](https://github.com/clerk/javascript/pull/9305)) by [@dmoerner](https://github.com/dmoerner)
+
+  The `createUser()` documentation is corrected accordingly: it stated unconditionally that created email addresses and phone numbers are automatically verified, which is only the default.
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
+## 3.15.0
+
+### Minor Changes
+
+- Update fields for BillingSubscription and BillingSubscriptionItem ([#9196](https://github.com/clerk/javascript/pull/9196)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Return a `TokenVerificationError` from `decodeJwt` and `verifyToken` for tokens whose header, payload, or signature cannot be decoded. ([#9268](https://github.com/clerk/javascript/pull/9268)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
+## 3.14.0
+
+### Minor Changes
+
+- Align the `EnterpriseConnection` response resource with what the Backend API actually returns: ([#9156](https://github.com/clerk/javascript/pull/9156)) by [@manovotny](https://github.com/manovotny)
+  - `EnterpriseConnection` now exposes `provider`, `logoPublicUrl`, `allowOrganizationAccountLinking`, `authenticatable`, `disableJitProvisioning`, and `customAttributes`.
+  - `EnterpriseConnectionSamlConnection` now exposes `active`, `forceAuthn`, and `loginHint`.
+  - `EnterpriseConnectionOauthConfig` now exposes `providerKey`, `authUrl`, `tokenUrl`, `userInfoUrl`, and `requiresPkce`.
+  - Deprecated properties the Backend API never returns, which were always `undefined` despite their declared types: `allowSubdomains` on `EnterpriseConnection` (use `samlConnection.allowSubdomains`), and `idpMetadata` and `syncUserAttributes` on `EnterpriseConnectionSamlConnection` (use the top-level `syncUserAttributes`).
+  - `organizationId` is now normalized to `null` when the Backend API omits it, matching its declared `string | null` type. Properties backed by optional API fields (for example `oauthConfig.clientId` and the SAML IdP fields) are now typed as possibly `undefined` to match runtime behavior.
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+
+## 3.13.2
+
+### Patch Changes
+
+- Correct two Dashboard labels referenced in the instance restrictions documentation. `blockDisposableEmailDomains` bolded "Block sign-ups that use disposable email domains", but the toggle in the Clerk Dashboard is "Block sign-ups that use disposable email addresses". `ignoreDotsForGmailAddresses` bolded "Ignore dots for Gmail addresses" as a Dashboard toggle, but no such control exists — the wording now matches the equivalent comment on `UpdateRestrictionsParams`. Property names are unchanged. ([#9253](https://github.com/clerk/javascript/pull/9253)) by [@manovotny](https://github.com/manovotny)
+
+## 3.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+
+## 3.13.0
+
+### Minor Changes
+
+- Add an `fapiUrl` option to Frontend API proxy helpers so requests can target a custom Clerk Frontend API URL. ([#9223](https://github.com/clerk/javascript/pull/9223)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
 ## 3.12.0
 
 ### Minor Changes

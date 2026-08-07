@@ -1,9 +1,9 @@
 'use client';
 
-import { FloatingFocusManager, useMergeRefs } from '@floating-ui/react';
+import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils/render-element';
+import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../../utils';
 import { usePopoverContext } from './popover-context';
 
 export type PopoverPositionerProps = ComponentProps<'div'>;
@@ -19,6 +19,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       placement,
       getFloatingProps,
       modal,
+      initialFocus,
+      returnFocusRef,
       labelId,
       descriptionId,
       hasTitle,
@@ -27,16 +29,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
 
     const side = placement.split('-')[0];
 
-    // floating-ui types `setFloating` as a method signature, but at runtime it's
-    // a stable callback that doesn't use `this`, so the unbound-method check is a
-    // false positive here.
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const combinedRef = useMergeRefs([refs.setFloating, ref]);
-
     const ownProps = {
-      'data-cl-slot': 'popover-positioner',
-      'data-cl-side': side,
-      ref: combinedRef,
+      'data-side': side,
       style: floatingStyles,
       ...(hasTitle && { 'aria-labelledby': labelId }),
       ...(hasDescription && { 'aria-describedby': descriptionId }),
@@ -44,10 +38,15 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
 
     const defaultProps = { ...ownProps, ...getFloatingProps() };
 
-    const element = renderElement({
+    const element = useRender({
       defaultTagName: 'div',
       render,
       enabled: mounted,
+      // floating-ui types `setFloating` as a method signature, but at runtime it's
+      // a stable callback that doesn't use `this`, so the unbound-method check is a
+      // false positive here.
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: [refs.setFloating, ref],
       props: mergeProps<'div'>(defaultProps, otherProps),
     });
 
@@ -59,6 +58,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       <FloatingFocusManager
         context={floatingContext}
         modal={modal}
+        initialFocus={initialFocus === 'first' || isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        returnFocus={returnFocusRef}
       >
         {element}
       </FloatingFocusManager>

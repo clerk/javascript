@@ -62,8 +62,8 @@ export function Destructive({
     >
       {({ close }) => (
         <>
-          <Dialog.Title render={p => <Heading {...p} />}>{title}</Dialog.Title>
-          <Dialog.Description render={p => <Text {...p} />}>{description}</Dialog.Description>
+          <Dialog.Title render={<Heading />}>{title}</Dialog.Title>
+          <Dialog.Description render={<Text />}>{description}</Dialog.Description>
           {error && (
             <Box
               role='alert'
@@ -90,9 +90,7 @@ export function Destructive({
                 value={confirmValue}
                 onChange={e => setConfirmValue(e.target.value)}
                 disabled={isDeleting}
-                sx={t => ({
-                  marginBlockStart: t.spacing(1),
-                })}
+                style={{ marginBlockStart: 'var(--cl-spacing)' }}
               />
             </Box>
             <Box
@@ -110,7 +108,7 @@ export function Destructive({
               </Button>
               <Button
                 type='submit'
-                intent='destructive'
+                color='negative'
                 disabled={!canSubmit}
               >
                 {primaryActionLabel}

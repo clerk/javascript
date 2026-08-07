@@ -28,12 +28,17 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    avatar: dynamic(() => import('../stories/avatar.mdx')),
+    badge: dynamic(() => import('../stories/badge.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
+    item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
+    menu: dynamic(() => import('../stories/menu.component.mdx')),
+    popover: dynamic(() => import('../stories/popover.component.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
   },
@@ -51,6 +56,10 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
+  },
+  styles: {
+    // Atomic styles — shipped as StyleX atoms rather than components.
+    'scroll-area': dynamic(() => import('../stories/scroll-area.mdx')),
   },
   hooks: {
     // Headless hooks — alphabetical.
