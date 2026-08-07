@@ -8,9 +8,8 @@ import { MosaicProvider } from '../../MosaicProvider';
 import type { UserButtonProps } from '../user-button.view';
 import { userButtonBusyKeys, UserButtonView } from '../user-button.view';
 
-// The connected UserButton only ever renders `combined` — the container does not expose `mode` — so
-// this is the only place the three surfaces can be told apart. One describe per mode covers what
-// each carries and withholds; the describes after them cover what the modes share.
+// `mode` is the view's own prop, so what each of the three surfaces carries and withholds is settled
+// here. One describe per mode; the describes after them cover what the modes share.
 
 const alice = { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' };
 const bob = { sessionId: 'sess_2', name: 'Bob Jones', identifier: 'bob@example.com' };
@@ -161,10 +160,10 @@ describe('UserButtonView, user mode', () => {
   });
 });
 
-describe('UserButtonView, orgs mode', () => {
-  function renderOrgsMode(props: Partial<UserButtonProps> = {}) {
+describe('UserButtonView, organization mode', () => {
+  function renderOrganizationMode(props: Partial<UserButtonProps> = {}) {
     return renderView({
-      mode: 'orgs',
+      mode: 'organization',
       hasOrganizations: true,
       activeOrganization: foundry,
       memberships: [foundry, otherCo],
@@ -173,7 +172,7 @@ describe('UserButtonView, orgs mode', () => {
   }
 
   it('heads the surface with the active organization and what can be done to it', () => {
-    renderOrgsMode();
+    renderOrganizationMode();
 
     const header = groups()[0];
     expect(within(header).getByText('Foundry')).toBeInTheDocument();
@@ -183,7 +182,7 @@ describe('UserButtonView, orgs mode', () => {
   });
 
   it('falls back to the account in the header where no organization is active', () => {
-    renderOrgsMode({ activeOrganization: null });
+    renderOrganizationMode({ activeOrganization: null });
 
     expect(within(groups()[0]).getByText('Alice Smith')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
@@ -191,13 +190,13 @@ describe('UserButtonView, orgs mode', () => {
   });
 
   it('lists the workspaces, the personal one among them', () => {
-    renderOrgsMode();
+    renderOrganizationMode();
 
     expect(titles(workspaceList())).toEqual(['Personal account', 'Foundry', 'Other Co']);
   });
 
   it('carries no account rows, not even the one it belongs to', () => {
-    renderOrgsMode();
+    renderOrganizationMode();
 
     expect(accountsList()).toBeUndefined();
     expect(screen.queryByText('Accounts')).toBeNull();
@@ -206,7 +205,7 @@ describe('UserButtonView, orgs mode', () => {
   });
 
   it('takes "Create organization" at the foot, in place of the account actions', () => {
-    renderOrgsMode();
+    renderOrganizationMode();
 
     expect(screen.getByRole('button', { name: 'Create organization' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
@@ -573,7 +572,12 @@ describe('UserButtonView, the foot', () => {
   });
 
   it('carries the custom rows on an org-only surface too', () => {
-    renderView({ mode: 'orgs', hasOrganizations: true, activeOrganization: foundry, customMenuItems: [action()] });
+    renderView({
+      mode: 'organization',
+      hasOrganizations: true,
+      activeOrganization: foundry,
+      customMenuItems: [action()],
+    });
 
     expect(footLabels()).toEqual(['Terms of service', 'Create organization']);
   });
@@ -652,7 +656,7 @@ describe('UserButtonTrigger', () => {
   }
 
   it('names the active organization and its plan', () => {
-    renderTrigger({ mode: 'orgs' });
+    renderTrigger({ mode: 'organization' });
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.getByText('Pro')).toBeInTheDocument();
@@ -680,7 +684,7 @@ describe('UserButtonTrigger', () => {
   });
 
   it('renders the avatar alone when the label is off', () => {
-    renderTrigger({ mode: 'orgs', renderTriggerLabel: false });
+    renderTrigger({ mode: 'organization', renderTriggerLabel: false });
 
     expect(screen.queryByText('Foundry')).toBeNull();
     expect(screen.queryByText('Pro')).toBeNull();
@@ -688,7 +692,7 @@ describe('UserButtonTrigger', () => {
   });
 
   it('keeps the name when only the plan badge is off', () => {
-    renderTrigger({ mode: 'orgs', renderPlanBadge: false });
+    renderTrigger({ mode: 'organization', renderPlanBadge: false });
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.queryByText('Pro')).toBeNull();
@@ -702,14 +706,14 @@ describe('UserButtonTrigger', () => {
       return className;
     };
 
-    expect(corner({ mode: 'orgs' })).not.toEqual(corner({ mode: 'user' }));
-    expect(corner({ mode: 'orgs', renderTriggerLabel: false })).not.toEqual(
+    expect(corner({ mode: 'organization' })).not.toEqual(corner({ mode: 'user' }));
+    expect(corner({ mode: 'organization', renderTriggerLabel: false })).not.toEqual(
       corner({ mode: 'user', renderTriggerLabel: false }),
     );
   });
 
   it('names the active organization before its membership list has loaded', () => {
-    renderTrigger({ mode: 'orgs', memberships: [], hasOrganizations: false, organizationsLoading: true });
+    renderTrigger({ mode: 'organization', memberships: [], hasOrganizations: false, organizationsLoading: true });
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.queryByText('Alice Smith')).toBeNull();
