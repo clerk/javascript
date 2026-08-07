@@ -26,29 +26,29 @@ describe('UserButtonProps — nothing is required', () => {
 
 // ─── mode / modePriority ─────────────────────────────────────────────────────
 
-describe('mode and modePriority — the two vocabularies stay apart', () => {
+describe('mode and modePriority', () => {
   test('mode is the three switcher shapes', () => {
-    expectTypeOf<UserButtonProps['mode']>().toEqualTypeOf<'combined' | 'orgs' | 'user' | undefined>();
+    expectTypeOf<UserButtonProps['mode']>().toEqualTypeOf<'combined' | 'organization' | 'user' | undefined>();
   });
 
-  test('modePriority names the organization in full, unlike mode', () => {
-    expectTypeOf<UserButtonProps['modePriority']>().toEqualTypeOf<'organizations' | 'user' | undefined>();
+  test('modePriority is the two a combined surface chooses between', () => {
+    expectTypeOf<UserButtonProps['modePriority']>().toEqualTypeOf<'organization' | 'user' | undefined>();
   });
 
   test('every mode is accepted', () => {
     accept({ mode: 'combined' });
-    accept({ mode: 'orgs' });
+    accept({ mode: 'organization' });
     accept({ mode: 'user' });
   });
 
   test('a mode outside the union is rejected', () => {
-    // @ts-expect-error — 'organizations' is modePriority's word, not mode's
-    accept({ mode: 'organizations' });
+    // @ts-expect-error - 'orgs' is not the word for it
+    accept({ mode: 'orgs' });
   });
 
-  test("modePriority does not take mode's abbreviation", () => {
-    // @ts-expect-error — 'orgs' is mode's word, not modePriority's
-    accept({ modePriority: 'orgs' });
+  test('combined is not something modePriority can lead with', () => {
+    // @ts-expect-error - 'combined' is a mode, not a priority
+    accept({ modePriority: 'combined' });
   });
 });
 
