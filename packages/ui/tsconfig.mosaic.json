@@ -7,8 +7,10 @@
       // declaration bundle. Its published `dist/*.d.ts` are re-export barrels that
       // rolldown-plugin-dts can't follow when inlining, so building types against source
       // (the monorepo default) lets Mosaic components import headless types directly.
+      // `utils` and `hooks` sit at the source root; every other subpath is a primitive.
       "@clerk/headless/utils": ["../headless/src/utils/index.ts"],
-      "@clerk/headless/*": ["../headless/src/*"],
+      "@clerk/headless/hooks": ["../headless/src/hooks/index.ts"],
+      "@clerk/headless/*": ["../headless/src/primitives/*"],
       // Preserve the base config's test-only aliases (extends replaces `paths` wholesale).
       "@/core/*": ["../clerk-js/src/core/*"],
       "@/*": ["./src/*"],

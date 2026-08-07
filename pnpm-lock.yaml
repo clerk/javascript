@@ -876,6 +876,9 @@ importers:
         specifier: catalog:repo
         version: 2.8.1
     devDependencies:
+      '@clerk/ui':
+        specifier: workspace:*
+        version: link:../ui
       crypto-es:
         specifier: ^2.1.0
         version: 2.1.0
@@ -1225,9 +1228,6 @@ importers:
       '@solana/wallet-standard':
         specifier: catalog:module-manager
         version: 1.1.4(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10))(bs58@6.0.0)(react@18.3.1)
-      '@stylexjs/stylex':
-        specifier: 0.19.0
-        version: 0.19.0
       '@swc/helpers':
         specifier: catalog:repo
         version: 0.5.21
@@ -1281,6 +1281,9 @@ importers:
         specifier: 0.19.0
         version: 0.19.0
       '@stylexjs/rollup-plugin':
+        specifier: 0.19.0
+        version: 0.19.0
+      '@stylexjs/stylex':
         specifier: 0.19.0
         version: 0.19.0
       '@stylexjs/unplugin':
@@ -8340,6 +8343,7 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   css-mediaquery@0.1.2:
     resolution: {integrity: sha512-COtn4EROW5dBGlE/4PiKnh6rZpAPxDeFLaEEwt4i10jpDMFt2EhQGS79QmmrO+iKCHv0PU/HrOWEhijFd1x99Q==}

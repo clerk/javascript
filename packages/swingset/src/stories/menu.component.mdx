@@ -120,10 +120,10 @@ const [open, setOpen] = useState(false);
 Unlike the slot-recipe components, the Mosaic menu is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots above) alongside the StyleX atoms. Consumers never
 target the hashed atomic classes — override by targeting the `.cl-*` slot from a CSS layer that wins
-over `@clerk/ui/styles.css`:
+over `@clerk/ui/experimental/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/ui/experimental/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-menu-popup {
