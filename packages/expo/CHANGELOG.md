@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.27.2
+  - @clerk/react@6.13.2
+  - @clerk/clerk-js@6.27.2
+
 ## 4.2.3
 
 ### Patch Changes
