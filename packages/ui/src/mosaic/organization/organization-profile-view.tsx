@@ -8,17 +8,24 @@ interface OrganizationProfileViewProps {
   general: ReactNode;
   /** The Members tab's panel content. */
   members: ReactNode;
+  /** The Billing tab's panel content. */
+  billing: ReactNode;
   /** The API keys tab's panel content. */
   apiKeys: ReactNode;
 }
 
 /**
  * The organization profile shell: a heading and a tabbed layout that hosts each
- * panel's content in the General, Members, and API keys tabs. Layout only — the
- * caller supplies each tab's panel via the `general`, `members`, and `apiKeys`
- * slots, so this component holds no data or Clerk state itself.
+ * panel's content in the General, Members, Billing, and API keys tabs. Layout only —
+ * the caller supplies each tab's panel via the `general`, `members`, `billing`, and
+ * `apiKeys` slots, so this component holds no data or Clerk state itself.
  */
-export function OrganizationProfileView({ general, members, apiKeys }: OrganizationProfileViewProps): ReactElement {
+export function OrganizationProfileView({
+  general,
+  members,
+  billing,
+  apiKeys,
+}: OrganizationProfileViewProps): ReactElement {
   return (
     <Box
       sx={{
@@ -39,10 +46,12 @@ export function OrganizationProfileView({ general, members, apiKeys }: Organizat
         <Tabs.List>
           <Tabs.Tab value='general'>General</Tabs.Tab>
           <Tabs.Tab value='members'>Members</Tabs.Tab>
+          <Tabs.Tab value='billing'>Billing</Tabs.Tab>
           <Tabs.Tab value='api-keys'>API keys</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='general'>{general}</Tabs.Panel>
         <Tabs.Panel value='members'>{members}</Tabs.Panel>
+        <Tabs.Panel value='billing'>{billing}</Tabs.Panel>
         <Tabs.Panel value='api-keys'>{apiKeys}</Tabs.Panel>
       </Tabs.Root>
     </Box>
