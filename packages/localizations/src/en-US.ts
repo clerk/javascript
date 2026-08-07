@@ -649,11 +649,6 @@ export const enUS: LocalizationResource = {
       title: 'Configure Single Sign-On (SSO)',
     },
     organizationDomainsStep: {
-      affiliationDomainSuggestion: {
-        formButtonPrimary__verify: 'Verify ownership',
-        messageLabel:
-          'We noticed you have verified domains <bold>{{domains}}</bold>. Do you want to verify their ownership?',
-      },
       domainCard: {
         affiliationLabel: 'Affiliation',
         badge__expired: 'Expired',
@@ -665,6 +660,7 @@ export const enUS: LocalizationResource = {
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         ownershipLabel: 'Ownership',
+        proveOwnershipButton: 'Prove ownership',
         txtRecord: {
           hostLabel: 'Host / Name',
           instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",

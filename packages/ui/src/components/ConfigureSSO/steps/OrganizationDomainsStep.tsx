@@ -95,17 +95,6 @@ export const OrganizationDomainsStep = (): JSX.Element => {
     }
   };
 
-  const handlePrepareAffiliationDomainsOwnershipVerification = async (domains: OrganizationDomainResource[]) => {
-    card.setError(undefined);
-
-    try {
-      await prepareOwnershipVerification(domains);
-    } catch (err: any) {
-      const apiError = getFieldError(err) ?? getGlobalError(err);
-      card.setError(apiError);
-    }
-  };
-
   const handleRemoveDomain = async (domain: OrganizationDomainResource) => {
     if (enterpriseConnection) {
       const domains = enterpriseConnection.domains.filter(name => name !== domain.name);
@@ -122,9 +111,6 @@ export const OrganizationDomainsStep = (): JSX.Element => {
   };
 
   const hasAllDomainsVerified = areAllOrganizationDomainsVerified(organizationDomains);
-  const ownershipDomains = organizationDomains?.filter(domain => domain.ownershipVerification) ?? [];
-  const affiliationVerifiedDomains =
-    organizationDomains?.filter(domain => !domain.ownershipVerification && hasVerifiedAffiliation(domain)) ?? [];
 
   // A connection needs at least one verified domain to point at, so the last
   // remaining verified domain cannot be removed while a connection exists
@@ -159,13 +145,6 @@ export const OrganizationDomainsStep = (): JSX.Element => {
 
               {!organizationDomains?.length && <DomainSuggestion onSubmit={handleCreateDomain} />}
 
-              {!!affiliationVerifiedDomains.length && (
-                <AffiliationDomainSuggestion
-                  domains={affiliationVerifiedDomains}
-                  onSubmit={handlePrepareAffiliationDomainsOwnershipVerification}
-                />
-              )}
-
               {card.error && (
                 <Alert
                   variant='danger'
@@ -174,7 +153,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
               )}
             </Col>
 
-            {!!ownershipDomains.length && (
+            {!!organizationDomains?.length && (
               <Col
                 elementDescriptor={descriptors.configureSSOVerifyDomainList}
                 sx={t => ({
@@ -189,7 +168,7 @@ export const OrganizationDomainsStep = (): JSX.Element => {
                   ...common.unstyledScrollbar(t),
                 })}
               >
-                {ownershipDomains.map(domain => {
+                {organizationDomains.map(domain => {
                   const isVerified = domain.ownershipVerification?.status === 'verified';
                   const isLastVerifiedDomain = isVerified && verifiedDomainCount === 1;
                   const isRemoveDisabled = lockLastVerifiedDomain && isLastVerifiedDomain;
@@ -393,64 +372,6 @@ const DomainSuggestion = ({ onSubmit }: { onSubmit: (domain: string) => Promise<
   );
 };
 
-const AffiliationDomainSuggestion = ({
-  domains,
-  onSubmit,
-}: {
-  domains: OrganizationDomainResource[];
-  onSubmit: (domains: OrganizationDomainResource[]) => Promise<void>;
-}): JSX.Element => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const domainNames = domains.map(domain => domain.name).join(', ');
-
-  const handleVerifyOwnership = () => {
-    setIsSubmitting(true);
-    void onSubmit(domains).finally(() => setIsSubmitting(false));
-  };
-
-  return (
-    <Flex
-      elementDescriptor={descriptors.configureSSOVerifyDomainSuggestion}
-      align='center'
-      justify='between'
-      sx={t => ({
-        gap: t.space.$2,
-        paddingInline: t.space.$3,
-        paddingBlock: t.space.$1x5,
-        borderWidth: t.borderWidths.$normal,
-        borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$borderAlpha150,
-        borderRadius: t.radii.$lg,
-        background: t.colors.$neutralAlpha50,
-      })}
-    >
-      <Text
-        as='span'
-        colorScheme='secondary'
-        localizationKey={localizationKeys(
-          'configureSSO.organizationDomainsStep.affiliationDomainSuggestion.messageLabel',
-          {
-            domains: domainNames,
-          },
-        )}
-        sx={t => ({ fontSize: t.fontSizes.$sm })}
-      />
-
-      <Button
-        variant='bordered'
-        colorScheme='secondary'
-        size='xs'
-        isLoading={isSubmitting}
-        onClick={handleVerifyOwnership}
-        localizationKey={localizationKeys(
-          'configureSSO.organizationDomainsStep.affiliationDomainSuggestion.formButtonPrimary__verify',
-        )}
-        sx={{ flexShrink: 0 }}
-      />
-    </Flex>
-  );
-};
-
 const DomainCard = ({
   domain,
   onRemove,
@@ -471,6 +392,7 @@ const DomainCard = ({
   const ownershipVerification = domain.ownershipVerification;
   const isVerified = ownershipVerification?.status === 'verified';
   const isExpired = ownershipVerification?.status === 'expired';
+  const hasOwnershipVerification = Boolean(ownershipVerification);
   const isAffiliationVerified = hasVerifiedAffiliation(domain);
   const cardId = ownershipVerification?.status ?? 'unverified';
 
@@ -563,7 +485,7 @@ const DomainCard = ({
             }
           />
 
-          {!isVerified && !isExpired && (
+          {!isVerified && !isExpired && hasOwnershipVerification && (
             <Spinner
               size='xs'
               colorScheme='neutral'
@@ -584,7 +506,12 @@ const DomainCard = ({
 
       <Box sx={{ overflow: 'hidden' }}>
         <Animated>
-          {isExpired ? (
+          {!hasOwnershipVerification ? (
+            <OwnershipUpgradeNotice
+              key='prove-ownership'
+              onPrepareOwnershipVerification={onPrepareOwnershipVerification}
+            />
+          ) : isExpired ? (
             <ExpiredNotice
               key='expired'
               expiresAt={ownershipVerification?.expiresAt ?? null}
@@ -608,6 +535,44 @@ const DomainCard = ({
           )}
         </Animated>
       </Box>
+    </Col>
+  );
+};
+
+const OwnershipUpgradeNotice = ({
+  onPrepareOwnershipVerification,
+}: {
+  onPrepareOwnershipVerification: () => Promise<void>;
+}): JSX.Element => {
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  const handleProveOwnership = () => {
+    setIsPreparing(true);
+    void onPrepareOwnershipVerification().finally(() => setIsPreparing(false));
+  };
+
+  return (
+    <Col
+      sx={t => ({
+        alignItems: 'center',
+        paddingInline: t.space.$4,
+        paddingBottom: t.space.$4,
+        paddingTop: t.space.$2,
+      })}
+    >
+      <Button
+        variant='bordered'
+        colorScheme='secondary'
+        size='lg'
+        isLoading={isPreparing}
+        onClick={handleProveOwnership}
+        sx={t => ({ minWidth: t.sizes.$48 })}
+      >
+        <Text
+          as='span'
+          localizationKey={localizationKeys('configureSSO.organizationDomainsStep.domainCard.proveOwnershipButton')}
+        />
+      </Button>
     </Col>
   );
 };
