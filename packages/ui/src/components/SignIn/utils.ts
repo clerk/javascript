@@ -18,6 +18,10 @@ const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
+export function isOfferableSecondFactor(factor: { strategy: SignInStrategy }): boolean {
+  return factor.strategy !== 'passkey' || isWebAuthnSupported();
+}
+
 function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
   if (isWebAuthnSupported()) {
     // @ts-ignore

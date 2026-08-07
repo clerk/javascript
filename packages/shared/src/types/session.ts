@@ -487,6 +487,10 @@ export interface PublicUserData {
    * Indicates whether the user is banned.
    */
   banned?: boolean;
+  /**
+   * Indicates whether the user has been deprovisioned by their identity provider.
+   */
+  deprovisioned?: boolean;
 }
 
 /**

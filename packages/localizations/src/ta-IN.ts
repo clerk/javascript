@@ -64,6 +64,7 @@ export const taIN: LocalizationResource = {
   badge__canceledEndsAt: "ரத்து செய்யப்பட்டது • முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__currentPlan: 'தற்போதைய திட்டம்',
   badge__default: 'இயல்புநிலை',
+  badge__deprovisioned: undefined,
   badge__endsAt: "முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__expired: 'காலாவதியானது',
   badge__freeTrial: 'இலவச சோதனை',
@@ -248,6 +249,79 @@ export const taIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -634,6 +708,10 @@ export const taIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'உங்கள் அனுமதிகளை மேம்படுத்த உங்கள் நிறுவனத்தின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
@@ -687,6 +765,10 @@ export const taIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'தனிப்பயன் SAML வழங்குநர்',
         google: undefined,
@@ -1323,6 +1405,10 @@ export const taIN: LocalizationResource = {
         subtitle: 'தொடர அசல் தாவலுக்குத் திரும்பவும்',
         subtitleNewTab: 'தொடர புதிதாகத் திறக்கப்பட்ட தாவலுக்குத் திரும்பவும்',
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

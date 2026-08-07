@@ -62,6 +62,7 @@ export const kkKZ: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Ағымдағы жоспар',
   badge__default: 'Әдепкі бойынша',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('kk-KZ') }} күні аяқталады",
   badge__expired: 'Мерзімі біткен',
   badge__freeTrial: undefined,
@@ -240,6 +241,79 @@ export const kkKZ: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -626,6 +700,10 @@ export const kkKZ: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Рұқсаттарыңызды жаңарту үшін ұйым әкімшісіне хабарласыңыз.',
@@ -679,6 +757,10 @@ export const kkKZ: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Реттелетін SAML провайдері',
         google: undefined,
@@ -1300,6 +1382,10 @@ export const kkKZ: LocalizationResource = {
         subtitle: 'Жалғастыру үшін бастапқы бетке оралыңыз',
         subtitleNewTab: 'Жалғастыру үшін жаңа бетке оралыңыз',
         titleNewTab: 'Басқа бетте кірдіңіз',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

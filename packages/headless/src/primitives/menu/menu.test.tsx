@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Popover } from '../popover';
 import { Menu } from './index';
 
 afterEach(() => cleanup());
@@ -399,6 +400,45 @@ describe('Menu', () => {
   });
 
   describe('focus management', () => {
+    it('focuses the menu itself, not an item, when opened with a pointer', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner data-testid='menu-positioner'>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="menu-positioner"]'));
+    });
+
+    it('focuses the first item when opened with the keyboard', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      screen.getByText('Actions').focus();
+      await user.keyboard('{Enter}');
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByText('Cut'));
+    });
+
     it('returns focus to trigger on close via Escape', async () => {
       const user = userEvent.setup();
       render(
@@ -557,6 +597,34 @@ describe('Menu', () => {
 
       const shareTrigger = screen.getByText('Share');
       expect(shareTrigger).toHaveAttribute('role', 'menuitem');
+    });
+
+    it('leaves a trigger inside a popover as a plain button', async () => {
+      const user = userEvent.setup();
+      render(
+        <Popover.Root>
+          <Popover.Trigger>Account</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Menu.Root>
+                <Menu.Trigger>Actions</Menu.Trigger>
+                <Menu.Positioner>
+                  <Menu.Popup>
+                    <Menu.Item label='Sign out'>Sign out</Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByText('Account'));
+
+      // A popover is not a menu, so its children are not menu items. Only the floating tree is
+      // shared, and that is dismissal plumbing rather than menu hierarchy.
+      expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument();
+      expect(screen.getByText('Actions')).not.toHaveAttribute('role');
     });
 
     it('opens submenu via controlled open prop', () => {

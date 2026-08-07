@@ -25,15 +25,15 @@ import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
 import {
+  IdentityProviderConfigurationModes,
+  type SamlIdpConfigurationMode,
+} from '../shared/IdentityProviderConfigurationModes';
+import {
   applySamlSubmitError,
   buildSamlConfigurationPayload,
   IdentityProviderConfigurationForm,
   type IdentityProviderConfigurationFormProps,
 } from './shared/IdentityProviderConfigurationForm';
-import {
-  IdentityProviderConfigurationModes,
-  type IdpConfigurationMode,
-} from './shared/IdentityProviderConfigurationModes';
 
 const CUSTOM_STEPS: WizardStepConfig[] = [
   { id: 'create-app' },
@@ -308,7 +308,7 @@ const SamlCustomAssignUsersStep = (): JSX.Element => {
   );
 };
 
-const CUSTOM_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly IdpConfigurationMode[];
+const CUSTOM_SAML_IDP_MODES = ['metadataUrl', 'manual'] as const satisfies readonly SamlIdpConfigurationMode[];
 
 const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
   const card = useCardState();
@@ -327,7 +327,7 @@ const SamlCustomIdentityProviderMetadataStep = (): JSX.Element => {
   );
   const existingCertPresent = Boolean(samlConnection?.idpCertificate);
 
-  const [mode, setMode] = React.useState<IdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
+  const [mode, setMode] = React.useState<SamlIdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
   const [certFile, setCertFile] = React.useState<File | null>(null);
   // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
   // parent (this is the terminal nested step) and the parent DEFERS the

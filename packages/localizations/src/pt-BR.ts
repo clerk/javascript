@@ -63,6 +63,7 @@ export const ptBR: LocalizationResource = {
   badge__canceledEndsAt: "Cancelado • Termina {{ date | shortDate('pt-BR') }}",
   badge__currentPlan: 'Plano atual',
   badge__default: 'Padrão',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termina {{ date | shortDate('pt-BR') }}",
   badge__expired: 'Expirado',
   badge__freeTrial: 'Teste gratuito',
@@ -246,6 +247,79 @@ export const ptBR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +706,10 @@ export const ptBR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Entre em contato com o administrador da sua organização para ampliar suas permissões.',
@@ -685,6 +763,10 @@ export const ptBR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Provedor SAML personalizado',
         google: undefined,
@@ -1319,6 +1401,10 @@ export const ptBR: LocalizationResource = {
         subtitle: 'Retorne para a aba original para continuar',
         subtitleNewTab: 'Retorne para a nova aba que foi aberta para continuar',
         titleNewTab: 'Conectado em outra aba',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

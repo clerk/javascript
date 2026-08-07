@@ -1,6 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "jsxImportSource": "react"
+    "jsxImportSource": "react",
+    "paths": {
+      // Resolve the private, unpublished `@clerk/headless` to its SOURCE for the Mosaic
+      // declaration bundle. Its published `dist/*.d.ts` are re-export barrels that
+      // rolldown-plugin-dts can't follow when inlining, so building types against source
+      // (the monorepo default) lets Mosaic components import headless types directly.
+      "@clerk/headless/utils": ["../headless/src/utils/index.ts"],
+      "@clerk/headless/*": ["../headless/src/*"],
+      // Preserve the base config's test-only aliases (extends replaces `paths` wholesale).
+      "@/core/*": ["../clerk-js/src/core/*"],
+      "@/*": ["./src/*"],
+      "@/ui*": ["./src/*"]
+    }
   }
 }

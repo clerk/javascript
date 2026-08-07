@@ -15,8 +15,11 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+# Runs the official maestro CLI. maestro-runner was tried and reverted: its
+# drivers mangle typed text and resolve text selectors by substring, so
+# tapOn 'Continue' hits the 'Continue to <app>' title instead of the button.
 command -v maestro >/dev/null 2>&1 || {
-  echo "maestro CLI is required: https://docs.maestro.dev/getting-started/installing-maestro"
+  echo "maestro is required: https://docs.maestro.dev"
   exit 1
 }
 
@@ -25,15 +28,59 @@ command -v maestro >/dev/null 2>&1 || {
 
 force_stop() { if [ "$#" -gt 0 ]; then "$@" >/dev/null 2>&1 || true; fi; }
 
-debug_args=()
-if [ -n "${MAESTRO_DEBUG_OUTPUT:-}" ]; then
-  debug_args=(--debug-output "$MAESTRO_DEBUG_OUTPUT" --flatten-debug-output)
+run_flow() {
+  local output_name=$1
+  shift
+  local output_root=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
+
+  maestro test \
+    --debug-output "$output_root/$output_name" \
+    --flatten-debug-output \
+    "$@"
+}
+
+record_result() {
+  local flow=$1
+  local result=$2
+  local attempts=$3
+  local duration=$4
+
+  echo "Flow $flow: $result after $attempts attempt(s) in ${duration}s"
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    printf '| `%s` | %s | %s | %ss |\n' "$flow" "$result" "$attempts" "$duration" >> "$GITHUB_STEP_SUMMARY"
+  fi
+}
+
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+  {
+    echo '### Maestro flow timings'
+    echo '| Flow | Result | Attempts | Duration |'
+    echo '| --- | --- | ---: | ---: |'
+  } >> "$GITHUB_STEP_SUMMARY"
 fi
 
-# Warmup: parse the JS bundle + populate the a11y tree once so the first real
-# flow doesn't flake on cold-start; force-stop afterwards so the first
-# launchApp clearState doesn't race a still-foregrounded app process.
-maestro test ${debug_args+"${debug_args[@]}"} flows/subflows/_warmup.yaml || true
+# Warm up the JS bundle and accessibility tree before running the flows.
+warmup_started=$SECONDS
+warmup_result=failed
+for warmup_attempt in 1 2; do
+  if run_flow "warmup-attempt-$warmup_attempt" flows/subflows/_warmup.yaml; then
+    warmup_result=passed
+    break
+  fi
+  force_stop "$@"
+  if [ "$warmup_attempt" -eq 1 ]; then
+    echo "::warning::Warmup failed attempt 1, retrying after 10s..."
+    sleep 10
+  fi
+done
+warmup_duration=$((SECONDS - warmup_started))
+record_result "_warmup" "$warmup_result" "$warmup_attempt" "$warmup_duration"
+if [ "$warmup_result" != passed ]; then
+  echo "::error::Warmup failed after 2 attempts; aborting Maestro flows"
+  exit 1
+fi
+
+# Force-stop so the first launchApp clearState doesn't race the warm process.
 force_stop "$@"
 
 # Every flows/*.yaml is a cross-platform test (platform differences live in
@@ -41,22 +88,27 @@ force_stop "$@"
 status=0
 for flow in flows/*.yaml; do
   [ -e "$flow" ] || continue
+  flow_started=$SECONDS
+  flow_result=failed
   for attempt in 1 2; do
-    if maestro test \
-      --env CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
-      --env CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
-      ${debug_args+"${debug_args[@]}"} \
+    if run_flow "${flow##*/}-attempt-$attempt" \
+      -e CLERK_TEST_EMAIL="$CLERK_TEST_EMAIL" \
+      -e CLERK_TEST_PASSWORD="$CLERK_TEST_PASSWORD" \
       "$flow"; then
+      flow_result=passed
       break
     fi
     if [ "$attempt" -eq 2 ]; then
       echo "::error::Flow $flow failed after 2 attempts"
       status=1
+      force_stop "$@"
       break
     fi
     echo "::warning::Flow $flow failed attempt $attempt, retrying after 10s..."
     force_stop "$@"
     sleep 10
   done
+  flow_duration=$((SECONDS - flow_started))
+  record_result "$flow" "$flow_result" "$attempt" "$flow_duration"
 done
 exit $status

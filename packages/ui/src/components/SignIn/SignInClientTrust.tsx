@@ -9,6 +9,7 @@ import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
 import { SignInFactorTwoPasskeyCard } from './SignInFactorTwoPasskeyCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
+import { isOfferableSecondFactor } from './utils';
 
 function SignInClientTrustInternal(): JSX.Element {
   const signIn = useCoreSignIn();
@@ -20,6 +21,8 @@ function SignInClientTrustInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const onShowAlternativeMethodsClicked =
+    (signIn.supportedSecondFactors?.filter(isOfferableSecondFactor).length ?? 0) > 1 ? toggleAllStrategies : undefined;
 
   if (!currentFactor) {
     return <LoadingCard />;
@@ -42,7 +45,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_code':
@@ -52,7 +55,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_link':
@@ -62,11 +65,11 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'passkey':
-      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked} />;
     default:
       return <LoadingCard />;
   }

@@ -63,6 +63,7 @@ export const hiIN: LocalizationResource = {
   badge__canceledEndsAt: "रद्द • समाप्त {{ date | shortDate('hi-IN') }}",
   badge__currentPlan: 'वर्तमान योजना',
   badge__default: 'डिफ़ॉल्ट',
+  badge__deprovisioned: undefined,
   badge__endsAt: "समाप्त {{ date | shortDate('hi-IN') }}",
   badge__expired: 'समाप्त',
   badge__freeTrial: 'निःशुल्क परीक्षण',
@@ -246,6 +247,79 @@ export const hiIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +706,10 @@ export const hiIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'अपनी अनुमतियाँ अपग्रेड करने के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
@@ -685,6 +763,10 @@ export const hiIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'कस्टम SAML प्रदाता',
         google: undefined,
@@ -1317,6 +1399,10 @@ export const hiIN: LocalizationResource = {
         subtitle: 'जारी रखने के लिए मूल टैब पर वापस जाएं',
         subtitleNewTab: 'जारी रखने के लिए नए खोले गए टैब पर वापस जाएं',
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

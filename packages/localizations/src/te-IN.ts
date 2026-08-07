@@ -63,6 +63,7 @@ export const teIN: LocalizationResource = {
   badge__canceledEndsAt: "రద్దు చేయబడింది • ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__currentPlan: 'ప్రస్తుత ప్లాన్',
   badge__default: 'డిఫాల్ట్',
+  badge__deprovisioned: undefined,
   badge__endsAt: "ముగుస్తుంది {{ date | shortDate('te-IN') }}",
   badge__expired: 'గడువు ముగిసింది',
   badge__freeTrial: 'ఉచిత ట్రయల్',
@@ -247,6 +248,79 @@ export const teIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -633,6 +707,10 @@ export const teIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'మీ అనుమతులను అప్‌గ్రేడ్ చేయడానికి మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
@@ -686,6 +764,10 @@ export const teIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'కస్టమ్ SAML ప్రొవైడర్',
         google: undefined,
@@ -1320,6 +1402,10 @@ export const teIN: LocalizationResource = {
         subtitle: 'కొనసాగించడానికి అసలు ట్యాబ్‌కి తిరిగి వెళ్ళండి',
         subtitleNewTab: 'కొనసాగించడానికి కొత్తగా తెరిచిన ట్యాబ్‌కి తిరిగి వెళ్ళండి',
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

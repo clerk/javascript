@@ -119,6 +119,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   type SignInFactorTwoParams = {
     identifier?: string;
     supportPhoneCode?: boolean;
+    supportEmailCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
     supportPasskey?: boolean;
@@ -186,10 +187,14 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
+  const startSignInVerification = (
+    status: Extract<SignInJSON['status'], 'needs_client_trust' | 'needs_second_factor'>,
+    params?: SignInFactorTwoParams,
+  ) => {
     const {
       identifier = '+30 691 1111111',
       supportPhoneCode = true,
+      supportEmailCode,
       supportTotp,
       supportBackupCode,
       supportPasskey,
@@ -197,7 +202,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supportResetPasswordPhone,
     } = params || {};
     baseClient.sign_in = {
-      status: 'needs_second_factor',
+      status,
       identifier,
       ...(supportResetPasswordEmail
         ? {
@@ -218,6 +223,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_identifiers: ['email_address', 'phone_number'],
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.com' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportPasskey ? [{ strategy: 'passkey' }] : []),
@@ -225,6 +231,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
+
+  const startSignInFactorTwo = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_second_factor', params);
+
+  const startSignInClientTrust = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_client_trust', params);
 
   const startSignInWithProtectCheck = (params?: {
     expiresAt?: number;
@@ -252,7 +264,13 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo, startSignInWithProtectCheck };
+  return {
+    startSignInWithEmailAddress,
+    startSignInWithPhoneNumber,
+    startSignInFactorTwo,
+    startSignInClientTrust,
+    startSignInWithProtectCheck,
+  };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
@@ -639,6 +657,14 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     us.sign_up.mfa = { required };
   };
 
+  const withEnumerationProtection = () => {
+    us.attack_protection = {
+      enumeration_protection: {
+        enabled: true,
+      },
+    };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -660,5 +686,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withLegalConsent,
     withWaitlistMode,
     withMfaRequired,
+    withEnumerationProtection,
   };
 };

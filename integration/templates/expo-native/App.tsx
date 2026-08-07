@@ -1,5 +1,5 @@
 import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
-import { AuthView, UserButton } from '@clerk/expo/native';
+import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
@@ -18,6 +18,7 @@ function NativeBuildFixture() {
   const { isLoaded, isSignedIn, signOut } = useAuth({ treatPendingAsSignedOut: false });
   const { user } = useUser();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [e2eStatus, setE2eStatus] = useState<string | null>(null);
 
   return (
@@ -40,10 +41,26 @@ function NativeBuildFixture() {
       {e2eStatus && <Text testID='e2e-status'>{e2eStatus}</Text>}
       {isSignedIn && (
         <Button
+          testID='open-embedded-profile-button'
+          title='Open embedded profile'
+          onPress={() => setIsProfileOpen(true)}
+        />
+      )}
+      {isSignedIn && (
+        <Button
           testID='sign-out-button'
           title='Sign out'
           onPress={() => void signOut()}
         />
+      )}
+
+      {isProfileOpen && (
+        <View style={styles.embeddedProfile}>
+          <UserProfileView
+            isDismissible={false}
+            onHostBack={() => setIsProfileOpen(false)}
+          />
+        </View>
       )}
 
       <Modal
@@ -52,7 +69,17 @@ function NativeBuildFixture() {
         presentationStyle='pageSheet'
         onRequestClose={() => setIsAuthOpen(false)}
       >
-        <AuthView onDismiss={() => setIsAuthOpen(false)} />
+        <AuthView
+          logo={
+            <View
+              testID='custom-logo'
+              style={styles.customLogo}
+            >
+              <Text style={styles.customLogoText}>E2E Custom Logo</Text>
+            </View>
+          }
+          onDismiss={() => setIsAuthOpen(false)}
+        />
       </Modal>
     </View>
   );
@@ -75,6 +102,25 @@ const styles = StyleSheet.create({
     gap: 12,
     justifyContent: 'center',
     padding: 24,
+  },
+  embeddedProfile: {
+    backgroundColor: '#FFFFFF',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  customLogo: {
+    backgroundColor: '#6C47FF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  customLogoText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   header: {
     alignItems: 'center',

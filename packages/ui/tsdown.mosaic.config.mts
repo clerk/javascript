@@ -1,21 +1,6 @@
 import stylexPlugin from '@stylexjs/rollup-plugin';
 import { defineConfig } from 'tsdown';
-
-// lightningcss encodes browser versions as (major << 16) | (minor << 8) | patch.
-const version = (major: number, minor = 0) => (major << 16) | (minor << 8);
-
-// Pin targets to browsers that natively support `light-dark()` and `oklch()`
-// (the token color model). Without this, the plugin defaults to a broad
-// browserslist and lightningcss down-levels `light-dark()` into an incomplete
-// `--lightningcss-*` polyfill (no prefers-color-scheme toggle rules), producing
-// invalid two-token color values. These targets keep the tokens verbatim.
-const targets = {
-  chrome: version(123),
-  edge: version(123),
-  firefox: version(120),
-  safari: version(17, 5),
-  ios_saf: version(17, 5),
-};
+import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
 
 // Isolated Mosaic build: compiles ONLY the StyleX barrel (`src/mosaic/styles`)
 // with the StyleX rollup plugin, emitting transformed ESM + a single static
@@ -37,12 +22,15 @@ export default defineConfig({
   minify: false,
   // Use the standard React JSX runtime, not Emotion's — the Mosaic build must be Emotion-free.
   tsconfig: './tsconfig.mosaic.json',
-  external: ['react', 'react-dom', '@stylexjs/stylex'],
+  // `@clerk/headless` stays external here (the main build inlines it): this entry exists to
+  // extract `styles.css`, and only that file is exported from the package — so there is nothing
+  // to gain from pulling the primitives and their deps into a bundle nobody imports.
+  external: ['react', 'react-dom', '@stylexjs/stylex', /^@clerk\/headless/],
   plugins: [
     stylexPlugin({
       fileName: 'styles.css',
       useCSSLayers: true,
-      lightningcssOptions: { targets },
+      lightningcssOptions: { targets: mosaicLightningCssTargets },
     }),
   ],
 });

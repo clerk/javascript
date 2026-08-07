@@ -63,6 +63,7 @@ export const bnIN: LocalizationResource = {
   badge__canceledEndsAt: "বাতিল • শেষ {{ date | shortDate('bn-IN') }}",
   badge__currentPlan: 'বর্তমান প্ল্যান',
   badge__default: 'ডিফল্ট',
+  badge__deprovisioned: undefined,
   badge__endsAt: "শেষ {{ date | shortDate('bn-IN') }}",
   badge__expired: 'মেয়াদ শেষ',
   badge__freeTrial: 'বিনামূল্যের ট্রায়াল',
@@ -246,6 +247,79 @@ export const bnIN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +706,10 @@ export const bnIN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'আপনার অনুমতি আপগ্রেড করতে আপনার সংস্থার প্রশাসকের সাথে যোগাযোগ করুন।',
@@ -685,6 +763,10 @@ export const bnIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'কাস্টম SAML প্রদানকারী',
         google: undefined,
@@ -1317,6 +1399,10 @@ export const bnIN: LocalizationResource = {
         subtitle: 'চালিয়ে যেতে আসল ট্যাবে ফিরে যান',
         subtitleNewTab: 'চালিয়ে যেতে নতুন খোলা ট্যাবে ফিরে যান',
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

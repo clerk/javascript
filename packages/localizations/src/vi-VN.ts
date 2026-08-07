@@ -63,6 +63,7 @@ export const viVN: LocalizationResource = {
   badge__canceledEndsAt: "Đã hủy • Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__currentPlan: 'Gói hiện tại',
   badge__default: 'Mặc định',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Kết thúc {{ date | shortDate('vi-VN') }}",
   badge__expired: 'Đã hết hạn',
   badge__freeTrial: 'Dùng thử miễn phí',
@@ -246,6 +247,79 @@ export const viVN: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +706,10 @@ export const viVN: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nâng cấp quyền của bạn.',
@@ -685,6 +763,10 @@ export const viVN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Nhà cung cấp SAML tùy chỉnh',
         google: undefined,
@@ -1317,6 +1399,10 @@ export const viVN: LocalizationResource = {
         subtitle: 'Quay lại tab gốc để tiếp tục',
         subtitleNewTab: 'Quay lại tab mới được mở để tiếp tục',
         titleNewTab: 'Đăng nhập trên tab khác',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

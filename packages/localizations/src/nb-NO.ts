@@ -63,6 +63,7 @@ export const nbNO: LocalizationResource = {
   badge__canceledEndsAt: "Kansellert • Slutter {{ date | shortDate('nb-NO') }}",
   badge__currentPlan: 'Nåværende plan',
   badge__default: 'Standard',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Slutter {{ date | shortDate('nb-NO') }}",
   badge__expired: 'Utløpt',
   badge__freeTrial: 'Gratis prøveperiode',
@@ -247,6 +248,79 @@ export const nbNO: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -633,6 +707,10 @@ export const nbNO: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontakt organisasjonens administrator for å oppgradere tillatelsene dine.',
@@ -686,6 +764,10 @@ export const nbNO: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Egendefinert SAML-leverandør',
         google: undefined,
@@ -1320,6 +1402,10 @@ export const nbNO: LocalizationResource = {
         subtitle: 'Gå tilbake til den opprinnelige fanen for å fortsette',
         subtitleNewTab: 'Gå tilbake til den nyåpnede fanen for å fortsette',
         titleNewTab: 'Logget inn på en annen fane',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

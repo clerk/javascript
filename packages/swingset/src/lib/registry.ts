@@ -1,6 +1,19 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
+import {
+  Fallback as AvatarFallbackStory,
+  meta as avatarMeta,
+  Primary as AvatarPrimary,
+  Shapes as AvatarShapes,
+  Sizes as AvatarSizes,
+} from '../stories/avatar.stories';
+import {
+  Colors as BadgeColors,
+  meta as badgeMeta,
+  Primary as BadgePrimary,
+  WithIcon as BadgeWithIcon,
+} from '../stories/badge.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import {
   Centered as CardCentered,
@@ -14,8 +27,8 @@ import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
+  Colors as HeadingColors,
   Default as HeadingDefault,
-  Intents as HeadingIntents,
   meta as headingMeta,
   Sizes as HeadingSizes,
 } from '../stories/heading.stories';
@@ -33,6 +46,14 @@ import {
   meta as inputMeta,
   Sizes as InputSizes,
 } from '../stories/input.stories';
+import {
+  Default as ItemDefault,
+  Group as ItemGroup,
+  Interactive as ItemInteractive,
+  meta as itemMeta,
+  Scrolling as ItemScrolling,
+} from '../stories/item.stories';
+import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OrganizationProfileDefault,
@@ -67,13 +88,28 @@ import {
   meta as organizationProfileProfileSectionMeta,
 } from '../stories/organization-profile-profile-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Alignment as PopoverComponentAlignment,
+  Default as PopoverComponentDefault,
+  meta as popoverComponentMeta,
+  Placement as PopoverComponentPlacement,
+} from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import {
+  Default as ScrollAreaDefault,
+  Gutter as ScrollAreaGutter,
+  HoverReveal as ScrollAreaHoverReveal,
+  meta as scrollAreaMeta,
+  NotScrollable as ScrollAreaNotScrollable,
+  ShadowIndicators as ScrollAreaShadowIndicators,
+  ThemedScrollbar as ScrollAreaThemedScrollbar,
+} from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
+  Colors as TextColors,
   Default as TextDefault,
-  Intents as TextIntents,
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
@@ -115,22 +151,54 @@ const organizationProfileMembersPanelModule: StoryModule = {
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
+const avatarModule: StoryModule = {
+  meta: avatarMeta,
+  Primary: AvatarPrimary,
+  Fallback: AvatarFallbackStory,
+  Sizes: AvatarSizes,
+  Shapes: AvatarShapes,
+};
+
+const badgeModule: StoryModule = {
+  meta: badgeMeta,
+  Primary: BadgePrimary,
+  Colors: BadgeColors,
+  WithIcon: BadgeWithIcon,
+};
+
 const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
 
 const inputModule: StoryModule = { meta: inputMeta, Default, Sizes: InputSizes, Disabled: InputDisabled, Invalid };
 
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const popoverComponentModule: StoryModule = {
+  meta: popoverComponentMeta,
+  Default: PopoverComponentDefault,
+  Placement: PopoverComponentPlacement,
+  Alignment: PopoverComponentAlignment,
+};
+
+const itemModule: StoryModule = {
+  meta: itemMeta,
+  Default: ItemDefault,
+  Interactive: ItemInteractive,
+  Group: ItemGroup,
+  Scrolling: ItemScrolling,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
   Sizes: HeadingSizes,
-  Intents: HeadingIntents,
+  Colors: HeadingColors,
 };
+
+const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
-const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Intents: TextIntents };
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const iconModule: StoryModule = {
   meta: iconMeta,
@@ -156,6 +224,16 @@ const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const scrollAreaModule: StoryModule = {
+  meta: scrollAreaMeta,
+  Default: ScrollAreaDefault,
+  NotScrollable: ScrollAreaNotScrollable,
+  Gutter: ScrollAreaGutter,
+  HoverReveal: ScrollAreaHoverReveal,
+  ThemedScrollbar: ScrollAreaThemedScrollbar,
+  ShadowIndicators: ScrollAreaShadowIndicators,
+};
+
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
@@ -171,12 +249,17 @@ export const registry: StoryModule[] = [
   // Blocks
   destructiveModule,
   // Components
+  avatarModule,
+  badgeModule,
   buttonModule,
   cardComponentModule,
   inputModule,
+  itemModule,
   dialogComponentModule,
   headingModule,
   iconModule,
+  menuComponentModule,
+  popoverComponentModule,
   tabsComponentModule,
   textModule,
   // Primitives — alphabetical within the group.
@@ -192,6 +275,8 @@ export const registry: StoryModule[] = [
   selectModule,
   tabsModule,
   tooltipModule,
+  // Styles — atomic styles that ship as StyleX atoms rather than components.
+  scrollAreaModule,
   // Hooks — alphabetical within the group.
   useDataTableModule,
 ];

@@ -1,5 +1,46 @@
 # @clerk/astro
 
+## 4.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`f38cf02`](https://github.com/clerk/javascript/commit/f38cf02fd55a551fcf1d43c89371cf2132c2ba92), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/backend@3.16.0
+  - @clerk/shared@4.27.0
+
+## 4.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`a601cd7`](https://github.com/clerk/javascript/commit/a601cd7f45095fdbf8b0a23b01d9f559feeda347), [`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/backend@3.15.1
+  - @clerk/shared@4.26.0
+
+## 4.0.5
+
+### Patch Changes
+
+- Fix the `appearance` option rejecting valid properties such as `theme`, `variables`, and `elements` with a "does not exist in type `Appearance<Ui>`" TypeScript error. This also affects `@clerk/nuxt`, which derives its module options from `@clerk/vue`. ([#9281](https://github.com/clerk/javascript/pull/9281)) by [@BobbyLin23](https://github.com/BobbyLin23)
+
+- Updated dependencies [[`9c51d74`](https://github.com/clerk/javascript/commit/9c51d74ac36391888367e4da44912c92999a7ac2), [`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f), [`fe6ee54`](https://github.com/clerk/javascript/commit/fe6ee5489d9efcdc5aec53b1ba74b0260e539f80)]:
+  - @clerk/backend@3.15.0
+  - @clerk/shared@4.25.10
+
+## 4.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`23071bd`](https://github.com/clerk/javascript/commit/23071bdd6b511c63ac8312d5adb13ed9d907d4b8), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+  - @clerk/backend@3.14.0
+
+## 4.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`6f5fde9`](https://github.com/clerk/javascript/commit/6f5fde9005ca4e90dc59a8b5a04b5742aa540173)]:
+  - @clerk/backend@3.13.2
+
 ## 4.0.2
 
 ### Patch Changes
@@ -32,9 +73,9 @@
   import type { APIRoute } from 'astro';
 
   export const GET: APIRoute = ({ locals }) => {
-    const { userId } = locals.auth();
+    const { isAuthenticated, userId } = locals.auth();
 
-    if (!userId) {
+    if (!isAuthenticated) {
       return new Response('Unauthorized', { status: 401 });
     }
 
@@ -52,11 +93,11 @@
      logic that uses it (returning 401s, calling `auth().redirectToSignIn()`, etc.).
   2. For every route those matchers protected, move the auth check into the resource itself:
      - In `.astro` pages, add this to the frontmatter:
-       const { userId, redirectToSignIn } = Astro.locals.auth();
-       if (!userId) return redirectToSignIn();
+       const { isAuthenticated, redirectToSignIn } = Astro.locals.auth();
+       if (!isAuthenticated) return redirectToSignIn();
      - In API routes and server handlers, add this at the top of the handler:
-       const { userId } = locals.auth();
-       if (!userId) return new Response('Unauthorized', { status: 401 });
+       const { isAuthenticated } = locals.auth();
+       if (!isAuthenticated) return new Response('Unauthorized', { status: 401 });
      - Keep any role or permission checks (`auth().has(...)`) with the resource as well.
   3. Remove the `createRouteMatcher` import and calls from the middleware. Keep
      `clerkMiddleware()` itself. Middleware logic unrelated to auth protection

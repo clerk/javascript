@@ -1,4 +1,25 @@
+import type { ComponentProps } from '@clerk/headless/utils';
 import type React from 'react';
+
+/**
+ * The native props for a tag, minus the non-standard HTML `color` attribute. That
+ * attribute is typed `string`, so leaving it in widens any component that exposes
+ * `color` as a variant union. Use for a component that has no `render`.
+ */
+export type MosaicElementProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
+  React.ComponentPropsWithRef<Tag>,
+  'color'
+>;
+
+/**
+ * The base props every Mosaic component accepts: the native props for its default
+ * tag, plus the `render` escape hatch that swaps the rendered element.
+ *
+ * Mosaic's name for the headless part contract, which already drops `color` and
+ * hands `render` callbacks tag-agnostic props. Aliased rather than rebuilt so the
+ * two layers cannot drift, and so `@clerk/ui` consumers have a name to import.
+ */
+export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = ComponentProps<Tag>;
 
 // The public styling contract, emitted onto a component's root element:
 //   1. `--cl-*` vars      — from `tokens.stylex.ts` (`:root { --cl-color-primary: … }`)

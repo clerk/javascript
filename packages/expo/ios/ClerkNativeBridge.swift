@@ -4,7 +4,7 @@ import UIKit
 import SwiftUI
 import Observation
 @_spi(FrameworkIntegration) import ClerkKit
-import ClerkKitUI
+@_spi(FrameworkIntegration) import ClerkKitUI
 
 /// Events emitted by the native view wrappers to their React Native host views.
 public enum ClerkNativeViewEvent: String {
@@ -14,6 +14,32 @@ public enum ClerkNativeViewEvent: String {
 
 extension Notification.Name {
   static let clerkNativeSDKDidConfigure = Notification.Name("com.clerk.expo.native-sdk.did-configure")
+}
+
+@Observable
+final class ClerkInlineAuthLogoState {
+  struct Content {
+    let view: UIView
+    let size: CGSize
+  }
+
+  private(set) var content: Content?
+
+  func setView(_ view: UIView) {
+    content = Content(view: view, size: view.bounds.size)
+  }
+
+  func updateSize(for view: UIView) {
+    guard content?.view === view else { return }
+    let currentSize = view.bounds.size
+    guard content?.size != currentSize else { return }
+    content = Content(view: view, size: currentSize)
+  }
+
+  func removeView(_ view: UIView) {
+    guard content?.view === view else { return }
+    content = nil
+  }
 }
 
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
@@ -243,7 +269,9 @@ final class ClerkNativeBridge {
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
+    logoState: ClerkInlineAuthLogoState,
     logoMaxHeight: CGFloat?,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -252,8 +280,10 @@ final class ClerkNativeBridge {
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme,
+        logoState: logoState,
         logoMaxHeight: logoMaxHeight
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
@@ -262,6 +292,7 @@ final class ClerkNativeBridge {
 
   func makeUserProfileViewController(
     dismissible: Bool,
+    hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
@@ -269,6 +300,7 @@ final class ClerkNativeBridge {
     return makeHostingController(
       rootView: ClerkInlineProfileWrapperView(
         dismissible: dismissible,
+        hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme
       ),
@@ -503,8 +535,10 @@ struct ClerkInlineUserButtonWrapperView: View {
 struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissible: Bool
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let logoState: ClerkInlineAuthLogoState
   let logoMaxHeight: CGFloat?
 
   @Environment(\.colorScheme) private var colorScheme
@@ -512,6 +546,7 @@ struct ClerkInlineAuthWrapperView: View {
   @ViewBuilder private var themedAuthView: some View {
     let view = AuthView(mode: mode, isDismissible: dismissible)
       .environment(Clerk.shared)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -521,7 +556,12 @@ struct ClerkInlineAuthWrapperView: View {
       }
     }
 
-    if let logoMaxHeight {
+    if let logo = logoState.content {
+      themedView.clerkAppIconView {
+        ClerkReactLogoView(view: logo.view)
+          .frame(width: logo.size.width, height: logo.size.height)
+      }
+    } else if let logoMaxHeight {
       themedView.clerkAppIcon(maxHeight: logoMaxHeight)
     } else {
       themedView
@@ -530,6 +570,45 @@ struct ClerkInlineAuthWrapperView: View {
 
   var body: some View {
     themedAuthView
+  }
+}
+
+private struct ClerkReactLogoView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
+    return ClerkReactLogoContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+    uiView.setContentView(view)
+  }
+}
+
+private final class ClerkReactLogoContainerView: UIView {
+  private var contentView: UIView?
+
+  init(contentView: UIView) {
+    super.init(frame: .zero)
+    setContentView(contentView)
+  }
+
+  required init?(coder: NSCoder) {
+    return nil
+  }
+
+  func setContentView(_ view: UIView) {
+    guard contentView !== view else { return }
+    contentView?.removeFromSuperview()
+    view.removeFromSuperview()
+    contentView = view
+    addSubview(view)
+    setNeedsLayout()
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    contentView?.frame = bounds
   }
 }
 
@@ -562,6 +641,7 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 
 struct ClerkInlineProfileWrapperView: View {
   let dismissible: Bool
+  let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
 
@@ -570,6 +650,7 @@ struct ClerkInlineProfileWrapperView: View {
   var body: some View {
     let view = UserProfileView(isDismissible: dismissible)
       .environment(Clerk.shared)
+      .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {

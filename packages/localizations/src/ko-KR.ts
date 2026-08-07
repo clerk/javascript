@@ -63,6 +63,7 @@ export const koKR: LocalizationResource = {
   badge__canceledEndsAt: "취소됨 • {{ date | shortDate('ko-KR') }}에 종료",
   badge__currentPlan: '현재 플랜',
   badge__default: '기본값',
+  badge__deprovisioned: undefined,
   badge__endsAt: "{{ date | shortDate('ko-KR') }}에 종료",
   badge__expired: '만료됨',
   badge__freeTrial: '무료 체험',
@@ -244,6 +245,79 @@ export const koKR: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -630,6 +704,10 @@ export const koKR: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '권한을 업그레이드하려면 조직 관리자에게 문의하세요.',
@@ -682,6 +760,10 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: '사용자 지정 SAML 공급자',
         google: undefined,
@@ -1305,6 +1387,10 @@ export const koKR: LocalizationResource = {
         subtitle: '계속하려면 원래 탭으로 돌아가세요',
         subtitleNewTab: '계속하려면 새로 연 탭으로 돌아가세요',
         titleNewTab: '다른 탭에서 로그인',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

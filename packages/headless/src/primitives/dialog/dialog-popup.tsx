@@ -12,8 +12,18 @@ export type DialogPopupProps = ComponentProps<'div'>;
 /** The dialog content container. Manages focus trapping via `FloatingFocusManager` and wires ARIA attributes from `Dialog.Title` and `Dialog.Description`. */
 export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(props, ref) {
   const { render, ...otherProps } = props;
-  const { popupRef, refs, getFloatingProps, floatingContext, modal, labelId, descriptionId, mounted, transitionProps } =
-    useDialogContext();
+  const {
+    popupRef,
+    refs,
+    getFloatingProps,
+    floatingContext,
+    modal,
+    returnFocusRef,
+    labelId,
+    descriptionId,
+    mounted,
+    transitionProps,
+  } = useDialogContext();
 
   const ownProps = {
     'aria-labelledby': labelId,
@@ -43,6 +53,7 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
       context={floatingContext}
       modal={modal}
       outsideElementsInert={modal}
+      returnFocus={returnFocusRef}
     >
       {element}
     </FloatingFocusManager>

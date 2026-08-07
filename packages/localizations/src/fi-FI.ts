@@ -63,6 +63,7 @@ export const fiFI: LocalizationResource = {
   badge__canceledEndsAt: "Peruutettu • Päättyy {{ date | shortDate('fi-FI') }}",
   badge__currentPlan: 'Nykyinen paketti',
   badge__default: 'Oletus',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Päättyy {{ date | shortDate('fi-FI') }}",
   badge__expired: 'Vanhentunut',
   badge__freeTrial: 'Ilmainen kokeilu',
@@ -246,6 +247,79 @@ export const fiFI: LocalizationResource = {
         badges: {
           optional: undefined,
           required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
         },
       },
       samlCustom: {
@@ -632,6 +706,10 @@ export const fiFI: LocalizationResource = {
         },
         mainHeaderTitle: undefined,
       },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Ota yhteyttä organisaatiosi järjestelmänvalvojaan päivittääksesi oikeuksiasi.',
@@ -685,6 +763,10 @@ export const fiFI: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Mukautettu SAML-palveluntarjoaja',
         google: undefined,
@@ -1319,6 +1401,10 @@ export const fiFI: LocalizationResource = {
         subtitle: 'Palaa alkuperäiseen välilehteen jatkaaksesi',
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         titleNewTab: 'Kirjautunut toiseen välilehteen',
+      },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
       },
     },
     emailLinkMfa: {

@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
@@ -34,6 +35,239 @@ describe('SignIn', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  describe('prepareSecondFactor', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('coalesces concurrent identical preparations', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      const first = signIn.prepareSecondFactor(params);
+      const second = signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('does not coalesce preparations for different factors', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+
+      await Promise.all([
+        signIn.prepareSecondFactor({ strategy: 'email_code', emailAddressId: 'email_123' }),
+        signIn.prepareSecondFactor({ strategy: 'email_code', emailAddressId: 'email_456' }),
+      ]);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request succeeds', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      await signIn.prepareSecondFactor(params);
+      await signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts a new preparation after the previous request fails', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('prepare failed'))
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      await expect(signIn.prepareSecondFactor(params)).rejects.toThrow('prepare failed');
+      await signIn.prepareSecondFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('factor preparation across APIs', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('coalesces concurrent first-factor preparations', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      const first = signIn.prepareFirstFactor(params);
+      const second = signIn.prepareFirstFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('coalesces concurrent first-factor preparations from the future API', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      signIn.supportedFirstFactors = [
+        { strategy: 'email_code', emailAddressId: 'email_123', safeIdentifier: 't***@example.com' },
+      ];
+
+      const first = signIn.__internal_future.emailCode.sendCode({ emailAddressId: 'email_123' });
+      const second = signIn.__internal_future.emailCode.sendCode({ emailAddressId: 'email_123' });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('coalesces concurrent second-factor preparations from the future API', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      signIn.supportedSecondFactors = [
+        { strategy: 'email_code', emailAddressId: 'email_123', safeIdentifier: 't***@example.com' },
+      ];
+
+      const first = signIn.__internal_future.mfa.sendEmailCode();
+      const second = signIn.__internal_future.mfa.sendEmailCode();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('allows a new preparation after the TTL without aborting the pending request', async () => {
+      vi.useFakeTimers();
+      try {
+        const firstDeferred = createDeferredPromise<any>();
+        const secondDeferred = createDeferredPromise<any>();
+        const mockFetch = vi
+          .fn()
+          .mockReturnValueOnce(firstDeferred.promise)
+          .mockReturnValueOnce(secondDeferred.promise);
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+        const first = signIn.prepareFirstFactor(params);
+        const duplicate = signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(30_000);
+
+        const replacement = signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+        expect(mockFetch.mock.calls[0][0].signal.aborted).toBe(false);
+        expect(mockFetch.mock.calls[1][0].signal.aborted).toBe(false);
+
+        firstDeferred.resolve({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        await Promise.all([first, duplicate]);
+
+        const replacementDuplicate = signIn.prepareFirstFactor(params);
+        expect(mockFetch).toHaveBeenCalledTimes(2);
+
+        secondDeferred.resolve({
+          client: null,
+          response: { id: 'signin_123' },
+        });
+        await Promise.all([replacement, replacementDuplicate]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not coalesce preparations across different sign-in attempts', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, emailAddressId: 'email_123' };
+
+      const first = signIn.prepareFirstFactor(params);
+      signIn.id = 'signin_456';
+      const second = signIn.prepareFirstFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_456' },
+      });
+      await Promise.all([first, second]);
+    });
+
+    it('does not coalesce concurrent factor attempts', async () => {
+      const deferred = createDeferredPromise<any>();
+      const mockFetch = vi.fn().mockReturnValue(deferred.promise);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      const params = { strategy: 'email_code' as const, code: '123456' };
+
+      const first = signIn.attemptFirstFactor(params);
+      const second = signIn.attemptFirstFactor(params);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+
+      deferred.resolve({
+        client: null,
+        response: { id: 'signin_123' },
+      });
+      await Promise.all([first, second]);
+    });
   });
 
   describe('authenticateWithRedirect with an OAuth transport', () => {
@@ -485,6 +719,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -499,6 +734,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -513,6 +749,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_1',
             strategy: 'email_code',
@@ -527,6 +764,7 @@ describe('SignIn', () => {
         expect(BaseResource._fetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/test_id/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_address_0',
             strategy: 'email_code',
@@ -899,6 +1137,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'email_code',
@@ -933,6 +1172,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_456',
             strategy: 'email_code',
@@ -1005,6 +1245,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             redirectUrl: 'https://example.com/verify',
@@ -1039,6 +1280,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             redirectUrl: 'https://other.com/verify',
@@ -1076,6 +1318,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_456',
             redirectUrl: 'https://example.com/verify',
@@ -1188,6 +1431,37 @@ describe('SignIn', () => {
           expect.anything(),
         );
       });
+
+      it('polls until firstFactorVerification status is transferable', async () => {
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: { status: 'unverified' },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: { status: 'transferable' },
+            },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({ id: 'signin_123' } as any);
+        await signIn.__internal_future.emailLink.waitForVerification();
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'GET',
+            path: '/client/sign_ins/signin_123',
+          }),
+          expect.anything(),
+        );
+      });
     });
 
     describe('sendPhoneCode', () => {
@@ -1224,6 +1498,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1255,6 +1530,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1290,6 +1566,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenLastCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_456',
             strategy: 'phone_code',
@@ -1356,6 +1633,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'reset_password_email_code',
@@ -1421,6 +1699,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'reset_password_phone_code',
@@ -1450,6 +1729,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'reset_password_phone_code',
@@ -1580,6 +1860,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_second_factor',
+          signal: expect.any(AbortSignal),
           body: {
             phoneNumberId: 'phone_123',
             strategy: 'phone_code',
@@ -1622,6 +1903,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith({
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_second_factor',
+          signal: expect.any(AbortSignal),
           body: {
             emailAddressId: 'email_123',
             strategy: 'email_code',
@@ -1698,6 +1980,7 @@ describe('SignIn', () => {
           expect.objectContaining({
             method: 'POST',
             path: '/client/sign_ins/signin_123/prepare_first_factor',
+            signal: expect.any(AbortSignal),
             body: { strategy: 'passkey' },
           }),
         );
@@ -2105,6 +2388,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             web3WalletId: 'wallet_123',
             strategy: 'web3_metamask_signature',
@@ -2437,6 +2721,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_123/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'enterprise_sso',
             redirectUrl: 'https://example.com/sso-callback',
@@ -2492,6 +2777,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(2, {
           method: 'POST',
           path: '/client/sign_ins/signin_ticket/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: {
             strategy: 'enterprise_sso',
             redirectUrl: 'https://example.com/sso-callback',
@@ -2598,6 +2884,7 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenNthCalledWith(1, {
           method: 'POST',
           path: '/client/sign_ins/signin_enterprise/prepare_first_factor',
+          signal: expect.any(AbortSignal),
           body: expect.objectContaining({
             strategy: 'enterprise_sso',
           }),

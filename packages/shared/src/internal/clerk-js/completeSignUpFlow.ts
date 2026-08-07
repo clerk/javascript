@@ -1,5 +1,5 @@
 import type { SignUpResource } from '../../types';
-import { forwardClerkQueryParams } from './queryParams';
+import { forwardClerkQueryParams, removeClerkQueryParam } from './queryParams';
 
 type CompleteSignUpFlowProps = {
   signUp: SignUpResource;
@@ -27,6 +27,8 @@ export const completeSignUpFlow = ({
   oidcPrompt,
 }: CompleteSignUpFlowProps): Promise<unknown> | undefined => {
   if (signUp.status === 'complete') {
+    removeClerkQueryParam('__clerk_ticket');
+    removeClerkQueryParam('__clerk_invitation_token');
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
     if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {

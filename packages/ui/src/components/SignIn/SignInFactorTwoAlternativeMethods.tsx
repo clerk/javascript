@@ -1,5 +1,4 @@
 import type { SignInSecondFactor } from '@clerk/shared/types';
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import React from 'react';
 
 import { useCoreSignIn } from '@/contexts';
@@ -13,6 +12,7 @@ import { backupCodePrefFactorComparator } from '@/utils/factorSorting';
 import { formatSafeIdentifier } from '@/utils/formatSafeIdentifier';
 
 import { HavingTrouble } from './HavingTrouble';
+import { isOfferableSecondFactor } from './utils';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -58,7 +58,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             <Col gap={2}>
               {supportedSecondFactors &&
                 supportedSecondFactors
-                  .filter(factor => factor.strategy !== 'passkey' || isWebAuthnSupported())
+                  .filter(isOfferableSecondFactor)
                   .sort(backupCodePrefFactorComparator)
                   .map((factor, i) => (
                     <ArrowBlockButton

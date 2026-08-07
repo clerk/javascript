@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback } from 'react';
+import { useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
@@ -19,6 +19,9 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  * Use `useAuth()`, `useUser()`, or `useSession()` to react to authentication
  * state changes.
  *
+ * To push the auth flow onto your own navigation stack, hide the route's header and
+ * pass `onHostBack` so Clerk's own chrome takes over.
+ *
  * @example
  * ```tsx
  * import { AuthView } from '@clerk/expo/native';
@@ -38,11 +41,13 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  * @see {@link https://clerk.com/docs/components/authentication/sign-in} Clerk Sign-In Documentation
  */
 export function AuthView({
+  logo,
   mode = 'signInOrUp',
   isDismissible = true,
   logoMaxHeight,
   onDismiss,
-}: AuthViewProps): ReactElement {
+  onHostBack,
+}: AuthViewProps) {
   const handleAuthEvent = useCallback(
     (event: AuthNativeEvent) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -70,7 +75,18 @@ export function AuthView({
       mode={mode}
       isDismissible={isDismissible}
       logoMaxHeight={logoMaxHeight}
+      hostBackButton={!!onHostBack}
       onAuthEvent={handleAuthEvent}
-    />
+      onHostBack={onHostBack ? () => onHostBack() : undefined}
+    >
+      {logo ? (
+        <View
+          collapsable={false}
+          style={{ alignSelf: 'flex-start' }}
+        >
+          {logo}
+        </View>
+      ) : null}
+    </NativeClerkAuthView>
   );
 }

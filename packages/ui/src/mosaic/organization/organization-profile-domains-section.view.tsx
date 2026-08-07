@@ -108,7 +108,7 @@ function DomainRow({ domain, canManage, onManage, onVerify, onRemove }: DomainRo
       >
         <Text
           render={p => <span {...p} />}
-          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {domain.name}
         </Text>
@@ -138,7 +138,7 @@ function DomainRow({ domain, canManage, onManage, onVerify, onRemove }: DomainRo
           <Button
             variant='ghost'
             size='sm'
-            intent='destructive'
+            color='negative'
             type='button'
             onClick={() => onRemove(domain)}
           >

@@ -9,7 +9,7 @@ import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { useHandleAuthenticateWithPasskey } from './shared';
 
 type SignInFactorTwoPasskeyCardProps = {
-  onShowAlternativeMethodsClicked: React.MouseEventHandler;
+  onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
 export const SignInFactorTwoPasskeyCard = (props: SignInFactorTwoPasskeyCardProps) => {
@@ -44,10 +44,12 @@ export const SignInFactorTwoPasskeyCard = (props: SignInFactorTwoPasskeyCardProp
             <Form.SubmitButton hasArrow />
           </Form.Root>
           <Card.Action elementId='alternativeMethods'>
-            <Card.ActionLink
-              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-              onClick={onShowAlternativeMethodsClicked}
-            />
+            {onShowAlternativeMethodsClicked && (
+              <Card.ActionLink
+                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                onClick={onShowAlternativeMethodsClicked}
+              />
+            )}
           </Card.Action>
         </Flex>
       </Card.Content>
