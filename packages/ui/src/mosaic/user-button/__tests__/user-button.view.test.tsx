@@ -708,6 +708,42 @@ describe('UserButtonTrigger', () => {
     expect(screen.queryByText('Pro')).toBeNull();
   });
 
+  it('names the plan from a renderer instead of the active organization', async () => {
+    renderTrigger({ mode: 'organization', renderPlanBadge: () => ({ name: 'Enterprise' }) });
+
+    expect(await screen.findByText('Enterprise')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  it('awaits a renderer that resolves late', async () => {
+    renderTrigger({
+      mode: 'organization',
+      renderPlanBadge: () => Promise.resolve({ name: 'Scale', slug: 'plan_scale' }),
+    });
+
+    expect(screen.queryByText('Scale')).toBeNull();
+
+    const badge = await screen.findByText('Scale');
+    expect(badge).toHaveAttribute('data-plan', 'plan_scale');
+  });
+
+  it('draws no badge when the renderer declines one', async () => {
+    renderTrigger({ mode: 'organization', renderPlanBadge: () => null });
+
+    expect(await screen.findByText('Foundry')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
+  });
+
+  // An inline arrow is a new function every render, so a renderer keyed on identity would refetch
+  // forever. It runs once per mount instead.
+  it('runs an inline renderer once', async () => {
+    const renderer = vi.fn(() => ({ name: 'Enterprise' }));
+    renderTrigger({ mode: 'organization', renderPlanBadge: () => renderer() });
+
+    await screen.findByText('Enterprise');
+    expect(renderer).toHaveBeenCalledTimes(1);
+  });
+
   it('takes its corner from the workspace it names, labelled or not', () => {
     const corner = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);

@@ -960,6 +960,20 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
   );
 }
 
+/** What the badge says, and which plan it says it about. */
+export interface UserButtonPlanBadge {
+  /** The badge's text. */
+  name: string;
+  /** Identifies the plan to `appearance`, as `data-plan`. Nothing is rendered from it. */
+  slug?: string;
+}
+
+/**
+ * Supplies the badge yourself. Return `null` for no badge. May be async: the trigger renders
+ * without a badge until it settles.
+ */
+export type UserButtonPlanBadgeRenderer = () => UserButtonPlanBadge | null | Promise<UserButtonPlanBadge | null>;
+
 export interface UserButtonTriggerProps {
   /**
    * Names the active workspace beside its avatar — the organization wherever one heads the
@@ -972,9 +986,65 @@ export interface UserButtonTriggerProps {
    * Carries the active organization's plan beside its name. Part of the label, so it needs
    * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
    *
+   * Pass a function to name the plan yourself, from wherever you hold subscriptions. It runs
+   * once per mount, so read live data through a state setter rather than expecting a refetch.
+   *
    * @default true
+   *
+   * @example
+   * // Suppress the badge
+   * <UserButton renderPlanBadge={false} />
+   *
+   * @example
+   * // Name it from your own subscription data
+   * <UserButton
+   *   renderPlanBadge={async () => {
+   *     const { name, plan_id } = await currentSubscriptionQuery();
+   *     return { name, slug: plan_id };
+   *   }}
+   * />
    */
-  renderPlanBadge?: boolean;
+  renderPlanBadge?: boolean | UserButtonPlanBadgeRenderer;
+}
+
+/**
+ * Resolves `renderPlanBadge` down to the badge to draw. A boolean reads the plan off the active
+ * organization; a function supplies its own, awaited if it needs to be.
+ */
+function usePlanBadge(
+  renderPlanBadge: boolean | UserButtonPlanBadgeRenderer,
+  organizationPlanLabel: string | undefined,
+): UserButtonPlanBadge | null {
+  const [resolved, setResolved] = React.useState<UserButtonPlanBadge | null>(null);
+  const isCustom = typeof renderPlanBadge === 'function';
+
+  // An inline arrow is a new function on every render, so keying the effect on it would refetch
+  // forever. The ref carries the latest one; only switching between the two forms re-runs.
+  const rendererRef = React.useRef(renderPlanBadge);
+  rendererRef.current = renderPlanBadge;
+
+  React.useEffect(() => {
+    const renderer = rendererRef.current;
+    if (typeof renderer !== 'function') {
+      setResolved(null);
+      return;
+    }
+
+    let live = true;
+    void Promise.resolve(renderer()).then(badge => {
+      if (live) {
+        setResolved(badge);
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, [isCustom]);
+
+  if (isCustom) {
+    return resolved;
+  }
+  return renderPlanBadge && organizationPlanLabel ? { name: organizationPlanLabel } : null;
 }
 
 /** The trigger: the active workspace's avatar, and what it is called. */
@@ -984,7 +1054,7 @@ export function UserButtonTrigger({
 }: UserButtonTriggerProps = {}): ReactElement {
   const data = useUserButtonContext();
   const { name, imageUrl, shape, organization } = leadWorkspace(data);
-  const planLabel = renderPlanBadge ? organization?.planLabel : undefined;
+  const planBadge = usePlanBadge(renderPlanBadge, organization?.planLabel);
 
   return (
     <Popover.Trigger
@@ -1000,7 +1070,14 @@ export function UserButtonTrigger({
       {renderTriggerLabel ? (
         <>
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
-          {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          {planBadge ? (
+            <Badge
+              color='neutral'
+              data-plan={planBadge.slug}
+            >
+              {planBadge.name}
+            </Badge>
+          ) : null}
         </>
       ) : null}
     </Popover.Trigger>

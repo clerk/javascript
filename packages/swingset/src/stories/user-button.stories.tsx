@@ -276,6 +276,20 @@ export function WithoutPlanBadge(_args: Record<string, unknown>) {
   );
 }
 
+export function CustomPlanBadge(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  // Stands in for a subscription query, so the badge arrives a beat after the trigger does.
+  return (
+    <UserButtonView
+      {...prototype}
+      renderPlanBadge={() =>
+        new Promise(resolve => setTimeout(() => resolve({ name: 'Enterprise', slug: 'plan_enterprise' }), 600))
+      }
+    />
+  );
+}
+
 export function Organizations(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 

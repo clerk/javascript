@@ -90,6 +90,15 @@ trigger, the account otherwise.
   storyModule={UserButtonStories}
 />
 
+Pass a function instead to name the plan from your own data. It may be async, and the trigger
+renders without a badge until it settles. `slug` lands on the badge as `data-plan` for `appearance`
+to target; only `name` is rendered. It runs once per mount.
+
+<Story
+  name='CustomPlanBadge'
+  storyModule={UserButtonStories}
+/>
+
 ## Modes
 
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
