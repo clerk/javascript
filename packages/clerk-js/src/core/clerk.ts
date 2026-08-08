@@ -275,9 +275,7 @@ export class Clerk implements ClerkInterface {
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #protectAssertion: ProtectAssertion | undefined;
-  // Distinguishes "never set via setProtectAssertion" from "explicitly cleared with
-  // undefined". Without it, clearing would silently fall back to the `protectAssertion`
-  // option, and a setter call before `load()` would be overwritten by it.
+  // Distinguishes never-set from cleared-with-undefined, so clearing does not fall back to the option.
   #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
@@ -489,11 +487,7 @@ export class Clerk implements ClerkInterface {
     this.#protectAssertionSet = true;
   };
 
-  /**
-   * The assertion in force right now: whatever was last passed to `setProtectAssertion`,
-   * otherwise the `protectAssertion` option. Read per request, so `load()` may run before or
-   * after the setter without either clobbering the other.
-   */
+  /** The last value passed to `setProtectAssertion` once called, otherwise the `protectAssertion` option. */
   #currentProtectAssertion(): ProtectAssertion | undefined {
     return this.#protectAssertionSet ? this.#protectAssertion : this.#options.protectAssertion;
   }

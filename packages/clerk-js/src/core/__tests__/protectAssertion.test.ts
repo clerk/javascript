@@ -19,8 +19,6 @@ describe('resolveProtectAssertion', () => {
     await expect(resolveProtectAssertion(() => Promise.resolve('token-async'))).resolves.toBe('token-async');
   });
 
-  // The whole reason a function is supported: the token outlives neither the page nor its own
-  // expiry, so a value captured once at configuration time would silently stop applying.
   it('re-reads the resolver on every call', async () => {
     const resolver = vi.fn<() => string>();
     resolver.mockReturnValueOnce('first').mockReturnValueOnce('second');
@@ -34,8 +32,7 @@ describe('resolveProtectAssertion', () => {
     await expect(resolveProtectAssertion(() => undefined)).resolves.toBeUndefined();
   });
 
-  // An assertion may influence a sign-in but must never prevent one, so every bad input
-  // degrades to "no assertion" rather than propagating.
+  // Bad inputs degrade to "no assertion" rather than propagating; Protect must never fail a sign-in.
   it.each([
     [
       'a throwing resolver',
@@ -45,7 +42,7 @@ describe('resolveProtectAssertion', () => {
     ],
     ['a rejecting resolver', () => Promise.reject(new Error('boom'))],
   ])('never rejects for %s', async (_label, resolver) => {
-    await expect(resolveProtectAssertion(resolver as () => string)).resolves.toBeUndefined();
+    await expect(resolveProtectAssertion(resolver as unknown as () => string)).resolves.toBeUndefined();
   });
 
   it.each([
@@ -66,18 +63,13 @@ describe('protectAssertionParams', () => {
     });
   });
 
-  // The param name is a cross-repo contract with the server, and it is deliberately identical
-  // to the cookie that can carry the same value. It is also all lower-case + underscores, so
-  // the body's camelCase→snake_case encoder leaves it alone — pinned here because a rename
-  // would break silently, as an ignored param rather than an error.
+  // The param name is a cross-repo contract with the server; a rename would break silently.
   it('uses a param name the body encoder cannot mangle', () => {
     expect(PROTECT_ASSERTION_PARAM).toBe('__clerk_protect_assertion');
     expect(PROTECT_ASSERTION_PARAM).toBe(PROTECT_ASSERTION_PARAM.toLowerCase());
     expect(PROTECT_ASSERTION_PARAM).not.toMatch(/[A-Z]/);
   });
 
-  // Returning undefined rather than {} is what keeps a request with no assertion byte-for-byte
-  // the request that would have been sent before this existed.
   it('returns undefined when there is nothing to attach', async () => {
     await expect(protectAssertionParams(undefined)).resolves.toBeUndefined();
     await expect(protectAssertionParams(() => undefined)).resolves.toBeUndefined();

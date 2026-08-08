@@ -385,9 +385,6 @@ describe('request', () => {
   });
 
   describe('Protect params', () => {
-    // A body param rather than a header, because a custom header would trigger a CORS
-    // preflight — the same reason `_method` is a query param. These tests pin that the params
-    // reach the encoded body, and reach nothing else.
     const protectParams = { __clerk_protect_assertion: 'token-abc' };
     const clientWithProtect = createFapiClient({
       ...baseFapiClientOptions,
@@ -419,13 +416,11 @@ describe('request', () => {
       );
     });
 
-    // The param name survives the body's camelCase→snake_case key encoder untouched — it is
-    // all lower-case, so there is nothing for that encoder to rewrite. If it ever did not
-    // survive, the server would see an unknown param and reject the whole request.
+    // All lower-case, so the camel-to-snake body key encoder has nothing to rewrite.
     it('does not mangle the param name', async () => {
       await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST' });
 
-      const [, init] = (fetch as Mock).mock.calls.at(-1);
+      const [, init] = (fetch as Mock).mock.calls.at(-1)!;
       expect(init.body).toBe('__clerk_protect_assertion=token-abc');
     });
 
@@ -436,12 +431,11 @@ describe('request', () => {
     ])('does not attach them to %s', async (_label, method, path) => {
       await clientWithProtect.request({ path, method: method as any, body: { a: 'b' } as any });
 
-      const [, init] = (fetch as Mock).mock.calls.at(-1);
+      const [, init] = (fetch as Mock).mock.calls.at(-1)!;
       expect(init.body ?? '').not.toContain('__clerk_protect_assertion');
     });
 
-    // Spreading a FormData would discard the caller's payload rather than add to it, so a body
-    // that is not a plain object is left completely alone.
+    // Spreading a FormData would discard the caller's payload, so non-plain bodies are left alone.
     it('leaves a FormData body untouched', async () => {
       const formData = new FormData();
       formData.append('identifier', 'user@example.com');
@@ -452,8 +446,7 @@ describe('request', () => {
     });
 
     it('leaves a string body untouched', async () => {
-      // text/plain so the form-urlencoded encoder stays out of it; the point here is that the
-      // merge does not touch a body it cannot safely spread.
+      // text/plain keeps the form-urlencoded encoder out of it.
       await clientWithProtect.request({
         path: '/client/sign_ins',
         method: 'POST',
@@ -489,8 +482,6 @@ describe('request', () => {
       expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: 'identifier=a' }));
     });
 
-    // Every client built before this existed passes no hook at all; it must behave exactly as
-    // it did.
     it('is inert when no hook is configured', async () => {
       await fapiClient.request({ path: '/client/sign_ins', method: 'POST', body: { identifier: 'a' } as any });
 

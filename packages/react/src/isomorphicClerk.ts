@@ -397,8 +397,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs && this.loaded) {
       callback();
     } else {
-      // Keyed by method name, so a second call before load replaces the first — which is the
-      // semantics a setter wants, and means a value set early is not lost.
       this.premountMethodCalls.set('setProtectAssertion', callback);
     }
   };
