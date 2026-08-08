@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 
+import type { PlaywrightSetupClerkTestingTokenOptions } from '../../setupClerkTestingToken';
 import { createAPIKeysComponentPageObject } from './apiKeys';
 import { createAppPageObject } from './app';
 import { createCheckoutPageObject } from './checkout';
@@ -26,13 +27,15 @@ export const createPageObjects = ({
   page,
   useTestingToken = true,
   baseURL,
+  testingTokenOptions,
 }: {
   page: Page;
   useTestingToken?: boolean;
   baseURL?: string;
+  testingTokenOptions?: PlaywrightSetupClerkTestingTokenOptions;
 }) => {
-  const app = createAppPageObject({ page, useTestingToken }, { baseURL });
-  const testArgs = { page: app };
+  const app = createAppPageObject({ page, useTestingToken, testingTokenOptions }, { baseURL });
+  const testArgs = { page: app, testingTokenOptions };
 
   return {
     page: app,

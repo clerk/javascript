@@ -1,10 +1,14 @@
 import type { Page } from '@playwright/test';
 
+import type { PlaywrightSetupClerkTestingTokenOptions } from '../../setupClerkTestingToken';
 import { setupClerkTestingToken } from '../../setupClerkTestingToken';
 
 export type EnhancedPage = ReturnType<typeof createAppPageObject>;
-export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: { baseURL?: string }) => {
-  const { page, useTestingToken = true } = testArgs;
+export const createAppPageObject = (
+  testArgs: { page: Page; useTestingToken?: boolean; testingTokenOptions?: PlaywrightSetupClerkTestingTokenOptions },
+  app: { baseURL?: string },
+) => {
+  const { page, useTestingToken = true, testingTokenOptions } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
     goToAppHome: async () => {
@@ -16,7 +20,7 @@ export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: bo
 
       try {
         if (useTestingToken) {
-          await setupClerkTestingToken({ page });
+          await setupClerkTestingToken({ page, options: testingTokenOptions });
         }
 
         await page.goto(app.baseURL);
@@ -56,7 +60,7 @@ export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: bo
       }
 
       if (useTestingToken) {
-        await setupClerkTestingToken({ page });
+        await setupClerkTestingToken({ page, options: testingTokenOptions });
       }
 
       return page.goto(url.toString(), { timeout: opts.timeout ?? 20000, waitUntil: opts.waitUntil });
