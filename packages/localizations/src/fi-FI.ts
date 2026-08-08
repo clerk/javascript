@@ -105,8 +105,11 @@ export const fiFI: LocalizationResource = {
       'Et voi tilata tätä pakettia kuukausimaksulla. Tilataksesi tämän sinun on valittava vuositilaus.',
     cannotSubscribeUnrecoverable: 'Et voi tilata tätä pakettia. Nykyinen tilauksesi on kalliimpi kuin tämä paketti.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Maksusi onnistui.',
       description__subscriptionSuccessful: 'Uusi tilauksesi on valmis.',
+      discount: undefined,
       downgradeNotice:
         'Säilytät nykyisen tilauksesi ja sen ominaisuudet laskutuskauden loppuun asti, minkä jälkeen siirryt tähän tilaukseen.',
       emailForm: {
@@ -122,6 +125,8 @@ export const fiFI: LocalizationResource = {
       },
       pastDueNotice: 'Edellinen tilauksesi oli erääntynyt eikä maksua ole suoritettu.',
       perMonth: 'kuukaudessa',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Kassa',
       title__paymentSuccessful: 'Maksu onnistui!',
       title__subscriptionSuccessful: 'Onnistui!',
@@ -132,6 +137,9 @@ export const fiFI: LocalizationResource = {
     credit: 'Hyvitys',
     creditRemainder: 'Hyvitys nykyisen tilauksesi jäljellä olevalta ajalta.',
     defaultFreePlanActive: 'Olet tällä hetkellä ilmaisella tilauksella.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ilmainen',
     getStarted: 'Aloita',
     highlightedPlanBadge: 'Suosittu',
@@ -143,6 +151,7 @@ export const fiFI: LocalizationResource = {
     monthAbbreviation: 'kk',
     monthPerUnit: 'Kuukausi per {{unitName}}',
     monthly: 'Kuukausittain',
+    months: undefined,
     pastDue: 'Erääntynyt',
     pay: 'Maksa {{amount}}',
     payerCreditRemainder: 'Hyvitys tilin saldosta.',
@@ -221,6 +230,7 @@ export const fiFI: LocalizationResource = {
     year: 'Vuosi',
     yearAbbreviation: 'v',
     yearPerUnit: 'Vuosi per {{unitName}}',
+    years: undefined,
   },
   configureSSO: {
     activate: {

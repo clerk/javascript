@@ -8,6 +8,7 @@ import type {
 import { describe, expect, it } from 'vitest';
 
 import {
+  billingDiscountRedemptionFromJSON,
   billingPaymentTotalsFromJSON,
   billingSubscriptionItemNextPaymentFromJSON,
   billingSubscriptionNextPaymentFromJSON,
@@ -39,6 +40,15 @@ const nextPaymentTotalsJSON = (): BillingTotalsJSON => ({
       cycle_days_passed: 15,
       cycle_days_total: 30,
       cycle_passed_percent: 50,
+    },
+    discount: {
+      amount: moneyJSON(1000),
+      discount_id: 'discount_123',
+      name: 'Welcome',
+      effect: 'percentage',
+      percent_off: 20,
+      promo_code: 'WELCOME20',
+      cycles_remaining: 2,
     },
     total: moneyJSON(500),
   },
@@ -109,6 +119,14 @@ describe('billingPaymentTotalsFromJSON', () => {
           cycle_days_total: 30,
           cycle_passed_percent: 3,
         },
+        discount: {
+          amount: moneyJSON(100),
+          discount_id: 'discount_123',
+          name: 'Fixed discount',
+          effect: 'fixed_amount',
+          amount_off: moneyJSON(100),
+          cycles_remaining: null,
+        },
         total: moneyJSON(16),
       },
     };
@@ -117,6 +135,14 @@ describe('billingPaymentTotalsFromJSON', () => {
 
     expect(totals.discounts?.proration?.amount.amount).toBe(16);
     expect(totals.discounts?.proration?.cycleDaysPassed).toBe(1);
+    expect(totals.discounts?.discount).toMatchObject({
+      amount: { amount: 100 },
+      discountId: 'discount_123',
+      name: 'Fixed discount',
+      effect: 'fixed_amount',
+      amountOff: { amount: 100, amountFormatted: '1.00', currency: 'USD', currencySymbol: '$' },
+      cyclesRemaining: null,
+    });
     expect(totals.discounts?.total.amount).toBe(16);
   });
 
@@ -209,6 +235,15 @@ describe('billingSubscriptionNextPaymentFromJSON', () => {
           cycleDaysTotal: 30,
           cyclePassedPercent: 50,
         },
+        discount: {
+          amount: { amount: 1000 },
+          discountId: 'discount_123',
+          name: 'Welcome',
+          effect: 'percentage',
+          percentOff: 20,
+          promoCode: 'WELCOME20',
+          cyclesRemaining: 2,
+        },
         total: { amount: 500 },
       },
       perUnitTotals: [{ name: 'seats', blockSize: 1 }],
@@ -219,6 +254,55 @@ describe('billingSubscriptionNextPaymentFromJSON', () => {
         grandTotal: { amount: 11000 },
         perUnitTotals: [{ name: 'seats', blockSize: 1 }],
       },
+    });
+  });
+});
+
+describe('billingDiscountRedemptionFromJSON', () => {
+  it('maps an applied subscription item discount', () => {
+    const discount = billingDiscountRedemptionFromJSON({
+      object: 'commerce_discount_redemption',
+      id: 'redemption_123',
+      subscription_item_id: 'sub_item_123',
+      discount_id: 'discount_123',
+      name: 'Welcome',
+      source: 'promo_code',
+      promo_code: 'WELCOME20',
+      effect: 'fixed_amount',
+      amount_off: moneyJSON(500),
+      amount: moneyJSON(400),
+      cycles_remaining: 2,
+      cycles_applied: 1,
+      status: 'active',
+      redeemed_at: 1_609_459_200_000,
+      redeemed_by: 'user_123',
+    });
+
+    expect(discount).toMatchObject({
+      id: 'redemption_123',
+      subscriptionItemId: 'sub_item_123',
+      discountId: 'discount_123',
+      name: 'Welcome',
+      source: 'promo_code',
+      promoCode: 'WELCOME20',
+      effect: 'fixed_amount',
+      amountOff: {
+        amount: 500,
+        amountFormatted: '5.00',
+        currency: 'USD',
+        currencySymbol: '$',
+      },
+      amount: {
+        amount: 400,
+        amountFormatted: '4.00',
+        currency: 'USD',
+        currencySymbol: '$',
+      },
+      cyclesRemaining: 2,
+      cyclesApplied: 1,
+      status: 'active',
+      redeemedAt: new Date('2021-01-01T00:00:00.000Z'),
+      redeemedBy: 'user_123',
     });
   });
 });

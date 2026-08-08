@@ -1,8 +1,12 @@
 import type {
+  BillingAppliedDiscount,
+  BillingAppliedDiscountJSON,
   BillingCheckoutTotals,
   BillingCheckoutTotalsJSON,
   BillingCredits,
   BillingCreditsJSON,
+  BillingDiscountRedemption,
+  BillingDiscountRedemptionJSON,
   BillingDiscounts,
   BillingDiscountsJSON,
   BillingMoneyAmount,
@@ -105,9 +109,39 @@ const billingDiscountsFromJSON = (data: BillingDiscountsJSON): BillingDiscounts 
           cyclePassedPercent: data.proration.cycle_passed_percent,
         }
       : null,
+    discount: data.discount ? billingAppliedDiscountFromJSON(data.discount) : undefined,
     total: billingMoneyAmountFromJSON(data.total),
   };
 };
+
+const billingAppliedDiscountFromJSON = (data: BillingAppliedDiscountJSON): BillingAppliedDiscount => ({
+  amount: billingMoneyAmountFromJSON(data.amount),
+  discountId: data.discount_id,
+  name: data.name,
+  effect: data.effect,
+  percentOff: data.percent_off,
+  amountOff: data.amount_off ? billingMoneyAmountFromJSON(data.amount_off) : undefined,
+  promoCode: data.promo_code,
+  cyclesRemaining: data.cycles_remaining,
+});
+
+export const billingDiscountRedemptionFromJSON = (data: BillingDiscountRedemptionJSON): BillingDiscountRedemption => ({
+  id: data.id,
+  subscriptionItemId: data.subscription_item_id,
+  discountId: data.discount_id,
+  name: data.name,
+  source: data.source,
+  promoCode: data.promo_code,
+  effect: data.effect,
+  percentOff: data.percent_off,
+  amountOff: data.amount_off ? billingMoneyAmountFromJSON(data.amount_off) : undefined,
+  amount: data.amount ? billingMoneyAmountFromJSON(data.amount) : undefined,
+  cyclesRemaining: data.cycles_remaining,
+  cyclesApplied: data.cycles_applied,
+  status: data.status,
+  redeemedAt: unixEpochToDate(data.redeemed_at),
+  redeemedBy: data.redeemed_by,
+});
 
 const billingPeriodTotalsFromJSON = (data: BillingPeriodTotalsJSON): BillingPeriodTotals => {
   return {

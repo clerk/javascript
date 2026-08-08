@@ -107,8 +107,11 @@ export const taIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'இந்த திட்டத்திற்கு நீங்கள் சந்தா செலுத்த முடியாது. உங்கள் தற்போதைய சந்தா இந்த திட்டத்தை விட விலை அதிகம்.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'உங்கள் கட்டணம் வெற்றிகரமாக முடிந்தது.',
       description__subscriptionSuccessful: 'உங்கள் புதிய சந்தா முழுமையாகத் தயாராக உள்ளது.',
+      discount: undefined,
       downgradeNotice:
         'பில்லிங் சுழற்சியின் முடிவு வரை உங்கள் தற்போதைய சந்தாவையும் அதன் அம்சங்களையும் வைத்திருப்பீர்கள், பின்னர் நீங்கள் இந்த சந்தாவிற்கு மாற்றப்படுவீர்கள்.',
       emailForm: {
@@ -124,6 +127,8 @@ export const taIN: LocalizationResource = {
       },
       pastDueNotice: 'உங்கள் முந்தைய சந்தா நிலுவையில் இருந்தது, கட்டணம் எதுவும் இல்லாமல்.',
       perMonth: 'மாதத்திற்கு',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'செக்அவுட்',
       title__paymentSuccessful: 'கட்டணம் வெற்றிகரமாக முடிந்தது!',
       title__subscriptionSuccessful: 'வெற்றி!',
@@ -134,6 +139,9 @@ export const taIN: LocalizationResource = {
     credit: 'கடன்',
     creditRemainder: 'உங்கள் தற்போதைய சந்தாவின் மீதமுள்ள காலத்திற்கான கடன்.',
     defaultFreePlanActive: 'நீங்கள் தற்போது இலவச திட்டத்தில் உள்ளீர்கள்',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'இலவசம்',
     getStarted: 'தொடங்குங்கள்',
     highlightedPlanBadge: 'பிரபலமான',
@@ -145,6 +153,7 @@ export const taIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'மாதந்தோறும்',
+    months: undefined,
     pastDue: 'நிலுவை',
     pay: '{{amount}} செலுத்து',
     payerCreditRemainder: undefined,
@@ -223,6 +232,7 @@ export const taIN: LocalizationResource = {
     year: 'ஆண்டு',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

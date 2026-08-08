@@ -106,8 +106,11 @@ export const ptPT: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Não pode subscrever este plano. A sua subscrição atual é mais dispendiosa do que este plano.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'O seu pagamento foi efetuado com sucesso.',
       description__subscriptionSuccessful: 'A sua nova subscrição está pronta.',
+      discount: undefined,
       downgradeNotice:
         'Manterá a sua subscrição atual e respetivas funcionalidades até ao fim do ciclo de faturação e, depois disso, passará para esta subscrição.',
       emailForm: {
@@ -124,6 +127,8 @@ export const ptPT: LocalizationResource = {
       },
       pastDueNotice: 'A sua subscrição anterior encontrava-se em atraso, sem pagamento.',
       perMonth: 'por mês',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Finalizar compra',
       title__paymentSuccessful: 'Pagamento efetuado com sucesso!',
       title__subscriptionSuccessful: 'Sucesso!',
@@ -134,6 +139,9 @@ export const ptPT: LocalizationResource = {
     credit: 'Crédito',
     creditRemainder: 'Crédito relativo ao período restante da sua subscrição atual.',
     defaultFreePlanActive: 'Está atualmente no plano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Começar',
     highlightedPlanBadge: 'Popular',
@@ -145,6 +153,7 @@ export const ptPT: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensal',
+    months: undefined,
     pastDue: 'Em atraso',
     pay: 'Pagar {{amount}}',
     payerCreditRemainder: undefined,
@@ -223,6 +232,7 @@ export const ptPT: LocalizationResource = {
     year: 'Ano',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
