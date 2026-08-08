@@ -1,8 +1,0 @@
-- generic [active] [ref=f1e1]:
-  - heading [level=2] [ref=f1e2]:
-    - text: "pathname:"
-    - code [ref=f1e3]: /
-  - generic [ref=f1e4]:
-    - heading "home" [level=1] [ref=f1e5]
-    - link "Sign In" [ref=f1e6] [cursor=pointer]:
-      - /url: /signin
