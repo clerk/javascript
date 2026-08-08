@@ -1,0 +1,47 @@
+- generic [active] [ref=f3e1]:
+  - heading [level=2] [ref=f3e7]:
+    - text: "pathname:"
+    - code [ref=f3e3]: /signin
+  - generic [ref=f3e8]:
+    - heading "sign in" [level=1] [ref=f3e9]
+    - link "go home" [ref=f3e10] [cursor=pointer]:
+      - /url: /
+    - generic [ref=f3e12]:
+      - generic [ref=f3e13]:
+        - generic [ref=f3e14]:
+          - link [ref=f3e16] [cursor=pointer]:
+            - /url: http://localhost:3010/
+            - img "alphaXiv" [ref=f3e17]
+          - generic [ref=f3e18]:
+            - heading "Sign in to alphaXiv" [level=1] [ref=f3e19]
+            - paragraph [ref=f3e20]: Welcome back! Please sign in to continue
+        - generic [ref=f3e21]:
+          - button "Sign in with Google Continue with Google" [ref=f3e24] [cursor=pointer]:
+            - generic [ref=f3e25]:
+              - generic "Sign in with Google" [ref=f3e27]
+              - generic [ref=f3e28]: Continue with Google
+          - paragraph [ref=f3e31]: or
+          - generic [ref=f3e33]:
+            - generic [ref=f3e34]:
+              - generic [ref=f3e37]:
+                - generic [ref=f3e38]: Email address
+                - textbox "Email address" [ref=f3e40]:
+                  - /placeholder: Enter your email address
+              - generic:
+                - generic: Password
+                - generic:
+                  - textbox:
+                    - /placeholder: Enter your password
+                  - button
+            - button "Continue" [ref=f3e43] [cursor=pointer]
+      - generic [ref=f3e47]:
+        - generic [ref=f3e48]:
+          - generic [ref=f3e49]: Don’t have an account?
+          - link "Sign up" [ref=f3e50] [cursor=pointer]:
+            - /url: http://localhost:3010/signup
+        - paragraph [ref=f3e53]: Development mode
+  - generic:
+    - contentinfo:
+      - button "Open TanStack Router Devtools" [ref=f3e54] [cursor=pointer]:
+        - generic [ref=f3e126]: "-"
+        - generic [ref=f3e127]: TanStack Router

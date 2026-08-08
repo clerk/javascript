@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - heading [level=2] [ref=e128]:
+    - text: "pathname:"
+    - code [ref=e3]: /login?redirect_url=http%3A%2F%2Flocalhost%3A3010%2F
+  - generic [ref=e129]:
+    - paragraph [ref=e131]: The page you are looking for does not exist.
+    - paragraph [ref=e132]:
+      - button "Go back" [ref=e133]
+      - link "Start Over" [ref=e134] [cursor=pointer]:
+        - /url: /
+  - generic:
+    - contentinfo:
+      - button "Open TanStack Router Devtools" [ref=e7] [cursor=pointer]:
+        - generic [ref=e79]: "-"
+        - generic [ref=e80]: TanStack Router
