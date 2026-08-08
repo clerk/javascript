@@ -15,6 +15,8 @@ import {
   DUMMY_CLERK_CLIENT_RESOURCE,
   DUMMY_CLERK_ENVIRONMENT_RESOURCE,
   EnvironmentResourceCache,
+  isDummyClient,
+  isDummyEnvironment,
   SessionJWTCache,
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
@@ -238,12 +240,15 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
             const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
-            if (environment) {
+            // Persisting a dummy would make the next boot see a populated cache and skip recovery.
+            if (environment && !isDummyEnvironment(environment)) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
 
             if (client) {
-              void ClientResourceCache.save(client.__internal_toSnapshot());
+              if (!isDummyClient(client)) {
+                void ClientResourceCache.save(client.__internal_toSnapshot());
+              }
               if (client.lastActiveSessionId) {
                 const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
                 const token = currentSession?.lastActiveToken?.getRawString();
@@ -260,14 +265,19 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
             client: ClientJSONSnapshot | null;
             environment: EnvironmentJSONSnapshot | null;
           }> => {
-            let environment = await EnvironmentResourceCache.load();
-            let client = await ClientResourceCache.load();
+            const cachedEnvironment = await EnvironmentResourceCache.load();
+            const cachedClient = await ClientResourceCache.load();
+            // Installs that persisted a dummy before the save guard existed must still recover.
+            const environment = isDummyEnvironment(cachedEnvironment) ? null : cachedEnvironment;
+            const client = isDummyClient(cachedClient) ? null : cachedClient;
             if (!environment || !client) {
-              environment = DUMMY_CLERK_ENVIRONMENT_RESOURCE;
-              client = DUMMY_CLERK_CLIENT_RESOURCE;
               scheduleResourceRetry(3000);
             }
-            return { client, environment };
+            // Substitute only what is missing: a dummy environment drops instance settings for the whole app run.
+            return {
+              client: client ?? DUMMY_CLERK_CLIENT_RESOURCE,
+              environment: environment ?? DUMMY_CLERK_ENVIRONMENT_RESOURCE,
+            };
           };
         }
       }
