@@ -105,6 +105,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -190,6 +191,7 @@ import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
+import { protectAssertionParams } from './protectAssertion';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -272,6 +274,11 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #protectAssertion: ProtectAssertion | undefined;
+  // Distinguishes "never set via setProtectAssertion" from "explicitly cleared with
+  // undefined". Without it, clearing would silently fall back to the `protectAssertion`
+  // option, and a setter call before `load()` would be overwritten by it.
+  #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -477,6 +484,20 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  public setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    this.#protectAssertion = assertion;
+    this.#protectAssertionSet = true;
+  };
+
+  /**
+   * The assertion in force right now: whatever was last passed to `setProtectAssertion`,
+   * otherwise the `protectAssertion` option. Read per request, so `load()` may run before or
+   * after the setter without either clobbering the other.
+   */
+  #currentProtectAssertion(): ProtectAssertion | undefined {
+    return this.#protectAssertionSet ? this.#protectAssertion : this.#options.protectAssertion;
+  }
+
   get isSignedIn(): boolean {
     const hasPendingSession = this?.session?.status === 'pending';
     if (hasPendingSession) {
@@ -514,6 +535,7 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      getProtectParams: () => protectAssertionParams(this.#currentProtectAssertion()),
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');

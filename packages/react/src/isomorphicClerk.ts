@@ -46,6 +46,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   RedirectOptions,
   Resources,
   SetActiveParams,
@@ -390,6 +391,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
     return false;
   }
+
+  setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    const callback = () => this.clerkjs?.setProtectAssertion(assertion);
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      // Keyed by method name, so a second call before load replaces the first — which is the
+      // semantics a setter wants, and means a value set early is not lost.
+      this.premountMethodCalls.set('setProtectAssertion', callback);
+    }
+  };
 
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';
