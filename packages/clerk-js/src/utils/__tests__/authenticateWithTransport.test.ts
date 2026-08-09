@@ -43,7 +43,7 @@ describe('_authenticateWithTransport', () => {
     expect(resource.create).not.toHaveBeenCalled();
   });
 
-  it('replaces a page-derived redirectUrlComplete with the transport URL so FAPI only ever validates the registered callback', async () => {
+  it('replaces a page-derived redirectUrlComplete with the transport URL', async () => {
     const clerk = makeClerk();
     const transport = {
       getRedirectUrl: vi.fn().mockResolvedValue('myapp://app/'),
