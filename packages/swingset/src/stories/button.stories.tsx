@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import { Button, SubmitButton } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import React from 'react';
 
@@ -299,5 +299,96 @@ export function Disabled(props: Record<string, unknown>) {
     >
       Disabled
     </Button>
+  );
+}
+
+// Stands in for an async submit, so the example can be pressed and the flip between the two
+// states watched — including that the button doesn't resize under the spinner.
+function usePendingOnPress(duration = 2000) {
+  const [isPending, setIsPending] = React.useState(false);
+  const timeout = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  React.useEffect(() => () => clearTimeout(timeout.current), []);
+
+  return {
+    isPending,
+    onClick: () => {
+      setIsPending(true);
+      timeout.current = setTimeout(() => setIsPending(false), duration);
+    },
+  };
+}
+
+export function Submit(props: Record<string, unknown>) {
+  const { isPending, onClick } = usePendingOnPress();
+  return (
+    <SubmitButton
+      {...knobsAsProps(props)}
+      isPending={isPending}
+      onClick={onClick}
+    >
+      Save changes
+    </SubmitButton>
+  );
+}
+
+// Press both: only the slow one ever draws a spinner. The fast one is pending the whole time it
+// says it is — it just finishes before the spinner is due, so nothing flashes.
+export function SubmitDelay(props: Record<string, unknown>) {
+  const slow = usePendingOnPress(2000);
+  const fast = usePendingOnPress(150);
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <SubmitButton
+        {...knobsAsProps(props)}
+        isPending={slow.isPending}
+        onClick={slow.onClick}
+      >
+        Slow action
+      </SubmitButton>
+      <SubmitButton
+        {...knobsAsProps(props)}
+        isPending={fast.isPending}
+        onClick={fast.onClick}
+      >
+        Fast action
+      </SubmitButton>
+    </div>
+  );
+}
+
+export function SubmitSizes(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {(['sm', 'md', 'lg'] as const).map(size => (
+        <SubmitButton
+          key={size}
+          {...knobsAsProps(props)}
+          size={size}
+          isPending
+        >
+          Save changes
+        </SubmitButton>
+      ))}
+    </div>
+  );
+}
+
+// The spinner takes its arc from `currentColor`, so it reads on a fill and on a bare surface
+// alike — no color prop to keep in step with the button's.
+export function SubmitVariants(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {(['filled', 'outline', 'ghost'] as const).map(variant => (
+        <SubmitButton
+          key={variant}
+          {...knobsAsProps(props)}
+          variant={variant}
+          isPending
+        >
+          Save changes
+        </SubmitButton>
+      ))}
+    </div>
   );
 }

@@ -976,6 +976,7 @@ export const ukUA: LocalizationResource = {
       title: 'URL перенаправлення',
     },
     scopeList: {
+      privateMetadata: undefined,
       title: 'Це надасть {{applicationName}} доступ до:',
     },
     subtitle: 'запитує доступ до {{applicationName}} від імені {{identifier}}',

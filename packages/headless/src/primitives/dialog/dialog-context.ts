@@ -11,6 +11,8 @@ export interface DialogContextValue {
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
   popupRef: React.RefObject<HTMLDivElement | null>;
+  /** Where focus goes when the dialog closes, or `null` to leave focus alone. */
+  returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   modal: boolean;
   labelId: string;
   descriptionId: string;

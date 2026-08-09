@@ -400,6 +400,45 @@ describe('Menu', () => {
   });
 
   describe('focus management', () => {
+    it('focuses the menu itself, not an item, when opened with a pointer', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner data-testid='menu-positioner'>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="menu-positioner"]'));
+    });
+
+    it('focuses the first item when opened with the keyboard', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      screen.getByText('Actions').focus();
+      await user.keyboard('{Enter}');
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByText('Cut'));
+    });
+
     it('returns focus to trigger on close via Escape', async () => {
       const user = userEvent.setup();
       render(

@@ -25,6 +25,7 @@ import {
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
 import { MenuContext, type MenuContextValue } from './menu-context';
@@ -84,6 +85,8 @@ function MenuInner(props: MenuProps) {
     ],
     whileElementsMounted: autoUpdate,
   });
+
+  const returnFocusRef = useReturnFocus(floatingContext);
 
   const { mounted, transitionProps } = useTransition({
     open,
@@ -179,6 +182,7 @@ function MenuInner(props: MenuProps) {
       labelsRef,
       arrowRef,
       popupRef,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,
@@ -194,6 +198,7 @@ function MenuInner(props: MenuProps) {
       getFloatingProps,
       getItemProps,
       activeIndex,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,
