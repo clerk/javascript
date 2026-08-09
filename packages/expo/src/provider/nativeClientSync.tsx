@@ -12,6 +12,7 @@ const tokenCacheReadTimeoutMs = 1_000;
 const nativeDeviceTokenPollIntervalMs = 100;
 const nativeDeviceTokenAvailabilityTimeoutMs = 3_000;
 const nativeClientSyncSourceIdPrefix = 'clerk-expo-js-sync';
+const unauthenticatedRecoveryCooldownMs = 5_000;
 
 export type SyncableClerkInstance = {
   addListener?: (listener: () => void, options?: { skipInitialEmit?: boolean }) => () => void;
@@ -262,6 +263,7 @@ async function refreshJsClientFromNativeState({
   rejectForeignSessionlessClient = false,
   reloadInitialResources,
   shouldSyncDeviceToken = true,
+  suppressDeviceTokenRollbackNotification = false,
   suppressTokenCacheNotificationsRef,
   tokenCache,
 }: {
@@ -271,9 +273,10 @@ async function refreshJsClientFromNativeState({
   rejectForeignSessionlessClient?: boolean;
   reloadInitialResources: boolean;
   shouldSyncDeviceToken?: boolean;
+  suppressDeviceTokenRollbackNotification?: boolean;
   suppressTokenCacheNotificationsRef?: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
-}): Promise<boolean> {
+}): Promise<false | 'refreshed' | 'restored'> {
   const previousClientSnapshot = snapshotClientState(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
@@ -281,7 +284,15 @@ async function refreshJsClientFromNativeState({
       return;
     }
 
-    await syncDeviceTokenToCache(tokenCache, previousDeviceToken);
+    // On the 401 path a rollback is part of recovery, not an external rotation, so it must not
+    // reopen the cooldown. The native-event path still notifies so native resyncs the restored token.
+    await syncNativeDeviceTokenToCache({
+      deviceToken: previousDeviceToken,
+      suppressTokenCacheNotificationsRef: suppressDeviceTokenRollbackNotification
+        ? suppressTokenCacheNotificationsRef
+        : undefined,
+      tokenCache,
+    });
   };
 
   let refreshedClient: ClientResource | null;
@@ -310,14 +321,14 @@ async function refreshJsClientFromNativeState({
           clerkInstance,
         });
       }
-      return true;
+      return 'restored';
     }
 
     clerkInstance.updateClient?.(refreshedClient);
     await reconcileJsActiveSessionFromClient({
       clerkInstance,
     });
-    return true;
+    return 'refreshed';
   }
 
   if (reloadInitialResources && typeof clerkInstance.__internal_reloadInitialResources === 'function') {
@@ -325,7 +336,7 @@ async function refreshJsClientFromNativeState({
     await reconcileJsActiveSessionFromClient({
       clerkInstance,
     });
-    return Boolean(getDefaultSignedInSession(clerkInstance.client));
+    return getDefaultSignedInSession(clerkInstance.client) ? 'refreshed' : false;
   }
 
   return false;
@@ -570,6 +581,7 @@ export function NativeClientSync({
   const pendingNativeRefreshRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const pendingNativeRefreshBeforeReadyRef = useRef<NativeRefreshFromJsOptions | null>(null);
   const nativeRefreshGenerationRef = useRef(0);
+  const lastUnauthenticatedRecoveryRef = useRef<number | undefined>(undefined);
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
 
@@ -743,6 +755,9 @@ export function NativeClientSync({
 
   useEffect(() => {
     const listener: DeviceTokenCacheListener = deviceToken => {
+      // A rotated device token is new input for recovery, so it reopens the unauthenticated cooldown.
+      lastUnauthenticatedRecoveryRef.current = undefined;
+
       const options = {
         deviceToken,
         didChangeClient: false,
@@ -784,39 +799,64 @@ export function NativeClientSync({
 
       isHandlingUnauthenticated = true;
       try {
-        return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
-          try {
-            const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
-            const previousDeviceToken = await getCachedDeviceToken(tokenCache);
-            // Native may have already moved the server-side client to a new
-            // active session. Refresh JS before allowing Clerk JS' stale-session
-            // 401 path to collapse the whole client to signed out.
-            const didRecover = await refreshJsClientFromNativeState({
-              clerkInstance,
-              nativeDeviceToken,
-              previousDeviceToken,
-              rejectForeignSessionlessClient: true,
-              reloadInitialResources: false,
-              suppressTokenCacheNotificationsRef,
-              tokenCache,
-            });
-            if (didRecover) {
-              return;
-            }
-          } catch (error) {
-            const didRecover = await recoverJsClientFromNativeDeviceToken({
-              clerkInstance,
-              error,
-              suppressTokenCacheNotificationsRef,
-              tokenCache,
-            });
-            if (didRecover) {
-              return;
-            }
+        // Re-reading native state and refetching the client for every response in a 401 burst only amplifies it.
+        const lastRecovery = lastUnauthenticatedRecoveryRef.current;
+        if (lastRecovery !== undefined) {
+          const elapsed = Date.now() - lastRecovery;
+          // A backwards clock jump makes elapsed negative; treat it as expired instead of waiting out the gap.
+          if (elapsed >= 0 && elapsed < unauthenticatedRecoveryCooldownMs) {
+            return await originalHandleUnauthenticated(options);
           }
+        }
+        lastUnauthenticatedRecoveryRef.current = Date.now();
 
-          return originalHandleUnauthenticated(options);
-        });
+        try {
+          return await runWithSuppressedJsClientChanges(suppressJsClientChangedRef, async () => {
+            try {
+              const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
+              const previousDeviceToken = await getCachedDeviceToken(tokenCache);
+              // Native may have already moved the server-side client to a new
+              // active session. Refresh JS before allowing Clerk JS' stale-session
+              // 401 path to collapse the whole client to signed out.
+              const result = await refreshJsClientFromNativeState({
+                clerkInstance,
+                nativeDeviceToken,
+                previousDeviceToken,
+                rejectForeignSessionlessClient: true,
+                reloadInitialResources: false,
+                suppressDeviceTokenRollbackNotification: true,
+                suppressTokenCacheNotificationsRef,
+                tokenCache,
+              });
+              // The suppressed rollback write skips the listener that resyncs native, so the
+              // restored token must be pushed to native from here.
+              if (result === 'restored' && previousDeviceToken !== undefined) {
+                nativeRefreshFromJsControllerRef.current?.syncDeviceTokenToNative(previousDeviceToken);
+              }
+              if (result) {
+                return;
+              }
+            } catch (error) {
+              const didRecover = await recoverJsClientFromNativeDeviceToken({
+                clerkInstance,
+                error,
+                suppressTokenCacheNotificationsRef,
+                tokenCache,
+              });
+              if (didRecover) {
+                return;
+              }
+            }
+
+            return originalHandleUnauthenticated(options);
+          });
+        } finally {
+          // Slow attempts must not finish with a mostly spent window, so the stamp moves to settle
+          // time. A rotation mid-attempt cleared the ref to force a fresh attempt; keep it cleared.
+          if (lastUnauthenticatedRecoveryRef.current !== undefined) {
+            lastUnauthenticatedRecoveryRef.current = Date.now();
+          }
+        }
       } finally {
         isHandlingUnauthenticated = false;
       }
@@ -829,7 +869,13 @@ export function NativeClientSync({
         clerkInstance.handleUnauthenticated = originalHandleUnauthenticated;
       }
     };
-  }, [clerkInstance, suppressJsClientChangedRef, suppressTokenCacheNotificationsRef, tokenCache]);
+  }, [
+    clerkInstance,
+    nativeRefreshFromJsControllerRef,
+    suppressJsClientChangedRef,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+  ]);
 
   useEffect(() => {
     if (!clerkInstance || typeof clerkInstance.addListener !== 'function') {
