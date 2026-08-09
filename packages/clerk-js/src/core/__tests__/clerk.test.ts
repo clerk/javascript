@@ -1730,6 +1730,66 @@ describe('Clerk singleton', () => {
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    it('uses __internal_navigate for intermediate callback navigations instead of window-level navigation', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const internalNavigate = vi.fn().mockResolvedValue(undefined);
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'missing_requirements', missingFields: ['phone_number'] }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      await sut.handleRedirectCallback({
+        continueSignUpUrl: 'continue',
+        __internal_navigate: internalNavigate,
+      });
+
+      await waitFor(() => {
+        expect(internalNavigate).toHaveBeenCalledWith('continue');
+      });
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({

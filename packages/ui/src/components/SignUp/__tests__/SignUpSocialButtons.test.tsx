@@ -66,6 +66,7 @@ describe('SignUpSocialButtons', () => {
           verifyPhoneNumberUrl: 'verify-phone-number',
           unsafeMetadata: { source: 'test' },
           __internal_navigateOnSetActive: expect.any(Function),
+          __internal_navigate: expect.any(Function),
         }),
       });
     });

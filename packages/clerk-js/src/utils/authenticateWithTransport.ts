@@ -71,7 +71,11 @@ export async function _authenticateWithTransport(opts: {
   const redirectUrl = String(await opts.transport.getRedirectUrl());
 
   let verificationUrl: URL | string | undefined;
-  await opts.authenticateMethod({ ...opts.params, redirectUrl }, url => {
+  // Production FAPI validates both URLs against the instance's redirect allowlist, and only the
+  // transport callback is guaranteed to be registered. Page-derived completion URLs (e.g. a modal's
+  // window.location.href) would be rejected; the app's real destination is handled client-side via
+  // `callbackParams` after the callback completes.
+  await opts.authenticateMethod({ ...opts.params, redirectUrl, redirectUrlComplete: redirectUrl }, url => {
     verificationUrl = url;
   });
 

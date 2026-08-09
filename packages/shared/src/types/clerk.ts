@@ -1325,6 +1325,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
       redirectUrl: string;
       decorateUrl: (url: string) => string;
     }) => Promise<unknown>;
+    /**
+     * Internal navigation hook used by Clerk UI to keep intermediate OAuth callback navigations
+     * (continue, factor steps, sign-in/sign-up switches) inside the component's own router when the
+     * callback completes in-process (transport flows). Without it, these navigations fall back to
+     * window-level navigation, which breaks modal flows in native apps. Not set by the web
+     * redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigate?: (to: string) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;

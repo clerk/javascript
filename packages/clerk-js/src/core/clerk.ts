@@ -2389,9 +2389,10 @@ export class Clerk implements ClerkInterface {
     const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
     const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
 
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function'
-        ? customNavigate(this.buildUrlWithAuth(to))
+      resolvedNavigate && typeof resolvedNavigate === 'function'
+        ? resolvedNavigate(this.buildUrlWithAuth(to))
         : this.navigate(this.buildUrlWithAuth(to));
 
     return this._handleRedirectCallback(params, {
@@ -2741,8 +2742,9 @@ export class Clerk implements ClerkInterface {
     }
     const { signIn, signUp } = this.client;
 
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+      resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
 
     return this._handleRedirectCallback(params, {
       signUp,
