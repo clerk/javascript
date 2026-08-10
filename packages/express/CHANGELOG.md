@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.1.54
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+  - @clerk/backend@3.16.3
+
 ## 2.1.53
 
 ### Patch Changes
