@@ -558,6 +558,27 @@ describe('UserButton (connected)', () => {
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
   });
 
+  // The spinner is held up for a minimum so it cannot flicker off. That hold is for a surface still
+  // on screen, so an action that closes the surface must not carry it: reopening inside the window
+  // would otherwise find the popup spinning over rows that are all stood down, for nothing.
+  it('reopens ready to use after an action that closed it', async () => {
+    const deferred = createDeferred();
+    setActive.mockReturnValueOnce(deferred.promise);
+    renderUserButton();
+    const act = await open();
+
+    await act.click(screen.getByRole('button', { name: 'Other' }));
+    expect(spinner()).toBeInTheDocument();
+
+    deferred.resolve();
+    await waitFor(() => expect(popup()).toBeNull());
+
+    await act.click(trigger());
+
+    expect(spinner()).toBeNull();
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeEnabled();
+  });
+
   // The view decides whether to mount the sentinel at all; this is the wiring that carries the
   // in-view ref from the paginated lists, through the controller, to it.
   it('hands the paging sentinel to the in-view ref when a list has a next page', async () => {
