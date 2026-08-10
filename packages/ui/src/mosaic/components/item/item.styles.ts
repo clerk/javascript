@@ -29,34 +29,34 @@ export const item = stylex.create({
 
   // interactive rows (rendered as a link/button via `render`) gain hover + cursor. Only these
   // promote on hover: a static row is not pointing at anything, so its icon and label hold.
+  // A row that is standing down while another action runs keeps its look rather than dimming, so
+  // it holds its opacity where `Button` drops to 0.5. The pointer still reaches it, which is what
+  // shows `not-allowed`, so every hover branch has to exclude `:disabled` itself.
   interactive: {
     '--_cl-icon-color': {
       default: colorVars['--cl-color-neutral-faded'],
       '@media (hover: hover)': {
         default: null,
-        ':hover': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled)': colorVars['--cl-color-neutral'],
       },
     },
     backgroundColor: {
       default: null,
       ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled)': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     color: {
       default: colorVars['--cl-color-neutral-faded'],
       '@media (hover: hover)': {
         default: null,
-        ':hover': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled)': colorVars['--cl-color-neutral'],
       },
     },
-    cursor: 'pointer',
-    // A row that is standing down while another action runs keeps its place and its look, but
-    // stops answering the pointer — one declaration takes the cursor and the hover states with it.
-    pointerEvents: {
-      default: null,
-      ':disabled': 'none',
+    cursor: {
+      default: 'pointer',
+      ':disabled': 'not-allowed',
     },
   },
 
