@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
+      fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
 
@@ -38,6 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
 
       // Should contain the new device verification notice
       await expect(u.page.getByText("You're signing in from a new device.")).toBeVisible();
+      await expect(u.page.getByRole('link', { name: 'Use another method' })).toBeHidden();
 
       // User should not be signed in yet since client trust step is required
       await u.po.expect.toBeSignedOut();

@@ -72,3 +72,20 @@ export function tokenOrgId(input: TokenResource | JWT): string {
 export function normalizeOrgId(orgId?: string | null): string {
   return orgId || '';
 }
+
+// Mirrors the cookie guard: only a same session+org lastActiveToken is a comparable
+// freshness baseline, so a session or org switch always adopts the incoming token.
+// Without this, an org-switch token minted by a stale edge (lower oiat) would lose
+// to the previous org's token and pin lastActiveToken to the old org's claims.
+export function shouldKeepExistingLastActiveToken(
+  current: TokenResource | null | undefined,
+  incoming: TokenResource,
+): boolean {
+  if (!current?.jwt) {
+    return false;
+  }
+  if (tokenSid(current) !== tokenSid(incoming) || tokenOrgId(current) !== tokenOrgId(incoming)) {
+    return false;
+  }
+  return pickFreshestJwt(current, incoming) !== incoming;
+}

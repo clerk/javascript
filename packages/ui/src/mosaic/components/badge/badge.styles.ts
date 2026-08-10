@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 // warning/negative/positive tint a faded fill and use the saturated token as text;
 // primary/neutral fill with the solid token and use its `-foreground` for text.
@@ -11,6 +11,7 @@ export const styles = stylex.create({
     paddingInline: space['2'],
     alignItems: 'center',
     display: 'inline-flex',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',

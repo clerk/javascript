@@ -1,5 +1,39 @@
 # Change Log
 
+## 7.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`63d25ba`](https://github.com/clerk/javascript/commit/63d25ba21386c77e186b3cbb00d09f9c6d0f1f8f), [`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/backend@3.16.1
+  - @clerk/shared@4.27.1
+  - @clerk/react@6.13.1
+
+## 7.7.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`f38cf02`](https://github.com/clerk/javascript/commit/f38cf02fd55a551fcf1d43c89371cf2132c2ba92), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df), [`58d8ff5`](https://github.com/clerk/javascript/commit/58d8ff50b121ebf42744ba32302da6b22e90b704)]:
+  - @clerk/backend@3.16.0
+  - @clerk/shared@4.27.0
+  - @clerk/react@6.13.0
+
 ## 7.6.5
 
 ### Patch Changes
