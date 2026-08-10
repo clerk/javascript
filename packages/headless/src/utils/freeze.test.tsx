@@ -73,6 +73,14 @@ describe('Freeze', () => {
     act(() => bump());
 
     expect(screen.getByText('count: 0')).toBeInTheDocument();
+
+    rerender(
+      <Freeze frozen={false}>
+        <Counter />
+      </Freeze>,
+    );
+
+    expect(screen.getByText('count: 1')).toBeInTheDocument();
   });
 
   it('holds a context change read from inside the frozen subtree', () => {
@@ -97,5 +105,15 @@ describe('Freeze', () => {
     );
 
     expect(screen.getByText('Acme')).toBeInTheDocument();
+
+    rerender(
+      <NameContext.Provider value='Globex'>
+        <Freeze frozen={false}>
+          <Reader />
+        </Freeze>
+      </NameContext.Provider>,
+    );
+
+    expect(screen.getByText('Globex')).toBeInTheDocument();
   });
 });

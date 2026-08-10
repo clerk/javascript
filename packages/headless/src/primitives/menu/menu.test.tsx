@@ -707,6 +707,8 @@ describe('Menu', () => {
       await new Promise(r => requestAnimationFrame(r));
       await user.keyboard('{ArrowDown}');
       await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('Share')).toHaveAttribute('data-open', '');
+
       await user.keyboard('{Escape}');
 
       expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
@@ -740,6 +742,8 @@ describe('Menu', () => {
       renderMenuInPopover();
 
       await user.click(screen.getByText('Actions'));
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+
       await user.keyboard('{Escape}');
 
       expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
@@ -752,6 +756,11 @@ describe('Menu', () => {
 
       await user.click(screen.getByText('Actions'));
       await user.keyboard('{Escape}');
+      // The whole point of the two-step: the first Escape must spend itself on the menu and leave
+      // the popover up, or the second one is closing something that was already closed.
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Open popover')).toHaveAttribute('data-open', '');
+
       await user.keyboard('{Escape}');
 
       expect(screen.getByText('Open popover')).toHaveAttribute('data-closed', '');
