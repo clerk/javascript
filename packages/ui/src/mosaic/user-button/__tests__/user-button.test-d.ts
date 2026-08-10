@@ -1,7 +1,7 @@
 import type { OrganizationResource, UserResource } from '@clerk/shared/types';
 import { describe, expectTypeOf, test } from 'vitest';
 
-import type { UserButtonProps } from '../index';
+import type { UserButtonProps } from '../../index';
 
 // The published surface of `@clerk/nextjs/experimental/mosaic`, imported the way a consumer gets it.
 // Object literals reach `accept` the same way JSX attributes reach the component, excess-property
