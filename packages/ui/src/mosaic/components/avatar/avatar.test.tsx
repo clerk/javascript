@@ -1,8 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Avatar } from './avatar';
+
+// React reads this off the global object and ships no typing for it.
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
+}
 
 // jsdom never fires load/error on images, so drive `new window.Image()` manually.
 // Each instance resolves to the outcome keyed by its `src`. A `cached` src reports `complete`
@@ -136,6 +143,40 @@ describe('Mosaic Avatar', () => {
 
     expect(screen.getByRole('img', { name: 'Alex' })).toBeInTheDocument();
     expect(screen.queryByText('CN')).not.toBeInTheDocument();
+  });
+
+  // `render` wraps in `act`, which drains passive effects and the re-render they schedule before it
+  // returns, so it cannot tell a layout effect from a `useEffect` here. Driving the root directly is
+  // what pins the guarantee down: `flushSync` runs layout effects and the update they raise, and
+  // stops short of passive effects. The image has to be committed by then, or a browser gets a frame
+  // with the initials in it.
+  it('commits a cached image before passive effects run, so no frame shows the fallback', () => {
+    cached.add('https://example.com/cached.png');
+    const container = document.body.appendChild(document.createElement('div'));
+    const root = createRoot(container);
+    const wasActEnvironment = globalThis.IS_REACT_ACT_ENVIRONMENT;
+    globalThis.IS_REACT_ACT_ENVIRONMENT = false;
+
+    try {
+      flushSync(() => {
+        root.render(
+          <Avatar.Root>
+            <Avatar.Image
+              src='https://example.com/cached.png'
+              alt='Alex'
+            />
+            <Avatar.Fallback>CN</Avatar.Fallback>
+          </Avatar.Root>,
+        );
+      });
+
+      expect(container.querySelector('img')).toHaveAttribute('alt', 'Alex');
+      expect(container.textContent).toBe('');
+    } finally {
+      flushSync(() => root.unmount());
+      container.remove();
+      globalThis.IS_REACT_ACT_ENVIRONMENT = wasActEnvironment;
+    }
   });
 
   it('swaps straight to a cached image rather than falling back between the two', async () => {
