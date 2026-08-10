@@ -311,6 +311,13 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     expect(has({ permission: 'org:feature:permission_53' })).toBe(true);
   });
 
+  test('discards mask bits outside the declared permission list', () => {
+    const { authObject, has } = authFromFeaturePermissionMask('18014398509481984');
+
+    expect(authObject.orgPermissions).toEqual([]);
+    expect(has({ permission: 'org:feature:undefined' })).toBe(false);
+  });
+
   test.each([
     ['1', [0]],
     ['3', [0, 1]],

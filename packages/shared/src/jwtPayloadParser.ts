@@ -88,7 +88,7 @@ function buildOrgPermissions({
       continue;
     }
 
-    for (let permIndex = 0; permIndex < permissionBits.length; permIndex++) {
+    for (let permIndex = 0; permIndex < permissionBits.length && permIndex < permissions.length; permIndex++) {
       if (permissionBits[permIndex] === 1) {
         orgPermissions.push(`org:${feature}:${permissions[permIndex]}`);
       }
