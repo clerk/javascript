@@ -138,6 +138,19 @@ this mode ignores it, down to the trigger.
   storyModule={UserButtonStories}
 />
 
+## Single session
+
+An instance in single-session mode holds one account at a time, so there is nothing to switch to and
+no second account to add. It hands the view an empty `additionalSessions` and leaves `onAddAccount`
+and `onSignOutAll` off — the surface withholds the Accounts group, **Add account**, and **Sign out of
+all accounts** together. The account's own `⋯` still carries **Sign out**, which is all "all
+accounts" ever meant here.
+
+<Story
+  name='SingleSession'
+  storyModule={UserButtonStories}
+/>
+
 ## Menu items
 
 `customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with

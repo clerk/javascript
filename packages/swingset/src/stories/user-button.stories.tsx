@@ -300,6 +300,22 @@ export function User(_args: Record<string, unknown>) {
   );
 }
 
+export function SingleSession(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  // What an instance in single-session mode hands the view: one account, and neither of the two
+  // actions that only make sense with a second one. The account's own `⋯` still signs out of it.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      additionalSessions={[]}
+      onAddAccount={undefined}
+      onSignOutAll={undefined}
+    />
+  );
+}
+
 export function CustomMenuItems(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
