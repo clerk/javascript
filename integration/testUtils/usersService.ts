@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import type { TestInfo } from '@playwright/test';
 
 import { fakerPassword, hash } from '../models/helpers';
+import { getE2ERunMarker } from './e2eRun';
 
 async function withErrorLogging<T>(operation: string, fn: () => Promise<T>): Promise<T> {
   try {
@@ -129,24 +130,29 @@ export const createUserService = (clerkClient: ClerkClient) => {
         withUsername = false,
       } = options || {};
       const randomHash = hash();
+      const runMarker = getE2ERunMarker();
+      const markedHash = runMarker ? `${runMarker}.${randomHash}` : randomHash;
       const email = fictionalEmail
-        ? `${randomHash}+clerk_test@clerkcookie.com`
-        : `clerkcookie+${randomHash}@mailsac.com`;
+        ? `${markedHash}+clerk_test@clerkcookie.com`
+        : `clerkcookie+${markedHash}@mailsac.com`;
       const phoneNumber = fakerPhoneNumber();
       const { file, line, title, titlePath } = test.info();
+      const fakeUserEmail = withEmail ? email : undefined;
+      const fakeUserPhoneNumber = withPhoneNumber ? phoneNumber : undefined;
 
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
-        email: withEmail ? email : undefined,
-        username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
+        email: fakeUserEmail,
+        username: withUsername ? `${markedHash}_clerk_cookie` : undefined,
         password: withPassword ? fakerPassword() : undefined,
-        phoneNumber: withPhoneNumber ? phoneNumber : undefined,
+        phoneNumber: fakeUserPhoneNumber,
         privateMetadata: {
           title,
           titlePath,
           file,
           line,
+          ...(runMarker ? { e2eRunMarker: runMarker } : {}),
         },
         deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };
