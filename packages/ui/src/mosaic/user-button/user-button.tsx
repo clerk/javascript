@@ -131,7 +131,12 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
 
   // Every action here is a network round trip, so there is nothing to debounce and the click gets
   // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
-  const displayPendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
+  const displayPendingKey = useSpinDelay(context.pendingKey, {
+    delay: 0,
+    // Holding it steadies a surface still on screen. An action that closes the popup leaves none,
+    // so the hold would outlive it and stiffen the next open instead.
+    minDuration: context.closeOnSuccess ? 0 : undefined,
+  });
 
   // If controller ever goes back into loading, we want to preserve the portals
   if (controller.status === 'loading') {
