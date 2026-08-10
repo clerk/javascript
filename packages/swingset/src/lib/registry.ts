@@ -96,6 +96,10 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
+import {
+  Default as UserProfileAccountSectionDefault,
+  meta as userProfileAccountSectionMeta,
+} from '../stories/user-profile-account-section.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -204,9 +208,15 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileAccountSectionModule: StoryModule = {
+  meta: userProfileAccountSectionMeta,
+  Default: UserProfileAccountSectionDefault,
+};
+
 export const registry: StoryModule[] = [
   // User
   userButtonModule,
+  userProfileAccountSectionModule,
   // Components
   avatarModule,
   badgeModule,
