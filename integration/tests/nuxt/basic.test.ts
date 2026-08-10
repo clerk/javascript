@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
   });

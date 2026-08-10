@@ -7,11 +7,11 @@ import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
 import { withRetry } from './retryableClerkClient';
-import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail } from './usersService';
+import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, PlaywrightTest } from './usersService';
 import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
 
-export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail };
+export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, PlaywrightTest };
 
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({

@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser({
+      fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
