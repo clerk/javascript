@@ -1,5 +1,12 @@
 # @clerk/headless
 
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+
 ## 0.0.22
 
 ### Patch Changes
