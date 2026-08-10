@@ -76,6 +76,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             __internal_callbackParams: {
               ...buildSignUpOAuthTransportCallbackParams(ctx),
               __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+              __internal_navigate: navigate,
             },
           })
           .catch(err => {

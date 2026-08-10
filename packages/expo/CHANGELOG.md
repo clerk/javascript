@@ -1,5 +1,20 @@
 # Change Log
 
+## 4.2.4
+
+### Patch Changes
+
+- Keep a cached environment when the app starts offline and only the client cache is empty. Previously both resources fell back to placeholder data, so instance settings were lost until the app was restarted with a working network. ([#9284](https://github.com/clerk/javascript/pull/9284)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Repeated unauthenticated responses now share one native recovery attempt within a few seconds of each other, instead of reading native state and refetching the client for every response.
+
+  Fix the `tokenCache` prop documentation: the cache stores the client JWT, not the session token.
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`8c61153`](https://github.com/clerk/javascript/commit/8c61153bc69b3e677613ab3e1e4c45948cf93405), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/clerk-js@6.28.0
+  - @clerk/shared@4.28.0
+  - @clerk/react@6.14.0
+
 ## 4.2.3
 
 ### Patch Changes
