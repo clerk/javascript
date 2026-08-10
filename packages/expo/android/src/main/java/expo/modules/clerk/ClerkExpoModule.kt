@@ -15,6 +15,8 @@ import com.clerk.api.ui.ClerkTheme
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.records.Field
+import expo.modules.kotlin.records.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,6 +36,12 @@ private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
         Log.d(tag, message)
     }
+}
+
+internal class ConfigureOptions : Record {
+    @Field val bearerToken: String? = null
+
+    @Field val proxyUrl: String? = null
 }
 
 class ClerkExpoModule : Module() {
@@ -86,8 +94,14 @@ class ClerkExpoModule : Module() {
             clientStateObserverJob = null
         }
 
-        AsyncFunction("configure") { pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise ->
-            configure(pubKey, bearerToken, proxyUrl, promise)
+        // Kept with the pre-proxy signature so OTA-updated JS bundles built against older
+        // SDK versions keep working; new bundles feature-detect configureWithOptions.
+        AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
+            configure(pubKey, bearerToken, null, promise)
+        }
+
+        AsyncFunction("configureWithOptions") { pubKey: String, options: ConfigureOptions, promise: Promise ->
+            configure(pubKey, options.bearerToken, options.proxyUrl, promise)
         }
 
         AsyncFunction("getClientToken") { promise: Promise ->

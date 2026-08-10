@@ -5,6 +5,13 @@
 import ExpoModulesCore
 import Foundation
 
+// MARK: - Records
+
+struct ConfigureOptions: Record {
+  @Field var bearerToken: String?
+  @Field var proxyUrl: String?
+}
+
 // MARK: - Module
 
 public class ClerkExpoModule: Module {
@@ -31,8 +38,14 @@ public class ClerkExpoModule: Module {
       }
     }
 
-    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) in
-      self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: proxyUrl, promise: promise)
+    // Kept with the pre-proxy signature so OTA-updated JS bundles built against older
+    // SDK versions keep working; new bundles feature-detect configureWithOptions.
+    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
+      self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: nil, promise: promise)
+    }
+
+    AsyncFunction("configureWithOptions") { (publishableKey: String, options: ConfigureOptions, promise: Promise) in
+      self.configure(publishableKey, bearerToken: options.bearerToken, proxyUrl: options.proxyUrl, promise: promise)
     }
 
     AsyncFunction("getClientToken") { (promise: Promise) in

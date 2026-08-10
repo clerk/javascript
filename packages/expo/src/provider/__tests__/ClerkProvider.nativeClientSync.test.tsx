@@ -3,11 +3,13 @@ import React, { type ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
+import NativeClerkModule from '../../specs/NativeClerkModule';
 import { ClerkProvider } from '../ClerkProvider';
 
 const mocks = vi.hoisted(() => {
   return {
     configure: vi.fn(),
+    configureWithOptions: vi.fn(),
     getClientToken: vi.fn(),
     nativeClientEvent: null as unknown,
     syncClientStateFromJs: vi.fn(),
@@ -95,6 +97,7 @@ vi.mock('../../specs/NativeClerkModule', () => {
     default: {
       addListener: vi.fn(),
       configure: mocks.configure,
+      configureWithOptions: mocks.configureWithOptions,
       getClientToken: mocks.getClientToken,
       syncClientStateFromJs: mocks.syncClientStateFromJs,
     },
@@ -129,7 +132,10 @@ describe('ClerkProvider native client sync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.nativeClientEvent = null;
+    (NativeClerkModule as unknown as { configureWithOptions?: unknown }).configureWithOptions =
+      mocks.configureWithOptions;
     mocks.configure.mockResolvedValue(undefined);
+    mocks.configureWithOptions.mockResolvedValue(undefined);
     mocks.getClientToken.mockResolvedValue(null);
     mocks.syncClientStateFromJs.mockResolvedValue(undefined);
     mocks.tokenCache.getToken.mockResolvedValue(null);
@@ -186,9 +192,12 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token', null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: 'client-token',
+        proxyUrl: null,
+      });
     });
-    expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
     expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
     expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
   });
@@ -203,9 +212,33 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, 'https://example.com/api/__clerk');
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: null,
+        proxyUrl: 'https://example.com/api/__clerk',
+      });
+    });
+    expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
+    expect(mocks.configure).not.toHaveBeenCalled();
+  });
+
+  test('falls back to the legacy configure signature when the binary lacks configureWithOptions', async () => {
+    delete (NativeClerkModule as unknown as { configureWithOptions?: unknown }).configureWithOptions;
+    mocks.tokenCache.getToken.mockResolvedValue('client-token');
+    mocks.getClientToken.mockResolvedValue('client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        proxyUrl='https://example.com/api/__clerk'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token');
     });
     expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.configureWithOptions).not.toHaveBeenCalled();
   });
 
   test('syncs the native device token to JS after Clerk loads during bootstrap', async () => {
@@ -223,7 +256,7 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() => {
       expect(mocks.clerkInstance.on).toHaveBeenCalledWith('status', expect.any(Function));
     });
-    expect(mocks.configure).not.toHaveBeenCalled();
+    expect(mocks.configureWithOptions).not.toHaveBeenCalled();
     expect(mocks.getClientToken).not.toHaveBeenCalled();
     expect(mocks.tokenCache.saveToken).not.toHaveBeenCalled();
     expect(mocks.clerkInstance.__internal_reloadInitialResources).not.toHaveBeenCalled();
@@ -239,7 +272,7 @@ describe('ClerkProvider native client sync', () => {
     });
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
       expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
     });
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
@@ -248,7 +281,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('syncs a JS token rotated during bootstrap to native exactly once', async () => {
     const configure = deferred();
-    mocks.configure.mockReturnValue(configure.promise);
+    mocks.configureWithOptions.mockReturnValue(configure.promise);
     mocks.tokenCache.getToken.mockResolvedValueOnce('cached-client-token').mockResolvedValue('rotated-client-token');
     mocks.getClientToken.mockResolvedValue('native-client-token');
 
@@ -260,9 +293,12 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'cached-client-token', null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: 'cached-client-token',
+        proxyUrl: null,
+      });
     });
-    expect(mocks.configure).toHaveBeenCalledTimes(1);
+    expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
     expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
 
     act(() => {
@@ -283,7 +319,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('flushes one JS client change that occurs after JS loads but before native is ready', async () => {
     const configure = deferred();
-    mocks.configure.mockReturnValue(configure.promise);
+    mocks.configureWithOptions.mockReturnValue(configure.promise);
 
     render(
       <ClerkProvider
@@ -293,7 +329,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledTimes(1);
+      expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
       expect(mocks.clerkInstance.addListener).toHaveBeenCalled();
     });
 
@@ -314,7 +350,7 @@ describe('ClerkProvider native client sync', () => {
 
   test('keeps synchronization enabled when native configure rejects', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    mocks.configure.mockRejectedValue(new Error('native refresh failed'));
+    mocks.configureWithOptions.mockRejectedValue(new Error('native refresh failed'));
 
     render(
       <ClerkProvider
@@ -324,7 +360,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledTimes(1);
+      expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
     });
 
     act(() => {
@@ -352,8 +388,8 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() => {
       expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
     });
-    expect(mocks.configure).toHaveBeenCalledTimes(1);
-    expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+    expect(mocks.configureWithOptions).toHaveBeenCalledTimes(1);
+    expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalledTimes(1);
   });
@@ -387,7 +423,7 @@ describe('ClerkProvider native client sync', () => {
     render(<ClerkProvider publishableKey='pk_test_123' />);
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -410,7 +446,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
@@ -447,7 +483,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
@@ -485,7 +521,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.__internal_reloadInitialResources.mockClear();
@@ -523,7 +559,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -569,7 +605,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -665,7 +701,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.nativeClientEvent = {
@@ -728,7 +764,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.setActive.mockClear();
@@ -787,7 +823,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     mocks.clerkInstance.setActive.mockClear();
@@ -872,7 +908,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
 
     originalUpdateClient.mockClear();
@@ -940,7 +976,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -992,7 +1028,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.updateClient).not.toBe(originalUpdateClient);
@@ -1108,7 +1144,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.updateClient).not.toBe(originalUpdateClient);
@@ -1189,7 +1225,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1236,7 +1272,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1274,7 +1310,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1317,7 +1353,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1371,7 +1407,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalled();
+      expect(mocks.configureWithOptions).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1404,7 +1440,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1435,7 +1471,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     act(() => {
@@ -1473,7 +1509,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     await act(async () => {
@@ -1508,7 +1544,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1533,7 +1569,7 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', { bearerToken: null, proxyUrl: null });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1629,7 +1665,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: jsDeviceToken,
+        proxyUrl: null,
+      });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1690,7 +1729,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: jsDeviceToken,
+        proxyUrl: null,
+      });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1749,7 +1791,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: jsDeviceToken,
+        proxyUrl: null,
+      });
     });
 
     mocks.syncClientStateFromJs.mockClear();
@@ -1812,7 +1857,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', jsDeviceToken, null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: jsDeviceToken,
+        proxyUrl: null,
+      });
     });
 
     mocks.tokenCache.saveToken.mockClear();
@@ -1871,7 +1919,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'js-device-token', null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: 'js-device-token',
+        proxyUrl: null,
+      });
     });
     await waitFor(() => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
@@ -1926,7 +1977,10 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => {
-      expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'js-device-token', null);
+      expect(mocks.configureWithOptions).toHaveBeenCalledWith('pk_test_123', {
+        bearerToken: 'js-device-token',
+        proxyUrl: null,
+      });
     });
 
     mocks.tokenCache.getToken.mockImplementation(() => new Promise(() => {}));

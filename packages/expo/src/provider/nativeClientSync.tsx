@@ -1023,7 +1023,22 @@ export function useNativeClientBootstrap({
             }
 
             didAttemptConfigure = true;
-            await ClerkExpo.configure(publishableKey, initialJsDeviceToken, nativeProxyUrl);
+            if (typeof ClerkExpo.configureWithOptions === 'function') {
+              await ClerkExpo.configureWithOptions(publishableKey, {
+                bearerToken: initialJsDeviceToken,
+                proxyUrl: nativeProxyUrl,
+              });
+            } else {
+              // Binary predates proxy support; OTA-updated JS must keep the legacy 2-arg call
+              // because Expo Modules rejects calls with more arguments than the binary declares.
+              if (nativeProxyUrl && __DEV__) {
+                console.warn(
+                  '[ClerkProvider] The installed Clerk native module does not support proxyUrl. ' +
+                    'Rebuild the app binary to route native components through your proxy.',
+                );
+              }
+              await ClerkExpo.configure(publishableKey, initialJsDeviceToken);
+            }
 
             if (!isCurrentConfiguration()) {
               return;
