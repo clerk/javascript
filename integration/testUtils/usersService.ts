@@ -173,24 +173,35 @@ export const createUserService = (clerkClient: ClerkClient) => {
       return await self.createBapiUser(fakeUser);
     },
     deleteIfExists: async (opts: { id?: string; email?: string; phoneNumber?: string }) => {
-      let id = opts.id;
+      const [usersByEmail, usersByPhoneNumber] = await Promise.all([
+        opts.email
+          ? withErrorLogging('getUserList', () =>
+              clerkClient.users.getUserList({
+                emailAddress: [opts.email],
+              }),
+            )
+          : undefined,
+        opts.phoneNumber
+          ? withErrorLogging('getUserList', () =>
+              clerkClient.users.getUserList({
+                phoneNumber: [opts.phoneNumber],
+              }),
+            )
+          : undefined,
+      ]);
 
-      if (!id) {
-        const { data: users } = await withErrorLogging('getUserList', () =>
-          clerkClient.users.getUserList({
-            emailAddress: [opts.email],
-            phoneNumber: [opts.phoneNumber],
-          }),
-        );
-        id = users[0]?.id;
-      }
+      const ids = new Set([
+        ...(opts.id ? [opts.id] : []),
+        ...(usersByEmail?.data.map(user => user.id) ?? []),
+        ...(usersByPhoneNumber?.data.map(user => user.id) ?? []),
+      ]);
 
-      if (!id) {
+      if (ids.size === 0) {
         console.log(`User "${opts.email || opts.phoneNumber}" does not exist!`);
         return;
       }
 
-      await withErrorLogging('deleteUser', () => clerkClient.users.deleteUser(id));
+      await Promise.all(Array.from(ids, id => withErrorLogging('deleteUser', () => clerkClient.users.deleteUser(id))));
     },
     getUser: async (opts: { id?: string; email?: string }) => {
       if (opts.id) {
