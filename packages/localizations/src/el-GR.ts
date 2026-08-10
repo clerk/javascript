@@ -100,8 +100,11 @@ export const elGR: LocalizationResource = {
     cannotSubscribeMonthly: 'Δεν μπορείτε να εγγραφείτε μηνιαίως σε αυτό το πλάνο',
     cannotSubscribeUnrecoverable: 'Δεν μπορείτε να εγγραφείτε σε αυτό το πλάνο αυτήν τη στιγμή',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Η πληρωμή σας ολοκληρώθηκε επιτυχώς',
       description__subscriptionSuccessful: 'Η συνδρομή σας ξεκίνησε επιτυχώς',
+      discount: undefined,
       downgradeNotice: 'Θα υποβαθμιστείτε στο τέλος της τρέχουσας περιόδου χρέωσης',
       emailForm: {
         subtitle: 'Εισάγετε τη διεύθυνση email σας για να συνεχίσετε',
@@ -116,6 +119,8 @@ export const elGR: LocalizationResource = {
       },
       pastDueNotice: 'Η συνδρομή σας είναι ληξιπρόθεσμη. Παρακαλώ ενημερώστε τη μέθοδο πληρωμής σας.',
       perMonth: 'ανά μήνα',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Ολοκλήρωση πληρωμής',
       title__paymentSuccessful: 'Επιτυχής πληρωμή',
       title__subscriptionSuccessful: 'Επιτυχής συνδρομή',
@@ -126,6 +131,9 @@ export const elGR: LocalizationResource = {
     credit: 'Πίστωση',
     creditRemainder: 'Υπόλοιπο πίστωσης',
     defaultFreePlanActive: 'Το προεπιλεγμένο δωρεάν πλάνο είναι ενεργό',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Δωρεάν',
     getStarted: 'Ξεκινήστε',
     highlightedPlanBadge: 'Δημοφιλές',
@@ -137,6 +145,7 @@ export const elGR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Μηνιαία',
+    months: undefined,
     pastDue: 'Ληξιπρόθεσμο',
     pay: 'Πληρωμή',
     payerCreditRemainder: undefined,
@@ -215,6 +224,7 @@ export const elGR: LocalizationResource = {
     year: 'έτος',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -938,6 +948,7 @@ export const elGR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,

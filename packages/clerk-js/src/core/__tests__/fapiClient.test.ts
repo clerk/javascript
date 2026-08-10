@@ -384,12 +384,18 @@ describe('request', () => {
     });
   });
 
-  describe('protect params', () => {
+  describe('Protect params', () => {
+    // Two independent features feed this one hook — an application-supplied assertion and the
+    // server-configured session token — so the fixture carries params from both.
     const protectParams = {
+      __clerk_protect_assertion: 'token-abc',
       __clerk_protect_token: 'v1.payload.mac',
       __clerk_protect_status: 'ok',
       __clerk_protect_cid: `1-${'a'.repeat(26)}-${'b'.repeat(26)}`,
     };
+    const expectedProtectQuery =
+      '__clerk_protect_assertion=token-abc&__clerk_protect_token=v1.payload.mac&__clerk_protect_status=ok' +
+      `&__clerk_protect_cid=${protectParams.__clerk_protect_cid}`;
 
     let getProtectParams: Mock;
     let clientWithProtect: ReturnType<typeof createFapiClient>;
@@ -401,18 +407,18 @@ describe('request', () => {
 
     const bodyOf = () => (fetch as Mock).mock.calls[0][1].body as string;
 
-    it.each(['/client/sign_ins', '/client/sign_ups', '/client/sign_ins/sia_123/attempt_first_factor'])(
-      'merges them into the form-encoded body of %s',
-      async path => {
-        await clientWithProtect.request({ path, method: 'POST', body: { identifier: 'nick@clerk.dev' } as any });
+    it.each([
+      '/client/sign_ins',
+      '/client/sign_ups',
+      '/client/sign_ins/sia_123/attempt_first_factor',
+      '/client/sign_ups/sua_123/attempt_verification',
+    ])('merges them into the form-encoded body of %s', async path => {
+      await clientWithProtect.request({ path, method: 'POST', body: { identifier: 'nick@clerk.dev' } as any });
 
-        expect(bodyOf()).toBe(
-          `identifier=nick%40clerk.dev&__clerk_protect_token=v1.payload.mac&__clerk_protect_status=ok&__clerk_protect_cid=${protectParams.__clerk_protect_cid}`,
-        );
-        // A signed credential must never land in the URL, which is logged all along the path.
-        expect((fetch as Mock).mock.calls[0][0].toString()).not.toContain('__clerk_protect');
-      },
-    );
+      expect(bodyOf()).toBe(`identifier=nick%40clerk.dev&${expectedProtectQuery}`);
+      // A signed credential must never land in the URL, which is logged all along the path.
+      expect((fetch as Mock).mock.calls[0][0].toString()).not.toContain('__clerk_protect');
+    });
 
     it('adds no request headers', async () => {
       await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: {} as any });
@@ -421,13 +427,15 @@ describe('request', () => {
       expect([...headers.keys()]).toEqual(['content-type']);
     });
 
+    // Also pins the param names against the camel-to-snake body key encoder: they are all
+    // lower-case, so it has nothing to rewrite.
     it('populates the body even when the request had none', async () => {
       await clientWithProtect.request({ path: '/client/sign_ups', method: 'POST' });
 
-      expect(bodyOf()).toContain('__clerk_protect_status=ok');
+      expect(bodyOf()).toBe(expectedProtectQuery);
     });
 
-    it.each(['/client', '/client/sessions', '/environment', '/client/sign_insomething'])(
+    it.each(['/client', '/client/sessions', '/environment', '/client/sign_insomething', '/client/sign_ins_other'])(
       'leaves %s alone',
       async path => {
         await clientWithProtect.request({ path, method: 'POST', body: { foo: 'bar' } as any });
@@ -443,6 +451,7 @@ describe('request', () => {
       expect(getProtectParams).not.toHaveBeenCalled();
     });
 
+    // Spreading a FormData would discard the caller's payload, so non-plain bodies are left alone.
     it('leaves a FormData body alone', async () => {
       const formData = new FormData();
       formData.append('identifier', 'nick@clerk.dev');
@@ -453,12 +462,17 @@ describe('request', () => {
       expect(getProtectParams).not.toHaveBeenCalled();
     });
 
-    it('sends nothing extra when the instance does not participate', async () => {
-      getProtectParams.mockResolvedValue(undefined);
+    it('leaves a string body alone', async () => {
+      // text/plain keeps the form-urlencoded encoder out of it.
+      await clientWithProtect.request({
+        path: '/client/sign_ins',
+        method: 'POST',
+        body: 'raw string body',
+        headers: { 'content-type': 'text/plain' },
+      });
 
-      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: { foo: 'bar' } as any });
-
-      expect(bodyOf()).toBe('foo=bar');
+      expect(bodyOf()).toBe('raw string body');
+      expect(getProtectParams).not.toHaveBeenCalled();
     });
 
     // Merging into any of these would spread away the caller's payload rather than add to it.
@@ -473,6 +487,14 @@ describe('request', () => {
       expect(String((fetch as Mock).mock.calls[0][1].body)).not.toContain('__clerk_protect');
     });
 
+    it('sends nothing extra when the instance contributes no params', async () => {
+      getProtectParams.mockResolvedValue(undefined);
+
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: { foo: 'bar' } as any });
+
+      expect(bodyOf()).toBe('foo=bar');
+    });
+
     it('still sends the request when resolving the params rejects', async () => {
       getProtectParams.mockRejectedValue(new DOMException('storage is blocked', 'SecurityError'));
 
@@ -481,6 +503,12 @@ describe('request', () => {
         clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: { foo: 'bar' } as any }),
       ).resolves.toBeDefined();
       expect(bodyOf()).toBe('foo=bar');
+    });
+
+    it('is inert when no hook is configured', async () => {
+      await fapiClient.request({ path: '/client/sign_ins', method: 'POST', body: { identifier: 'a' } as any });
+
+      expect(bodyOf()).toBe('identifier=a');
     });
   });
 

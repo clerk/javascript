@@ -75,9 +75,9 @@ type FapiClientOptions = {
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
   /**
-   * Resolves the Protect params (`__clerk_protect_token` / `_status` / `_cid`) to merge into the
-   * body of a sign-in or sign-up POST, or `undefined` when this instance does not participate.
-   * Resolves to `undefined` before the environment has loaded, so early requests carry nothing.
+   * Resolves the Protect params to merge into the body of a sign-in or sign-up POST, or `undefined`
+   * when this instance contributes none. Resolves to `undefined` before the environment has loaded,
+   * so early requests carry nothing.
    */
   getProtectParams?: () => Promise<Record<string, string | undefined> | undefined>;
   isSatellite?: boolean;
@@ -228,11 +228,11 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const { method = 'GET' } = requestInit;
     let { body } = requestInit;
 
-    // The Protect session token rides in the form-encoded body of sign-in and
-    // sign-up POSTs. It has to be merged here, before the body is stringified below — the
-    // onBeforeRequest callbacks run after stringification, so they cannot add a body param. A body
-    // param also keeps the request CORS-simple; a custom header would trigger the preflight that
-    // breaks cookie dropping in Safari, the same reason `_method` is a query param.
+    // Protect params ride in the form-encoded body of sign-in and sign-up POSTs. They have to be
+    // merged here, before the body is stringified below — the onBeforeRequest callbacks run after
+    // stringification, so they cannot add a body param. A body param also keeps the request
+    // CORS-simple; a custom header would trigger the preflight that breaks cookie dropping in
+    // Safari, the same reason `_method` is a query param.
     if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
       // Protect can degrade a sign-in but must never fail one, so a rejection here costs the
       // params and nothing else.

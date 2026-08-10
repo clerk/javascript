@@ -143,6 +143,7 @@ describe('PaymentElement Localization', () => {
     error: null,
     fetchStatus: 'idle' as const,
     confirm: vi.fn(),
+    update: vi.fn(),
     start: vi.fn(),
     clear: vi.fn(),
     finalize: vi.fn(),

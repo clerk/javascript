@@ -16,10 +16,10 @@ testAgainstRunningApps({
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
-    fakeAdmin = m.services.users.createFakeUser();
+    fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-    fakeViewer = m.services.users.createFakeUser();
+    fakeViewer = m.services.users.createFakeUser(test);
     const viewer = await m.services.users.createBapiUser(fakeViewer);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,

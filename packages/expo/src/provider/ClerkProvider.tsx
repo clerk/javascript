@@ -32,7 +32,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    */
   publishableKey: string;
   /**
-   * The token cache is used to persist the active user's session token. Clerk stores this token in memory by default, however it is recommended to use a token cache for production applications.
+   * The token cache is used to persist the client JWT that identifies this device to Clerk. Clerk keeps it in memory by default, however it is recommended to use a token cache backed by secure storage for production applications.
    * @see https://clerk.com/docs/quickstarts/expo#configure-the-token-cache-with-expo
    */
   tokenCache?: TokenCache;
