@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test('sign up with email and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -38,7 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test("can't sign up with weak password", async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -67,7 +67,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test('can sign up with phone number', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -95,7 +95,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test('(modal) can sign up with phone number', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -126,7 +126,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test('sign up with first name, last name, email, phone and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -165,7 +165,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
   test('sign up, sign out and sign in again', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    const fakeUser = u.services.users.createFakeUser({
+    const fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
