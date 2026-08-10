@@ -272,7 +272,7 @@ If you need a fake user to login to the test site, use `createTestUtils`.
        // ...
 
        const m = createTestUtils({ app });
-       fakeUser = m.services.users.createFakeUser();
+       fakeUser = m.services.users.createFakeUser(test);
        await m.services.users.createBapiUser(fakeUser);
      });
 

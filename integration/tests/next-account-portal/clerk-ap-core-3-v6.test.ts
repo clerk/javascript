@@ -18,7 +18,7 @@ test.describe('Next with ClerkJS V6 <-> Account Portal Core 3 @ap-flows', () => 
     await app.withEnv(appConfigs.envs.withAPCore3ClerkV6);
     await app.dev();
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 
@@ -36,7 +36,7 @@ test.describe('Next with ClerkJS V6 <-> Account Portal Core 3 @ap-flows', () => 
   });
 
   test('sign up', async ({ page, context }) => {
-    await testSignUp({ app, page, context, fakeUser });
+    await testSignUp({ app, page, context, fakeUser }, test);
   });
 
   test('ssr', async ({ page, context }) => {

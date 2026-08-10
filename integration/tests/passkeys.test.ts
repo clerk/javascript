@@ -36,7 +36,7 @@ test.describe('passkeys @generic', () => {
     await app.withEnv(appConfigs.envs.withPasskeys);
     await app.dev();
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({ fictionalEmail: true, withPassword: true });
+    fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: true, withPassword: true });
     await u.services.users.createBapiUser(fakeUser);
   });
 
