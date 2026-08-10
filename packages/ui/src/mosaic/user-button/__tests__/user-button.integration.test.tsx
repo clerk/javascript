@@ -490,10 +490,11 @@ describe('UserButton (connected)', () => {
     // Every one of these is a network round trip, so there is nothing to debounce: the click gets
     // its spinner in the same pass rather than after a delay window.
     expect(spinner()).toBeInTheDocument();
-    // A stood-down row stays a button, disabled. Dropping it to a static row would remount it,
-    // and with it the avatar it carries.
-    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'bob@example.com' })).toBeDisabled();
+    // A stood-down row stays a button, and `aria-disabled` rather than natively disabled so it
+    // keeps its place in the tab order. Dropping it to a static row would remount it, and with it
+    // the avatar it carries.
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'bob@example.com' })).toHaveAttribute('aria-disabled', 'true');
     expect(popup()).toBeInTheDocument();
 
     deferred.resolve();
