@@ -118,12 +118,13 @@ describe('UserButtonView, user mode', () => {
     expect(within(header).getAllByText('alice@example.com')).toHaveLength(1);
   });
 
-  it('lists no workspaces at all', () => {
+  it('lists no workspaces at all, and offers no way to make one', () => {
     renderUserMode();
 
     expect(workspaceList()).toBeUndefined();
     expect(screen.queryByText('Personal account')).toBeNull();
     expect(screen.queryByText('Gamma')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
   });
 
   it('signs out of the account from the header, beside the gear', async () => {
@@ -157,6 +158,12 @@ describe('UserButtonView, user mode', () => {
 
     expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Account actions' })).toBeNull();
+  });
+
+  it('signs out of every account at the foot', () => {
+    renderUserMode();
+
+    expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toBeInTheDocument();
   });
 });
 
@@ -202,6 +209,9 @@ describe('UserButtonView, organization mode', () => {
     expect(screen.queryByText('Accounts')).toBeNull();
     expect(screen.queryByRole('button', { name: 'bob@example.com' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Actions for alice@example.com' })).toBeNull();
+    // Nothing carries "Sign out" either: with no row to hang it off, the header would be the only
+    // place left, and that slot is the organization's.
+    expect(screen.queryByRole('button', { name: 'Sign out' })).toBeNull();
   });
 
   it('takes "Create organization" at the foot, in place of the account actions', () => {
@@ -228,6 +238,7 @@ describe('UserButtonView, combined mode', () => {
 
     // The subtitle is the header's alone; the row below it carries only a title.
     expect(screen.getByText('24 members · Pro')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
   });
 

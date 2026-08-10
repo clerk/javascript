@@ -335,7 +335,8 @@ function Header() {
   const subtitle = organization ? membershipSubtitle(organization) : accountSubtitle;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
-  const invitable = data.layout.listsOrganizations ? data.activeOrganization : null;
+  const invitable =
+    data.layout.placement.inviteMembers === 'header' && data.layout.listsOrganizations ? data.activeOrganization : null;
 
   const actions: HeaderAction[] = [];
   if (invitable && data.onInviteMembers) {
@@ -343,7 +344,7 @@ function Header() {
   }
   // Every other surface hangs "Sign out" off the account's own row. An account-only one has no such
   // row, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
-  if (data.layout.signOutInHeader && signOutSession) {
+  if (data.layout.placement.signOut === 'header' && signOutSession) {
     actions.push({
       label: m.accounts.signOut,
       onClick: () => signOutSession(sessionId),
@@ -432,13 +433,13 @@ function ActiveAccountRow() {
   const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId));
 
   const actions: AccountAction[] = [];
-  if (data.onCreateOrganization) {
+  if (data.layout.placement.createOrganization === 'account-row' && data.onCreateOrganization) {
     actions.push({ label: m.manage.createOrganization, onClick: data.onCreateOrganization });
   }
   if (data.onManageAccount) {
     actions.push({ label: m.manage.account, onClick: data.onManageAccount });
   }
-  if (signOutSession) {
+  if (data.layout.placement.signOut === 'account-row' && signOutSession) {
     actions.push({
       label: m.accounts.signOut,
       color: 'negative',
@@ -738,7 +739,7 @@ function AccountsHeading() {
   const data = useUserButtonContext();
 
   const actions: AccountAction[] = [];
-  if (data.onAddAccount) {
+  if (data.layout.placement.addAccount === 'accounts-heading' && data.onAddAccount) {
     actions.push({ label: m.accounts.add, onClick: data.onAddAccount });
   }
 
@@ -793,7 +794,7 @@ function AccountsSection() {
 function Footer() {
   const data = useUserButtonContext();
 
-  const { layout } = data;
+  const { placement } = data.layout;
   // "Create organization" and "Add account" are the same slot, taken by whichever of the two the
   // surface has nowhere else to put (see `user-button.layout`), so they share the icon as well.
   const plus = (
@@ -804,7 +805,7 @@ function Footer() {
   );
 
   const builtIn: ActionRowProps[] = [];
-  if (layout.createOrganizationInFooter && data.onCreateOrganization) {
+  if (placement.createOrganization === 'footer' && data.onCreateOrganization) {
     builtIn.push({
       id: 'createOrganization',
       icon: plus,
@@ -812,10 +813,10 @@ function Footer() {
       onClick: data.onCreateOrganization,
     });
   }
-  if (layout.addAccountInFooter && data.onAddAccount) {
+  if (placement.addAccount === 'footer' && data.onAddAccount) {
     builtIn.push({ id: 'addAccount', icon: plus, label: m.accounts.add, onClick: data.onAddAccount });
   }
-  if (layout.signOutAllInFooter && data.onSignOutAll) {
+  if (placement.signOutAll === 'footer' && data.onSignOutAll) {
     builtIn.push({
       id: 'signOutAll',
       icon: (
