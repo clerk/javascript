@@ -1,0 +1,66 @@
+import * as SettingsGroupStories from './settings-group.stories';
+
+# SettingsGroup
+
+A settings block that carries the canonical section, surface, separator, and label/control layout. Use it for product settings rather than assembling those decisions from generic cards and item groups.
+
+## Usage
+
+```tsx
+import { SettingsGroup } from '@clerk/ui/mosaic/block/settings-group';
+
+<SettingsGroup.Root>
+  <SettingsGroup.Title>Account</SettingsGroup.Title>
+  <SettingsGroup.List>
+    <SettingsGroup.Row>
+      <SettingsGroup.Media>{icon}</SettingsGroup.Media>
+      <SettingsGroup.Label description='Shown throughout the application.'>
+        Name
+      </SettingsGroup.Label>
+      <SettingsGroup.Control>{control}</SettingsGroup.Control>
+    </SettingsGroup.Row>
+  </SettingsGroup.List>
+</SettingsGroup.Root>
+```
+
+`SettingsGroup.List` owns the outlined surface and separation between direct `SettingsGroup.Row` children. `SettingsGroup.Media` reserves a consistent slot for icons, avatars, and provider marks. Each row places its label opposite its control. Use `SettingsGroup.Control` for inputs, switches, menus, and buttons—not only actions.
+
+When a row contains one form control, add `field` to associate its label automatically:
+
+```tsx
+<SettingsGroup.Row field>
+  <SettingsGroup.Label>Name</SettingsGroup.Label>
+  <SettingsGroup.Control>
+    <Input />
+  </SettingsGroup.Control>
+</SettingsGroup.Row>
+```
+
+## Examples
+
+<Story
+  name='Default'
+  storyModule={SettingsGroupStories}
+  composition={[
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+  ]}
+/>
+
+### Connected accounts
+
+<Story
+  name='ConnectedAccounts'
+  storyModule={SettingsGroupStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+  ]}
+/>
+
+### Destructive setting
+
+<Story
+  name='Destructive'
+  storyModule={SettingsGroupStories}
+/>

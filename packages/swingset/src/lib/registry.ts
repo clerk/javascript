@@ -106,6 +106,12 @@ import {
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  ConnectedAccounts as SettingsGroupConnectedAccounts,
+  Default as SettingsGroupDefault,
+  Destructive as SettingsGroupDestructive,
+  meta as settingsGroupMeta,
+} from '../stories/settings-group.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
@@ -126,6 +132,12 @@ import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
+const settingsGroupModule: StoryModule = {
+  meta: settingsGroupMeta,
+  Default: SettingsGroupDefault,
+  ConnectedAccounts: SettingsGroupConnectedAccounts,
+  Destructive: SettingsGroupDestructive,
+};
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
   Default: OrganizationProfileLeaveSectionDefault,
@@ -269,6 +281,7 @@ export const registry: StoryModule[] = [
   organizationProfileDeleteSectionModule,
   // Blocks
   destructiveModule,
+  settingsGroupModule,
   // Components
   avatarModule,
   badgeModule,
