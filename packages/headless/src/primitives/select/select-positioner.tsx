@@ -20,6 +20,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       getFloatingProps,
       elementsRef,
       labelsRef,
+      returnFocusRef,
       setActiveIndex,
     } = useSelectContext();
 
@@ -83,6 +84,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       <FloatingFocusManager
         context={floatingContext}
         modal={false}
+        returnFocus={returnFocusRef}
       >
         <FloatingList
           elementsRef={elementsRef}

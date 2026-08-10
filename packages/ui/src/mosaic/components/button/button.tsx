@@ -49,7 +49,7 @@ export interface ButtonProps extends MosaicElementProps<'button'> {
 // adjacent text shares one box, or `Delete {name}` would split into two flex items with the
 // button's `gap` opening up mid-sentence. Element children (icons) pass through untouched,
 // so they stay direct flex items and `gap` still applies.
-function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
+export function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
   const result: React.ReactNode[] = [];
   let run: React.ReactNode[] = [];
 

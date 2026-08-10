@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.16.1
+
+### Patch Changes
+
+- Use a root-relative link (`/contact/support`) for the `passwordHasher` "contact support" reference so the generated API reference renders it as an internal same-tab link instead of an external one. ([#9347](https://github.com/clerk/javascript/pull/9347)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
 ## 3.16.0
 
 ### Minor Changes
