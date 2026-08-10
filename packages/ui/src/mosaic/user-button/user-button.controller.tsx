@@ -7,6 +7,7 @@ import { useOrganizationListInView } from '../../hooks/useOrganizationListInView
 import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../hooks/useMosaicRouter';
 import type {
+  UserButtonBrandingProps,
   UserButtonCallbacks,
   UserButtonData,
   UserButtonInvitation,
@@ -31,7 +32,8 @@ export type UserButtonController =
   | { status: 'hidden' }
   | (UserButtonData &
       Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks & {
+      UserButtonAsyncCallbacks &
+      UserButtonBrandingProps & {
         status: 'ready';
         /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
         organizationsEnabled: boolean;
@@ -236,6 +238,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   return {
     status: 'ready',
     organizationsEnabled,
+    branded: displayConfig.branded,
     activeSession: toSession(session.id, user),
     activeOrganization: organization ? toMembership(organization) : null,
     // The user resource carries its own memberships, so whether the account has any is settled
