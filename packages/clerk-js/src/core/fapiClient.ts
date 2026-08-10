@@ -65,14 +65,37 @@ export interface FapiClient {
 // List of paths that should not receive the session ID parameter in the URL
 const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
+// The requests Protect gates. Params are attached to these and nothing else.
+const protectPathPrefixes = ['/client/sign_ins', '/client/sign_ups'];
+
 type FapiClientOptions = {
   frontendApi: string;
   domain?: string;
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  getProtectParams?: () => Promise<Record<string, string | undefined> | undefined>;
   isSatellite?: boolean;
 };
+
+function isProtectGatedRequest(method: string, path: string | undefined): boolean {
+  if (method === 'GET' || !path) {
+    return false;
+  }
+  return protectPathPrefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/** Only a plain-object body (or none at all) can take extra params without changing its shape. */
+function isMergeableBody(body: unknown): body is Record<string, unknown> | undefined {
+  if (body === undefined) {
+    return true;
+  }
+  if (typeof body !== 'object' || body === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(body);
+  return prototype === Object.prototype || prototype === null;
+}
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
@@ -195,7 +218,20 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
-    const { method = 'GET', body } = requestInit;
+    const { method = 'GET' } = requestInit;
+    let { body } = requestInit;
+
+    // Protect params must merge before the body is stringified below (onBeforeRequest callbacks run
+    // after stringification), and ride the body rather than a header to avoid the same
+    // CORS preflight `_method` avoids.
+    if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
+      // A rejection costs the params, never the request.
+      const protectParams = await options.getProtectParams().catch(() => undefined);
+      if (protectParams) {
+        body = { ...((body ?? {}) as Record<string, unknown>), ...protectParams } as unknown as BodyInit;
+        requestInit.body = body;
+      }
+    }
 
     if (body && typeof body === 'object' && !(body instanceof FormData)) {
       requestInit.body = filterUndefinedValues(body);
