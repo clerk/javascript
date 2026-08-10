@@ -152,17 +152,23 @@ function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) 
 /**
  * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
  *
- * A row that is waiting on an action stays a button and takes `disabled`, rather than dropping to a
- * static row: swapping the host element out remounts the row, and the avatar it carries comes back
- * as initials while it re-resolves an image the browser already has.
+ * A row that is waiting on an action stays a button, rather than dropping to a static row: swapping
+ * the host element out remounts the row, and the avatar it carries comes back as initials while it
+ * re-resolves an image the browser already has.
+ *
+ * It stands down through `aria-disabled` rather than the native attribute, the way `SubmitButton`
+ * does: the row that owns the action stands down along with the rest, and disabling it natively
+ * would drop it out of the tab order just as its spinner is announced, taking focus with it.
+ * `aria-disabled` is advisory, so the press is dropped here instead.
  */
 const asButton =
   (disabled = false) =>
-  ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+  ({ children, onClick, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <button
       type='button'
-      disabled={disabled}
+      aria-disabled={disabled || undefined}
       {...props}
+      onClick={disabled ? undefined : onClick}
     >
       {children}
     </button>

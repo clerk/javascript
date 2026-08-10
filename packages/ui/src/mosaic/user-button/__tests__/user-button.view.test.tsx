@@ -407,7 +407,7 @@ describe('UserButtonView, the workspace list', () => {
       renderList({ pendingKey: userButtonBusyKeys.selectOrganization(null) });
 
       const row = screen.getByRole('button', { name: 'Personal account' });
-      expect(row).toBeDisabled();
+      expect(row).toHaveAttribute('aria-disabled', 'true');
       expect(row.querySelector('.cl-spinner')).not.toBeNull();
     });
 
@@ -613,7 +613,7 @@ describe('UserButtonView, the foot', () => {
   it('holds a custom action in place, disabled, while another action runs', () => {
     renderView({ customMenuItems: [action()], pendingKey: userButtonBusyKeys.switchSession('sess_9') });
 
-    expect(screen.getByRole('button', { name: 'Terms of service' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Terms of service' })).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('leaves a custom link followable while another action runs', () => {
@@ -653,7 +653,7 @@ describe('UserButtonView, the foot', () => {
 // row's host element out while it waits would remount it, dropping the avatar back to its initials
 // for the length of the action — so a row that stands down stays the button it was.
 describe('UserButtonView, one action at a time', () => {
-  function surface(pendingKey: string | null) {
+  function surface(pendingKey: string | null, props: Partial<UserButtonProps> = {}) {
     return (
       <MosaicProvider>
         <UserButtonView
@@ -673,18 +673,35 @@ describe('UserButtonView, one action at a time', () => {
           onAddAccount={vi.fn()}
           onManageAccount={vi.fn()}
           onSignOutSession={vi.fn()}
+          {...props}
         />
       </MosaicProvider>
     );
   }
 
+  // `aria-disabled` rather than the native attribute, the way `SubmitButton` does it: the row that
+  // owns the action is standing down too, and natively disabling it would drop it out of the tab
+  // order just as its spinner appears, taking focus with it.
   it.each([
     ['a workspace row', 'Other Co'],
     ['the personal row', 'Personal account'],
     ['an account row', 'bob@example.com'],
     ['an action row', 'Sign out of all accounts'],
-    // Both `⋯` stand down the same way. Withholding what one opens would unmount its trigger, so
-    // the row would drop its trailing edge for the length of the action and get it back after.
+  ])('holds %s in place, aria-disabled and still focusable, while another action runs', (_name, label) => {
+    const { rerender } = render(surface(null));
+    const row = screen.getByRole('button', { name: label });
+
+    rerender(surface(userButtonBusyKeys.switchSession('sess_9')));
+
+    const stoodDown = screen.getByRole('button', { name: label });
+    expect(stoodDown).toBe(row);
+    expect(stoodDown).toHaveAttribute('aria-disabled', 'true');
+    expect(stoodDown).toBeEnabled();
+  });
+
+  // Both `⋯` stand down the same way. Withholding what one opens would unmount its trigger, so
+  // the row would drop its trailing edge for the length of the action and get it back after.
+  it.each([
     ['the account menu', 'Actions for alice@example.com'],
     ['the accounts menu', 'Account actions'],
   ])('holds %s in place, disabled, while another action runs', (_name, label) => {
@@ -696,6 +713,19 @@ describe('UserButtonView, one action at a time', () => {
     const stoodDown = screen.getByRole('button', { name: label });
     expect(stoodDown).toBe(row);
     expect(stoodDown).toBeDisabled();
+  });
+
+  // `aria-disabled` is advisory, so the row has to drop the press itself.
+  it('ignores a press on a row that is standing down', async () => {
+    const onSwitchSession = vi.fn();
+    render(surface(userButtonBusyKeys.selectOrganization('org_2'), { onSwitchSession }));
+    const row = screen.getByRole('button', { name: 'bob@example.com' });
+
+    row.focus();
+    await userEvent.click(row);
+
+    expect(onSwitchSession).not.toHaveBeenCalled();
+    expect(row).toHaveFocus();
   });
 });
 

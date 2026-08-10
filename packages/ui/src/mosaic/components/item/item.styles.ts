@@ -31,32 +31,34 @@ export const item = stylex.create({
   // promote on hover: a static row is not pointing at anything, so its icon and label hold.
   // A row that is standing down while another action runs keeps its look rather than dimming, so
   // it holds its opacity where `Button` drops to 0.5. The pointer still reaches it, which is what
-  // shows `not-allowed`, so every hover branch has to exclude `:disabled` itself.
+  // shows `not-allowed`, so every hover branch has to exclude a standing-down row itself. Both
+  // spellings count: a row that has to stay focusable while it waits carries `aria-disabled`
+  // instead of the native attribute.
   interactive: {
     '--_cl-icon-color': {
       default: colorVars['--cl-color-neutral-faded'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled)': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral'],
       },
     },
     backgroundColor: {
       default: null,
-      ':active': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+      ':active:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
       '@media (hover: hover)': {
-        ':hover:not(:disabled)': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled, [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     color: {
       default: colorVars['--cl-color-neutral-faded'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:disabled)': colorVars['--cl-color-neutral'],
+        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral'],
       },
     },
     cursor: {
       default: 'pointer',
-      ':disabled': 'not-allowed',
+      ':is(:disabled, [aria-disabled="true"])': 'not-allowed',
     },
   },
 
