@@ -22,7 +22,6 @@ import type { IconName } from '../icons/registry';
 import { fontWeightVars } from '../tokens.stylex';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
-import { arrangeMenuRows } from './user-button.menu';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
 import { styles, triggerShapes } from './user-button.styles';
 import type {
@@ -35,6 +34,7 @@ import type {
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
+import { applyOrder } from './user-button.utils';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the controller and the view agree on, so neither file owns them.
@@ -830,7 +830,12 @@ function Footer() {
     });
   }
 
-  const actions = arrangeMenuRows<ActionRowProps>(data.menuItemOrder, data.customMenuItems ?? [], builtIn);
+  // Custom rows lead by default, the way the existing UserButton lists them above "Add account".
+  const actions = applyOrder<ActionRowProps>(
+    data.menuItemOrder,
+    [...(data.customMenuItems ?? []), ...builtIn],
+    r => r.id,
+  );
 
   return (
     <>

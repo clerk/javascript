@@ -1,3 +1,4 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -62,7 +63,7 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
 
   // Preload `src` and report status to the root, so the fallback shows until the image resolves.
   // A layout effect, because it also has to catch the case below before anything is painted.
-  React.useLayoutEffect(() => {
+  useSafeLayoutEffect(() => {
     if (!src) {
       onStatusChange('error');
       return;
