@@ -131,7 +131,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       } = options || {};
       const randomHash = hash();
       const runMarker = getE2ERunMarker();
-      const markedHash = runMarker ? `${runMarker}.${randomHash}` : randomHash;
+      const markedHash = runMarker ? `${runMarker}_${randomHash}` : randomHash;
       const email = fictionalEmail
         ? `${markedHash}+clerk_test@clerkcookie.com`
         : `clerkcookie+${markedHash}@mailsac.com`;
