@@ -11,7 +11,7 @@ import { sizes, styles } from './icon.styles';
 
 export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
   name: IconName;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   placement?: 'inline-start' | 'inline-end';
 }
 

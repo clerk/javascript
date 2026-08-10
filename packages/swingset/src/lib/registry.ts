@@ -9,6 +9,11 @@ import {
   Sizes as AvatarSizes,
 } from '../stories/avatar.stories';
 import {
+  Default as AvatarButtonDefault,
+  Fallback as AvatarButtonFallback,
+  meta as avatarButtonMeta,
+} from '../stories/avatar-button.stories';
+import {
   Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
@@ -139,6 +144,11 @@ const settingsModule: StoryModule = {
   MultipleEmailAndPhoneNumbers: SettingsMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SettingsConnectedAccounts,
   Destructive: SettingsDestructive,
+};
+const avatarButtonModule: StoryModule = {
+  meta: avatarButtonMeta,
+  Default: AvatarButtonDefault,
+  Fallback: AvatarButtonFallback,
 };
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
@@ -282,6 +292,7 @@ export const registry: StoryModule[] = [
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,
   // Blocks
+  avatarButtonModule,
   destructiveModule,
   // Components
   avatarModule,
