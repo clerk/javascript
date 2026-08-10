@@ -7,7 +7,7 @@ import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
 import { Eye, EyeSlash } from '../icons';
-import type { PropsOfComponent } from '../styledSystem';
+import { common, type PropsOfComponent } from '../styledSystem';
 import { mergeRefs } from '../utils/mergeRefs';
 import { IconButton } from './IconButton';
 
@@ -112,12 +112,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         size='xs'
         tabIndex={tabIndex}
         onClick={() => setHidden(s => !s)}
-        sx={theme => ({
-          position: 'absolute',
-          insetInlineEnd: 0,
-          marginInlineEnd: theme.space.$1,
-          color: theme.colors.$neutralAlpha400,
-        })}
+        sx={theme => common.inputTrailingButton(theme)}
         icon={hidden ? Eye : EyeSlash}
       />
     </Flex>

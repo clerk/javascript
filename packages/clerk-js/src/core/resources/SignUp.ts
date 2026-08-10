@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { Poller } from '@clerk/shared/poller';
 import type {
@@ -16,6 +17,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  ProtectCheckResource,
   SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
@@ -31,6 +33,7 @@ import type {
   SignUpFuturePhoneCodeVerifyParams,
   SignUpFutureResource,
   SignUpFutureSSOParams,
+  SignUpFutureSubmitProtectCheckParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
   SignUpFutureVerifications as SignUpFutureVerificationsType,
@@ -92,6 +95,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   externalAccount: any;
   hasPassword = false;
   unsafeMetadata: SignUpUnsafeMetadata = {};
+  protectCheck: ProtectCheckResource | null = null;
   createdSessionId: string | null = null;
   createdUserId: string | null = null;
   abandonAt: number | null = null;
@@ -184,6 +188,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePost({
       body: params,
       action: 'prepare_verification',
+      coalesce: true,
     });
   };
 
@@ -192,6 +197,22 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this._basePost({
       body: params,
       action: 'attempt_verification',
+    });
+  };
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-up.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to the updated `SignUp` resource (gate cleared, a chained
+   * challenge, or the completed flow).
+   */
+  submitProtectCheck = (params: { proofToken: string }): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.submitProtectCheck', { id: this.id });
+    return this._basePatch({
+      action: 'protect_check',
+      body: { proof_token: params.proofToken },
     });
   };
 
@@ -507,6 +528,15 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.missingFields = data.missing_fields;
       this.unverifiedFields = data.unverified_fields;
       this.verifications = new SignUpVerifications(data.verifications);
+      this.protectCheck = data.protect_check
+        ? {
+            status: data.protect_check.status,
+            token: data.protect_check.token,
+            sdkUrl: data.protect_check.sdk_url,
+            expiresAt: data.protect_check.expires_at,
+            uiHints: data.protect_check.ui_hints,
+          }
+        : null;
       this.username = data.username;
       this.firstName = data.first_name;
       this.lastName = data.last_name;
@@ -540,6 +570,15 @@ export class SignUp extends BaseResource implements SignUpResource {
       missing_fields: this.missingFields,
       unverified_fields: this.unverifiedFields,
       verifications: this.verifications.__internal_toSnapshot(),
+      protect_check: this.protectCheck
+        ? {
+            status: this.protectCheck.status,
+            token: this.protectCheck.token,
+            sdk_url: this.protectCheck.sdkUrl,
+            ...(this.protectCheck.expiresAt !== undefined && { expires_at: this.protectCheck.expiresAt }),
+            ...(this.protectCheck.uiHints !== undefined && { ui_hints: this.protectCheck.uiHints }),
+          }
+        : null,
       username: this.username,
       first_name: this.firstName,
       last_name: this.lastName,
@@ -790,11 +829,15 @@ class SignUpFuture implements SignUpFutureResource {
     return this.#resource.unverifiedFields;
   }
 
+  get protectCheck() {
+    return this.#resource.protectCheck;
+  }
+
   get isTransferable() {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
       this.#resource.verifications.externalAccount.status === 'transferable' &&
-      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.error?.code === ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS
     );
   }
 
@@ -931,6 +974,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_code' },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -951,6 +995,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -978,6 +1023,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'email_link', redirectUrl: absoluteVerificationUrl },
         action: 'prepare_verification',
+        coalesce: true,
       });
     });
   }
@@ -1121,6 +1167,7 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
+        coalesce: true,
       });
 
       const { message } = this.#resource.verifications.web3Wallet;
@@ -1149,6 +1196,22 @@ class SignUpFuture implements SignUpFutureResource {
       await this.#resource.__internal_basePost({
         body: { signature, strategy },
         action: 'attempt_verification',
+      });
+    });
+  }
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-up.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
+   */
+  async submitProtectCheck(params: SignUpFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePatch({
+        action: 'protect_check',
+        body: { proof_token: params.proofToken },
       });
     });
   }

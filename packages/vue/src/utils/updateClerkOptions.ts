@@ -1,8 +1,8 @@
 import type { ClerkOptions } from '@clerk/shared/types';
-import type { Appearance, Ui } from '@clerk/ui/internal';
+import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 
 type ClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
-  appearance?: Appearance<TUi>;
+  appearance?: ExtractAppearanceType<TUi, Appearance>;
 };
 
 /**

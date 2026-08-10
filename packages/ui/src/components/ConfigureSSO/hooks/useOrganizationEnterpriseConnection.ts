@@ -20,9 +20,9 @@ import type {
 import { useCallback, useMemo, useRef } from 'react';
 
 import {
-  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
+  organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
 } from '../domain/organizationEnterpriseConnection';
 import type { ProviderType } from '../types';
 import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './useEnterpriseConnectionTestRuns';
@@ -109,6 +109,11 @@ export interface TestRunsView {
   setPage: (page: number) => void;
   /** Pass `{ armPolling: true }` after the user kicks off a run. */
   refresh: (options?: RefreshTestRunsOptions) => Promise<unknown>;
+  /**
+   * Revalidates the success probe and resolves with the fresh answer, so the
+   * Test step's Continue gate can pick up a run completed elsewhere on demand.
+   */
+  revalidateHasSuccessfulTestRun: () => Promise<boolean>;
 }
 
 /**
@@ -173,6 +178,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     page: testRunPage,
     setPage: setTestRunPage,
     refresh: refreshTestRuns,
+    revalidateHasSuccessfulTestRun,
   } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive);
 
   const { user } = useUser();
@@ -274,7 +280,6 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       createTestRun,
     };
   }, [
-    user,
     organization,
     organizationDomains,
     enterpriseConnection,
@@ -293,6 +298,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       page: testRunPage,
       setPage: setTestRunPage,
       refresh: refreshTestRuns,
+      revalidateHasSuccessfulTestRun,
     }),
     [
       testRunRows,
@@ -303,6 +309,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       testRunPage,
       setTestRunPage,
       refreshTestRuns,
+      revalidateHasSuccessfulTestRun,
     ],
   );
 

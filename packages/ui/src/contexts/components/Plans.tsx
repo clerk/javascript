@@ -4,6 +4,8 @@ import {
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditBalanceQuery,
+  __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
   useClerk,
   useSession,
@@ -84,6 +86,16 @@ export const usePlans = (params?: { mode: 'cache' }) => {
     enabled: true,
     __experimental_mode: params?.mode,
   });
+};
+
+export const useCreditBalance = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditBalanceQuery(params);
+};
+
+export const useCreditHistory = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditHistoryQuery(params);
 };
 
 type HandleSelectPlanProps = {

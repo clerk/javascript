@@ -63,6 +63,7 @@ export type SignInStatus =
   | 'needs_second_factor'
   | 'needs_client_trust'
   | 'needs_new_password'
+  | 'needs_protect_check'
   | 'complete';
 
 export type SignInIdentifier =

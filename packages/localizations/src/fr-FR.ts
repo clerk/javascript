@@ -63,6 +63,7 @@ export const frFR: LocalizationResource = {
   badge__canceledEndsAt: "Annulé • Termine le {{ date | shortDate('fr-FR') }}",
   badge__currentPlan: 'Plan actuel',
   badge__default: 'Défaut',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Termine le {{ date | shortDate('fr-FR') }}",
   badge__expired: 'Expiré',
   badge__freeTrial: 'Essai gratuit',
@@ -224,37 +225,128 @@ export const frFR: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
           required: undefined,
         },
       },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -264,7 +356,6 @@ export const frFR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -305,7 +396,6 @@ export const frFR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -353,7 +443,6 @@ export const frFR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -390,7 +479,6 @@ export const frFR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -420,6 +508,8 @@ export const frFR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -439,21 +529,17 @@ export const frFR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -501,7 +587,6 @@ export const frFR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -533,7 +618,6 @@ export const frFR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -574,7 +658,6 @@ export const frFR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -621,37 +704,12 @@ export const frFR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
       },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
+      unsupportedProvider: {
+        description: undefined,
         title: undefined,
       },
     },
@@ -664,8 +722,11 @@ export const frFR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Non vérifié',
         badge__verified: 'Vérifié',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -676,6 +737,7 @@ export const frFR: LocalizationResource = {
           valueLabel: 'Valeur',
         },
         verifiedAtLabel: "Vérifié le {{ date | shortDate('fr-FR') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Ajouter {{domain}}',
@@ -703,6 +765,10 @@ export const frFR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Fournisseur SAML personnalisé',
         google: undefined,
@@ -880,6 +946,7 @@ export const frFR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -907,6 +974,15 @@ export const frFR: LocalizationResource = {
     badge__manualInvitation: "Pas d'inscription automatique",
     badge__unverified: 'Non vérifié',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Aucun historique de paiement',
         notFound: 'Tentative de paiement introuvable',
@@ -1110,6 +1186,9 @@ export const frFR: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1240,6 +1319,9 @@ export const frFR: LocalizationResource = {
       title: 'Vérification par application d’authentification',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Ajouter un compte',
@@ -1322,6 +1404,10 @@ export const frFR: LocalizationResource = {
         subtitleNewTab: "Revenez à l'onglet nouvellement ouvert pour continuer",
         titleNewTab: 'Connecté sur un autre onglet',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
@@ -1382,6 +1468,12 @@ export const frFR: LocalizationResource = {
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
       subtitle: 'Entrez le code envoyé à votre téléphone pour continuer.',
       title: 'Vérifiez votre téléphone',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'Réinitialiser',
@@ -1489,6 +1581,12 @@ export const frFR: LocalizationResource = {
       resendButton: 'Renvoyer le code',
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre téléphone',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Contacter le support',
@@ -1627,6 +1725,7 @@ export const frFR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1703,6 +1802,14 @@ export const frFR: LocalizationResource = {
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
     web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',
@@ -1756,9 +1863,9 @@ export const frFR: LocalizationResource = {
     action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
-    label__userButtonPopover: 'Panneau du compte',
     label__accountActions: 'Actions du compte',
     label__activeSessions: 'Sessions actives',
+    label__userButtonPopover: 'Panneau du compte',
   },
   userProfile: {
     apiKeysPage: {
@@ -1781,6 +1888,15 @@ export const frFR: LocalizationResource = {
       title__codelist: 'Codes de récupération',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Aucun historique de paiement',
         notFound: 'Tentative de paiement introuvable',

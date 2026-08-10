@@ -176,4 +176,37 @@ describe('UserAPI', () => {
       expect(response.publicMetadata).toEqual({ replaced: true });
     });
   });
+
+  describe('removePassword', () => {
+    it('calls POST /users/{id}/remove_password without a request body by default', async () => {
+      const postHandler = vi.fn(async ({ request }: { request: Request }) => {
+        expect(await request.text()).toBe('');
+        return HttpResponse.json(mockUserResponse);
+      });
+
+      server.use(http.post('https://api.clerk.test/v1/users/user_123/remove_password', validateHeaders(postHandler)));
+
+      const response = await apiClient.users.removePassword('user_123');
+
+      expect(postHandler).toHaveBeenCalledTimes(1);
+      expect(response.id).toBe('user_123');
+    });
+
+    it('passes signOutOfOtherSessions in the request body', async () => {
+      const postHandler = vi.fn(async ({ request }: { request: Request }) => {
+        expect(await request.json()).toEqual({ sign_out_of_other_sessions: true });
+        return HttpResponse.json(mockUserResponse);
+      });
+
+      server.use(http.post('https://api.clerk.test/v1/users/user_123/remove_password', validateHeaders(postHandler)));
+
+      await apiClient.users.removePassword('user_123', { signOutOfOtherSessions: true });
+
+      expect(postHandler).toHaveBeenCalledTimes(1);
+    });
+
+    it('requires a user ID', async () => {
+      await expect(apiClient.users.removePassword('')).rejects.toThrow('A valid resource ID is required.');
+    });
+  });
 });

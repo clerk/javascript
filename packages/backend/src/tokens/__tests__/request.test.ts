@@ -8,6 +8,7 @@ import {
   mockJwks,
   mockJwt,
   mockJwtPayload,
+  mockM2MJwtPayload,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -954,6 +955,40 @@ describe('tokens.authenticateRequest(options)', () => {
     });
   });
 
+  test('cookieToken: logs satellite-domain guidance when satellite sync enters a redirect loop', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_redirect_count: '3',
+        },
+        `http://satellite.example/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Satellite-domain authentication'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('configured primary or satellite domain'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('preview deployments'));
+
+    consoleSpy.mockRestore();
+  });
+
   test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - dev', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
@@ -1243,6 +1278,32 @@ describe('tokens.authenticateRequest(options)', () => {
 
     expect(requestState).toBeSignedIn();
     expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  test('cookieToken: returns signed out when an M2M JWT is presented in the __session cookie (SDK-107)', async () => {
+    // A same-instance M2M JWT carries the instance issuer, so it survives the suffixed-cookie check.
+    const { data: m2mJwt } = await signJwt({ ...mockM2MJwtPayload, iss: mockJwtPayload.iss }, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+    });
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: m2mJwt!,
+        },
+      ),
+      mockOptions(),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.TokenTypeMismatch,
+      message: '',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
   // todo(
@@ -2024,7 +2085,8 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test('does not trigger handshake when referer is from production accounts portal', async () => {
+    // accounts.example.com is not this instance's derived accounts portal, so it must not be trusted.
+    test('triggers handshake when referer is an unrelated accounts.* domain', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.example.com/sign-in',
@@ -2046,6 +2108,36 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (current format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://foo-bar-13.accounts.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
       expect(requestState).toBeSignedIn({
         domain: 'primary.com',
         isSatellite: false,
@@ -2053,7 +2145,38 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (current format)', async () => {
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (legacy format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    // A production instance must not trust dev-portal referrers, which are freely obtainable.
+    test('triggers handshake when referer is a dev accounts portal on a production instance (current format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://foo-bar-13.accounts.dev/sign-in',
@@ -2075,14 +2198,14 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (legacy format)', async () => {
+    test('triggers handshake when referer is a dev accounts portal on a production instance (legacy format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
@@ -2104,9 +2227,9 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });

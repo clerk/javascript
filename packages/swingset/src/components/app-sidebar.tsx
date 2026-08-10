@@ -71,16 +71,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {components.map(({ mod, componentSlug }) => {
                   const href = `/${groupSlug}/${componentSlug}`;
+                  // How an entry is USED differs by layer, so the label follows the layer rather
+                  // than a guess at the title: hooks are called, atomic styles are a set of
+                  // exports with no single call form worth privileging, and everything else is a
+                  // component rendered as JSX.
+                  const usage =
+                    mod.meta.group === 'Hooks'
+                      ? `${mod.meta.title}()`
+                      : mod.meta.group === 'Styles'
+                        ? mod.meta.title
+                        : `<${mod.meta.title} />`;
                   return (
                     <SidebarMenuItem key={mod.meta.title}>
                       <SidebarMenuButton
-                        className='h-auto justify-between py-1 text-xs leading-relaxed'
+                        className='h-auto items-start py-1 text-xs leading-relaxed'
                         isActive={pathname === href}
                         render={<Link href={href} />}
                       >
-                        <span className='truncate'>{mod.meta.label ?? mod.meta.title}</span>
-                        <span className='text-sidebar-foreground/50 shrink-0 font-mono text-[10px] leading-none'>
-                          {`<${mod.meta.title} />`}
+                        <span className='whitespace-normal! break-all font-mono text-[10px] leading-relaxed'>
+                          {usage}
                         </span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

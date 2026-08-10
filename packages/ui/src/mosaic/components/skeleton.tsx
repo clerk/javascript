@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { keyframes } from '@emotion/react';
 import type { ReactNode } from 'react';
 

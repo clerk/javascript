@@ -1,4 +1,6 @@
-import type { ClerkGlobalHookError } from '../errors/globalHookError';
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ModuleManager } from '../moduleManager';
 import type { ClerkUIConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -139,11 +141,13 @@ export type SDKMetadata = {
 
 /**
  * A callback function that is called when Clerk resources change.
+ *
  * @inline
  */
 export type ListenerCallback = (emission: Resources) => void;
 /**
  * Optional configuration for the `addListener()` method.
+ *
  * @param skipInitialEmit - If `true`, the callback will not be called immediately after registration. Defaults to `false`.
  * @inline
  */
@@ -188,7 +192,8 @@ export type SetActiveNavigate = (params: {
 
 /**
  * A callback that runs after sign out completes.
- * @inline */
+ *
+  @inline */
 export type SignOutCallback = () => void | Promise<any>;
 
 /**
@@ -298,6 +303,20 @@ export interface Clerk {
    */
   __internal_windowNavigate: (to: URL | string, opts?: { useStaticAllowlistOnly?: boolean }) => void;
 
+  /**
+   * Internal handle to the bundled ModuleManager. Exposed so framework SDK
+   * wrappers (e.g. IsomorphicClerk) can forward it to composed UI components
+   * that need dynamic-imported modules (Coinbase Wallet, Base, Stripe, zxcvbn).
+   * Plain property access crosses the bundle boundary that other channels
+   * cannot — clerk-js inlines its own @clerk/shared, so module-scoped state is
+   * invisible to consumers loading @clerk/shared from node_modules. It is
+   * `undefined` on a wrapper whose inner clerk-js has not loaded yet, so
+   * readers must handle the absent case.
+   *
+   * @internal
+   */
+  __internal_moduleManager: ModuleManager | undefined;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -317,6 +336,7 @@ export interface Clerk {
 
   /**
    * Indicates whether the instance is being loaded in a standard browser environment. Set to `false` on native platforms where cookies cannot be set. When `undefined`, Clerk assumes a standard browser.
+   *
    * @inline
    */
   isStandardBrowser: boolean | undefined;
@@ -350,6 +370,7 @@ export interface Clerk {
    * `effect()` that can be used to subscribe to changes from Signals.
    *
    * @hidden
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
@@ -398,6 +419,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk Checkout drawer.
+   *
    * @hidden
    */
   __internal_closeCheckout: () => void;
@@ -412,6 +434,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk PlanDetails drawer.
+   *
    * @hidden
    */
   __internal_closePlanDetails: () => void;
@@ -426,6 +449,7 @@ export interface Clerk {
 
   /**
    * Closes the Clerk SubscriptionDetails drawer.
+   *
    * @hidden
    */
   __internal_closeSubscriptionDetails: () => void;
@@ -440,12 +464,14 @@ export interface Clerk {
 
   /**
    * Closes the Clerk user verification modal.
+   *
    * @hidden
    */
   __internal_closeReverification: () => void;
 
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   *
    * @hidden
    */
   __internal_attemptToEnableEnvironmentSetting: (
@@ -454,12 +480,14 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
+   *
    * @hidden
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
+   *
    * @hidden
    */
   __internal_closeEnableOrganizationsPrompt: () => void;
@@ -512,6 +540,18 @@ export interface Clerk {
    * Closes the Clerk OrganizationProfile modal.
    */
   closeOrganizationProfile: () => void;
+
+  /**
+   * Opens a modal containing the organization invite-members form.
+   *
+   * @param props - Optional props that will be passed to the invite-members modal.
+   */
+  openInviteMembers: (props?: InviteMembersModalProps) => void;
+
+  /**
+   * Closes the invite-members modal.
+   */
+  closeInviteMembers: () => void;
 
   /**
    * Opens the Clerk CreateOrganization modal.
@@ -939,12 +979,14 @@ export interface Clerk {
 
   /**
    * Returns the configured `afterSignInUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured `afterSignUpUrl` of the instance.
+   *
    * @param params - Optional query parameters to append to the URL.
    */
   buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
@@ -1044,7 +1086,7 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where [session tasks](https://clerk.com/docs/reference/objects/session) are mounted.
    *
-   * @param opts - Options to control the redirect (e.g. redirect URL after tasks are complete).
+   * @param opts - Options to control the redirect (e.g., redirect URL after tasks are complete).
    */
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
@@ -1100,6 +1142,7 @@ export interface Clerk {
 
   /**
    * Completes an email link verification flow started by `Clerk.client.signIn.createEmailLinkFlow` or `Clerk.client.signUp.createEmailLinkFlow`, by processing the verification results from the redirect URL query parameters. This method should be called after the user is redirected back from visiting the verification link in their email.
+   *
    * @param params - Allows you to define the URLs where the user should be redirected to on successful verification or pending/completed sign-up or sign-in attempts. If the email link is successfully verified on another device, there's a callback function parameter that allows custom code execution.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1201,7 +1244,7 @@ export interface Clerk {
   apiKeys: APIKeysNamespace;
 
   /**
-   * OAuth application helpers (e.g. consent metadata for custom consent UIs).
+   * OAuth application helpers (e.g., consent metadata for custom consent UIs).
    */
   oauthApplication: OAuthApplicationNamespace;
 
@@ -1252,6 +1295,16 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * The full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-in is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-in component.
+     */
+    signInProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up is gated by a Clerk Protect challenge
+     * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
+     */
+    signUpProtectCheckUrl?: string | null;
     /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
@@ -1375,11 +1428,12 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
+     *
      * @default true
      */
     polling?: boolean;
     /**
-     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g., by selecting a specific session.
      */
     selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
@@ -1391,7 +1445,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/sessions/POST/v1/client/sessions/%7Bsession_id%7D/touch){{ target: '_blank' }} is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
@@ -1434,19 +1488,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
     telemetry?:
       | false
       | {
-          /**
-           * If `true`, telemetry will not be collected.
-           */
+          /** Whether telemetry will be collected. */
           disabled?: boolean;
-          /**
-           * If `true`, telemetry events are only logged to the console and not sent to Clerk
-           */
+          /** Whether telemetry events are only logged to the console and not sent to Clerk. */
           debug?: boolean;
-          /**
-           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
-           *
-           * @default true
-           */
+          /** Whether the sampling rates provided per telemetry event will be ignored and all events will be sent. Defaults to `true`. */
           perEventSampling?: boolean;
         };
 
@@ -1819,6 +1865,7 @@ export type __internal_EnableOrganizationsPromptProps = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'useOrganizationList'
     | 'useOrganization';
@@ -1829,6 +1876,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
   caller:
     | 'OrganizationSwitcher'
     | 'OrganizationProfile'
+    | 'InviteMembers'
     | 'OrganizationList'
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
@@ -1946,7 +1994,7 @@ export type UserProfileProps = RoutingOptions & {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
-   * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
+   * e.g., <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
    */
   additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
   /*
@@ -1963,7 +2011,7 @@ export type UserProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <UserProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2012,7 +2060,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
-   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   * e.g., <OrganizationProfile apiKeysProps={{ showDescription: true }} />
    *
    * @experimental
    */
@@ -2027,6 +2075,23 @@ export type OrganizationProfileProps = RoutingOptions & {
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {
+  /**
+   * Function that returns the container element where portals should be rendered.
+   * This allows Clerk components to render inside external dialogs/popovers
+   * (e.g., Radix Dialog, React Aria Components) instead of document.body.
+   */
+  getContainer?: () => HTMLElement | null;
+};
+
+/** @generateWithEmptyComment */
+export type InviteMembersProps = {
+  /**
+   * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
+   */
+  appearance?: OrganizationProfileProps['appearance'];
+};
+
+export type InviteMembersModalProps = InviteMembersProps & {
   /**
    * Function that returns the container element where portals should be rendered.
    * This allows Clerk components to render inside external dialogs/popovers
@@ -2119,7 +2184,7 @@ export type UserButtonProps = UserButtonProfileMode & {
 
   /**
    * Specify options for the underlying <UserProfile /> component.
-   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+   * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
@@ -2221,7 +2286,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     appearance?: ClerkAppearanceTheme;
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g. <UserButton userProfileProps={{appearance: {...}}} />
+     * e.g., <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
   };
@@ -2341,7 +2406,7 @@ type PricingTableBaseProps = {
   appearance?: ClerkAppearanceTheme;
   /*
    * Specify options for the underlying <Checkout /> component.
-   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   * e.g., <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
    */
   checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
@@ -2677,6 +2742,11 @@ export type SignUpButtonProps = (SignUpButtonPropsModal | ButtonPropsRedirect) &
     | 'oauthFlow'
   >;
 
+/**
+ * The invite-members form is only available as a modal, so there is no `mode` prop.
+ */
+export type InviteMembersButtonProps = InviteMembersProps;
+
 /** @generateWithEmptyComment */
 export type TaskChooseOrganizationProps = {
   /**
@@ -2781,6 +2851,15 @@ export interface ClerkAuthenticateWithWeb3Params {
    * The URL to navigate to if [second factor](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication) is required.
    */
   secondFactorUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-in flow.
+   */
+  protectCheckUrl?: string;
+  /**
+   * The URL to navigate to if a Clerk Protect challenge gates the sign-up flow (when the web3
+   * attempt falls back to sign-up).
+   */
+  signUpProtectCheckUrl?: string;
   /**
    * The name of the wallet to use for authentication.
    */

@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,
   SignUpContext,
@@ -23,6 +23,7 @@ import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -33,8 +34,10 @@ import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
+import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInProtectCheck } from './SignInProtectCheck';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -53,6 +56,14 @@ function SignInRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signIn'>
       <Switch>
+        {/* No canActivate guard here. `!!signIn.protectCheck` flips to false the
+            instant the check resolves (submitProtectCheck clears protectCheck),
+            which would unmount this card mid-navigation and blank the route
+            (RouteGuard renders null + navigateToFlowStart). The card owns its
+            own routing — it navigates to the next step on resolution. */}
+        <Route path='protect-check'>
+          <SignInProtectCheck />
+        </Route>
         <Route path='factor-one'>
           <SignInFactorOne />
         </Route>
@@ -78,14 +89,16 @@ function SignInRoutes(): JSX.Element {
           <SignInFactorOneSolanaWalletsCard />
         </Route>
         <Route path='verify'>
-          <SignInEmailLinkFlowComplete
-            redirectUrlComplete={signInContext.afterSignInUrl}
-            redirectUrl='../factor-two'
-          />
+          <SignInEmailLinkVerify />
         </Route>
 
         {signInContext.isCombinedFlow && (
           <Route path='create'>
+            {/* No canActivate guard — same resolution race as the sign-in
+                protect-check route above; the card owns its own routing. */}
+            <Route path='protect-check'>
+              <LazySignUpProtectCheck />
+            </Route>
             <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -110,6 +123,12 @@ function SignInRoutes(): JSX.Element {
               />
             </Route>
             <Route path='continue'>
+              {/* No canActivate guard — same resolution race as the sign-in
+                  protect-check route; the card owns its own routing. */}
+              <Route path='protect-check'>
+                {/* Under `create/continue`, the continue index is `..`, not `../continue`. */}
+                <LazySignUpProtectCheck continuePath='..' />
+              </Route>
               <Route
                 path='verify-email-address'
                 canActivate={clerk => !!clerk.client.signUp.emailAddress}

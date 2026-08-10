@@ -27,6 +27,8 @@ export interface JwtHeader {
   x5c?: string | string[];
   /** @internal - used by Session Minter for monotonic token freshness checks. Do not depend on this field. */
   oiat?: number;
+  /** @internal - Clerk token-category tag written by the token minter. Do not depend on this field. */
+  cat?: string;
 }
 
 declare global {

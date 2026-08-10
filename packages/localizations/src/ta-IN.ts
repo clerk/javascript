@@ -64,6 +64,7 @@ export const taIN: LocalizationResource = {
   badge__canceledEndsAt: "ரத்து செய்யப்பட்டது • முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__currentPlan: 'தற்போதைய திட்டம்',
   badge__default: 'இயல்புநிலை',
+  badge__deprovisioned: undefined,
   badge__endsAt: "முடிவடைகிறது {{ date | shortDate('ta-IN') }}",
   badge__expired: 'காலாவதியானது',
   badge__freeTrial: 'இலவச சோதனை',
@@ -224,37 +225,128 @@ export const taIN: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
           required: undefined,
         },
       },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -264,7 +356,6 @@ export const taIN: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -305,7 +396,6 @@ export const taIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -353,7 +443,6 @@ export const taIN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -390,7 +479,6 @@ export const taIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -420,6 +508,8 @@ export const taIN: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -439,21 +529,17 @@ export const taIN: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -501,7 +587,6 @@ export const taIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -533,7 +618,6 @@ export const taIN: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -574,7 +658,6 @@ export const taIN: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -621,37 +704,12 @@ export const taIN: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
       },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
+      unsupportedProvider: {
+        description: undefined,
         title: undefined,
       },
     },
@@ -664,8 +722,11 @@ export const taIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'சரிபார்க்கப்படவில்லை',
         badge__verified: 'சரிபார்க்கப்பட்டது',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -676,6 +737,7 @@ export const taIN: LocalizationResource = {
           valueLabel: 'மதிப்பு',
         },
         verifiedAtLabel: "{{ date | shortDate('ta-IN') }} அன்று சரிபார்க்கப்பட்டது",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} ஐச் சேர்',
@@ -703,6 +765,10 @@ export const taIN: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'தனிப்பயன் SAML வழங்குநர்',
         google: undefined,
@@ -878,6 +944,7 @@ export const taIN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -905,6 +972,15 @@ export const taIN: LocalizationResource = {
     badge__manualInvitation: 'தானியங்கி சேர்க்கை இல்லை',
     badge__unverified: 'சரிபார்க்கப்படாதது',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'கட்டண வரலாறு இல்லை',
         notFound: 'கட்டண முயற்சி கண்டறியப்படவில்லை',
@@ -1109,6 +1185,9 @@ export const taIN: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1238,6 +1317,9 @@ export const taIN: LocalizationResource = {
       title: 'சரிபார்ப்பு தேவை',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'கணக்கைச் சேர்',
@@ -1320,6 +1402,10 @@ export const taIN: LocalizationResource = {
         subtitleNewTab: 'தொடர புதிதாகத் திறக்கப்பட்ட தாவலுக்குத் திரும்பவும்',
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
@@ -1381,6 +1467,12 @@ export const taIN: LocalizationResource = {
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
       subtitle: 'தொடர, உங்கள் தொலைபேசிக்கு அனுப்பப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       title: 'உங்கள் தொலைபேசியைச் சரிபார்க்கவும்',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'கடவுச்சொல்லை மீட்டமைக்க',
@@ -1486,6 +1578,12 @@ export const taIN: LocalizationResource = {
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
       subtitle: 'உங்கள் தொலைபேசிக்கு அனுப்பப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       title: 'உங்கள் தொலைபேசியை சரிபார்க்கவும்',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'உள்நுழை',
@@ -1635,6 +1733,7 @@ export const taIN: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1717,6 +1816,14 @@ export const taIN: LocalizationResource = {
       sentencePrefix: 'உங்கள் கடவுச்சொல்லில் இருக்க வேண்டும்',
     },
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
     web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
@@ -1770,9 +1877,9 @@ export const taIN: LocalizationResource = {
     action__openUserMenu: 'பயனர் மெனுவைத் திற',
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
-    label__userButtonPopover: 'கணக்கு பலகம்',
     label__accountActions: 'கணக்கு செயல்கள்',
     label__activeSessions: 'செயலில் உள்ள அமர்வுகள்',
+    label__userButtonPopover: 'கணக்கு பலகம்',
   },
   userProfile: {
     apiKeysPage: {
@@ -1795,6 +1902,15 @@ export const taIN: LocalizationResource = {
       title__codelist: 'காப்புக் குறியீடுகள்',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'கட்டண வரலாறு இல்லை',
         notFound: 'கட்டண முயற்சி கண்டறியப்படவில்லை',

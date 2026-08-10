@@ -12,6 +12,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
+import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
@@ -73,8 +74,8 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
-    return this._baseGet({ fetchMaxTries });
+  fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries, abortSignal });
   }
 
   async destroy(): Promise<void> {
@@ -141,7 +142,20 @@ export class Client extends BaseResource implements ClientResource {
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
-      this.sessions = (data.sessions || []).map(s => new Session(s));
+      // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
+      const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
+      this.sessions = (data.sessions || []).map(s => {
+        const session = new Session(s);
+        const previousToken = previousTokens.get(session.id);
+        if (
+          previousToken &&
+          session.lastActiveToken &&
+          shouldKeepExistingLastActiveToken(previousToken, session.lastActiveToken)
+        ) {
+          session.lastActiveToken = previousToken;
+        }
+        return session;
+      });
 
       if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
         this.signUp.__internal_updateFromJSON(data.sign_up);

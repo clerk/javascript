@@ -1,5 +1,172 @@
 # Change Log
 
+## 4.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
+## 4.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+
+## 4.14.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+### Patch Changes
+
+- Updated dependencies [[`5c81479`](https://github.com/clerk/javascript/commit/5c81479d303fc6146dc81309d0b58564aa96706e)]:
+  - @clerk/shared@4.26.0
+
+## 4.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`aaea141`](https://github.com/clerk/javascript/commit/aaea141d62804624cd8cd73036b4afe6f482184f)]:
+  - @clerk/shared@4.25.10
+
+## 4.13.9
+
+### Patch Changes
+
+- Add support for configuring custom OpenID Connect enterprise connections through the Organization Profile. ([#9200](https://github.com/clerk/javascript/pull/9200)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Expose whether an organization member has been deprovisioned, and mark deprovisioned members as inactive in the Organization Profile. ([#9202](https://github.com/clerk/javascript/pull/9202)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`2974fb0`](https://github.com/clerk/javascript/commit/2974fb008ad262845a53dbeea269eb82c36242eb), [`e2dd4e2`](https://github.com/clerk/javascript/commit/e2dd4e23068dfa7740d159c45596c530ade085de)]:
+  - @clerk/shared@4.25.9
+
+## 4.13.8
+
+### Patch Changes
+
+- Updated dependencies [[`01f2c12`](https://github.com/clerk/javascript/commit/01f2c120787fd5ca2ba8001e7c2fbe86d438b34e)]:
+  - @clerk/shared@4.25.8
+
+## 4.13.7
+
+### Patch Changes
+
+- Updated dependencies [[`097432d`](https://github.com/clerk/javascript/commit/097432d90dff670ff6e5c58bc7bf358b71a77239)]:
+  - @clerk/shared@4.25.7
+
+## 4.13.6
+
+### Patch Changes
+
+- Updated dependencies [[`858a689`](https://github.com/clerk/javascript/commit/858a6896736cd2a82e6a2f10c3cd84435fa2b0de), [`c904fb4`](https://github.com/clerk/javascript/commit/c904fb4d0ea6a6fa10c1961b56420d6f99f5188e)]:
+  - @clerk/shared@4.25.6
+
+## 4.13.5
+
+### Patch Changes
+
+- Updated dependencies [[`bcbdda6`](https://github.com/clerk/javascript/commit/bcbdda6d7d6c6e12cf33febe17fd148c69788716)]:
+  - @clerk/shared@4.25.5
+
+## 4.13.4
+
+### Patch Changes
+
+- Updated dependencies [[`e162b71`](https://github.com/clerk/javascript/commit/e162b7144e4b84dc8e69ca415a5da98df876cba0)]:
+  - @clerk/shared@4.25.4
+
+## 4.13.3
+
+### Patch Changes
+
+- Updated dependencies [[`d8fc1d7`](https://github.com/clerk/javascript/commit/d8fc1d7df68305db28c224b4ce0aa429d0b30a8e), [`1d0e78c`](https://github.com/clerk/javascript/commit/1d0e78cd26ac3598b11631a91192dba0f1155afc)]:
+  - @clerk/shared@4.25.3
+
+## 4.13.2
+
+### Patch Changes
+
+- Add a clear button to search inputs for quickly resetting the current query. It appears in the `<APIKeys />` search and the `<OrganizationProfile />` members search. ([#9098](https://github.com/clerk/javascript/pull/9098)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Search inputs now expose a shared `searchInput` appearance element (layered alongside any existing component-specific element), and the clear button is themeable via the new shared `searchInputClearButton` element. The clear button's label can be customized with the new shared `searchInput.action__clear` localization key.
+
+- Updated dependencies [[`8dbf343`](https://github.com/clerk/javascript/commit/8dbf343f9d327bae9f950718645ef71d6272c797)]:
+  - @clerk/shared@4.25.2
+
+## 4.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`62f6702`](https://github.com/clerk/javascript/commit/62f6702dda69acf5570fd61dfa01ca8cd0dd2c77)]:
+  - @clerk/shared@4.25.1
+
+## 4.13.0
+
+### Minor Changes
+
+- Add support for Clerk Protect mid-flow SDK challenges (`protect_check`) on both sign-up and sign-in. ([#8329](https://github.com/clerk/javascript/pull/8329)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  When the Protect antifraud service issues a challenge, responses now carry a `protectCheck` field
+  with `{ status, token, sdkUrl, expiresAt?, uiHints? }`. Clients resolve the gate by loading the
+  SDK at `sdkUrl`, executing the challenge, and submitting the resulting proof token via
+  `signUp.submitProtectCheck({ proofToken })` or `signIn.submitProtectCheck({ proofToken })`. The
+  response may carry a chained challenge, which the SDK resolves iteratively.
+
+  Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union. **Upgrading this
+  package is type-only and does not change runtime behavior**: the server returns the new status
+  (and the `protectCheck` field) only for instances where Protect mid-flow challenges have been
+  explicitly enabled — the feature is off by default and is not enabled for existing instances by
+  upgrading. The server additionally only emits the new status value to SDK versions that
+  understand it, so older clients never receive an unknown status.
+
+  If an exhaustive `switch` on `signIn.status` flags the new value after upgrading, handle it by
+  running the challenge described by `protectCheck` and submitting the proof via
+  `submitProtectCheck()`. Clients should treat the `protectCheck` field as the authoritative gate
+  signal and fall back to the status value for defense in depth.
+
+  The pre-built `<SignIn />` and `<SignUp />` components handle the gate automatically by routing
+  to a new `protect-check` route that runs the challenge SDK and resumes the flow on completion.
+
+### Patch Changes
+
+- Updated dependencies [[`6f97ef5`](https://github.com/clerk/javascript/commit/6f97ef59429a88af14534df895e52893b4f160a6), [`bab1f29`](https://github.com/clerk/javascript/commit/bab1f2978d6fed5aab62721b85a7066cd771d5c9), [`f2d9e4b`](https://github.com/clerk/javascript/commit/f2d9e4b9eeac4cb9a2b1c9d4278ff11cf49555b1)]:
+  - @clerk/shared@4.25.0
+
+## 4.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`1efc7e5`](https://github.com/clerk/javascript/commit/1efc7e55c568e87b7e47c2d3f235ea4d822242d9), [`5028b54`](https://github.com/clerk/javascript/commit/5028b540c945571db396f8c32a7a6b0c48a31071), [`2e1fec7`](https://github.com/clerk/javascript/commit/2e1fec7c85d7f5d95aa42f8e1f1066be399b88db)]:
+  - @clerk/shared@4.24.0
+
+## 4.12.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Updated dependencies [[`4306146`](https://github.com/clerk/javascript/commit/430614605666c4ad387c3f945700c08df1e774c0), [`533f0b1`](https://github.com/clerk/javascript/commit/533f0b17e48bc326310df80a9d4a53234548b915)]:
+  - @clerk/shared@4.23.0
+
+## 4.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`cb76aa2`](https://github.com/clerk/javascript/commit/cb76aa25b80124a86d8d2384f3fb370eb6917f6d)]:
+  - @clerk/shared@4.22.1
+
 ## 4.11.0
 
 ### Minor Changes

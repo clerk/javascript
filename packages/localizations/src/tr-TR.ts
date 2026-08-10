@@ -62,6 +62,7 @@ export const trTR: LocalizationResource = {
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
+  badge__deprovisioned: undefined,
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__freeTrial: undefined,
@@ -216,37 +217,128 @@ export const trTR: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
           required: undefined,
         },
       },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +348,6 @@ export const trTR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +388,6 @@ export const trTR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +435,6 @@ export const trTR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +471,6 @@ export const trTR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +500,8 @@ export const trTR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +521,17 @@ export const trTR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +579,6 @@ export const trTR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +610,6 @@ export const trTR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +650,6 @@ export const trTR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,37 +696,12 @@ export const trTR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
       },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
+      unsupportedProvider: {
+        description: undefined,
         title: undefined,
       },
     },
@@ -656,8 +714,11 @@ export const trTR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Doğrulanmadı',
         badge__verified: 'Doğrulandı',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -668,6 +729,7 @@ export const trTR: LocalizationResource = {
           valueLabel: 'Değer',
         },
         verifiedAtLabel: "{{ date | shortDate('tr-TR') }} tarihinde doğrulandı",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: '{{domain}} ekle',
@@ -695,6 +757,10 @@ export const trTR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Özel SAML Sağlayıcısı',
         google: undefined,
@@ -869,6 +935,7 @@ export const trTR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -896,6 +963,15 @@ export const trTR: LocalizationResource = {
     badge__manualInvitation: 'Davetler',
     badge__unverified: 'Doğrulanmamış',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,
@@ -1096,6 +1172,9 @@ export const trTR: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1223,6 +1302,9 @@ export const trTR: LocalizationResource = {
       title: 'TOTP Kodunu Girin',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Hesap ekle',
@@ -1306,6 +1388,10 @@ export const trTR: LocalizationResource = {
         subtitleNewTab: 'Devam etmek için yeni açılmış sekmeye dönün',
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
@@ -1367,6 +1453,12 @@ export const trTR: LocalizationResource = {
       resendButton: 'Kod almadınız mı? Tekrar gönderin',
       subtitle: 'Devam etmek için lütfen telefonunuza gönderilen doğrulama kodunu girin',
       title: 'Telefonuza gönderilen kodu girin',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'Şifremi sıfırla',
@@ -1472,6 +1564,12 @@ export const trTR: LocalizationResource = {
       resendButton: 'Kodu tekrar gönder',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Telefon numaranızı doğrulayın',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Yardım almak için destekle iletişime geçin',
@@ -1611,6 +1709,7 @@ export const trTR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1685,6 +1784,14 @@ export const trTR: LocalizationResource = {
       sentencePrefix: 'Şifreniz;',
     },
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
@@ -1738,9 +1845,9 @@ export const trTR: LocalizationResource = {
     action__openUserMenu: undefined,
     action__signOut: 'Çıkış yap',
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
-    label__userButtonPopover: 'Hesap paneli',
     label__accountActions: 'Hesap eylemleri',
     label__activeSessions: 'Aktif oturumlar',
+    label__userButtonPopover: 'Hesap paneli',
   },
   userProfile: {
     apiKeysPage: {
@@ -1763,6 +1870,15 @@ export const trTR: LocalizationResource = {
       title__codelist: 'Yedekleme kodları',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: undefined,
         notFound: undefined,

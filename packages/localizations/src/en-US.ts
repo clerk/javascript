@@ -51,6 +51,7 @@ export const enUS: LocalizationResource = {
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__deprovisioned: 'Deprovisioned',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__freeTrial: 'Free trial',
@@ -229,14 +230,89 @@ export const enUS: LocalizationResource = {
     },
     configureStep: {
       activeConnectionWarning: {
+        dismiss: 'Dismiss',
         title:
           'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
-        dismiss: 'Dismiss',
       },
       attributeMappingTable: {
         badges: {
           optional: 'Optional',
           required: 'Required',
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          headerSubtitle: 'Add your application credentials',
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          headerSubtitle: 'Add your identity provider’s endpoints',
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+        redirectUriStep: {
+          claims: {
+            description: 'Ensure your ID token includes the following claims:',
+            table: {
+              columns: {
+                attribute: 'Clerk attribute',
+                claim: 'ID token claim',
+              },
+              rows: {
+                email: {
+                  attribute: 'Primary email',
+                },
+                firstName: {
+                  attribute: 'First name',
+                },
+                lastName: {
+                  attribute: 'Last name',
+                },
+                subject: {
+                  attribute: 'External user ID',
+                },
+              },
+            },
+          },
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
         },
       },
       samlCustom: {
@@ -639,6 +715,11 @@ export const enUS: LocalizationResource = {
         },
         mainHeaderTitle: 'Configure Okta Workforce',
       },
+      unsupportedProvider: {
+        description:
+          'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
+        title: 'Unsupported provider',
+      },
     },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
@@ -694,6 +775,10 @@ export const enUS: LocalizationResource = {
       title: 'Reset connection',
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: 'OpenID Connect (OIDC)',
+        oidcProvider: 'OIDC Provider',
+      },
       saml: {
         customSaml: 'Custom SAML Provider',
         google: 'Google Workspace',
@@ -875,6 +960,7 @@ export const enUS: LocalizationResource = {
       title: 'Redirect URL',
     },
     scopeList: {
+      privateMetadata: 'Your private metadata set by {{applicationName}}, which may include sensitive information',
       title: 'This will allow {{applicationName}} access to:',
     },
     subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
@@ -903,6 +989,15 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -1108,8 +1203,8 @@ export const enUS: LocalizationResource = {
         title: 'SSO',
         tooltip:
           'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
-        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
         tooltipLabel: 'More information',
+        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
       },
       title: 'Security',
     },
@@ -1238,6 +1333,9 @@ export const enUS: LocalizationResource = {
       title: 'Verification required',
     },
   },
+  searchInput: {
+    action__clear: 'Clear search',
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Add account',
@@ -1321,6 +1419,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      verifiedTransferable: {
+        subtitle: 'Return to original tab to continue',
+        title: 'Email verified',
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Use the verification link sent to your email',
@@ -1381,6 +1483,12 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'To continue, please enter the verification code sent to your phone',
       title: 'Check your phone',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
@@ -1487,6 +1595,12 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
     restrictedAccess: {
       actionLink: 'Sign in',
@@ -1633,6 +1747,7 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     api_key_name_already_exists: 'API Key name already exists.',
     api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
@@ -1707,6 +1822,16 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: "Verification didn't complete. Please try again.",
+    protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
+    protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_script_load_failed:
+      "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
+    protect_check_timed_out: "Verification didn't complete in time. Please try again.",
+    protect_check_unsupported_environment:
+      "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
@@ -1759,9 +1884,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
-    label__userButtonPopover: 'Account panel',
     label__accountActions: 'Account actions',
     label__activeSessions: 'Active sessions',
+    label__userButtonPopover: 'Account panel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1784,6 +1909,15 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',

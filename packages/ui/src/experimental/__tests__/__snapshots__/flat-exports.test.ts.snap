@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`@clerk/ui/experimental flat exports > exposes a stable set of flat named exports 1`] = `
+[
+  "OrganizationProfileAPIKeysPanel",
+  "OrganizationProfileBillingPanel",
+  "OrganizationProfileDeleteSection",
+  "OrganizationProfileDomainsSection",
+  "OrganizationProfileGeneralPanel",
+  "OrganizationProfileLeaveSection",
+  "OrganizationProfileMembersPanel",
+  "OrganizationProfileProfileSection",
+  "OrganizationProfileProvider",
+  "OrganizationProfileSecurityPanel",
+  "UserProfileAPIKeysPanel",
+  "UserProfileAccountPanel",
+  "UserProfileActiveDevicesSection",
+  "UserProfileBillingPanel",
+  "UserProfileConnectedAccountsSection",
+  "UserProfileDeleteSection",
+  "UserProfileEmailSection",
+  "UserProfileEnterpriseAccountsSection",
+  "UserProfileMfaSection",
+  "UserProfilePasskeysSection",
+  "UserProfilePasswordSection",
+  "UserProfilePhoneSection",
+  "UserProfileProfileSection",
+  "UserProfileProvider",
+  "UserProfileSecurityPanel",
+  "UserProfileUsernameSection",
+  "UserProfileWeb3Section",
+]
+`;

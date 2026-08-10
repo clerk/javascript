@@ -22,11 +22,13 @@ vi.mock('electron', () => ({
 }));
 
 vi.mock('electron-store', () => ({
-  default: vi.fn(() => ({
-    get: storeGet,
-    set: storeSet,
-    delete: storeDelete,
-  })),
+  default: vi.fn(function () {
+    return {
+      get: storeGet,
+      set: storeSet,
+      delete: storeDelete,
+    };
+  }),
 }));
 
 const ss = safeStorage as unknown as Record<string, unknown>;

@@ -11,9 +11,9 @@ import type {
 export type { OrganizationDomainMutations };
 
 /**
- * Shared state for the ConfigureSSO wizard, persisted across steps. Everything
- * is sourced from the umbrella `useOrganizationEnterpriseConnection` hook one
- * level up, so the context never observes a loading state and the steps read
+ * Shared state for the ConfigureSSO wizard, persisted across steps. Connection
+ * state is sourced from the umbrella `useOrganizationEnterpriseConnection` hook
+ * one level up, so the context never observes a loading state and the steps read
  * display gates / mutations from a single place instead of re-deriving.
  */
 export interface ConfigureSSOData {

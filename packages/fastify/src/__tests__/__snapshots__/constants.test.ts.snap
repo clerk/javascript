@@ -15,18 +15,3 @@ exports[`constants > from environment variables 1`] = `
   "SECRET_KEY": "TEST_SECRET_KEY",
 }
 `;
-
-exports[`constants from environment variables 1`] = `
-{
-  "API_URL": "CLERK_API_URL",
-  "API_VERSION": "CLERK_API_VERSION",
-  "JWT_KEY": "CLERK_JWT_KEY",
-  "PUBLISHABLE_KEY": "CLERK_PUBLISHABLE_KEY",
-  "SDK_METADATA": {
-    "environment": "test",
-    "name": "@clerk/fastify",
-    "version": "0.0.0-test",
-  },
-  "SECRET_KEY": "CLERK_SECRET_KEY",
-}
-`;

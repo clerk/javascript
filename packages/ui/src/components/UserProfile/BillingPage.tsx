@@ -7,6 +7,7 @@ import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
+import { AccountCredits } from '../AccountCredits';
 import { PaymentAttemptsList } from '../PaymentAttempts';
 import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
@@ -26,7 +27,7 @@ const BillingPageInternal = withCardStateProvider(() => {
     <ProfileCard.Page>
       <Col
         elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground })}
+        sx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground, isolation: 'isolate' })}
       >
         <Col
           elementDescriptor={descriptors.profilePage}
@@ -66,6 +67,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                   )}
                 />
                 <PaymentMethods />
+                <AccountCredits />
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <StatementsList />

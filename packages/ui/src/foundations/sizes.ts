@@ -16,8 +16,10 @@ const baseSpaceUnits = Object.freeze({
 const spacingScale = Object.freeze({
   '0x25': { rem: '0.0625rem', multiplier: 0.25 },
   '0x5': { rem: '0.125rem', multiplier: 0.5 },
+  '0x75': { rem: '0.1875rem', multiplier: 0.75 },
   '1': { rem: '0.25rem', multiplier: 1 },
   '1x5': { rem: '0.375rem', multiplier: 1.5 },
+  '1x75': { rem: '0.4375rem', multiplier: 1.75 },
   '2': { rem: '0.5rem', multiplier: 2 },
   '2x5': { rem: '0.625rem', multiplier: 2.5 },
   '3': { rem: '0.75rem', multiplier: 3 },
@@ -94,8 +96,10 @@ type ExtractRemValues<T> = {
 const spaceUnits = Object.freeze({
   '0x25': spacingScale['0x25'].rem,
   '0x5': spacingScale['0x5'].rem,
+  '0x75': spacingScale['0x75'].rem,
   '1': spacingScale['1'].rem,
   '1x5': spacingScale['1x5'].rem,
+  '1x75': spacingScale['1x75'].rem,
   '2': spacingScale['2'].rem,
   '2x5': spacingScale['2x5'].rem,
   '3': spacingScale['3'].rem,
@@ -197,4 +201,4 @@ const radii = Object.freeze({
  */
 const spaceScaleKeys = Object.keys(spacingScale) as SpacingScaleKey[];
 
-export { sizes, space, radii, spaceScaleKeys };
+export { radii, sizes, space, spaceScaleKeys };

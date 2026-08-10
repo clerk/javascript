@@ -18,41 +18,58 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
   protected val activity: ComponentActivity? = findActivity(context)
 
   private var recomposer: Recomposer? = null
-  private var recomposerJob: kotlinx.coroutines.Job? = null
+  private var recomposerJob: Job? = null
 
   private val composeView = ComposeView(context).also { view ->
     activity?.let { act ->
       view.setViewTreeLifecycleOwner(act)
       view.setViewTreeViewModelStoreOwner(act)
       view.setViewTreeSavedStateRegistryOwner(act)
-
-      val recomposerContext = AndroidUiDispatcher.Main
-      val newRecomposer = Recomposer(recomposerContext)
-      recomposer = newRecomposer
-      view.setParentCompositionContext(newRecomposer)
-      val scope = CoroutineScope(recomposerContext + kotlinx.coroutines.SupervisorJob())
-      recomposerJob = scope.coroutineContext[kotlinx.coroutines.Job]
-      scope.launch {
-        newRecomposer.runRecomposeAndApplyChanges()
-      }
     }
     addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+  }
+
+  init {
+    // Fabric measures before window attach; without a parent composition context, ComposeView.onMeasure throws.
+    startRecomposer()
+  }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    setupView()
   }
 
   override fun onDetachedFromWindow() {
     recomposer?.cancel()
     recomposerJob?.cancel()
+    recomposer = null
+    recomposerJob = null
     onHostDetachedFromWindow()
     super.onDetachedFromWindow()
   }
 
+  private fun startRecomposer() {
+    if (activity == null || recomposerJob?.isActive == true) return
+
+    // Navigation can detach and later reattach the same host, so a reattached ComposeView needs a fresh recomposer.
+    val recomposerContext = AndroidUiDispatcher.Main
+    val newRecomposer = Recomposer(recomposerContext)
+    recomposer = newRecomposer
+    composeView.setParentCompositionContext(newRecomposer)
+    recomposerJob = CoroutineScope(recomposerContext).launch {
+      newRecomposer.runRecomposeAndApplyChanges()
+    }
+  }
+
   fun setupView() {
+    startRecomposer()
     composeView.setContent {
       val viewModelStoreOwner = localViewModelStoreOwner()
 

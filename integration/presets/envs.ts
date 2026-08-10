@@ -249,6 +249,8 @@ const withProtectService = withInstanceKeys('with-protect-service', base.clone()
 
 const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust', base.clone().setId('withNeedsClientTrust'));
 
+const withPasskeys = withInstanceKeys('with-passkeys', base.clone().setId('withPasskeys'));
+
 export const envs = {
   base,
   sessionsProd1,
@@ -269,6 +271,7 @@ export const envs = {
   withKeyless,
   withLegalConsent,
   withNeedsClientTrust,
+  withPasskeys,
   withRestrictedMode,
   withReverification,
   withSessionTasks,

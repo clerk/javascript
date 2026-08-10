@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, renderElement } from '../../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Props for {@link DialogDescription}. */
@@ -16,12 +16,12 @@ export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDe
 
     const defaultProps = {
       id: descriptionId,
-      ref,
     } satisfies DefaultProps<'p'>;
 
-    return renderElement({
+    return useRender({
       defaultTagName: 'p',
       render,
+      ref,
       props: mergeProps<'p'>(defaultProps, otherProps),
     });
   },

@@ -11,10 +11,10 @@ export interface UseTransitionOptions {
 }
 
 export interface TransitionProps {
-  'data-cl-open'?: '';
-  'data-cl-closed'?: '';
-  'data-cl-starting-style'?: '';
-  'data-cl-ending-style'?: '';
+  'data-open'?: '';
+  'data-closed'?: '';
+  'data-starting-style'?: '';
+  'data-ending-style'?: '';
   style?: CSSProperties;
 }
 
@@ -30,13 +30,13 @@ export interface UseTransitionReturn {
  * Returns:
  * - `mounted`: whether the element should render. Gate your JSX on this.
  * - `transitionProps`: spread onto the element. Exposes
- *   `data-cl-open` / `data-cl-closed` / `data-cl-starting-style` /
- *   `data-cl-ending-style` data attributes and an inline `transition: none` on
+ *   `data-open` / `data-closed` / `data-starting-style` /
+ *   `data-ending-style` data attributes and an inline `transition: none` on
  *   the first mount frame.
  *
  * Consumers drive all animation via CSS — no durations in JS. Works with CSS
- * transitions (via `[data-cl-starting-style]` / `[data-cl-ending-style]`) and
- * CSS keyframe animations (via `[data-cl-open]` / `[data-cl-closed]`).
+ * transitions (via `[data-starting-style]` / `[data-ending-style]`) and
+ * CSS keyframe animations (via `[data-open]` / `[data-closed]`).
  */
 export function useTransition({ open, ref }: UseTransitionOptions): UseTransitionReturn {
   const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
@@ -54,15 +54,15 @@ export function useTransition({ open, ref }: UseTransitionOptions): UseTransitio
   const transitionProps = useMemo<TransitionProps>(() => {
     const props: TransitionProps = {};
     if (open) {
-      props['data-cl-open'] = '';
+      props['data-open'] = '';
     } else if (mounted) {
-      props['data-cl-closed'] = '';
+      props['data-closed'] = '';
     }
     if (transitionStatus === 'starting') {
-      props['data-cl-starting-style'] = '';
+      props['data-starting-style'] = '';
       props.style = { transition: 'none' };
     } else if (transitionStatus === 'ending') {
-      props['data-cl-ending-style'] = '';
+      props['data-ending-style'] = '';
     }
     return props;
   }, [open, mounted, transitionStatus]);

@@ -1,12 +1,15 @@
+import { usePortalRoot } from '@clerk/shared/react';
 import type { Placement, UseFloatingReturn, UseInteractionsReturn } from '@floating-ui/react';
 import {
   autoUpdate,
   flip,
+  FloatingNode,
   FloatingPortal,
   offset,
   shift,
   useDismiss,
   useFloating,
+  useFloatingNodeId,
   useFocus,
   useHover,
   useInteractions,
@@ -16,11 +19,10 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { usePortalRoot } from '@clerk/shared/react';
-
 import { Box, descriptors, type LocalizationKey, Span, Text, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
+import { withFloatingTree } from './contexts';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -34,6 +36,7 @@ interface UseTooltipReturn extends UseFloatingReturn, UseInteractionsReturn {
   setOpen: (open: boolean) => void;
   isMounted: boolean;
   transitionStyles: React.CSSProperties;
+  nodeId: string | undefined;
 }
 
 export function useTooltip({
@@ -51,7 +54,9 @@ export function useTooltip({
   const { animations: layoutAnimations } = useAppearance().parsedOptions;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
+  const nodeId = useFloatingNodeId();
   const data = useFloating({
+    nodeId,
     placement,
     open,
     onOpenChange: setOpen,
@@ -104,11 +109,12 @@ export function useTooltip({
       open,
       setOpen,
       isMounted,
+      nodeId,
       ...interactions,
       ...data,
       transitionStyles,
     }),
-    [open, setOpen, interactions, data, isMounted, transitionStyles],
+    [open, setOpen, interactions, data, isMounted, transitionStyles, nodeId],
   );
 }
 
@@ -126,12 +132,12 @@ export const useTooltipContext = (): UseTooltipReturn => {
   return context;
 };
 
-function Root({ children, ...options }: { children: React.ReactNode } & TooltipOptions) {
+const Root = withFloatingTree(({ children, ...options }: { children: React.ReactNode } & TooltipOptions) => {
   // This can accept any props as options, e.g. `placement`,
   // or other positioning options.
   const tooltip = useTooltip(options);
   return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
-}
+});
 
 type TriggerProps = React.HTMLProps<HTMLElement> & {
   sx?: ThemableCssProp;
@@ -203,41 +209,44 @@ const Content = React.forwardRef<
   }
 
   return (
-    <FloatingPortal root={effectiveRoot}>
-      <Box
-        ref={ref}
-        elementDescriptor={descriptors.tooltip}
-        style={{
-          ...context.floatingStyles,
-          ...style,
-        }}
-        {...context.getFloatingProps(props)}
-      >
+    <FloatingNode id={context.nodeId}>
+      <FloatingPortal root={effectiveRoot}>
         <Box
-          elementDescriptor={descriptors.tooltipContent}
-          style={context.transitionStyles}
-          sx={[
-            t => ({
-              paddingBlock: t.space.$1,
-              paddingInline: t.space.$1x5,
-              borderRadius: t.radii.$md,
-              backgroundColor: t.colors.$black,
-              color: t.colors.$white,
-              maxWidth: t.sizes.$60,
-            }),
-            sx,
-          ]}
+          ref={ref}
+          elementDescriptor={descriptors.tooltip}
+          style={{
+            ...context.floatingStyles,
+            ...style,
+          }}
+          {...context.getFloatingProps(props)}
+          sx={t => ({ zIndex: t.zIndices.$tooltip })}
         >
-          <Text
-            elementDescriptor={descriptors.tooltipText}
-            localizationKey={text}
-            variant='body'
-            colorScheme='inherit'
-            sx={textSx}
-          />
+          <Box
+            elementDescriptor={descriptors.tooltipContent}
+            style={context.transitionStyles}
+            sx={[
+              t => ({
+                paddingBlock: t.space.$1,
+                paddingInline: t.space.$1x5,
+                borderRadius: t.radii.$md,
+                backgroundColor: t.colors.$black,
+                color: t.colors.$white,
+                maxWidth: t.sizes.$60,
+              }),
+              sx,
+            ]}
+          >
+            <Text
+              elementDescriptor={descriptors.tooltipText}
+              localizationKey={text}
+              variant='body'
+              colorScheme='inherit'
+              sx={textSx}
+            />
+          </Box>
         </Box>
-      </Box>
-    </FloatingPortal>
+      </FloatingPortal>
+    </FloatingNode>
   );
 });
 

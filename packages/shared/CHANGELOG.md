@@ -1,5 +1,179 @@
 # Change Log
 
+## 4.27.1
+
+### Patch Changes
+
+- Clarify that `ClientResource.cookieExpiresAt` is nullable, can change when Clerk refreshes the client cookie, and reflects the cookie Device Trust uses to recognize a browser. ([#9350](https://github.com/clerk/javascript/pull/9350)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.27.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Improve generated API reference links, expose `BillingSubscriptionItemStatus`, and clarify the `createUser()` identification status documentation. ([#9340](https://github.com/clerk/javascript/pull/9340)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Rename "Client Trust" to "Device Trust" in documentation strings and links. This is a naming change only — the `needs_client_trust` sign-in status, the `clientTrustState` property, and every other API value keep their existing names, so no integration changes are required. ([#9266](https://github.com/clerk/javascript/pull/9266)) by [@mwickett](https://github.com/mwickett)
+
+## 4.26.0
+
+### Minor Changes
+
+- Support sign-in-or-sign-up combined flow with Clerk <SignIn> component ([#7928](https://github.com/clerk/javascript/pull/7928)) by [@dmoerner](https://github.com/dmoerner)
+
+  when strict enumeration protection is enabled.
+
+  On development instances, `<SignIn>` now logs a warning when the sign-in-or-up flow is rendered on an
+  instance that has both password and strict enumeration protection enabled. In that configuration
+  visitors without an account are routed to the password screen and cannot complete a sign-up, so the
+  warning names both settings and how to resolve them.
+
+## 4.25.10
+
+### Patch Changes
+
+- Enable self-serve OIDC configuration for every application. Organization admins can now select an OIDC provider in the `<OrganizationProfile />` Security tab without the `experimental.oidcSelfServe` option, and existing OIDC connections open their configuration steps instead of the unsupported-provider state. The `experimental.oidcSelfServe` option no longer does anything and can be removed from `<ClerkProvider />` and `Clerk.load()`. ([#9288](https://github.com/clerk/javascript/pull/9288)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.25.9
+
+### Patch Changes
+
+- Add support for configuring custom OpenID Connect enterprise connections through the Organization Profile. ([#9200](https://github.com/clerk/javascript/pull/9200)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Expose whether an organization member has been deprovisioned, and mark deprovisioned members as inactive in the Organization Profile. ([#9202](https://github.com/clerk/javascript/pull/9202)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.25.8
+
+### Patch Changes
+
+- Internal plumbing to support `@clerk/ui` composed `UserProfile` / `OrganizationProfile` subcomponents. ([#9144](https://github.com/clerk/javascript/pull/9144)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.25.7
+
+### Patch Changes
+
+- Moved the internal `patchRequest()` helper for reuse across framework SDKs. ([#9220](https://github.com/clerk/javascript/pull/9220)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.25.6
+
+### Patch Changes
+
+- Standardize JSDoc punctuation to always follow `e.g.` and `i.e.` with a comma (`e.g.,` / `i.e.,`), matching the docs style guide. Comment-only change; no runtime behavior is affected. This keeps the generated Typedoc reference output consistent. ([#9201](https://github.com/clerk/javascript/pull/9201)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add an experimental `oidcSelfServe` option to enable the self-serve OIDC configuration flow in `<ConfigureSSO />`. ([#9198](https://github.com/clerk/javascript/pull/9198)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.25.5
+
+### Patch Changes
+
+- Escape `<`, `>`, and `/` when serializing the Clerk auth state into SSR `<script>` tags, preventing a `</script>` sequence inside user-controllable session claims from breaking out of the script element (stored XSS). The embedded JSON still parses to identical values on the client. ([#9166](https://github.com/clerk/javascript/pull/9166)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 4.25.4
+
+### Patch Changes
+
+- Add `CLERK_DISABLE_AUTO_PROXY=true` to opt out of automatic Frontend API proxying on Vercel production deployments. ([#9159](https://github.com/clerk/javascript/pull/9159)) by [@brkalow](https://github.com/brkalow)
+
+## 4.25.3
+
+### Patch Changes
+
+- Fail fast when the Clerk Frontend API (FAPI) is slow or unreachable during load. The client request and the load-recovery token mint are now bounded by a timeout, and the timed-out client request is aborted instead of being left in flight. A cold `Clerk.load()` renders identity from a freshly minted session token (falling back to the session cookie if the mint fails) in seconds instead of hanging while retries run. After a degraded load, the client is re-fetched in the background without a time limit, so a slow-but-healthy origin recovers full client data (user profile, other sessions) without a reload. Also fixes hooks like `useUser()` keeping the cookie-derived stub user after full user data arrives. Adds a `timeLimit` utility to `@clerk/shared/utils` that optionally aborts an `AbortController` on timeout. ([#9065](https://github.com/clerk/javascript/pull/9065)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add named protect check parameter types for future sign-in and sign-up flows. ([#9116](https://github.com/clerk/javascript/pull/9116)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.25.2
+
+### Patch Changes
+
+- Add a clear button to search inputs for quickly resetting the current query. It appears in the `<APIKeys />` search and the `<OrganizationProfile />` members search. ([#9098](https://github.com/clerk/javascript/pull/9098)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Search inputs now expose a shared `searchInput` appearance element (layered alongside any existing component-specific element), and the clear button is themeable via the new shared `searchInputClearButton` element. The clear button's label can be customized with the new shared `searchInput.action__clear` localization key.
+
+## 4.25.1
+
+### Patch Changes
+
+- Deprecate `createPathMatcher()` and its pattern types (`PathMatcherParam`, `PathPattern`, `WithPathSegmentWildcard`). Pattern-based path matching is being phased out along with the framework-level `createRouteMatcher()` helpers and will be removed in the next major version. Use your framework's native routing primitives to decide which paths to protect instead. ([#9094](https://github.com/clerk/javascript/pull/9094)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.25.0
+
+### Minor Changes
+
+- Add support for Clerk Protect mid-flow SDK challenges (`protect_check`) on both sign-up and sign-in. ([#8329](https://github.com/clerk/javascript/pull/8329)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  When the Protect antifraud service issues a challenge, responses now carry a `protectCheck` field
+  with `{ status, token, sdkUrl, expiresAt?, uiHints? }`. Clients resolve the gate by loading the
+  SDK at `sdkUrl`, executing the challenge, and submitting the resulting proof token via
+  `signUp.submitProtectCheck({ proofToken })` or `signIn.submitProtectCheck({ proofToken })`. The
+  response may carry a chained challenge, which the SDK resolves iteratively.
+
+  Sign-in adds a new `'needs_protect_check'` value to the `SignInStatus` union. **Upgrading this
+  package is type-only and does not change runtime behavior**: the server returns the new status
+  (and the `protectCheck` field) only for instances where Protect mid-flow challenges have been
+  explicitly enabled — the feature is off by default and is not enabled for existing instances by
+  upgrading. The server additionally only emits the new status value to SDK versions that
+  understand it, so older clients never receive an unknown status.
+
+  If an exhaustive `switch` on `signIn.status` flags the new value after upgrading, handle it by
+  running the challenge described by `protectCheck` and submitting the proof via
+  `submitProtectCheck()`. Clients should treat the `protectCheck` field as the authoritative gate
+  signal and fall back to the status value for defense in depth.
+
+  The pre-built `<SignIn />` and `<SignUp />` components handle the gate automatically by routing
+  to a new `protect-check` route that runs the challenge SDK and resumes the flow on completion.
+
+### Patch Changes
+
+- Fix the `touchSession` option documentation to link directly to the Frontend API touch endpoint. ([#9097](https://github.com/clerk/javascript/pull/9097)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Polish the Protect check card: the loading spinner now hides while a challenge widget (e.g. Turnstile) is visible instead of spinning alongside it, only appears after a short delay so near-instant checks never flash it, and the card no longer reserves empty space above the spinner before a widget has rendered. ([#9099](https://github.com/clerk/javascript/pull/9099)) by [@mwickett](https://github.com/mwickett)
+
+## 4.24.0
+
+### Minor Changes
+
+- Add `idpCertificateIssuedAt` and `idpCertificateExpiresAt` to SAML enterprise connections, exposing the IdP certificate validity window ([#9077](https://github.com/clerk/javascript/pull/9077)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- On the Test step of the self-serve SSO configuration flow, clicking Continue now re-checks for a successful test run before blocking, so a successful run completed in a separate browser tab is recognized without first clicking Refresh logs. ([#9046](https://github.com/clerk/javascript/pull/9046)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- `createPathMatcher()` and `createRouteMatcher()` route suggestions now use the `:path*` subtree form (e.g. `/dashboard/:path*`) instead of `(.*)`. Unlike `/dashboard(.*)`, which also matches sibling routes such as `/dashboardxyz`, `/dashboard/:path*` matches only `/dashboard` and its path-segment subtree. The new suggestion type is exported as `WithPathSegmentWildcard`; the existing `WithPathPatternWildcard` type is unchanged (now deprecated), and `(.*)` patterns keep working. This only changes the type-level autocomplete suggestion. ([#9057](https://github.com/clerk/javascript/pull/9057)) by [@jacekradko](https://github.com/jacekradko)
+
+## 4.23.0
+
+### Minor Changes
+
+- Add account credits section and credit history page to the billing tab for payers with an existing credit balance. ([#8977](https://github.com/clerk/javascript/pull/8977)) by [@l-armstrong](https://github.com/l-armstrong)
+
+### Patch Changes
+
+- Fix native OAuth transport handling for combined sign-in-or-up flows so transfer callbacks can continue instead of surfacing a generic OAuth callback failure. ([#9037](https://github.com/clerk/javascript/pull/9037)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.22.1
+
+### Patch Changes
+
+- Fix missing redirect URL protocol validation for Clerk UI browser navigations, including the multi-session add-account flow. ([#8961](https://github.com/clerk/javascript/pull/8961)) by [@jacekradko](https://github.com/jacekradko)
+
+  Internal browser navigations now consistently honor configured redirect protocols and fail closed across mixed ClerkJS/UI bundle versions.
+
 ## 4.22.0
 
 ### Minor Changes

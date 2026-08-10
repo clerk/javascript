@@ -11,15 +11,16 @@ import type {
   CreateOrganizationModalProps,
   EnvironmentResource,
   GoogleOneTapProps,
+  InviteMembersModalProps,
   OrganizationProfileModalProps,
-  SignInProps,
   SignInModalProps,
-  SignUpProps,
+  SignInProps,
   SignUpModalProps,
+  SignUpProps,
   UserProfileModalProps,
   UserProfileProps,
-  WaitlistProps,
   WaitlistModalProps,
+  WaitlistProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense, useCallback, useRef, useSyncExternalStore } from 'react';
@@ -34,6 +35,7 @@ import {
   CreateOrganizationModal,
   EnableOrganizationsPrompt,
   ImpersonationFab,
+  InviteMembersModal,
   KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
@@ -90,6 +92,7 @@ export type ComponentControls = {
       | 'signUp'
       | 'userProfile'
       | 'organizationProfile'
+      | 'inviteMembers'
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
@@ -105,9 +108,11 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : T extends 'enableOrganizationsPrompt'
-              ? __internal_EnableOrganizationsPromptProps
-              : UserProfileProps,
+            : T extends 'inviteMembers'
+              ? InviteMembersModalProps
+              : T extends 'enableOrganizationsPrompt'
+                ? __internal_EnableOrganizationsPromptProps
+                : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -116,6 +121,7 @@ export type ComponentControls = {
       | 'signUp'
       | 'userProfile'
       | 'organizationProfile'
+      | 'inviteMembers'
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
@@ -170,6 +176,7 @@ interface ComponentsState {
   userProfileModal: null | UserProfileModalProps;
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileModalProps;
+  inviteMembersModal: null | InviteMembersModalProps;
   createOrganizationModal: null | CreateOrganizationModalProps;
   enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
@@ -300,6 +307,7 @@ const Components = (props: ComponentsProps) => {
     userProfileModal: null,
     userVerificationModal: null,
     organizationProfileModal: null,
+    inviteMembersModal: null,
     createOrganizationModal: null,
     enableOrganizationsPromptModal: null,
     organizationSwitcherPrefetch: false,
@@ -327,6 +335,7 @@ const Components = (props: ComponentsProps) => {
     userProfileModal,
     userVerificationModal,
     organizationProfileModal,
+    inviteMembersModal,
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
@@ -604,6 +613,23 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedInviteMembersModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'organizationProfile'}
+      componentAppearance={inviteMembersModal?.appearance}
+      flowName={'organizationProfile'}
+      onClose={() => componentsControls.closeModal('inviteMembers')}
+      onExternalNavigate={() => componentsControls.closeModal('inviteMembers')}
+      startPath={buildVirtualRouterUrl({ base: '/inviteMembers', path: urlStateParam?.path })}
+      getContainer={inviteMembersModal?.getContainer ?? (() => null)}
+      componentName={'InviteMembersModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+    >
+      <InviteMembersModal {...inviteMembersModal} />
+    </LazyModalRenderer>
+  );
+
   const mountedCreateOrganizationModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -688,6 +714,7 @@ const Components = (props: ComponentsProps) => {
         {userProfileModal && mountedUserProfileModal}
         {userVerificationModal && mountedUserVerificationModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
+        {inviteMembersModal && mountedInviteMembersModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}

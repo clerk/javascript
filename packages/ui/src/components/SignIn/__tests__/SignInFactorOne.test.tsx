@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, mockWebAuthn, render, screen } from '@/test/utils';
 
-import { SignInFactorOne } from '../SignInFactorOne';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
+import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -104,6 +104,34 @@ describe('SignInFactorOne', () => {
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
       await waitFor(() => {
         expect(fixtures.clerk.setActive).toHaveBeenCalled();
+      });
+    });
+
+    it('routes to the protect-check card when the first-factor attempt is gated by Clerk Protect', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPreferredSignInStrategy({ strategy: 'password' });
+        f.startSignInWithEmailAddress({ supportPassword: true });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      // A protect_check gate can fire on attempt_first_factor; the card must route to the gate
+      // instead of dispatching on the (now-irrelevant) underlying status.
+      fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_protect_check',
+          protectCheck: { status: 'pending', token: 'challenge-token', sdkUrl: 'https://protect.example.com/sdk.js' },
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText('Password'), '123456');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
+        // and must not fall through to a status-based route
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
       });
     });
   });

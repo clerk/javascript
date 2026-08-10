@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen } from '@/test/utils';
+import { render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 // The Test step reads navigation through the generic wizard facade. `goPrev`
@@ -28,6 +28,10 @@ const testRunsSource = vi.hoisted(() => ({
   page: 1,
   setPage: vi.fn(),
   refresh: vi.fn(() => Promise.resolve()),
+  // Resolves with the fresh success answer (what a probe revalidate returns).
+  // Defaults to `false`; a test overrides it to model a run that completed in
+  // another tab — a server-side success the local `rows` don't reflect yet.
+  revalidateHasSuccessfulTestRun: vi.fn(() => Promise.resolve(false)),
 }));
 
 const createTestRun = vi.fn(() => Promise.resolve({ url: 'https://idp.example.com/test' }));
@@ -77,6 +81,8 @@ beforeEach(() => {
   testRunsSource.setPage.mockReset();
   testRunsSource.refresh.mockReset();
   testRunsSource.refresh.mockImplementation(() => Promise.resolve());
+  testRunsSource.revalidateHasSuccessfulTestRun.mockReset();
+  testRunsSource.revalidateHasSuccessfulTestRun.mockResolvedValue(false);
   testRunsSource.rows = [];
   testRunsSource.totalCount = 0;
   testRunsSource.isLoading = false;
@@ -150,10 +156,56 @@ describe('TestConfigurationStep', () => {
     expect(goNext).toHaveBeenCalledTimes(1);
   });
 
+  it('revalidates the probe on Continue and advances when a run completed in another tab (not yet in the local probe)', async () => {
+    // The local probe shows no success at first render — e.g. the successful run
+    // happened in a different browser tab, so this tab's probe is stale…
+    testRunsSource.rows = [];
+    testRunsSource.totalCount = 0;
+    // …but a fresh probe (what clicking "Refresh logs" would have fetched)
+    // reports a success.
+    testRunsSource.revalidateHasSuccessfulTestRun.mockResolvedValue(true);
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+    // Continue revalidated the probe and advanced — no manual "Refresh logs"
+    // first — gating on the fresh answer rather than the stale render value.
+    expect(testRunsSource.revalidateHasSuccessfulTestRun).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(goNext).toHaveBeenCalledTimes(1));
+  });
+
+  it('shows a loading state on the Continue button while the probe revalidates', async () => {
+    // No local success → Continue takes the revalidate path. Hold the probe open
+    // so the in-flight loading state is observable.
+    testRunsSource.rows = [];
+    let resolveProbe!: (value: boolean) => void;
+    testRunsSource.revalidateHasSuccessfulTestRun.mockImplementation(
+      () =>
+        new Promise<boolean>(resolve => {
+          resolveProbe = resolve;
+        }),
+    );
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    const continueButton = screen.getByRole('button', { name: /Continue/i });
+    await userEvent.click(continueButton);
+
+    // While the probe is in flight the Continue button is in its loading
+    // (disabled) state.
+    await waitFor(() => expect(continueButton).toBeDisabled());
+
+    // Resolving the probe with a success clears the loading state and advances.
+    resolveProbe(true);
+    await waitFor(() => expect(goNext).toHaveBeenCalledTimes(1));
+  });
+
   it('surfaces an inline error and stays put when there is no successful test run', async () => {
-    // No success row → the gate fails. Continue stays enabled (matching legacy)
-    // so the user gets the validation message instead of a silently disabled
-    // button, and the wizard does not advance.
+    // No local success → Continue revalidates the probe; the fresh probe also
+    // reports no success (default mock), so the gate holds. Continue stays
+    // enabled (matching legacy) so the user gets the validation message instead
+    // of a silently disabled button, and the wizard does not advance.
     testRunsSource.rows = [aRow({ id: 'run_1', status: 'failed' })];
     testRunsSource.totalCount = 1;
     const { wrapper } = await createFixtures();
@@ -161,6 +213,7 @@ describe('TestConfigurationStep', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
 
+    expect(testRunsSource.revalidateHasSuccessfulTestRun).toHaveBeenCalledTimes(1);
     expect(goNext).not.toHaveBeenCalled();
     expect(await screen.findByText(/You need at least one successful test run/i)).toBeInTheDocument();
   });

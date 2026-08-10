@@ -1,5 +1,6 @@
-import { useMemo, type ReactNode } from 'react';
 import { useOrganization } from '@clerk/shared/react';
+import { type ReactNode, useMemo } from 'react';
+
 import { Animated } from '@/ui/elements/Animated';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import { isPlanWithPerSeatCosts } from '@/ui/utils/billingPlanSeats';

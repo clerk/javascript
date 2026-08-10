@@ -446,8 +446,8 @@ describe('Checkout', () => {
     expect(prorationCreditRow).toBeInTheDocument();
     expect(accountCreditRow).toBeInTheDocument();
 
-    expect(prorationCreditRow).toHaveTextContent('- $5.00');
-    expect(accountCreditRow).toHaveTextContent('- $10.00');
+    expect(prorationCreditRow).toHaveTextContent('-$5.00');
+    expect(accountCreditRow).toHaveTextContent('-$10.00');
   });
 
   it('renders free trial details during confirmation stage', async () => {
@@ -1738,7 +1738,7 @@ describe('Checkout', () => {
 
       const proratedDiscountRow = getByText('Prorated discount').closest('.cl-lineItemsGroup');
       expect(proratedDiscountRow).toBeInTheDocument();
-      expect(proratedDiscountRow).toHaveTextContent('- $5.00');
+      expect(proratedDiscountRow).toHaveTextContent('-$5.00');
 
       const totalPerPeriodRow = getByText('Total per period').closest('.cl-lineItemsGroup');
       expect(totalPerPeriodRow).toBeInTheDocument();

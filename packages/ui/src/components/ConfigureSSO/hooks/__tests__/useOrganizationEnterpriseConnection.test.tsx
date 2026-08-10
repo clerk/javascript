@@ -7,20 +7,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // test-runs query's `enabled` and folds its loading into the global gate.
 
 // A connection shaped enough for the umbrella's gating: the derived
-// "configured" predicate reads `samlConnection.idpSsoUrl` + `idpEntityId`, and
-// the active path reads `active`.
+// "configured" predicate branches on `provider`, then reads
+// `samlConnection.idpSsoUrl` + `idpEntityId`, and the active path reads `active`.
 type MockConnection = {
   id: string;
+  provider: string;
   active?: boolean;
   samlConnection?: { idpSsoUrl?: string; idpEntityId?: string } | null;
 };
 
 const configuredConnection = (id: string): MockConnection => ({
   id,
+  provider: 'saml_okta',
   samlConnection: { idpSsoUrl: 'https://idp.example.com/sso', idpEntityId: 'https://idp.example.com/entity' },
 });
 
-const unconfiguredConnection = (id: string): MockConnection => ({ id, samlConnection: null });
+const unconfiguredConnection = (id: string): MockConnection => ({ id, provider: 'saml_okta', samlConnection: null });
 
 // Mutable state the connection-source mock reads from, so a test can flip from
 // "no connection at load" to "connection created mid-flow" between renders.
@@ -119,7 +121,7 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
   });
 
   it('(a2) active (but unconfigured) connection at load → test-runs active via the isActive path', () => {
-    connectionsState.data = [{ id: 'ent_active', active: true, samlConnection: null }];
+    connectionsState.data = [{ id: 'ent_active', provider: 'saml_okta', active: true, samlConnection: null }];
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 

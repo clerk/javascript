@@ -62,6 +62,7 @@ export const elGR: LocalizationResource = {
   badge__canceledEndsAt: 'Ακυρώθηκε, λήγει {{date | timeString("el-GR")}}',
   badge__currentPlan: 'Τρέχον πλάνο',
   badge__default: 'Προεπιλογή',
+  badge__deprovisioned: undefined,
   badge__endsAt: 'Λήγει {{date | timeString("el-GR")}}',
   badge__expired: 'Έληξε',
   badge__freeTrial: 'Δωρεάν δοκιμή',
@@ -216,37 +217,128 @@ export const elGR: LocalizationResource = {
     yearPerUnit: undefined,
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
       attributeMappingTable: {
         badges: {
           optional: undefined,
           required: undefined,
         },
       },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
       samlCustom: {
         assignUsersStep: {
           headerSubtitle: undefined,
           paragraph: undefined,
-          title: undefined,
         },
         attributeMappingStep: {
           attributeMappingTable: {
             columns: {
               attributeName: undefined,
-              userProfile: undefined,
+              userAttribute: undefined,
             },
             rows: {
               email: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               firstName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
               lastName: {
                 attributeName: undefined,
-                userProfile: undefined,
+                userAttribute: undefined,
               },
             },
           },
@@ -256,7 +348,6 @@ export const elGR: LocalizationResource = {
         createAppStep: {
           createAppInstructions: {
             paragraph: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
           serviceProviderFields: {
@@ -297,7 +388,6 @@ export const elGR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -345,7 +435,6 @@ export const elGR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -382,7 +471,6 @@ export const elGR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataFile: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -412,6 +500,8 @@ export const elGR: LocalizationResource = {
               claimName: undefined,
               value: undefined,
             },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
             rows: {
               email: {
                 attribute: undefined,
@@ -431,21 +521,17 @@ export const elGR: LocalizationResource = {
             },
           },
           headerSubtitle: undefined,
-          paragraph: undefined,
           step1: undefined,
           step2: undefined,
-          step3: undefined,
           title: undefined,
         },
         createAppStep: {
           assignUsersInstructions: {
-            paragraph1: undefined,
             step1: undefined,
             step2: undefined,
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            step6: undefined,
             title: undefined,
           },
           createAppInstructions: {
@@ -493,7 +579,6 @@ export const elGR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
@@ -525,7 +610,6 @@ export const elGR: LocalizationResource = {
             step3: undefined,
             step4: undefined,
             step5: undefined,
-            title: undefined,
           },
           headerSubtitle: undefined,
         },
@@ -566,7 +650,6 @@ export const elGR: LocalizationResource = {
             step2: undefined,
             step3: undefined,
             step4: undefined,
-            step5: undefined,
             title: undefined,
           },
           headerSubtitle: undefined,
@@ -613,37 +696,12 @@ export const elGR: LocalizationResource = {
             ariaLabel: undefined,
             manual: undefined,
             metadataUrl: undefined,
-            title: undefined,
           },
         },
         mainHeaderTitle: undefined,
       },
-    },
-    confirmation: {
-      configurationSection: {
-        configureAgainLink: undefined,
-        issuerLabel: undefined,
-        ssoUrlLabel: undefined,
-        title: undefined,
-      },
-      domainSection: {
-        title: undefined,
-      },
-      enableSection: {
-        title: undefined,
-      },
-      inactiveBanner: {
-        title: undefined,
-      },
-      resetSection: {
-        confirmationFieldLabel: undefined,
-        submitButton: undefined,
-        title: undefined,
-        warning: undefined,
-      },
-      statusSection: {
-        activeBadge: undefined,
-        inactiveBadge: undefined,
+      unsupportedProvider: {
+        description: undefined,
         title: undefined,
       },
     },
@@ -656,8 +714,11 @@ export const elGR: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__expired: undefined,
         badge__unverified: 'Μη επαληθευμένο',
         badge__verified: 'Επαληθευμένο',
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -668,6 +729,7 @@ export const elGR: LocalizationResource = {
           valueLabel: 'Τιμή',
         },
         verifiedAtLabel: "Επαληθεύτηκε στις {{ date | shortDate('el-GR') }}",
+        verifyAgainButton: undefined,
       },
       domainSuggestion: {
         formButtonPrimary__add: 'Προσθήκη {{domain}}',
@@ -695,6 +757,10 @@ export const elGR: LocalizationResource = {
       title: undefined,
     },
     selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
       saml: {
         customSaml: 'Προσαρμοσμένος πάροχος SAML',
         google: undefined,
@@ -872,6 +938,7 @@ export const elGR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
@@ -899,6 +966,15 @@ export const elGR: LocalizationResource = {
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
     badge__unverified: 'Μη επαληθευμένο',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Δεν υπάρχει ιστορικό πληρωμών',
         notFound: 'Δεν βρέθηκαν πληρωμές',
@@ -1100,6 +1176,9 @@ export const elGR: LocalizationResource = {
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
       },
       title: undefined,
     },
@@ -1230,6 +1309,9 @@ export const elGR: LocalizationResource = {
       title: 'Επαλήθευση δύο παραγόντων',
     },
   },
+  searchInput: {
+    action__clear: undefined,
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Προσθήκη λογαριασμού',
@@ -1314,6 +1396,10 @@ export const elGR: LocalizationResource = {
         subtitleNewTab: 'Επιστροφή στη νέα καρτέλα που άνοιξε για να συνεχίσετε',
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
@@ -1375,6 +1461,12 @@ export const elGR: LocalizationResource = {
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το τηλέφωνό σας',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     resetPassword: {
       formButtonPrimary: 'Επαναφορά κωδικού πρόσβασης',
@@ -1482,6 +1574,12 @@ export const elGR: LocalizationResource = {
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Επαληθεύστε το τηλέφωνό σας',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Σύνδεση',
@@ -1621,6 +1719,7 @@ export const elGR: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: 'Είστε ήδη μέλος σε αυτόν τον οργανισμό',
     api_key_name_already_exists: undefined,
     api_key_usage_exceeded: undefined,
@@ -1702,6 +1801,14 @@ export const elGR: LocalizationResource = {
       sentencePrefix: 'Ο κωδικός πρόσβασής σας πρέπει να περιέχει',
     },
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Έχετε ήδη συνδεθεί.',
     web3_missing_identifier: 'Δεν εντοπίστηκε αναγνωριστικό Web3. Παρακαλώ δοκιμάστε ξανά.',
     web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
@@ -1757,9 +1864,9 @@ export const elGR: LocalizationResource = {
     action__openUserMenu: 'Άνοιγμα μενού χρήστη',
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
-    label__userButtonPopover: 'Πίνακας λογαριασμού',
     label__accountActions: 'Ενέργειες λογαριασμού',
     label__activeSessions: 'Ενεργές συνεδρίες',
+    label__userButtonPopover: 'Πίνακας λογαριασμού',
   },
   userProfile: {
     apiKeysPage: {
@@ -1782,6 +1889,15 @@ export const elGR: LocalizationResource = {
       title__codelist: 'Εφεδρικοί κωδικοί',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Δεν υπάρχει ιστορικό πληρωμών',
         notFound: 'Δεν βρέθηκαν πληρωμές',

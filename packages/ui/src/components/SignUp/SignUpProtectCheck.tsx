@@ -1,0 +1,168 @@
+import { useClerk } from '@clerk/shared/react';
+import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
+import { type ComponentType, useEffect, useRef, useState } from 'react';
+
+import { Card } from '@/ui/elements/Card';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
+
+import { withRedirectToAfterSignUp } from '../../common';
+import { useCoreSignUp, useSignUpContext } from '../../contexts';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Flow,
+  localizationKeys,
+  Spinner,
+  useLocalizations,
+} from '../../customizables';
+import { useSpinDelay } from '../../hooks';
+import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
+import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
+import { useRouter } from '../../router';
+import { completeSignUpFlow } from './util';
+
+/**
+ * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
+ * mounted deeper (e.g. `continue/protect-check` or the combined-flow `create/.../protect-check`),
+ * the nested route passes overrides so a resolved gate routes within the correct subtree instead
+ * of dead-ending. The verify/self paths resolve correctly from every mount; only `continuePath`
+ * differs (the `continue` index is `..`, not `../continue`, once we're already under `continue`).
+ */
+type SignUpProtectCheckProps = Partial<SignUpProps> & {
+  verifyEmailPath?: string;
+  verifyPhonePath?: string;
+  continuePath?: string;
+  protectCheckPath?: string;
+};
+
+function SignUpProtectCheckInternal({
+  verifyEmailPath = '../verify-email-address',
+  verifyPhonePath = '../verify-phone-number',
+  continuePath = '../continue',
+  protectCheckPath = '.',
+}: SignUpProtectCheckProps = {}): JSX.Element | null {
+  const card = useCardState();
+  const { t } = useLocalizations();
+  const signUp = useCoreSignUp();
+  const { navigate } = useRouter();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { setActive } = useClerk();
+  const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  // Latches that a protect check existed at some point, so the resolution race
+  // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for
+  // a stale visit. State adjusted during render (guarded) rather than a ref
+  // write, which React disallows in the render body.
+  const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signUp.protectCheck);
+  const didStartNoCheckFallbackRef = useRef(false);
+
+  if (signUp.protectCheck && !everSawProtectCheck) {
+    setEverSawProtectCheck(true);
+  }
+
+  useEffect(() => {
+    if (!signUp.protectCheck && !everSawProtectCheck && !didStartNoCheckFallbackRef.current) {
+      didStartNoCheckFallbackRef.current = true;
+      void navigateToFlowStart();
+    }
+  }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
+
+  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignUpResource>({
+    getProtectCheck: () => signUp.protectCheck,
+    getResource: () => signUp,
+    reload: () => signUp.reload(),
+    submitProtectCheck: params => signUp.submitProtectCheck(params),
+    // Routes on the resolved resource. `completeSignUpFlow` handles the `complete` case (via
+    // `handleComplete`) as well as routing to the next missing-field / verification / chained-
+    // challenge step, so both the normal success and the `protect_check_already_resolved` reload
+    // land correctly.
+    onResolved: async (updatedSignUp, isCancelled) => {
+      if (isCancelled()) {
+        return;
+      }
+      await completeSignUpFlow({
+        signUp: updatedSignUp,
+        verifyEmailPath,
+        verifyPhonePath,
+        protectCheckPath, // Defaults to '.' so a chained challenge re-runs this same route
+        continuePath,
+        handleComplete: () =>
+          setActive({
+            session: updatedSignUp.createdSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
+            },
+          }),
+        navigate,
+      });
+    },
+  });
+
+  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
+  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
+  // The error and widget-visibility gates stay OUTSIDE the delay hook (in the JSX below): its
+  // minimum visible duration must never outrank the handshake's "spinner is gone when the
+  // promise resolves" guarantee, nor keep a spinner next to the retry button.
+  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+
+  // Stale/direct visit that never had a check: render nothing while the
+  // flow-start redirect scheduled above kicks in, instead of flashing the card
+  // shell for one paint. Must stay below every hook call.
+  if (!signUp.protectCheck && !everSawProtectCheck) {
+    return null;
+  }
+
+  return (
+    <Flow.Part part='protectCheck'>
+      <Card.Root>
+        <Card.Content>
+          <Header.Root showLogo>
+            <Header.Title localizationKey={localizationKeys('signUp.protectCheck.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signUp.protectCheck.subtitle')} />
+          </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Col
+            elementDescriptor={descriptors.main}
+            gap={6}
+          >
+            <Box
+              ref={containerRef}
+              id='clerk-protect-check'
+              aria-busy={isRunning}
+              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
+              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
+              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
+            />
+            {showSpinner && !hasError && !isWidgetVisible ? (
+              <Flex center>
+                <Spinner
+                  size='lg'
+                  colorScheme='primary'
+                  elementDescriptor={descriptors.spinner}
+                  aria-label={t(localizationKeys('signUp.protectCheck.loading'))}
+                />
+              </Flex>
+            ) : null}
+            {hasError ? (
+              <Button
+                onClick={retry}
+                localizationKey={localizationKeys('signUp.protectCheck.retryButton')}
+              />
+            ) : null}
+          </Col>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    </Flow.Part>
+  );
+}
+
+// The redirect HOC widens props back to the shared component-props union; re-expose the path
+// overrides so nested route mounts (continue/protect-check, create/continue/protect-check) can
+// pass them.
+export const SignUpProtectCheck = withRedirectToAfterSignUp(
+  withCardStateProvider(SignUpProtectCheckInternal),
+) as ComponentType<SignUpProtectCheckProps>;

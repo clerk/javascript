@@ -19,6 +19,7 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
+  WaitlistEntryStatus,
 } from './Enums';
 
 export type { SignUpStatus } from '@clerk/shared/types';
