@@ -6,6 +6,42 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from './types';
 
+const decimalToBinaryBits = (decimal: string, minimumLength: number): number[] | undefined => {
+  if (!/^\d+$/.test(decimal)) {
+    return undefined;
+  }
+
+  let remaining = decimal.replace(/^0+/, '') || '0';
+  const bits: number[] = [];
+
+  while (remaining !== '0') {
+    let quotient = '';
+    let remainder = 0;
+
+    for (let i = 0; i < remaining.length; i++) {
+      const value = remainder * 10 + remaining.charCodeAt(i) - 48;
+      const quotientDigit = Math.floor(value / 2);
+
+      if (quotient || quotientDigit !== 0) {
+        quotient += quotientDigit;
+      }
+      remainder = value % 2;
+    }
+
+    bits.push(remainder);
+    remaining = quotient || '0';
+  }
+
+  if (bits.length === 0) {
+    bits.push(0);
+  }
+  while (bits.length < minimumLength) {
+    bits.push(0);
+  }
+
+  return bits;
+};
+
 export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
   if (!per || !fpm) {
     return { permissions: [], featurePermissionMap: [] };
@@ -13,19 +49,9 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
 
   const permissions = per.split(',').map(p => p.trim());
 
-  // TODO: make this more efficient
   const featurePermissionMap = fpm
     .split(',')
-    .map(permission => Number.parseInt(permission.trim(), 10))
-    .map((permission: number) =>
-      permission
-        .toString(2)
-        .padStart(permissions.length, '0')
-        .split('')
-        .map(bit => Number.parseInt(bit, 10))
-        .reverse(),
-    )
-    .filter(Boolean);
+    .map(permission => decimalToBinaryBits(permission.trim(), permissions.length) ?? []);
 
   return { permissions, featurePermissionMap };
 };

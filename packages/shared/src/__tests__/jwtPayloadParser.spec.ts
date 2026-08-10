@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { splitByScope } from '../authorization';
+import { createCheckAuthorization, splitByScope } from '../authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties } from '../jwtPayloadParser';
 
 const baseClaims = {
@@ -12,6 +12,33 @@ const baseClaims = {
   azp: 'azp',
   nbf: 1234567890,
   __raw: '',
+};
+
+const permissionNames = Array.from({ length: 54 }, (_, index) => `permission_${index}`);
+
+const authFromFeaturePermissionMask = (fpm: string) => {
+  const authObject = JWTPayloadToAuthObjectProperties({
+    ...baseClaims,
+    v: 2,
+    fea: 'o:feature',
+    o: {
+      id: 'org_id',
+      rol: 'admin',
+      per: permissionNames.join(','),
+      fpm,
+    },
+  });
+  const has = createCheckAuthorization({
+    userId: authObject.userId,
+    orgId: authObject.orgId,
+    orgRole: authObject.orgRole,
+    orgPermissions: authObject.orgPermissions,
+    factorVerificationAge: authObject.factorVerificationAge,
+    features: null,
+    plans: null,
+  });
+
+  return { authObject, has };
 };
 
 describe('JWTPayloadToAuthObjectProperties', () => {
@@ -260,6 +287,50 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         'org:projects:revoke',
       ].sort(),
     );
+  });
+
+  test('preserves permissions above the safe integer boundary', () => {
+    const { authObject, has } = authFromFeaturePermissionMask('9007199254740993');
+
+    expect(authObject.orgPermissions).toEqual(['org:feature:permission_0', 'org:feature:permission_53']);
+    expect(has({ permission: 'org:feature:permission_0' })).toBe(true);
+    expect(has({ permission: 'org:feature:permission_53' })).toBe(true);
+  });
+
+  test('does not introduce permissions when decoding a mask above the safe integer boundary', () => {
+    const { authObject, has } = authFromFeaturePermissionMask('9007199254740995');
+
+    expect(authObject.orgPermissions).toEqual([
+      'org:feature:permission_0',
+      'org:feature:permission_1',
+      'org:feature:permission_53',
+    ]);
+    expect(has({ permission: 'org:feature:permission_0' })).toBe(true);
+    expect(has({ permission: 'org:feature:permission_1' })).toBe(true);
+    expect(has({ permission: 'org:feature:permission_2' })).toBe(false);
+    expect(has({ permission: 'org:feature:permission_53' })).toBe(true);
+  });
+
+  test.each([
+    ['1', [0]],
+    ['3', [0, 1]],
+    ['7', [0, 1, 2]],
+    ['21', [0, 2, 4]],
+  ])('preserves permissions for the safe mask %s', (fpm, expectedPermissionIndexes) => {
+    const { authObject, has } = authFromFeaturePermissionMask(fpm);
+    const expectedPermissions = expectedPermissionIndexes.map(index => `org:feature:permission_${index}`);
+
+    expect(authObject.orgPermissions).toEqual(expectedPermissions);
+    for (const permission of expectedPermissions) {
+      expect(has({ permission })).toBe(true);
+    }
+  });
+
+  test.each(['1invalid', '-1', '1.5'])('fails closed for the malformed mask %s', fpm => {
+    const { authObject, has } = authFromFeaturePermissionMask(fpm);
+
+    expect(authObject.orgPermissions).toEqual([]);
+    expect(has({ permission: 'org:feature:permission_0' })).toBe(false);
   });
 });
 
