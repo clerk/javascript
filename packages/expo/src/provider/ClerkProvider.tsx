@@ -92,6 +92,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   const suppressJsClientChangedRef = useRef(0);
   const { isMountedRef, isNativeClientReady } = useNativeClientBootstrap({
     publishableKey: pk,
+    proxyUrl,
     nativeRefreshFromJsControllerRef,
     suppressTokenCacheNotificationsRef,
     tokenCache: syncableTokenCache,

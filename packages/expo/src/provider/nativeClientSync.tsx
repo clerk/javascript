@@ -963,20 +963,25 @@ function waitForClerkInstanceLoad(clerkInstance: SyncableClerkInstance): Promise
 
 export function useNativeClientBootstrap({
   publishableKey,
+  proxyUrl,
   nativeRefreshFromJsControllerRef,
   suppressTokenCacheNotificationsRef,
   tokenCache,
   clerkInstance,
 }: {
   publishableKey: string;
+  proxyUrl?: string | ((url: URL) => string);
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
   suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
   clerkInstance: SyncableClerkInstance | null | undefined;
 }) {
-  const startedPublishableKeyRef = useRef<string | null>(null);
+  const startedConfigKeyRef = useRef<string | null>(null);
   const isMountedRef = useRef(true);
-  const [readyPublishableKey, setReadyPublishableKey] = useState<string | null>(null);
+  const [readyConfigKey, setReadyConfigKey] = useState<string | null>(null);
+  // Function proxyUrls are browser-only; the singleton already rejects them on native.
+  const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
+  const configKey = `${publishableKey}|${nativeProxyUrl ?? ''}`;
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -984,12 +989,11 @@ export function useNativeClientBootstrap({
     if (
       (Platform.OS === 'ios' || Platform.OS === 'android') &&
       publishableKey &&
-      startedPublishableKeyRef.current !== publishableKey
+      startedConfigKeyRef.current !== configKey
     ) {
-      startedPublishableKeyRef.current = publishableKey;
-      const configuringPublishableKey = publishableKey;
-      const isCurrentConfiguration = () =>
-        isMountedRef.current && startedPublishableKeyRef.current === configuringPublishableKey;
+      startedConfigKeyRef.current = configKey;
+      const configuringConfigKey = configKey;
+      const isCurrentConfiguration = () => isMountedRef.current && startedConfigKeyRef.current === configuringConfigKey;
 
       const configureNativeClerk = async () => {
         let didAttemptConfigure = false;
@@ -1019,7 +1023,7 @@ export function useNativeClientBootstrap({
             }
 
             didAttemptConfigure = true;
-            await ClerkExpo.configure(configuringPublishableKey, initialJsDeviceToken);
+            await ClerkExpo.configure(publishableKey, initialJsDeviceToken, nativeProxyUrl);
 
             if (!isCurrentConfiguration()) {
               return;
@@ -1073,7 +1077,7 @@ export function useNativeClientBootstrap({
           }
         } finally {
           if (didAttemptConfigure && isCurrentConfiguration()) {
-            setReadyPublishableKey(configuringPublishableKey);
+            setReadyConfigKey(configuringConfigKey);
           }
         }
       };
@@ -1083,11 +1087,19 @@ export function useNativeClientBootstrap({
     return () => {
       isMountedRef.current = false;
     };
-  }, [publishableKey, nativeRefreshFromJsControllerRef, suppressTokenCacheNotificationsRef, tokenCache, clerkInstance]);
+  }, [
+    publishableKey,
+    configKey,
+    nativeProxyUrl,
+    nativeRefreshFromJsControllerRef,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+    clerkInstance,
+  ]);
 
   return {
     isMountedRef,
-    isNativeClientReady: readyPublishableKey === publishableKey,
+    isNativeClientReady: readyConfigKey === configKey,
   };
 }
 

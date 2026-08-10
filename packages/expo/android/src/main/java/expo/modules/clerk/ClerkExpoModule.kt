@@ -42,6 +42,7 @@ class ClerkExpoModule : Module() {
     private var lastObservedClientState: ClientStateSnapshot? = null
     private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
+    private var configuredProxyUrl: String? = null
 
     private data class ClientStateSnapshot(
         val client: Client?,
@@ -85,8 +86,8 @@ class ClerkExpoModule : Module() {
             clientStateObserverJob = null
         }
 
-        AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
-            configure(pubKey, bearerToken, promise)
+        AsyncFunction("configure") { pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise ->
+            configure(pubKey, bearerToken, proxyUrl, promise)
         }
 
         AsyncFunction("getClientToken") { promise: Promise ->
@@ -112,7 +113,7 @@ class ClerkExpoModule : Module() {
     private val reactContext: Context?
         get() = appContext.reactContext
 
-    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+    private fun clerkConfigurationOptions(proxyUrl: String?): ClerkConfigurationOptions {
         val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
         val customHeaders = buildMap {
             put(HOST_SDK_HEADER, HOST_SDK)
@@ -121,7 +122,7 @@ class ClerkExpoModule : Module() {
             }
         }
 
-        return ClerkConfigurationOptions().withCustomHeaders(customHeaders)
+        return ClerkConfigurationOptions(proxyUrl = proxyUrl).withCustomHeaders(customHeaders)
     }
 
     private fun startClientStateObserver() {
@@ -207,7 +208,7 @@ class ClerkExpoModule : Module() {
 
     // MARK: - configure
 
-    private fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+    private fun configure(pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
         val context = reactContext ?: run {
             promise.reject("E_INIT_FAILED", "React context is not available", null)
             return
@@ -216,6 +217,7 @@ class ClerkExpoModule : Module() {
         coroutineScope.launch {
             try {
                 val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+                val normalizedProxyUrl = proxyUrl?.trim()?.takeIf { it.isNotEmpty() }
 
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
@@ -227,7 +229,7 @@ class ClerkExpoModule : Module() {
                             .apply()
                     }
 
-                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
@@ -272,6 +274,7 @@ class ClerkExpoModule : Module() {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
                         configuredPublishableKey = pubKey
+                        configuredProxyUrl = normalizedProxyUrl
                         lastObservedClientState = clientStateSnapshot()
                         promise.resolve(null)
                     }
@@ -279,8 +282,8 @@ class ClerkExpoModule : Module() {
                 }
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
-                if (activePublishableKey != null && activePublishableKey != pubKey) {
-                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                if (activePublishableKey != null && (activePublishableKey != pubKey || configuredProxyUrl != normalizedProxyUrl)) {
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     loadThemeFromAssets(context)
@@ -325,6 +328,7 @@ class ClerkExpoModule : Module() {
                     }
 
                     configuredPublishableKey = pubKey
+                    configuredProxyUrl = normalizedProxyUrl
                     lastObservedClientState = clientStateSnapshot()
                     promise.resolve(null)
                     return@launch

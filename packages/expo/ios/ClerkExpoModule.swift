@@ -31,8 +31,8 @@ public class ClerkExpoModule: Module {
       }
     }
 
-    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
-      self.configure(publishableKey, bearerToken: bearerToken, promise: promise)
+    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) in
+      self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: proxyUrl, promise: promise)
     }
 
     AsyncFunction("getClientToken") { (promise: Promise) in
@@ -57,10 +57,11 @@ public class ClerkExpoModule: Module {
 
   // MARK: - configure
 
-  private func configure(_ publishableKey: String, bearerToken: String?, promise: Promise) {
+  private func configure(_ publishableKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
     Task {
       do {
-        try await ClerkNativeBridge.shared.configure(publishableKey: publishableKey, bearerToken: bearerToken)
+        try await ClerkNativeBridge.shared.configure(
+          publishableKey: publishableKey, bearerToken: bearerToken, proxyUrl: proxyUrl)
         promise.resolve()
       } catch {
         promise.reject("E_CONFIGURE_FAILED", error.localizedDescription)
