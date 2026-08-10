@@ -1,0 +1,14 @@
+import * as Stories from './user-profile-account-section.stories';
+
+# UserProfileAccountSection
+
+Account details, profile image, email addresses, and phone numbers composed with `Section`.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>
