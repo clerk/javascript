@@ -1,5 +1,6 @@
 import type { APIKey, ClerkClient, Organization, User } from '@clerk/backend';
 import { faker } from '@faker-js/faker';
+import type { TestInfo } from '@playwright/test';
 
 import { fakerPassword, hash } from '../models/helpers';
 
@@ -54,6 +55,10 @@ type FakeUserOptions = {
   withEmail?: boolean;
 };
 
+export type PlaywrightTest = {
+  info: () => Pick<TestInfo, 'file' | 'line' | 'title' | 'titlePath'>;
+};
+
 export type FakeUser = {
   firstName: string;
   lastName: string;
@@ -61,6 +66,7 @@ export type FakeUser = {
   password: string;
   username?: string;
   phoneNumber?: string;
+  privateMetadata?: UserPrivateMetadata;
   deleteIfExists: () => Promise<void>;
 };
 
@@ -79,7 +85,7 @@ export type FakeAPIKey = {
 };
 
 export type UserService = {
-  createFakeUser: (options?: FakeUserOptions) => FakeUser;
+  createFakeUser: (test: PlaywrightTest, options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
   /**
    * Creates a BAPI user if it doesn't exist, otherwise returns the existing user.
@@ -114,7 +120,7 @@ export function fakerPhoneNumber() {
 
 export const createUserService = (clerkClient: ClerkClient) => {
   const self: UserService = {
-    createFakeUser: (options?: FakeUserOptions) => {
+    createFakeUser: (test: PlaywrightTest, options?: FakeUserOptions) => {
       const {
         fictionalEmail = true,
         withEmail = true,
@@ -127,6 +133,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         ? `${randomHash}+clerk_test@clerkcookie.com`
         : `clerkcookie+${randomHash}@mailsac.com`;
       const phoneNumber = fakerPhoneNumber();
+      const { file, line, title, titlePath } = test.info();
 
       return {
         firstName: faker.person.firstName(),
@@ -135,6 +142,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? fakerPassword() : undefined,
         phoneNumber: withPhoneNumber ? phoneNumber : undefined,
+        privateMetadata: {
+          title,
+          titlePath,
+          file,
+          line,
+        },
         deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };
     },
@@ -147,6 +160,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
           lastName: fakeUser.lastName,
           phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
           username: fakeUser.username,
+          privateMetadata: fakeUser.privateMetadata,
           skipPasswordRequirement: fakeUser.password === undefined,
         }),
       );
