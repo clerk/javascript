@@ -1,7 +1,41 @@
+import {
+  disabledUserAPIKeysFeature,
+  disabledUserBillingFeature,
+} from '@clerk/shared/internal/clerk-js/componentGuards';
+import { useClerk } from '@clerk/shared/react';
 import type { CustomPage } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
+
+import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
+import { applyOrder } from './user-button.utils';
+
+/** A page the UserProfile brings itself, named by the id its navigation knows it as. */
+export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys';
+
+/**
+ * The UserProfile's own pages, in the order it lists them, minus the ones this instance has turned
+ * off.
+ *
+ * Ordering a custom page after a built-in one means naming every built-in that follows it, so the
+ * list has to match what the profile will actually show. It mirrors clerk-js rather than being read
+ * from it: the profile is not mounted yet at the point this is needed, and it decides its own pages
+ * from the same environment behind the same guards.
+ */
+export function useUserProfilePages(): UserProfilePageId[] {
+  const clerk = useClerk();
+  const environment = useMosaicEnvironment();
+
+  const pages: UserProfilePageId[] = ['account', 'security'];
+  if (!disabledUserBillingFeature(clerk, environment)) {
+    pages.push('billing');
+  }
+  if (!disabledUserAPIKeysFeature(clerk, environment)) {
+    pages.push('apiKeys');
+  }
+  return pages;
+}
 
 /** A page of your own inside the profile, reached from its navigation. */
 export interface CustomProfilePage {
@@ -47,25 +81,6 @@ export interface CustomPagesBridge {
 
 const isLink = (item: CustomProfileItem): item is CustomProfileLink => item.href !== undefined;
 
-/**
- * The ids to send, in the order the profile should show them.
- *
- * clerk-js puts every built-in page it was *not* asked to move ahead of everything it was, so a
- * built-in left out of the order has to be sent anyway to keep it behind the pages that were named.
- * Ids that match no page are dropped rather than sent: clerk-js would reject them, and does so by
- * logging them as invalid page data, which is not what a typo in this list deserves.
- */
-function arrange(
-  order: readonly string[],
-  items: ReadonlyMap<string, CustomProfileItem>,
-  builtInPages: readonly string[],
-): string[] {
-  const exists = (id: string) => items.has(id) || builtInPages.includes(id);
-  const named = [...new Set(order)].filter(exists);
-  const rest = [...builtInPages, ...items.keys()].filter(id => !named.includes(id));
-  return [...named, ...rest];
-}
-
 function portalInto(containers: ReadonlyMap<string, HTMLDivElement>, id: string, node: ReactNode): ReactNode {
   const container = containers.get(id);
   return container ? createPortal(node, container, id) : null;
@@ -103,7 +118,10 @@ export function useCustomPages({ items, order, builtInPages }: CustomPagesOption
   );
 
   const byId = new Map((items ?? []).map(item => [item.path, item]));
-  const ids = order?.length ? arrange(order, byId, builtInPages) : [...byId.keys()];
+  // clerk-js puts every built-in page it was *not* asked to move ahead of everything it was, so a
+  // built-in left out of the order has to be sent anyway to keep it behind the pages that were named.
+  // Without an order there is nothing to hold in place, so only the custom pages go out.
+  const ids = order?.length ? applyOrder(order, [...builtInPages, ...byId.keys()], id => id) : [...byId.keys()];
 
   if (!ids.length) {
     return { customPages: undefined, portals: [] };

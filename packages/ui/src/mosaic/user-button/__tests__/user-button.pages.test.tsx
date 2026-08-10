@@ -2,8 +2,8 @@ import type { CustomPage } from '@clerk/shared/types';
 import { act, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import type { CustomPagesOptions, CustomProfileItem } from '../useCustomPages';
-import { useCustomPages } from '../useCustomPages';
+import type { CustomPagesOptions, CustomProfileItem } from '../user-button.pages';
+import { useCustomPages } from '../user-button.pages';
 
 // The bridge's other half lives in clerk-js: `ExternalElementMounter` renders a `div` and hands it to
 // `mount`, then hands it back to `unmount` when the profile goes away. These stand in for it, so the
