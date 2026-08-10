@@ -103,6 +103,7 @@ const AppliedPromoCodeRow = () => {
         }
         badge={
           <Button
+            elementDescriptor={descriptors.checkoutFormPromoCodeRemoveButton}
             type='button'
             variant='ghost'
             colorScheme='neutral'
@@ -148,6 +149,7 @@ const PromoCodeInput = () => {
 
   return (
     <Box
+      elementDescriptor={descriptors.checkoutFormPromoCodeRoot}
       sx={theme => ({
         padding: theme.space.$4,
         borderBottomWidth: theme.borderWidths.$normal,
@@ -172,6 +174,7 @@ const PromoCodeInput = () => {
         })}
       >
         <Input
+          elementDescriptor={descriptors.checkoutFormPromoCodeInput}
           aria-label={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
           aria-describedby={error ? errorId : undefined}
           hasError={Boolean(error)}
@@ -184,6 +187,7 @@ const PromoCodeInput = () => {
           }}
         />
         <Button
+          elementDescriptor={descriptors.checkoutFormPromoCodeApplyButton}
           type='submit'
           variant='bordered'
           colorScheme='secondary'
@@ -193,6 +197,7 @@ const PromoCodeInput = () => {
         />
         {error ? (
           <Text
+            elementDescriptor={descriptors.checkoutFormPromoCodeErrorText}
             id={errorId}
             role='alert'
             variant='caption'
