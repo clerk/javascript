@@ -1029,8 +1029,7 @@ export function useNativeClientBootstrap({
                 proxyUrl: nativeProxyUrl,
               });
             } else {
-              // Binary predates proxy support; OTA-updated JS must keep the legacy 2-arg call
-              // because Expo Modules rejects calls with more arguments than the binary declares.
+              // Old binaries reject extra configure args, so OTA-updated JS must use the legacy call.
               if (nativeProxyUrl && __DEV__) {
                 console.warn(
                   '[ClerkProvider] The installed Clerk native module does not support proxyUrl. ' +
