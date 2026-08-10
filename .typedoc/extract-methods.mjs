@@ -725,7 +725,13 @@ function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
 }
 
 /** Block tags omitted from extracted method prose (see `custom-theme.mjs` `comment` partial for theme output). */
-const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@typeParam', '@returns', '@experimental']);
+const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set([
+  '@example',
+  '@param',
+  '@typeParam',
+  '@returns',
+  '@experimental',
+]);
 
 /**
  * @param {import('typedoc').Comment | undefined} comment
