@@ -22,7 +22,13 @@ export const styles = stylex.create({
     width: space['5'],
   },
   root: {
-    gap: space['6'],
+    gap: space['4'],
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  sections: {
+    gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
