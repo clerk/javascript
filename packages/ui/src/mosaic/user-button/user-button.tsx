@@ -2,16 +2,13 @@
 
 import type { ReactElement } from 'react';
 
-import type { CustomProfileItem } from '../hooks/useCustomPages';
-import { useCustomPages } from '../hooks/useCustomPages';
-import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
 import { useSpinDelay } from '../hooks/useSpinDelay';
-import type { UserProfilePageId } from '../hooks/useUserProfilePages';
-import { useUserProfilePages } from '../hooks/useUserProfilePages';
 import { useMachine } from '../machine/useMachine';
 import type { UserButtonControllerOptions } from './user-button.controller';
 import { useUserButtonController } from './user-button.controller';
 import { userButtonMachine } from './user-button.machine';
+import type { CustomProfileItem, UserProfilePageId } from './user-button.pages';
+import { useCustomPages, useUserProfilePages } from './user-button.pages';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonView } from './user-button.view';
@@ -119,12 +116,6 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   // interaction closes the surface, so they settle together or not at all.
   const [{ value, context }, send] = useMachine(userButtonMachine);
 
-  // Organizations off at the instance leaves nothing for an organization surface to lead with or
-  // list, so the button is the account's whatever mode asked for. clerk-js withholds its own
-  // `<OrganizationSwitcher>` at the mount boundary; nothing mounts this one, so the gate lives here.
-  const organizationsEnabled = useMosaicEnvironment()?.organizationSettings?.enabled ?? true;
-  const mode = organizationsEnabled ? requestedMode : 'user';
-
   // Every action here is a network round trip, so there is nothing to debounce and the click gets
   // its spinner at once. The hook is still what steadies it, holding it up long enough to read.
   const displayPendingKey = useSpinDelay(context.pendingKey, { delay: 0 });
@@ -185,6 +176,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   // lands in one step when it settles. See `frozen` in the machine for why.
   const {
     status: _status,
+    organizationsEnabled,
     onSelectOrganization,
     onSwitchSession,
     onSignOutSession,
@@ -198,6 +190,11 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     onAddAccount,
     ...data
   } = context.frozen ?? controller;
+
+  // Organizations off at the instance leaves nothing for an organization surface to lead with or
+  // list, so the button is the account's whatever mode asked for. clerk-js withholds its own
+  // `<OrganizationSwitcher>` at the mount boundary; nothing mounts this one, so the gate lives here.
+  const mode = organizationsEnabled ? requestedMode : 'user';
 
   return (
     <>
