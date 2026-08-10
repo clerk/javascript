@@ -7,7 +7,7 @@ import type { BrowserContext } from '@playwright/test';
 import type { EnvironmentConfig } from '../../models/environment';
 import { withRetry } from '../../testUtils/retryableClerkClient';
 import { createUserService } from '../../testUtils/usersService';
-import type { FakeUser } from '../../testUtils/usersService';
+import type { FakeUser, PlaywrightTest } from '../../testUtils/usersService';
 
 /**
  * Query the background service worker for auth state via chrome.runtime.sendMessage.
@@ -79,7 +79,7 @@ export async function getExtensionId(context: BrowserContext) {
 /**
  * Create a fake user from an env config and register it via the Backend API.
  */
-export async function createTestUser(env: EnvironmentConfig): Promise<FakeUser> {
+export async function createTestUser(env: EnvironmentConfig, test: PlaywrightTest): Promise<FakeUser> {
   const clerkClient = withRetry(
     backendCreateClerkClient({
       apiUrl: env.privateVariables.get('CLERK_API_URL'),
@@ -88,7 +88,7 @@ export async function createTestUser(env: EnvironmentConfig): Promise<FakeUser> 
     }),
   );
   const users = createUserService(clerkClient);
-  const fakeUser = users.createFakeUser();
+  const fakeUser = users.createFakeUser(test);
   await users.createBapiUser(fakeUser);
   return fakeUser;
 }

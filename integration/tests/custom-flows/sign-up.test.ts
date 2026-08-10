@@ -18,7 +18,7 @@ test.describe('Custom Flows Sign Up @custom', () => {
     await app.dev();
 
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
+    fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
       withPhoneNumber: true,

@@ -384,6 +384,111 @@ describe('request', () => {
     });
   });
 
+  describe('Protect params', () => {
+    const protectParams = { __clerk_protect_assertion: 'token-abc' };
+    const clientWithProtect = createFapiClient({
+      ...baseFapiClientOptions,
+      getProtectParams: () => Promise.resolve(protectParams),
+    });
+
+    it.each([
+      ['/client/sign_ins'],
+      ['/client/sign_ins/sia_123/attempt_first_factor'],
+      ['/client/sign_ups'],
+      ['/client/sign_ups/sua_123/attempt_verification'],
+    ])('attaches them to POST %s', async path => {
+      await clientWithProtect.request({ path, method: 'POST', body: { identifier: 'user@example.com' } as any });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: 'identifier=user%40example.com&__clerk_protect_assertion=token-abc',
+        }),
+      );
+    });
+
+    it('attaches them when the request has no body of its own', async () => {
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST' });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({ body: '__clerk_protect_assertion=token-abc' }),
+      );
+    });
+
+    // All lower-case, so the camel-to-snake body key encoder has nothing to rewrite.
+    it('does not mangle the param name', async () => {
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST' });
+
+      const [, init] = (fetch as Mock).mock.calls.at(-1)!;
+      expect(init.body).toBe('__clerk_protect_assertion=token-abc');
+    });
+
+    it.each([
+      ['a GET', 'GET', '/client/sign_ins'],
+      ['an unrelated path', 'POST', '/client/sessions'],
+      ['a path that merely shares a prefix', 'POST', '/client/sign_ins_other'],
+    ])('does not attach them to %s', async (_label, method, path) => {
+      await clientWithProtect.request({ path, method: method as any, body: { a: 'b' } as any });
+
+      const [, init] = (fetch as Mock).mock.calls.at(-1)!;
+      expect(init.body ?? '').not.toContain('__clerk_protect_assertion');
+    });
+
+    // Spreading a FormData would discard the caller's payload, so non-plain bodies are left alone.
+    it('leaves a FormData body untouched', async () => {
+      const formData = new FormData();
+      formData.append('identifier', 'user@example.com');
+
+      await clientWithProtect.request({ path: '/client/sign_ins', method: 'POST', body: formData });
+
+      expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: formData }));
+    });
+
+    it('leaves a string body untouched', async () => {
+      // text/plain keeps the form-urlencoded encoder out of it.
+      await clientWithProtect.request({
+        path: '/client/sign_ins',
+        method: 'POST',
+        body: 'raw string body',
+        headers: { 'content-type': 'text/plain' },
+      });
+
+      expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: 'raw string body' }));
+    });
+
+    // Protect may influence a sign-in but must never fail one.
+    it('sends the request unchanged when resolving the params rejects', async () => {
+      const failing = createFapiClient({
+        ...baseFapiClientOptions,
+        getProtectParams: () => Promise.reject(new Error('boom')),
+      });
+
+      await expect(
+        failing.request({ path: '/client/sign_ins', method: 'POST', body: { identifier: 'a' } as any }),
+      ).resolves.toBeTruthy();
+
+      expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: 'identifier=a' }));
+    });
+
+    it('sends the request unchanged when there are no params', async () => {
+      const none = createFapiClient({
+        ...baseFapiClientOptions,
+        getProtectParams: () => Promise.resolve(undefined),
+      });
+
+      await none.request({ path: '/client/sign_ins', method: 'POST', body: { identifier: 'a' } as any });
+
+      expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: 'identifier=a' }));
+    });
+
+    it('is inert when no hook is configured', async () => {
+      await fapiClient.request({ path: '/client/sign_ins', method: 'POST', body: { identifier: 'a' } as any });
+
+      expect(fetch).toHaveBeenCalledWith(expect.any(URL), expect.objectContaining({ body: 'identifier=a' }));
+    });
+  });
+
   describe('retry logic', () => {
     it('does not send retry query parameter on initial request', async () => {
       await fapiClient.request({

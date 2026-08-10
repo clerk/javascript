@@ -46,6 +46,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   RedirectOptions,
   Resources,
   SetActiveParams,
@@ -390,6 +391,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
     return false;
   }
+
+  setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    const callback = () => this.clerkjs?.setProtectAssertion(assertion);
+    if (this.clerkjs && this.loaded) {
+      callback();
+    } else {
+      this.premountMethodCalls.set('setProtectAssertion', callback);
+    }
+  };
 
   buildSignInUrl = (opts?: RedirectOptions): string | void => {
     const callback = () => this.clerkjs?.buildSignInUrl(opts) || '';

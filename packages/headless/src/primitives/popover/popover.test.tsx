@@ -6,7 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
 import { Popover } from './index';
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>> = {}) {
   return render(
@@ -242,6 +245,31 @@ describe('Popover', () => {
 
       const positioner = document.querySelector('[data-testid="popover-positioner"]');
       expect(positioner).toHaveAttribute('data-side', 'bottom');
+    });
+
+    // jsdom reports a zero-sized viewport, which leaves `shift` no room and pins the alignment
+    // axis to its padding whatever the offset asked for. Giving it a viewport is what lets the
+    // offset show up in the transform at all.
+    async function transformWithViewport(props: Partial<React.ComponentProps<typeof Popover.Root>>) {
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+
+      renderPopover({ defaultOpen: true, ...props });
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      await waitFor(() => expect(positioner).toHaveStyle({ position: 'absolute' }));
+      return positioner instanceof HTMLElement ? positioner.style.transform : null;
+    }
+
+    it('nudges along the alignment axis by alignOffset', async () => {
+      const transform = await transformWithViewport({ placement: 'bottom-start', alignOffset: 24 });
+
+      expect(transform).toBe('translate(24px, 4px)');
+    });
+
+    it('keeps alignOffset off the side axis, which stays sideOffset', async () => {
+      const transform = await transformWithViewport({ placement: 'bottom-start', alignOffset: 24, sideOffset: 10 });
+
+      expect(transform).toBe('translate(24px, 10px)');
     });
   });
 

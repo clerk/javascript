@@ -63,14 +63,15 @@ const [open, setOpen] = useState(false);
 
 ### `Popover.Root`
 
-| Prop           | Type                      | Default    | Description                        |
-| -------------- | ------------------------- | ---------- | ---------------------------------- |
-| `open`         | `boolean`                 | —          | Controlled open state              |
-| `defaultOpen`  | `boolean`                 | `false`    | Initial open state (uncontrolled)  |
-| `onOpenChange` | `(open: boolean) => void` | —          | Called when open state changes     |
-| `placement`    | `Placement`               | `"bottom"` | Floating UI placement              |
-| `sideOffset`   | `number`                  | `4`        | Gap between trigger and popup (px) |
-| `modal`        | `boolean`                 | `false`    | Traps focus within the popover     |
+| Prop           | Type                      | Default    | Description                         |
+| -------------- | ------------------------- | ---------- | ----------------------------------- |
+| `open`         | `boolean`                 | —          | Controlled open state               |
+| `defaultOpen`  | `boolean`                 | `false`    | Initial open state (uncontrolled)   |
+| `onOpenChange` | `(open: boolean) => void` | —          | Called when open state changes      |
+| `placement`    | `Placement`               | `"bottom"` | Floating UI placement               |
+| `sideOffset`   | `number`                  | `4`        | Gap between trigger and popup (px)  |
+| `alignOffset`  | `number`                  | `0`        | Nudge along the alignment axis (px) |
+| `modal`        | `boolean`                 | `false`    | Traps focus within the popover      |
 
 ### `Popover.Trigger`, `Popover.Positioner`, `Popover.Popup`, `Popover.Title`, `Popover.Description`, `Popover.Close`
 
@@ -104,6 +105,7 @@ Middleware stack: `offset` -> `flip` -> `shift` -> `arrow` -> CSS vars. The popu
 - **Title and Description are optional but recommended.** They wire `aria-labelledby` and `aria-describedby` to the positioner. If omitted, those attributes are simply absent.
 - **Non-modal by default.** Unlike Dialog, the page remains interactive behind the popover. Set `modal={true}` for a stricter focus trap.
 - **Nested popovers are supported.** The `FloatingTree` pattern handles nesting automatically.
+- **Popup contents freeze while closing.** The popup outlives `open` by its exit animation, so its children are wrapped in `Freeze` (`@clerk/headless/utils`) and hold their last frame instead of re-rendering under the animation. The popup element itself keeps updating, so `data-closed` / `data-ending-style` still land. Freezing wraps the children in a `display: contents` element and detaches refs inside them until the popup reopens.
 
 ## ARIA
 

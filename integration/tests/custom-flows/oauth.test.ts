@@ -26,7 +26,7 @@ test.describe('Custom Flows OAuth @custom', () => {
       publishableKey: instanceKeys.get('oauth-provider').pk,
     });
     const users = createUserService(client);
-    fakeUser = users.createFakeUser({ withUsername: true });
+    fakeUser = users.createFakeUser(test, { withUsername: true });
     await users.createBapiUser(fakeUser);
   });
 
