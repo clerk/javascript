@@ -56,7 +56,7 @@ type FakeUserOptions = {
 };
 
 export type PlaywrightTest = {
-  info: () => Pick<TestInfo, 'testId'>;
+  info: () => Pick<TestInfo, 'file' | 'line' | 'title' | 'titlePath'>;
 };
 
 export type FakeUser = {
@@ -133,6 +133,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         ? `${randomHash}+clerk_test@clerkcookie.com`
         : `clerkcookie+${randomHash}@mailsac.com`;
       const phoneNumber = fakerPhoneNumber();
+      const { file, line, title, titlePath } = test.info();
 
       return {
         firstName: faker.person.firstName(),
@@ -141,7 +142,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? fakerPassword() : undefined,
         phoneNumber: withPhoneNumber ? phoneNumber : undefined,
-        privateMetadata: { testId: test.info().testId },
+        privateMetadata: {
+          title,
+          titlePath,
+          file,
+          line,
+        },
         deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };
     },
