@@ -725,25 +725,23 @@ function renderMemberTableOmittingExampleBlocks(roots, ctx, render) {
 }
 
 /** Block tags omitted from extracted method prose (see `custom-theme.mjs` `comment` partial for theme output). */
-const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set([
-  '@example',
-  '@param',
-  '@typeParam',
-  '@returns',
-  '@experimental',
-]);
+const BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE = new Set(['@param', '@typeParam', '@returns', '@experimental']);
 
 /**
  * @param {import('typedoc').Comment | undefined} comment
+ * @param {{ omitExamples?: boolean }} [options]
  */
-function commentSummaryAndBody(comment) {
+function commentSummaryAndBody(comment, options = {}) {
   if (!comment) {
     return '';
   }
   const c = applyTodoStrippingToComment(comment) ?? comment;
   const summary = displayPartsToString(c.summary).trim();
   const block = c.blockTags
-    ?.filter(t => !BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE.has(t.tag))
+    ?.filter(
+      t =>
+        !BLOCK_TAGS_OMITTED_FROM_EXTRACTED_METHOD_PROSE.has(t.tag) && !(options.omitExamples && t.tag === '@example'),
+    )
     .map(t => displayPartsToString(t.content).trim())
     .filter(Boolean)
     .join('\n\n');
@@ -1239,7 +1237,7 @@ function buildMethodMdx(decl, ctx, options = {}) {
   const paramsHeadingLevel = methodFormat === 'page' ? 2 : 4;
   /** Prefer the declaration comment (property-style methods document `addListener` on the property, not the signature). */
   const comment = decl.comment ?? sig.comment;
-  let description = commentSummaryAndBody(comment);
+  let description = commentSummaryAndBody(comment, { omitExamples: methodFormat === 'page' });
   const sigReturns = comment === sig.comment ? '' : appendSignatureOnlyReturns(decl.comment, sig.comment);
   if (sigReturns) {
     description = [description, sigReturns].filter(Boolean).join('\n\n');
