@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, scrollFadeVars, space, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
 
 export const styles = stylex.create({
   // The avatar is the trigger, so the button paints nothing of its own.
@@ -35,12 +35,9 @@ export const styles = stylex.create({
   },
 
   // The workspace list scrolls; the header and footer stay put. The scroll area carries the
-  // overflow itself, along with the edge fades and the scrollbar, so only the cap and the scroll
-  // padding are ours. The padding answers those fades: tabbing to a row below the fold would
-  // otherwise land it flush against the edge the mask fades out, on the one row you just moved to.
+  // overflow, the edge fades, the scrollbar and the scroll padding they need, so only the cap
+  // is ours.
   scroll: {
-    scrollPaddingBlockEnd: scrollFadeVars['--cl-scroll-fade-size'],
-    scrollPaddingBlockStart: scrollFadeVars['--cl-scroll-fade-size'],
     maxHeight: '18rem',
   },
 
