@@ -21,9 +21,9 @@ describe('Session', () => {
   beforeEach(() => {
     // Mock Date.now() to make the test tokens appear valid
     // mockJwt has iat: 1666648250, exp: 1666648310
-    // Set current time to 1666648260 (10 seconds after iat, 50 seconds before exp)
+    // Set current time to iat so token appears freshly issued (60 seconds before exp)
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(1666648260 * 1000));
+    vi.setSystemTime(new Date(1666648250 * 1000));
   });
 
   afterEach(() => {
