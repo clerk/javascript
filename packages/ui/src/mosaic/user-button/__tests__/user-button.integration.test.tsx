@@ -85,7 +85,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_environment: {
         displayConfig: { afterSwitchSessionUrl: '/after-switch' },
         authConfig: { singleSessionMode },
-        organizationSettings: { enabled: organizationsEnabled },
+        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection: false },
         commerceSettings: { billing: { user: { enabled: false } } },
         apiKeysSettings: { user_api_keys_enabled: false },
       },
