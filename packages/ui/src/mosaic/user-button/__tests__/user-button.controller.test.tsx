@@ -43,6 +43,7 @@ let userSuggestions: FakeList;
 let signedInSessions: FakeSession[];
 let pagingRef: (element: HTMLElement | null) => void;
 let singleSessionMode: boolean;
+let branded: boolean;
 let forceOrganizationSelection: boolean;
 let organizationsEnabled: boolean;
 // False stands for the window before clerk-js has hydrated it, which the controller has to sit out.
@@ -52,7 +53,7 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-        displayConfig: { afterSwitchSessionUrl: '/after-switch' },
+        displayConfig: { afterSwitchSessionUrl: '/after-switch', branded },
         authConfig: { singleSessionMode },
         organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
       }
@@ -148,6 +149,7 @@ beforeEach(() => {
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
   pagingRef = vi.fn();
   singleSessionMode = false;
+  branded = true;
   forceOrganizationSelection = false;
   organizationsEnabled = true;
   environmentHydrated = true;
@@ -195,6 +197,7 @@ function Harness(options: UserButtonControllerOptions = {}) {
       <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
       <output data-testid='orgs-enabled'>{String(c.organizationsEnabled)}</output>
+      <output data-testid='branded'>{String(c.branded)}</output>
       <output data-testid='hide-personal'>{String(c.hidePersonal)}</output>
       <output data-testid='orgs-loading'>{String(c.organizationsLoading)}</output>
       <output data-testid='additional'>{c.additionalSessions.map(a => a.sessionId).join(',')}</output>
@@ -590,6 +593,18 @@ describe('useUserButtonController', () => {
     render(<Harness />);
     expect(screen.getByTestId('can-sign-out-all')).toHaveTextContent('false');
     expect(screen.getByTestId('can-add-account')).toHaveTextContent('false');
+  });
+
+  // An instance that has paid the branding off carries none of it, and the environment is the only
+  // place that answer lives.
+  it('carries the branding the instance is on, not the branding everyone gets', () => {
+    render(<Harness />);
+    expect(screen.getByTestId('branded')).toHaveTextContent('true');
+
+    cleanup();
+    branded = false;
+    render(<Harness />);
+    expect(screen.getByTestId('branded')).toHaveTextContent('false');
   });
 
   // Both profiles open as a modal unless a URL routes instead, which is what the pre-Mosaic
