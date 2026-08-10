@@ -105,6 +105,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -190,6 +191,7 @@ import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
+import { protectAssertionParams } from './protectAssertion';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -272,6 +274,9 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #protectAssertion: ProtectAssertion | undefined;
+  // Distinguishes never-set from cleared-with-undefined, so clearing does not fall back to the option.
+  #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -477,6 +482,16 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  public setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    this.#protectAssertion = assertion;
+    this.#protectAssertionSet = true;
+  };
+
+  /** The last value passed to `setProtectAssertion` once called, otherwise the `protectAssertion` option. */
+  #currentProtectAssertion(): ProtectAssertion | undefined {
+    return this.#protectAssertionSet ? this.#protectAssertion : this.#options.protectAssertion;
+  }
+
   get isSignedIn(): boolean {
     const hasPendingSession = this?.session?.status === 'pending';
     if (hasPendingSession) {
@@ -514,6 +529,7 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      getProtectParams: () => protectAssertionParams(this.#currentProtectAssertion()),
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');

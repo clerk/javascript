@@ -2,7 +2,7 @@ import type { BrowserContext, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 import type { Application } from '../../models/application';
-import type { FakeUser } from '../../testUtils';
+import type { FakeUser, PlaywrightTest } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
 const CLERK_DB_JWT_COOKIE_NAME = '__clerk_db_jwt';
@@ -78,9 +78,9 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   expect(finalURL.searchParams.size).toEqual(0);
 };
 
-export const testSignUp = async ({ app, page, context }: TestParams) => {
+export const testSignUp = async ({ app, page, context }: TestParams, test: PlaywrightTest) => {
   const u = createTestUtils({ app, page, context, useTestingToken: false });
-  const tempUser = u.services.users.createFakeUser({ fictionalEmail: true });
+  const tempUser = u.services.users.createFakeUser(test, { fictionalEmail: true });
 
   // Begin in localhost
   await u.page.goToAppHome();

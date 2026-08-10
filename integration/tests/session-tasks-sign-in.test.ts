@@ -16,7 +16,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      user = u.services.users.createFakeUser();
+      user = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(user);
     });
 
@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
       const users = createUserService(client);
-      const userFromOAuth = users.createFakeUser({
+      const userFromOAuth = users.createFakeUser(test, {
         withUsername: true,
       });
       // Create the user on the OAuth provider instance so we do not need to sign up twice

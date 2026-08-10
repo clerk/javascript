@@ -52,7 +52,7 @@ import { clerkInvalidStrategy, clerkInvalidVerificationLevel, clerkMissingWebAut
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
-import { normalizeOrgId, pickFreshestJwt, tokenOrgId, tokenSid } from '../tokenFreshness';
+import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
@@ -450,7 +450,10 @@ export class Session extends BaseResource implements SessionResource {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
 
-    this.lastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+    const incomingLastActiveToken = data.last_active_token ? new Token(data.last_active_token) : null;
+    if (!incomingLastActiveToken || !shouldKeepExistingLastActiveToken(this.lastActiveToken, incomingLastActiveToken)) {
+      this.lastActiveToken = incomingLastActiveToken;
+    }
 
     return this;
   }
@@ -567,28 +570,10 @@ export class Session extends BaseResource implements SessionResource {
 
     eventBus.emit(events.TokenUpdate, { token });
 
-    if (token.jwt && !this.#shouldKeepExistingLastActiveToken(token)) {
+    if (token.jwt && !shouldKeepExistingLastActiveToken(this.lastActiveToken, token)) {
       this.lastActiveToken = token;
       eventBus.emit(events.SessionTokenResolved, null);
     }
-  }
-
-  // Mirrors the cookie guard: only a same session+org lastActiveToken is a comparable
-  // freshness baseline, so a session or org switch always adopts the incoming token.
-  // Without this, an org-switch token minted by a stale edge (lower oiat) would lose
-  // to the previous org's token and pin lastActiveToken to the old org's claims.
-  #shouldKeepExistingLastActiveToken(incoming: TokenResource): boolean {
-    const current = this.lastActiveToken;
-    if (!current?.jwt) {
-      return false;
-    }
-    if (
-      tokenSid(current) !== tokenSid(incoming) ||
-      normalizeOrgId(tokenOrgId(current)) !== normalizeOrgId(tokenOrgId(incoming))
-    ) {
-      return false;
-    }
-    return pickFreshestJwt(current, incoming) !== incoming;
   }
 
   #fetchToken(

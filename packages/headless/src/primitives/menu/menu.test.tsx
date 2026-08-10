@@ -682,6 +682,89 @@ describe('Menu', () => {
 
       expect(onClick).toHaveBeenCalledTimes(1);
     });
+
+    it('Escape closes only the submenu', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Root>
+                <Menu.Trigger>Share</Menu.Trigger>
+                <Menu.Positioner>
+                  <Menu.Popup>
+                    <Menu.Item label='Email'>Email</Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('Share')).toHaveAttribute('data-open', '');
+
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+  });
+
+  describe('inside a popover', () => {
+    function renderMenuInPopover() {
+      return render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Menu.Root>
+                <Menu.Trigger>Actions</Menu.Trigger>
+                <Menu.Positioner>
+                  <Menu.Popup>
+                    <Menu.Item label='Cut'>Cut</Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+    }
+
+    it('Escape closes only the menu', async () => {
+      const user = userEvent.setup();
+      renderMenuInPopover();
+
+      await user.click(screen.getByText('Actions'));
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Open popover')).toHaveAttribute('data-open', '');
+    });
+
+    it('Escape closes the popover once the menu is closed', async () => {
+      const user = userEvent.setup();
+      renderMenuInPopover();
+
+      await user.click(screen.getByText('Actions'));
+      await user.keyboard('{Escape}');
+      // The whole point of the two-step: the first Escape must spend itself on the menu and leave
+      // the popover up, or the second one is closing something that was already closed.
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Open popover')).toHaveAttribute('data-open', '');
+
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByText('Open popover')).toHaveAttribute('data-closed', '');
+    });
   });
 
   describe('positioner', () => {

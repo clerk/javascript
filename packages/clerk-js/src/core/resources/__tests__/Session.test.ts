@@ -15,7 +15,7 @@ import { TokenId } from '@/utils/tokenId';
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
-import { BaseResource, Organization, Session } from '../internal';
+import { BaseResource, Client, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -2400,6 +2400,7 @@ describe('Session', () => {
     afterEach(() => {
       dispatchSpy?.mockRestore();
       fetchSpy?.mockRestore();
+      Client.clearInstance();
       BaseResource.clerk = null as any;
       SessionTokenCache.clear();
     });
@@ -2574,6 +2575,82 @@ describe('Session', () => {
       // A cross-org lastActiveToken is not a freshness baseline: the new org's token
       // wins even though a stale edge minted it with a lower oiat.
       expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
+    });
+
+    describe('fromJSON', () => {
+      const tokenJSON = (jwt: string) => ({ object: 'token' as const, id: 'tok_1', jwt });
+
+      const touchResponse = (lastActiveToken: ReturnType<typeof tokenJSON> | null) => ({
+        response: {
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+          last_active_token: lastActiveToken,
+        } as unknown as SessionJSON,
+      });
+
+      it('a stale touch response does not regress lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(low)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a fresher touch response replaces lastActiveToken', async () => {
+        const low = createJwtWithOiat(NOW, NOW);
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(low) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(high)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a touch response without a token still clears lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(null) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken).toBeNull();
+      });
+
+      it('a stale piggybacked client payload does not regress the rebuilt session token', () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const higher = createJwtWithOiat(NOW, NOW + 60);
+
+        const clientJSON = (lastActiveToken: ReturnType<typeof tokenJSON> | null) =>
+          ({
+            object: 'client',
+            id: 'client_1',
+            last_active_session_id: 'session_1',
+            sessions: [touchResponse(lastActiveToken).response],
+          }) as any;
+
+        const client = Client.getOrCreateInstance().fromJSON(clientJSON(tokenJSON(high)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(low)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(higher)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(higher);
+
+        client.fromJSON(clientJSON(null));
+        expect(client.sessions[0]?.lastActiveToken).toBeNull();
+      });
     });
   });
 });

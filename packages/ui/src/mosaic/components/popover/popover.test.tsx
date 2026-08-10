@@ -99,7 +99,7 @@ describe('Mosaic Popover', () => {
       </Popover.Root>,
     );
 
-    const popup = screen.getByText('Body');
+    const popup = document.querySelector('.cl-popover-popup');
     expect(popup).toHaveClass('cl-popover-popup', 'my-popup');
     expect(popup).toHaveStyle({ marginTop: '8px' });
   });
@@ -221,6 +221,6 @@ describe('Mosaic Popover', () => {
       </Popover.Root>,
     );
 
-    expect(ref.current).toBe(screen.getByText('Body'));
+    expect(ref.current).toBe(document.querySelector('.cl-popover-popup'));
   });
 });
