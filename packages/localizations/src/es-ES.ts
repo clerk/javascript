@@ -104,8 +104,11 @@ export const esES: LocalizationResource = {
       'No puedes suscribirte a este plan con pago mensual. Para suscribirte, debes elegir el pago anual.',
     cannotSubscribeUnrecoverable: 'No puedes suscribirte a este plan. Tu suscripción actual es más cara que este plan.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Tu pago se ha realizado correctamente.',
       description__subscriptionSuccessful: 'Tu nueva suscripción está lista.',
+      discount: undefined,
       downgradeNotice:
         'Mantendrás tu suscripción actual y sus funciones hasta el final del ciclo de facturación; después se te cambiará a esta suscripción.',
       emailForm: {
@@ -122,6 +125,8 @@ export const esES: LocalizationResource = {
       },
       pastDueNotice: 'Tu suscripción anterior tenía un pago pendiente.',
       perMonth: 'al mes',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pago',
       title__paymentSuccessful: '¡Pago realizado con éxito!',
       title__subscriptionSuccessful: '¡Todo listo!',
@@ -132,6 +137,9 @@ export const esES: LocalizationResource = {
     credit: 'Crédito',
     creditRemainder: 'Crédito por el tiempo restante de tu suscripción actual.',
     defaultFreePlanActive: 'Actualmente estás en el plan gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratis',
     getStarted: 'Empezar',
     highlightedPlanBadge: 'Popular',
@@ -143,6 +151,7 @@ export const esES: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensual',
+    months: undefined,
     pastDue: 'Pago pendiente',
     pay: 'Pagar {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const esES: LocalizationResource = {
     year: 'Año',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {

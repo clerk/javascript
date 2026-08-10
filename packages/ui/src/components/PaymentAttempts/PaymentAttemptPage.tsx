@@ -5,7 +5,7 @@ import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { LineItems } from '@/ui/elements/LineItems';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { toNegativeAmount } from '@/ui/utils/billing';
+import { getDiscountDescription, toNegativeAmount } from '@/ui/utils/billing';
 import { getPlanSeatLimit, getSeatsPerUnitTotal, summarizeSeatCharges } from '@/ui/utils/billingPlanSeats';
 import { formatDate } from '@/ui/utils/formatDate';
 import { truncateWithEndVisible } from '@/ui/utils/truncateTextWithEndVisible';
@@ -201,13 +201,14 @@ export const PaymentAttemptPage = () => {
 };
 
 function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPaymentResource | undefined }) {
-  const { $ } = useLocalizations();
+  const { $, t } = useLocalizations();
 
   if (!paymentAttempt) {
     return null;
   }
 
   const { subscriptionItem } = paymentAttempt;
+  const catalogDiscount = paymentAttempt.totals?.discounts?.discount;
 
   const fee =
     subscriptionItem.planPeriod === 'month'
@@ -283,6 +284,21 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
           <LineItems.Group variant='tertiary'>
             <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
             <LineItems.Description text={$(toNegativeAmount(paymentAttempt.totals.discounts.proration.amount))} />
+          </LineItems.Group>
+        )}
+        {catalogDiscount && catalogDiscount.amount.amount > 0 && (
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title
+              title={catalogDiscount.name}
+              description={getDiscountDescription(
+                catalogDiscount,
+                catalogDiscount.cyclesRemaining,
+                subscriptionItem.planPeriod,
+                { $, t },
+              )}
+              badge={catalogDiscount.promoCode ? <Badge>{catalogDiscount.promoCode}</Badge> : null}
+            />
+            <LineItems.Description text={$(toNegativeAmount(catalogDiscount.amount))} />
           </LineItems.Group>
         )}
         {subscriptionItem.credits &&

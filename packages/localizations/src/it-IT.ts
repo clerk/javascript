@@ -104,8 +104,11 @@ export const itIT: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Non puoi abbonarti a questo piano. Il tuo abbonamento esistente è più costoso di questo piano.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Il pagamento è andato a buon fine.',
       description__subscriptionSuccessful: 'Il tuo nuovo abbonamento è pronto.',
+      discount: undefined,
       downgradeNotice:
         'Manterrai il tuo abbonamento attuale e le sue funzionalità fino alla fine del ciclo di fatturazione, quindi passerai a questo abbonamento.',
       emailForm: {
@@ -122,6 +125,8 @@ export const itIT: LocalizationResource = {
       },
       pastDueNotice: 'Il tuo precedente abbonamento era scaduto, senza alcun pagamento.',
       perMonth: 'al mese',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento riuscito!',
       title__subscriptionSuccessful: 'Successo!',
@@ -132,6 +137,9 @@ export const itIT: LocalizationResource = {
     credit: 'Credito',
     creditRemainder: 'Credito per il resto del tuo abbonamento attuale.',
     defaultFreePlanActive: 'Attualmente sei sul piano Gratuito',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuito',
     getStarted: 'Inizia',
     highlightedPlanBadge: 'Popolare',
@@ -143,6 +151,7 @@ export const itIT: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensile',
+    months: undefined,
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
     payerCreditRemainder: undefined,
@@ -221,6 +230,7 @@ export const itIT: LocalizationResource = {
     year: 'Anno',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
