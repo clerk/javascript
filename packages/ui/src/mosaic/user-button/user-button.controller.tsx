@@ -31,7 +31,11 @@ export type UserButtonController =
   | { status: 'hidden' }
   | (UserButtonData &
       Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks & { status: 'ready' });
+      UserButtonAsyncCallbacks & {
+        status: 'ready';
+        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+        organizationsEnabled: boolean;
+      });
 
 // Mirrors the `<OrganizationSwitcher>` `afterSelectOrganizationUrl` prop: a full URL/path, a `:token`
 // path template resolved against the organization, or a builder function.
@@ -136,11 +140,6 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
   // same root or it renders behind the surface that opened it.
   const getContainer = usePortalRoot();
   const environment = useMosaicEnvironment();
-  const displayConfig = environment?.displayConfig;
-  const singleSessionMode = environment?.authConfig?.singleSessionMode ?? false;
-  // clerk-js refuses `setActive({ organization: null })` outright on an instance that forces
-  // organization selection, so there is no personal workspace to offer a way back to.
-  const forceOrganizationSelection = environment?.organizationSettings?.forceOrganizationSelection ?? false;
 
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
@@ -166,13 +165,21 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     navigate: router.navigate,
   });
 
-  if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded) {
+  // Organizations, single-session and forced selection all come off the environment, and it
+  // hydrates on its own schedule. Waiting for it beats guessing at three answers and rearranging.
+  if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded || !environment) {
     return { status: 'loading' };
   }
 
   if (!user || !session) {
     return { status: 'hidden' };
   }
+
+  const { displayConfig, authConfig, organizationSettings } = environment;
+  // clerk-js refuses `setActive({ organization: null })` outright on an instance that forces
+  // organization selection, so there is no personal workspace to offer a way back to.
+  const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
+  const { singleSessionMode } = authConfig;
 
   const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION }) ?? false;
   const membershipData = userMemberships.data ?? [];
@@ -228,6 +235,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
 
   return {
     status: 'ready',
+    organizationsEnabled,
     activeSession: toSession(session.id, user),
     activeOrganization: organization ? toMembership(organization) : null,
     // The user resource carries its own memberships, so whether the account has any is settled
@@ -250,7 +258,7 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     onSelectOrganization: organizationId =>
       clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
     onSwitchSession: sessionId =>
-      clerk.setActive({ session: sessionId, redirectUrl: displayConfig?.afterSwitchSessionUrl }),
+      clerk.setActive({ session: sessionId, redirectUrl: displayConfig.afterSwitchSessionUrl }),
     onSignOutSession: sessionId =>
       clerk.signOut({
         sessionId,

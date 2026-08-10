@@ -1,5 +1,5 @@
 import type * as SharedReact from '@clerk/shared/react';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { UserButtonControllerOptions } from '../user-button.controller';
@@ -44,6 +44,20 @@ let signedInSessions: FakeSession[];
 let pagingRef: (element: HTMLElement | null) => void;
 let singleSessionMode: boolean;
 let forceOrganizationSelection: boolean;
+let organizationsEnabled: boolean;
+// False stands for the window before clerk-js has hydrated it, which the controller has to sit out.
+let environmentHydrated: boolean;
+
+// Built per read rather than once, so a test setting any of the flags above is answered by it.
+function environment() {
+  return environmentHydrated
+    ? {
+        displayConfig: { afterSwitchSessionUrl: '/after-switch' },
+        authConfig: { singleSessionMode },
+        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
+      }
+    : null;
+}
 
 let setActive: ReturnType<typeof vi.fn>;
 let signOut: ReturnType<typeof vi.fn>;
@@ -80,11 +94,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       buildAfterSignOutUrl: () => '/after-sign-out',
       buildAfterMultiSessionSingleSignOutUrl: () => '/after-single-sign-out',
       client: { signedInSessions },
-      __internal_environment: {
-        displayConfig: { afterSwitchSessionUrl: '/after-switch' },
-        authConfig: { singleSessionMode },
-        organizationSettings: { forceOrganizationSelection },
-      },
+      __internal_environment: environment(),
     }),
   };
 });
@@ -139,6 +149,8 @@ beforeEach(() => {
   pagingRef = vi.fn();
   singleSessionMode = false;
   forceOrganizationSelection = false;
+  organizationsEnabled = true;
+  environmentHydrated = true;
   signedInSessions = [
     { id: 'sess_1', user: user },
     {
@@ -182,6 +194,7 @@ function Harness(options: UserButtonControllerOptions = {}) {
       <output data-testid='active-session'>{c.activeSession.sessionId}</output>
       <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
+      <output data-testid='orgs-enabled'>{String(c.organizationsEnabled)}</output>
       <output data-testid='hide-personal'>{String(c.hidePersonal)}</output>
       <output data-testid='orgs-loading'>{String(c.organizationsLoading)}</output>
       <output data-testid='additional'>{c.additionalSessions.map(a => a.sessionId).join(',')}</output>
@@ -297,6 +310,29 @@ describe('useUserButtonController', () => {
     isOrgLoaded = false;
     rerender(<Harness />);
     expect(screen.getByTestId('status')).toHaveTextContent('loading');
+  });
+
+  // Every instance-level answer the surface needs — organizations, single-session, forced
+  // selection — comes off the environment, and it hydrates on its own schedule. Reporting ready
+  // without it would mean guessing at all three and rearranging once it lands.
+  it('is loading until the environment has hydrated', () => {
+    environmentHydrated = false;
+    const { rerender } = render(<Harness />);
+    expect(screen.getByTestId('status')).toHaveTextContent('loading');
+
+    environmentHydrated = true;
+    rerender(<Harness />);
+    expect(screen.getByTestId('status')).toHaveTextContent('ready');
+  });
+
+  it('reports whether the instance has organizations at all', () => {
+    render(<Harness />);
+    expect(screen.getByTestId('orgs-enabled')).toHaveTextContent('true');
+
+    cleanup();
+    organizationsEnabled = false;
+    render(<Harness />);
+    expect(screen.getByTestId('orgs-enabled')).toHaveTextContent('false');
   });
 
   it('is hidden when loaded but there is no active user', () => {
