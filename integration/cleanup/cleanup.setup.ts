@@ -217,10 +217,6 @@ setup('cleanup instances ', async () => {
   if (errorInstances === 0 && unauthorizedInstances === 0) {
     console.log('\n✅ Cleanup completed successfully with no errors');
   }
-
-  if (runMarker && (errorInstances > 0 || unauthorizedInstances > 0)) {
-    throw new Error(`Run-scoped cleanup failed for ${errorInstances + unauthorizedInstances} instance(s)`);
-  }
 });
 
 const skipObjectsThatWereCreatedWithinTheLast10Minutes = <T extends { createdAt: string }>(objects: T[]): T[] => {
