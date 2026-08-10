@@ -24,6 +24,7 @@ export const userButtonBase = {
   accounts: {
     heading: 'Accounts',
     menu: 'Account actions',
+    actionsFor: 'Actions for {identifier}',
     add: 'Add account',
     signOut: 'Sign out',
     signOutAll: 'Sign out of all accounts',

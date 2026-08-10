@@ -68,7 +68,8 @@ export function resolveUserButtonLayout(
   data: UserButtonData,
 ): UserButtonLayout {
   const section = sections[mode];
-  const listsAccounts = section.listsAccounts && data.additionalSessions.length > 0;
+  const hasOtherAccounts = data.additionalSessions.length > 0;
+  const listsAccounts = section.listsAccounts && hasOtherAccounts;
   const accountsHeading = listsAccounts && section.accountsHeading;
   const addAccount = placements.addAccount[mode];
 
@@ -89,7 +90,9 @@ export function resolveUserButtonLayout(
       signOut: placements.signOut[mode],
       createOrganization: placements.createOrganization[mode],
       addAccount: addAccount === 'accounts-heading' && !accountsHeading ? 'footer' : addAccount,
-      signOutAll: placements.signOutAll[mode],
+      // "All accounts" is one account. The account's own row already signs out of it, so the foot
+      // would be offering the same thing over again, in the plural.
+      signOutAll: hasOtherAccounts ? placements.signOutAll[mode] : 'none',
     },
   };
 }

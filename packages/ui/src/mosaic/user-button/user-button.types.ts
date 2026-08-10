@@ -131,6 +131,17 @@ export interface UserButtonModeProps {
   modePriority?: UserButtonModePriority;
 }
 
+/** Whether the surface signs itself with Clerk's mark. */
+export interface UserButtonBrandingProps {
+  /**
+   * Signs the foot of the popup with "Secured by Clerk". An instance that has paid the branding off
+   * carries none of it, so this follows `displayConfig.branded` rather than being on for everyone.
+   *
+   * @default true
+   */
+  branded?: boolean;
+}
+
 export interface UserButtonBusyState {
   /**
    * Key of the single in-flight action (see `userButtonBusyKeys`), or `null`/absent when idle. The

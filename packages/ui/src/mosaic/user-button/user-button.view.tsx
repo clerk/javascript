@@ -25,6 +25,7 @@ import { resolveUserButtonLayout } from './user-button.layout';
 import { fill, plural, userButtonBase as m } from './user-button.messages';
 import { styles, triggerShapes } from './user-button.styles';
 import type {
+  UserButtonBrandingProps,
   UserButtonBusyState,
   UserButtonCallbacks,
   UserButtonData,
@@ -56,6 +57,7 @@ export const userButtonBusyKeys = {
 type UserButtonContextValue = UserButtonData &
   UserButtonCallbacks &
   UserButtonBusyState &
+  UserButtonBrandingProps &
   UserButtonMenuProps & { layout: UserButtonLayout };
 
 // ─── Context ────────────────────────────────────────────────────────────────
@@ -70,10 +72,17 @@ function useUserButtonContext(): UserButtonContextValue {
   return value;
 }
 
-/** Splits the one in-flight action into the affordance that owns it and every one that must wait. */
-function useBusy(key: string): { busy: boolean; disabled: boolean } {
+/**
+ * Splits the one in-flight action into the affordance that owns it and every one that must wait.
+ * An affordance with no key of its own — a navigation, or a menu that only opens — owns nothing, so
+ * it never spins, but it still waits.
+ */
+function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   const { pendingKey } = useUserButtonContext();
-  return { busy: pendingKey === key, disabled: Boolean(pendingKey) && pendingKey !== key };
+  if (!pendingKey) {
+    return { busy: false, disabled: false };
+  }
+  return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
 interface ActiveWorkspace {
@@ -261,7 +270,7 @@ interface ActionRowProps {
 
 /** A bare action at the foot of a group ("Add account", "Sign out of all accounts"). */
 function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
-  const { busy, disabled } = useBusy(busyKey ?? '');
+  const { busy, disabled } = useBusy(busyKey);
 
   return (
     <Item.Root
@@ -292,7 +301,7 @@ interface HeaderAction {
 
 // Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
 function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
-  const { busy, disabled } = useBusy(busyKey ?? '');
+  const { busy, disabled } = useBusy(busyKey);
   // On an icon button the spinner takes the icon's place; on a labelled one it leads the label, so
   // the button keeps its width while the action runs.
   const spinner = busy ? <Spinner size='sm' /> : null;
@@ -463,7 +472,7 @@ function ActiveAccountRow() {
         </Trailing>
       ) : (
         <ActionMenu
-          label={`Actions for ${identifier}`}
+          label={fill(m.accounts.actionsFor, { identifier })}
           actions={actions}
           disabled={disabled}
         />
@@ -679,7 +688,11 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
 /** Holds the workspace list's place until its first page lands. */
 function WorkspaceListLoadingRow() {
   return (
-    <Item.Root size='xs'>
+    // The rows land under a popup that is already open, so nothing else reports the wait ending.
+    <Item.Root
+      size='xs'
+      role='status'
+    >
       <Item.Media>
         <Spinner size='sm' />
       </Item.Media>
@@ -736,6 +749,9 @@ function WorkspaceSection() {
 /** The heading the account rows sit under, and the account-wide actions it carries. */
 function AccountsHeading() {
   const data = useUserButtonContext();
+  // Everything it opens is a navigation, so it owns no action of its own to spin. It still stands
+  // down while one runs, the way the account row's `⋯` does.
+  const { disabled } = useBusy();
 
   const actions: AccountAction[] = [];
   if (data.layout.placement.addAccount === 'accounts-heading' && data.onAddAccount) {
@@ -750,6 +766,7 @@ function AccountsHeading() {
       <ActionMenu
         label={m.accounts.menu}
         actions={actions}
+        disabled={disabled}
       />
     </Item.Root>
   );
@@ -852,17 +869,19 @@ function Footer() {
           </Item.Group>
         </>
       ) : null}
-      <div {...stylex.props(styles.branding)}>
-        {m.branding.securedBy}{' '}
-        <a
-          href='https://go.clerk.com/components'
-          target='_blank'
-          rel='noopener noreferrer'
-          {...stylex.props(styles.brandingLink)}
-        >
-          <ClerkLogo height={14} />
-        </a>
-      </div>
+      {data.branded === false ? null : (
+        <div {...stylex.props(styles.branding)}>
+          {m.branding.securedBy}{' '}
+          <a
+            href='https://go.clerk.com/components'
+            target='_blank'
+            rel='noopener noreferrer'
+            {...stylex.props(styles.brandingLink)}
+          >
+            <ClerkLogo height={14} />
+          </a>
+        </div>
+      )}
     </>
   );
 }
@@ -870,7 +889,13 @@ function Footer() {
 // ─── Public parts ───────────────────────────────────────────────────────────
 
 export interface UserButtonRootProps
-  extends UserButtonData, UserButtonCallbacks, UserButtonBusyState, UserButtonMenuProps, UserButtonModeProps {
+  extends
+    UserButtonData,
+    UserButtonCallbacks,
+    UserButtonBusyState,
+    UserButtonBrandingProps,
+    UserButtonMenuProps,
+    UserButtonModeProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;

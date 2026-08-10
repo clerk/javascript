@@ -509,6 +509,13 @@ describe('UserButtonView, the workspace list', () => {
       expect(titles(workspaceList())).toEqual([]);
     });
 
+    // The rows land under a popup that is already open, so the placeholder has to say so itself.
+    it('says so to a screen reader, since nothing else reports the rows landing', () => {
+      renderList({ organizationsLoading: true });
+
+      expect(screen.getByRole('status')).toHaveTextContent('Loading organizations…');
+    });
+
     it('leaves the account row above it alone, since it does not wait on the list', () => {
       renderList({ organizationsLoading: true });
 
@@ -589,7 +596,7 @@ describe('UserButtonView, the foot', () => {
   it('orders "Add account" where the foot is what carries it', () => {
     renderView({ additionalSessions: [], customMenuItems: [action()], menuItemOrder: ['addAccount', 'terms'] });
 
-    expect(footLabels()).toEqual(['Add account', 'Terms of service', 'Sign out of all accounts']);
+    expect(footLabels()).toEqual(['Add account', 'Terms of service']);
   });
 
   it('carries the custom rows on an org-only surface too', () => {
@@ -624,6 +631,22 @@ describe('UserButtonView, the foot', () => {
     expect(logo).toHaveAttribute('target', '_blank');
     expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
   });
+
+  // An instance that has paid the branding off carries none of it, the way every other Clerk
+  // surface reads `displayConfig.branded`.
+  it('withholds the branding where the instance carries none', () => {
+    renderView({ branded: false });
+
+    expect(screen.queryByText('Secured by')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
+  });
+
+  // "All accounts" is one account, and the account's own row already signs out of it.
+  it('withholds "Sign out of all accounts" where there is no second account', () => {
+    renderView({ additionalSessions: [] });
+
+    expect(screen.queryByRole('button', { name: 'Sign out of all accounts' })).toBeNull();
+  });
 });
 
 // Rows carry avatars, and an avatar's load state dies with the element it hangs off. Swapping a
@@ -647,6 +670,7 @@ describe('UserButtonView, one action at a time', () => {
           onSelectOrganization={vi.fn()}
           onSwitchSession={vi.fn()}
           onSignOutAll={vi.fn()}
+          onAddAccount={vi.fn()}
           onManageAccount={vi.fn()}
           onSignOutSession={vi.fn()}
         />
@@ -659,9 +683,10 @@ describe('UserButtonView, one action at a time', () => {
     ['the personal row', 'Personal account'],
     ['an account row', 'bob@example.com'],
     ['an action row', 'Sign out of all accounts'],
-    // The `⋯` stands down the same way. Withholding what it opens would unmount the trigger, so
+    // Both `⋯` stand down the same way. Withholding what one opens would unmount its trigger, so
     // the row would drop its trailing edge for the length of the action and get it back after.
     ['the account menu', 'Actions for alice@example.com'],
+    ['the accounts menu', 'Account actions'],
   ])('holds %s in place, disabled, while another action runs', (_name, label) => {
     const { rerender } = render(surface(null));
     const row = screen.getByRole('button', { name: label });
