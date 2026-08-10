@@ -5,4 +5,4 @@
 '@clerk/ui': minor
 ---
 
-Add support for applying promo codes at checkout
+Add support for manual discounts and promo codes. Discounts, whether manual or via a promo code, are shown in the subscriptions list and in payments/statements. Promo codes can now be entered at checkout.
