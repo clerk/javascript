@@ -335,8 +335,7 @@ function Header() {
   const subtitle = organization ? membershipSubtitle(organization) : accountSubtitle;
   // Inviting belongs to whichever organization is active, even where the account is what heads the
   // surface. The gear manages whatever the header names.
-  const invitable =
-    data.layout.placement.inviteMembers === 'header' && data.layout.listsOrganizations ? data.activeOrganization : null;
+  const invitable = data.layout.placement.inviteMembers === 'header' ? data.activeOrganization : null;
 
   const actions: HeaderAction[] = [];
   if (invitable && data.onInviteMembers) {

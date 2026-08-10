@@ -196,6 +196,16 @@ describe('UserButtonView, organization mode', () => {
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
+  // The header acts on the active organization, which is known whole before the list it belongs to
+  // lands. Invite and the gear act on the same organization, so they answer together.
+  it('offers to invite while the membership list is still in flight', () => {
+    renderOrganizationMode({ memberships: [], hasOrganizations: false, organizationsLoading: true });
+
+    expect(within(groups()[0]).getByText('Foundry')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
+  });
+
   it('lists the workspaces, the personal one among them', () => {
     renderOrganizationMode();
 
