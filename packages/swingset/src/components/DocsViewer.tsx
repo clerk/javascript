@@ -28,6 +28,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-delete-section': dynamic(() => import('../stories/organization-profile-delete-section.mdx')),
   },
   blocks: {
+    'avatar-button': dynamic(() => import('../stories/avatar-button.mdx')),
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {

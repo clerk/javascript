@@ -9,6 +9,11 @@ import {
   Sizes as AvatarSizes,
 } from '../stories/avatar.stories';
 import {
+  Default as AvatarButtonDefault,
+  Fallback as AvatarButtonFallback,
+  meta as avatarButtonMeta,
+} from '../stories/avatar-button.stories';
+import {
   Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
@@ -126,6 +131,11 @@ import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
+const avatarButtonModule: StoryModule = {
+  meta: avatarButtonMeta,
+  Default: AvatarButtonDefault,
+  Fallback: AvatarButtonFallback,
+};
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
   Default: OrganizationProfileLeaveSectionDefault,
@@ -268,6 +278,7 @@ export const registry: StoryModule[] = [
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,
   // Blocks
+  avatarButtonModule,
   destructiveModule,
   // Components
   avatarModule,
