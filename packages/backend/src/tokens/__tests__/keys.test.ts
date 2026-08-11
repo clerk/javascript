@@ -200,8 +200,94 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
         kid,
       }),
     ).rejects.toThrowError(
-      "Unable to find a signing key in JWKS that matches the kid='ins_whatever' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ins_2GIoQhbUpy0hX7B2cVkuTMinXoD",
+      "Unable to find a signing key in JWKS that matches the kid='ins_whatever' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.",
     );
+  });
+
+  // The cached kids are instance ids; enumerating them discloses which co-tenants
+  // are warm in a shared process.
+  it('does not enumerate cached kids in the error message', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const error = await loadClerkJWKFromRemote({ secretKey: 'deadbeef', kid: 'ins_whatever' }).catch(e => e);
+
+    expect(error).toBeInstanceOf(TokenVerificationError);
+    expect(error.message).not.toContain(mockRsaJwkKid);
+  });
+
+  // Regression test for SDK-148. The cache was keyed on `kid` alone. Since a Clerk `kid`
+  // is the instance id and the lookup short-circuits before `secretKey` is consulted, a
+  // key fetched for one instance was served to another instance's verifier, and
+  // `verifyJwt` never asserts `iss`.
+  it('does not serve a cached key to a different secretKey', async () => {
+    const instanceAKid = 'ins_tenant_a';
+    let secretKeysUsed: string[] = [];
+
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(({ request }) => {
+          secretKeysUsed.push((request.headers.get('Authorization') ?? '').replace('Bearer ', ''));
+          // Each instance's JWKS contains only its own signing key.
+          return HttpResponse.json({ keys: [{ ...mockRsaJwk, kid: instanceAKid }] });
+        }),
+      ),
+    );
+
+    // Instance A warms the cache with its own key.
+    const jwk = await loadClerkJWKFromRemote({ secretKey: 'sk_test_a', kid: instanceAKid });
+    expect(jwk).toMatchObject({ kid: instanceAKid });
+    expect(secretKeysUsed).toEqual(['sk_test_a']);
+
+    // Instance B asking for instance A's kid must miss the cache and fetch under its
+    // own secretKey.
+    secretKeysUsed = [];
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(({ request }) => {
+          secretKeysUsed.push((request.headers.get('Authorization') ?? '').replace('Bearer ', ''));
+          return HttpResponse.json({ keys: [{ ...mockRsaJwk, kid: 'ins_tenant_b' }] });
+        }),
+      ),
+    );
+
+    await expect(() => loadClerkJWKFromRemote({ secretKey: 'sk_test_b', kid: instanceAKid })).rejects.toThrowError(
+      TokenVerificationError,
+    );
+    expect(secretKeysUsed).toEqual(['sk_test_b']);
+  });
+
+  it('keeps a separate cache TTL per instance', async () => {
+    let fetchCount = 0;
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          fetchCount++;
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_a', kid: mockRsaJwkKid });
+    expect(fetchCount).toBe(1);
+
+    // A second instance must not ride on the first instance's fresh TTL.
+    await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_b', kid: mockRsaJwkKid });
+    expect(fetchCount).toBe(2);
+
+    // Each instance now serves from its own cache.
+    await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_a', kid: mockRsaJwkKid });
+    await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_b', kid: mockRsaJwkKid });
+    expect(fetchCount).toBe(2);
   });
 
   it('cache TTLs do not conflict', async () => {
