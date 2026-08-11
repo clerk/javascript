@@ -1043,13 +1043,38 @@ export interface BillingProrationDiscount {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingAppliedDiscount {
+  /**
+   * The monetary value of the discount applied to the transaction.
+   */
   amount: BillingMoneyAmount;
+  /**
+   * The unique identifier of the discount.
+   */
   discountId: string;
+  /**
+   * The display name of the discount.
+   */
   name: string;
+  /**
+   * Whether the discount subtracts a percentage or a fixed amount.
+   */
   effect: 'percentage' | 'fixed_amount';
+  /**
+   * The percentage deducted when `effect` is `'percentage'`.
+   */
   percentOff?: number;
+  /**
+   * The monetary value deducted when `effect` is `'fixed_amount'`.
+   */
   amountOff?: BillingMoneyAmount;
+  /**
+   * The promotion code used to apply the discount.
+   */
   promoCode?: string;
+  /**
+   * The number of billing cycles for which the discount remains active. `null` means the discount does not expire
+   * after a fixed number of cycles.
+   */
   cyclesRemaining: number | null;
 }
 
@@ -1059,20 +1084,66 @@ export interface BillingAppliedDiscount {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingDiscountRedemption {
+  /**
+   * The unique identifier of the discount redemption.
+   */
   id: string;
+  /**
+   * The unique identifier of the subscription item receiving the discount.
+   */
   subscriptionItemId: string;
+  /**
+   * The unique identifier of the redeemed discount.
+   */
   discountId: string;
+  /**
+   * The display name of the discount.
+   */
   name: string;
+  /**
+   * How the discount was applied to the subscription item.
+   */
   source: 'promotion' | 'manual' | 'promo_code';
+  /**
+   * The promotion code used to redeem the discount.
+   */
   promoCode?: string;
+  /**
+   * Whether the discount subtracts a percentage or a fixed amount.
+   */
   effect?: 'percentage' | 'fixed_amount';
+  /**
+   * The percentage deducted when `effect` is `'percentage'`.
+   */
   percentOff?: number;
+  /**
+   * The monetary value deducted when `effect` is `'fixed_amount'`.
+   */
   amountOff?: BillingMoneyAmount;
+  /**
+   * The monetary value of the discount applied to the subscription item.
+   */
   amount?: BillingMoneyAmount;
+  /**
+   * The number of billing cycles for which the discount remains active. `null` means the discount does not expire
+   * after a fixed number of cycles.
+   */
   cyclesRemaining: number | null;
+  /**
+   * The number of billing cycles to which the discount has already been applied.
+   */
   cyclesApplied: number;
+  /**
+   * The current status of the discount redemption.
+   */
   status?: 'active' | 'exhausted' | 'removed';
+  /**
+   * The date and time when the discount was redeemed.
+   */
   redeemedAt: Date;
+  /**
+   * The identifier of the user who redeemed the discount. `null` if no user was recorded.
+   */
   redeemedBy: string | null;
 }
 

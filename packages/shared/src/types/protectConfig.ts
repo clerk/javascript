@@ -28,6 +28,8 @@ export interface ProtectConfigResource extends ClerkResource {
  * Called per request, so a token refreshed in the background is picked up without
  * re-configuring Clerk. It must not throw, and a rejected promise is treated the same as
  * `undefined`: an assertion may influence a sign-in, but never prevent one.
+ *
+ * @inline
  */
 export type ProtectAssertionResolver = () => string | undefined | Promise<string | undefined>;
 
@@ -42,5 +44,7 @@ export type ProtectAssertionResolver = () => string | undefined | Promise<string
  *
  * The assertion is an input to rules you author, never a decision on its own, and it only
  * applies from the context you constrained it to when you minted it.
+ *
+ * @inline
  */
 export type ProtectAssertion = string | ProtectAssertionResolver;
