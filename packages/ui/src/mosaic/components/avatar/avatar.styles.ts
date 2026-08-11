@@ -2,9 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
-// Fades the fallback's neutral fill in and out. That fill is the only thing it paints — the
-// content it is handed is hidden — so the whole element's opacity is the fill's. Timed to
-// match `skeleton.tsx`'s pulse, so the two generations of placeholder read as one thing.
+// Timed to match `skeleton.tsx`'s pulse, so the two generations of placeholder read as one thing.
 const pulse = stylex.keyframes({
   '50%': { opacity: 0.5 },
 });
@@ -50,18 +48,12 @@ export const styles = stylex.create({
     width: '100%',
   },
 
-  // The fallback is a blank placeholder rather than a label: whatever it is handed stays in the
-  // box but is never painted, so someone without a picture gets a plain mark instead of two
-  // letters. `visibility` rather than a transparent color or `aria-hidden`, because it is the one
-  // property that takes the content out of the page, the accessibility tree, and the tab order at
-  // once — and, unlike `inert`, leaves hit-testing alone, so a click still reaches the row this
-  // sits in. A consumer who wants the initials back overrides this one slot.
+  // `visibility` over `aria-hidden` or `inert`: it clears the page, the accessibility tree, and the
+  // tab order at once, and still lets a click through to the row this sits in.
   fallbackContent: {
     visibility: 'hidden',
   },
 
-  // Only while an image is on its way. Someone who has no picture is not waiting on anything,
-  // so their mark holds still rather than pulsing for as long as it is on screen.
   fallbackPending: {
     animationDuration: '2s',
     animationIterationCount: 'infinite',
@@ -79,9 +71,8 @@ export const shapes = stylex.create({
   square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
 
-// size — square box; fallback text scales with the box via inherited font-size.
-// Each font-size is ~0.4x the box: two initials are the widest thing this holds, and past
-// that a wide pair runs into the circle's clip rather than just reading tight.
+// size — square box; font-size is ~0.4x the box, the ceiling at which two initials still clear
+// the circle's clip.
 export const sizes = stylex.create({
   xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
   sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },

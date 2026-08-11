@@ -649,9 +649,8 @@ describe('UserButtonView, the foot', () => {
   });
 });
 
-// Rows carry avatars, and an avatar's load state dies with the element it hangs off. Swapping a
-// row's host element out while it waits would remount it, dropping the avatar back to a blank
-// placeholder for the length of the action — so a row that stands down stays the button it was.
+// An avatar's load state dies with the element it hangs off, so a row that stands down stays the
+// button it was rather than remounting and dropping its avatar to a placeholder.
 describe('UserButtonView, one action at a time', () => {
   function surface(pendingKey: string | null, props: Partial<UserButtonProps> = {}) {
     return (

@@ -131,9 +131,8 @@ interface WorkspaceAvatarProps {
 
 function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) {
   return (
-    // Decorative: every avatar here sits next to the same name in text, or in a labelled button, so
-    // the mark itself has nothing to add. Held at the root rather than left to the parts, so the
-    // whole thing stays out of the accessible name however the image resolves.
+    // Decorative: the same name is always in text alongside. Held at the root so the whole mark
+    // stays out of the accessible name however the image resolves.
     <Avatar.Root
       aria-hidden
       size={size}
@@ -153,9 +152,8 @@ function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) 
 /**
  * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
  *
- * A row that is waiting on an action stays a button, rather than dropping to a static row: swapping
- * the host element out remounts the row, and the avatar it carries comes back as a blank placeholder
- * while it re-resolves an image the browser already has.
+ * A row waiting on an action stays a button: swapping the host element out remounts the row, and
+ * its avatar drops back to a blank placeholder while it re-resolves an image the browser already has.
  *
  * It stands down through `aria-disabled` rather than the native attribute, the way `SubmitButton`
  * does: the row that owns the action stands down along with the rest, and disabling it natively
@@ -183,9 +181,8 @@ function Trailing({ children }: { children: ReactNode }) {
 interface WorkspaceRowProps {
   name: string;
   /**
-   * Names the avatar, where what the row is titled by is not what it is called: an account row is
-   * titled by its identifier, but the mark stands for the person. The fallback holds this without
-   * painting it, so it only ever surfaces through the `avatar-fallback` slot.
+   * Names the avatar where that differs from the row's own title: an account row is titled by its
+   * identifier, but the mark stands for the person. The fallback holds this without painting it.
    *
    * @default name
    */
@@ -680,7 +677,6 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
   return (
     <WorkspaceRow
       // Named by its identifier, like the active account's row, so the two read as the same kind.
-      // The mark still stands for the person, so it is named after them rather than the row.
       name={session.identifier}
       avatarName={session.name}
       imageUrl={session.imageUrl}

@@ -11,11 +11,9 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
 }
 
-// jsdom never fires load/error on images, so drive `new window.Image()` manually.
-// Each instance resolves to the outcome keyed by its `src`. A `cached` src reports `complete`
-// the moment it is assigned, the way a browser does for an image it already holds, and an
-// `unresolved` one fires neither event, so a test can hold the avatar mid-load for as long
-// as it needs. `Outcome` names the two events, not the status the root settles on.
+// jsdom never fires load/error on images, so drive `new window.Image()` manually. A `cached` src
+// reports `complete` the moment it is assigned, the way a browser does for an image it already
+// holds; an `unresolved` one fires neither event, holding the avatar mid-load.
 type Outcome = 'load' | 'error';
 let outcomes: Record<string, Outcome> = {};
 let cached = new Set<string>();
@@ -225,9 +223,6 @@ describe('Mosaic Avatar', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  // The fallback is a blank placeholder, not a label: it holds whatever it is handed so a consumer
-  // can style it back into view, in a slot of its own that `visibility: hidden` takes out of the
-  // page, the accessibility tree, and the tab order together.
   it('holds the fallback content in a slot of its own rather than painting it', () => {
     render(
       <Avatar.Root>
@@ -258,8 +253,6 @@ describe('Mosaic Avatar', () => {
     await waitFor(() => expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending'));
   });
 
-  // Nothing is on its way for someone who simply has no picture, so their mark holds still
-  // rather than pulsing for as long as it is on screen.
   it('holds still when there is no image to wait for', () => {
     render(
       <Avatar.Root>
