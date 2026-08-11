@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -6,7 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from '../../test-utils/axe';
 import { Popover } from './index';
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 function renderPopover(props: Partial<React.ComponentProps<typeof Popover.Root>> = {}) {
   return render(
@@ -243,6 +246,31 @@ describe('Popover', () => {
       const positioner = document.querySelector('[data-testid="popover-positioner"]');
       expect(positioner).toHaveAttribute('data-side', 'bottom');
     });
+
+    // jsdom reports a zero-sized viewport, which leaves `shift` no room and pins the alignment
+    // axis to its padding whatever the offset asked for. Giving it a viewport is what lets the
+    // offset show up in the transform at all.
+    async function transformWithViewport(props: Partial<React.ComponentProps<typeof Popover.Root>>) {
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+
+      renderPopover({ defaultOpen: true, ...props });
+      const positioner = document.querySelector('[data-testid="popover-positioner"]');
+      await waitFor(() => expect(positioner).toHaveStyle({ position: 'absolute' }));
+      return positioner instanceof HTMLElement ? positioner.style.transform : null;
+    }
+
+    it('nudges along the alignment axis by alignOffset', async () => {
+      const transform = await transformWithViewport({ placement: 'bottom-start', alignOffset: 24 });
+
+      expect(transform).toBe('translate(24px, 4px)');
+    });
+
+    it('keeps alignOffset off the side axis, which stays sideOffset', async () => {
+      const transform = await transformWithViewport({ placement: 'bottom-start', alignOffset: 24, sideOffset: 10 });
+
+      expect(transform).toBe('translate(24px, 10px)');
+    });
   });
 
   describe('focus management', () => {
@@ -256,6 +284,36 @@ describe('Popover', () => {
 
       const positioner = document.querySelector('[data-testid="popover-positioner"]');
       expect(positioner?.contains(document.activeElement)).toBe(true);
+    });
+
+    it('focuses the popup itself, not a control inside it, when opened with a pointer', async () => {
+      const user = userEvent.setup();
+      renderPopover();
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(document.querySelector('[data-testid="popover-positioner"]'));
+    });
+
+    it('focuses the first tabbable element when opened with the keyboard', async () => {
+      renderPopover();
+
+      // A button handles Enter/Space itself, so keyboard activation reaches the popover
+      // as a click with no pointer behind it. userEvent stamps its synthetic keyboard
+      // click with a pointerType, which browsers do not.
+      fireEvent.click(screen.getByRole('button', { name: 'Open popover' }), { detail: 0 });
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+    });
+
+    it('focuses the first tabbable element on pointer open when initialFocus is "first"', async () => {
+      const user = userEvent.setup();
+      renderPopover({ initialFocus: 'first' });
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
     });
 
     it('returns focus to trigger on close via Escape', async () => {

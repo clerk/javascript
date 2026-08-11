@@ -106,8 +106,11 @@ export const frFR: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Vous ne pouvez pas souscrire à ce plan. Votre abonnement actuel est plus cher que celui-ci.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Votre paiement a été effectué avec succès.',
       description__subscriptionSuccessful: 'Votre nouvel abonnement est prêt.',
+      discount: undefined,
       downgradeNotice:
         "Vous conserverez votre abonnement actuel et ses fonctionnalités jusqu'à la fin du cycle de facturation, puis vous passerez à cet abonnement.",
       emailForm: {
@@ -124,6 +127,8 @@ export const frFR: LocalizationResource = {
       },
       pastDueNotice: 'Votre abonnement précédent était en retard de paiement.',
       perMonth: 'par mois',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Paiement',
       title__paymentSuccessful: 'Le paiement a réussi !',
       title__subscriptionSuccessful: 'Succès !',
@@ -134,6 +139,9 @@ export const frFR: LocalizationResource = {
     credit: 'Crédit',
     creditRemainder: 'Crédit restant',
     defaultFreePlanActive: 'Vous êtes actuellement sur le plan gratuit',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Gratuit',
     getStarted: 'Commencer',
     highlightedPlanBadge: 'Populaire',
@@ -145,6 +153,7 @@ export const frFR: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Mensuel',
+    months: undefined,
     pastDue: 'En retard',
     pay: 'Payer {{amount}}',
     payerCreditRemainder: undefined,
@@ -223,6 +232,7 @@ export const frFR: LocalizationResource = {
     year: 'An',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -946,6 +956,7 @@ export const frFR: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,

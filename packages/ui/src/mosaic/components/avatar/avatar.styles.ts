@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // root — clips its parts to the shape/size; fill comes from the image or fallback
@@ -10,6 +10,7 @@ export const styles = stylex.create({
     aspectRatio: '1 / 1',
     display: 'inline-flex',
     flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     justifyContent: 'center',
     lineHeight: 1,
@@ -18,8 +19,10 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
 
-  // image fills the clipped box
+  // Carries the root's radius rather than leaning on the clip alone, so a part that paints its own
+  // fill rounds off cleanly instead of showing a corner.
   image: {
+    borderRadius: 'inherit',
     aspectRatio: '1 / 1',
     display: 'block',
     objectFit: 'cover',
@@ -30,6 +33,7 @@ export const styles = stylex.create({
 
   // fallback fills the box, centering its content and inheriting the sized font
   fallback: {
+    borderRadius: 'inherit',
     alignItems: 'center',
     backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
     color: colorVars['--cl-color-neutral'],
@@ -40,10 +44,10 @@ export const styles = stylex.create({
   },
 });
 
-// shape — square shares the control radius with Button; circle rounds fully
+// shape — square shares its radius with Button; circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },
-  square: { borderRadius: radiusVars['--cl-radius-control'] },
+  square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
 
 // size — square box; fallback text scales with the box via inherited font-size

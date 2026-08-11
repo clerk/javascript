@@ -224,7 +224,7 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  </ul>
    *
-   * If you need support for any particular hashing algorithm, [contact support](https://clerk.com/contact/support).
+   * If you need support for any particular hashing algorithm, [contact support](/contact/support).
    */
   passwordHasher: PasswordHasher;
 };
@@ -364,6 +364,12 @@ export type VerifyPasswordParams = {
   userId: string;
   /** The password to verify. */
   password: string;
+};
+
+/** @inline */
+export type RemovePasswordParams = {
+  /** When set to `true`, all of the user's active sessions are revoked after their password is removed. Defaults to `false`. */
+  signOutOfOtherSessions?: boolean;
 };
 
 /** @generateWithEmptyComment */
@@ -697,6 +703,39 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Removes the password credential from the given user. This is a privileged operation and does not require the user's current password. Password removal is allowed even when the user has no other sign-in method configured.
+   *
+   * By default, existing sessions remain active. Set `signOutOfOtherSessions` to `true` to revoke sessions active when the request is processed.
+   * @param userId - The ID of the user whose password to remove.
+   * @param params - Options for the request.
+   * @returns The updated [`User`](https://clerk.com/docs/reference/backend/types/backend-user).
+   * @example
+   * ### Keep existing sessions active
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123');
+   * ```
+   *
+   * @example
+   * ### Revoke existing sessions
+   *
+   * ```ts
+   * const user = await clerkClient.users.removePassword('user_123', {
+   *   signOutOfOtherSessions: true,
+   * });
+   * ```
+   */
+  public async removePassword(userId: string, params: RemovePasswordParams = {}): Promise<User> {
+    this.requireId(userId);
+
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'remove_password'),
+      bodyParams: params,
+    });
+  }
+
   /** Check that the user's password matches the supplied input. Useful for custom auth flows and re-verification. */
   public async verifyPassword(params: VerifyPasswordParams) {
     const { userId, password } = params;
@@ -746,7 +785,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured in the application's [**Attack protection**](https://dashboard.clerk.com/~/protect/attack-protection) settings. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured in the application's [**Rules**](https://dashboard.clerk.com/~/protect/rules) settings. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {

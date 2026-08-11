@@ -1,4 +1,6 @@
 import type {
+  BillingAppliedDiscount,
+  BillingAppliedDiscountJSON,
   BillingCredits,
   BillingCreditsJSON,
   BillingDiscounts,
@@ -51,6 +53,17 @@ const billingCreditsFromJSON = (credits: BillingCreditsJSON): BillingCredits => 
   total: billingMoneyAmountFromJSON(credits.total),
 });
 
+const billingAppliedDiscountFromJSON = (discount: BillingAppliedDiscountJSON): BillingAppliedDiscount => ({
+  amount: billingMoneyAmountFromJSON(discount.amount),
+  discountId: discount.discount_id,
+  name: discount.name,
+  effect: discount.effect,
+  percentOff: discount.percent_off,
+  amountOff: discount.amount_off ? billingMoneyAmountFromJSON(discount.amount_off) : undefined,
+  promoCode: discount.promo_code,
+  cyclesRemaining: discount.cycles_remaining,
+});
+
 const billingDiscountsFromJSON = (discounts: BillingDiscountsJSON): BillingDiscounts => ({
   proration: discounts.proration
     ? {
@@ -60,6 +73,7 @@ const billingDiscountsFromJSON = (discounts: BillingDiscountsJSON): BillingDisco
         cyclePassedPercent: discounts.proration.cycle_passed_percent,
       }
     : null,
+  discount: discounts.discount ? billingAppliedDiscountFromJSON(discounts.discount) : undefined,
   total: billingMoneyAmountFromJSON(discounts.total),
 });
 

@@ -25,6 +25,7 @@ import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
+import type { ProtectAssertion } from './protectConfig';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -292,6 +293,20 @@ export interface Clerk {
    * @internal
    */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
+
+  /**
+   * Sets the Protect assertion attached to subsequent sign-in and sign-up requests, replacing
+   * any value supplied via the `protectAssertion` option. Pass `undefined` to clear it.
+   *
+   * Use this when the token is not available at `Clerk.load()` time — for example when your
+   * app fetches one from your backend after the page has started. Passing a function instead
+   * of a string has it re-read for each request, which is what you want if the token is
+   * refreshed while the page is open.
+   *
+   * @param assertion - A token minted by your backend, a function returning one, or
+   * `undefined`.
+   */
+  setProtectAssertion: (assertion?: ProtectAssertion) => void;
 
   /**
    * @internal
@@ -1325,6 +1340,14 @@ export type HandleOAuthCallbackParams = TransferableOption &
       redirectUrl: string;
       decorateUrl: (url: string) => string;
     }) => Promise<unknown>;
+    /**
+     * Internal navigation hook used by Clerk UI to keep intermediate OAuth callback navigations
+     * (continue, factor steps, sign-in/sign-up switches) inside the component's own router when the
+     * callback completes in-process (transport flows). Not set by the web redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigate?: (to: string) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1426,6 +1449,18 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * An object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
+    /**
+     * A Clerk Protect assertion — a short-lived, signed token you mint from your own backend
+     * with the Clerk Backend API — carrying key/value pairs your Protect rules can read. Clerk
+     * attaches it to sign-in and sign-up requests.
+     *
+     * Pass a string if you already have one, or a function to have it re-read for each request.
+     * Prefer the function when a page can outlive the token: assertions are short-lived by
+     * design, and a string captured here stops applying once it expires.
+     *
+     * Can also be set later with `Clerk.setProtectAssertion()`.
+     */
+    protectAssertion?: ProtectAssertion;
     /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
      *

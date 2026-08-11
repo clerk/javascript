@@ -1,5 +1,76 @@
 # Change Log
 
+## 4.28.1
+
+### Patch Changes
+
+- Fix native OAuth transport flows (e.g. `@clerk/electron`) breaking out of modal components and failing with "Redirect url mismatch" errors. ([#9370](https://github.com/clerk/javascript/pull/9370)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Intermediate OAuth callback steps (sign-in to sign-up transfer, continue, MFA factors, password reset) now navigate inside the component's own router instead of navigating the app window to an internal Clerk route. Transport flows also always send the registered transport callback URL as the completion redirect, so production instances no longer reject sign-in or sign-up requests when a page-derived URL was picked up as the completion redirect.
+
+## 4.28.0
+
+### Minor Changes
+
+- Add support for manual discounts and promo codes. Discounts, whether manual or via a promo code, are shown in the subscriptions list and in payments/statements. Promo codes can now be entered at checkout. ([#9316](https://github.com/clerk/javascript/pull/9316)) by [@dstaley](https://github.com/dstaley)
+
+- Add a way to supply a Clerk Protect assertion from your application, so a token minted by your own backend reaches Protect without your having to set a cookie. ([#9313](https://github.com/clerk/javascript/pull/9313)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  A Protect assertion is a short-lived, signed token you create with the Clerk Backend API, carrying key/value pairs your Protect rules can read. Until now the only way to deliver one was the `__clerk_protect_assertion` cookie, which requires your app and Frontend API to be on the same site — true with a production CNAME setup, but not on development instances.
+
+  Pass the token to Clerk and it is attached to sign-in and sign-up requests instead:
+
+  ```ts
+  // A token you already have.
+  Clerk.load({ protectAssertion: token });
+
+  // Or a function, re-read for each request.
+  Clerk.load({ protectAssertion: () => sessionStorage.getItem('protect_assertion') ?? undefined });
+
+  // Or set it later, once your app has fetched one.
+  clerk.setProtectAssertion(token);
+  ```
+
+  Prefer the function form when a page can outlive the token. Assertions are short-lived by design, so a string captured at load time stops applying once it expires, whereas a function picks up a refreshed one.
+
+  An assertion is an input to rules you author, never a decision on its own, and it applies only from the context you constrained it to when you minted it. Nothing about it can fail a sign-in: a resolver that throws, rejects, or returns anything other than a non-empty string simply results in no assertion being attached, and the request proceeds.
+
+  The cookie continues to work unchanged. If both are present, the value supplied to the SDK wins.
+
+### Patch Changes
+
+- Make OAuth consent screens clearly identify private metadata as potentially sensitive information set by the Clerk application. ([#9226](https://github.com/clerk/javascript/pull/9226)) by [@jescalan](https://github.com/jescalan)
+
+## 4.27.1
+
+### Patch Changes
+
+- Clarify that `ClientResource.cookieExpiresAt` is nullable, can change when Clerk refreshes the client cookie, and reflects the cookie Device Trust uses to recognize a browser. ([#9350](https://github.com/clerk/javascript/pull/9350)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 4.27.0
+
+### Minor Changes
+
+- Add `<InviteMembersButton />`, a control component that opens the organization invite-members form in a modal when clicked, working like `<SignInButton mode="modal">`. ([#9124](https://github.com/clerk/javascript/pull/9124)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Wrap your own button (or omit children for a default one). The button requires an active organization and should be rendered for members who can manage memberships (`org:sys_memberships:manage`). Opening it without an active organization or that permission is a no-op in production, and throws a descriptive error in development.
+
+  ```tsx
+  import { InviteMembersButton } from '@clerk/nextjs';
+
+  <InviteMembersButton>
+    <button>Invite members</button>
+  </InviteMembersButton>;
+  ```
+
+  This also adds `Clerk.openInviteMembers()` and `Clerk.closeInviteMembers()` for opening and closing the modal programmatically.
+
+### Patch Changes
+
+- Improve generated API reference links, expose `BillingSubscriptionItemStatus`, and clarify the `createUser()` identification status documentation. ([#9340](https://github.com/clerk/javascript/pull/9340)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Rename "Client Trust" to "Device Trust" in documentation strings and links. This is a naming change only — the `needs_client_trust` sign-in status, the `clientTrustState` property, and every other API value keep their existing names, so no integration changes are required. ([#9266](https://github.com/clerk/javascript/pull/9266)) by [@mwickett](https://github.com/mwickett)
+
 ## 4.26.0
 
 ### Minor Changes

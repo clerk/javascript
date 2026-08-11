@@ -47,7 +47,10 @@ const colorDefaults = {
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
 
-  '--cl-color-border': 'light-dark(oklch(0.9475 0.0067 286.27), oklch(0.3321 0.014 285.61))',
+  '--cl-color-input': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-input-placeholder': '#a3a3a3',
+
+  '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
   '--cl-color-border-faded': 'light-dark(oklch(0.9587 0.0027 286.35), oklch(0.296 0.0126 285.61))',
 } as const;
 
@@ -56,18 +59,15 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
-// Named by what a surface is, not by size, so the steps nest: `inner` for a mark
-// sitting inside a control, `control` for the control itself (button, avatar
-// square), `container` for anything wrapping controls. `control` is 6px — a step
-// the 4/8/12 progression doesn't land on, which is why it's its own token rather
-// than a reuse of `inner` or `element`.
+// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
+// square), and neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
-  '--cl-radius-inner': '0.25rem',
-  '--cl-radius-control': '0.375rem',
-  '--cl-radius-element': '0.5rem',
-  '--cl-radius-container': '0.75rem',
+  '--cl-radius-sm': '0.25rem',
+  '--cl-radius-md': '0.375rem',
+  '--cl-radius-lg': '0.5rem',
+  '--cl-radius-xl': '0.75rem',
   '--cl-radius-full': 'calc(infinity * 1px)',
 } as const;
 
@@ -234,6 +234,16 @@ const typeScaleDefaults = {
 } as const;
 
 export const typeScaleVars = stylex.defineVars(typeScaleDefaults);
+
+// =============================================================================
+// Typography Tokens — font family
+// =============================================================================
+
+const fontFamilyDefaults = {
+  '--cl-font-family-sans': 'inherit',
+} as const;
+
+export const fontFamilyVars = stylex.defineVars(fontFamilyDefaults);
 
 // =============================================================================
 // Typography Tokens — font weight

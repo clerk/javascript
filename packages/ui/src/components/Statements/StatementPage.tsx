@@ -3,6 +3,7 @@ import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { getDiscountDescription } from '@/ui/utils/billing';
 import { formatDate } from '@/ui/utils/formatDate';
 
 import { useSubscriberTypeContext, useSubscriberTypeLocalizationRoot } from '../../contexts/components';
@@ -144,6 +145,17 @@ export const StatementPage = () => {
                           <Statement.SectionContentDetailsListItem
                             label={localizationKeys('billing.proratedDiscount')}
                             value={`(${$(item.totals.discounts.proration.amount)})`}
+                          />
+                        ) : null}
+                        {item.totals?.discounts?.discount && item.totals.discounts.discount.amount.amount > 0 ? (
+                          <Statement.SectionContentDetailsListItem
+                            label={`${item.totals.discounts.discount.name} ${getDiscountDescription(
+                              item.totals.discounts.discount,
+                              item.totals.discounts.discount.cyclesRemaining,
+                              item.subscriptionItem.planPeriod,
+                              { $, t },
+                            )}`}
+                            value={`(${$(item.totals.discounts.discount.amount)})`}
                           />
                         ) : null}
                         {item.subscriptionItem.credits &&

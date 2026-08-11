@@ -643,6 +643,7 @@ describe('Autocomplete', () => {
 
       return (
         <Popover.Root
+          initialFocus='first'
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);
@@ -786,6 +787,7 @@ describe('Autocomplete', () => {
 
       return (
         <Popover.Root
+          initialFocus='first'
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);
@@ -880,6 +882,7 @@ describe('Autocomplete', () => {
 
       return (
         <Popover.Root
+          initialFocus='first'
           open={popoverOpen}
           onOpenChange={open => {
             setPopoverOpen(open);

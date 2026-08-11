@@ -19,7 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       publishableKey: instanceKeys.get('oauth-provider').pk,
     });
     const users = createUserService(client);
-    fakeUser = users.createFakeUser({
+    fakeUser = users.createFakeUser(test, {
       withUsername: true,
     });
     // Create the user on the OAuth provider instance so we do not need to sign up twice.
@@ -271,7 +271,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
       const users = createUserService(client);
-      fakeUser = users.createFakeUser({
+      fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
       await users.createBapiUser(fakeUser);
@@ -328,7 +328,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
       const users = createUserService(client);
-      fakeUser = users.createFakeUser({
+      fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
       await users.createBapiUser(fakeUser);
@@ -389,7 +389,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
       const users = createUserService(client);
-      fakeUser = users.createFakeUser({
+      fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
       // Create the user on the OAuth provider instance so we do not need to sign up twice.

@@ -1,4 +1,6 @@
 export { cssVars } from './css-vars';
+export { Freeze, type FreezeProps } from './freeze';
+export { isKeyboardEvent, isKeyboardOpen } from './interaction-modality';
 export { resetLayoutStyles } from './reset-layout-styles';
 export {
   type ComponentProps,

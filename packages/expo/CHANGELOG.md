@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/clerk-js@6.28.1
+  - @clerk/shared@4.28.1
+  - @clerk/react@6.14.1
+
+## 4.2.4
+
+### Patch Changes
+
+- Keep a cached environment when the app starts offline and only the client cache is empty. Previously both resources fell back to placeholder data, so instance settings were lost until the app was restarted with a working network. ([#9284](https://github.com/clerk/javascript/pull/9284)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Repeated unauthenticated responses now share one native recovery attempt within a few seconds of each other, instead of reading native state and refetching the client for every response.
+
+  Fix the `tokenCache` prop documentation: the cache stores the client JWT, not the session token.
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`8c61153`](https://github.com/clerk/javascript/commit/8c61153bc69b3e677613ab3e1e4c45948cf93405), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/clerk-js@6.28.0
+  - @clerk/shared@4.28.0
+  - @clerk/react@6.14.0
+
+## 4.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+  - @clerk/clerk-js@6.27.1
+  - @clerk/react@6.13.1
+
+## 4.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df), [`58d8ff5`](https://github.com/clerk/javascript/commit/58d8ff50b121ebf42744ba32302da6b22e90b704)]:
+  - @clerk/shared@4.27.0
+  - @clerk/clerk-js@6.27.0
+  - @clerk/react@6.13.0
+
 ## 4.2.1
 
 ### Patch Changes

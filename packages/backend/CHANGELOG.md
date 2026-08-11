@@ -1,5 +1,41 @@
 # Change Log
 
+## 3.16.3
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+
+## 3.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+
+## 3.16.1
+
+### Patch Changes
+
+- Use a root-relative link (`/contact/support`) for the `passwordHasher` "contact support" reference so the generated API reference renders it as an internal same-tab link instead of an external one. ([#9347](https://github.com/clerk/javascript/pull/9347)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`34d278b`](https://github.com/clerk/javascript/commit/34d278bafc92d8f02ba150523de168f472679211)]:
+  - @clerk/shared@4.27.1
+
+## 3.16.0
+
+### Minor Changes
+
+- Add `clerkClient.users.removePassword(userId, params?)` to remove a user's password through the Backend API. Password removal is allowed even when the user has no alternate sign-in method configured. Existing sessions remain active by default; pass `{ signOutOfOtherSessions: true }` to revoke them. ([#9326](https://github.com/clerk/javascript/pull/9326)) by [@joshrowley](https://github.com/joshrowley)
+
+### Patch Changes
+
+- Improve generated API reference links, expose `BillingSubscriptionItemStatus`, and clarify the `createUser()` identification status documentation. ([#9340](https://github.com/clerk/javascript/pull/9340)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`1ef84c3`](https://github.com/clerk/javascript/commit/1ef84c3592cee8a7d3ec5f40a9826862afe125e7), [`d639048`](https://github.com/clerk/javascript/commit/d639048e0e48ff3a120435134f9e01221697b6bc), [`a66cbbf`](https://github.com/clerk/javascript/commit/a66cbbf549477cf8afc155ad17d29e48078e60df)]:
+  - @clerk/shared@4.27.0
+
 ## 3.15.1
 
 ### Patch Changes

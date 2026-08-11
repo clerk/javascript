@@ -25,6 +25,7 @@ import {
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
 import { MenuContext, type MenuContextValue } from './menu-context';
@@ -85,6 +86,8 @@ function MenuInner(props: MenuProps) {
     whileElementsMounted: autoUpdate,
   });
 
+  const returnFocusRef = useReturnFocus(floatingContext);
+
   const { mounted, transitionProps } = useTransition({
     open,
     ref: popupRef,
@@ -111,7 +114,9 @@ function MenuInner(props: MenuProps) {
     delete reference.role;
     return { ...baseRole, reference };
   }, [baseRole, isNested]);
-  const dismiss = useDismiss(floatingContext, { bubbles: true });
+  // Escape must not bubble: it closes this menu and leaves whatever it sits inside — a parent menu,
+  // or a popover — open. An outside press is the opposite, and dismisses the whole stack.
+  const dismiss = useDismiss(floatingContext, { bubbles: { escapeKey: false, outsidePress: true } });
   const listNavigation = useListNavigation(floatingContext, {
     listRef: elementsRef,
     activeIndex,
@@ -179,6 +184,7 @@ function MenuInner(props: MenuProps) {
       labelsRef,
       arrowRef,
       popupRef,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,
@@ -194,6 +200,7 @@ function MenuInner(props: MenuProps) {
       getFloatingProps,
       getItemProps,
       activeIndex,
+      returnFocusRef,
       isNested,
       mounted,
       transitionProps,
