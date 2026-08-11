@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -719,6 +719,10 @@ describe('UserButtonView, one action at a time', () => {
     const onSwitchSession = vi.fn();
     render(surface(userButtonBusyKeys.selectOrganization('org_2'), { onSwitchSession }));
     const row = screen.getByRole('button', { name: 'bob@example.com' });
+
+    // The popup takes its own initial focus a frame after it opens. Waiting for that lets the row
+    // hold the focus it takes next, rather than losing it to a steal that lands mid-press.
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveFocus());
 
     row.focus();
     await userEvent.click(row);
