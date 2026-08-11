@@ -7,6 +7,9 @@ export const styles = stylex.create({
   // token: it composites over whatever the host app renders, so the same value reads
   // consistently on any page.
   //
+  // Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
+  // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
+  //
   // A stacked dialog paints its OWN scrim rather than deferring to the one beneath it, so each
   // level reads as a step further from the page. It is lighter than the base because the two
   // COMPOSITE: alpha over alpha is `1 − (1 − a)(1 − b)`, so the nested value is solved for the

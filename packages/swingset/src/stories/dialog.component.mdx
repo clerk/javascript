@@ -23,7 +23,7 @@ primitive's focus trapping, scroll lock, and ARIA wiring.
     { name: 'children', type: 'ReactNode | ((ctx: { close: () => void }) => ReactNode)' },
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
-    { name: 'onOpenChange', type: '(open: boolean) => void' },
+    { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
     { name: 'modal', type: 'boolean', default: 'true' },
     { name: 'closedBy', type: "'any' | 'closerequest' | 'none'", default: "'any'" },
   ]}
@@ -169,7 +169,8 @@ It carries an English `Close` label by default; pass `aria-label` to override it
 
 > **Where you put it decides what the dialog opens focused on.** Focus goes to the first tabbable
 > element, so a `Dialog.CloseButton` rendered before the form makes "dismiss" the initial focus.
-> Render the close button last if a field should take focus instead.
+> Point `initialFocus` on `Dialog.Popup` at the field that should take it instead — see
+> [Custom focus management](#custom-focus-management).
 
 ### Dismissal
 
@@ -180,18 +181,18 @@ user input, so a stray backdrop click cannot discard it.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                   |
-| -------------------- | --------------------- | ------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State provider; owns `size`, open/close, `modal`, `closedBy`. |
-| `Dialog.Trigger`     | —                     | Opens the dialog; accepts `render`.                           |
-| `Dialog.Portal`      | —                     | Portals the overlay out of the tree.                          |
-| `Dialog.Backdrop`    | `dialog-backdrop`     | The scrim behind the dialog.                                  |
-| `Dialog.Viewport`    | `dialog-viewport`     | Centering container; owns the scroll lock.                    |
-| `Dialog.Popup`       | `dialog-popup`        | The surface (`role="dialog"`, focus-trapped).                 |
-| `Dialog.Title`       | —                     | Heading; wired to the popup's `aria-labelledby`.              |
-| `Dialog.Description` | —                     | Description; wired to the popup's `aria-describedby`.         |
-| `Dialog.Close`       | —                     | Dismisses the dialog; unstyled, accepts a `render` prop.      |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X.                                          |
+| Part                 | Slot                  | Description                                                                  |
+| -------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State provider; owns `size`, open/close, `modal`, `closedBy`, `handle`.      |
+| `Dialog.Trigger`     | —                     | Opens the dialog; accepts `render`, and `handle` + `payload` when detached.  |
+| `Dialog.Portal`      | —                     | Portals the overlay out of the tree.                                         |
+| `Dialog.Backdrop`    | `dialog-backdrop`     | The scrim behind the dialog.                                                 |
+| `Dialog.Viewport`    | `dialog-viewport`     | Centering container; owns the scroll lock.                                   |
+| `Dialog.Popup`       | `dialog-popup`        | The surface (`role="dialog"`, focus-trapped); `initialFocus` / `finalFocus`. |
+| `Dialog.Title`       | —                     | Heading; wired to the popup's `aria-labelledby`.                             |
+| `Dialog.Description` | —                     | Description; wired to the popup's `aria-describedby`.                        |
+| `Dialog.Close`       | —                     | Dismisses the dialog; unstyled, accepts a `render` prop.                     |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X.                                                         |
 
 `Dialog.Title` and `Dialog.Description` are unstyled passthroughs from the headless layer — render
 them through your own typography (`Heading`, `Text`) via `render`.
@@ -377,3 +378,50 @@ What you get without asking for it:
 
 Give the inner dialog `closedBy='closerequest'` whenever it holds input, so a stray click on its
 backdrop cannot discard what was typed.
+
+### Detached triggers
+
+A trigger does not have to be nested inside its root. `Dialog.createHandle()` returns a handle;
+pass the same handle to both `Dialog.Trigger` and `Dialog.Root`, and the trigger drives the
+dialog from anywhere in the tree. The handle also has imperative `open()` / `close()` / `isOpen`
+members for opens with no trigger element at all — calls made while no root is mounted are
+ignored.
+
+<Story
+  name='DetachedTrigger'
+  storyModule={DialogStories}
+/>
+
+### Multiple triggers
+
+Several triggers can share one dialog through the same handle. Give each an `id` and a
+`payload`, and make the root's children a function — it receives the active trigger's payload,
+so one dialog renders per-trigger content. Type the payload through the handle:
+`Dialog.createHandle<Payload>()`.
+
+<Story
+  name='MultipleTriggers'
+  storyModule={DialogStories}
+/>
+
+Everything keyed to "the trigger" follows the one that was actually used: focus returns to it on
+close. In controlled mode, drive the attribution yourself with
+`triggerId` on `Dialog.Root` — `onOpenChange`'s second argument names the trigger behind each
+change, and setting `triggerId` alongside a programmatic `open` behaves exactly as if that
+trigger had been clicked.
+
+### Custom focus management
+
+`initialFocus` and `finalFocus` on `Dialog.Popup` control where focus moves when the dialog
+opens and closes. Each accepts `true` (the default behavior), `false` (do not move focus), a
+ref, or a function of the interaction type behind the change
+(`'mouse' | 'touch' | 'pen' | 'keyboard' | ''`, empty when programmatic).
+
+<Story
+  name='CustomFocus'
+  storyModule={DialogStories}
+/>
+
+This is the answer to the close-button caveat under [Close button](#close-button): when a corner
+X would otherwise take the dialog's initial focus, point `initialFocus` at the field that should
+have it.
