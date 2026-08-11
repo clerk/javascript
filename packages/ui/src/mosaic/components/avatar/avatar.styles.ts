@@ -2,6 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
+// Timed to match `skeleton.tsx`'s pulse, so the two generations of placeholder read as one thing.
+const pulse = stylex.keyframes({
+  '50%': { opacity: 0.5 },
+});
+
 export const styles = stylex.create({
   // root — clips its parts to the shape/size; fill comes from the image or fallback
   base: {
@@ -42,6 +47,22 @@ export const styles = stylex.create({
     height: '100%',
     width: '100%',
   },
+
+  // `visibility` over `aria-hidden` or `inert`: it clears the page, the accessibility tree, and the
+  // tab order at once, and still lets a click through to the row this sits in.
+  fallbackContent: {
+    visibility: 'hidden',
+  },
+
+  fallbackPending: {
+    animationDuration: '2s',
+    animationIterationCount: 'infinite',
+    animationName: {
+      default: pulse,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: 'cubic-bezier(0.4, 0, 0.6, 1)',
+  },
 });
 
 // shape — square shares its radius with Button; circle rounds fully
@@ -50,10 +71,11 @@ export const shapes = stylex.create({
   square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
 
-// size — square box; fallback text scales with the box via inherited font-size
+// size — square box; font-size is ~0.4x the box, the ceiling at which two initials still clear
+// the circle's clip.
 export const sizes = stylex.create({
-  xs: { fontSize: '0.625rem', height: space['5'], width: space['5'] },
-  sm: { fontSize: '0.75rem', height: space['7'], width: space['7'] },
+  xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
+  sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },
   md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
   lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
   fit: { fontSize: '0.75rem', height: '100%', width: '100%' },

@@ -131,8 +131,8 @@ interface WorkspaceAvatarProps {
 
 function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) {
   return (
-    // Decorative: every avatar here sits next to the same name in text, or in a labelled button, so
-    // exposing the fallback initials would only pad the accessible name ("O Other").
+    // Decorative: the same name is always in text alongside. Held at the root so the whole mark
+    // stays out of the accessible name however the image resolves.
     <Avatar.Root
       aria-hidden
       size={size}
@@ -152,9 +152,8 @@ function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) 
 /**
  * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
  *
- * A row that is waiting on an action stays a button, rather than dropping to a static row: swapping
- * the host element out remounts the row, and the avatar it carries comes back as initials while it
- * re-resolves an image the browser already has.
+ * A row waiting on an action stays a button: swapping the host element out remounts the row, and
+ * its avatar drops back to a blank placeholder while it re-resolves an image the browser already has.
  *
  * It stands down through `aria-disabled` rather than the native attribute, the way `SubmitButton`
  * does: the row that owns the action stands down along with the rest, and disabling it natively
@@ -182,8 +181,8 @@ function Trailing({ children }: { children: ReactNode }) {
 interface WorkspaceRowProps {
   name: string;
   /**
-   * Draws the avatar's fallback initials, where what the row is titled by is not what it is called:
-   * an account row is titled by its identifier, but the mark stands for the person.
+   * Names the avatar where that differs from the row's own title: an account row is titled by its
+   * identifier, but the mark stands for the person. The fallback holds this without painting it.
    *
    * @default name
    */
@@ -678,7 +677,6 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
   return (
     <WorkspaceRow
       // Named by its identifier, like the active account's row, so the two read as the same kind.
-      // The mark still stands for the person, so the initials come from the name.
       name={session.identifier}
       avatarName={session.name}
       imageUrl={session.imageUrl}
