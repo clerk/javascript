@@ -33,7 +33,7 @@ import { Input } from '@clerk/ui/mosaic/components/input';
 
 Explicit `id`, `htmlFor`, `aria-labelledby`, and `aria-describedby` values remain supported. Field preserves explicit IDs after hydration and merges external ARIA references with its generated relationships. During server rendering, Field emits its generated control ID and native label relationship; explicit control IDs and generated label and message ARIA references finalize during hydration. `name` still identifies the submitted form value and is typically what form libraries use for registration.
 
-Field does not validate controls, propagate semantic state, or render errors automatically. Its parts may also be used independently without `Field.Root`.
+Field does not validate controls or render errors automatically. Its parts may also be used independently without `Field.Root`.
 
 ## Parts
 
