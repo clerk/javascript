@@ -179,7 +179,7 @@ describe('ClerkProvider native client sync', () => {
       <ClerkProvider
         publishableKey='pk_test_123'
         tokenCache={mocks.tokenCache}
-        __internal_disableNativeClientSync
+        __experimental_disableNativeClientSync
       />,
     );
 

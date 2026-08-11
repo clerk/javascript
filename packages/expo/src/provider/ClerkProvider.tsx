@@ -53,9 +53,9 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    * Disables synchronization between the Clerk JS and native clients.
    * Only use this when the application does not render Clerk native components.
    *
-   * @internal
+   * @experimental This API is experimental and may change at any moment.
    */
-  __internal_disableNativeClientSync?: boolean;
+  __experimental_disableNativeClientSync?: boolean;
 };
 
 const SDK_METADATA = {
@@ -73,11 +73,11 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
-    __internal_disableNativeClientSync = false,
+    __experimental_disableNativeClientSync = false,
     ...rest
   } = props;
   const pk = publishableKey;
-  const nativeClientSyncEnabled = isNative() && !__internal_disableNativeClientSync;
+  const nativeClientSyncEnabled = isNative() && !__experimental_disableNativeClientSync;
   const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
   const suppressTokenCacheNotificationsRef = useRef(0);
   const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
