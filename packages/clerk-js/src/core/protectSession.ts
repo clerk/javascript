@@ -45,6 +45,14 @@ const MAX_TOKEN_LENGTH = 4_096;
 const TOKEN_SHAPE = /^v\d+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 /** How long a settled, tokenless acquisition is reused before a fresh run is allowed. */
 const REACQUIRE_COOLDOWN_MS = 30 * 1_000;
+/**
+ * Ceiling on the backoff between tokenless attempts. The cooldown doubles per consecutive failure
+ * so a Specter outage costs a bounded number of deadlines instead of one every cooldown window,
+ * and this stops it growing past the point where a recovered Specter would go unnoticed.
+ */
+const MAX_REACQUIRE_COOLDOWN_MS = 15 * 60 * 1_000;
+/** A token this close to expiry is not worth sending — it would lapse before it was verified. */
+const TOKEN_SEND_MARGIN_MS = 5 * 1_000;
 /** Bounds we hold the server-supplied `retry_in_ms` to. */
 const MIN_RETRY_DELAY_MS = 50;
 const MAX_RETRY_DELAY_MS = 1_000;
@@ -100,7 +108,19 @@ type StoredToken = {
   /** Unix seconds, as served by the token endpoint. */
   exp: number;
   rid: string;
+  /**
+   * Local milliseconds at the moment we stored it. `exp` compares server truth against this
+   * browser's clock, so a skewed clock either ships lapsed tokens or discards good ones; this
+   * bounds both by elapsed local time, which is measured entirely on the one clock.
+   */
+  at: number;
 };
+
+/**
+ * A token as it arrives from a mint, before it is stored. `at` is stamped by the write rather
+ * than carried from here, so the two states are different types and a producer cannot forget it.
+ */
+type MintedToken = Omit<StoredToken, 'at'>;
 
 type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
@@ -237,13 +257,34 @@ function readStoredToken(key: string, marginMs: number): StoredToken | null {
     return null;
   }
 
-  const { token, exp, rid } = parsed as Record<string, unknown>;
+  const { token, exp, rid, at } = parsed as Record<string, unknown>;
   if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid)) {
+    return null;
+  }
+  if (!freshByLocalClock(at)) {
     return null;
   }
 
   const validated = validateToken(token, exp, marginMs);
-  return validated ? { ...validated, rid } : null;
+  return validated ? { ...validated, rid, at: at as number } : null;
+}
+
+/**
+ * The clock-skew bound. `exp` is server truth compared against this browser's clock, so a clock
+ * running slow keeps an entry alive long past its real expiry and a clock running fast throws
+ * good ones away. Elapsed time since we stored it is measured on one clock, so a constant offset
+ * cancels: an entry older than any token we would ever be issued is stale whatever `exp` claims,
+ * and one stamped in the future means the clock moved backwards under us.
+ *
+ * This bounds the damage rather than removing it — a fully skew-proof check needs the server to
+ * send a relative lifetime instead of an absolute `exp`, which is a wire change.
+ */
+function freshByLocalClock(at: unknown): boolean {
+  if (typeof at !== 'number' || !Number.isFinite(at)) {
+    return false;
+  }
+  const elapsed = Date.now() - at;
+  return elapsed >= 0 && elapsed < MAX_TOKEN_LIFETIME_MS;
 }
 
 /**
@@ -269,8 +310,9 @@ function validateToken(token: unknown, exp: unknown, marginMs: number): { token:
   return { token, exp };
 }
 
-function writeStoredToken(key: string, value: StoredToken): void {
-  writeStored(key, JSON.stringify(value));
+/** `at` is the writer's business, not the caller's — it is stamped here, at the write. */
+function writeStoredToken(key: string, value: MintedToken): void {
+  writeStored(key, JSON.stringify({ ...value, at: Date.now() }));
 }
 
 /** Sentinel for "the deadline won", distinguishable from anything `ready` could resolve to. */
@@ -306,7 +348,7 @@ function settleWithin(ready: PromiseLike<unknown>, deadline: number): Promise<un
  * `timeout`: until the server half deploys it is the correct answer for every load, and calling
  * that a timeout would make a normal rollout look like an outage.
  */
-async function readInlineToken(cid: string, rid: string, deadline: number): Promise<StoredToken | ProtectStatus> {
+async function readInlineToken(cid: string, rid: string, deadline: number): Promise<MintedToken | ProtectStatus> {
   const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
   if (!inline || typeof inline !== 'object') {
     return 'no_token';
@@ -435,6 +477,8 @@ export class ProtectSession {
   #acquisition?: Promise<ProtectStatus>;
   #acquisitionSettled = false;
   #lastAttemptAt = 0;
+  /** Consecutive attempts that settled without a usable token. Drives the re-acquire backoff. */
+  #consecutiveFailures = 0;
 
   /**
    * Returns a session only when at least one loader references a placeholder — an instance using
@@ -507,8 +551,9 @@ export class ProtectSession {
     this.#rearmIfStale();
     const status = this.#acquisition ? await withDeadline(this.#acquisition, this.#timeoutMs) : 'timeout';
 
-    // Re-read: another tab may have completed a run after ours gave up.
-    const stored = readStoredToken(this.#tokenStorageKey, 0);
+    // Re-read: another tab may have completed a run after ours gave up. The send margin is what
+    // stops us shipping a token with a second of life left, which could only fail verification.
+    const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS);
     if (stored) {
       return {
         __clerk_protect_token: stored.token,
@@ -549,13 +594,27 @@ export class ProtectSession {
     if (!this.#acquisitionSettled) {
       return;
     }
-    if (readStoredToken(this.#tokenStorageKey, 0)) {
+    if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS)) {
       return;
     }
-    if (Date.now() - this.#lastAttemptAt < REACQUIRE_COOLDOWN_MS) {
+    if (Date.now() - this.#lastAttemptAt < this.#backoffMs()) {
       return;
     }
     this.#startAcquisition();
+  }
+
+  /**
+   * How long to wait before another attempt, doubling per consecutive tokenless one. A flat
+   * cooldown means a Specter outage adds the full deadline to a sign-in every cooldown window,
+   * for as long as the outage lasts — which is the auth-critical-path cost landing exactly when
+   * things are already worst. The ceiling keeps a long-lived tab noticing a recovery.
+   */
+  #backoffMs(): number {
+    if (this.#consecutiveFailures <= 1) {
+      return REACQUIRE_COOLDOWN_MS;
+    }
+    // 2 ** n overflows to Infinity long before it matters; Math.min still yields the ceiling.
+    return Math.min(REACQUIRE_COOLDOWN_MS * 2 ** (this.#consecutiveFailures - 1), MAX_REACQUIRE_COOLDOWN_MS);
   }
 
   #startAcquisition(): void {
@@ -563,6 +622,11 @@ export class ProtectSession {
     this.#acquisitionSettled = false;
     const settled = (status: ProtectStatus): ProtectStatus => {
       this.#acquisitionSettled = true;
+      // Judged on whether a token landed, not on the status: another tab may have won the lock
+      // and written one while this attempt reported `timeout`, and that is not a failure.
+      this.#consecutiveFailures = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS)
+        ? 0
+        : this.#consecutiveFailures + 1;
       return status;
     };
     this.#acquisition = this.#acquire().then(settled, () => settled('timeout'));
@@ -733,7 +797,7 @@ function resolveTokenUrl(loader: ProtectLoader, placeholders: ProtectPlaceholder
   }
 }
 
-async function readTokenPayload(response: Response, rid: string): Promise<StoredToken | null> {
+async function readTokenPayload(response: Response, rid: string): Promise<MintedToken | null> {
   let json: unknown;
   try {
     json = await response.json();

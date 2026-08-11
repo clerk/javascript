@@ -31,6 +31,20 @@ const nowSeconds = () => Math.floor(Date.now() / 1_000);
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 
 /**
+ * A store entry exactly as `writeStoredToken` would have written it. Tests override only the
+ * field under test, so a rejection is provably about that field and not about a malformed
+ * fixture — every one of these cases is asserting *why* an entry was rejected.
+ */
+const storedEntry = (overrides: Record<string, unknown> = {}) =>
+  JSON.stringify({
+    token: 'v1.cached.mac',
+    exp: nowSeconds() + 43_200,
+    rid: 'b'.repeat(26),
+    at: Date.now(),
+    ...overrides,
+  });
+
+/**
  * Stands in for `Protect.applyLoader`, handing the test the element the session is waiting on so
  * it can play the part of the browser and fire `load` or `error`.
  */
@@ -368,10 +382,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('reuses a fresh token without injecting the loader at all', async () => {
-    localStorage.setItem(
-      '__clerk_protect_st',
-      JSON.stringify({ token: 'v1.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
-    );
+    localStorage.setItem('__clerk_protect_st', storedEntry());
 
     const { session: created, elements } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(true);
@@ -387,10 +398,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('ignores a stored token that has expired', async () => {
-    localStorage.setItem(
-      '__clerk_protect_st',
-      JSON.stringify({ token: 'v1.stale.mac', exp: nowSeconds() - 1, rid: 'b'.repeat(26) }),
-    );
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.stale.mac', exp: nowSeconds() - 1 }));
 
     const { session: created, injected } = session([loader()]);
     expect(created?.hasFreshToken()).toBe(false);
@@ -404,7 +412,7 @@ describe('ProtectSession inline token', () => {
   it('ignores a planted token claiming more life than we ever mint', async () => {
     localStorage.setItem(
       '__clerk_protect_st',
-      JSON.stringify({ token: 'v1.planted.mac', exp: nowSeconds() + 10 * 365 * 24 * 60 * 60, rid: 'b'.repeat(26) }),
+      storedEntry({ token: 'v1.planted.mac', exp: nowSeconds() + 10 * 365 * 24 * 60 * 60 }),
     );
 
     const { session: created, injected } = session([loader()]);
@@ -418,10 +426,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('ignores a planted value that could never have been a mint', async () => {
-    localStorage.setItem(
-      '__clerk_protect_st',
-      JSON.stringify({ token: 'not-a-token', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
-    );
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'not-a-token' }));
 
     const { session: created, injected } = session([loader()]);
     // Shape alone proves nothing — only the server can tell a mint from a well-formed forgery —
@@ -434,11 +439,44 @@ describe('ProtectSession inline token', () => {
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
   });
 
-  it('reuses a mint whose version this build predates', async () => {
+  it('ignores an entry older than any token we would ever be issued', async () => {
+    // `exp` is server truth compared against this browser's clock, so a clock running slow keeps
+    // a lapsed entry alive. Elapsed local time is measured on one clock, so it still catches it.
     localStorage.setItem(
       '__clerk_protect_st',
-      JSON.stringify({ token: 'v9.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
+      storedEntry({ at: Date.now() - 25 * 60 * 60 * 1_000, exp: nowSeconds() + 43_200 }),
     );
+
+    const { session: created, injected } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(false);
+
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('ignores an entry stamped in the future, which means the clock moved backwards', () => {
+    localStorage.setItem('__clerk_protect_st', storedEntry({ at: Date.now() + 60 * 60 * 1_000 }));
+
+    const { session: created } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(false);
+  });
+
+  it('does not send a token that would lapse in flight', async () => {
+    // Inside the send margin: still unexpired, but not worth shipping — it could only fail
+    // verification by the time it arrived.
+    localStorage.setItem('__clerk_protect_st', storedEntry({ exp: nowSeconds() + 2 }));
+
+    const { session: created } = session([loader()]);
+    expect(created?.hasFreshToken()).toBe(false);
+
+    const params = await created?.getRequestParams();
+    expect(params?.__clerk_protect_token).toBeUndefined();
+  });
+
+  it('reuses a mint whose version this build predates', async () => {
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v9.cached.mac' }));
 
     // The shape check must not pin a version. The server may mint ahead of this build, and
     // rejecting that here would re-run the loader on every page load until the SDK caught up.
@@ -702,10 +740,7 @@ describe('ProtectSession cross-tab single flight', () => {
     created?.start();
     // Written after the pre-lock read has already missed, so this can only be picked up by the
     // read that follows a failed lock acquisition.
-    localStorage.setItem(
-      '__clerk_protect_st',
-      JSON.stringify({ token: 'v1.leader.mac', exp: nowSeconds() + 43_200, rid: 'c'.repeat(26) }),
-    );
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
 
     await expect(created?.getRequestParams()).resolves.toMatchObject({
       __clerk_protect_token: 'v1.leader.mac',

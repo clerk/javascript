@@ -140,7 +140,7 @@ describe('Protect.load', () => {
   it('still applies the other loaders when a token for this browser session is shared', async () => {
     localStorage.setItem(
       '__clerk_protect_st',
-      JSON.stringify({ token: 'v1.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26) }),
+      JSON.stringify({ token: 'v1.cached.mac', exp: nowSeconds() + 43_200, rid: 'b'.repeat(26), at: Date.now() }),
     );
 
     const protect = new Protect();
