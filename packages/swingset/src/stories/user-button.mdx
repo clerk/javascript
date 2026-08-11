@@ -1,0 +1,182 @@
+import * as UserButtonStories from './user-button.stories';
+
+# UserButton
+
+The account & organization switcher behind the user avatar. The active organization heads the surface,
+carrying a **gear** and **Invite**. The account's workspaces sit under it: every organization, plus
+**suggested** and **invited** ones it can Join. Every signed-in account sits under an **Accounts**
+heading — the active one checked, the rest a click away — so an account never reads as a workspace.
+The foot signs out of everything. `mode` narrows all of it, and `modePriority` picks what heads it;
+see [Modes](#modes).
+
+Only the active account's organizations are listed. Not a design choice: org requests are scoped to
+the session that makes them, so another account's workspaces are unknowable until it _is_ active.
+Hence `additionalSessions` carries sessions alone, and `onSelectOrganization` takes no session.
+
+Composed from `Popover`, `Card`, `Item`, `Avatar`, and `Menu`, so behavior, focus, and ARIA come from
+them rather than being restyled. `UserButtonView` is presentational; the connected `UserButton` wraps
+it with `useUserButtonController()` and needs no props.
+
+## Example
+
+A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
+stand down, and the surface stays open so you land on the result. Only picking a workspace closes it.
+`pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
+that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
+
+<Story
+  name='Combined'
+  storyModule={UserButtonStories}
+/>
+
+## Usage
+
+`UserButtonView` renders trigger and popup from one prop-driven call:
+
+```tsx
+import { UserButtonView } from '@clerk/ui/mosaic/user-button/user-button.view';
+
+<UserButtonView
+  activeSession={{ sessionId: 'sess_colin', name: 'Colin', identifier: 'colin@clerk.dev' }}
+  activeOrganization={{ kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' }}
+  hasOrganizations
+  memberships={[
+    { kind: 'membership', organizationId: 'org_clerk_app', name: 'Clerk app', membersCount: 24, planLabel: 'Pro plan' },
+    { kind: 'membership', organizationId: 'org_clerk_cloud', name: 'Clerk Cloud' },
+  ]}
+  suggestions={[{ kind: 'suggestion', id: 'sug_labs', organizationId: 'org_clerk_labs', name: 'Clerk Labs', status: 'pending' }]}
+  invitations={[]}
+  additionalSessions={[{ sessionId: 'sess_braden', name: 'Braden', identifier: 'braden@clerk.dev' }]}
+  onSelectOrganization={organization => setActive({ organization })}
+  onSwitchSession={session => setActive({ session })}
+  onSignOutAll={() => signOut()}
+/>
+```
+
+To drop the popup into your own trigger, compose the parts. Data and callbacks live on
+`UserButtonRoot`; the leaves read them from context:
+
+```tsx
+import {
+  UserButtonRoot,
+  UserButtonTrigger,
+  UserButtonPopup,
+} from '@clerk/ui/mosaic/user-button/user-button.view';
+
+<UserButtonRoot {...data} {...callbacks}>
+  <UserButtonTrigger />
+  <UserButtonPopup />
+</UserButtonRoot>
+```
+
+Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use client'` boundary.
+
+## Trigger
+
+The active workspace's avatar and what it is called: the org and its plan wherever one heads the
+trigger, the account otherwise.
+
+`renderTriggerLabel={false}` leaves the avatar alone.
+
+<Story
+  name='AvatarOnly'
+  storyModule={UserButtonStories}
+/>
+
+`renderTriggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
+
+<Story
+  name='WithoutTriggerBadge'
+  storyModule={UserButtonStories}
+/>
+
+## Modes
+
+`mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
+Everything else is data.
+
+| Mode                 | Popup                                | Leads with                        |
+| -------------------- | ------------------------------------ | --------------------------------- |
+| `combined` (default) | Organizations and accounts together. | The org; `modePriority` flips it. |
+| `organization`       | Organizations only; no account rows. | The org.                          |
+| `user`               | Accounts only; never shows an org.   | The account.                      |
+
+What a mode leads with is named in the trigger and heads the popup — the two always agree.
+**Invite** belongs to the active org wherever there is one; the gear manages whatever leads.
+
+`combined` carries both switchers, so `modePriority` picks which one leads. Everything is listed
+either way; only the trigger and the header move.
+
+<Story
+  name='UserPriority'
+  storyModule={UserButtonStories}
+/>
+
+Off-mode data is not an error. Both examples below take the same props as the one above and differ
+only by `mode`.
+
+### Organizations
+
+The org heads it, with **Invite** and the gear (**Manage organization**). With no account menu to
+hold it, **Create organization** moves to the foot. The extra account is in the props, deliberately
+unrendered.
+
+<Story
+  name='Organizations'
+  storyModule={UserButtonStories}
+/>
+
+### User
+
+The account heads it, with **Sign out** in **Invite**'s slot and the gear (**Manage account**). The
+header is the active account, so the list holds only the accounts to switch to — no heading over
+them, and **Add account** moves to the foot the way **Create organization** does. An org is active;
+this mode ignores it, down to the trigger.
+
+<Story
+  name='User'
+  storyModule={UserButtonStories}
+/>
+
+## Single session
+
+An instance in single-session mode holds one account at a time, so there is nothing to switch to and
+no second account to add. It hands the view an empty `additionalSessions` and leaves `onAddAccount`
+and `onSignOutAll` off — the surface withholds the Accounts group, **Add account**, and **Sign out of
+all accounts** together. The account's own `⋯` still carries **Sign out**, which is all "all
+accounts" ever meant here.
+
+<Story
+  name='SingleSession'
+  storyModule={UserButtonStories}
+/>
+
+## Menu items
+
+`customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with
+`onClick` is an action and closes the popup on the way out; a row with `href` is a link and navigates
+on its own, so it stays followable while another action is in flight. The `icon` is optional — a row
+without one still holds the column, so labels stay in line.
+
+`menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
+ids it knows are `createOrganization`, `addAccount`, `signOutAll`, and each custom item's `id`. Those
+are the only actions the foot lists as rows; the rest live in the header or behind a `⋯`, where
+there is no list for an order to run in.
+
+Which of the three the foot carries depends on the surface, not just the mode: `createOrganization`
+is a row only on an org-only surface, and `addAccount` only where no Accounts heading holds it — an
+account with nobody to switch to. So an id the surface has not got is ignored rather than an error,
+and one order can cover every mode.
+
+<Story
+  name='CustomMenuItems'
+  storyModule={UserButtonStories}
+/>
+
+## Parts
+
+| Part                | Description                                                                  |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
+| `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
+| `UserButtonPopup`   | The popover surface: header, workspace list, additional accounts, footer.    |

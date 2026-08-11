@@ -115,6 +115,12 @@ import {
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import {
+  Combined as UserButtonCombined,
+  meta as userButtonMeta,
+  Organizations as UserButtonOrganizations,
+  User as UserButtonUser,
+} from '../stories/user-button.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
@@ -187,6 +193,13 @@ const itemModule: StoryModule = {
   Scrolling: ItemScrolling,
 };
 
+const userButtonModule: StoryModule = {
+  meta: userButtonMeta,
+  Combined: UserButtonCombined,
+  Organizations: UserButtonOrganizations,
+  User: UserButtonUser,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -237,6 +250,8 @@ const scrollAreaModule: StoryModule = {
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
+  // User
+  userButtonModule,
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,

@@ -60,13 +60,13 @@ setup('cleanup instances ', async () => {
           const { data: usersWithEmail } = await clerkClient.users.getUserList({
             orderBy: '-created_at',
             query: 'clerkcookie',
-            limit: 150,
+            limit: 500,
           });
 
           const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
             orderBy: '-created_at',
             query: '55501',
-            limit: 150,
+            limit: 500,
           });
 
           const allUsersMap = new Map();
@@ -88,7 +88,7 @@ setup('cleanup instances ', async () => {
           orgs = [];
         } else {
           const { data: orgsData } = await clerkClient.organizations.getOrganizationList({
-            limit: 150,
+            limit: 500,
           });
           orgs = orgsData;
         }
