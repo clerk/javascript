@@ -2,7 +2,6 @@
 import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
@@ -14,6 +13,7 @@ import { RouterTelemetry } from '../../utils/router-telemetry';
 import { invalidateCacheAction } from '../server-actions';
 import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
+import { useAwaitableRefresh } from './useAwaitableRefresh';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
 /**
@@ -26,9 +26,9 @@ const LazyCreateKeylessApplication = dynamic(() =>
 
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
   const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
-  const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
+  const refresh = useAwaitableRefresh();
 
   useSafeLayoutEffect(() => {
     window.__internal_onBeforeSetActive = intent => {
@@ -71,8 +71,11 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
 
     window.__internal_onAfterSetActive = () => {
       if (__internal_invokeMiddlewareOnAuthStateChange) {
-        return router.refresh();
+        // Deferred until in-flight transitions settle, so the refresh is never dispatched while a
+        // server-redirect follow-up navigation is still pending (which wedges the App Router, #9405)
+        return refresh();
       }
+      return undefined;
     };
   }, []);
 
