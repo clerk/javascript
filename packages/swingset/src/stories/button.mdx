@@ -13,7 +13,13 @@ Button is the primary action element in Mosaic, used for form submissions and di
 
 ## Props
 
-<PropTable meta={ButtonStories.meta} />
+<PropTable
+  meta={ButtonStories.meta}
+  extra={[
+    { name: 'disabled', type: 'boolean', default: 'false' },
+    { name: 'focusableWhenDisabled', type: 'boolean', default: 'false' },
+  ]}
+/>
 
 ## Usage
 
@@ -123,6 +129,42 @@ by the styles, not by `pointer-events`: the button stays hit-testable, which is 
 `cursor: not-allowed` render at all and what lets a wrapping tooltip explain _why_ it's disabled.
 That tooltip is worth adding — a disabled control with no explanation is a dead end.
 
+Those states are gated on `[data-disabled]` rather than `:enabled`, so a button disabled either way
+dims identically — which is what the next section relies on.
+
+#### Keeping focus
+
+<Story
+  name='FocusableWhenDisabled'
+  storyModule={ButtonStories}
+/>
+
+Tab through each row above. In the first, focus jumps the disabled button entirely; in the second it
+stops on it and moves on normally from there.
+
+Disabling a button that is _currently focused_ drops focus to the body, which is a real cost when the
+button disables itself in response to being pressed — the user is left with no focus position, and the
+next Tab restarts from the top of the page. Screen reader users lose their place outright.
+`focusableWhenDisabled` keeps the button in the tab order for that case:
+
+```tsx
+<Button
+  type='submit'
+  disabled={submitting}
+  focusableWhenDisabled
+>
+  Save
+</Button>
+```
+
+The button is marked `aria-disabled` instead of carrying the native `disabled` attribute, and stays
+inert — clicks and keyboard activation do nothing, and a press won't pull focus off whatever holds
+it. Only the tab order changes. `Tab` itself is deliberately left working, so focus can still leave.
+
+Reach for it when a button disables itself mid-interaction. A button that renders disabled and stays
+that way — a form that isn't filled in yet — doesn't need it: nobody's focus is inside it to lose,
+and an extra tab stop that does nothing is noise.
+
 ### Submitting
 
 `SubmitButton` is a `Button` that defaults `type` to `submit` and adds `isPending`. Use it for
@@ -145,8 +187,9 @@ any submit button, `.cl-button[data-pending] .cl-button-content` for it mid-acti
 A pending button is inert but not `disabled`: it carries `aria-disabled`, drops its pointer events
 so hover and press stop firing, and cancels the press so the form can't be submitted twice. The
 native `disabled` attribute would do all of that too, but it takes the button out of the tab order
-mid-action — pulling focus away at the exact moment the spinner is announced. The state is also
-reflected as `data-pending` for styling.
+mid-action — pulling focus away at the exact moment the spinner is announced. That is the same
+problem `focusableWhenDisabled` solves above; `SubmitButton` just handles it for you. The state is
+also reflected as `data-pending` for styling.
 
 #### The spinner is delayed
 
