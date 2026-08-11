@@ -1,5 +1,12 @@
 # @clerk/hono
 
+## 0.1.65
+
+### Patch Changes
+
+- Updated dependencies [[`167204b`](https://github.com/clerk/javascript/commit/167204b8b810a302364883a1aa048233a0216be8)]:
+  - @clerk/backend@3.16.4
+
 ## 0.1.64
 
 ### Patch Changes
