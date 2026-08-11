@@ -148,12 +148,6 @@ export interface UserButtonBusyState {
    * affordance that owns it spins; every other one is disabled so a second action cannot start.
    */
   pendingKey?: string | null;
-  /**
-   * Names the in-flight action for assistive tech ("Switching to Foundry"), announced by the popup's
-   * live region for as long as it runs. Nothing else reports the wait: the row that started it keeps
-   * focus while it stands down, and its spinner is decorative. Absent, the wait passes in silence.
-   */
-  pendingLabel?: string;
 }
 
 // ─── Menu items ─────────────────────────────────────────────────────────────

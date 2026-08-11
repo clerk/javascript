@@ -85,6 +85,48 @@ function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
+/**
+ * What the surface says while an action runs, by the key that owns it. Keyed through
+ * `userButtonBusyKeys` rather than by parsing `pendingKey`, so the key grammar stays in one place,
+ * and built from the rows' own names so the announcement names the same thing the row does.
+ */
+function pendingAnnouncements(data: UserButtonContextValue): Map<string, string> {
+  const switching = (name: string) => fill(m.status.switching, { name });
+  const announcements = new Map<string, string>([
+    [userButtonBusyKeys.selectOrganization(null), switching(m.workspaces.personal)],
+    [userButtonBusyKeys.signOutAll(), m.status.signingOutAll],
+  ]);
+
+  // The active organization is described whole rather than found in `memberships`, so it is named
+  // here even while the list it belongs to is still loading.
+  for (const membership of data.activeOrganization
+    ? [data.activeOrganization, ...data.memberships]
+    : data.memberships) {
+    announcements.set(userButtonBusyKeys.selectOrganization(membership.organizationId), switching(membership.name));
+  }
+  // Accounts are named by identifier, the way their rows are.
+  for (const session of [data.activeSession, ...data.additionalSessions]) {
+    announcements.set(userButtonBusyKeys.switchSession(session.sessionId), switching(session.identifier));
+    announcements.set(
+      userButtonBusyKeys.signOutSession(session.sessionId),
+      fill(m.status.signingOut, { identifier: session.identifier }),
+    );
+  }
+  for (const invitation of data.invitations) {
+    announcements.set(
+      userButtonBusyKeys.acceptInvitation(invitation.id),
+      fill(m.status.joining, { name: invitation.organizationName }),
+    );
+  }
+  for (const suggestion of data.suggestions) {
+    announcements.set(
+      userButtonBusyKeys.acceptSuggestion(suggestion.id),
+      fill(m.status.requesting, { name: suggestion.name }),
+    );
+  }
+  return announcements;
+}
+
 interface ActiveWorkspace {
   name: string;
   imageUrl?: string;
@@ -996,7 +1038,7 @@ export function UserButtonTrigger({
  * would unmount mid-announcement.
  */
 function ActionStatus(): ReactElement {
-  const { pendingLabel } = useUserButtonContext();
+  const data = useUserButtonContext();
   // Mounted whether or not anything is running: a region that arrives with its message already in
   // it is not announced, so the message has to land in a region that is already on the page.
   return (
@@ -1004,7 +1046,7 @@ function ActionStatus(): ReactElement {
       role='status'
       {...stylex.props(styles.visuallyHidden)}
     >
-      {pendingLabel ?? ''}
+      {(data.pendingKey && pendingAnnouncements(data).get(data.pendingKey)) || ''}
     </span>
   );
 }

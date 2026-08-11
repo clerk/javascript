@@ -731,10 +731,19 @@ describe('UserButtonView, one action at a time', () => {
 
   // The row keeps focus while it stands down, so nothing about the surface reports the wait on its
   // own: the spinner is a picture, and `aria-disabled` says a row cannot be used rather than why.
-  it('reports the wait in a live region', () => {
-    render(surface(userButtonBusyKeys.switchSession('sess_2'), { pendingLabel: 'Switching to Bob Jones' }));
+  // Named from the key, so the surface says what is running rather than that something is.
+  it.each([
+    [userButtonBusyKeys.selectOrganization('org_2'), 'Switching to Other Co', {}],
+    [userButtonBusyKeys.selectOrganization(null), 'Switching to Personal account', {}],
+    [userButtonBusyKeys.switchSession('sess_2'), 'Switching to bob@example.com', {}],
+    [userButtonBusyKeys.signOutSession('sess_2'), 'Signing out of bob@example.com', {}],
+    [userButtonBusyKeys.signOutAll(), 'Signing out of all accounts', {}],
+    [userButtonBusyKeys.acceptInvitation('inv_1'), 'Joining Gamma', { invitations: [gamma] }],
+    [userButtonBusyKeys.acceptSuggestion('sug_1'), 'Requesting to join Beta', { suggestions: [beta] }],
+  ])('names the wait in a live region: %s', (pendingKey, announcement, props) => {
+    render(surface(pendingKey, props));
 
-    expect(screen.getByRole('status')).toHaveTextContent('Switching to Bob Jones');
+    expect(screen.getByRole('status')).toHaveTextContent(announcement);
   });
 
   // A region that mounts with its message already in it is not announced, so the popup carries an
@@ -745,10 +754,10 @@ describe('UserButtonView, one action at a time', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
-  // The label is what is spoken, not what the surface stands down on: a container that spins a row
-  // without naming the wait leaves the region silent rather than announcing an empty string.
-  it('says nothing where the action is unnamed', () => {
-    render(surface(userButtonBusyKeys.switchSession('sess_2')));
+  // A key can outlive what it names: an account signs out from its own row, and the row is gone
+  // before the action lands. The region says nothing rather than announcing a half-filled template.
+  it('says nothing for an action it cannot name', () => {
+    render(surface(userButtonBusyKeys.switchSession('sess_9')));
 
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });

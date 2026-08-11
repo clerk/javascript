@@ -13,6 +13,14 @@ export const userButtonBase = {
   popup: {
     label: 'Account',
   },
+  // What the popup's live region says while an action runs, by the affordance that owns it.
+  status: {
+    switching: 'Switching to {name}',
+    signingOut: 'Signing out of {identifier}',
+    signingOutAll: 'Signing out of all accounts',
+    joining: 'Joining {name}',
+    requesting: 'Requesting to join {name}',
+  },
   workspaces: {
     personal: 'Personal account',
     loading: 'Loading organizations…',
