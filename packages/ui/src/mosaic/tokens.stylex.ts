@@ -203,6 +203,7 @@ export const space = stylex.defineVars({
   '3': step(3),
   '3.5': step(3.5),
   '4': step(4),
+  '4.5': step(4.5),
   '5': step(5),
   '6': step(6),
   '7': step(7),

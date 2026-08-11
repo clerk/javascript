@@ -14,6 +14,20 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Dialog } from '../components/dialog';
+export type {
+  DialogBackdropProps,
+  DialogCloseButtonProps,
+  DialogCloseProps,
+  DialogDescriptionProps,
+  DialogPopupProps,
+  DialogProps,
+  DialogRootProps,
+  DialogSize,
+  DialogTitleProps,
+  DialogTriggerProps,
+  DialogViewportProps,
+} from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';

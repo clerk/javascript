@@ -23,6 +23,18 @@ export interface ButtonProps extends MosaicElementProps<'button'> {
    */
   touchTarget?: boolean;
   /**
+   * StyleX styles composed into the button's own, last so they win.
+   *
+   * Needed rather than `className` whenever the override touches a property the button already
+   * declares conditionally. Atoms passed through `className` sit outside the button's
+   * `stylex.props` call, so StyleX cannot dedupe them and the winner falls to stylesheet order
+   * and specificity — and the button's media-guarded rules compile to a doubled class that
+   * outranks a plain one. `position` is the live example: `touchTarget` sets it under
+   * `@media (pointer: coarse)`, so a `className` trying to position the button absolutely is
+   * silently ignored on touch devices.
+   */
+  xstyle?: stylex.StyleXStyles;
+  /**
    * Keeps the button in the tab order while `disabled`, so focus is not dropped when a button
    * disables itself mid-interaction — while a form submits, say — and the user keeps their place
    * on the page. The button is marked `aria-disabled` rather than `disabled`, and stays inert to
@@ -100,6 +112,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     fullWidth = false,
     touchTarget = true,
     disabled = false,
+    xstyle,
     focusableWhenDisabled = false,
     className,
     style,
@@ -129,6 +142,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
           hasTouchTarget && isIconShape && styles.touchTargetIcon,
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
+          xstyle,
         ),
         className,
         style,

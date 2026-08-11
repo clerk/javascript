@@ -1,0 +1,28 @@
+---
+'@clerk/headless': patch
+'@clerk/ui': patch
+---
+
+Move the Mosaic `Dialog` onto StyleX, joining the other migrated components, and rework its sizing, motion and mobile behaviour.
+
+**Styling.** The dialog's rules now ship in `@clerk/ui/styles.css`. Style it by targeting the `.cl-dialog-backdrop` / `.cl-dialog-viewport` / `.cl-dialog-popup` slot classes from a CSS layer of your own, or per-part with `className` and `style`, in place of the previous `sx` prop.
+
+**Sizes.** `size` replaces `md` / `lg` with three named surfaces, and moves from `Dialog.Popup` to `Dialog.Root` because the backdrop reads it too. `prompt` (the default, `23.75rem`) asks one thing — a confirmation or a single-field form. `card` (`25rem`) is the sign-in / sign-up surface. `panel` fills the viewport minus its inset, up to `94rem` wide, so a settings surface does not resize as you navigate between its sections.
+
+**The inset.** The gap between a dialog and the edge of the screen is now a fixed inset that steps up at two breakpoints — `1rem`, `2rem` at `48rem`, `3rem` at `90rem` — rather than a percentage of the viewport. A percentage margin is asymmetric between the axes and the asymmetry tracks the viewport's aspect ratio, so the surround never read as an even frame.
+
+**Panels compose.** A `panel` clips rather than scrolling, and carries no padding of its own. Build the scroll region inside it with `scrollAreaRoot` / `scrollAreaViewport()`. That keeps anything anchored to the popup's corner from scrolling away, lets a scroll region sit flush with the dialog's edge, and makes a fixed-sidebar layout a plain flex row. `prompt` and `card` still pad themselves.
+
+**On a phone.** Below `48rem` a `prompt` pins to the bottom of the viewport and slides up as a sheet, keeping the inset on all four sides. `card` and `panel` are unchanged at every width. When an on-screen keyboard opens, `Dialog.Viewport` measures how much of the viewport it covers and pads for it, so a sheet rises to sit on top of the keyboard, a card re-centres in the space that is left without being squashed, and a panel shrinks.
+
+**Motion.** `prompt` and `card` scale out of the element that opened them — the dialog measures its trigger on open and exposes the result as `--cl-dialog-origin`, which the popup uses as its `transform-origin`; a dialog with no trigger falls back to a centred scale. Corner radius no longer distorts during the scale. `panel` has no enter or exit animation, since the absolute travel of a scale is a proportion of the element's own size. Under `prefers-reduced-motion: reduce` the movement drops and the fade remains.
+
+This also fixes the enter/exit transition, which was keyed to a `data-cl-starting-style` attribute the headless layer does not emit — dialogs previously appeared with no animation at all.
+
+**New `Dialog.CloseButton`.** The corner dismiss affordance: a ghost circular button holding the close glyph, anchored to the popup's top-inline-end corner. `Dialog.Close` is unchanged and stays unstyled, for footer "Cancel" buttons. Note that a close button rendered before a form becomes the dialog's initial focus.
+
+**Stacked dialogs.** A dialog opened from inside another one carries `data-nested` and paints a lighter scrim, so backdrops no longer compound into an opaque wall as the stack grows; the nested value is solved against the base so two levels composite to a `0.68` dim.
+
+**Browser chrome.** While a dialog is open, the mobile browser's own chrome is tinted to match the scrim — both `theme-color` and the `<body>` background, the latter being what paints the overscroll gutter and the area behind the address bar. On by default and needing no integration: the colour is derived from the backdrop rather than shipped, the meta is prepended rather than mutated so removing it restores the app's own, and it is refcounted across stacked dialogs. Opt out with `syncBrowserChrome={false}`.
+
+**`Button` gains an `xstyle` prop** for composing StyleX styles into its own, last so they win. Styles passed through `className` sit outside the button's `stylex.props` call and cannot be deduped, so the button's media-guarded rules — which compile to a doubled class — silently outrank them; positioning a button absolutely via `className` was ignored under a coarse pointer.

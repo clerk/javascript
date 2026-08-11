@@ -42,9 +42,9 @@ export interface DialogProps {
   children: ReactNode;
 }
 
-function DialogInner(props: DialogProps) {
+function DialogInner(props: DialogProps & { isNested: boolean }) {
   const nodeId = useFloatingNodeId();
-  const { modal = true, closedBy = 'any', children } = props;
+  const { modal = true, closedBy = 'any', isNested, children } = props;
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -87,6 +87,7 @@ function DialogInner(props: DialogProps) {
       popupRef,
       returnFocusRef,
       modal,
+      isNested,
       labelId,
       descriptionId,
       mounted,
@@ -101,6 +102,7 @@ function DialogInner(props: DialogProps) {
       getFloatingProps,
       returnFocusRef,
       modal,
+      isNested,
       labelId,
       descriptionId,
       mounted,
@@ -121,10 +123,18 @@ export function DialogRoot(props: DialogProps) {
   if (parentId === null) {
     return (
       <FloatingTree>
-        <DialogInner {...props} />
+        <DialogInner
+          {...props}
+          isNested={false}
+        />
       </FloatingTree>
     );
   }
 
-  return <DialogInner {...props} />;
+  return (
+    <DialogInner
+      {...props}
+      isNested
+    />
+  );
 }

@@ -120,9 +120,14 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                   | Applies To                         | Description |
-| --------------------------- | ---------------------------------- | ----------- |
-| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
+| Attribute                   | Applies To                         | Description                                 |
+| --------------------------- | ---------------------------------- | ------------------------------------------- |
+| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state                                  |
+| `data-nested`               | Backdrop, Viewport, Popup          | Opened from inside another floating element |
+
+`data-nested` is what a stacked overlay styles itself from — chiefly so backdrops don't composite
+into an ever-darker scrim as the stack grows. It reflects any floating ancestor, not strictly a
+dialog one: the `FloatingTree` a Menu or Popover establishes counts too.
 
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
@@ -130,7 +135,8 @@ The headless parts are unstyled. Target a part with your own className (or `rend
 
 - **`Dialog.Popup` should be a child of `Dialog.Viewport`** for centered, scroll-locked modal behavior. The viewport hosts the fixed overlay container; the popup alone does not handle positioning or scroll lock.
 - **Title and Description are optional but recommended.** If omitted, `aria-labelledby` / `aria-describedby` are simply absent from the popup.
-- **Nested dialogs are supported.** The `FloatingTree` pattern handles nesting automatically.
+- **Nested dialogs are supported**, and covered by tests. The `FloatingTree` pattern handles it: `useDismiss` blocks both Escape and outside-press on a parent while any child is open, and `FloatingOverlay`'s scroll lock is refcounted, so the body stays locked until the last dialog closes.
+- **`Dialog.Popup` gets a `--cl-dialog-origin` custom property** when the dialog was opened from a `Dialog.Trigger` — the trigger's centre, in the popup's own coordinate space. Use it as `transform-origin` to scale the dialog out of whatever opened it. It is left unset for a dialog with no trigger, so a `var(--cl-dialog-origin, center)` fallback centres the scale.
 - **No positioning middleware.** Dialogs are centered via CSS, not Floating UI positioning.
 
 ## Authoring rule for new primitives
