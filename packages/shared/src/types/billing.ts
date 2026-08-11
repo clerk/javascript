@@ -994,21 +994,63 @@ export interface BillingMoneyAmount {
   currencySymbol: string;
 }
 
+/**
+ * Contains details about a proration credit, including the remaining portion of the billing cycle.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingProrationCreditDetail {
+  /**
+   * The monetary value of the proration credit.
+   */
   amount: BillingMoneyAmount;
+  /**
+   * The number of days remaining in the current billing cycle.
+   */
   cycleDaysRemaining: number;
+  /**
+   * The total number of days in the billing cycle.
+   */
   cycleDaysTotal: number;
+  /**
+   * The percentage of the billing cycle that remains.
+   */
   cycleRemainingPercent: number;
 }
 
+/**
+ * Contains details about the payer's available credit and the amount applied to the transaction.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingPayerCredit {
+  /**
+   * The payer's credit balance remaining after the transaction.
+   */
   remainingBalance: BillingMoneyAmount;
+  /**
+   * The amount of payer credit applied to the transaction.
+   */
   appliedAmount: BillingMoneyAmount;
 }
 
+/**
+ * The `BillingCredits` type represents the credits applied to a checkout or payment.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
 export interface BillingCredits {
+  /**
+   * The credit for the unused portion of the current billing cycle. `null` when no proration credit applies.
+   */
   proration: BillingProrationCreditDetail | null;
+  /**
+   * The payer credit applied to the transaction. `null` when no payer credit applies.
+   */
   payer: BillingPayerCredit | null;
+  /**
+   * The total monetary value of all credits applied to the transaction.
+   */
   total: BillingMoneyAmount;
 }
 
