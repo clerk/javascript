@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.2.6
+
+### Patch Changes
+
+- Add an experimental `ClerkProvider` option to disable native client synchronization when Clerk native components are not used. ([#9396](https://github.com/clerk/javascript/pull/9396)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.6` to `1.3.7`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.7. ([#9390](https://github.com/clerk/javascript/pull/9390)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.7` to `1.3.8`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.8. ([#9395](https://github.com/clerk/javascript/pull/9395)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.28.1
+
 ## 4.2.5
 
 ### Patch Changes
