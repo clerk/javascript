@@ -94,12 +94,8 @@ class ClerkRequest extends Request {
   }
 
   private parseCookies(req: Request) {
-    const cookiesRecord = parse(this.decodeCookieValue(req.headers.get('cookie') || ''));
+    const cookiesRecord = parse(req.headers.get('cookie') || '');
     return new Map(Object.entries(cookiesRecord));
-  }
-
-  private decodeCookieValue(str: string) {
-    return str ? str.replace(/(%[0-9A-Z]{2})+/g, decodeURIComponent) : str;
   }
 }
 

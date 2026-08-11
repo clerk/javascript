@@ -89,12 +89,36 @@ describe('createClerkRequest', () => {
       expect(req.cookies.get('foo')).toBe('bar');
     });
 
-    it('should parse and return cookies with special characters', () => {
+    it('should decode values after parsing cookie pairs', () => {
       const req = createClerkRequest(
-        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%20bar%3B%20baz%3Dqux' }) }),
+        new Request('http://localhost:3000', {
+          headers: new Headers({ cookie: 'foo=%20bar%3B%20baz%3Dqux; after=parsed' }),
+        }),
       );
-      expect(req.cookies.get('foo')).toBe('bar');
-      expect(req.cookies.get('baz')).toBe('qux');
+
+      expect(req.cookies.get('foo')).toBe(' bar; baz=qux');
+      expect(req.cookies.get('baz')).toBeUndefined();
+      expect(req.cookies.get('after')).toBe('parsed');
+    });
+
+    it.each(['%E2%9', '%98', '%C0%80'])('should preserve a malformed encoded cookie value: %s', value => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', {
+          headers: new Headers({ cookie: `__session=abc; analytics_id=${value}; after=parsed` }),
+        }),
+      );
+
+      expect(req.cookies.get('__session')).toBe('abc');
+      expect(req.cookies.get('analytics_id')).toBe(value);
+      expect(req.cookies.get('after')).toBe('parsed');
+    });
+
+    it('should decode lowercase percent escapes', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%c3%a9' }) }),
+      );
+
+      expect(req.cookies.get('foo')).toBe('é');
     });
 
     it('should parse and return cookies even if no cookie header exists', () => {
