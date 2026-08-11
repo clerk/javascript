@@ -979,7 +979,10 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
       placement={placement ?? 'bottom-start'}
       sideOffset={sideOffset}
     >
-      <UserButtonContext.Provider value={{ ...data, layout }}>{children}</UserButtonContext.Provider>
+      <UserButtonContext.Provider value={{ ...data, layout }}>
+        {children}
+        <ActionStatus />
+      </UserButtonContext.Provider>
     </Popover.Root>
   );
 }
@@ -1033,9 +1036,11 @@ export function UserButtonTrigger({
 
 /**
  * Speaks the one in-flight action. `pendingKey` allows a single action at a time, so the surface
- * needs one region rather than one per affordance, and the row that owns the action often goes when
- * it lands — the list re-sorts, a signed-out account leaves — so a region living inside the row
- * would unmount mid-announcement.
+ * needs one region rather than one per affordance.
+ *
+ * It belongs to the surface rather than to the popup or the acting row, both of which go while the
+ * action is still running: picking a workspace closes the popup behind it, and a row leaves when the
+ * list re-sorts or an account signs out. A region taken off the page mid-announcement is not read.
  */
 function ActionStatus(): ReactElement {
   const data = useUserButtonContext();
@@ -1055,7 +1060,6 @@ function ActionStatus(): ReactElement {
 export function UserButtonPopup(): ReactElement {
   return (
     <Popover.Popup aria-label={m.popup.label}>
-      <ActionStatus />
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
       <Card.Root style={{ rowGap: 0 }}>
         <Header />

@@ -754,6 +754,15 @@ describe('UserButtonView, one action at a time', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 
+  // Picking a workspace closes the popup behind it, so a region living in the popup would be taken
+  // off the page while it was still being read out. It belongs to the surface, which stays.
+  it('carries the region whether or not the popup is open', () => {
+    render(surface(userButtonBusyKeys.selectOrganization('org_2'), { defaultOpen: false }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Switching to Other Co');
+  });
+
   // A key can outlive what it names: an account signs out from its own row, and the row is gone
   // before the action lands. The region says nothing rather than announcing a half-filled template.
   it('says nothing for an action it cannot name', () => {
