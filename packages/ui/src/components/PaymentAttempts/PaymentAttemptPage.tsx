@@ -292,7 +292,7 @@ function PaymentAttemptBody({ paymentAttempt }: { paymentAttempt: BillingPayment
               title={catalogDiscount.name}
               description={getDiscountDescription(
                 catalogDiscount,
-                catalogDiscount.cyclesRemaining,
+                catalogDiscount.durationInCycles,
                 subscriptionItem.planPeriod,
                 { $, t },
               )}

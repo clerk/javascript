@@ -1022,6 +1022,7 @@ export interface BillingAppliedDiscountJSON {
   amount_off?: BillingMoneyAmountJSON;
   promo_code?: string;
   cycles_remaining: number | null;
+  duration_in_cycles?: number | null;
 }
 
 export interface BillingDiscountRedemptionJSON extends ClerkResourceJSON {

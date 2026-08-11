@@ -1051,6 +1051,7 @@ export interface BillingAppliedDiscount {
   amountOff?: BillingMoneyAmount;
   promoCode?: string;
   cyclesRemaining: number | null;
+  durationInCycles?: number | null;
 }
 
 /**

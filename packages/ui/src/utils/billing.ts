@@ -13,7 +13,7 @@ type Localizations = Pick<ReturnType<typeof useLocalizations>, '$' | 't'>;
 
 export function getDiscountDescription(
   discount: Discount,
-  cycles: number | null,
+  cycles: number | null | undefined,
   planPeriod: BillingSubscriptionPlanPeriod,
   { $, t }: Localizations,
 ) {
@@ -24,7 +24,7 @@ export function getDiscountDescription(
         ? $(discount.amountOff)
         : '';
 
-  if (cycles === null) {
+  if (cycles == null) {
     return t(localizationKeys('billing.discountAmount', { amount }));
   }
 
