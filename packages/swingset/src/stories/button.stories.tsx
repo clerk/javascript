@@ -302,6 +302,36 @@ export function Disabled(props: Record<string, unknown>) {
   );
 }
 
+// Two rows so the difference is reachable from the keyboard: tab through each and watch where
+// focus lands. The neighbours are the point — the middle button is the one that changes.
+export function FocusableWhenDisabled(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+        >
+          Skipped
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+          focusableWhenDisabled
+        >
+          Focusable
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+    </div>
+  );
+}
+
 // Stands in for an async submit, so the example can be pressed and the flip between the two
 // states watched — including that the button doesn't resize under the spinner.
 function usePendingOnPress(duration = 2000) {
