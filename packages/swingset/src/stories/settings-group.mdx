@@ -1,49 +1,55 @@
-import * as SettingsGroupStories from './settings-group.stories';
+import * as SettingsStories from './settings-group.stories';
 
-# SettingsGroup
+# Settings
 
-A settings block that carries the canonical section, surface, separator, and label/control layout. Use it for product settings rather than assembling those decisions from generic cards and item groups.
+A settings block that carries the canonical section, surface, row grouping, and item layout. Use it for product settings while composing each item's media, content, and actions as needed.
 
 ## Usage
 
 ```tsx
-import { SettingsGroup } from '@clerk/ui/mosaic/block/settings-group';
+import { Settings } from '@clerk/ui/mosaic/block/settings-group';
 
-<SettingsGroup.Root>
-  <SettingsGroup.Title>Account</SettingsGroup.Title>
-  <SettingsGroup.List>
-    <SettingsGroup.Row>
-      <SettingsGroup.Media>{icon}</SettingsGroup.Media>
-      <SettingsGroup.Label description='Shown throughout the application.'>
-        Name
-      </SettingsGroup.Label>
-      <SettingsGroup.Control>{control}</SettingsGroup.Control>
-    </SettingsGroup.Row>
-  </SettingsGroup.List>
-</SettingsGroup.Root>
+<Settings.Root>
+  <Settings.Title>Account</Settings.Title>
+  <Settings.Group>
+    <Settings.Row>
+      <Settings.Item>
+        <Settings.Media>{icon}</Settings.Media>
+        <Settings.Content>
+          <Settings.Label>Name</Settings.Label>
+          <Settings.Description>Shown throughout the application.</Settings.Description>
+        </Settings.Content>
+        <Settings.Actions>{control}</Settings.Actions>
+      </Settings.Item>
+    </Settings.Row>
+  </Settings.Group>
+</Settings.Root>
 ```
 
-`SettingsGroup.List` owns the outlined surface and separation between direct `SettingsGroup.Row` children. `SettingsGroup.Media` reserves a consistent slot for icons, avatars, and provider marks. Each row places its label opposite its control. Use `SettingsGroup.Control` for inputs, switches, menus, and buttons—not only actions.
+`Settings.Group` owns the outlined surface. Its direct `Settings.Row` children own separation and may stack one or more `Settings.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Settings.Media` accepts `md` and `lg` sizes.
 
-When a row contains one form control, add `field` to associate its label automatically:
-
-```tsx
-<SettingsGroup.Row field>
-  <SettingsGroup.Label>Name</SettingsGroup.Label>
-  <SettingsGroup.Control>
-    <Input />
-  </SettingsGroup.Control>
-</SettingsGroup.Row>
-```
+Use `Settings.Items` for a nested value list beneath a row's header item. The row keeps an 8px header-to-list gap, nested items stack without gaps at a 44px minimum height, and their content receives 12px vertical padding.
 
 ## Examples
 
 <Story
   name='Default'
-  storyModule={SettingsGroupStories}
+  storyModule={SettingsStories}
   composition={[
     { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
-    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+### Multiple email addresses and phone numbers
+
+<Story
+  name='MultipleEmailAndPhoneNumbers'
+  storyModule={SettingsStories}
+  composition={[
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
   ]}
 />
 
@@ -51,7 +57,7 @@ When a row contains one form control, add `field` to associate its label automat
 
 <Story
   name='ConnectedAccounts'
-  storyModule={SettingsGroupStories}
+  storyModule={SettingsStories}
   composition={[
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
@@ -62,5 +68,5 @@ When a row contains one form control, add `field` to associate its label automat
 
 <Story
   name='Destructive'
-  storyModule={SettingsGroupStories}
+  storyModule={SettingsStories}
 />

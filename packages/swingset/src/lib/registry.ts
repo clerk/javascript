@@ -111,6 +111,7 @@ import {
   Default as SettingsGroupDefault,
   Destructive as SettingsGroupDestructive,
   meta as settingsGroupMeta,
+  MultipleEmailAndPhoneNumbers as SettingsGroupMultipleEmailAndPhoneNumbers,
 } from '../stories/settings-group.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -135,6 +136,7 @@ const destructiveModule: StoryModule = { meta: destructiveMeta, Default: Destruc
 const settingsGroupModule: StoryModule = {
   meta: settingsGroupMeta,
   Default: SettingsGroupDefault,
+  MultipleEmailAndPhoneNumbers: SettingsGroupMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SettingsGroupConnectedAccounts,
   Destructive: SettingsGroupDestructive,
 };

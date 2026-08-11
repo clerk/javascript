@@ -29,7 +29,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
-    'settings-group': dynamic(() => import('../stories/settings-group.mdx')),
+    settings: dynamic(() => import('../stories/settings-group.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
