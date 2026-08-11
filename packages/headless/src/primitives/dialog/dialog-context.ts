@@ -2,17 +2,31 @@ import type { ExtendedRefs, FloatingContext, ReferenceType, UseInteractionsRetur
 import { createContext, useContext } from 'react';
 
 import type { TransitionProps } from '../../hooks/use-transition';
+import type { DialogHandle } from './dialog-handle';
 
 export interface DialogContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
-  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
   popupRef: React.RefObject<HTMLDivElement | null>;
   /** Where focus goes when the dialog closes, or `null` to leave focus alone. */
   returnFocusRef: React.MutableRefObject<HTMLElement | null>;
+  /**
+   * The store connecting this root to its triggers — the `handle` prop when one was passed,
+   * otherwise a private store the root created. Triggers nested inside the root reach it here;
+   * detached triggers hold the same object through their `handle` prop.
+   */
+  store: DialogHandle;
+  /**
+   * Set by `Dialog.Popup` when its `finalFocus` is a function, and invoked by the root
+   * synchronously on every close — dismissal or programmatic — with the event behind it, if
+   * any. Resolving inside the close call is what guarantees the result is in place before
+   * `FloatingFocusManager` restores focus; an effect can lose that race when close and unmount
+   * land in the same commit.
+   */
+  finalFocusResolverRef: React.MutableRefObject<((event: Event | undefined) => void) | null>;
   modal: boolean;
   /**
    * Whether this dialog opened from inside another floating element, so a stacked overlay can
@@ -38,4 +52,9 @@ export function useDialogContext() {
     throw new Error('Dialog compound components must be used within <Dialog.Root>');
   }
   return ctx;
+}
+
+/** Context access for parts that can also live outside the root — a trigger given a `handle`. */
+export function useOptionalDialogContext() {
+  return useContext(DialogContext);
 }

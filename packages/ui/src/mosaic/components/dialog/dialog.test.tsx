@@ -313,10 +313,77 @@ describe('Dialog.CloseButton', () => {
       </Dialog>,
     );
 
-    // Pinning the consequence rather than endorsing it: with no `initialFocus` API, a corner X
-    // rendered before the form is what the dialog opens focused on. `FloatingFocusManager` moves
-    // focus in an effect, hence the wait.
+    // Pinning the default: a corner X rendered before the form is what the dialog opens
+    // focused on unless `initialFocus` on `Dialog.Popup` says otherwise (next test).
+    // `FloatingFocusManager` moves focus in an effect, hence the wait.
     await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+  });
+});
+
+describe('composition APIs', () => {
+  it('opens from a detached trigger through a handle', async () => {
+    const user = userEvent.setup();
+    const handle = Dialog.createHandle();
+    render(
+      <>
+        <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
+        <Dialog.Root handle={handle}>
+          <Dialog.Popup>
+            <Dialog.Title>Detached</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Open detached' }));
+
+    expect(screen.getByRole('dialog', { name: 'Detached' })).toBeInTheDocument();
+  });
+
+  it('renders per-trigger content from the payload', async () => {
+    const user = userEvent.setup();
+    const handle = Dialog.createHandle<string>();
+    render(
+      <>
+        <Dialog.Trigger
+          handle={handle}
+          payload='from-a'
+        >
+          Open A
+        </Dialog.Trigger>
+        <Dialog.Root handle={handle}>
+          {({ payload }) => (
+            <Dialog.Popup>
+              <Dialog.Title>{payload ?? 'none'}</Dialog.Title>
+            </Dialog.Popup>
+          )}
+        </Dialog.Root>
+      </>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Open A' }));
+
+    expect(screen.getByRole('dialog', { name: 'from-a' })).toBeInTheDocument();
+  });
+
+  it('initialFocus on the popup redirects the open focus past the close button', async () => {
+    function Fixture() {
+      const inputRef = React.useRef<HTMLInputElement | null>(null);
+      return (
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup initialFocus={inputRef}>
+            <Dialog.CloseButton />
+            <input
+              ref={inputRef}
+              aria-label='Email'
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      );
+    }
+    render(<Fixture />);
+
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Email' })).toHaveFocus());
   });
 });
 

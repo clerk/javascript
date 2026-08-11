@@ -7,18 +7,29 @@ export const styles = stylex.create({
   // token: it composites over whatever the host app renders, so the same value reads
   // consistently on any page.
   //
+  // Dark mode veils rather than darkens: a light grey at low alpha over a dark page, where light
+  // mode lays black over a light one. Same job, opposite direction, so the two are unrelated
+  // colours rather than one colour at two opacities — hence `light-dark()` per value.
+  //
   // A stacked dialog paints its OWN scrim rather than deferring to the one beneath it, so each
-  // level reads as a step further from the page. It is lighter than the base because the two
-  // COMPOSITE: alpha over alpha is `1 − (1 − a)(1 − b)`, so the nested value is solved for the
-  // intended total rather than picked by eye — `1 − 0.32/0.6 = 0.4667` lands two levels on 0.68.
-  // Exact for a two-deep stack, which is the shape that exists; a third level would go darker
-  // still, and wants its own value rather than a third application of this one.
-  // `data-nested` comes from the headless layer.
+  // level reads as a step further from the page. It is solved, not picked: alpha over alpha is
+  // `1 − (1 − a)(1 − b)`, so the nested value is whatever lands two levels on the intended total.
+  //
+  //   light  base 0.4  → total 0.68     ⇒ nested `1 − 0.32/0.6`   = 0.4667
+  //   dark   base 0.24 → total 0.408    ⇒ nested `1 − 0.592/0.76` = 0.2211
+  //
+  // The dark total is the same PROPORTIONAL deepening as light's — 1.7× the base — rather than the
+  // same absolute value, because a 0.68 veil of grey over a dark page would read as fog, not as a
+  // second surface. Preserving the ratio keeps the step between one dialog and two feeling equal
+  // in both schemes.
+  //
+  // Exact for a two-deep stack, which is the shape that exists; a third level wants its own value
+  // rather than a third application of this one. `data-nested` comes from the headless layer.
   backdrop: {
     inset: 0,
     backgroundColor: {
-      default: 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)',
-      ':where([data-nested])': 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)',
+      default: 'light-dark(rgba(0, 0, 0, 0.4), rgba(115, 115, 115, 0.24))',
+      ':where([data-nested])': 'light-dark(rgba(0, 0, 0, 0.4667), rgba(115, 115, 115, 0.2211))',
     },
     position: 'fixed',
   },

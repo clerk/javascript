@@ -89,8 +89,7 @@ const deleteAccountTrigger = (props: RenderProps) => (
   </Button>
 );
 
-// A `panel` has no padding of its own — its regions reach the popup's edges — so a body that is
-// ordinary padded content supplies its own. See `PanelSidebar` for the case that motivates it.
+// A `panel` has no padding of its own, so a body of ordinary content supplies it.
 const panelBody = {
   display: 'flex',
   flex: 1,
@@ -101,10 +100,6 @@ const panelBody = {
   padding: '1.5rem',
 } as const;
 
-// The triggers deliberately sit at three corners of the panel — two at the inline end, at
-// different heights, and one at the start edge near the bottom. Each card scales out of the
-// button that opened it, so spreading them apart is what makes that visible; stacked in a
-// column they would all resolve to nearly the same origin.
 const sectionHeader = {
   alignItems: 'center',
   display: 'flex',
@@ -112,7 +107,7 @@ const sectionHeader = {
   justifyContent: 'space-between',
 } as const;
 
-/** A `card` dialog opened from inside the `panel` — the shape the account profile uses. */
+/** A `prompt` dialog opened from inside the `panel` — the shape the account profile uses. */
 function AddValueDialog({
   trigger,
   title,
@@ -139,7 +134,6 @@ function AddValueDialog({
           <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
           <Dialog.Description render={<Text />}>{description}</Dialog.Description>
           <Input placeholder={placeholder} />
-          {/* Hand-rolled, as every dialog's footer is today. A Header/Body/Footer split is planned. */}
           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
             <Button
               variant='outline'
@@ -184,13 +178,13 @@ export function Nested() {
         <Item.Group>
           <Item.Root>
             <Item.Content>
-              <Item.Title>ada@example.com</Item.Title>
+              <Item.Label>ada@example.com</Item.Label>
               <Item.Description>Primary</Item.Description>
             </Item.Content>
           </Item.Root>
           <Item.Root>
             <Item.Content>
-              <Item.Title>ada.lovelace@work.example.com</Item.Title>
+              <Item.Label>ada.lovelace@work.example.com</Item.Label>
             </Item.Content>
           </Item.Root>
         </Item.Group>
@@ -207,12 +201,11 @@ export function Nested() {
         <Item.Group>
           <Item.Root>
             <Item.Content>
-              <Item.Title>+1 (555) 010-1842</Item.Title>
+              <Item.Label>+1 (555) 010-1842</Item.Label>
             </Item.Content>
           </Item.Root>
         </Item.Group>
 
-        {/* Pinned to the bottom of the panel, at the opposite edge from the two above. */}
         <div style={{ display: 'flex', marginBlockStart: 'auto' }}>
           <AddValueDialog
             trigger={deleteAccountTrigger}
@@ -232,8 +225,7 @@ const settingsTrigger = (props: RenderProps) => <Button {...props}>Open settings
 
 const NAV_SECTIONS = ['Profile', 'Security', 'Sessions', 'Connected accounts', 'Billing'];
 
-// Deliberately long — a 27" display shows a lot of a 90dvh panel, and the example is worthless
-// if it doesn't actually overflow there.
+// Long enough to overflow the panel even on a large display, or the scroll example shows nothing.
 const SESSION_DEVICES = [
   'MacBook Pro',
   'iPhone 15',
@@ -260,11 +252,7 @@ const SESSIONS = Array.from({ length: 40 }, (_, index) => ({
   when: SESSION_TIMES[index % SESSION_TIMES.length],
 }));
 
-/**
- * The panel clips rather than scrolling, so the scroll region is composed inside it. A flex row
- * puts a fixed rail beside a scrolling column, and the close button — anchored to the popup —
- * stays put while the right side moves.
- */
+/** The panel clips rather than scrolling, so the scroll region is composed inside it. */
 export function PanelSidebar() {
   return (
     <Dialog
@@ -279,10 +267,7 @@ export function PanelSidebar() {
       </div>
 
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        {/*
-          A 14rem rail beside a scrolling column has nowhere to go on a phone, so it is dropped
-          below Tailwind's `md` — which is 48rem, the same band the dialog's own layout switches on.
-        */}
+        {/* The rail has nowhere to go on a phone; `md` is 48rem, the dialog's own mobile band. */}
         <nav
           className='hidden md:flex'
           style={{
@@ -300,8 +285,7 @@ export function PanelSidebar() {
               variant='ghost'
               size='sm'
               fullWidth
-              // A nav row is a label, not a centred action — `Button` centres its content, so the
-              // alignment has to be overridden per item.
+              // `Button` centres its content; a nav row wants a leading label.
               style={{ justifyContent: 'flex-start' }}
               aria-current={index === 2 ? 'page' : undefined}
             >
@@ -310,11 +294,7 @@ export function PanelSidebar() {
           ))}
         </nav>
 
-        {/*
-          The scroll region sits FLUSH with the popup — no padding between it and the dialog edge —
-          so its scrollbar and edge fade land on the true edge. Padding goes on the content inside
-          it instead. `scrollAreaRoot` is the positioned ancestor; `scrollAreaViewport()` scrolls.
-        */}
+        {/* Flush with the popup edge, so the scrollbar and edge fade land on the true edge. */}
         <div
           {...stylex.props(scrollAreaRoot)}
           style={{ flex: 1, minWidth: 0 }}
@@ -325,7 +305,7 @@ export function PanelSidebar() {
                 {SESSIONS.map(session => (
                   <Item.Root key={session.id}>
                     <Item.Content>
-                      <Item.Title>{session.device}</Item.Title>
+                      <Item.Label>{session.device}</Item.Label>
                       <Item.Description>
                         {session.where} · {session.when}
                       </Item.Description>
@@ -347,6 +327,85 @@ export function PanelSidebar() {
         </div>
       </div>
     </Dialog>
+  );
+}
+
+/**
+ * A handle at module scope: the trigger and the root only share it, not a JSX ancestor.
+ * The same handle also has imperative `open()` / `close()` for opens with no trigger at all.
+ */
+const notificationsDialog = Dialog.createHandle();
+
+export function DetachedTrigger() {
+  return (
+    <>
+      <Dialog.Trigger
+        handle={notificationsDialog}
+        render={props => <Button {...props}>View notifications</Button>}
+      />
+      <Dialog.Root handle={notificationsDialog}>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Viewport>
+            <Dialog.Popup>
+              <Dialog.CloseButton />
+              <Dialog.Title render={<Heading size='sm' />}>Notifications</Dialog.Title>
+              <Dialog.Description render={<Text />}>You are all caught up. Good job!</Dialog.Description>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
+  );
+}
+
+const memberDialog = Dialog.createHandle<{ name: string; role: string }>();
+
+const MEMBERS = [
+  { name: 'Ada Lovelace', role: 'Admin' },
+  { name: 'Grace Hopper', role: 'Member' },
+  { name: 'Annie Easley', role: 'Member' },
+];
+
+/** One dialog, three triggers: each carries a payload the dialog's children render from. */
+export function MultipleTriggers() {
+  return (
+    <>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        {MEMBERS.map(member => (
+          <Dialog.Trigger
+            key={member.name}
+            handle={memberDialog}
+            id={member.name}
+            payload={member}
+            render={props => (
+              <Button
+                {...props}
+                variant='outline'
+              >
+                {member.name}
+              </Button>
+            )}
+          />
+        ))}
+      </div>
+      <Dialog.Root handle={memberDialog}>
+        {({ payload }) => (
+          <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Viewport>
+              <Dialog.Popup>
+                <Dialog.CloseButton />
+                <Dialog.Title render={<Heading size='sm' />}>{payload?.name}</Dialog.Title>
+                <Dialog.Description render={<Text />}>
+                  {payload ? `${payload.role} of this organization.` : null}
+                </Dialog.Description>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Portal>
+        )}
+      </Dialog.Root>
+    </>
   );
 }
 
@@ -434,6 +493,33 @@ export function OutsideScroll() {
               />
               <Button>Accept</Button>
             </Card.Footer>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+/** `initialFocus` skips past the close button and the name field; `finalFocus` is left default. */
+export function CustomFocus() {
+  const feedbackRef = React.useRef<HTMLInputElement | null>(null);
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={props => <Button {...props}>Give feedback</Button>} />
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup initialFocus={feedbackRef}>
+            <Dialog.CloseButton />
+            <Dialog.Title render={<Heading size='sm' />}>Feedback</Dialog.Title>
+            <Dialog.Description render={<Text />}>
+              The feedback field takes focus on open — past the close button and the name field.
+            </Dialog.Description>
+            <Input placeholder='Name' />
+            <Input
+              ref={feedbackRef}
+              placeholder='Feedback'
+            />
           </Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
