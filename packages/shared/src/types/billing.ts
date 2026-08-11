@@ -852,6 +852,9 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
      */
     amount: BillingMoneyAmount;
   };
+  /**
+   * The credits applied to this subscription item.
+   */
   credits?: BillingCredits;
   /**
    * The active discount applied to this subscription item.
@@ -1344,6 +1347,9 @@ export interface BillingCheckoutTotals {
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
   credit: BillingMoneyAmount | null;
+  /**
+   * The credits applied to the checkout. `null` when no credits apply.
+   */
   credits: BillingCredits | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
