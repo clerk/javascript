@@ -29,21 +29,21 @@ export class Protect {
     // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
     // down with it.
     try {
-      this.#apply(config.loaders, config.id || undefined);
+      this.#apply(config.loaders);
     } catch (error) {
       logger.warnOnce(`[protect] failed to load: ${error}`);
     }
   }
 
-  #apply(configured: ProtectLoader[], instanceId?: string): void {
+  #apply(configured: ProtectLoader[]): void {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
 
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
-    // not using it keeps today's behaviour and stores nothing in the browser.
+    // not using it is unaffected and stores nothing in the browser.
     const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
-    this.#session = ProtectSession.create(loaders, instanceId, applyLoader);
+    this.#session = ProtectSession.create(loaders, applyLoader);
 
     for (const loader of loaders) {
       // The session injects this one itself, under the acquisition lock, so exactly one tab per

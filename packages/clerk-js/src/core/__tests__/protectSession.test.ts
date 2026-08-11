@@ -17,11 +17,12 @@ const LOADER_SRC = 'https://loader.example.com/ins_2abc/{cid}/loader.js';
 /**
  * No `src` by default: jsdom runs with `resources: 'usable'`, so a real URL is actually fetched
  * and fires `error` on its own schedule, racing the events these tests need to drive themselves.
+ * `type=module` keeps it on the event-driven path regardless, which is what the served loader is.
  */
 const loader = (overrides: Partial<ProtectLoader> = {}): ProtectLoader => ({
   target: 'head',
   type: 'script',
-  attributes: { 'data-cid': '{cid}' },
+  attributes: { 'data-cid': '{cid}', type: 'module' },
   tokenTimeoutMs: 200,
   ...overrides,
 });
@@ -55,9 +56,9 @@ const harness = () => {
   return { applyLoader, elements, injected };
 };
 
-const session = (loaders: ProtectLoader[], instanceId?: string) => {
+const session = (loaders: ProtectLoader[]) => {
   const h = harness();
-  return { session: ProtectSession.create(loaders, instanceId, h.applyLoader), ...h };
+  return { session: ProtectSession.create(loaders, h.applyLoader), ...h };
 };
 
 /** What the server does: the script body assigns the global, then the element fires `load`. */
@@ -128,21 +129,25 @@ describe('encodeBase32', () => {
 describe('interpolatePlaceholders', () => {
   it('substitutes the closed set', () => {
     expect(
-      interpolatePlaceholders('{instance_id}/{cid}/{pid}/{rid}', {
+      interpolatePlaceholders('{sdkver}/{cid}/{pid}/{rid}', {
         cid: 'c',
         pid: 'p',
         rid: 'r',
-        instance_id: 'ins_2abc',
+        sdkver: '1.2.3',
       }),
-    ).toBe('ins_2abc/c/p/r');
+    ).toBe('1.2.3/c/p/r');
   });
 
   it('leaves an unrecognised placeholder verbatim', () => {
-    expect(interpolatePlaceholders('{cid}/{nope}/{PID}', { cid: 'c' })).toBe('c/{nope}/{PID}');
+    // `{instance_id}` is not in the set and must not be: the instance id is the server's to place
+    // into the config it serves, never something the client interpolates.
+    expect(interpolatePlaceholders('{cid}/{nope}/{PID}/{instance_id}', { cid: 'c' })).toBe(
+      'c/{nope}/{PID}/{instance_id}',
+    );
   });
 
   it('leaves a recognised placeholder verbatim when there is no value for it', () => {
-    expect(interpolatePlaceholders('{cid}/{instance_id}', { cid: 'c' })).toBe('c/{instance_id}');
+    expect(interpolatePlaceholders('{cid}/{sdkver}', { cid: 'c' })).toBe('c/{sdkver}');
   });
 });
 
@@ -173,19 +178,12 @@ describe('ProtectSession.create', () => {
     expect(buildCid(second?.pid as string, second?.rid as string)).toBe(second?.cid);
   });
 
-  it('substitutes the instance id when one is available', () => {
-    const { session: created } = session([loader()], 'ins_2abc');
-    expect(created?.placeholders().instance_id).toBe('ins_2abc');
-  });
+  it('stores nothing for a loader that only templates the SDK version', async () => {
+    const { session: created, elements } = session([
+      loader({ attributes: { src: 'https://loader.example.com/{sdkver}/loader.js' } }),
+    ]);
 
-  it('stores nothing for a loader that only templates the instance id', async () => {
-    const { session: created, elements } = session(
-      [loader({ attributes: { src: 'https://loader.example.com/{instance_id}/loader.js' } })],
-      'ins_2abc',
-    );
-
-    expect(created?.placeholders().instance_id).toBe('ins_2abc');
-    // The instance id needs no minted identity, so none is planted for it.
+    // The SDK version needs no minted identity, so none is planted for it.
     expect(created?.placeholders().pid).toBeUndefined();
     expect(localStorage.getItem('__clerk_protect_pid')).toBeNull();
 
@@ -215,7 +213,7 @@ describe('ProtectSession.create', () => {
 
 describe('ProtectSession inline token', () => {
   it('hands the correlation id to the loader it injects', async () => {
-    const { session: created, injected } = session([loader({ attributes: { src: LOADER_SRC } })], 'ins_2abc');
+    const { session: created, injected } = session([loader({ attributes: { src: LOADER_SRC } })]);
     created?.start();
 
     expect((await injected()).getAttribute('src')).toBe(
@@ -251,6 +249,42 @@ describe('ProtectSession inline token', () => {
     await expect(created?.getRequestParams()).resolves.toEqual({
       __clerk_protect_status: 'no_token',
       __clerk_protect_cid: created?.placeholders().cid,
+    });
+  });
+
+  it('takes the token from a classic inline script, which fires no load event', async () => {
+    // A `<script>` with no `src` runs during `appendChild` and reports through neither `load` nor
+    // `error`. Waiting on an event that cannot arrive would burn the whole deadline and then
+    // discard a token the script body had already assigned.
+    const { session: created } = session([loader({ attributes: { 'data-cid': '{cid}' } })]);
+    (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
+      cid: created?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: nowSeconds() + 43_200 }),
+    };
+
+    created?.start();
+
+    await expect(created?.getRequestParams()).resolves.toEqual({
+      __clerk_protect_token: 'v1.payload.mac',
+      __clerk_protect_status: 'ok',
+      __clerk_protect_cid: created?.placeholders().cid,
+    });
+  });
+
+  it('waits for load on an inline module, which evaluates asynchronously', async () => {
+    // An inline module does fire `load`, so settling early would read the global before the module
+    // body had written it.
+    const { session: created, injected } = session([loader()]);
+    created?.start();
+
+    const element = await injected();
+    await tick();
+    // Nothing has been served yet; settling now would report no_token.
+    serveInline(element, { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.payload.mac',
+      __clerk_protect_status: 'ok',
     });
   });
 
@@ -427,17 +461,17 @@ describe('ProtectSession inline token', () => {
 
 describe('ProtectSession upgrade mint', () => {
   const upgrade = (overrides: Partial<ProtectLoader> = {}) =>
-    loader({ tokenUrl: 'https://loader.example.com/{instance_id}/{cid}/token', ...overrides });
+    loader({ tokenUrl: 'https://loader.example.com/{cid}/token', ...overrides });
 
   it('fetches the explicitly configured endpoint once the loader has run', async () => {
-    const { session: created, injected } = session([upgrade()], 'ins_2abc');
+    const { session: created, injected } = session([upgrade()]);
     created?.start();
 
     (await injected()).dispatchEvent(new Event('load'));
 
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
     expect(global.fetch).toHaveBeenCalledWith(
-      `https://loader.example.com/ins_2abc/${created?.placeholders().cid}/token`,
+      `https://loader.example.com/${created?.placeholders().cid}/token`,
       expect.objectContaining({ credentials: 'omit' }),
     );
   });
@@ -446,7 +480,9 @@ describe('ProtectSession upgrade mint', () => {
     // The cid rides in a data attribute and the src is not a token endpoint; without an explicit
     // tokenUrl the inline path is the only one, so nothing is fetched.
     const { session: created, injected } = session([
-      loader({ attributes: { 'data-cid': '{cid}', 'data-loader': 'https://cdn.example.com/loader.js' } }),
+      loader({
+        attributes: { 'data-cid': '{cid}', 'data-loader': 'https://cdn.example.com/loader.js', type: 'module' },
+      }),
     ]);
     created?.start();
     serveInline(await injected(), { cid: created?.placeholders().cid });
@@ -546,17 +582,18 @@ describe('ProtectSession storage', () => {
     expect(second?.placeholders().pid).toBe(first?.placeholders().pid);
   });
 
-  it('does not share a token between two instances on one origin', async () => {
-    const a = session([loader()], 'ins_aaa');
+  it('keeps one store per origin, not one per instance', async () => {
+    const a = session([loader()]);
     a.session?.start();
     serveInline(await a.injected(), { cid: a.session?.placeholders().cid });
     await expect(a.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
 
-    const b = session([loader()], 'ins_bbb');
-    // Instance B must run its own loader rather than sending a token minted for instance A.
-    expect(b.session?.hasFreshToken()).toBe(false);
-    expect(localStorage.getItem('__clerk_protect_st.ins_aaa')).not.toBeNull();
-    expect(localStorage.getItem('__clerk_protect_st.ins_bbb')).toBeNull();
+    // A second session on the same origin reads the same store rather than running its own loader.
+    // The token names the instance that minted it and is verified server-side, so an origin serving
+    // two instances costs a rejected token — never a token honoured for the wrong instance.
+    const b = session([loader()]);
+    expect(b.session?.hasFreshToken()).toBe(true);
+    expect(localStorage.getItem('__clerk_protect_st')).not.toBeNull();
   });
 });
 

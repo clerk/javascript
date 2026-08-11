@@ -57,9 +57,9 @@ const BASE32_128_REGEX = /^[a-z2-7]{26}$/;
 export const CID_REGEX = /^1-[a-z2-7]{26}-[a-z2-7]{26}$/;
 
 /** The closed set of placeholders `applyLoader` substitutes. Anything else is left verbatim. */
-const PLACEHOLDER_REGEX = /\{(cid|pid|rid|instance_id|sdkver)\}/g;
+const PLACEHOLDER_REGEX = /\{(cid|pid|rid|sdkver)\}/g;
 /** Non-global twin of the above, so `test` does not carry `lastIndex` between calls. */
-const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|instance_id|sdkver)\}/;
+const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|sdkver)\}/;
 /** The placeholders that need a minted, persisted client id to substitute. */
 const HAS_CLIENT_ID_REGEX = /\{(?:cid|pid|rid)\}/;
 /** Only the correlation id binds a loader to a Specter run, so only it names the token loader. */
@@ -82,7 +82,6 @@ export type ProtectPlaceholders = {
   cid?: string;
   pid?: string;
   rid?: string;
-  instance_id?: string;
   sdkver?: string;
 };
 
@@ -401,6 +400,18 @@ function isCorrelated(loader: ProtectLoader): boolean {
   return templatedValues(loader).some(value => HAS_CID_REGEX.test(value));
 }
 
+/**
+ * Will this element fetch, and so eventually fire `load` or `error`? A classic inline script will
+ * not — it runs during `appendChild` and reports through neither event. An inline module will: it
+ * evaluates off a module graph the browser still has to fetch.
+ */
+function isFetching(element: HTMLElement): boolean {
+  if (element.getAttribute('src') || element.getAttribute('href')) {
+    return true;
+  }
+  return element.tagName === 'SCRIPT' && element.getAttribute('type')?.toLowerCase() === 'module';
+}
+
 export class ProtectSession {
   /** `null` when no loader needs it, or when the platform has no CSPRNG. */
   readonly #pid: string | null;
@@ -413,7 +424,10 @@ export class ProtectSession {
   readonly #tokenUrl?: string;
   readonly #timeoutMs: number;
   readonly #applyLoader: ApplyLoader;
-  /** Namespaced per instance: two Clerk instances on one origin must not share a token. */
+  /**
+   * One store per origin. The token is scoped to the instance that minted it and is verified
+   * server-side, so an origin serving two instances costs a rejected token, never a wrong grant.
+   */
   readonly #tokenStorageKey: string;
   readonly #lock: ReturnType<typeof SafeLock>;
 
@@ -423,22 +437,22 @@ export class ProtectSession {
   #lastAttemptAt = 0;
 
   /**
-   * Returns a session only when at least one loader references a placeholder — an instance not
-   * using any of them keeps today's behaviour exactly.
+   * Returns a session only when at least one loader references a placeholder — an instance using
+   * none of them is unaffected.
    */
-  static create(loaders: ProtectLoader[], instanceId: string | undefined, applyLoader: ApplyLoader) {
+  static create(loaders: ProtectLoader[], applyLoader: ApplyLoader): ProtectSession | undefined {
     const templated = loaders.filter(isTemplated);
     if (templated.length === 0) {
       return undefined;
     }
-    return new ProtectSession(templated, instanceId, applyLoader);
+    return new ProtectSession(templated, applyLoader);
   }
 
-  private constructor(templatedLoaders: ProtectLoader[], instanceId: string | undefined, applyLoader: ApplyLoader) {
+  private constructor(templatedLoaders: ProtectLoader[], applyLoader: ApplyLoader) {
     this.#applyLoader = applyLoader;
 
-    // Nothing is persisted for an instance that only templates its instance id: that needs no
-    // minted identity, so minting one would plant a durable id nobody asked for.
+    // Nothing is persisted for a loader that only templates the SDK version: that needs no minted
+    // identity, so minting one would plant a durable id nobody asked for.
     const clientIdNeeded = templatedLoaders.some(needsClientId);
     this.#pid = clientIdNeeded ? readOrMintPid() : null;
     this.#rid = this.#pid ? random128() : null;
@@ -448,7 +462,6 @@ export class ProtectSession {
       ...(this.#cid ? { cid: this.#cid } : {}),
       ...(this.#pid ? { pid: this.#pid } : {}),
       ...(this.#rid ? { rid: this.#rid } : {}),
-      ...(instanceId ? { instance_id: instanceId } : {}),
       // Sending a version is what tells the server this build interpolates placeholders at all,
       // and so can be served the current shape. A build that leaves it verbatim gets the base one.
       sdkver: __PKG_VERSION__,
@@ -459,9 +472,8 @@ export class ProtectSession {
     this.#tokenUrl = tokenLoader ? resolveTokenUrl(tokenLoader, this.#placeholders) : undefined;
     this.#timeoutMs = clampTimeout(tokenLoader?.tokenTimeoutMs);
 
-    const suffix = instanceId ? `.${instanceId}` : '';
-    this.#tokenStorageKey = `${TOKEN_STORAGE_KEY}${suffix}`;
-    this.#lock = SafeLock(`${ACQUISITION_LOCK_KEY}${suffix}`);
+    this.#tokenStorageKey = TOKEN_STORAGE_KEY;
+    this.#lock = SafeLock(ACQUISITION_LOCK_KEY);
   }
 
   placeholders(): ProtectPlaceholders {
@@ -610,7 +622,7 @@ export class ProtectSession {
 
   /**
    * Injects the token loader and settles on whichever of `load`, `error` or the deadline comes
-   * first. The inline token is assigned by the script body, so it is readable once `load` fires.
+   * first, or immediately when the element has nothing to fetch.
    */
   #runTokenLoader(deadline: number): Promise<LoaderOutcome> {
     const loader = this.#tokenLoader;
@@ -626,6 +638,15 @@ export class ProtectSession {
     }
     if (!element) {
       return Promise.resolve('error');
+    }
+
+    // An element that fetches nothing fires neither `load` nor `error`, and a classic inline script
+    // has already executed by the time it was appended. Waiting for an event that cannot arrive
+    // would spend the whole deadline and then discard the token the script body had assigned before
+    // we ever looked. An inline module is the exception: it evaluates off a fetched graph, so its
+    // `load` does arrive and settling early would read the global before it is written.
+    if (!isFetching(element)) {
+      return Promise.resolve('loaded');
     }
 
     return new Promise<LoaderOutcome>(resolve => {

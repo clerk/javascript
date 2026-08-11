@@ -5,14 +5,16 @@ import { Protect } from '../protect';
 import { __internal_resetProtectStorage } from '../protectSession';
 import type { Environment } from '../resources';
 
-const environment = (loaders: unknown[], id = ''): Environment =>
-  ({ protectConfig: { id, loaders } }) as unknown as Environment;
+const environment = (loaders: unknown[]): Environment => ({ protectConfig: { loaders } }) as unknown as Environment;
 
-/** No `src`: jsdom fetches real URLs, which fires `error` and races the events we drive here. */
+/**
+ * No `src`: jsdom fetches real URLs, which fires `error` and races the events we drive here.
+ * `type=module` keeps it on the event-driven path regardless, which is what the served loader is.
+ */
 const loader = (overrides: Partial<ProtectLoader> = {}): ProtectLoader => ({
   target: 'head',
   type: 'script',
-  attributes: { 'data-cid': '{cid}' },
+  attributes: { 'data-cid': '{cid}', type: 'module' },
   tokenTimeoutMs: 200,
   ...overrides,
 });
@@ -82,20 +84,18 @@ describe('Protect.load', () => {
   it('substitutes the placeholders it recognises and leaves the rest verbatim', async () => {
     const protect = new Protect();
     protect.load(
-      environment(
-        [
-          loader({
-            attributes: {
-              'data-src': 'https://loader.example.com/{instance_id}/{cid}/loader.js',
-              'data-pid': '{pid}',
-              'data-rid': '{rid}',
-              'data-unknown': '{whatever}',
-              'data-count': 3,
-            },
-          }),
-        ],
-        'ins_2abc',
-      ),
+      environment([
+        loader({
+          attributes: {
+            // The instance id is baked into the config the server serves, not interpolated here.
+            'data-src': 'https://loader.example.com/ins_2abc/{cid}/loader.js',
+            'data-pid': '{pid}',
+            'data-rid': '{rid}',
+            'data-unknown': '{whatever}',
+            'data-count': 3,
+          },
+        }),
+      ]),
     );
 
     const element = await injected('script');
@@ -111,14 +111,14 @@ describe('Protect.load', () => {
 
   it('substitutes placeholders in textContent as well as attributes', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ textContent: 'window.__vendor_cid = "{cid}";' })], 'ins_2abc'));
+    protect.load(environment([loader({ textContent: 'window.__vendor_cid = "{cid}";' })]));
 
     const element = await injected('script');
     expect(element.textContent).toBe(`window.__vendor_cid = "${element.getAttribute('data-cid')}";`);
     expect(element.textContent).not.toContain('{cid}');
   });
 
-  it('leaves {instance_id} verbatim when the environment does not carry one', async () => {
+  it('never interpolates {instance_id}', async () => {
     const protect = new Protect();
     protect.load(environment([loader({ attributes: { 'data-src': '{instance_id}/{cid}.js' } })]));
 
