@@ -1,3 +1,4 @@
+import { Button as HeadlessButton } from '@clerk/headless/button';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -21,6 +22,13 @@ export interface ButtonProps extends MosaicElementProps<'button'> {
    * effect on `variant='link'`, which is text rather than a control.
    */
   touchTarget?: boolean;
+  /**
+   * Keeps the button in the tab order while `disabled`, so focus is not dropped when a button
+   * disables itself mid-interaction — while a form submits, say — and the user keeps their place
+   * on the page. The button is marked `aria-disabled` rather than `disabled`, and stays inert to
+   * clicks and keyboard activation. It dims and reads as disabled either way.
+   */
+  focusableWhenDisabled?: boolean;
 }
 
 /**
@@ -92,6 +100,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     fullWidth = false,
     touchTarget = true,
     disabled = false,
+    focusableWhenDisabled = false,
     className,
     style,
     children,
@@ -102,10 +111,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   const isIconShape = shape === 'square' || shape === 'circle';
   const hasTouchTarget = touchTarget && variant !== 'link';
   return (
-    <button
+    <HeadlessButton
       ref={ref}
-      type='button'
       disabled={disabled}
+      focusableWhenDisabled={focusableWhenDisabled}
       {...mergeStyleProps(
         themeProps('button', { color, variant, size, shape, fullWidth, disabled }),
         stylex.props(
@@ -127,6 +136,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       {...rest}
     >
       {withTruncatableLabel(children)}
-    </button>
+    </HeadlessButton>
   );
 });
