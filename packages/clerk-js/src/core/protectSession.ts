@@ -62,7 +62,7 @@ const PLACEHOLDER_REGEX = /\{(cid|pid|rid|sdkver)\}/g;
 const HAS_PLACEHOLDER_REGEX = /\{(?:cid|pid|rid|sdkver)\}/;
 /** The placeholders that need a minted, persisted client id to substitute. */
 const HAS_CLIENT_ID_REGEX = /\{(?:cid|pid|rid)\}/;
-/** Only the correlation id binds a loader to a Specter run, so only it names the token loader. */
+/** Only the correlation id binds a loader to an acquisition run, so only it names the token loader. */
 const HAS_CID_REGEX = /\{cid\}/;
 
 /**

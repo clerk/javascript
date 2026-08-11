@@ -339,7 +339,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('survives a ready that rejects, which the contract says it never does', async () => {
-    const rejected = Promise.reject(new Error('specter blew up'));
+    const rejected = Promise.reject(new Error('loader blew up'));
     rejected.catch(() => undefined);
 
     const { session: created, injected } = session([loader()]);
