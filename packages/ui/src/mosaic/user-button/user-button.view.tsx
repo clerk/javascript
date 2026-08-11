@@ -1,5 +1,6 @@
 'use client';
 
+import { Button as HeadlessButton } from '@clerk/headless/button';
 import type { PopoverProps } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
@@ -155,23 +156,17 @@ function WorkspaceAvatar({ name, imageUrl, shape, size }: WorkspaceAvatarProps) 
  * A row waiting on an action stays a button: swapping the host element out remounts the row, and
  * its avatar drops back to a blank placeholder while it re-resolves an image the browser already has.
  *
- * It stands down through `aria-disabled` rather than the native attribute, the way `SubmitButton`
- * does: the row that owns the action stands down along with the rest, and disabling it natively
- * would drop it out of the tab order just as its spinner is announced, taking focus with it.
- * `aria-disabled` is advisory, so the press is dropped here instead.
+ * `focusableWhenDisabled` is what keeps a standing-down row in the tab order: the row that owns the
+ * action stands down along with the rest, and the native attribute would drop it out just as its
+ * spinner is announced, taking focus with it. The headless `Button` marks it `aria-disabled` and
+ * drops the press instead.
  */
-const asButton =
-  (disabled = false) =>
-  ({ children, onClick, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <button
-      type='button'
-      aria-disabled={disabled || undefined}
-      {...props}
-      onClick={disabled ? undefined : onClick}
-    >
-      {children}
-    </button>
-  );
+const rowButton = (disabled = false) => (
+  <HeadlessButton
+    disabled={disabled}
+    focusableWhenDisabled
+  />
+);
 
 /** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
 function Trailing({ children }: { children: ReactNode }) {
@@ -218,7 +213,7 @@ function WorkspaceRow({
       size='xs'
       // The check is decorative, so without this the active row reads like the ones you can switch to.
       aria-current={active ? 'true' : undefined}
-      render={select ? asButton(waiting) : undefined}
+      render={select ? rowButton(waiting) : undefined}
       onClick={select}
     >
       <Item.Media>
@@ -282,7 +277,7 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
       size='xs'
       // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
       // has nothing to wait behind and never stands down.
-      render={href ? asAnchor(href) : asButton(busy || disabled)}
+      render={href ? asAnchor(href) : rowButton(busy || disabled)}
       onClick={onClick}
     >
       <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
