@@ -132,20 +132,30 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
     return null;
   }
 
+  const pending = status === 'loading';
+
   return (
     <span
       ref={ref}
-      {...mergeStyleProps(themeProps('avatar-fallback'), stylex.props(reset.base, styles.fallback), className, style)}
+      {...mergeStyleProps(
+        themeProps('avatar-fallback', { pending }),
+        stylex.props(reset.base, styles.fallback, pending && styles.fallbackPending),
+        className,
+        style,
+      )}
       {...rest}
     >
-      {children}
+      <span {...mergeStyleProps(themeProps('avatar-fallback-content'), stylex.props(styles.fallbackContent))}>
+        {children}
+      </span>
     </span>
   );
 });
 
 /**
  * Compound avatar. `Avatar.Root` clips and sizes the box; `Avatar.Image` renders
- * once its source loads; `Avatar.Fallback` shows until then.
+ * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
+ * placeholder that pulses only while an image is actually on its way.
  */
 export const Avatar = {
   Root: AvatarRoot,

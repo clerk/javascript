@@ -46,6 +46,20 @@ export function Primary(props: Record<string, unknown>) {
   );
 }
 
+// `/api/pending-image` holds its response for a minute (see `app/api/pending-image/route.ts`),
+// so the pulse is the component's real `loading` status rather than a pinned attribute.
+export function Pending(props: Record<string, unknown>) {
+  return (
+    <Avatar.Root {...knobsAsProps(props)}>
+      <Avatar.Image
+        src='/api/pending-image'
+        alt='@clerk'
+      />
+      <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
+  );
+}
+
 export function Fallback(props: Record<string, unknown>) {
   return (
     <Avatar.Root {...knobsAsProps(props)}>

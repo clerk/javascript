@@ -13,10 +13,13 @@ declare global {
 
 // jsdom never fires load/error on images, so drive `new window.Image()` manually.
 // Each instance resolves to the outcome keyed by its `src`. A `cached` src reports `complete`
-// the moment it is assigned, the way a browser does for an image it already holds.
+// the moment it is assigned, the way a browser does for an image it already holds, and an
+// `unresolved` one fires neither event, so a test can hold the avatar mid-load for as long
+// as it needs. `Outcome` names the two events, not the status the root settles on.
 type Outcome = 'load' | 'error';
 let outcomes: Record<string, Outcome> = {};
 let cached = new Set<string>();
+let unresolved = new Set<string>();
 
 class MockImage {
   complete = false;
@@ -25,6 +28,9 @@ class MockImage {
   set src(value: string) {
     if (cached.has(value)) {
       this.complete = true;
+      return;
+    }
+    if (unresolved.has(value)) {
       return;
     }
     queueMicrotask(() => {
@@ -42,6 +48,7 @@ vi.stubGlobal('Image', MockImage);
 afterEach(() => {
   outcomes = {};
   cached = new Set();
+  unresolved = new Set();
 });
 
 describe('Mosaic Avatar', () => {
@@ -80,8 +87,7 @@ describe('Mosaic Avatar', () => {
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
-    const fallback = screen.getByText('CN');
-    expect(fallback).toHaveClass('cl-avatar-fallback');
+    expect(screen.getByText('CN').closest('.cl-avatar-fallback')).toBeInTheDocument();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
@@ -217,6 +223,50 @@ describe('Mosaic Avatar', () => {
     );
     await waitFor(() => expect(screen.getByText('CN')).toBeInTheDocument());
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  // The fallback is a blank placeholder, not a label: it holds whatever it is handed so a consumer
+  // can style it back into view, in a slot of its own that `visibility: hidden` takes out of the
+  // page, the accessibility tree, and the tab order together.
+  it('holds the fallback content in a slot of its own rather than painting it', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).toHaveTextContent('CN');
+    expect(screen.getByText('CN')).toHaveClass('cl-avatar-fallback-content');
+  });
+
+  it('pulses only while an image is still resolving', async () => {
+    unresolved.add('https://example.com/slow.png');
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image src='https://example.com/slow.png' />
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).toHaveAttribute('data-pending', '');
+
+    outcomes['https://example.com/bad.png'] = 'error';
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image src='https://example.com/bad.png' />
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    await waitFor(() => expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending'));
+  });
+
+  // Nothing is on its way for someone who simply has no picture, so their mark holds still
+  // rather than pulsing for as long as it is on screen.
+  it('holds still when there is no image to wait for', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending');
   });
 
   it('wires consumer className/style/ref through to the root', () => {
