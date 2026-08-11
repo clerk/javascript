@@ -3,6 +3,9 @@ import React from 'react';
 
 interface FieldContextValue {
   controlId: string;
+  disabled: boolean;
+  required: boolean;
+  invalid: boolean;
   labelIds: string[];
   messageIds: string[];
   registerControlId: (source: symbol, id: string | null | undefined) => void;
@@ -17,7 +20,13 @@ function mergeIds(...values: Array<string | undefined>): string | undefined {
   return ids.length > 0 ? ids.join(' ') : undefined;
 }
 
-export function FieldProvider({ children }: React.PropsWithChildren) {
+interface FieldProviderProps extends React.PropsWithChildren {
+  disabled: boolean;
+  required: boolean;
+  invalid: boolean;
+}
+
+export function FieldProvider({ children, disabled, required, invalid }: FieldProviderProps) {
   const generatedId = React.useId();
   const defaultControlId = `cl-field-${generatedId}`;
   const [controlId, setControlId] = React.useState(defaultControlId);
@@ -49,8 +58,18 @@ export function FieldProvider({ children }: React.PropsWithChildren) {
     [defaultControlId],
   );
   const context = React.useMemo<FieldContextValue>(
-    () => ({ controlId, labelIds, messageIds, registerControlId, setLabelIds, setMessageIds }),
-    [controlId, labelIds, messageIds, registerControlId],
+    () => ({
+      controlId,
+      disabled,
+      required,
+      invalid,
+      labelIds,
+      messageIds,
+      registerControlId,
+      setLabelIds,
+      setMessageIds,
+    }),
+    [controlId, disabled, required, invalid, labelIds, messageIds, registerControlId],
   );
 
   return <FieldContext.Provider value={context}>{children}</FieldContext.Provider>;
@@ -76,11 +95,21 @@ export function useRegisterFieldPartId(
 
 interface FieldControlProps {
   id?: string;
+  disabled?: boolean;
+  required?: boolean;
+  ariaInvalid?: React.AriaAttributes['aria-invalid'];
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
 }
 
-export function useOptionalFieldControlProps({ id, ariaLabelledBy, ariaDescribedBy }: FieldControlProps) {
+export function useOptionalFieldControlProps({
+  id,
+  disabled,
+  required,
+  ariaInvalid,
+  ariaLabelledBy,
+  ariaDescribedBy,
+}: FieldControlProps) {
   const context = useOptionalFieldContext();
   const registerControlId = context?.registerControlId;
   const source = React.useRef(Symbol('field-control'));
@@ -100,6 +129,9 @@ export function useOptionalFieldControlProps({ id, ariaLabelledBy, ariaDescribed
 
   return {
     id: context.controlId,
+    disabled: disabled ?? context.disabled,
+    required: required ?? context.required,
+    'aria-invalid': ariaInvalid ?? (context.invalid ? true : undefined),
     'aria-labelledby': mergeIds(ariaLabelledBy, ...context.labelIds),
     'aria-describedby': mergeIds(ariaDescribedBy, ...context.messageIds),
   };

@@ -18,10 +18,14 @@ function useNativeLabelWarning(label: HTMLLabelElement | null) {
 }
 
 /** Props for a field container that associates exactly one form control. */
-export type FieldRootProps = MosaicComponentProps<'div'>;
+export interface FieldRootProps extends MosaicComponentProps<'div'> {
+  disabled?: boolean;
+  required?: boolean;
+  invalid?: boolean;
+}
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, className, style, ...rest },
+  { render, className, style, disabled = false, required = false, invalid = false, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -34,7 +38,15 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     },
   });
 
-  return <FieldProvider>{element}</FieldProvider>;
+  return (
+    <FieldProvider
+      disabled={disabled}
+      required={required}
+      invalid={invalid}
+    >
+      {element}
+    </FieldProvider>
+  );
 });
 
 /** Props for a native field label. */

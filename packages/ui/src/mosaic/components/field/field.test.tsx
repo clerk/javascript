@@ -144,6 +144,39 @@ describe('Mosaic Field', () => {
     expect(inside).not.toHaveClass('cl-field-control');
   });
 
+  it('propagates semantic state while preserving explicit control props', () => {
+    render(
+      <>
+        <Field.Root
+          disabled
+          required
+          invalid
+        >
+          <Input data-testid='inherited' />
+        </Field.Root>
+        <Field.Root
+          disabled
+          required
+          invalid
+        >
+          <Input
+            data-testid='explicit'
+            disabled={false}
+            required={false}
+            aria-invalid='grammar'
+          />
+        </Field.Root>
+      </>,
+    );
+
+    expect(screen.getByTestId('inherited')).toBeDisabled();
+    expect(screen.getByTestId('inherited')).toBeRequired();
+    expect(screen.getByTestId('inherited')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByTestId('explicit')).not.toBeDisabled();
+    expect(screen.getByTestId('explicit')).not.toBeRequired();
+    expect(screen.getByTestId('explicit')).toHaveAttribute('aria-invalid', 'grammar');
+  });
+
   it('finalizes explicit IDs and generated relationships during hydration', async () => {
     const field = (
       <Field.Root>
