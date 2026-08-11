@@ -6,15 +6,20 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
-export { SettingsGroup } from '../block/settings-group';
+export { Settings, settingsVars } from '../block/settings-group';
 export type {
-  SettingsGroupControlProps,
-  SettingsGroupLabelProps,
-  SettingsGroupListProps,
-  SettingsGroupMediaProps,
-  SettingsGroupRowProps,
-  SettingsGroupRootProps,
-  SettingsGroupTitleProps,
+  SettingsActionsProps,
+  SettingsContentProps,
+  SettingsDescriptionProps,
+  SettingsGroupProps,
+  SettingsItemProps,
+  SettingsItemsProps,
+  SettingsLabelProps,
+  SettingsMediaProps,
+  SettingsMediaSize,
+  SettingsRootProps,
+  SettingsRowProps,
+  SettingsTitleProps,
 } from '../block/settings-group';
 
 export { Avatar } from '../components/avatar';

@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { SettingsGroup } from '../block/settings-group';
+import { Settings } from '../block/settings-group';
 import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
@@ -61,20 +61,17 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Item', <Item.Root key='item' />],
   ['Item.Group', <Item.Group key='item-group' />],
   ['Item.Separator', <Item.Separator key='item-separator' />],
-  ['SettingsGroup', <SettingsGroup.Root key='settings-group' />],
-  ['SettingsGroup.Title', <SettingsGroup.Title key='settings-group-title'>Account</SettingsGroup.Title>],
-  ['SettingsGroup.List', <SettingsGroup.List key='settings-group-list' />],
-  ['SettingsGroup.Row', <SettingsGroup.Row key='settings-group-row' />],
-  [
-    'SettingsGroup.Row[field]',
-    <SettingsGroup.Row
-      key='settings-group-field-row'
-      field
-    />,
-  ],
-  ['SettingsGroup.Media', <SettingsGroup.Media key='settings-group-media' />],
-  ['SettingsGroup.Label', <SettingsGroup.Label key='settings-group-label' />],
-  ['SettingsGroup.Control', <SettingsGroup.Control key='settings-group-control' />],
+  ['Settings', <Settings.Root key='settings' />],
+  ['Settings.Title', <Settings.Title key='settings-title'>Account</Settings.Title>],
+  ['Settings.Group', <Settings.Group key='settings-group' />],
+  ['Settings.Row', <Settings.Row key='settings-row' />],
+  ['Settings.Items', <Settings.Items key='settings-items' />],
+  ['Settings.Item', <Settings.Item key='settings-item' />],
+  ['Settings.Media', <Settings.Media key='settings-media' />],
+  ['Settings.Content', <Settings.Content key='settings-content' />],
+  ['Settings.Label', <Settings.Label key='settings-label' />],
+  ['Settings.Description', <Settings.Description key='settings-description' />],
+  ['Settings.Actions', <Settings.Actions key='settings-actions' />],
   ['Text', <Text key='text'>Body copy</Text>],
 ];
 

@@ -3,30 +3,32 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { Field as MosaicField } from '../components/field';
 import type { HeadingProps } from '../components/heading';
 import { Heading } from '../components/heading';
 import { reset } from '../components/reset.styles';
 import type { MosaicComponentProps } from '../props';
 import { mergeStyleProps, themeProps } from '../props';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+import { settingsItemsMarker } from './settings-group.markers.stylex';
+import { settingsVars } from './settings-group.vars.stylex';
 
-export type SettingsGroupRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SettingsGroupTitleProps = Omit<HeadingProps, 'size'>;
+export { settingsVars } from './settings-group.vars.stylex';
 
-export type SettingsGroupListProps = MosaicComponentProps<'div'>;
-export interface SettingsGroupRowProps extends MosaicComponentProps<'div'> {
-  /** Associates the row label with exactly one nested form control. */
-  field?: boolean;
-}
-export type SettingsGroupMediaProps = MosaicComponentProps<'div'>;
+export type SettingsRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
+export type SettingsTitleProps = Omit<HeadingProps, 'size'>;
+export type SettingsGroupProps = MosaicComponentProps<'div'>;
+export type SettingsRowProps = MosaicComponentProps<'div'>;
+export type SettingsItemsProps = MosaicComponentProps<'div'>;
+export type SettingsItemProps = MosaicComponentProps<'div'>;
+export type SettingsMediaSize = 'sm' | 'md' | 'lg';
+export type SettingsMediaProps = MosaicComponentProps<'div'> & { size?: SettingsMediaSize };
+export type SettingsContentProps = MosaicComponentProps<'div'>;
+export type SettingsLabelProps = MosaicComponentProps<'div'>;
+export type SettingsDescriptionProps = MosaicComponentProps<'div'>;
+export type SettingsActionsProps = MosaicComponentProps<'div'>;
 
-export interface SettingsGroupLabelProps extends MosaicComponentProps<'div'> {
-  description?: React.ReactNode;
-}
-
-export type SettingsGroupControlProps = MosaicComponentProps<'div'>;
-
+/* eslint-disable @stylexjs/no-lookahead-selectors -- Mosaic's supported browsers include :has();
+   the marker keeps this selector scoped to Settings.Items. */
 const styles = stylex.create({
   root: {
     display: 'flex',
@@ -34,52 +36,82 @@ const styles = stylex.create({
     rowGap: space['2'],
     width: '100%',
   },
-  list: {
-    padding: space['2'],
+  group: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
+    backgroundColor: settingsVars['--cl-settings-background'],
     width: '100%',
   },
   row: {
-    marginInline: space['2'],
-    paddingBlock: space['4'],
-    alignItems: 'center',
+    marginInline: space['4'],
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: {
       default: '1px',
       ':first-child': '0px',
     },
-    columnGap: space['6'],
+    display: 'flex',
+    flexDirection: 'column',
+    paddingBlockEnd: {
+      default: space['4'],
+      [stylex.when.descendant('[data-nested]', settingsItemsMarker)]: space['1'],
+    },
+    paddingBlockStart: space['4'],
+    rowGap: space['2'],
+    width: 'auto',
+  },
+  items: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  item: {
+    alignItems: 'center',
+    columnGap: space['3'],
     display: 'flex',
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
-    rowGap: space['3'],
-    minHeight: space['13'],
-    width: 'auto',
+    width: '100%',
   },
-  media: {
+  nestedItem: {
+    minHeight: space['11'],
+  },
+  mediaBase: {
     alignItems: 'center',
     alignSelf: 'center',
+    aspectRatio: '1/1',
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
+  },
+  mediaSm: {
+    height: space['4'],
+    width: space['4'],
+  },
+  mediaMd: {
     height: space['6'],
     width: space['6'],
   },
-  label: {
-    color: colorVars['--cl-color-card-foreground'],
+  mediaLg: {
+    height: space['8'],
+    width: space['8'],
+  },
+  content: {
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
+    justifyContent: 'center',
     rowGap: space['0.5'],
     minWidth: 0,
   },
-  labelText: {
+  nestedContent: {
+    paddingBlock: space['3'],
+  },
+  label: {
+    color: colorVars['--cl-color-card-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
@@ -87,26 +119,30 @@ const styles = stylex.create({
   description: {
     color: colorVars['--cl-color-neutral-faded'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-normal'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'balance',
   },
-  control: {
+  actions: {
     alignItems: 'center',
     display: 'flex',
-    flexBasis: 'auto',
     flexShrink: 0,
     justifyContent: 'flex-end',
-    maxWidth: '60%',
-    minWidth: 0,
-    width: 'auto',
+    marginInlineStart: space['3'],
   },
 });
+/* eslint-enable @stylexjs/no-lookahead-selectors */
 
-const SettingsGroupRowFieldContext = React.createContext(false);
-const SettingsGroupTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
+const mediaSizes = {
+  sm: styles.mediaSm,
+  md: styles.mediaMd,
+  lg: styles.mediaLg,
+};
 
-const Root = React.forwardRef<HTMLElement, SettingsGroupRootProps>(function SettingsGroupRoot(
+const SettingsTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
+const SettingsItemsContext = React.createContext(false);
+
+const Root = React.forwardRef<HTMLElement, SettingsRootProps>(function SettingsRoot(
   { render, className, style, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
@@ -117,23 +153,23 @@ const Root = React.forwardRef<HTMLElement, SettingsGroupRootProps>(function Sett
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-group'), stylex.props(reset.base, styles.root), className, style),
+      ...mergeStyleProps(themeProps('settings'), stylex.props(reset.base, styles.root), className, style),
       ...rest,
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleIds.join(' ') || undefined),
     },
   });
 
-  return <SettingsGroupTitleContext.Provider value={setTitleIds}>{element}</SettingsGroupTitleContext.Provider>;
+  return <SettingsTitleContext.Provider value={setTitleIds}>{element}</SettingsTitleContext.Provider>;
 });
 
-const Title = React.forwardRef<HTMLHeadingElement, SettingsGroupTitleProps>(function SettingsGroupTitle(
+const Title = React.forwardRef<HTMLHeadingElement, SettingsTitleProps>(function SettingsTitle(
   { id: idProp, render, className, style, ...rest },
   ref,
 ) {
-  const setTitleIds = React.useContext(SettingsGroupTitleContext);
+  const setTitleIds = React.useContext(SettingsTitleContext);
   const generatedId = React.useId();
-  const id = idProp ?? (setTitleIds ? `cl-settings-group-${generatedId}-title` : undefined);
+  const id = idProp ?? (setTitleIds ? `cl-settings-${generatedId}-title` : undefined);
 
   useSafeLayoutEffect(() => {
     if (!id || !setTitleIds) {
@@ -149,14 +185,14 @@ const Title = React.forwardRef<HTMLHeadingElement, SettingsGroupTitleProps>(func
       ref={ref}
       id={id}
       render={render ?? (props => <h4 {...props} />)}
-      size='xs'
-      {...mergeStyleProps(themeProps('settings-group-title'), className, style)}
+      size='sm'
+      {...mergeStyleProps(themeProps('settings-title'), className, style)}
       {...rest}
     />
   );
 });
 
-const List = React.forwardRef<HTMLDivElement, SettingsGroupListProps>(function SettingsGroupList(
+const Group = React.forwardRef<HTMLDivElement, SettingsGroupProps>(function SettingsGroup(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -165,25 +201,39 @@ const List = React.forwardRef<HTMLDivElement, SettingsGroupListProps>(function S
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-group-list'), stylex.props(reset.base, styles.list), className, style),
+      ...mergeStyleProps(themeProps('settings-group'), stylex.props(reset.base, styles.group), className, style),
       ...rest,
     },
   });
 });
 
-const Row = React.forwardRef<HTMLDivElement, SettingsGroupRowProps>(function SettingsGroupRow(
-  { field = false, render, className, style, ...rest },
+const Row = React.forwardRef<HTMLDivElement, SettingsRowProps>(function SettingsRow(
+  { render, className, style, ...rest },
   ref,
 ) {
-  const resolvedRender = field ? <MosaicField.Root render={render} /> : render;
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('settings-row'), stylex.props(reset.base, styles.row), className, style),
+      ...rest,
+    },
+  });
+});
+
+const Items = React.forwardRef<HTMLDivElement, SettingsItemsProps>(function SettingsItems(
+  { render, className, style, ...rest },
+  ref,
+) {
   const element = useRender({
     defaultTagName: 'div',
-    render: resolvedRender,
+    render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-group-row', { field }),
-        stylex.props(reset.base, styles.row),
+        themeProps('settings-items', { nested: true }),
+        stylex.props(reset.base, styles.items, settingsItemsMarker),
         className,
         style,
       ),
@@ -191,58 +241,33 @@ const Row = React.forwardRef<HTMLDivElement, SettingsGroupRowProps>(function Set
     },
   });
 
-  return <SettingsGroupRowFieldContext.Provider value={field}>{element}</SettingsGroupRowFieldContext.Provider>;
+  return <SettingsItemsContext.Provider value>{element}</SettingsItemsContext.Provider>;
 });
 
-const Media = React.forwardRef<HTMLDivElement, SettingsGroupMediaProps>(function SettingsGroupMedia(
+const Item = React.forwardRef<HTMLDivElement, SettingsItemProps>(function SettingsItem(
   { render, className, style, ...rest },
   ref,
 ) {
+  const nested = React.useContext(SettingsItemsContext);
+
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-group-media'), stylex.props(reset.base, styles.media), className, style),
-      ...rest,
-    },
-  });
-});
-
-const Label = React.forwardRef<HTMLDivElement, SettingsGroupLabelProps>(function SettingsGroupLabel(
-  { description, render, className, style, children, ...rest },
-  ref,
-) {
-  const field = React.useContext(SettingsGroupRowFieldContext);
-  const resolvedRender = field ? <MosaicField.Label render={render} /> : render;
-
-  return useRender({
-    defaultTagName: 'div',
-    render: resolvedRender,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('settings-group-label'), stylex.props(reset.base, styles.label), className, style),
-      ...rest,
-      children: (
-        <>
-          <span {...mergeStyleProps(themeProps('settings-group-label-text'), stylex.props(styles.labelText))}>
-            {children}
-          </span>
-          {description ? (
-            <span
-              {...mergeStyleProps(themeProps('settings-group-label-description'), stylex.props(styles.description))}
-            >
-              {description}
-            </span>
-          ) : null}
-        </>
+      ...mergeStyleProps(
+        themeProps('settings-item', { nested }),
+        stylex.props(reset.base, styles.item, nested && styles.nestedItem),
+        className,
+        style,
       ),
+      ...rest,
     },
   });
 });
 
-const Control = React.forwardRef<HTMLDivElement, SettingsGroupControlProps>(function SettingsGroupControl(
-  { render, className, style, ...rest },
+const Media = React.forwardRef<HTMLDivElement, SettingsMediaProps>(function SettingsMedia(
+  { size = 'md', render, className, style, ...rest },
   ref,
 ) {
   return useRender({
@@ -251,18 +276,90 @@ const Control = React.forwardRef<HTMLDivElement, SettingsGroupControlProps>(func
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-group-control'),
-        stylex.props(reset.base, styles.control),
+        themeProps('settings-media', { size }),
+        stylex.props(reset.base, styles.mediaBase, mediaSizes[size]),
         className,
         style,
       ),
+      ...rest,
+    },
+  });
+});
+
+const Content = React.forwardRef<HTMLDivElement, SettingsContentProps>(function SettingsContent(
+  { render, className, style, ...rest },
+  ref,
+) {
+  const nested = React.useContext(SettingsItemsContext);
+
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('settings-content', { nested }),
+        stylex.props(reset.base, styles.content, nested && styles.nestedContent),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
+});
+
+const Label = React.forwardRef<HTMLDivElement, SettingsLabelProps>(function SettingsLabel(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('settings-label'), stylex.props(reset.base, styles.label), className, style),
+      ...rest,
+    },
+  });
+});
+
+const Description = React.forwardRef<HTMLDivElement, SettingsDescriptionProps>(function SettingsDescription(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('settings-description'),
+        stylex.props(reset.base, styles.description),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
+});
+
+const Actions = React.forwardRef<HTMLDivElement, SettingsActionsProps>(function SettingsActions(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('settings-actions'), stylex.props(reset.base, styles.actions), className, style),
       ...rest,
     },
   });
 });
 
 /**
- * A settings block that fixes section semantics, surface treatment, row separation,
- * and label/control layout while leaving each control composable.
+ * A settings block that fixes section semantics, surface treatment, row grouping,
+ * and item layout while leaving each item's content composable.
  */
-export const SettingsGroup = { Root, Title, List, Row, Media, Label, Control };
+export const Settings = { Root, Title, Group, Row, Items, Item, Media, Content, Label, Description, Actions };
