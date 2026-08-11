@@ -7,6 +7,7 @@ import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
 import { Card } from './card';
+import { Field } from './field';
 import { Heading } from './heading';
 import { Icon } from './icon';
 import { Input } from './input';
@@ -43,6 +44,10 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Card.Header', <Card.Header key='card-header' />],
   ['Card.Content', <Card.Content key='card-content' />],
   ['Card.Footer', <Card.Footer key='card-footer' />],
+  ['Field.Root', <Field.Root key='field-root' />],
+  ['Field.Label', <Field.Label key='field-label' />],
+  ['Field.Description', <Field.Description key='field-description' />],
+  ['Field.Error', <Field.Error key='field-error' />],
   ['Heading', <Heading key='heading'>Title</Heading>],
   [
     'Icon',

@@ -5,6 +5,7 @@ import React from 'react';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Icon } from '../icon';
+import { reset } from '../reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../typography.styles';
 import { FieldProvider, useOptionalFieldContext, useRegisterFieldPartId } from './field.context';
 import { styles } from './field.styles';
@@ -33,7 +34,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), className, style),
+      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base), className, style),
       ...rest,
     },
   });
@@ -70,7 +71,7 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
     props: {
       ...mergeStyleProps(
         themeProps('field-label'),
-        stylex.props(typographyStyles.base, typographySizes.sm, styles.label),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.sm, styles.label),
         className,
         style,
       ),
@@ -99,7 +100,7 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
     props: {
       ...mergeStyleProps(
         themeProps('field-description'),
-        stylex.props(typographyStyles.base, typographySizes.xs, styles.message, styles.description),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.description),
         className,
         style,
       ),
@@ -127,7 +128,7 @@ const FieldError = React.forwardRef<HTMLParagraphElement, FieldErrorProps>(funct
     props: {
       ...mergeStyleProps(
         themeProps('field-error'),
-        stylex.props(typographyStyles.base, typographySizes.xs, styles.message, styles.error),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.error),
         className,
         style,
       ),
