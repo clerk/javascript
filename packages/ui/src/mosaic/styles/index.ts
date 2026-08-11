@@ -14,6 +14,8 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Field } from '../components/field';
+export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
@@ -36,7 +38,6 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
-
 export { Popover } from '../components/popover';
 export type {
   PopoverCloseProps,
