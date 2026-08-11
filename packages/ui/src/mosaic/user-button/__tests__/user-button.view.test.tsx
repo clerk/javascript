@@ -513,7 +513,9 @@ describe('UserButtonView, the workspace list', () => {
     it('says so to a screen reader, since nothing else reports the rows landing', () => {
       renderList({ organizationsLoading: true });
 
-      expect(screen.getByRole('status')).toHaveTextContent('Loading organizations…');
+      // The popup's own region speaks for the action a row is running, so the placeholder is asked
+      // for by its text: the two report different waits and are both on the page here.
+      expect(screen.getByText('Loading organizations…').closest('[role="status"]')).toBeInTheDocument();
     });
 
     it('leaves the account row above it alone, since it does not wait on the list', () => {
@@ -725,6 +727,30 @@ describe('UserButtonView, one action at a time', () => {
 
     expect(onSwitchSession).not.toHaveBeenCalled();
     expect(row).toHaveFocus();
+  });
+
+  // The row keeps focus while it stands down, so nothing about the surface reports the wait on its
+  // own: the spinner is a picture, and `aria-disabled` says a row cannot be used rather than why.
+  it('reports the wait in a live region', () => {
+    render(surface(userButtonBusyKeys.switchSession('sess_2'), { pendingLabel: 'Switching to Bob Jones' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Switching to Bob Jones');
+  });
+
+  // A region that mounts with its message already in it is not announced, so the popup carries an
+  // empty one from the moment it opens and the message lands in a region that is already there.
+  it('carries the region while idle', () => {
+    render(surface(null));
+
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  // The label is what is spoken, not what the surface stands down on: a container that spins a row
+  // without naming the wait leaves the region silent rather than announcing an empty string.
+  it('says nothing where the action is unnamed', () => {
+    render(surface(userButtonBusyKeys.switchSession('sess_2')));
+
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
   });
 });
 

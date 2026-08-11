@@ -989,10 +989,31 @@ export function UserButtonTrigger({
   );
 }
 
+/**
+ * Speaks the one in-flight action. `pendingKey` allows a single action at a time, so the surface
+ * needs one region rather than one per affordance, and the row that owns the action often goes when
+ * it lands — the list re-sorts, a signed-out account leaves — so a region living inside the row
+ * would unmount mid-announcement.
+ */
+function ActionStatus(): ReactElement {
+  const { pendingLabel } = useUserButtonContext();
+  // Mounted whether or not anything is running: a region that arrives with its message already in
+  // it is not announced, so the message has to land in a region that is already on the page.
+  return (
+    <span
+      role='status'
+      {...stylex.props(styles.visuallyHidden)}
+    >
+      {pendingLabel ?? ''}
+    </span>
+  );
+}
+
 /** The popover surface: header, workspace list, additional accounts, and footer. */
 export function UserButtonPopup(): ReactElement {
   return (
     <Popover.Popup aria-label={m.popup.label}>
+      <ActionStatus />
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
       <Card.Root style={{ rowGap: 0 }}>
         <Header />

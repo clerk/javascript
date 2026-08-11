@@ -3,6 +3,17 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
 
 export const styles = stylex.create({
+  // Takes the live region out of the layout without taking it out of the accessibility tree, which
+  // `display: none` and `visibility: hidden` both do.
+  visuallyHidden: {
+    overflow: 'hidden',
+    clipPath: 'inset(50%)',
+    position: 'absolute',
+    whiteSpace: 'nowrap',
+    height: '1px',
+    width: '1px',
+  },
+
   // The avatar is the trigger, so the button paints nothing of its own.
   trigger: {
     padding: 0,
