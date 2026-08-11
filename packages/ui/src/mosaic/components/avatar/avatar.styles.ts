@@ -79,9 +79,11 @@ export const shapes = stylex.create({
   square: { borderRadius: radiusVars['--cl-radius-md'] },
 });
 
-// size — square box; fallback text scales with the box via inherited font-size
+// size — square box; fallback text scales with the box via inherited font-size.
+// Each font-size is ~0.4x the box: two initials are the widest thing this holds, and past
+// that a wide pair runs into the circle's clip rather than just reading tight.
 export const sizes = stylex.create({
-  xs: { fontSize: '0.625rem', height: space['5'], width: space['5'] },
+  xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
   sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },
   md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
   lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
