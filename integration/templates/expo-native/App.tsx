@@ -18,6 +18,19 @@ function NativeBuildFixture() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  if (isProfileOpen) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.embeddedProfile}>
+          <UserProfileView
+            isDismissible={false}
+            onHostBack={() => setIsProfileOpen(false)}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -46,15 +59,6 @@ function NativeBuildFixture() {
           title='Sign out'
           onPress={() => void signOut()}
         />
-      )}
-
-      {isProfileOpen && (
-        <View style={styles.embeddedProfile}>
-          <UserProfileView
-            isDismissible={false}
-            onHostBack={() => setIsProfileOpen(false)}
-          />
-        </View>
       )}
 
       <Modal
