@@ -109,6 +109,10 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
       return localizationKeys('reverification.alternativeMethods.blockButton__emailCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
+    case 'email_link':
+      return localizationKeys('reverification.alternativeMethods.blockButton__emailLink', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     case 'phone_code':
       return localizationKeys('reverification.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
@@ -125,6 +129,7 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
 export function getButtonIcon(factor: SessionVerificationFirstFactor) {
   const icons = {
     email_code: Envelope,
+    email_link: Envelope,
     phone_code: SpeechBubble,
     password: Lock,
     passkey: Fingerprint,

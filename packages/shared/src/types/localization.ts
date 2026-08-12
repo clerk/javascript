@@ -642,6 +642,29 @@ export type __internal_LocalizationResource = {
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
+    emailLink: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      verified: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      failed: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      clientMismatch: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+    };
     phoneCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -674,6 +697,7 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
       actionText: LocalizationValue;
       blockButton__emailCode: LocalizationValue<'identifier'>;
+      blockButton__emailLink: LocalizationValue<'identifier'>;
       blockButton__phoneCode: LocalizationValue<'identifier'>;
       blockButton__password: LocalizationValue;
       blockButton__totp: LocalizationValue;

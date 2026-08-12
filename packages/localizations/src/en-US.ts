@@ -1286,6 +1286,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__emailLink: 'Email link to {{identifier}}',
       blockButton__passkey: 'Use your passkey',
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
@@ -1308,6 +1309,29 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your email to continue',
       title: 'Verification required',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: 'Open the link in the same browser where you started verification.',
+        title: 'Verification link is invalid for this browser',
+      },
+      expired: {
+        subtitle: 'Return to the original tab and request a new link.',
+        title: 'This verification link has expired',
+      },
+      failed: {
+        subtitle: 'Return to the original tab and request a new link.',
+        title: 'This verification link is invalid',
+      },
+      formSubtitle: 'Use the verification link sent to your email',
+      formTitle: 'Verification link',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'We sent a verification link to your email address',
+      title: 'Check your email',
+      verified: {
+        subtitle: 'Return to the original tab to continue.',
+        title: 'Verification complete',
+      },
     },
     noAvailableMethods: {
       message: 'Cannot proceed with verification. No suitable authentication factor is configured',

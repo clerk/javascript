@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -72,6 +72,47 @@ describe('UserVerificationFactorOne', () => {
     });
 
     expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
+  });
+
+  it('prepares email-link reverification and preserves the protected action URL', async () => {
+    window.history.replaceState({}, '', '/account/billing?return=plans');
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+    const startEmailLinkFlow = vi.fn().mockResolvedValue({
+      status: 'complete',
+      session: { id: 'session_1' },
+      firstFactorVerification: { status: 'verified' },
+    });
+    fixtures.session?.startVerification.mockResolvedValue({
+      status: 'needs_first_factor',
+      supportedFirstFactors: [
+        {
+          strategy: 'email_link',
+          emailAddressId: 'idn_email',
+          safeIdentifier: 'user@example.com',
+        },
+      ],
+    });
+    fixtures.session?.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow,
+      cancelEmailLinkFlow: vi.fn(),
+    });
+
+    const { getByText } = render(<UserVerificationFactorOne />, { wrapper });
+    await waitFor(() => getByText('Check your email'));
+    await waitFor(() => expect(startEmailLinkFlow).toHaveBeenCalledOnce());
+
+    const redirectUrl = new URL(startEmailLinkFlow.mock.calls[0][0].redirectUrl);
+    expect(redirectUrl.pathname).toBe('/account/billing');
+    expect(redirectUrl.searchParams.get('return')).toBe('plans');
+    const modalState = JSON.parse(atob(redirectUrl.searchParams.get('__clerk_modal_state')!));
+    expect(modalState).toMatchObject({
+      componentName: 'UserVerification',
+      path: '/verify',
+      startPath: '/user-verification',
+    });
+    await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalledWith({ session: 'session_1' }));
   });
 
   describe('Submitting', () => {
