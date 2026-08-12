@@ -74,6 +74,11 @@ type FapiClientOptions = {
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  /**
+   * Resolves the Protect params to merge into the body of a sign-in or sign-up POST, or `undefined`
+   * when this instance contributes none. Resolves to `undefined` before the environment has loaded,
+   * so early requests carry nothing.
+   */
   getProtectParams?: () => Promise<Record<string, string | undefined> | undefined>;
   isSatellite?: boolean;
 };
@@ -93,6 +98,8 @@ function isMergeableBody(body: unknown): body is Record<string, unknown> | undef
   if (typeof body !== 'object' || body === null) {
     return false;
   }
+  // Spreading anything else — a Blob, a typed array, a stream — would discard the caller's payload
+  // rather than add to it.
   const prototype = Object.getPrototypeOf(body);
   return prototype === Object.prototype || prototype === null;
 }
@@ -221,11 +228,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const { method = 'GET' } = requestInit;
     let { body } = requestInit;
 
-    // Protect params must merge before the body is stringified below (onBeforeRequest callbacks run
-    // after stringification), and ride the body rather than a header to avoid the same
-    // CORS preflight `_method` avoids.
+    // Protect params ride in the form-encoded body of sign-in and sign-up POSTs. They have to be
+    // merged here, before the body is stringified below — the onBeforeRequest callbacks run after
+    // stringification, so they cannot add a body param. A body param also keeps the request
+    // CORS-simple; a custom header would trigger the preflight that breaks cookie dropping in
+    // Safari, the same reason `_method` is a query param.
     if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
-      // A rejection costs the params, never the request.
+      // Protect can degrade a sign-in but must never fail one, so a rejection here costs the
+      // params and nothing else.
       const protectParams = await options.getProtectParams().catch(() => undefined);
       if (protectParams) {
         body = { ...((body ?? {}) as Record<string, unknown>), ...protectParams } as unknown as BodyInit;
