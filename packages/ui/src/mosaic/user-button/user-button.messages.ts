@@ -37,9 +37,6 @@ export const userButtonBase = {
     organization: 'Manage organization',
     createOrganization: 'Create organization',
   },
-  branding: {
-    securedBy: 'Secured by',
-  },
 };
 
 /** Substitutes `{name}`-style placeholders. Replaced by the localization layer's own formatter. */

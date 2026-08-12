@@ -11,7 +11,6 @@ import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button, SubmitButton } from '../components/button';
 import { Card } from '../components/card';
-import { ClerkLogo } from '../components/clerk-logo';
 import { Icon } from '../components/icon';
 import { Item } from '../components/item';
 import { Menu } from '../components/menu';
@@ -832,7 +831,7 @@ function SessionSection() {
   );
 }
 
-/** The actions that close out the surface, plus the Clerk attribution. */
+/** The actions that close out the surface. */
 function Footer() {
   const data = useUserButtonContext();
 
@@ -881,34 +880,21 @@ function Footer() {
     r => r.id,
   );
 
+  if (actions.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      {actions.length > 0 ? (
-        <>
-          <Item.Separator />
-          <Item.Group>
-            {actions.map(action => (
-              <ActionRow
-                key={action.id}
-                {...action}
-              />
-            ))}
-          </Item.Group>
-        </>
-      ) : null}
-      {data.branded === false ? null : (
-        <div {...stylex.props(styles.branding)}>
-          {m.branding.securedBy}{' '}
-          <a
-            href='https://go.clerk.com/components'
-            target='_blank'
-            rel='noopener noreferrer'
-            {...stylex.props(styles.brandingLink)}
-          >
-            <ClerkLogo height={14} />
-          </a>
-        </div>
-      )}
+      <Item.Separator />
+      <Item.Group>
+        {actions.map(action => (
+          <ActionRow
+            key={action.id}
+            {...action}
+          />
+        ))}
+      </Item.Group>
     </>
   );
 }
@@ -1014,10 +1000,15 @@ export function UserButtonTrigger({
 
 /** The popover surface: header, organizations, other accounts, and footer. */
 export function UserButtonPopup(): ReactElement {
+  const { renderBranding } = useUserButtonContext();
+
   return (
     <Popover.Popup aria-label={m.popup.label}>
       {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
-      <Card.Root style={{ rowGap: 0 }}>
+      <Card.Root
+        style={{ rowGap: 0 }}
+        renderBranding={renderBranding}
+      >
         <Header />
         <OrganizationSection />
         <SessionSection />

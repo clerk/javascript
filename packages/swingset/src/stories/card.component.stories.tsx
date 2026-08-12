@@ -20,10 +20,12 @@ export const meta: StoryMeta = {
     _variants: {
       alignment: { start: {}, center: {} },
       elevation: { card: {}, flush: {}, overlay: {} },
+      renderBranding: { true: {}, false: {} },
     },
     _defaultVariants: {
       alignment: 'start',
       elevation: 'card',
+      renderBranding: true,
     },
   },
 };

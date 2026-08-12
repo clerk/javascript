@@ -4,6 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { ClerkLogo } from '../clerk-logo';
 import { reset } from '../reset.styles';
 import { TextContext } from '../text';
 import { elevations, headerAlignments, styles } from './card.styles';
@@ -19,16 +20,51 @@ const CardVariantContext = React.createContext<{ alignment: CardAlignment; eleva
   elevation: DEFAULT_ELEVATION,
 });
 
+/** Signs the foot of the card with "Secured by Clerk". */
+function Branding() {
+  return (
+    <div {...mergeStyleProps(themeProps('card-branding'), stylex.props(reset.base, styles.branding))}>
+      <span {...mergeStyleProps(themeProps('card-branding-text'), stylex.props(reset.base, styles.brandingText))}>
+        Secured by{' '}
+        <a
+          href='https://go.clerk.com/components'
+          target='_blank'
+          rel='noopener noreferrer'
+          {...mergeStyleProps(themeProps('card-branding-link'), stylex.props(reset.base, styles.brandingLink))}
+        >
+          <ClerkLogo height={14} />
+        </a>
+      </span>
+    </div>
+  );
+}
+
 /** Props for `Card.Root`, including native `div` props and the Mosaic `render` escape hatch. */
 export interface CardProps extends MosaicComponentProps<'div'> {
   /** Alignment applied to `Card.Header`. @default 'start' */
   alignment?: CardAlignment;
   /** Surface treatment applied to the card. @default 'card' */
   elevation?: CardElevation;
+  /**
+   * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
+   * carries none of it, so a connected surface passes `displayConfig.branded` here.
+   *
+   * @default true
+   */
+  renderBranding?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { alignment = DEFAULT_ALIGNMENT, elevation = DEFAULT_ELEVATION, render, className, style, ...rest },
+  {
+    alignment = DEFAULT_ALIGNMENT,
+    elevation = DEFAULT_ELEVATION,
+    renderBranding = true,
+    render,
+    className,
+    style,
+    children,
+    ...rest
+  },
   ref,
 ) {
   const element = useRender({
@@ -43,6 +79,12 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
         style,
       ),
       ...rest,
+      children: (
+        <>
+          {children}
+          {renderBranding ? <Branding /> : null}
+        </>
+      ),
     },
   });
 

@@ -638,23 +638,16 @@ describe('UserButtonView, the foot', () => {
     expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
   });
 
-  // The logo names the link, so the mark is what a screen reader reaches rather than an unnamed link.
-  it('sends the branding logo to Clerk, in a tab of its own', () => {
-    renderView();
+  // The card owns the mark; the popup only carries the answer through. An instance that has paid
+  // the branding off carries none of it, the way every other Clerk surface reads
+  // `displayConfig.branded`.
+  it('signs the popup with Clerk, and withholds the mark where the instance carries none', () => {
+    const { unmount } = renderView();
+    expect(within(popup()).getByRole('link', { name: 'Clerk' })).toBeInTheDocument();
 
-    const logo = screen.getByRole('link', { name: 'Clerk' });
-    expect(logo).toHaveAttribute('href', 'https://go.clerk.com/components');
-    expect(logo).toHaveAttribute('target', '_blank');
-    expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  // An instance that has paid the branding off carries none of it, the way every other Clerk
-  // surface reads `displayConfig.branded`.
-  it('withholds the branding where the instance carries none', () => {
-    renderView({ branded: false });
-
-    expect(screen.queryByText('Secured by')).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
+    unmount();
+    renderView({ renderBranding: false });
+    expect(within(popup()).queryByRole('link', { name: 'Clerk' })).toBeNull();
   });
 
   // "All accounts" is one account, and the account's own row already signs out of it.
