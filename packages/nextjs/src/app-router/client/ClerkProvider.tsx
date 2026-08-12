@@ -13,8 +13,8 @@ import { RouterTelemetry } from '../../utils/router-telemetry';
 import { invalidateCacheAction } from '../server-actions';
 import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
-import { useAwaitableRefresh } from './useAwaitableRefresh';
 import { useAwaitableReplace } from './useAwaitableReplace';
+import { useDeferredRefresh } from './useDeferredRefresh';
 
 /**
  * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
@@ -28,7 +28,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
-  const refresh = useAwaitableRefresh();
+  const refresh = useDeferredRefresh();
 
   useSafeLayoutEffect(() => {
     window.__internal_onBeforeSetActive = intent => {
@@ -72,10 +72,10 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
     window.__internal_onAfterSetActive = () => {
       if (__internal_invokeMiddlewareOnAuthStateChange) {
         // Deferred until in-flight transitions settle, so the refresh is never dispatched while a
-        // server-redirect follow-up navigation is still pending (which wedges the App Router, #9405)
-        return refresh();
+        // server-redirect follow-up navigation is still pending (which wedges the App Router, #9405).
+        // Fire-and-forget: setActive must not block on unrelated long-running transitions.
+        refresh();
       }
-      return undefined;
     };
   }, []);
 

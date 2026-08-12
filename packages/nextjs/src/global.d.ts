@@ -39,8 +39,8 @@ interface Window {
   __clerk_nav_await: Array<(value: void) => void>;
   __clerk_nav: (to: string) => Promise<void>;
   __clerk_internal_refresh?: {
-    fun?: () => Promise<void>;
-    promisesBuffer?: Array<() => void>;
+    fun?: () => void;
+    pending?: boolean;
   };
 
   __internal_onBeforeSetActive: (intent?: 'sign-out') => void | Promise<void>;
