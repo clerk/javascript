@@ -44,6 +44,8 @@ const colorDefaults = {
   '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
   '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
 
+  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
 

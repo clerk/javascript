@@ -106,6 +106,13 @@ import {
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  ConnectedAccounts as SettingsConnectedAccounts,
+  Default as SettingsDefault,
+  Destructive as SettingsDestructive,
+  meta as settingsMeta,
+  MultipleEmailAndPhoneNumbers as SettingsMultipleEmailAndPhoneNumbers,
+} from '../stories/settings.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
@@ -126,6 +133,13 @@ import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
+const settingsModule: StoryModule = {
+  meta: settingsMeta,
+  Default: SettingsDefault,
+  MultipleEmailAndPhoneNumbers: SettingsMultipleEmailAndPhoneNumbers,
+  ConnectedAccounts: SettingsConnectedAccounts,
+  Destructive: SettingsDestructive,
+};
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
   Default: OrganizationProfileLeaveSectionDefault,
@@ -281,6 +295,7 @@ export const registry: StoryModule[] = [
   iconModule,
   menuComponentModule,
   popoverComponentModule,
+  settingsModule,
   tabsComponentModule,
   textModule,
   fieldModule,
