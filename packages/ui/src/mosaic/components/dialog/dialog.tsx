@@ -10,7 +10,7 @@ import { Button } from '../button';
 import { Icon } from '../icon';
 import { reset } from '../reset.styles';
 import { acquireBrowserChrome } from './browser-chrome';
-import { backdropMotion, closeInsets, popupMotion, sizes, styles } from './dialog.styles';
+import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
 /** Width of the dialog surface, and for `panel` its height too. */
@@ -247,11 +247,17 @@ const Viewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(function 
   { className, style, ...rest },
   ref,
 ) {
+  const size = React.useContext(DialogSizeContext);
   React.useEffect(() => acquireKeyboardInset(), []);
   return (
     <Primitive.Viewport
       ref={ref}
-      {...mergeStyleProps(themeProps('dialog-viewport'), stylex.props(reset.base, styles.viewport), className, style)}
+      {...mergeStyleProps(
+        themeProps('dialog-viewport', { size }),
+        stylex.props(reset.base, styles.viewport, viewportSizes[size]),
+        className,
+        style,
+      )}
       {...rest}
     />
   );

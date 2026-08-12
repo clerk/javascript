@@ -98,37 +98,56 @@ both axes: its content _navigates_ — a settings surface switches sections in p
 content-driven height would resize the window on every section change, in both directions at once
 since the viewport centres it.
 
+### A card brings its own surface
+
+`prompt` and `panel` paint themselves. **`card` does not** — it contributes width and motion only,
+and the background, shadow, radius and padding come from `Card`. Compose it by rendering the popup
+**as** the card rather than nesting one inside the other:
+
+<Story
+  name='CardSurface'
+  storyModule={DialogStories}
+/>
+
+Rendering it as the card matters for more than tidiness. One element then both paints and animates,
+which is what keeps the popup's corner-radius correction landing on the corners you can see —
+`transform: scale()` scales a rendered radius along with everything else, so the popup divides the
+radius by the same factor to cancel it. Nested, the popup would scale a transparent box while the
+`Card` inside took that scale on its own painted corners with no correction.
+
+The trade is that `size="card"` with no `Card` inside renders an unpainted box.
+
 ### The inset
 
-The gap between a dialog and the edge of the screen is a **fixed inset**, not a percentage, and it
-steps up at two breakpoints:
+The gap between a dialog and the edge of the screen is a fixed inset that steps up at two
+breakpoints, rather than a percentage of the viewport:
 
-| Viewport      | Inset         |
-| ------------- | ------------- |
-| `< 48rem`     | `1rem` (16px) |
-| `48rem–90rem` | `2rem` (32px) |
-| `>= 90rem`    | `3rem` (48px) |
+| Viewport      | Top & bottom     | Sides         |
+| ------------- | ---------------- | ------------- |
+| `< 48rem`     | `1.25rem` (20px) | `1rem` (16px) |
+| `48rem–90rem` | `2rem` (32px)    | `2rem` (32px) |
+| `>= 90rem`    | `3rem` (48px)    | `3rem` (48px) |
 
-A percentage margin is asymmetric between the axes, and the asymmetry tracks the viewport's aspect
-ratio: at `90vw` / `90dvh` a 1920×1080 screen leaves 96px at the sides but 54px top and bottom, an
-ultrawide closer to 172 against 72, and a phone inverts it — 20px at the sides against 42px. The
-surround never reads as an even frame, and its character changes per device. One inset is even on
-all four sides everywhere, and grows with available room rather than with aspect ratio.
+Square except on a phone, where the sides come in and the top and bottom stay put. The horizontal
+inset is the expensive one at that width — it comes out of a content box only around 380px wide, so
+a pixel there costs line length in a way the same pixel costs nothing vertically. The vertical edges
+are doing the opposite job: holding the surface off the browser's own chrome, which is closer on a
+phone than on any desktop.
 
-It lives on `Dialog.Viewport`'s padding, so a `prompt` or `card` gets it for free by being
-`width: 100%` inside it. `panel` reads the same value back out of `--_cl-dialog-inset` for its
-height.
+It lives on `Dialog.Viewport`'s padding, so a popup gets it for free by being `width: 100%` inside
+it — no width arithmetic of its own.
 
 ### On a phone, a prompt is a sheet
 
-Below `48rem` — the same band that sets the tightest inset — a `prompt` pins to the bottom of the
-viewport and slides up instead of scaling out of its trigger. It keeps the inset on all four sides
-and all four corners rounded, so it reads as a floating sheet rather than a tray welded to the
-edge. Its width cap lifts at the same time, so the sheet spans whatever the inset leaves.
+Below `48rem`, a `prompt` pins to the bottom of the viewport and slides up instead of scaling out
+of its trigger. It keeps an inset on all four sides and all four corners rounded — a floating
+sheet, not a tray welded to the edge — and its width cap lifts so it spans whatever the inset
+leaves. `card` and `panel` are unchanged at every width. Resize the preview under
+[Playground](#playground) below `48rem` to see it.
 
-`card` and `panel` are unchanged at every width: a `card` stays centred and origin-scaled, and a
-`panel` already fills the inset. Resize the preview under [Playground](#playground) below `48rem`
-to see it.
+The sheet fades over the full length of its slide, while the backdrop keeps its own faster timing —
+the scrim answers the tap first, then the sheet arrives into an already-dimmed page. Under
+`prefers-reduced-motion: reduce` the sheet holds flat and only the fade runs.
 
 **The gate is width, not `pointer: coarse`.** A coarse pointer describes the input device rather
 than the screen — an iPad reports it in both orientations, so it would put a bottom sheet across a
@@ -248,9 +267,11 @@ State attributes from the headless layer are available for CSS targeting:
 
 ### Motion
 
-Only `card` animates. Its opacity and scale are driven off `data-starting-style` /
-`data-ending-style`: the fade takes `linear`, the scale takes `--cl-ease-default` arriving and
-`--cl-ease-exit` leaving, and the exit runs shorter than the entrance. Under
+`prompt` and `card` animate; `panel` opens and closes with no animation at all — it is most of the
+viewport, and even a 2% scale reads as a zoom at that scale.
+
+Opacity and scale are driven off `data-starting-style` / `data-ending-style`, with the exit shorter
+than the entrance. The popup scales from its own centre. Under
 `prefers-reduced-motion: reduce` only `transform` drops out — the fade still runs, since the
 vestibular concern is the movement.
 
@@ -334,10 +355,10 @@ scroll on the popup takes everything anchored to it along for the ride, starting
   storyModule={DialogStories}
 />
 
-A `panel` carries **no padding of its own** — its regions reach the popup's edges. That is what
-lets a scroll region sit flush, so its scrollbar and edge fade land on the true edge instead of
-floating in a margin, and lets a sidebar run the full height. Padding goes on the content inside
-each region. (`card` is unchanged and still pads itself.)
+A `panel` carries **no padding of its own** — its regions reach the popup's edges, which lets a
+scroll region sit flush so its scrollbar and edge fade land on the true edge, and lets a sidebar
+run the full height. Padding goes on the content inside each region. (`prompt` still pads itself;
+`card` takes its padding from the `Card` that supplies its surface.)
 
 `scrollAreaRoot` is the positioned ancestor and `scrollAreaViewport()` is the element that
 actually scrolls — both are style objects, not components, so they add no DOM of their own:
@@ -368,12 +389,32 @@ accessible name has to survive the rail disappearing.
 `min-height: 0` on the row is load-bearing — a flex child's default `min-height: auto` refuses to
 shrink below its content, so without it the row grows past the panel and the scroll never engages.
 
-Composition is what makes the sidebar case fall out for free: a fixed rail beside a scrolling
-column is just a flex row. It also means the panel's anatomy is yours — there is no prescribed
-Header/Body/Footer to work around, and anything you anchor to the popup's corner stays anchored.
+### Scrolling a tall card
 
-The scroll region brings its own `overscroll-behavior: contain`, a styled scrollbar, and the
-mask-based "content continues" fade at its edges.
+The other half of the scroll story. A `panel` scrolls **inside**, because it is a fixed-height
+window you navigate within. A `prompt` and a `card` take their height from their content and have
+no obvious region to scroll, so they scroll **outside**: the popup keeps its natural height and the
+whole dialog moves within the viewport, inset and all.
+
+<Story
+  name='OutsideScroll'
+  storyModule={DialogStories}
+/>
+
+Nothing is opted into — it follows from the size. The viewport is `min-height: 100%` for the two
+content-height surfaces and a pinned `height: 100%` for `panel`. That one property is the whole
+mechanism: pinned, the viewport cannot grow, so an over-tall popup spills past its padding box and
+runs flush into the bottom of the screen with none of the inset it has everywhere else. Allowed to
+grow, the padding travels with the content, while short dialogs still fill the overlay so centring
+has something to centre against.
+
+`place-items: safe center` is the other half. Centring an item taller than its box overflows it
+equally in both directions, putting the top half above the scroll origin where it cannot be
+reached; `safe` falls back to start alignment in exactly that case.
+
+> One surface is excluded: a `prompt` below `48rem` is a bottom sheet, and the rule that stops its
+> off-screen slide painting a scrollbar also stops it scrolling. A prompt asks one thing, so it
+> should not reach that height — reach for `card` if a tall surface is needed on a phone.
 
 ### Nested dialogs
 

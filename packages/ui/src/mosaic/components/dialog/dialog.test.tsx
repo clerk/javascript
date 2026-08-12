@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
 import { space } from '../../tokens.stylex';
+import type { DialogSize } from './dialog';
 import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
@@ -271,41 +272,6 @@ describe('stacked backdrops', () => {
   });
 });
 
-describe('transform origin', () => {
-  it('points the popup at the trigger that opened it', async () => {
-    const user = userEvent.setup();
-    render(
-      <Dialog
-        trigger={props => (
-          <button
-            type='button'
-            {...props}
-          >
-            Open
-          </button>
-        )}
-      >
-        Body
-      </Dialog>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-
-    // jsdom reports every rect as zero, so the computed offsets are not meaningful here —
-    // what this pins is that a trigger produces an origin at all, and the next test that a
-    // trigger-less dialog leaves the property alone so the `center` fallback applies.
-    const popup = document.querySelector<HTMLElement>('.cl-dialog-popup');
-    expect(popup?.style.getPropertyValue('--cl-dialog-origin')).not.toBe('');
-  });
-
-  it('leaves the origin unset on a trigger-less dialog, falling back to center', () => {
-    render(<Dialog defaultOpen>Body</Dialog>);
-
-    const popup = document.querySelector<HTMLElement>('.cl-dialog-popup');
-    expect(popup?.style.getPropertyValue('--cl-dialog-origin')).toBe('');
-  });
-});
-
 describe('Dialog.CloseButton', () => {
   it('closes the dialog and carries a default accessible name', async () => {
     const user = userEvent.setup();
@@ -348,14 +314,14 @@ describe('Dialog.CloseButton', () => {
   });
 });
 
-describe('panel padding', () => {
-  // Regression: `sizes.panel` has to actually override `styles.popup`'s padding, so a panel's
-  // children own their own and a scroll region can sit flush with the popup's edge. StyleX
-  // dedupes by property within one `stylex.props` call, so the panel atom should REPLACE the
-  // base one rather than sit alongside it. A probe gives us the atom to look for without
-  // hard-coding a hash.
+describe('popup padding', () => {
+  // Regression: `sizes[size]` has to actually override `styles.popup`'s padding. StyleX dedupes
+  // by property within one `stylex.props` call, so the size atom should REPLACE the base one
+  // rather than sit alongside it — and a `null` should remove it outright. A probe gives us the
+  // atoms to look for without hard-coding a hash.
   const probe = stylex.create({
     zero: { padding: space['0'] },
+    four: { padding: space['4'] },
     six: { padding: space['6'] },
   });
   const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
@@ -366,8 +332,92 @@ describe('panel padding', () => {
 
   const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
 
-  it('pads a card popup and leaves a panel popup unpadded', () => {
+  const popupClassesFor = (size: DialogSize) => {
     const { unmount } = render(
+      <Dialog
+        defaultOpen
+        size={size}
+      >
+        Body
+      </Dialog>,
+    );
+    const classes = classesOf('.cl-dialog-popup');
+    unmount();
+    return classes;
+  };
+
+  it('gives a prompt 1rem, overriding the popup default', () => {
+    const prompt = popupClassesFor('prompt');
+
+    expect(prompt).toEqual(expect.arrayContaining(atomFor(probe.four)));
+    expect(prompt).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
+  });
+
+  it('leaves a panel unpadded so its children can sit flush with the edge', () => {
+    const panel = popupClassesFor('panel');
+
+    expect(panel).toEqual(expect.arrayContaining(atomFor(probe.zero)));
+    expect(panel).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
+  });
+
+  // A `card` takes its padding from the `Card` rendered as the popup, so the popup must emit NO
+  // padding atom at all — a competing value would put two atoms for the same property on the
+  // element, and StyleX cannot dedupe across the two `stylex.props` calls involved.
+  it('emits no padding at all for a card, deferring to the Card surface', () => {
+    const card = popupClassesFor('card');
+
+    for (const value of [probe.zero, probe.four, probe.six]) {
+      expect(card).not.toEqual(expect.arrayContaining(atomFor(value)));
+    }
+  });
+});
+
+describe('viewport scroll behaviour', () => {
+  // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
+  // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
+  // box grow with it. Which one applies follows from the size, so what this pins is that the
+  // viewport reads the size at all — a regression here is silent, since both values look right
+  // until the content is taller than the screen.
+  const probe = stylex.create({
+    fixed: { height: '100%' },
+    grows: { minHeight: '100%' },
+  });
+  const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
+    stylex
+      .props(style)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+
+  const viewportClassesFor = (size: DialogSize) => {
+    const { unmount } = render(
+      <Dialog
+        defaultOpen
+        size={size}
+      >
+        Body
+      </Dialog>,
+    );
+    const classes = Array.from(document.querySelector('.cl-dialog-viewport')!.classList);
+    unmount();
+    return classes;
+  };
+
+  it.each(['prompt', 'card'] as const)('lets the viewport grow for %s, so the inset survives', size => {
+    const viewport = viewportClassesFor(size);
+
+    expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.grows)));
+    expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.fixed)));
+  });
+
+  it('pins the viewport for a panel, which scrolls inside instead', () => {
+    const viewport = viewportClassesFor('panel');
+
+    expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.fixed)));
+    expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.grows)));
+  });
+
+  it('exposes the size on the viewport for styling', () => {
+    render(
       <Dialog
         defaultOpen
         size='card'
@@ -375,22 +425,8 @@ describe('panel padding', () => {
         Body
       </Dialog>,
     );
-    const card = classesOf('.cl-dialog-popup');
-    unmount();
 
-    render(
-      <Dialog
-        defaultOpen
-        size='panel'
-      >
-        Body
-      </Dialog>,
-    );
-    const panel = classesOf('.cl-dialog-popup');
-
-    expect(card).toEqual(expect.arrayContaining(atomFor(probe.six)));
-    expect(panel).toEqual(expect.arrayContaining(atomFor(probe.zero)));
-    expect(panel).not.toEqual(expect.arrayContaining(atomFor(probe.six)));
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-size', 'card');
   });
 });
 

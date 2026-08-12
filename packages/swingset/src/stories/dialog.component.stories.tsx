@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
+import { Card } from '@clerk/ui/mosaic/components/card';
 import type { DialogSize } from '@clerk/ui/mosaic/components/dialog';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
@@ -159,6 +160,7 @@ function AddValueDialog({
   );
 }
 
+/** A `panel` account surface with `card` dialogs opened from inside it. */
 export function Nested() {
   return (
     <Dialog
@@ -345,5 +347,96 @@ export function PanelSidebar() {
         </div>
       </div>
     </Dialog>
+  );
+}
+
+/** `size='card'` paints nothing itself — the popup renders AS a `Card`, which supplies the surface. */
+export function CardSurface() {
+  return (
+    <Dialog.Root size='card'>
+      <Dialog.Trigger render={props => <Button {...props}>Sign in</Button>} />
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup render={<Card.Root elevation='overlay' />}>
+            <Dialog.CloseButton />
+            <Card.Header>
+              <Dialog.Title render={<Heading size='sm' />}>Sign in</Dialog.Title>
+              <Dialog.Description render={<Text />}>Continue to your account.</Dialog.Description>
+            </Card.Header>
+            <Card.Content>
+              <Input placeholder='you@example.com' />
+            </Card.Content>
+            <Card.Footer>
+              <Dialog.Close
+                render={props => (
+                  <Button
+                    {...props}
+                    variant='outline'
+                  >
+                    Cancel
+                  </Button>
+                )}
+              />
+              <Button>Continue</Button>
+            </Card.Footer>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+// Long enough to outgrow a laptop screen, or the example demonstrates nothing.
+const TERMS_CLAUSES = Array.from({ length: 12 }, (_, index) => ({
+  heading: `${index + 1}. ${['Acceptance', 'Your account', 'Acceptable use', 'Content', 'Payment', 'Termination'][index % 6]}`,
+  body:
+    'You agree to use the service in accordance with these terms and with all applicable laws. ' +
+    'We may update this document from time to time, and continued use after an update means you accept it.',
+}));
+
+/** A tall `card` outgrows the screen, so the whole dialog scrolls inside the viewport. */
+export function OutsideScroll() {
+  return (
+    <Dialog.Root size='card'>
+      <Dialog.Trigger render={props => <Button {...props}>Review terms</Button>} />
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup render={<Card.Root elevation='overlay' />}>
+            <Dialog.CloseButton />
+            <Card.Header>
+              <Dialog.Title render={<Heading size='sm' />}>Terms of service</Dialog.Title>
+              <Dialog.Description render={<Text />}>
+                Nothing here scrolls on its own — the card grows past the screen and the viewport takes the scroll.
+              </Dialog.Description>
+            </Card.Header>
+            <Card.Content>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {TERMS_CLAUSES.map(clause => (
+                  <div key={clause.heading}>
+                    <Heading size='xs'>{clause.heading}</Heading>
+                    <Text>{clause.body}</Text>
+                  </div>
+                ))}
+              </div>
+            </Card.Content>
+            <Card.Footer>
+              <Dialog.Close
+                render={props => (
+                  <Button
+                    {...props}
+                    variant='outline'
+                  >
+                    Decline
+                  </Button>
+                )}
+              />
+              <Button>Accept</Button>
+            </Card.Footer>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
