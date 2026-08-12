@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { colorVars } from '../tokens.stylex';
-import { Settings, settingsVars } from './settings-group';
+import { Settings, settingsVars } from './settings';
 
 describe('Settings', () => {
   it('aliases its background to the global background token', () => {
@@ -12,6 +12,7 @@ describe('Settings', () => {
     });
     expect(settingsVars).toMatchObject({
       '--cl-settings-background': 'var(--cl-settings-background)',
+      '--cl-settings-items-gap': 'var(--cl-settings-items-gap)',
     });
   });
 

@@ -9,10 +9,10 @@ import { reset } from '../components/reset.styles';
 import type { MosaicComponentProps } from '../props';
 import { mergeStyleProps, themeProps } from '../props';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
-import { settingsItemsMarker } from './settings-group.markers.stylex';
-import { settingsVars } from './settings-group.vars.stylex';
+import { settingsItemsMarker } from './settings.markers.stylex';
+import { settingsVars } from './settings.vars.stylex';
 
-export { settingsVars } from './settings-group.vars.stylex';
+export { settingsVars } from './settings.vars.stylex';
 
 export type SettingsRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
 export type SettingsTitleProps = Omit<HeadingProps, 'size'>;
@@ -60,7 +60,7 @@ const styles = stylex.create({
       [stylex.when.descendant('[data-nested]', settingsItemsMarker)]: space['1'],
     },
     paddingBlockStart: space['4'],
-    rowGap: space['2'],
+    rowGap: settingsVars['--cl-settings-items-gap'],
     width: 'auto',
   },
   items: {

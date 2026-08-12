@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { Settings } from '@clerk/ui/mosaic/block/settings-group';
+import { Settings } from '@clerk/ui/mosaic/block/settings';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
@@ -7,7 +7,7 @@ import { Icon } from '@clerk/ui/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
-export { default as __source } from './settings-group.stories?raw';
+export { default as __source } from './settings.stories?raw';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
@@ -24,7 +24,7 @@ function ProviderIcon({ provider }: { provider: string }) {
 export const meta: StoryMeta = {
   group: 'Blocks',
   title: 'Settings',
-  source: 'packages/ui/src/mosaic/block/settings-group.tsx',
+  source: 'packages/ui/src/mosaic/block/settings.tsx',
   styleEngine: 'stylex',
 };
 

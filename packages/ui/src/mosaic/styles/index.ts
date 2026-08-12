@@ -6,7 +6,7 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
-export { Settings, settingsVars } from '../block/settings-group';
+export { Settings, settingsVars } from '../block/settings';
 export type {
   SettingsActionsProps,
   SettingsContentProps,
@@ -20,7 +20,7 @@ export type {
   SettingsRootProps,
   SettingsRowProps,
   SettingsTitleProps,
-} from '../block/settings-group';
+} from '../block/settings';
 
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';

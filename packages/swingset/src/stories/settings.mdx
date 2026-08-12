@@ -1,4 +1,4 @@
-import * as SettingsStories from './settings-group.stories';
+import * as SettingsStories from './settings.stories';
 
 # Settings
 
@@ -7,7 +7,7 @@ A settings block that carries the canonical section, surface, row grouping, and 
 ## Usage
 
 ```tsx
-import { Settings } from '@clerk/ui/mosaic/block/settings-group';
+import { Settings } from '@clerk/ui/mosaic/block/settings';
 
 <Settings.Root>
   <Settings.Title>Account</Settings.Title>
@@ -29,6 +29,8 @@ import { Settings } from '@clerk/ui/mosaic/block/settings-group';
 `Settings.Group` owns the outlined surface. Its direct `Settings.Row` children own separation and may stack one or more `Settings.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Settings.Media` accepts `md` and `lg` sizes.
 
 Use `Settings.Items` for a nested value list beneath a row's header item. The row keeps an 8px header-to-list gap, nested items stack without gaps at a 44px minimum height, and their content receives 12px vertical padding.
+
+Override `--cl-settings-items-gap` on `Settings.Root` or a specific `Settings.Row` to customize the space between the row header and its nested value list. It defaults to 8px.
 
 ## Examples
 

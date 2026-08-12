@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Settings } from '../block/settings-group';
+import { Settings } from '../block/settings';
 import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
