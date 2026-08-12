@@ -2,17 +2,24 @@ import type { ExtendedRefs, FloatingContext, ReferenceType, UseInteractionsRetur
 import { createContext, useContext } from 'react';
 
 import type { TransitionProps } from '../../hooks/use-transition';
+import type { DialogHandle } from './dialog-handle';
 
 export interface DialogContextValue {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  /** The optional event marks the change as user-driven, letting `finalFocus` resolve its interaction type. */
+  setOpen: (open: boolean, event?: Event) => void;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
-  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
   popupRef: React.RefObject<HTMLDivElement | null>;
   /** Where focus goes when the dialog closes, or `null` to leave focus alone. */
   returnFocusRef: React.MutableRefObject<HTMLElement | null>;
+  /**
+   * The store connecting this root to its triggers — the `handle` prop when one was passed,
+   * otherwise a private store the root created. Triggers nested inside the root reach it here;
+   * detached triggers hold the same object through their `handle` prop.
+   */
+  store: DialogHandle;
   modal: boolean;
   /**
    * Whether this dialog opened from inside another floating element, so a stacked overlay can
@@ -38,4 +45,9 @@ export function useDialogContext() {
     throw new Error('Dialog compound components must be used within <Dialog.Root>');
   }
   return ctx;
+}
+
+/** Context access for parts that can also live outside the root — a trigger given a `handle`. */
+export function useOptionalDialogContext() {
+  return useContext(DialogContext);
 }

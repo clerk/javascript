@@ -1,6 +1,6 @@
 'use client';
 
-import type { FloatingContext } from '@floating-ui/react';
+import type { FloatingContext, OpenChangeReason } from '@floating-ui/react';
 import { useEffect, useRef } from 'react';
 
 import { isKeyboardEvent } from '../utils/interaction-modality';
@@ -32,11 +32,12 @@ export function useReturnFocus(
   }, [open, trigger]);
 
   useEffect(() => {
-    // Closes routed straight through the consumer's own state setter (a Close button, an
-    // item click) never reach floating-ui, so only what floating-ui itself drives can
-    // downgrade the default.
-    function onOpenChange({ open, event }: { open: boolean; event?: Event }) {
-      if (!open && event && !isKeyboardEvent(event)) {
+    // Only a pointer dismissal downgrades the default, and a `reason` is what marks a close as
+    // one floating-ui's interaction hooks drove (outside press, a trigger press). An event
+    // forwarded without a reason — a Close button press — keeps the trigger, and programmatic
+    // closes carry no event at all.
+    function onOpenChange({ open, event, reason }: { open: boolean; event?: Event; reason?: OpenChangeReason }) {
+      if (!open && event && reason && !isKeyboardEvent(event)) {
         returnFocusRef.current = null;
       }
     }

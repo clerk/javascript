@@ -68,6 +68,85 @@ Reach for `closerequest` on anything holding user input or confirming a destruct
 Reserve `none` for flows the user must complete or explicitly acknowledge — it removes the
 keyboard exit, so it breaks the usual expectation that Escape dismisses a modal.
 
+### Detached triggers
+
+A trigger does not have to be nested inside its root. `Dialog.createHandle()` returns a
+handle; pass the same handle to both, and the trigger drives the root from anywhere in the
+tree. The handle also exposes imperative `open()` / `close()` / `isOpen`; calls made while no
+root is mounted are ignored.
+
+```tsx
+const feedbackDialog = Dialog.createHandle();
+
+<Dialog.Trigger handle={feedbackDialog}>Give feedback</Dialog.Trigger>;
+
+<Dialog.Root handle={feedbackDialog}>{/* portal + popup */}</Dialog.Root>;
+```
+
+### Multiple triggers and payloads
+
+Each trigger can carry an `id` and a `payload`, and the root's children can be a function of
+the active trigger's payload — one dialog, per-trigger content. Type the payload through the
+handle: `Dialog.createHandle<Payload>()`.
+
+```tsx
+const memberDialog = Dialog.createHandle<{ name: string }>();
+
+<Dialog.Trigger handle={memberDialog} id='alice' payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
+<Dialog.Trigger handle={memberDialog} id='bob' payload={{ name: 'Bob' }}>Bob</Dialog.Trigger>
+
+<Dialog.Root handle={memberDialog}>
+  {({ payload }) => (
+    <Dialog.Portal>
+      <Dialog.Backdrop />
+      <Dialog.Viewport>
+        <Dialog.Popup>
+          <Dialog.Title>{payload?.name}</Dialog.Title>
+        </Dialog.Popup>
+      </Dialog.Viewport>
+    </Dialog.Portal>
+  )}
+</Dialog.Root>
+```
+
+In controlled mode, track which trigger is active with `triggerId` — `onOpenChange`'s second
+argument names the trigger behind each change:
+
+```tsx
+const [open, setOpen] = useState(false);
+const [triggerId, setTriggerId] = useState<string | null>(null);
+
+<Dialog.Root
+  open={open}
+  triggerId={triggerId}
+  onOpenChange={(next, details) => {
+    setOpen(next);
+    setTriggerId(details.triggerId);
+  }}
+>
+  {/* portal + popup */}
+</Dialog.Root>;
+```
+
+Setting `triggerId` alongside a programmatic `open` attributes the open to that trigger — the
+dialog returns focus to it on close, exactly as if it had been clicked.
+
+### Custom focus management
+
+`initialFocus` and `finalFocus` on `Dialog.Popup` control where focus moves on open and
+close. Each accepts `true` (the default behavior), `false` (do not move focus), a ref, or a
+function of the interaction type behind the change
+(`'mouse' | 'touch' | 'pen' | 'keyboard' | ''`, empty when programmatic):
+
+```tsx
+<Dialog.Popup
+  initialFocus={interactionType => (interactionType === 'keyboard' ? fieldRef.current : false)}
+  finalFocus={summaryRef}
+>
+  {/* ... */}
+</Dialog.Popup>
+```
+
 ## Parts
 
 | Part                 | Default Element | Description                                                         |
@@ -91,13 +170,16 @@ for centered, scroll-locked modal behavior nest `Dialog.Popup` inside `Dialog.Vi
 
 ### `Dialog.Root`
 
-| Prop                      | Type                                           | Default            | Description                                    |
-| ------------------------- | ---------------------------------------------- | ------------------ | ---------------------------------------------- |
-| <code>open</code>         | <code>boolean</code>                           | —                  | Controlled open state                          |
-| <code>defaultOpen</code>  | <code>boolean</code>                           | <code>false</code> | Initial open state (uncontrolled)              |
-| <code>onOpenChange</code> | <code>(open: boolean) => void</code>           | —                  | Called when the open state changes             |
-| <code>modal</code>        | <code>boolean</code>                           | <code>true</code>  | Trap focus and make the rest of the page inert |
-| <code>closedBy</code>     | <code>'any' \| 'closerequest' \| 'none'</code> | <code>'any'</code> | Which gestures dismiss the dialog              |
+| Prop                      | Type                                                                   | Default            | Description                                                               |
+| ------------------------- | ---------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                                                   | —                  | Controlled open state                                                     |
+| <code>defaultOpen</code>  | <code>boolean</code>                                                   | <code>false</code> | Initial open state (uncontrolled)                                         |
+| <code>onOpenChange</code> | <code>(open: boolean, details: DialogOpenChangeDetails) => void</code> | —                  | Called when the open state changes; `details` names the trigger behind it |
+| <code>modal</code>        | <code>boolean</code>                                                   | <code>true</code>  | Trap focus and make the rest of the page inert                            |
+| <code>closedBy</code>     | <code>'any' \| 'closerequest' \| 'none'</code>                         | <code>'any'</code> | Which gestures dismiss the dialog                                         |
+| <code>handle</code>       | <code>DialogHandle</code>                                              | —                  | Connects detached triggers (see `Dialog.createHandle()`)                  |
+| <code>triggerId</code>    | <code>string \| null</code>                                            | tracked            | Controls which trigger the open is attributed to                          |
+| <code>children</code>     | <code>ReactNode \| (\{ payload \}) => ReactNode</code>                 | —                  | Content, or a render function of the active trigger's payload             |
 
 <code>closedBy</code> mirrors the native <code>&lt;dialog closedby&gt;</code> attribute:
 
@@ -122,9 +204,28 @@ dismisses but Escape does not — stays unrepresentable.
 | ----------------------- | -------------------- | ----------------- | ----------------------------------------- |
 | <code>lockScroll</code> | <code>boolean</code> | <code>true</code> | Lock body scroll while the dialog is open |
 
-`Dialog.Trigger`, `Dialog.Backdrop`, `Dialog.Popup`, `Dialog.Title`, `Dialog.Description`,
-and `Dialog.Close` take no additional props beyond standard HTML attributes for their
-default element.
+### `Dialog.Trigger`
+
+| Prop                 | Type                      | Default | Description                                              |
+| -------------------- | ------------------------- | ------- | -------------------------------------------------------- |
+| <code>handle</code>  | <code>DialogHandle</code> | —       | Drives a root elsewhere in the tree (detached trigger)   |
+| <code>id</code>      | <code>string</code>       | auto    | Names this trigger for the root's <code>triggerId</code> |
+| <code>payload</code> | <code>Payload</code>      | —       | Delivered to the root's children render function on open |
+
+### `Dialog.Popup`
+
+| Prop                      | Type                           | Default           | Description                             |
+| ------------------------- | ------------------------------ | ----------------- | --------------------------------------- |
+| <code>initialFocus</code> | <code>DialogFocusTarget</code> | <code>true</code> | Where focus moves when the dialog opens |
+| <code>finalFocus</code>   | <code>DialogFocusTarget</code> | <code>true</code> | Where focus returns when it closes      |
+
+<code>DialogFocusTarget</code> is
+<code>boolean | RefObject | (interactionType) => boolean | void | HTMLElement | null</code>.
+The defaults stay what they were: first tabbable element on open; on close the trigger,
+unless the close was pointer-driven, where focus is left where the pointer put it.
+
+`Dialog.Backdrop`, `Dialog.Title`, `Dialog.Description`, and `Dialog.Close` take no
+additional props beyond standard HTML attributes for their default element.
 
 ## Styling
 

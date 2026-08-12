@@ -1,5 +1,6 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
@@ -61,7 +62,7 @@ describe('Dialog', () => {
       expect(trigger).toHaveAttribute('data-closed', '');
     });
 
-    it('calls onOpenChange when toggled', async () => {
+    it('calls onOpenChange with details naming the trigger', async () => {
       const onOpenChange = vi.fn();
       const user = userEvent.setup();
       renderDialog({ onOpenChange });
@@ -69,7 +70,20 @@ describe('Dialog', () => {
       const trigger = screen.getByRole('button', { name: 'Open dialog' });
       await user.click(trigger);
 
-      expect(onOpenChange).toHaveBeenCalledWith(true);
+      expect(onOpenChange).toHaveBeenCalledWith(
+        true,
+        expect.objectContaining({ trigger, triggerId: expect.any(String) }),
+      );
+    });
+
+    it('calls onOpenChange with a null trigger on dismissal', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, onOpenChange });
+
+      await user.keyboard('{Escape}');
+
+      expect(onOpenChange).toHaveBeenCalledWith(false, expect.objectContaining({ trigger: null, triggerId: null }));
     });
   });
 
@@ -365,6 +379,295 @@ describe('Dialog', () => {
       await user.click(screen.getByRole('button', { name: 'Close' }));
 
       expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  describe('detached triggers (createHandle)', () => {
+    it('opens a root from a trigger rendered outside it', async () => {
+      const user = userEvent.setup();
+      const handle = Dialog.createHandle();
+      render(
+        <>
+          <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
+          <Dialog.Root handle={handle}>
+            <Dialog.Popup>
+              <Dialog.Title>Detached</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Open detached' });
+      expect(trigger).toHaveAttribute('data-closed', '');
+
+      await user.click(trigger);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      // Queried by text: the open modal marks everything outside itself inert.
+      expect(screen.getByText('Open detached')).toHaveAttribute('data-open', '');
+    });
+
+    it('returns focus to the detached trigger on Escape', async () => {
+      const user = userEvent.setup();
+      const handle = Dialog.createHandle();
+      render(
+        <>
+          <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
+          <Dialog.Root handle={handle}>
+            <Dialog.Popup>
+              <Dialog.Title>Detached</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Open detached' });
+      await user.click(trigger);
+      await user.keyboard('{Escape}');
+
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('supports imperative open and close, ignored while no root is attached', () => {
+      const handle = Dialog.createHandle();
+
+      // No root mounted: ignored, no crash.
+      handle.open();
+      expect(handle.isOpen).toBe(false);
+
+      render(
+        <Dialog.Root handle={handle}>
+          <Dialog.Popup>
+            <Dialog.Title>Imperative</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      act(() => handle.open());
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(handle.isOpen).toBe(true);
+
+      act(() => handle.close());
+      expect(handle.isOpen).toBe(false);
+    });
+  });
+
+  describe('multiple triggers and payload', () => {
+    function renderMultiTrigger(rootProps: Partial<React.ComponentProps<typeof Dialog.Root<string>>> = {}) {
+      const handle = Dialog.createHandle<string>();
+      render(
+        <>
+          <Dialog.Trigger
+            handle={handle}
+            id='trigger-a'
+            payload='payload-a'
+          >
+            Open A
+          </Dialog.Trigger>
+          <Dialog.Trigger
+            handle={handle}
+            id='trigger-b'
+            payload='payload-b'
+          >
+            Open B
+          </Dialog.Trigger>
+          <Dialog.Root
+            handle={handle}
+            {...rootProps}
+          >
+            {({ payload }) => (
+              <Dialog.Popup>
+                <Dialog.Title>{payload ?? 'no payload'}</Dialog.Title>
+                <Dialog.Close>Close</Dialog.Close>
+              </Dialog.Popup>
+            )}
+          </Dialog.Root>
+        </>,
+      );
+      return handle;
+    }
+
+    it('renders per-trigger content from the payload', async () => {
+      const user = userEvent.setup();
+      renderMultiTrigger();
+
+      await user.click(screen.getByRole('button', { name: 'Open A' }));
+      expect(screen.getByRole('dialog', { name: 'payload-a' })).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      await user.click(screen.getByRole('button', { name: 'Open B' }));
+      expect(screen.getByRole('dialog', { name: 'payload-b' })).toBeInTheDocument();
+    });
+
+    it('attributes the open to the activated trigger only', async () => {
+      const user = userEvent.setup();
+      renderMultiTrigger();
+
+      await user.click(screen.getByRole('button', { name: 'Open A' }));
+
+      // Queried by text: the open modal marks everything outside itself inert.
+      expect(screen.getByText('Open A')).toHaveAttribute('data-open', '');
+      expect(screen.getByText('Open B')).toHaveAttribute('data-closed', '');
+    });
+
+    it('reports the activated trigger id through onOpenChange details', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiTrigger({ onOpenChange });
+
+      await user.click(screen.getByRole('button', { name: 'Open B' }));
+
+      expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ triggerId: 'trigger-b' }));
+    });
+
+    it('resolves the payload from a controlled triggerId on programmatic open', () => {
+      renderMultiTrigger({ open: true, triggerId: 'trigger-b' });
+
+      expect(screen.getByRole('dialog', { name: 'payload-b' })).toBeInTheDocument();
+    });
+  });
+
+  describe('initialFocus', () => {
+    type InitialFocus = React.ComponentProps<typeof Dialog.Popup>['initialFocus'];
+
+    function InitialFocusFixture({
+      initialFocus,
+      useInputRef,
+    }: {
+      initialFocus?: InitialFocus;
+      useInputRef?: boolean;
+    }) {
+      const inputRef = React.useRef<HTMLInputElement | null>(null);
+      return (
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Popup initialFocus={useInputRef ? inputRef : initialFocus}>
+            <Dialog.Title>Title</Dialog.Title>
+            <button type='button'>First</button>
+            <input
+              ref={inputRef}
+              aria-label='Name'
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      );
+    }
+
+    const settleFocus = () => new Promise(r => requestAnimationFrame(r));
+
+    it('focuses a ref target instead of the first tabbable', async () => {
+      const user = userEvent.setup();
+      render(<InitialFocusFixture useInputRef />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await settleFocus();
+
+      expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Name' }));
+    });
+
+    it('does not move focus when false', async () => {
+      const user = userEvent.setup();
+      render(<InitialFocusFixture initialFocus={false} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await settleFocus();
+
+      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(false);
+    });
+
+    it('passes the interaction type to a function form', async () => {
+      const user = userEvent.setup();
+      const initialFocus = vi.fn(() => undefined);
+      render(<InitialFocusFixture initialFocus={initialFocus} />);
+
+      const trigger = screen.getByRole('button', { name: 'Open dialog' });
+      trigger.focus();
+      await user.keyboard('{Enter}');
+      await settleFocus();
+
+      expect(initialFocus).toHaveBeenCalledWith('keyboard');
+    });
+  });
+
+  describe('finalFocus', () => {
+    type FinalFocus = React.ComponentProps<typeof Dialog.Popup>['finalFocus'];
+
+    function FinalFocusFixture({ finalFocus, useTargetRef }: { finalFocus?: FinalFocus; useTargetRef?: boolean }) {
+      const targetRef = React.useRef<HTMLButtonElement | null>(null);
+      return (
+        <>
+          <button
+            type='button'
+            ref={targetRef}
+          >
+            Elsewhere
+          </button>
+          <Dialog.Root>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Popup finalFocus={useTargetRef ? targetRef : finalFocus}>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </>
+      );
+    }
+
+    it('restores focus to a ref target on close', async () => {
+      const user = userEvent.setup();
+      render(<FinalFocusFixture useTargetRef />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Elsewhere' }));
+    });
+
+    it('resolves a function form with the close interaction type', async () => {
+      const user = userEvent.setup();
+      const finalFocus = vi.fn(() => undefined);
+      render(<FinalFocusFixture finalFocus={finalFocus} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+
+      expect(finalFocus).toHaveBeenCalledWith('keyboard');
+      // Default behaviour on `undefined`: back to the trigger.
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    it('resolves the function form with the forwarded interaction type on Close press', async () => {
+      const user = userEvent.setup();
+      const finalFocus = vi.fn(() => undefined);
+      render(<FinalFocusFixture finalFocus={finalFocus} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(finalFocus).toHaveBeenCalledWith('mouse');
+      // A Close press is not a dismissal, so the default still returns focus to the trigger.
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    it('resolves the function form with an empty type on programmatic close', () => {
+      const handle = Dialog.createHandle();
+      const finalFocus = vi.fn(() => undefined);
+      render(
+        <Dialog.Root
+          handle={handle}
+          defaultOpen
+        >
+          <Dialog.Popup finalFocus={finalFocus}>
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      act(() => handle.close());
+
+      expect(finalFocus).toHaveBeenCalledWith('');
     });
   });
 

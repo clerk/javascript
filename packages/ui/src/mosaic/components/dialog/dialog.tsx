@@ -1,4 +1,4 @@
-import type { DialogProps as HeadlessDialogProps } from '@clerk/headless/dialog';
+import type { DialogFocusTarget, DialogHandle, DialogProps as HeadlessDialogProps } from '@clerk/headless/dialog';
 import { Dialog as Primitive, useDialogContext } from '@clerk/headless/dialog';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
@@ -16,7 +16,7 @@ import { acquireKeyboardInset } from './keyboard-inset';
 /** Width of the dialog surface, and for `panel` its height too. */
 export type DialogSize = keyof typeof sizes;
 
-export interface DialogRootProps extends HeadlessDialogProps {
+export interface DialogRootProps<Payload = unknown> extends HeadlessDialogProps<Payload> {
   /** Width, and for `panel` also height, of the dialog surface. @default 'prompt' */
   size?: DialogSize;
 }
@@ -36,7 +36,18 @@ const DialogSizeContext = React.createContext<DialogSize>('prompt');
  * callback can spread straight into a Mosaic component whose own `color` is a narrow
  * variant union.
  */
-export type DialogTriggerProps = MosaicComponentProps<'button'>;
+export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button'> & {
+  /**
+   * Connects this trigger to a root rendered elsewhere in the tree. Create with
+   * `Dialog.createHandle()` and pass the same handle to the `Dialog.Root`.
+   */
+  handle?: DialogHandle<Payload>;
+  /**
+   * Delivered to the root when this trigger opens it, for per-trigger content: the root's
+   * children-as-function receives it as `{ payload }`.
+   */
+  payload?: Payload;
+};
 export type DialogCloseProps = MosaicComponentProps<'button'>;
 /** `id` is owned by the primitive, which wires it to the popup's `aria-labelledby`. */
 export type DialogTitleProps = Omit<MosaicComponentProps<'h2'>, 'id'>;
@@ -54,13 +65,18 @@ export interface DialogViewportProps extends MosaicComponentProps<'div'> {
   /** When true, locks body scroll while the dialog is open. @default true */
   lockScroll?: boolean;
 }
-export type DialogPopupProps = MosaicComponentProps<'div'>;
+export type DialogPopupProps = MosaicComponentProps<'div'> & {
+  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  initialFocus?: DialogFocusTarget;
+  /** Where focus returns when the dialog closes. Default: the trigger. */
+  finalFocus?: DialogFocusTarget;
+};
 
 /** Owns the open state and the size both the backdrop and the popup read. */
-function Root({ size = 'prompt', children, ...rest }: DialogRootProps) {
+function Root<Payload = unknown>({ size = 'prompt', children, ...rest }: DialogRootProps<Payload>) {
   return (
     <DialogSizeContext.Provider value={size}>
-      <Primitive.Root {...rest}>{children}</Primitive.Root>
+      <Primitive.Root<Payload> {...rest}>{children}</Primitive.Root>
     </DialogSizeContext.Provider>
   );
 }
@@ -73,7 +89,9 @@ const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function
       {...props}
     />
   );
-});
+}) as <Payload = unknown>(
+  props: DialogTriggerProps<Payload> & { ref?: React.Ref<HTMLButtonElement> },
+) => React.ReactElement;
 
 /** Dismisses the dialog. Renders a `<button>`; `render` swaps in another element. */
 const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function DialogClose(props, ref) {
@@ -283,6 +301,8 @@ export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChang
 /** Compound parts for power-user / custom dialog layouts. */
 Dialog.Root = Root;
 Dialog.Trigger = Trigger;
+/** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
+Dialog.createHandle = Primitive.createHandle;
 Dialog.Portal = Primitive.Portal;
 Dialog.Backdrop = Backdrop;
 Dialog.Viewport = Viewport;
