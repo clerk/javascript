@@ -246,7 +246,7 @@ export function useUserButtonController(
   return {
     status: 'ready',
     organizationsEnabled,
-    branded: displayConfig.branded,
+    renderBranding: displayConfig.branded,
     activeSession: toSession(session.id, user),
     activeOrganization: organization ? toMembership(organization) : null,
     // The user resource carries its own memberships, so whether the account has any is settled

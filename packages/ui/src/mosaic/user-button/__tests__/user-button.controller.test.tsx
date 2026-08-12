@@ -198,7 +198,7 @@ function Harness({ customPages, ...options }: UserButtonControllerOptions & { cu
       <output data-testid='active-org'>{JSON.stringify(c.activeOrganization)}</output>
       <output data-testid='has-orgs'>{String(c.hasOrganizations)}</output>
       <output data-testid='orgs-enabled'>{String(c.organizationsEnabled)}</output>
-      <output data-testid='branded'>{String(c.branded)}</output>
+      <output data-testid='branded'>{String(c.renderBranding)}</output>
       <output data-testid='hide-personal'>{String(c.hidePersonal)}</output>
       <output data-testid='orgs-loading'>{String(c.organizationsLoading)}</output>
       <output data-testid='additional'>{c.additionalSessions.map(a => a.sessionId).join(',')}</output>
