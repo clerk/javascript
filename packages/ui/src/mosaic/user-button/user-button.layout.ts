@@ -1,65 +1,106 @@
 import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './user-button.types';
 
-/** Where an affordance lands. `none` is a mode not offering it at all. */
-type Slot = 'account-row' | 'accounts-heading' | 'footer' | 'header' | 'none';
+/**
+ * Which mode puts what where. The surface is four slots deep, in this order, and each mode fills
+ * them differently:
+ *
+ * ```
+ *  combined                       organization                 user
+ *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
+ *  │ Foundry       [Invite][⚙]  │ │ Foundry     [Invite][⚙]  │ │ Alice     [Sign out][⚙]    │ header
+ *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
+ *  │ alice@x.com           [⋯]  │ │                          │ │                            │ organizationsHeading
+ *  │ Personal account           │ │ Personal account         │ │                            │ ┐
+ *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
+ *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
+ *  │ Accounts              [⋯]  │ │                          │ │                            │ sessionsHeading
+ *  │ ✓ alice@x.com              │ │                          │ │                            │ ┐
+ *  │ bob@x.com                  │ │                          │ │ bob@x.com                  │ ┘ session rows
+ *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
+ *  │ ⤴ Sign out of all accounts │ │ + Create organization    │ │ + Add account              │ ┐
+ *  │                            │ │                          │ │ ⤴ Sign out of all accounts │ ┘ footer
+ *  └────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
+ * ```
+ *
+ * Both lists read the same way: a heading that carries the list's actions behind a `⋯`, then the
+ * rows. The organizations are headed by the active account, since they are the workspaces that
+ * account can switch between; the sessions are headed by the word "Accounts".
+ */
 
-/** Which sections a mode opens. Whether the data fills them is settled in `resolveUserButtonLayout`. */
-interface Sections {
-  /** The workspace list carries the active account's row, and the account-wide actions with it. */
-  accountRow: boolean;
-  /** There is a workspace list at all, and something to put in it. */
-  listsOrganizations: boolean;
-  /** There is an Accounts group, and another account to switch to. */
-  listsAccounts: boolean;
-  /** The Accounts group is headed, so it tells its rows apart and carries "Add account". */
-  accountsHeading: boolean;
+/** The four places an action can land. Every mode has a header and a footer; the headings vary. */
+const slots = ['header', 'organizationsHeading', 'sessionsHeading', 'footer'] as const;
+
+export type UserButtonSlot = (typeof slots)[number];
+
+export type UserButtonAction =
+  | 'addAccount'
+  | 'createOrganization'
+  | 'inviteMembers'
+  /** The gear. Manages whatever the header names: the organization where one leads, else the account. */
+  | 'manageLead'
+  | 'manageAccount'
+  | 'signOut'
+  | 'signOutAll';
+
+/** A list the surface can carry. `heading: false` runs the rows unheaded. */
+interface ListLayout {
+  heading: readonly UserButtonAction[] | false;
 }
 
-const sections = {
-  combined: { accountRow: true, listsOrganizations: true, listsAccounts: true, accountsHeading: true },
-  // Not about the account, so it carries no row for one and no accounts to switch between.
-  organization: { accountRow: false, listsOrganizations: true, listsAccounts: false, accountsHeading: false },
-  // Nothing to tell the account rows apart from, so they stand unheaded.
-  user: { accountRow: false, listsOrganizations: false, listsAccounts: true, accountsHeading: false },
-} as const satisfies Record<UserButtonMode, Sections>;
+/** One mode's whole surface, top to bottom. `false` is a list the mode does not carry at all. */
+interface ModeLayout {
+  header: readonly UserButtonAction[];
+  /** The workspaces the active account switches between: its own, plus the organizations it is in. */
+  organizations: ListLayout | false;
+  /** The other signed-in accounts. */
+  sessions: ListLayout | false;
+  footer: readonly UserButtonAction[];
+}
+
+const modes = {
+  combined: {
+    header: ['inviteMembers', 'manageLead'],
+    organizations: { heading: ['createOrganization', 'manageAccount', 'signOut'] },
+    sessions: { heading: ['addAccount'] },
+    footer: ['signOutAll'],
+  },
+  // Not about the account, so it heads its workspaces with nothing and lists no other account.
+  organization: {
+    header: ['inviteMembers', 'manageLead'],
+    organizations: { heading: false },
+    sessions: false,
+    footer: ['createOrganization'],
+  },
+  // No workspaces to head the accounts against, so they stand unheaded and the header takes the
+  // account's own actions.
+  user: {
+    header: ['signOut', 'manageLead'],
+    organizations: false,
+    sessions: { heading: false },
+    footer: ['addAccount', 'signOutAll'],
+  },
+} as const satisfies Record<UserButtonMode, ModeLayout>;
 
 /**
- * The slots a mode can name: the two every mode has, plus whichever sections it opens above. A mode
- * cannot put an affordance in a section it does not render, so the table below cannot drift out of
- * step with `sections` without failing to compile.
+ * Where each of the surface's actions landed, resolved once from `mode`, `modePriority` and the
+ * data, so no section has to read any of them again.
  */
-type ModeSlot<M extends UserButtonMode> =
-  | 'footer'
-  | 'header'
-  | 'none'
-  | ((typeof sections)[M]['accountRow'] extends true ? 'account-row' : never)
-  | ((typeof sections)[M]['accountsHeading'] extends true ? 'accounts-heading' : never);
-
-/**
- * Where each affordance lands in each mode. One row per affordance, so what the three modes do with
- * any one of them reads on a single line rather than spread across the sections that render it.
- *
- * An affordance falls to the footer wherever the section that would carry it is not there: no
- * account row to hang "Create organization" off, no Accounts heading to hang "Add account" off.
- */
-const placements = {
-  inviteMembers: { combined: 'header', organization: 'header', user: 'none' },
-  signOut: { combined: 'account-row', organization: 'none', user: 'header' },
-  createOrganization: { combined: 'account-row', organization: 'footer', user: 'none' },
-  addAccount: { combined: 'accounts-heading', organization: 'none', user: 'footer' },
-  signOutAll: { combined: 'footer', organization: 'none', user: 'footer' },
-} as const satisfies Record<string, { [M in UserButtonMode]: ModeSlot<M> }>;
-
-/**
- * Where each of the surface's affordances lands, resolved once from `mode` and `modePriority` so
- * no section has to read them again. The three modes differ only in the two tables above, so what
- * any one of them renders is legible in one place.
- */
-export interface UserButtonLayout extends Sections {
+export interface UserButtonLayout {
   /** Which workspace the trigger names and the header leads with. */
   leadWith: 'organization' | 'user';
-  /** Where each affordance landed, once the mode and the data have both had their say. */
-  placement: Record<keyof typeof placements, Slot>;
+  /** The organization rows: their own workspace, the organizations, and what is on offer. */
+  showOrganizations: boolean;
+  /**
+   * The active account's row above them. Not gated on the rows: an account with no organizations
+   * still needs somewhere to manage and sign out of itself.
+   */
+  showOrganizationsHeading: boolean;
+  /** The other signed-in accounts. */
+  showSessions: boolean;
+  /** The "Accounts" row above them. Pointless with no accounts under it, so it follows the rows. */
+  showSessionsHeading: boolean;
+  /** What each slot carries, in the order it renders. */
+  actions: Record<UserButtonSlot, UserButtonAction[]>;
 }
 
 export function resolveUserButtonLayout(
@@ -67,32 +108,62 @@ export function resolveUserButtonLayout(
   modePriority: UserButtonModePriority,
   data: UserButtonData,
 ): UserButtonLayout {
-  const section = sections[mode];
-  const hasOtherAccounts = data.additionalSessions.length > 0;
-  const listsAccounts = section.listsAccounts && hasOtherAccounts;
-  const accountsHeading = listsAccounts && section.accountsHeading;
-  const addAccount = placements.addAccount[mode];
+  const layout: ModeLayout = modes[mode];
+  const organizationsHeading = layout.organizations === false ? false : layout.organizations.heading;
+  const sessionsHeading = layout.sessions === false ? false : layout.sessions.heading;
+
+  const hasOtherSessions = data.additionalSessions.length > 0;
+  // A pending invitation or suggestion counts: it has to be reachable before there is a membership.
+  // Loading does not count, so an account with none never opens a list that then disappears.
+  const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
+
+  const showOrganizations = layout.organizations !== false && hasOrganizations;
+  const showOrganizationsHeading = organizationsHeading !== false;
+  const showSessions = layout.sessions !== false && hasOtherSessions;
+  const showSessionsHeading = showSessions && sessionsHeading !== false;
+
+  const actions: Record<UserButtonSlot, UserButtonAction[]> = {
+    header: [...layout.header],
+    organizationsHeading: [],
+    sessionsHeading: [],
+    footer: [...layout.footer],
+  };
+
+  // A heading the data left out has nowhere to put its actions, so they fall to the footer. Every
+  // mode has one.
+  if (organizationsHeading !== false) {
+    actions[showOrganizationsHeading ? 'organizationsHeading' : 'footer'].push(...organizationsHeading);
+  }
+  if (sessionsHeading !== false) {
+    actions[showSessionsHeading ? 'sessionsHeading' : 'footer'].push(...sessionsHeading);
+  }
+
+  const offered = (action: UserButtonAction): boolean => {
+    switch (action) {
+      // Inviting belongs to whichever organization is active, even where the account is what heads
+      // the surface.
+      case 'inviteMembers':
+        return Boolean(data.activeOrganization);
+      // "All accounts" is one account. The account's own row already signs out of it, so the foot
+      // would be offering the same thing over again, in the plural.
+      case 'signOutAll':
+        return hasOtherSessions;
+      default:
+        return true;
+    }
+  };
+
+  for (const slot of slots) {
+    actions[slot] = actions[slot].filter(offered);
+  }
 
   return {
     // Only a combined surface has two things to choose between; the other two are what they are.
     leadWith: mode === 'combined' ? modePriority : mode,
-    accountRow: section.accountRow,
-    // A pending invitation or suggestion counts: it has to be reachable before there is a
-    // membership. Loading does not count, so an account with none never opens a section that then
-    // disappears under it.
-    listsOrganizations:
-      section.listsOrganizations &&
-      (data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0),
-    listsAccounts,
-    accountsHeading,
-    placement: {
-      inviteMembers: placements.inviteMembers[mode],
-      signOut: placements.signOut[mode],
-      createOrganization: placements.createOrganization[mode],
-      addAccount: addAccount === 'accounts-heading' && !accountsHeading ? 'footer' : addAccount,
-      // "All accounts" is one account. The account's own row already signs out of it, so the foot
-      // would be offering the same thing over again, in the plural.
-      signOutAll: hasOtherAccounts ? placements.signOutAll[mode] : 'none',
-    },
+    showOrganizations,
+    showOrganizationsHeading,
+    showSessions,
+    showSessionsHeading,
+    actions,
   };
 }
