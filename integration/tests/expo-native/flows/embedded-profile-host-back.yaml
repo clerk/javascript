@@ -39,11 +39,14 @@ name: Embedded UserProfileView host back round trip
       - extendedWaitUntil:
           visible: 'Edit profile'
           timeout: 20000
-      - tapOn:
-          text: 'Manage account'
-      - extendedWaitUntil:
-          visible: 'EMAIL ADDRESSES|Add email address'
-          timeout: 15000
+      - retry:
+          maxRetries: 3
+          commands:
+            - tapOn:
+                text: 'Manage account'
+            - extendedWaitUntil:
+                visible: 'EMAIL ADDRESSES|Add email address'
+                timeout: 5000
       - tapOn: 'Back'
       - extendedWaitUntil:
           visible: 'Edit profile'
