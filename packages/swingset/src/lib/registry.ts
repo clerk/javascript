@@ -3,6 +3,7 @@ import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
+  Interactive as AvatarInteractive,
   meta as avatarMeta,
   Primary as AvatarPrimary,
   Shapes as AvatarShapes,
@@ -175,6 +176,7 @@ const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: Car
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
+  Interactive: AvatarInteractive,
   Fallback: AvatarFallbackStory,
   Sizes: AvatarSizes,
   Shapes: AvatarShapes,

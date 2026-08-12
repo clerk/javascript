@@ -7,7 +7,7 @@
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
 export { Avatar } from '../components/avatar';
-export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';
+export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Button, SubmitButton } from '../components/button';

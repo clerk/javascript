@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -33,6 +34,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 const IMAGE_SRC = 'https://github.com/clerk.png';
+const COLIN_IMAGE_SRC = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
 export function Primary(props: Record<string, unknown>) {
   return (
@@ -66,6 +68,30 @@ export function Fallback(props: Record<string, unknown>) {
         alt='@clerk'
       />
       <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
+  );
+}
+
+export function Interactive(props: Record<string, unknown>) {
+  return (
+    <Avatar.Root
+      {...knobsAsProps(props)}
+      size='lg'
+      render={
+        <button
+          type='button'
+          aria-label='Edit profile picture'
+        />
+      }
+    >
+      <Avatar.Image
+        src={COLIN_IMAGE_SRC}
+        alt='Colin'
+      />
+      <Avatar.Fallback>CL</Avatar.Fallback>
+      <Avatar.Icon>
+        <Icon name='pen' />
+      </Avatar.Icon>
     </Avatar.Root>
   );
 }

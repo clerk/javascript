@@ -9,11 +9,11 @@ type IconComponent = React.ForwardRefExoticComponent<
  * Builds a glyph from its inner `<path>` markup. Glyphs omit `width`/`height` so the `Icon` recipe
  * controls size, and use `currentColor` so they inherit text color. Grow the set on demand.
  */
-function glyph(children: React.ReactNode): IconComponent {
+function glyph(children: React.ReactNode, viewBox = '0 0 16 16'): IconComponent {
   return React.forwardRef<SVGSVGElement, React.ComponentPropsWithoutRef<'svg'>>((props, ref) => (
     <svg
       ref={ref}
-      viewBox='0 0 16 16'
+      viewBox={viewBox}
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
       {...props}
@@ -94,6 +94,15 @@ const Plus = glyph(
   />,
 );
 
+const Pen = glyph(
+  <path
+    d='M12.03 3.972a1.59 1.59 0 0 0-2.261 0l-.01.01-5.056 4.89a1.25 1.25 0 0 0-.351.627l-.61 2.747 2.542-.598a1.25 1.25 0 0 0 .59-.325L12.085 6.2c.573-.638.549-1.62-.057-2.228M8.71 2.909a3.09 3.09 0 0 1 4.383.005 3.126 3.126 0 0 1 .06 4.341l-5.228 5.138a2.75 2.75 0 0 1-1.298.715l-3.705.872a.75.75 0 0 1-.904-.893l.87-3.914a2.75 2.75 0 0 1 .772-1.38z'
+    fill='currentColor'
+    fillRule='evenodd'
+    clipRule='evenodd'
+  />,
+);
+
 const LogOut = glyph(
   <path
     d='M6.25 13.25H3.75V2.75H6.25M10.25 10.75L13 8L10.25 5.25M13 8H6.25'
@@ -141,6 +150,7 @@ export const iconRegistry = {
   check: Check,
   close: Close,
   ellipsis: Ellipsis,
+  pen: Pen,
   plus: Plus,
   'log-out': LogOut,
   cog: Cog,

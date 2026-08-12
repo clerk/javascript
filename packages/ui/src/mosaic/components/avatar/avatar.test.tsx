@@ -4,6 +4,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Icon } from '../icon';
 import { Avatar } from './avatar';
 
 // React reads this off the global object and ships no typing for it.
@@ -280,9 +281,37 @@ describe('Mosaic Avatar', () => {
     expect(avatar).toHaveStyle({ marginTop: '8px' });
   });
 
+  it('composes its root onto another element and renders an icon affordance', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Avatar.Root
+        ref={ref}
+        size='lg'
+        render={
+          <button
+            type='button'
+            aria-label='Edit profile picture'
+          />
+        }
+      >
+        <Avatar.Fallback>CN</Avatar.Fallback>
+        <Avatar.Icon>
+          <Icon name='pen' />
+        </Avatar.Icon>
+      </Avatar.Root>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Edit profile picture' });
+    expect(button).toHaveClass('cl-avatar');
+    expect(button).toHaveAttribute('data-size', 'lg');
+    expect(ref.current).toBe(button);
+    expect(button.querySelector('.cl-avatar-icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('throws when a part is rendered outside <Avatar.Root>', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<Avatar.Fallback>CN</Avatar.Fallback>)).toThrow(/must be rendered inside <Avatar.Root>/);
+    expect(() => render(<Avatar.Icon />)).toThrow(/must be rendered inside <Avatar.Root>/);
     spy.mockRestore();
   });
 });
