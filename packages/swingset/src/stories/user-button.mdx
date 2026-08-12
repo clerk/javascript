@@ -138,6 +138,20 @@ this mode ignores it, down to the trigger.
   storyModule={UserButtonStories}
 />
 
+## Loading
+
+Memberships, invitations and suggestions are three separate requests, and the popup opens before any
+of them land. `organizationsLoading` holds the workspace list's place until the last one is in — one
+placeholder for all three, so the list does not walk itself in a row at a time. The account row is
+already known, so it renders throughout.
+
+Reopen the popup to watch it again.
+
+<Story
+  name='LoadingOrganizations'
+  storyModule={UserButtonStories}
+/>
+
 ## Single session
 
 An instance in single-session mode holds one account at a time, so there is nothing to switch to and

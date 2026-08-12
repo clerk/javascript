@@ -184,6 +184,8 @@ interface WorkspaceRowProps {
   avatarName?: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
+  /** Names the title element, for a control in the row that has to point at the workspace it acts on. */
+  titleId?: string;
   active?: boolean;
   onSelect?: () => void;
   trailing?: ReactNode;
@@ -197,6 +199,7 @@ function WorkspaceRow({
   avatarName = name,
   imageUrl,
   shape,
+  titleId,
   active,
   onSelect,
   trailing,
@@ -213,6 +216,9 @@ function WorkspaceRow({
       size='xs'
       // The check is decorative, so without this the active row reads like the ones you can switch to.
       aria-current={active ? 'true' : undefined}
+      // Every row stands down `aria-disabled` together, so on its own that reads as unavailable
+      // rather than as running. Carried beside the indicator below, the way `SubmitButton` pairs them.
+      aria-busy={busy || undefined}
       render={select ? rowButton(waiting) : undefined}
       onClick={select}
     >
@@ -225,11 +231,20 @@ function WorkspaceRow({
         />
       </Item.Media>
       <Item.Content>
-        <Item.Title>{name}</Item.Title>
+        <Item.Title id={titleId}>{name}</Item.Title>
       </Item.Content>
       {busy ? (
         <Trailing>
-          <Spinner size='sm' />
+          <Spinner
+            // Focus stays on the row for the length of the action, so the row is what gets re-read
+            // when it changes. A decorative spinner changes nothing there and the wait passes in
+            // silence, so the indicator is named in its own right — the pairing `SubmitButton`
+            // makes, and the reason its pending state is spoken where this one was not.
+            role='progressbar'
+            aria-hidden={undefined}
+            aria-label={m.workspaces.pending}
+            size='sm'
+          />
         </Trailing>
       ) : trailing ? (
         <Item.Actions>{trailing}</Item.Actions>
@@ -566,12 +581,16 @@ interface PendingRowProps {
 /** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
   const { busy, disabled } = useBusy(busyKey);
+  // The button reads the same on every offer and the workspace it acts on is the title beside it,
+  // so pressing tab through the list gives no way to tell them apart without this.
+  const titleId = React.useId();
 
   return (
     <WorkspaceRow
       shape='square'
       name={name}
       imageUrl={imageUrl}
+      titleId={titleId}
       trailing={
         note ? (
           <Item.Description>{note}</Item.Description>
@@ -586,8 +605,10 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
             color='neutral'
             size='sm'
             isPending={busy}
+            pendingLabel={m.workspaces.pending}
             spinDelay={{ delay: 0 }}
             disabled={disabled}
+            aria-describedby={titleId}
             onClick={onAccept}
           >
             {actionLabel}
@@ -687,11 +708,9 @@ function AccountRow({ session, active }: { session: UserButtonSession; active?: 
 /** Holds the workspace list's place until its first page lands. */
 function WorkspaceListLoadingRow() {
   return (
-    // The rows land under a popup that is already open, so nothing else reports the wait ending.
-    <Item.Root
-      size='xs'
-      role='status'
-    >
+    // Plain text rather than a live region: it mounts with its copy already in it, so there is no
+    // change for one to report, and the popup it lands in is read on open either way.
+    <Item.Root size='xs'>
       <Item.Media>
         <Spinner size='sm' />
       </Item.Media>

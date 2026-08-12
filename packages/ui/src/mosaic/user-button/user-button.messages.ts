@@ -20,6 +20,8 @@ export const userButtonBase = {
     accept: 'Accept',
     join: 'Join',
     requested: 'Requested',
+    /** Names the pending indicator on a row and inside the accept and join buttons, read beside the label. */
+    pending: 'pending',
   },
   accounts: {
     heading: 'Accounts',
