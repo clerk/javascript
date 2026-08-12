@@ -1,10 +1,9 @@
 import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './user-button.types';
 
-/**
+/*
  * Which mode puts what where. The surface is four slots deep, in this order, and each mode fills
  * them differently:
  *
- * ```
  *  combined                       organization                 user
  *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
  *  │ Foundry       [Invite][⚙]  │ │ Foundry     [Invite][⚙]  │ │ Alice     [Sign out][⚙]    │ header
@@ -20,7 +19,6 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  *  │ ⤴ Sign out of all accounts │ │ + Create organization    │ │ + Add account              │ ┐
  *  │                            │ │                          │ │ ⤴ Sign out of all accounts │ ┘ footer
  *  └────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
- * ```
  *
  * Both lists read the same way: a heading that carries the list's actions behind a `⋯`, then the
  * rows. The organizations are headed by the active account, since they are the workspaces that
@@ -146,7 +144,7 @@ export function resolveUserButtonLayout(
     actions.organizationsHeading.push(...organizationsHeading.filter(offered));
   }
   // The accounts heading follows its rows, so with no other account there is nothing to carry its
-  // actions and they fall to the footer. Every mode has one.
+  // actions and they fall to the footer, which every mode has.
   if (sessionsHeading !== false) {
     actions[showSessionsHeading ? 'sessionsHeading' : 'footer'].push(...sessionsHeading.filter(offered));
   }
