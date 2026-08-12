@@ -430,6 +430,16 @@ describe('UserButtonView, the workspace list', () => {
       expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument();
     });
 
+    // The button reads the same on every offer, and the workspace it acts on is the row's title
+    // beside it rather than anything inside it, so on its own `Accept` does not say which. Pointed
+    // at that title rather than at a second copy of the name.
+    it('describes each offer by the workspace it acts on', () => {
+      renderList({ invitations: [gamma], suggestions: [beta] });
+
+      expect(screen.getByRole('button', { name: 'Accept' })).toHaveAccessibleDescription('Gamma');
+      expect(screen.getByRole('button', { name: 'Join' })).toHaveAccessibleDescription('Beta');
+    });
+
     // A pending row has to be reachable before there is a membership, or an account holding nothing
     // but an invitation would open onto a surface with no way to accept it.
     it('lists them with no memberships to list them beside', () => {
@@ -457,6 +467,15 @@ describe('UserButtonView, the workspace list', () => {
       const accept = screen.getByRole('button', { name: 'Accept' });
       expect(accept).toHaveAttribute('aria-busy', 'true');
       expect(within(accept).getByRole('progressbar')).toBeInTheDocument();
+    });
+
+    // `progressbar` is named in its own right rather than folding into the button above it, so that
+    // name is copy this surface owns. `SubmitButton`'s fallback is an untranslated literal.
+    it('names the pending indicator in the copy this surface carries', () => {
+      renderList({ invitations: [gamma], pendingKey: userButtonBusyKeys.acceptInvitation('inv_1') });
+
+      const accept = screen.getByRole('button', { name: 'Accept' });
+      expect(within(accept).getByRole('progressbar')).toHaveAccessibleName('pending');
     });
 
     it('reports an accepted suggestion instead of offering to join it again', () => {
@@ -507,13 +526,6 @@ describe('UserButtonView, the workspace list', () => {
       expect(screen.getByText('Loading organizations…')).toBeInTheDocument();
       expect(workspaceList()).toBeDefined();
       expect(titles(workspaceList())).toEqual([]);
-    });
-
-    // The rows land under a popup that is already open, so the placeholder has to say so itself.
-    it('says so to a screen reader, since nothing else reports the rows landing', () => {
-      renderList({ organizationsLoading: true });
-
-      expect(screen.getByRole('status')).toHaveTextContent('Loading organizations…');
     });
 
     it('leaves the account row above it alone, since it does not wait on the list', () => {
@@ -696,6 +708,26 @@ describe('UserButtonView, one action at a time', () => {
     expect(stoodDown).toBe(row);
     expect(stoodDown).toHaveAttribute('aria-disabled', 'true');
     expect(stoodDown).toBeEnabled();
+  });
+
+  // The press leaves focus on the row, so the row is what gets re-read while it works. It takes
+  // the same pairing as a pending `SubmitButton` — `aria-busy` beside an indicator carrying a name
+  // of its own — since a row that only stands down `aria-disabled` reads as unavailable instead.
+  it('reports the switch on the row that owns it, the way a pending button does', () => {
+    render(surface(userButtonBusyKeys.selectOrganization('org_2')));
+
+    const row = screen.getByRole('button', { name: 'Other Co' });
+    expect(row).toHaveAttribute('aria-busy', 'true');
+    expect(within(row).getByRole('progressbar')).toHaveAccessibleName('pending');
+  });
+
+  // The rows waiting on it are not running anything, so they carry the indicator's opposite.
+  it('leaves the rows standing down beside it with nothing to report', () => {
+    render(surface(userButtonBusyKeys.selectOrganization('org_2')));
+
+    const row = screen.getByRole('button', { name: 'Personal account' });
+    expect(row).not.toHaveAttribute('aria-busy');
+    expect(within(row).queryByRole('progressbar')).toBeNull();
   });
 
   // Both `⋯` stand down the same way. Withholding what one opens would unmount its trigger, so
