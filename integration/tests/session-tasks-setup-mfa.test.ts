@@ -206,7 +206,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksSetupMfa] })(
 
     test('can sign in as a different account from the two-step verification step', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
-      const user = u.services.users.createFakeUser({
+      const user = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withPassword: true,
