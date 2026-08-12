@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
@@ -79,11 +78,9 @@ export function Interactive(props: Record<string, unknown>) {
       {...knobsAsProps(props)}
       size='lg'
       render={
-        <Button
+        <button
+          type='button'
           aria-label='Edit profile picture'
-          color='neutral'
-          shape='circle'
-          variant='ghost'
         />
       }
     >

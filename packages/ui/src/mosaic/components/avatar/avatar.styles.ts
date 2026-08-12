@@ -10,8 +10,6 @@ const pulse = stylex.keyframes({
 export const styles = stylex.create({
   // root — sizes and positions its parts; fill comes from the image or fallback
   base: {
-    // An avatar used as a native button has no border shrinking the avatar inside it.
-    borderWidth: { default: null, ':is(button)': 0 },
     alignItems: 'center',
     aspectRatio: '1 / 1',
     display: 'inline-flex',
@@ -23,9 +21,20 @@ export const styles = stylex.create({
     position: 'relative',
     userSelect: 'none',
     verticalAlign: 'middle',
-    // Button's own largest size is smaller; non-button roots continue to follow the size axis.
-    minHeight: { default: null, ':is(button)': space['12'] },
-    minWidth: { default: null, ':is(button)': space['12'] },
+  },
+
+  interactive: {
+    // An avatar used as a native button has no border shrinking the avatar inside it.
+    borderWidth: 0,
+    outline: {
+      default: 'none',
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+    },
+    cursor: {
+      default: 'pointer',
+      ':is(:disabled, [aria-disabled="true"])': 'not-allowed',
+    },
+    outlineOffset: '2px',
   },
 
   // Carries the root's radius rather than leaning on the clip alone, so a part that paints its own
@@ -69,7 +78,6 @@ export const styles = stylex.create({
   },
 
   icon: {
-    '--_cl-icon-color': colorVars['--cl-color-avatar-icon'],
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-full'],
     borderStyle: 'solid',
@@ -79,8 +87,8 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-card'],
     boxSizing: 'border-box',
     display: 'flex',
-    insetBlockEnd: `calc(0px - ${space['2']})`,
-    insetInlineStart: '-4.5px',
+    insetBlockEnd: `calc(${space['2']} * -1)`,
+    insetInlineStart: `calc(${space['1']} * -1)`,
     justifyContent: 'center',
     position: 'absolute',
     height: space['6'],

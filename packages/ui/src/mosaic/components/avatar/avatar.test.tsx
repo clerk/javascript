@@ -4,7 +4,6 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Button } from '../button';
 import { Icon } from '../icon';
 import { Avatar } from './avatar';
 
@@ -289,11 +288,9 @@ describe('Mosaic Avatar', () => {
         ref={ref}
         size='lg'
         render={
-          <Button
+          <button
+            type='button'
             aria-label='Edit profile picture'
-            color='neutral'
-            shape='circle'
-            variant='ghost'
           />
         }
       >
@@ -305,7 +302,7 @@ describe('Mosaic Avatar', () => {
     );
 
     const button = screen.getByRole('button', { name: 'Edit profile picture' });
-    expect(button).toHaveClass('cl-avatar', 'cl-button');
+    expect(button).toHaveClass('cl-avatar');
     expect(button).toHaveAttribute('data-size', 'lg');
     expect(ref.current).toBe(button);
     expect(button.querySelector('.cl-avatar-icon')).toHaveAttribute('aria-hidden', 'true');
