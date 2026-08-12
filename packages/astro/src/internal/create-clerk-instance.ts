@@ -90,7 +90,9 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
         $csrState.setKey('organization', payload.organization);
       });
     })
-    .catch(() => {});
+    .catch((err: Error) => {
+      console.error(err.stack || err.message || err);
+    });
 }
 
 function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOptions<TUi>) {
