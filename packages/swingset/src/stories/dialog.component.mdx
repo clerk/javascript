@@ -26,7 +26,6 @@ primitive's focus trapping, scroll lock, and ARIA wiring.
     { name: 'onOpenChange', type: '(open: boolean) => void' },
     { name: 'modal', type: 'boolean', default: 'true' },
     { name: 'closedBy', type: "'any' | 'closerequest' | 'none'", default: "'any'" },
-    { name: 'syncBrowserChrome', type: 'boolean', default: 'true' },
   ]}
 />
 
@@ -233,22 +232,6 @@ Opacity and scale are driven off `data-starting-style` / `data-ending-style`, wi
 than the entrance. The popup scales from its own centre. Under
 `prefers-reduced-motion: reduce` only `transform` drops out — the fade still runs, since the
 vestibular concern is the movement.
-
-### Browser chrome
-
-On a phone an open dialog also tints the browser's own chrome, so it reads as one continuous
-surface rather than a dimmed page inside undimmed furniture. Two things move together:
-`<meta name="theme-color">` (the address bar and toolbar) and `<body>`'s background (the overscroll
-gutter and the strip revealed as the address bar collapses — areas a `position: fixed` scrim cannot
-cover).
-
-It is on by default and holds no opinion: the colour is derived from the backdrop's computed
-background composited over the page's own, the meta is prepended rather than mutated (so it
-overrides the app's tag — including framework-managed ones like Next's `viewport.themeColor` —
-and removal restores it), the body colour is saved and restored, and stacked dialogs share one
-meta.
-
-Pass `syncBrowserChrome={false}` if the app drives `theme-color` itself.
 
 ### On-screen keyboards
 
