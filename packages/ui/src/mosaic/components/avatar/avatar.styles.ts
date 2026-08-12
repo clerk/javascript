@@ -24,12 +24,14 @@ export const styles = stylex.create({
   },
 
   interactive: {
+    background: 'transparent',
     // An avatar used as a native button has no border shrinking the avatar inside it.
     borderWidth: 0,
     outline: {
       default: 'none',
       ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
     },
+    appearance: 'none',
     cursor: {
       default: 'pointer',
       ':is(:disabled, [aria-disabled="true"])': 'not-allowed',
