@@ -23,7 +23,7 @@ const loader = (overrides: Partial<ProtectLoader> = {}): ProtectLoader => ({
   target: 'head',
   type: 'script',
   attributes: { 'data-cid': '{cid}', type: 'module' },
-  tokenTimeoutMs: 200,
+  token_timeout_ms: 200,
   ...overrides,
 });
 
@@ -70,9 +70,9 @@ const harness = () => {
   return { applyLoader, elements, injected };
 };
 
-const session = (loaders: ProtectLoader[]) => {
+const session = (loaders: ProtectLoader[], tokensInvalidBefore?: number) => {
   const h = harness();
-  return { session: ProtectSession.create(loaders, h.applyLoader), ...h };
+  return { session: ProtectSession.create(loaders, h.applyLoader, tokensInvalidBefore), ...h };
 };
 
 /** What the server does: the script body assigns the global, then the element fires `load`. */
@@ -344,7 +344,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('reports timeout when ready never settles', async () => {
-    const { session: created, injected } = session([loader({ tokenTimeoutMs: 60 })]);
+    const { session: created, injected } = session([loader({ token_timeout_ms: 60 })]);
     created?.start();
 
     serveInline(await injected(), { cid: created?.placeholders().cid, ready: new Promise(() => {}) });
@@ -365,7 +365,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('reports script_error when the loader element fails to load', async () => {
-    const { session: created, injected } = session([loader({ tokenTimeoutMs: 5_000 })]);
+    const { session: created, injected } = session([loader({ token_timeout_ms: 5_000 })]);
     created?.start();
 
     (await injected()).dispatchEvent(new Event('error'));
@@ -374,7 +374,7 @@ describe('ProtectSession inline token', () => {
   });
 
   it('reports timeout when the loader never settles', async () => {
-    const { session: created, injected } = session([loader({ tokenTimeoutMs: 40 })]);
+    const { session: created, injected } = session([loader({ token_timeout_ms: 40 })]);
     created?.start();
     await injected();
 
@@ -475,6 +475,42 @@ describe('ProtectSession inline token', () => {
     expect(params?.__clerk_protect_token).toBeUndefined();
   });
 
+  it('re-acquires when the configured floor has moved past the stored one', async () => {
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.revoked.mac', floor: 1_000 }));
+
+    // Raising tokens_invalid_before is the recovery lever: a bad mint or a rolled key leaves
+    // browsers holding something the server will not accept, and without this they would keep
+    // sending it for the token's full lifetime.
+    const { session: created, injected } = session([loader()], 2_000);
+    expect(created?.hasFreshToken()).toBe(false);
+
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('keeps a token acquired at or above the configured floor', () => {
+    localStorage.setItem('__clerk_protect_st', storedEntry({ floor: 2_000 }));
+    expect(session([loader()], 2_000).session?.hasFreshToken()).toBe(true);
+  });
+
+  it('keeps cached tokens for an instance that has never set a floor', () => {
+    // An absent floor counts as zero on both sides, so introducing the mechanism must not make
+    // every browser re-acquire at once.
+    localStorage.setItem('__clerk_protect_st', storedEntry());
+    expect(session([loader()]).session?.hasFreshToken()).toBe(true);
+  });
+
+  it('stamps the floor in force onto a token it acquires', async () => {
+    const { session: created, injected } = session([loader()], 2_000);
+    created?.start();
+    serveInline(await injected(), { cid: created?.placeholders().cid });
+    await created?.getRequestParams();
+
+    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({ floor: 2_000 });
+  });
+
   it('reuses a mint whose version this build predates', async () => {
     localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v9.cached.mac' }));
 
@@ -499,7 +535,7 @@ describe('ProtectSession inline token', () => {
 
 describe('ProtectSession upgrade mint', () => {
   const upgrade = (overrides: Partial<ProtectLoader> = {}) =>
-    loader({ tokenUrl: 'https://loader.example.com/{cid}/token', ...overrides });
+    loader({ token_url: 'https://loader.example.com/{cid}/token', ...overrides });
 
   it('fetches the explicitly configured endpoint once the loader has run', async () => {
     const { session: created, injected } = session([upgrade()]);
@@ -534,7 +570,7 @@ describe('ProtectSession upgrade mint', () => {
       .mockImplementationOnce(() => Promise.resolve(retryResponse()))
       .mockImplementationOnce(() => Promise.resolve(tokenResponse()));
 
-    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    const { session: created, injected } = session([upgrade({ token_timeout_ms: 1_000 })]);
     created?.start();
     (await injected()).dispatchEvent(new Event('load'));
 
@@ -547,7 +583,7 @@ describe('ProtectSession upgrade mint', () => {
       .mockImplementationOnce(() => Promise.resolve(errorResponse(503)))
       .mockImplementationOnce(() => Promise.resolve(tokenResponse()));
 
-    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    const { session: created, injected } = session([upgrade({ token_timeout_ms: 1_000 })]);
     created?.start();
     (await injected()).dispatchEvent(new Event('load'));
 
@@ -558,7 +594,7 @@ describe('ProtectSession upgrade mint', () => {
   it('reports a non-retryable http status without retrying', async () => {
     (global.fetch as Mock).mockImplementation(() => Promise.resolve(errorResponse(400)));
 
-    const { session: created, injected } = session([upgrade({ tokenTimeoutMs: 1_000 })]);
+    const { session: created, injected } = session([upgrade({ token_timeout_ms: 1_000 })]);
     created?.start();
     (await injected()).dispatchEvent(new Event('load'));
 
@@ -636,8 +672,26 @@ describe('ProtectSession storage', () => {
 });
 
 describe('ProtectSession deadlines', () => {
+  it('honours a deadline that arrived under its wire name', async () => {
+    // The loaders array is assigned straight out of /v1/environment with no case conversion, so a
+    // fixture written as a TS literal agrees with the type by construction and can never catch a
+    // key the server does not send. `token_timeout_ms` was read as `tokenTimeoutMs` and was
+    // therefore always undefined in production while every test passed. Parse the wire shape.
+    const wire = JSON.parse(
+      '{"target":"head","type":"script","attributes":{"data-cid":"{cid}","type":"module"},"token_timeout_ms":50}',
+    ) as ProtectLoader;
+
+    const { session: created } = session([wire]);
+    created?.start();
+
+    const startedAt = Date.now();
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    // Misread, this would fall back to the 5s default and be two orders of magnitude out.
+    expect(Date.now() - startedAt).toBeLessThan(1_000);
+  });
+
   it('holds a sign-in no longer than the deadline, however long acquisition takes', async () => {
-    const { session: created } = session([loader({ tokenTimeoutMs: 50 })]);
+    const { session: created } = session([loader({ token_timeout_ms: 50 })]);
     created?.start();
 
     const startedAt = Date.now();
@@ -646,7 +700,7 @@ describe('ProtectSession deadlines', () => {
   });
 
   it('starts a fresh run once the cooldown has passed with no token to show for the last one', async () => {
-    const { session: created, injected, elements } = session([loader({ tokenTimeoutMs: 1_000 })]);
+    const { session: created, injected, elements } = session([loader({ token_timeout_ms: 1_000 })]);
     created?.start();
     (await injected()).dispatchEvent(new Event('error'));
 
@@ -664,7 +718,7 @@ describe('ProtectSession deadlines', () => {
   });
 
   it('does not re-run within the cooldown', async () => {
-    const { session: created, injected, elements } = session([loader({ tokenTimeoutMs: 1_000 })]);
+    const { session: created, injected, elements } = session([loader({ token_timeout_ms: 1_000 })]);
     created?.start();
     (await injected()).dispatchEvent(new Event('error'));
 
@@ -711,8 +765,8 @@ describe('ProtectSession cross-tab single flight', () => {
   it('runs the loader once when several tabs start together', async () => {
     const request = installSerialisingLocks();
 
-    const a = session([loader({ tokenTimeoutMs: 1_000 })]);
-    const b = session([loader({ tokenTimeoutMs: 1_000 })]);
+    const a = session([loader({ token_timeout_ms: 1_000 })]);
+    const b = session([loader({ token_timeout_ms: 1_000 })]);
     a.session?.start();
     b.session?.start();
 

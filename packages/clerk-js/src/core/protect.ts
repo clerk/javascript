@@ -29,13 +29,13 @@ export class Protect {
     // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
     // down with it.
     try {
-      this.#apply(config.loaders);
+      this.#apply(config.loaders, config.tokens_invalid_before);
     } catch (error) {
       logger.warnOnce(`[protect] failed to load: ${error}`);
     }
   }
 
-  #apply(configured: ProtectLoader[]): void {
+  #apply(configured: ProtectLoader[], tokensInvalidBefore?: number): void {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
@@ -43,7 +43,7 @@ export class Protect {
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
     // not using it is unaffected and stores nothing in the browser.
     const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
-    this.#session = ProtectSession.create(loaders, applyLoader);
+    this.#session = ProtectSession.create(loaders, applyLoader, tokensInvalidBefore);
 
     for (const loader of loaders) {
       // The session injects this one itself, under the acquisition lock, so exactly one tab per
@@ -100,10 +100,10 @@ export class Protect {
       }
     }
 
-    if (loader.textContent && typeof loader.textContent === 'string') {
+    if (loader.text_content && typeof loader.text_content === 'string') {
       element.textContent = placeholders
-        ? interpolatePlaceholders(loader.textContent, placeholders)
-        : loader.textContent;
+        ? interpolatePlaceholders(loader.text_content, placeholders)
+        : loader.text_content;
     }
 
     switch (target) {

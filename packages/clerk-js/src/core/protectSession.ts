@@ -114,13 +114,20 @@ type StoredToken = {
    * bounds both by elapsed local time, which is measured entirely on the one clock.
    */
   at: number;
+  /**
+   * The `tokens_invalid_before` in force when this was acquired. Raising the configured value
+   * strands every entry stamped with an older one, so a bad mint or a key roll is recovered from
+   * in minutes rather than over the token's full lifetime.
+   */
+  floor: number;
 };
 
 /**
- * A token as it arrives from a mint, before it is stored. `at` is stamped by the write rather
- * than carried from here, so the two states are different types and a producer cannot forget it.
+ * A token as it arrives from a mint, before it is stored. `at` and `floor` are stamped by the
+ * write rather than carried from here, so the two states are different types and a producer
+ * cannot forget either.
  */
-type MintedToken = Omit<StoredToken, 'at'>;
+type MintedToken = Omit<StoredToken, 'at' | 'floor'>;
 
 type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
@@ -238,9 +245,10 @@ function readOrMintPid(): string | null {
 /**
  * Reads the shared token store. `marginMs` is how much remaining life a token needs to count as
  * present: the acquisition path demands a margin so a run starts before the token lapses, while
- * the request path takes anything not yet expired.
+ * the request path takes anything not yet expired. `floor` is the instance's currently configured
+ * `tokens_invalid_before`; an entry acquired under an older one is stranded.
  */
-function readStoredToken(key: string, marginMs: number): StoredToken | null {
+function readStoredToken(key: string, marginMs: number, floor: number): StoredToken | null {
   const raw = readStored(key);
   if (!raw) {
     return null;
@@ -257,16 +265,26 @@ function readStoredToken(key: string, marginMs: number): StoredToken | null {
     return null;
   }
 
-  const { token, exp, rid, at } = parsed as Record<string, unknown>;
+  const { token, exp, rid, at, floor: storedFloor } = parsed as Record<string, unknown>;
   if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid)) {
     return null;
   }
   if (!freshByLocalClock(at)) {
     return null;
   }
+  // An entry with no floor predates the mechanism and counts as zero, so an instance that has
+  // never set one keeps its cached tokens rather than re-acquiring on every browser at once.
+  if (normalizeFloor(storedFloor) < floor) {
+    return null;
+  }
 
   const validated = validateToken(token, exp, marginMs);
-  return validated ? { ...validated, rid, at: at as number } : null;
+  return validated ? { ...validated, rid, at: at as number, floor: normalizeFloor(storedFloor) } : null;
+}
+
+/** A floor is unix seconds; anything else configured or stored is treated as no floor at all. */
+function normalizeFloor(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 /**
@@ -310,9 +328,9 @@ function validateToken(token: unknown, exp: unknown, marginMs: number): { token:
   return { token, exp };
 }
 
-/** `at` is the writer's business, not the caller's — it is stamped here, at the write. */
-function writeStoredToken(key: string, value: MintedToken): void {
-  writeStored(key, JSON.stringify({ ...value, at: Date.now() }));
+/** `at` and `floor` are the writer's business, not the caller's — both stamped here, at the write. */
+function writeStoredToken(key: string, value: MintedToken, floor: number): void {
+  writeStored(key, JSON.stringify({ ...value, at: Date.now(), floor }));
 }
 
 /** Sentinel for "the deadline won", distinguishable from anything `ready` could resolve to. */
@@ -414,11 +432,11 @@ function withDeadline(promise: Promise<ProtectStatus>, ms: number): Promise<Prot
 /** Every string a loader can carry a placeholder in. */
 function templatedValues(loader: ProtectLoader): string[] {
   const values: string[] = [];
-  if (typeof loader.tokenUrl === 'string') {
-    values.push(loader.tokenUrl);
+  if (typeof loader.token_url === 'string') {
+    values.push(loader.token_url);
   }
-  if (typeof loader.textContent === 'string') {
-    values.push(loader.textContent);
+  if (typeof loader.text_content === 'string') {
+    values.push(loader.text_content);
   }
   for (const value of Object.values(loader.attributes ?? {})) {
     if (typeof value === 'string') {
@@ -470,6 +488,8 @@ export class ProtectSession {
    * One store per origin. The token is scoped to the instance that minted it and is verified
    * server-side, so an origin serving two instances costs a rejected token, never a wrong grant.
    */
+  /** Currently configured `tokens_invalid_before`; 0 when the instance has never set one. */
+  readonly #floor: number = 0;
   readonly #tokenStorageKey: string;
   readonly #lock: ReturnType<typeof SafeLock>;
 
@@ -484,16 +504,21 @@ export class ProtectSession {
    * Returns a session only when at least one loader references a placeholder — an instance using
    * none of them is unaffected.
    */
-  static create(loaders: ProtectLoader[], applyLoader: ApplyLoader): ProtectSession | undefined {
+  static create(
+    loaders: ProtectLoader[],
+    applyLoader: ApplyLoader,
+    tokensInvalidBefore?: number,
+  ): ProtectSession | undefined {
     const templated = loaders.filter(isTemplated);
     if (templated.length === 0) {
       return undefined;
     }
-    return new ProtectSession(templated, applyLoader);
+    return new ProtectSession(templated, applyLoader, tokensInvalidBefore);
   }
 
-  private constructor(templatedLoaders: ProtectLoader[], applyLoader: ApplyLoader) {
+  private constructor(templatedLoaders: ProtectLoader[], applyLoader: ApplyLoader, tokensInvalidBefore?: number) {
     this.#applyLoader = applyLoader;
+    this.#floor = normalizeFloor(tokensInvalidBefore);
 
     // Nothing is persisted for a loader that only templates the SDK version: that needs no minted
     // identity, so minting one would plant a durable id nobody asked for.
@@ -514,7 +539,7 @@ export class ProtectSession {
     const tokenLoader = templatedLoaders.find(isCorrelated);
     this.#tokenLoader = tokenLoader;
     this.#tokenUrl = tokenLoader ? resolveTokenUrl(tokenLoader, this.#placeholders) : undefined;
-    this.#timeoutMs = clampTimeout(tokenLoader?.tokenTimeoutMs);
+    this.#timeoutMs = clampTimeout(tokenLoader?.token_timeout_ms);
 
     this.#tokenStorageKey = TOKEN_STORAGE_KEY;
     this.#lock = SafeLock(ACQUISITION_LOCK_KEY);
@@ -553,7 +578,7 @@ export class ProtectSession {
 
     // Re-read: another tab may have completed a run after ours gave up. The send margin is what
     // stops us shipping a token with a second of life left, which could only fail verification.
-    const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS);
+    const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
     if (stored) {
       return {
         __clerk_protect_token: stored.token,
@@ -579,7 +604,7 @@ export class ProtectSession {
   }
 
   #freshStoredToken(): StoredToken | null {
-    return readStoredToken(this.#tokenStorageKey, TOKEN_REFRESH_MARGIN_MS);
+    return readStoredToken(this.#tokenStorageKey, TOKEN_REFRESH_MARGIN_MS, this.#floor);
   }
 
   /**
@@ -594,7 +619,7 @@ export class ProtectSession {
     if (!this.#acquisitionSettled) {
       return;
     }
-    if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS)) {
+    if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor)) {
       return;
     }
     if (Date.now() - this.#lastAttemptAt < this.#backoffMs()) {
@@ -624,7 +649,7 @@ export class ProtectSession {
       this.#acquisitionSettled = true;
       // Judged on whether a token landed, not on the status: another tab may have won the lock
       // and written one while this attempt reported `timeout`, and that is not a failure.
-      this.#consecutiveFailures = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS)
+      this.#consecutiveFailures = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor)
         ? 0
         : this.#consecutiveFailures + 1;
       return status;
@@ -680,7 +705,7 @@ export class ProtectSession {
       return inline;
     }
 
-    writeStoredToken(this.#tokenStorageKey, inline);
+    writeStoredToken(this.#tokenStorageKey, inline, this.#floor);
     return 'ok';
   }
 
@@ -749,7 +774,7 @@ export class ProtectSession {
           if (!token) {
             return 'fetch_error';
           }
-          writeStoredToken(this.#tokenStorageKey, token);
+          writeStoredToken(this.#tokenStorageKey, token, this.#floor);
           return 'ok';
         }
 
@@ -785,13 +810,13 @@ export function clampTimeout(configured: unknown): number {
  * token arrives inline with the loader and there is no endpoint to resolve.
  */
 function resolveTokenUrl(loader: ProtectLoader, placeholders: ProtectPlaceholders): string | undefined {
-  if (typeof loader.tokenUrl !== 'string' || !loader.tokenUrl) {
+  if (typeof loader.token_url !== 'string' || !loader.token_url) {
     return undefined;
   }
 
   const base = typeof document !== 'undefined' ? document.baseURI : undefined;
   try {
-    return new URL(interpolatePlaceholders(loader.tokenUrl, placeholders), base).href;
+    return new URL(interpolatePlaceholders(loader.token_url, placeholders), base).href;
   } catch {
     return undefined;
   }

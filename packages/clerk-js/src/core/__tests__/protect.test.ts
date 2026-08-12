@@ -15,7 +15,7 @@ const loader = (overrides: Partial<ProtectLoader> = {}): ProtectLoader => ({
   target: 'head',
   type: 'script',
   attributes: { 'data-cid': '{cid}', type: 'module' },
-  tokenTimeoutMs: 200,
+  token_timeout_ms: 200,
   ...overrides,
 });
 
@@ -111,7 +111,7 @@ describe('Protect.load', () => {
 
   it('substitutes placeholders in textContent as well as attributes', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ textContent: 'window.__vendor_cid = "{cid}";' })]));
+    protect.load(environment([loader({ text_content: 'window.__vendor_cid = "{cid}";' })]));
 
     const element = await injected('script');
     expect(element.textContent).toBe(`window.__vendor_cid = "${element.getAttribute('data-cid')}";`);
@@ -171,7 +171,7 @@ describe('Protect.load', () => {
 
   it('reports script_error when the loader element fails to load', async () => {
     const protect = new Protect();
-    protect.load(environment([loader({ tokenTimeoutMs: 5_000 })]));
+    protect.load(environment([loader({ token_timeout_ms: 5_000 })]));
 
     (await injected('script')).dispatchEvent(new Event('error'));
 
