@@ -57,6 +57,17 @@ const [open, setOpen] = useState(false);
 <Dialog.Root modal={false}>{/* focus is not trapped and the rest of the page stays interactive */}</Dialog.Root>
 ```
 
+### Controlling dismissal
+
+```tsx
+// Escape still backs out, but a stray click on the backdrop won't discard the form.
+<Dialog.Root closedBy='closerequest'>{/* trigger + portal */}</Dialog.Root>
+```
+
+Reach for `closerequest` on anything holding user input or confirming a destructive action.
+Reserve `none` for flows the user must complete or explicitly acknowledge — it removes the
+keyboard exit, so it breaks the usual expectation that Escape dismisses a modal.
+
 ## Parts
 
 | Part                 | Default Element | Description                                                         |
@@ -80,12 +91,24 @@ for centered, scroll-locked modal behavior nest `Dialog.Popup` inside `Dialog.Vi
 
 ### `Dialog.Root`
 
-| Prop                      | Type                                 | Default            | Description                                    |
-| ------------------------- | ------------------------------------ | ------------------ | ---------------------------------------------- |
-| <code>open</code>         | <code>boolean</code>                 | —                  | Controlled open state                          |
-| <code>defaultOpen</code>  | <code>boolean</code>                 | <code>false</code> | Initial open state (uncontrolled)              |
-| <code>onOpenChange</code> | <code>(open: boolean) => void</code> | —                  | Called when the open state changes             |
-| <code>modal</code>        | <code>boolean</code>                 | <code>true</code>  | Trap focus and make the rest of the page inert |
+| Prop                      | Type                                           | Default            | Description                                    |
+| ------------------------- | ---------------------------------------------- | ------------------ | ---------------------------------------------- |
+| <code>open</code>         | <code>boolean</code>                           | —                  | Controlled open state                          |
+| <code>defaultOpen</code>  | <code>boolean</code>                           | <code>false</code> | Initial open state (uncontrolled)              |
+| <code>onOpenChange</code> | <code>(open: boolean) => void</code>           | —                  | Called when the open state changes             |
+| <code>modal</code>        | <code>boolean</code>                           | <code>true</code>  | Trap focus and make the rest of the page inert |
+| <code>closedBy</code>     | <code>'any' \| 'closerequest' \| 'none'</code> | <code>'any'</code> | Which gestures dismiss the dialog              |
+
+<code>closedBy</code> mirrors the native <code>&lt;dialog closedby&gt;</code> attribute:
+
+| Value                     | Escape | Outside press | Programmatic |
+| ------------------------- | ------ | ------------- | ------------ |
+| <code>any</code>          | yes    | yes           | yes          |
+| <code>closerequest</code> | yes    | no            | yes          |
+| <code>none</code>         | no     | no            | yes          |
+
+A single ordered enum rather than two booleans, so the fourth combination — outside press
+dismisses but Escape does not — stays unrepresentable.
 
 ### `Dialog.Portal`
 

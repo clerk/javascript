@@ -120,8 +120,15 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 });
 
-interface DialogProps extends Pick<HeadlessDialogProps, 'open' | 'defaultOpen' | 'onOpenChange' | 'modal'> {
-  trigger: MosaicComponentProps<'button'>['render'];
+interface DialogProps extends Pick<
+  HeadlessDialogProps,
+  'open' | 'defaultOpen' | 'onOpenChange' | 'modal' | 'closedBy'
+> {
+  /**
+   * Renders the button that opens the dialog. Omit for dialogs driven entirely by `open` —
+   * opened from a menu item, a route, or a state machine — where there is no trigger to render.
+   */
+  trigger?: MosaicComponentProps<'button'>['render'];
   children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
   size?: DialogVariantProps['size'];
 }
@@ -134,7 +141,7 @@ function DialogContent({ children }: { children: DialogProps['children'] }) {
   return <>{children({ close: () => setOpen(false) })}</>;
 }
 
-export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChange, modal }: DialogProps) {
+export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChange, modal, closedBy }: DialogProps) {
   return (
     <DialogVariantContext.Provider value={{ size }}>
       <Primitive.Root
@@ -142,8 +149,9 @@ export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChang
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
         modal={modal}
+        closedBy={closedBy}
       >
-        <Primitive.Trigger render={trigger} />
+        {trigger ? <Primitive.Trigger render={trigger} /> : null}
         <Primitive.Portal>
           <Backdrop />
           <Viewport>

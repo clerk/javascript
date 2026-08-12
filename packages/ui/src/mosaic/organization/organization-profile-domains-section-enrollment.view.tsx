@@ -42,6 +42,7 @@ export function OrganizationProfileDomainsSectionEnrollmentView({
 
   return (
     <Dialog.Root
+      closedBy='closerequest'
       open={isOpen}
       onOpenChange={open => {
         if (!open) {

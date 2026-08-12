@@ -63,12 +63,35 @@ const [open, setOpen] = useState(false);
 
 ### `Dialog.Root`
 
-| Prop           | Type                      | Default | Description                             |
-| -------------- | ------------------------- | ------- | --------------------------------------- |
-| `open`         | `boolean`                 | —       | Controlled open state                   |
-| `defaultOpen`  | `boolean`                 | `false` | Initial open state (uncontrolled)       |
-| `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes          |
-| `modal`        | `boolean`                 | `true`  | Traps focus and blocks page interaction |
+| Prop           | Type                                | Default | Description                             |
+| -------------- | ----------------------------------- | ------- | --------------------------------------- |
+| `open`         | `boolean`                           | —       | Controlled open state                   |
+| `defaultOpen`  | `boolean`                           | `false` | Initial open state (uncontrolled)       |
+| `onOpenChange` | `(open: boolean) => void`           | —       | Called when open state changes          |
+| `modal`        | `boolean`                           | `true`  | Traps focus and blocks page interaction |
+| `closedBy`     | `'any' \| 'closerequest' \| 'none'` | `'any'` | Which gestures dismiss the dialog       |
+
+#### `closedBy`
+
+Mirrors the native `<dialog closedby>` attribute.
+
+| Value          | Escape | Outside press | Programmatic |
+| -------------- | ------ | ------------- | ------------ |
+| `any`          | ✅     | ✅            | ✅           |
+| `closerequest` | ✅     | ❌            | ✅           |
+| `none`         | ❌     | ❌            | ✅           |
+
+```tsx
+// A form dialog: Escape backs out, a stray backdrop click doesn't discard input.
+<Dialog.Root closedBy='closerequest'>{/* ... */}</Dialog.Root>
+```
+
+Reach for `closerequest` on anything holding user input or confirming a destructive action.
+Reserve `none` for flows the user genuinely must complete or explicitly acknowledge — it removes
+the keyboard exit, so it fails the usual expectation that Escape dismisses a modal.
+
+A single ordered enum rather than two booleans: it keeps the fourth combination — outside press
+dismisses but Escape does not — unrepresentable.
 
 ### `Dialog.Portal`
 

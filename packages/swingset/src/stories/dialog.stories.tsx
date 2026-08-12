@@ -20,7 +20,8 @@ export function Default() {
     <Dialog.Root>
       <Dialog.Trigger>Open dialog</Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Backdrop>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
           <Dialog.Popup>
             <Dialog.Title>Confirm action</Dialog.Title>
             <Dialog.Description>
@@ -28,7 +29,7 @@ export function Default() {
             </Dialog.Description>
             <Dialog.Close>Cancel</Dialog.Close>
           </Dialog.Popup>
-        </Dialog.Backdrop>
+        </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>
   );
