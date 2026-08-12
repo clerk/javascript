@@ -715,9 +715,8 @@ function OrganizationListLoadingRow() {
  * The workspaces the active account can switch between, under the account's own heading. This is
  * the group that scrolls.
  *
- * The heading is not the list's to withhold: an account with no organizations still needs somewhere
- * to manage and sign out of itself. The other two modes name the account in their header instead,
- * or are not about it at all.
+ * The heading can render without the list: an account with no organizations still needs somewhere
+ * to manage and sign out of itself.
  */
 function OrganizationSection() {
   const data = useUserButtonContext();
