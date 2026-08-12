@@ -104,18 +104,18 @@ export function resolveUserButtonLayout(
   modePriority: UserButtonModePriority,
   data: UserButtonData,
 ): UserButtonLayout {
-  const layout: ModeLayout = modes[mode];
-  const organizationsHeading = layout.organizations === false ? false : layout.organizations.heading;
-  const sessionsHeading = layout.sessions === false ? false : layout.sessions.heading;
+  const declared: ModeLayout = modes[mode];
+  const organizationsHeading = declared.organizations === false ? false : declared.organizations.heading;
+  const sessionsHeading = declared.sessions === false ? false : declared.sessions.heading;
 
   const hasOtherSessions = data.additionalSessions.length > 0;
   // A pending invitation or suggestion counts: it has to be reachable before there is a membership.
   // Loading does not count, so an account with none never opens a list that then disappears.
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
-  const showOrganizations = layout.organizations !== false && hasOrganizations;
+  const showOrganizations = declared.organizations !== false && hasOrganizations;
   const showOrganizationsHeading = organizationsHeading !== false;
-  const showSessions = layout.sessions !== false && hasOtherSessions;
+  const showSessions = declared.sessions !== false && hasOtherSessions;
   const showSessionsHeading = showSessions && sessionsHeading !== false;
 
   const offered = (action: UserButtonAction): boolean => {
@@ -134,10 +134,10 @@ export function resolveUserButtonLayout(
   };
 
   const actions: Record<UserButtonSlot, UserButtonAction[]> = {
-    header: layout.header.filter(offered),
+    header: declared.header.filter(offered),
     organizationsHeading: [],
     sessionsHeading: [],
-    footer: layout.footer.filter(offered),
+    footer: declared.footer.filter(offered),
   };
 
   if (organizationsHeading !== false) {
