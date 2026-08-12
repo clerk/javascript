@@ -64,7 +64,8 @@ const feedbackDialog = Dialog.createHandle();
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
 the active trigger's payload, so one dialog renders per-trigger content. Type the payload through
-the handle: `Dialog.createHandle<Payload>()`.
+the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
+dialog; for data that can change while it is open, carry an id and read live state inside.
 
 ```tsx
 const detail = Dialog.createHandle<{ name: string }>();

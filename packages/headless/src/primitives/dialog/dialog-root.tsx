@@ -110,7 +110,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       openFromTrigger: (id, event) => {
         const registration = store.getTrigger(id);
         setActiveTriggerId(id);
-        setActivePayload(registration?.payload);
+        setActivePayload(registration?.getPayload());
         if (registration) {
           refs.setReference(registration.element);
         }
@@ -124,16 +124,15 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       },
       setOpen: nextOpen => floatingContext.onOpenChange(nextOpen),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- floatingContext.onOpenChange, setActiveTriggerId and refs are stable
-  }, [store]);
+    // `floatingContext` is rebuilt on open/element changes; re-registering is an idempotent swap.
+  }, [store, refs, floatingContext, setActiveTriggerId]);
 
   // The floating reference is the ACTIVE trigger — return focus and outside-press exclusion
   // both read `elements.domReference`. With no active trigger the first
   // registered one stands in, preserving single-trigger behaviour for `defaultOpen` dialogs.
   //
-  // Subscribed imperatively rather than through `useSyncExternalStore`: re-registration must not
-  // re-render this component, or a trigger whose `payload` is an inline object literal would
-  // re-register on every render of its own and the two would feed each other forever.
+  // Subscribed imperatively rather than through `useSyncExternalStore`, so triggers mounting
+  // and unmounting re-resolve the reference without re-rendering the root.
   useLayoutEffect(() => {
     const resolve = () => {
       const active = activeTriggerId != null ? store.getTrigger(activeTriggerId) : undefined;
@@ -141,8 +140,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
     };
     resolve();
     return store.subscribe(resolve);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refs is stable
-  }, [store, activeTriggerId]);
+  }, [store, activeTriggerId, refs]);
 
   // For opens that arrive without a trigger activation — a controlled `open`/`triggerId` pair,
   // `defaultOpen` — the payload is looked up from the registry once the dialog is open. Runs
@@ -150,7 +148,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // the time it reads, and the pre-paint re-render delivers their payload on the first frame.
   useLayoutEffect(() => {
     if (open) {
-      setActivePayload(activeTriggerId != null ? store.getTrigger(activeTriggerId)?.payload : undefined);
+      setActivePayload(activeTriggerId != null ? store.getTrigger(activeTriggerId)?.getPayload() : undefined);
     }
   }, [store, open, activeTriggerId]);
 
@@ -178,7 +176,10 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
 
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
-  const setOpen = useCallback((nextOpen: boolean) => floatingContext.onOpenChange(nextOpen), [floatingContext]);
+  const setOpen = useCallback(
+    (nextOpen: boolean, event?: Event) => floatingContext.onOpenChange(nextOpen, event),
+    [floatingContext],
+  );
 
   const contextValue = useMemo<DialogContextValue>(
     () => ({

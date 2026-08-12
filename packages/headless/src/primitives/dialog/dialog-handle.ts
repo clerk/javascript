@@ -11,7 +11,8 @@
 export interface DialogTriggerRegistration<Payload = unknown> {
   id: string;
   element: HTMLElement;
-  payload: Payload | undefined;
+  /** Read lazily so a `payload` with unstable identity never re-registers the trigger. */
+  getPayload: () => Payload | undefined;
 }
 
 /**

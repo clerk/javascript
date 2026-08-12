@@ -638,13 +638,34 @@ describe('Dialog', () => {
       expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
     });
 
-    it('resolves the function form with an empty type on programmatic close', async () => {
+    it('resolves the function form with the forwarded interaction type on Close press', async () => {
       const user = userEvent.setup();
       const finalFocus = vi.fn(() => undefined);
       render(<FinalFocusFixture finalFocus={finalFocus} />);
 
       await user.click(screen.getByRole('button', { name: 'Open dialog' }));
       await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(finalFocus).toHaveBeenCalledWith('mouse');
+      // A Close press is not a dismissal, so the default still returns focus to the trigger.
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
+    });
+
+    it('resolves the function form with an empty type on programmatic close', () => {
+      const handle = Dialog.createHandle();
+      const finalFocus = vi.fn(() => undefined);
+      render(
+        <Dialog.Root
+          handle={handle}
+          defaultOpen
+        >
+          <Dialog.Popup finalFocus={finalFocus}>
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Root>,
+      );
+
+      act(() => handle.close());
 
       expect(finalFocus).toHaveBeenCalledWith('');
     });

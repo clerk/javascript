@@ -16,7 +16,8 @@ export interface DialogTriggerProps<Payload = unknown> extends ComponentProps<'b
   handle?: DialogHandle<Payload>;
   /**
    * Data delivered to the root when this trigger opens the dialog, for per-trigger content:
-   * the root's children-as-function receives it as `{ payload }`.
+   * the root's children-as-function receives it as `{ payload }`. Captured at open; changes
+   * while the dialog is open are not reflected.
    */
   payload?: Payload;
 }
@@ -53,16 +54,22 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
     // trigger it is attributed to.
     const showsOpen = open && (activeTriggerId === null || activeTriggerId === triggerId);
 
+    // The registration hands out a payload getter rather than a snapshot: an inline-literal
+    // `payload` changes identity every render, and re-registering on it would notify the store
+    // (and flap the root's reference element) each time.
+    const payloadRef = React.useRef(payload);
+    React.useLayoutEffect(() => {
+      payloadRef.current = payload;
+    });
+
     const elementRef = React.useRef<HTMLButtonElement | null>(null);
     React.useLayoutEffect(() => {
       const element = elementRef.current;
       if (!element) {
         return;
       }
-      return store.registerTrigger({ id: triggerId, element, payload });
-    }, [store, triggerId, payload]);
-
-    const state = { open: showsOpen };
+      return store.registerTrigger({ id: triggerId, element, getPayload: () => payloadRef.current });
+    }, [store, triggerId]);
 
     const ownProps = {
       type: 'button',
@@ -82,7 +89,7 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
       defaultTagName: 'button',
       render,
       ref: [elementRef, ref],
-      state,
+      state: { open: showsOpen },
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
       },

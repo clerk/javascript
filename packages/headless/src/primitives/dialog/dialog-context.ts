@@ -6,7 +6,8 @@ import type { DialogHandle } from './dialog-handle';
 
 export interface DialogContextValue {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  /** The optional event marks the change as user-driven, letting `finalFocus` resolve its interaction type. */
+  setOpen: (open: boolean, event?: Event) => void;
   floatingContext: FloatingContext;
   refs: ExtendedRefs<ReferenceType>;
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
