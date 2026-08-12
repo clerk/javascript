@@ -24,7 +24,7 @@ export const styles = stylex.create({
     alignItems: 'center',
   },
 
-  // Matches `Item.Title`, so the trigger names a workspace the same way its row does. Capped,
+  // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-neutral'],
