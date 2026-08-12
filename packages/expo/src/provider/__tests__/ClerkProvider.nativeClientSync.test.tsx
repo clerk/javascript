@@ -172,6 +172,33 @@ describe('ClerkProvider native client sync', () => {
     });
   });
 
+  test('does not start native client synchronization when disabled', async () => {
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+        __experimental_disableNativeClientSync
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mocks.configure).not.toHaveBeenCalled();
+    expect(mocks.getClientToken).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.addListener).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.handleUnauthenticated).toBe(originalHandleUnauthenticated);
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+    });
+
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+  });
+
   test('configures native once with the cached device token during StrictMode bootstrap', async () => {
     mocks.tokenCache.getToken.mockResolvedValue('client-token');
     mocks.getClientToken.mockResolvedValue('client-token');
@@ -1151,12 +1178,15 @@ describe('ClerkProvider native client sync', () => {
       user: { id: 'user_1' },
     };
     const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    let reentersUnauthenticated = false;
 
     mocks.clerkInstance.client = {
       signedInSessions: [removedSession],
       lastActiveSessionId: 'session_1',
       fetch: vi.fn().mockImplementation(async () => {
-        await mocks.clerkInstance.handleUnauthenticated();
+        if (reentersUnauthenticated) {
+          await mocks.clerkInstance.handleUnauthenticated();
+        }
         throw new Error('stale session 401');
       }),
     };
@@ -1177,6 +1207,7 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
     });
 
+    reentersUnauthenticated = true;
     await act(async () => {
       await mocks.clerkInstance.handleUnauthenticated();
     });
@@ -1229,6 +1260,149 @@ describe('ClerkProvider native client sync', () => {
 
     expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token');
     expect(originalHandleUnauthenticated).toHaveBeenCalled();
+  });
+
+  test('runs native recovery once for a burst of unauthenticated responses', async () => {
+    const removedSession = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn().mockResolvedValue(null);
+
+    mocks.clerkInstance.client = {
+      signedInSessions: [removedSession],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    mocks.clerkInstance.session = removedSession;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+    expect(originalHandleUnauthenticated).toHaveBeenCalledTimes(2);
+  });
+
+  test('recovers again inside the cooldown window once native pushes a new device token', async () => {
+    const session = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn();
+    const client = {
+      id: 'client_1',
+      signedInSessions: [session],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    fetchClient.mockResolvedValue(client);
+
+    mocks.clerkInstance.client = client;
+    mocks.clerkInstance.session = session;
+    mocks.getClientToken.mockResolvedValue('native-client-token');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    // Drop the client fetches the bootstrap already made; only the 401 handling matters here.
+    fetchClient.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'rotated-native-client-token');
+    });
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    expect(fetchClient).toHaveBeenCalledTimes(2);
+    expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
+  });
+
+  test('keeps the cooldown when a failed recovery rolls the device token back', async () => {
+    const session = {
+      id: 'session_1',
+      status: 'active',
+      user: { id: 'user_1' },
+    };
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+    const fetchClient = vi.fn().mockRejectedValue(new Error('stale session 401'));
+
+    mocks.clerkInstance.client = {
+      id: 'client_1',
+      signedInSessions: [session],
+      lastActiveSessionId: 'session_1',
+      fetch: fetchClient,
+    };
+    mocks.clerkInstance.session = session;
+    // Cached token A differs from native token B, so the rollback write changes the cached value.
+    mocks.tokenCache.getToken.mockResolvedValue('cached-token-A');
+    mocks.getClientToken.mockResolvedValue('native-token-B');
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mocks.configure).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mocks.clerkInstance.handleUnauthenticated).not.toBe(originalHandleUnauthenticated);
+    });
+
+    fetchClient.mockClear();
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await mocks.clerkInstance.handleUnauthenticated();
+    });
+
+    // The rollback is internal recovery, not an external rotation, so the second 401 delegates to core.
+    expect(fetchClient).toHaveBeenCalledTimes(1);
+    expect(originalHandleUnauthenticated).toHaveBeenCalledTimes(1);
   });
 
   test('refreshes native from the server after the JS client changes', async () => {
@@ -1717,6 +1891,7 @@ describe('ClerkProvider native client sync', () => {
 
     mocks.getClientToken.mockResolvedValue('ghost-device-token');
     mocks.tokenCache.saveToken.mockClear();
+    mocks.syncClientStateFromJs.mockClear();
 
     await act(async () => {
       await mocks.clerkInstance.handleUnauthenticated();
@@ -1727,6 +1902,10 @@ describe('ClerkProvider native client sync', () => {
     expect(originalHandleUnauthenticated).not.toHaveBeenCalled();
     expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'ghost-device-token');
     expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'js-device-token');
+    // The rollback write is notification-suppressed, so the restored token reaches native via a direct push.
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith('js-device-token', expect.any(String), false, true);
+    });
   });
 
   test('skips native adoption when the cached device token read times out while signed in', async () => {

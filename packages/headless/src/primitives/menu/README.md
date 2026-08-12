@@ -139,7 +139,7 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 - Nested menus open on hover (75ms delay) with a `safePolygon` safe zone.
 - Only one sibling submenu can be open at a time.
 - Clicking any item with `closeOnClick={true}` (default) closes the entire menu tree via a tree event.
-- `Escape` closes the innermost menu first, bubbling up through the tree.
+- `Escape` closes one level: the innermost open menu, leaving its parent — a parent menu, or a `Popover` the menu is rendered inside — open. Pressing it again closes the next level up. An outside press is the opposite: it dismisses the whole stack at once.
 
 ## Important Notes
 

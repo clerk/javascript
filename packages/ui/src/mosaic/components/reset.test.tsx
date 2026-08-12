@@ -7,11 +7,13 @@ import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
 import { Card } from './card';
+import { Field } from './field';
 import { Heading } from './heading';
 import { Icon } from './icon';
 import { Input } from './input';
 import { Item } from './item';
 import { reset } from './reset.styles';
+import { Settings } from './settings';
 import { Text } from './text';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
@@ -43,6 +45,10 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Card.Header', <Card.Header key='card-header' />],
   ['Card.Content', <Card.Content key='card-content' />],
   ['Card.Footer', <Card.Footer key='card-footer' />],
+  ['Field.Root', <Field.Root key='field-root' />],
+  ['Field.Label', <Field.Label key='field-label' />],
+  ['Field.Description', <Field.Description key='field-description' />],
+  ['Field.Error', <Field.Error key='field-error' />],
   ['Heading', <Heading key='heading'>Title</Heading>],
   [
     'Icon',
@@ -55,6 +61,17 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Item', <Item.Root key='item' />],
   ['Item.Group', <Item.Group key='item-group' />],
   ['Item.Separator', <Item.Separator key='item-separator' />],
+  ['Settings', <Settings.Root key='settings' />],
+  ['Settings.Title', <Settings.Title key='settings-title'>Account</Settings.Title>],
+  ['Settings.Group', <Settings.Group key='settings-group' />],
+  ['Settings.Row', <Settings.Row key='settings-row' />],
+  ['Settings.Items', <Settings.Items key='settings-items' />],
+  ['Settings.Item', <Settings.Item key='settings-item' />],
+  ['Settings.Media', <Settings.Media key='settings-media' />],
+  ['Settings.Content', <Settings.Content key='settings-content' />],
+  ['Settings.Label', <Settings.Label key='settings-label' />],
+  ['Settings.Description', <Settings.Description key='settings-description' />],
+  ['Settings.Actions', <Settings.Actions key='settings-actions' />],
   ['Text', <Text key='text'>Body copy</Text>],
 ];
 

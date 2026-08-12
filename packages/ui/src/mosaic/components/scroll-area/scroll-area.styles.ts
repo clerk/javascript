@@ -63,12 +63,20 @@ const styles = stylex.create({
     minHeight: 0,
   },
 
-  /** The scroll container itself. */
+  /**
+   * The scroll container itself.
+   *
+   * The scroll padding answers the fade: tabbing to a row below the fold would otherwise land it
+   * flush against the edge the mask fades out, on the one row you just moved to. Block axis only,
+   * like everything else here.
+   */
   viewport: {
     overscrollBehavior: 'contain',
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,
+    scrollPaddingBlockEnd: fadeSize,
+    scrollPaddingBlockStart: fadeSize,
     minHeight: 0,
     overflowX: 'hidden',
     overflowY: 'auto',

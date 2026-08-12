@@ -17,12 +17,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test.beforeEach(() => {
       const u = createTestUtils({ app });
-      regularFakeUser = u.services.users.createFakeUser({
+      regularFakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
       });
-      fakeUserForOAuth = u.services.users.createFakeUser({
+      fakeUserForOAuth = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,

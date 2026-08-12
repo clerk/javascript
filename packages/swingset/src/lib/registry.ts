@@ -25,6 +25,7 @@ import { Default as DestructiveDefault, meta as destructiveMeta } from '../stori
 import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
 import { meta as dialogMeta } from '../stories/dialog.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
+import { Default as FieldDefault, meta as fieldMeta } from '../stories/field.component.stories';
 import { meta as fileUploadMeta } from '../stories/file-upload.stories';
 import {
   Colors as HeadingColors,
@@ -105,6 +106,13 @@ import {
   ThemedScrollbar as ScrollAreaThemedScrollbar,
 } from '../stories/scroll-area.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  ConnectedAccounts as SettingsConnectedAccounts,
+  Default as SettingsDefault,
+  Destructive as SettingsDestructive,
+  meta as settingsMeta,
+  MultipleEmailAndPhoneNumbers as SettingsMultipleEmailAndPhoneNumbers,
+} from '../stories/settings.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
@@ -115,10 +123,23 @@ import {
 } from '../stories/text.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import {
+  Combined as UserButtonCombined,
+  meta as userButtonMeta,
+  Organizations as UserButtonOrganizations,
+  User as UserButtonUser,
+} from '../stories/user-button.stories';
 import { toSlug } from './slug';
 import type { StoryModule } from './types';
 
 const destructiveModule: StoryModule = { meta: destructiveMeta, Default: DestructiveDefault };
+const settingsModule: StoryModule = {
+  meta: settingsMeta,
+  Default: SettingsDefault,
+  MultipleEmailAndPhoneNumbers: SettingsMultipleEmailAndPhoneNumbers,
+  ConnectedAccounts: SettingsConnectedAccounts,
+  Destructive: SettingsDestructive,
+};
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
   Default: OrganizationProfileLeaveSectionDefault,
@@ -187,6 +208,13 @@ const itemModule: StoryModule = {
   Scrolling: ItemScrolling,
 };
 
+const userButtonModule: StoryModule = {
+  meta: userButtonMeta,
+  Combined: UserButtonCombined,
+  Organizations: UserButtonOrganizations,
+  User: UserButtonUser,
+};
+
 const headingModule: StoryModule = {
   meta: headingMeta,
   Default: HeadingDefault,
@@ -199,6 +227,11 @@ const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: Men
 const tabsComponentModule: StoryModule = { meta: tabsComponentMeta, Default: TabsComponentDefault };
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
+
+const fieldModule: StoryModule = {
+  meta: fieldMeta,
+  Default: FieldDefault,
+};
 
 const iconModule: StoryModule = {
   meta: iconMeta,
@@ -237,6 +270,8 @@ const scrollAreaModule: StoryModule = {
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 export const registry: StoryModule[] = [
+  // User
+  userButtonModule,
   // Organization
   organizationProfileModule,
   organizationProfileGeneralPanelModule,
@@ -260,8 +295,10 @@ export const registry: StoryModule[] = [
   iconModule,
   menuComponentModule,
   popoverComponentModule,
+  settingsModule,
   tabsComponentModule,
   textModule,
+  fieldModule,
   // Primitives — alphabetical within the group.
   accordionModule,
   autocompleteModule,

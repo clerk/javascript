@@ -46,6 +46,18 @@ export function Primary(props: Record<string, unknown>) {
   );
 }
 
+export function Pending(props: Record<string, unknown>) {
+  return (
+    <Avatar.Root {...knobsAsProps(props)}>
+      <Avatar.Image
+        src='/api/pending-image'
+        alt='@clerk'
+      />
+      <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
+  );
+}
+
 export function Fallback(props: Record<string, unknown>) {
   return (
     <Avatar.Root {...knobsAsProps(props)}>

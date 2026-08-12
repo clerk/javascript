@@ -19,7 +19,7 @@ test.describe('electron basic auth @electron', () => {
 
   test.beforeAll(async ({ electronTestApp }) => {
     const u = createTestUtils({ app: electronTestApp });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 

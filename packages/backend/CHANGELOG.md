@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.16.4
+
+### Patch Changes
+
+- Update the `lockUser()` documentation to link to the current Rules page in the Clerk Dashboard. ([#9372](https://github.com/clerk/javascript/pull/9372)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+## 3.16.3
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/shared@4.28.1
+
+## 3.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/shared@4.28.0
+
 ## 3.16.1
 
 ### Patch Changes

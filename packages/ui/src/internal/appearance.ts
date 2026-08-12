@@ -233,6 +233,11 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
 
   checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormPromoCodeRoot: WithOptions;
+  checkoutFormPromoCodeInput: WithOptions;
+  checkoutFormPromoCodeApplyButton: WithOptions;
+  checkoutFormPromoCodeErrorText: WithOptions;
+  checkoutFormPromoCodeRemoveButton: WithOptions;
   checkoutFormElementsRoot: WithOptions;
 
   checkoutSuccessRoot: WithOptions;

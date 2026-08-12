@@ -14,6 +14,8 @@ export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Field } from '../components/field';
+export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
@@ -32,11 +34,25 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Settings, settingsVars } from '../components/settings';
+export type {
+  SettingsActionsProps,
+  SettingsContentProps,
+  SettingsDescriptionProps,
+  SettingsGroupProps,
+  SettingsItemProps,
+  SettingsItemsProps,
+  SettingsLabelProps,
+  SettingsMediaProps,
+  SettingsMediaSize,
+  SettingsRootProps,
+  SettingsRowProps,
+  SettingsTitleProps,
+} from '../components/settings';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
-
 export { Popover } from '../components/popover';
 export type {
   PopoverCloseProps,
