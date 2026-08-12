@@ -10,6 +10,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { reset } from '../reset.styles';
+import { acquireBrowserChrome } from './browser-chrome';
 import { backdropMotion, closeInsets, popupMotion, sizes, styles, viewportSizes } from './dialog.styles';
 import { acquireKeyboardInset } from './keyboard-inset';
 
@@ -19,6 +20,17 @@ export type DialogSize = keyof typeof sizes;
 export interface DialogRootProps<Payload = unknown> extends HeadlessDialogProps<Payload> {
   /** Width, and for `panel` also height, of the dialog surface. @default 'prompt' */
   size?: DialogSize;
+  /**
+   * Tint the mobile browser's own chrome — the address bar, and the canvas behind the overscroll
+   * gutter — to match the dialog's scrim, so an open dialog reads as one continuous surface.
+   *
+   * On by default. It ships no colour of its own (the target is derived from the backdrop
+   * composited over whatever the page already had), reverts exactly on close, and is inert
+   * wherever `theme-color` is ignored. Pass `false` if the app drives `theme-color` itself.
+   *
+   * @default true
+   */
+  syncBrowserChrome?: boolean;
 }
 
 /**
@@ -28,6 +40,56 @@ export interface DialogRootProps<Payload = unknown> extends HeadlessDialogProps<
  * tree; Dialog's parts are siblings, so the Root is the only place both can read.
  */
 const DialogSizeContext = React.createContext<DialogSize>('prompt');
+
+/** Whether the dialog tints the mobile browser's chrome to match its scrim. See `browser-chrome.ts`. */
+const DialogChromeContext = React.createContext(true);
+
+/**
+ * Drives the browser-chrome tint off the backdrop element itself, so both the colour and the timing
+ * come from the CSS rather than from constants duplicated in JS.
+ *
+ * Keyed on the NODE via state rather than a ref: the effect has to run once the backdrop is in the
+ * DOM and its computed style is readable, and a ref gives no signal when that happens.
+ */
+function useBrowserChrome(node: HTMLElement | null, enabled: boolean) {
+  React.useEffect(() => {
+    if (!enabled || !node) {
+      return;
+    }
+
+    // Driven by the backdrop's own transition attributes rather than by mount and unmount, so the
+    // colour runs on exactly the same clock as the scrim in both directions.
+    //
+    // Both attributes matter, for different reasons. `data-ending-style` because the headless
+    // layer keeps the backdrop mounted until its exit animation finishes, so releasing at unmount
+    // starts the revert only once the scrim has already gone. And `data-starting-style` because
+    // that frame carries an inline `transition: none` — acquiring there reads a duration of `0s`
+    // and the fade becomes a snap. Waiting for both to be absent is precisely waiting for the
+    // scrim's transition to arm.
+    //
+    // Two-way, because an exit can be interrupted: re-opening mid-exit clears the attribute on the
+    // same element, and the tint has to come back without waiting for a remount.
+    let handle: (() => void) | null = null;
+    const sync = () => {
+      const transitioning = node.hasAttribute('data-starting-style') || node.hasAttribute('data-ending-style');
+      if (transitioning && handle) {
+        handle();
+        handle = null;
+      } else if (!transitioning && !handle) {
+        handle = acquireBrowserChrome(node);
+      }
+    };
+
+    const observer = new MutationObserver(sync);
+    observer.observe(node, { attributes: true, attributeFilter: ['data-starting-style', 'data-ending-style'] });
+    sync();
+
+    return () => {
+      observer.disconnect();
+      handle?.();
+    };
+  }, [node, enabled]);
+}
 
 /**
  * The headless parts type their props (and the `render` callback's argument) against
@@ -73,10 +135,17 @@ export type DialogPopupProps = MosaicComponentProps<'div'> & {
 };
 
 /** Owns the open state and the size both the backdrop and the popup read. */
-function Root<Payload = unknown>({ size = 'prompt', children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({
+  size = 'prompt',
+  syncBrowserChrome = true,
+  children,
+  ...rest
+}: DialogRootProps<Payload>) {
   return (
     <DialogSizeContext.Provider value={size}>
-      <Primitive.Root<Payload> {...rest}>{children}</Primitive.Root>
+      <DialogChromeContext.Provider value={syncBrowserChrome}>
+        <Primitive.Root<Payload> {...rest}>{children}</Primitive.Root>
+      </DialogChromeContext.Provider>
     </DialogSizeContext.Provider>
   );
 }
@@ -167,9 +236,22 @@ const Backdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(function 
   ref,
 ) {
   const size = React.useContext(DialogSizeContext);
+  const [node, setNode] = React.useState<HTMLElement | null>(null);
+  useBrowserChrome(node, React.useContext(DialogChromeContext));
+  const mergedRef = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      setNode(el);
+      if (typeof ref === 'function') {
+        ref(el);
+      } else if (ref) {
+        ref.current = el;
+      }
+    },
+    [ref],
+  );
   return (
     <Primitive.Backdrop
-      ref={ref}
+      ref={mergedRef}
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         stylex.props(reset.base, styles.backdrop, backdropMotion[size]),
@@ -255,6 +337,8 @@ export interface DialogProps extends Pick<
   children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
   /** Width, and for `panel` also height, of the dialog surface. @default 'prompt' */
   size?: DialogSize;
+  /** Tint the mobile browser chrome to match the scrim. @default true */
+  syncBrowserChrome?: boolean;
 }
 
 function DialogContent({ children }: { children: DialogProps['children'] }) {
@@ -275,10 +359,21 @@ function DialogContent({ children }: { children: DialogProps['children'] }) {
  * keeps its focus management, scroll lock, and ARIA wiring. Drop to the compound parts
  * (`Dialog.Root` and friends) for layouts this wrapper does not cover.
  */
-export function Dialog({ trigger, children, size, open, defaultOpen, onOpenChange, modal, closedBy }: DialogProps) {
+export function Dialog({
+  trigger,
+  children,
+  size,
+  syncBrowserChrome,
+  open,
+  defaultOpen,
+  onOpenChange,
+  modal,
+  closedBy,
+}: DialogProps) {
   return (
     <Root
       size={size}
+      syncBrowserChrome={syncBrowserChrome}
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}

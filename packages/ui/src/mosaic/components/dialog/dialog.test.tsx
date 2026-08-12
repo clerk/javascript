@@ -494,6 +494,111 @@ describe('viewport scroll behaviour', () => {
   });
 });
 
+describe('browser chrome sync', () => {
+  const themeColor = () => document.head.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+
+  const addEmailTriggerShared = (props: MosaicComponentProps<'button'>) => (
+    <button
+      type='button'
+      {...props}
+    >
+      Add email
+    </button>
+  );
+
+  afterEach(() => {
+    document.head.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
+    document.body.style.backgroundColor = '';
+  });
+
+  it('adds a theme-color meta while open and removes it on close', async () => {
+    const user = userEvent.setup();
+    expect(themeColor()).toBeNull();
+
+    render(
+      <Dialog defaultOpen>
+        {({ close }) => (
+          <button
+            type='button'
+            onClick={close}
+          >
+            Dismiss
+          </button>
+        )}
+      </Dialog>,
+    );
+    // Acquired when the backdrop's transition arms — one frame after mount — not on the mount
+    // frame itself, where an inline `transition: none` would make the fade a snap.
+    await waitFor(() => expect(themeColor()).not.toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+    await waitFor(() => expect(themeColor()).toBeNull());
+  });
+
+  it('prepends its meta so it wins over the app’s own, and leaves that one untouched', async () => {
+    const appMeta = document.createElement('meta');
+    appMeta.name = 'theme-color';
+    appMeta.content = 'rgb(10, 20, 30)';
+    document.head.append(appMeta);
+
+    render(<Dialog defaultOpen>Body</Dialog>);
+    await waitFor(() => expect(document.head.querySelectorAll('meta[name="theme-color"]')).toHaveLength(2));
+
+    const metas = document.head.querySelectorAll('meta[name="theme-color"]');
+    // First in tree order is what the UA uses, so ours has to be first — and theirs unchanged.
+    expect(metas).toHaveLength(2);
+    expect(metas[0]).not.toBe(appMeta);
+    expect(appMeta.content).toBe('rgb(10, 20, 30)');
+  });
+
+  it('opts out with syncBrowserChrome={false}', () => {
+    render(
+      <Dialog
+        defaultOpen
+        syncBrowserChrome={false}
+      >
+        Body
+      </Dialog>,
+    );
+
+    expect(themeColor()).toBeNull();
+  });
+
+  it('keeps the tint when a dialog re-opens before the previous teardown fires', async () => {
+    // Regression: closing schedules the meta's removal after the fade. React StrictMode's
+    // mount → cleanup → mount, or simply opening again quickly, used to let that deferred
+    // removal fire and strip the tint from a dialog that was still open.
+    const user = userEvent.setup();
+    const { rerender } = render(<Dialog open>Body</Dialog>);
+    await waitFor(() => expect(themeColor()).not.toBeNull());
+
+    rerender(<Dialog open={false}>Body</Dialog>);
+    rerender(<Dialog open>Body</Dialog>);
+
+    await new Promise(resolve => setTimeout(resolve, 250));
+    expect(themeColor()).not.toBeNull();
+    await user.keyboard('{Escape}');
+  });
+
+  it('keeps one meta for stacked dialogs and removes it only with the last', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dialog defaultOpen>
+        <div>Outer</div>
+        <Dialog trigger={addEmailTriggerShared}>
+          <div>Inner</div>
+        </Dialog>
+      </Dialog>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+    expect(document.head.querySelectorAll('meta[name="theme-color"]')).toHaveLength(1);
+
+    await user.keyboard('{Escape}');
+    expect(themeColor()).not.toBeNull();
+  });
+});
+
 describe('accessible name warning', () => {
   it('warns when the dialog has no accessible name', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
