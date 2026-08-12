@@ -28,9 +28,7 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  */
 
 /** The four places an action can land. Every mode has a header and a footer; the headings vary. */
-const slots = ['header', 'organizationsHeading', 'sessionsHeading', 'footer'] as const;
-
-export type UserButtonSlot = (typeof slots)[number];
+export type UserButtonSlot = 'header' | 'organizationsHeading' | 'sessionsHeading' | 'footer';
 
 export type UserButtonAction =
   | 'addAccount'
@@ -122,22 +120,6 @@ export function resolveUserButtonLayout(
   const showSessions = layout.sessions !== false && hasOtherSessions;
   const showSessionsHeading = showSessions && sessionsHeading !== false;
 
-  const actions: Record<UserButtonSlot, UserButtonAction[]> = {
-    header: [...layout.header],
-    organizationsHeading: [],
-    sessionsHeading: [],
-    footer: [...layout.footer],
-  };
-
-  // A heading the data left out has nowhere to put its actions, so they fall to the footer. Every
-  // mode has one.
-  if (organizationsHeading !== false) {
-    actions[showOrganizationsHeading ? 'organizationsHeading' : 'footer'].push(...organizationsHeading);
-  }
-  if (sessionsHeading !== false) {
-    actions[showSessionsHeading ? 'sessionsHeading' : 'footer'].push(...sessionsHeading);
-  }
-
   const offered = (action: UserButtonAction): boolean => {
     switch (action) {
       // Inviting belongs to whichever organization is active, even where the account is what heads
@@ -153,8 +135,20 @@ export function resolveUserButtonLayout(
     }
   };
 
-  for (const slot of slots) {
-    actions[slot] = actions[slot].filter(offered);
+  const actions: Record<UserButtonSlot, UserButtonAction[]> = {
+    header: layout.header.filter(offered),
+    organizationsHeading: [],
+    sessionsHeading: [],
+    footer: layout.footer.filter(offered),
+  };
+
+  if (organizationsHeading !== false) {
+    actions.organizationsHeading.push(...organizationsHeading.filter(offered));
+  }
+  // The accounts heading follows its rows, so with no other account there is nothing to carry its
+  // actions and they fall to the footer. Every mode has one.
+  if (sessionsHeading !== false) {
+    actions[showSessionsHeading ? 'sessionsHeading' : 'footer'].push(...sessionsHeading.filter(offered));
   }
 
   return {
