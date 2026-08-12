@@ -50,6 +50,7 @@ describe('SignInSocialButtons', () => {
             secondFactorUrl: 'factor-two',
             resetPasswordUrl: 'reset-password',
             __internal_navigateOnSetActive: expect.any(Function),
+            __internal_navigate: expect.any(Function),
           }),
         }),
       );

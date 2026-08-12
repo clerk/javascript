@@ -151,7 +151,7 @@ export const StatementPage = () => {
                           <Statement.SectionContentDetailsListItem
                             label={`${item.totals.discounts.discount.name} ${getDiscountDescription(
                               item.totals.discounts.discount,
-                              item.totals.discounts.discount.cyclesRemaining,
+                              item.totals.discounts.discount.durationInCycles,
                               item.subscriptionItem.planPeriod,
                               { $, t },
                             )}`}

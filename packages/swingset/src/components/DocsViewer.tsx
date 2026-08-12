@@ -10,6 +10,9 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
+  user: {
+    'user-button': dynamic(() => import('../stories/user-button.mdx')),
+  },
   organization: {
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
@@ -41,6 +44,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    field: dynamic(() => import('../stories/field.component.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.

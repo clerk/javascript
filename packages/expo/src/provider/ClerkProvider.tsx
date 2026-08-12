@@ -49,6 +49,13 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_resourceCache?: BuildClerkOptions['__experimental_resourceCache'];
+  /**
+   * Disables synchronization between the Clerk JS and native clients.
+   * Only use this when the application does not render Clerk native components.
+   *
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_disableNativeClientSync?: boolean;
 };
 
 const SDK_METADATA = {
@@ -66,9 +73,11 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
+    __experimental_disableNativeClientSync = false,
     ...rest
   } = props;
   const pk = publishableKey;
+  const nativeClientSyncEnabled = isNative() && !__experimental_disableNativeClientSync;
   const tokenCacheListenersRef = useRef<Set<DeviceTokenCacheListener>>(new Set());
   const suppressTokenCacheNotificationsRef = useRef(0);
   const nativeRefreshFromJsControllerRef = useRef<NativeRefreshFromJsController | null>(null);
@@ -91,6 +100,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
 
   const suppressJsClientChangedRef = useRef(0);
   const { isMountedRef, isNativeClientReady } = useNativeClientBootstrap({
+    enabled: nativeClientSyncEnabled,
     publishableKey: pk,
     nativeRefreshFromJsControllerRef,
     suppressTokenCacheNotificationsRef,
@@ -98,7 +108,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     clerkInstance,
   });
   useNativeClientEventSync({
-    enabled: isNativeClientReady,
+    enabled: nativeClientSyncEnabled && isNativeClientReady,
     clerkInstance,
     isMountedRef,
     nativeRefreshFromJsControllerRef,
@@ -134,7 +144,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         ...(isNative() && { runtimeEnvironment: 'headless' as const }),
       }}
     >
-      {isNative() && (
+      {nativeClientSyncEnabled && (
         <NativeClientSync
           enabled={isNativeClientReady}
           clerkInstance={clerkInstance}

@@ -492,6 +492,26 @@ export class Clerk implements ClerkInterface {
     return this.#protectAssertionSet ? this.#protectAssertion : this.#options.protectAssertion;
   }
 
+  /**
+   * The Protect params for one sign-in or sign-up body. The application-supplied assertion and the
+   * server-configured session token are independent features that write disjoint params, so both
+   * contribute and neither can suppress the other: they are resolved concurrently, and a failure on
+   * one side costs only that side's params. Resolves to `undefined` when neither produces anything,
+   * so a request from an instance using no Protect feature is byte-for-byte what it was before.
+   */
+  async #protectParams(): Promise<Record<string, string | undefined> | undefined> {
+    const [assertion, session] = await Promise.all([
+      protectAssertionParams(this.#currentProtectAssertion()).catch(() => undefined),
+      this.#protect?.getRequestParams().catch(() => undefined),
+    ]);
+
+    if (!assertion && !session) {
+      return undefined;
+    }
+
+    return { ...assertion, ...session };
+  }
+
   get isSignedIn(): boolean {
     const hasPendingSession = this?.session?.status === 'pending';
     if (hasPendingSession) {
@@ -529,7 +549,7 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
-      getProtectParams: () => protectAssertionParams(this.#currentProtectAssertion()),
+      getProtectParams: () => this.#protectParams(),
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
@@ -2405,10 +2425,14 @@ export class Clerk implements ClerkInterface {
     const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
     const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
 
+    // The component router expects raw component-relative paths; buildUrlWithAuth would absolutize
+    // them on development instances and push the navigation back out to the window.
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function'
         ? customNavigate(this.buildUrlWithAuth(to))
-        : this.navigate(this.buildUrlWithAuth(to));
+        : params.__internal_navigate && typeof params.__internal_navigate === 'function'
+          ? params.__internal_navigate(to)
+          : this.navigate(this.buildUrlWithAuth(to));
 
     return this._handleRedirectCallback(params, {
       signUp,
@@ -2757,8 +2781,9 @@ export class Clerk implements ClerkInterface {
     }
     const { signIn, signUp } = this.client;
 
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+      resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
 
     return this._handleRedirectCallback(params, {
       signUp,
