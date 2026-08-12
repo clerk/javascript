@@ -36,6 +36,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
 ) {
   const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
   const value = React.useMemo<AvatarContextValue>(() => ({ status, onStatusChange: setStatus }), [status]);
+  const interactive = Boolean(render);
   const element = useRender({
     defaultTagName: 'span',
     render,
@@ -43,7 +44,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
     props: {
       ...mergeStyleProps(
         themeProps('avatar', { shape, size }),
-        stylex.props(reset.base, styles.base, shapes[shape], sizes[size]),
+        stylex.props(reset.base, styles.base, shapes[shape], sizes[size], interactive && styles.interactive),
         className,
         style,
       ),
