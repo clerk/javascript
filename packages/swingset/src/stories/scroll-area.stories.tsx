@@ -51,7 +51,7 @@ function OrganizationRow({ name }: { name: string }) {
         </Avatar.Root>
       </Item.Media>
       <Item.Content>
-        <Item.Title>{name}</Item.Title>
+        <Item.Label>{name}</Item.Label>
       </Item.Content>
     </Item.Root>
   );
@@ -166,7 +166,7 @@ export function Gutter() {
                       </Avatar.Root>
                     </Item.Media>
                     <Item.Content>
-                      <Item.Title>{name}</Item.Title>
+                      <Item.Label>{name}</Item.Label>
                     </Item.Content>
                     {/* The shift is only legible against something reaching the content's right edge. */}
                     <div className='bg-border h-4 w-8 rounded-full' />

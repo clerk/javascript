@@ -88,7 +88,7 @@ What we keep: `css` prop (with plain objects), `keyframes`, `Global`, style seri
 
 Every Mosaic part carries a **stable class** and reflects its variants and state as **data attributes** — no hashed classnames or registry keys to learn. `themeProps(slot, variants)` (in `props.ts`) emits:
 
-- `class="cl-<slot>"` — the slot identity (`.cl-button`, `.cl-item`, `.cl-item-title`)
+- `class="cl-<slot>"` — the slot identity (`.cl-button`, `.cl-item`, `.cl-item-label`)
 - `data-<axis>="<value>"` — the resolved variant (`data-variant="outline"`, `data-size="sm"`)
 - `data-<state>` — boolean state or boolean variant, presence-only (`data-interactive=""`); omitted when the value is false/null
 

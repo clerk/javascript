@@ -73,11 +73,13 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 // The `cl-` slot classes are Mosaic's public theming hooks, so they are a stable handle on the
 // popup's sections rather than an implementation detail.
 const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
-const titles = (group: HTMLElement | undefined) =>
-  Array.from(group?.querySelectorAll('.cl-item-title') ?? []).map(node => node.textContent ?? '');
-const row = (group: HTMLElement | undefined, title: string) =>
+const labels = (group: HTMLElement | undefined) =>
+  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='primary']") ?? []).map(
+    node => node.textContent ?? '',
+  );
+const row = (group: HTMLElement | undefined, label: string) =>
   Array.from(group?.querySelectorAll<HTMLElement>('.cl-item') ?? []).find(
-    node => node.querySelector('.cl-item-title')?.textContent === title,
+    node => node.querySelector(".cl-item-label[data-variant='primary']")?.textContent === label,
   );
 
 const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
@@ -87,7 +89,7 @@ const workspaceList = () => groups().find(group => scrollClasses.every(name => g
 
 /** The accounts group: the one whose rows are titled by identifier rather than by workspace name. */
 const accountsList = () =>
-  groups().find(group => group !== workspaceList() && titles(group).some(title => title.includes('@')));
+  groups().find(group => group !== workspaceList() && labels(group).some(label => label.includes('@')));
 
 describe('UserButtonView, user mode', () => {
   function renderUserMode(props: Partial<UserButtonProps> = {}) {
@@ -111,7 +113,7 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByText('Foundry')).toBeNull();
   });
 
-  it('drops the identifier line when it would only repeat the title', () => {
+  it('drops the identifier line when it would only repeat the label', () => {
     renderUserMode({ activeSession: { ...alice, name: 'alice@example.com' } });
 
     const header = groups()[0];
@@ -149,7 +151,7 @@ describe('UserButtonView, user mode', () => {
   it('lists only the accounts to switch to, with no heading above them', () => {
     renderUserMode();
 
-    expect(titles(accountsList())).toEqual(['bob@example.com']);
+    expect(labels(accountsList())).toEqual(['bob@example.com']);
     expect(screen.queryByText('Accounts')).toBeNull();
   });
 
@@ -209,7 +211,7 @@ describe('UserButtonView, organization mode', () => {
   it('lists the workspaces, the personal one among them', () => {
     renderOrganizationMode();
 
-    expect(titles(workspaceList())).toEqual(['Personal account', 'Foundry', 'Other Co']);
+    expect(labels(workspaceList())).toEqual(['Personal account', 'Foundry', 'Other Co']);
   });
 
   it('carries no account rows, not even the one it belongs to', () => {
@@ -246,7 +248,7 @@ describe('UserButtonView, combined mode', () => {
   it('heads the surface with the active organization by default', () => {
     renderCombined();
 
-    // The subtitle is the header's alone; the row below it carries only a title.
+    // The subtitle is the header's alone; the row below it carries only a label.
     expect(screen.getByText('24 members · Pro')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
@@ -282,7 +284,7 @@ describe('UserButtonView, combined mode', () => {
   it('heads the other accounts under "Accounts", listing the one it is on', () => {
     renderCombined();
 
-    expect(titles(accountsList())).toEqual(['alice@example.com', 'bob@example.com']);
+    expect(labels(accountsList())).toEqual(['alice@example.com', 'bob@example.com']);
     expect(screen.getByText('Accounts')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'alice@example.com' })).toBeNull();
   });
@@ -317,7 +319,7 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.getByRole('button', { name: 'Actions for alice@example.com' })).toBeInTheDocument();
     // The section is there, holding the account row alone.
     expect(workspaceList()).toBeDefined();
-    expect(titles(workspaceList())).toEqual([]);
+    expect(labels(workspaceList())).toEqual([]);
     expect(screen.queryByText('Personal account')).toBeNull();
   });
 });
@@ -336,7 +338,7 @@ describe('UserButtonView, the workspace list', () => {
   it('leads with the invitations, then the suggestions, then the workspaces held', () => {
     renderList({ invitations: [gamma], suggestions: [beta] });
 
-    expect(titles(workspaceList())).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
+    expect(labels(workspaceList())).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
   });
 
   // `auto` rather than `stable`: a reserved gutter would inset short lists off the edge the header
@@ -392,8 +394,8 @@ describe('UserButtonView, the workspace list', () => {
     it('names it "Personal account" rather than repeating the account', () => {
       renderList();
 
-      expect(titles(workspaceList())).toContain('Personal account');
-      expect(titles(workspaceList())).not.toContain('Alice Smith');
+      expect(labels(workspaceList())).toContain('Personal account');
+      expect(labels(workspaceList())).not.toContain('Alice Smith');
     });
 
     it('checks it, and offers no switch, where it is what is active', () => {
@@ -418,7 +420,7 @@ describe('UserButtonView, the workspace list', () => {
 
       expect(screen.queryByText('Personal account')).toBeNull();
       // The organizations are still listed; it is only the way back out of them that is gone.
-      expect(titles(workspaceList())).toEqual(['Foundry', 'Other Co']);
+      expect(labels(workspaceList())).toEqual(['Foundry', 'Other Co']);
     });
   });
 
@@ -445,7 +447,7 @@ describe('UserButtonView, the workspace list', () => {
     it('lists them with no memberships to list them beside', () => {
       renderList({ hasOrganizations: false, activeOrganization: null, memberships: [], invitations: [gamma] });
 
-      expect(titles(workspaceList())).toEqual(['Gamma', 'Personal account']);
+      expect(labels(workspaceList())).toEqual(['Gamma', 'Personal account']);
       expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
     });
 
@@ -503,7 +505,7 @@ describe('UserButtonView, the workspace list', () => {
         memberships: [foundry, { kind: 'membership', organizationId: 'org_3', name: 'Gamma' }],
       });
 
-      expect(titles(workspaceList())).toEqual(['Personal account', 'Foundry', 'Gamma']);
+      expect(labels(workspaceList())).toEqual(['Personal account', 'Foundry', 'Gamma']);
     });
 
     it('drops one for the organization that is already active', () => {
@@ -525,7 +527,7 @@ describe('UserButtonView, the workspace list', () => {
 
       expect(screen.getByText('Loading organizations…')).toBeInTheDocument();
       expect(workspaceList()).toBeDefined();
-      expect(titles(workspaceList())).toEqual([]);
+      expect(labels(workspaceList())).toEqual([]);
     });
 
     it('leaves the account row above it alone, since it does not wait on the list', () => {
@@ -538,7 +540,7 @@ describe('UserButtonView, the workspace list', () => {
       renderList();
 
       expect(screen.queryByText('Loading organizations…')).toBeNull();
-      expect(titles(workspaceList())).toEqual(['Personal account', 'Foundry']);
+      expect(labels(workspaceList())).toEqual(['Personal account', 'Foundry']);
     });
 
     // `hasOrganizations` is answered before the lists are fetched, so an account with none never
@@ -560,14 +562,16 @@ describe('UserButtonView, the foot', () => {
   const action = () => ({ ...terms, onClick: vi.fn() });
 
   /** The foot's rows, in the order it lists them. It is the last group in the popup. */
-  const footLabels = () =>
-    Array.from(groups().at(-1)?.querySelectorAll('.cl-item-label') ?? []).map(node => node.textContent ?? '');
+  const footActions = () =>
+    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='secondary']") ?? []).map(
+      node => node.textContent ?? '',
+    );
 
   // The order the existing UserButton lists them in, above "Add account".
   it('leads with the custom rows', () => {
     renderView({ customMenuItems: [action(), support] });
 
-    expect(footLabels()).toEqual(['Terms of service', 'Support', 'Sign out of all accounts']);
+    expect(footActions()).toEqual(['Terms of service', 'Support', 'Sign out of all accounts']);
   });
 
   it('runs a custom action on press', async () => {
@@ -594,7 +598,7 @@ describe('UserButtonView, the foot', () => {
   it('orders the rows by the ids it is given', () => {
     renderView({ customMenuItems: [action(), support], menuItemOrder: ['signOutAll', 'support'] });
 
-    expect(footLabels()).toEqual(['Sign out of all accounts', 'Support', 'Terms of service']);
+    expect(footActions()).toEqual(['Sign out of all accounts', 'Support', 'Terms of service']);
   });
 
   // Only some of the built-in actions are rows at all, and which of those a surface carries depends
@@ -602,13 +606,13 @@ describe('UserButtonView, the foot', () => {
   it('drops an id no row answers to', () => {
     renderView({ customMenuItems: [action()], menuItemOrder: ['manageAccount', 'signOutAll', 'nonsense'] });
 
-    expect(footLabels()).toEqual(['Sign out of all accounts', 'Terms of service']);
+    expect(footActions()).toEqual(['Sign out of all accounts', 'Terms of service']);
   });
 
   it('orders "Add account" where the foot is what carries it', () => {
     renderView({ additionalSessions: [], customMenuItems: [action()], menuItemOrder: ['addAccount', 'terms'] });
 
-    expect(footLabels()).toEqual(['Add account', 'Terms of service']);
+    expect(footActions()).toEqual(['Add account', 'Terms of service']);
   });
 
   it('carries the custom rows on an org-only surface too', () => {
@@ -619,7 +623,7 @@ describe('UserButtonView, the foot', () => {
       customMenuItems: [action()],
     });
 
-    expect(footLabels()).toEqual(['Terms of service', 'Create organization']);
+    expect(footActions()).toEqual(['Terms of service', 'Create organization']);
   });
 
   it('holds a custom action in place, disabled, while another action runs', () => {

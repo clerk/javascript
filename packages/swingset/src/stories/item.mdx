@@ -2,7 +2,7 @@ import * as ItemStories from './item.stories';
 
 # Item
 
-Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Title`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
+Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Label`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
 
 Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's height and gap, and `Item.Media` picks the matching column width up from context rather than taking a size of its own.
 
@@ -76,7 +76,7 @@ import { Item } from '@clerk/ui/mosaic/components/item';
       </Avatar.Root>
     </Item.Media>
     <Item.Content>
-      <Item.Title>Test Organization</Item.Title>
+      <Item.Label>Test Organization</Item.Label>
       <Item.Description>Member</Item.Description>
     </Item.Content>
     <Item.Actions>
@@ -86,7 +86,7 @@ import { Item } from '@clerk/ui/mosaic/components/item';
 </Item.Group>;
 ```
 
-Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. An action row that has no secondary text uses `Item.Label` in place of `Item.Title`:
+Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='secondary'`:
 
 ```tsx
 <Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
@@ -94,30 +94,35 @@ Media sizes itself from the row, so give it a child that fills its column — an
     <Icon name='log-out' size='sm' />
   </Item.Media>
   <Item.Content>
-    <Item.Label>Sign out of all accounts</Item.Label>
+    <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
   </Item.Content>
 </Item.Root>;
 ```
 
 ## Parts
 
-| Part               | Class                 | Description                                                                      |
-| ------------------ | --------------------- | -------------------------------------------------------------------------------- |
-| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.                   |
-| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar. Sized by the root's `size`.       |
-| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions.             |
-| `Item.Title`       | `cl-item-title`       | Primary label. Truncates to a single line.                                       |
-| `Item.Description` | `cl-item-description` | Secondary text beneath the title. Truncates to a single line.                    |
-| `Item.Label`       | `cl-item-label`       | Sole label on an action row, in place of a title. Inherits the row's text color. |
-| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                             |
-| `Item.Group`       | `cl-item-group`       | Vertical wrapper around a set of rows (layout only, no role).                    |
-| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                              |
+| Part               | Class                 | Description                                                                |
+| ------------------ | --------------------- | -------------------------------------------------------------------------- |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.             |
+| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar. Sized by the root's `size`. |
+| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions.       |
+| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                               |
+| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.              |
+| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                       |
+| `Item.Group`       | `cl-item-group`       | Vertical wrapper around a set of rows (layout only, no role).              |
+| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                        |
 
 Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
 ## Styling
 
-The row carries the text color and, through `--_cl-icon-color`, the strength of any `Icon` inside it: faded at rest, full-strength while hovered. Only interactive rows promote — a static row isn't pointing at anything, so its icon and `Item.Label` hold their resting color. A `Button` in `Item.Actions` sets its own icon color and is unaffected.
+The row carries the text color and, through `--_cl-icon-color`, the strength of any `Icon` inside it: faded at rest, full-strength while hovered. Only interactive rows promote — a static row isn't pointing at anything, so its icon holds its resting color. A `Button` in `Item.Actions` sets its own icon color and is unaffected.
+
+`Item.Label` chooses whether it joins that promotion. `variant='primary'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='secondary'` sets none and inherits the row's, so it fades and brightens with the row:
+
+| Prop      | Attribute      | Values                   | Default   |
+| --------- | -------------- | ------------------------ | --------- |
+| `variant` | `data-variant` | `primary` \| `secondary` | `primary` |
 
 The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
 

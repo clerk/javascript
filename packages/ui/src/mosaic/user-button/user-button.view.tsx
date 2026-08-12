@@ -185,7 +185,7 @@ interface WorkspaceRowProps {
   imageUrl?: string;
   shape: 'circle' | 'square';
   /** Names the title element, for a control in the row that has to point at the workspace it acts on. */
-  titleId?: string;
+  labelId?: string;
   active?: boolean;
   onSelect?: () => void;
   trailing?: ReactNode;
@@ -199,7 +199,7 @@ function WorkspaceRow({
   avatarName = name,
   imageUrl,
   shape,
-  titleId,
+  labelId,
   active,
   onSelect,
   trailing,
@@ -231,7 +231,7 @@ function WorkspaceRow({
         />
       </Item.Media>
       <Item.Content>
-        <Item.Title id={titleId}>{name}</Item.Title>
+        <Item.Label id={labelId}>{name}</Item.Label>
       </Item.Content>
       {busy ? (
         <Trailing>
@@ -297,7 +297,7 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
     >
       <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
       <Item.Content>
-        <Item.Label>{label}</Item.Label>
+        <Item.Label variant='secondary'>{label}</Item.Label>
       </Item.Content>
     </Item.Root>
   );
@@ -394,7 +394,7 @@ function Header() {
           />
         </Item.Media>
         <Item.Content>
-          <Item.Title>{name}</Item.Title>
+          <Item.Label>{name}</Item.Label>
           {subtitle ? <Item.Description>{subtitle}</Item.Description> : null}
         </Item.Content>
         <Item.Actions>
@@ -581,16 +581,16 @@ interface PendingRowProps {
 /** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
   const { busy, disabled } = useBusy(busyKey);
-  // The button reads the same on every offer and the workspace it acts on is the title beside it,
+  // The button reads the same on every offer and the workspace it acts on is the label beside it,
   // so pressing tab through the list gives no way to tell them apart without this.
-  const titleId = React.useId();
+  const labelId = React.useId();
 
   return (
     <WorkspaceRow
       shape='square'
       name={name}
       imageUrl={imageUrl}
-      titleId={titleId}
+      labelId={labelId}
       trailing={
         note ? (
           <Item.Description>{note}</Item.Description>
@@ -608,7 +608,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
             pendingLabel={m.workspaces.pending}
             spinDelay={{ delay: 0 }}
             disabled={disabled}
-            aria-describedby={titleId}
+            aria-describedby={labelId}
             onClick={onAccept}
           >
             {actionLabel}
@@ -779,7 +779,7 @@ function AccountsHeading() {
   return (
     <Item.Root size='xs'>
       <Item.Content>
-        <Item.Label>{m.accounts.heading}</Item.Label>
+        <Item.Label variant='secondary'>{m.accounts.heading}</Item.Label>
       </Item.Content>
       <ActionMenu
         label={m.accounts.menu}
