@@ -20,7 +20,7 @@ test.describe('sign up and sign in with email code @generic', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser({
+        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test, {
           fictionalEmail: true,
         });
       });
@@ -41,7 +41,9 @@ test.describe('sign up and sign in with email code @generic', () => {
 
       test('does not re-send the email code when the verification step is reloaded', async ({ page, context }) => {
         const u = createTestUtils({ app, page, context });
-        const reloadUser = createTestUtils({ app }).services.users.createFakeUser({ fictionalEmail: true });
+        const reloadUser = createTestUtils({ app }).services.users.createFakeUser(test, {
+          fictionalEmail: true,
+        });
 
         try {
           await u.po.signUp.goTo();

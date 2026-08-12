@@ -1,6 +1,0 @@
-{
-  "platforms": ["android"],
-  "android": {
-    "modules": ["com.clerk.e2ehooks.E2EHooksModule"]
-  }
-}

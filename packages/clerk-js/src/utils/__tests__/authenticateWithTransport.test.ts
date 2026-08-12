@@ -34,13 +34,46 @@ describe('_authenticateWithTransport', () => {
     });
 
     expect(authenticateMethod).toHaveBeenCalledWith(
-      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: '/done' }),
+      expect.objectContaining({ redirectUrl: 'myapp://sso-callback', redirectUrlComplete: 'myapp://sso-callback' }),
       expect.any(Function),
     );
     expect(transport.open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
     expect(resource.reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'abc' });
     expect(clerk.__internal_handleResourceCallback).toHaveBeenCalledWith(resource, callbackParams);
     expect(resource.create).not.toHaveBeenCalled();
+  });
+
+  it('replaces a page-derived redirectUrlComplete with the transport URL', async () => {
+    const clerk = makeClerk();
+    const transport = {
+      getRedirectUrl: vi.fn().mockResolvedValue('myapp://app/'),
+      open: vi.fn().mockResolvedValue({ callbackUrl: 'myapp://app/?rotating_token_nonce=abc' }),
+    };
+    const resource = {
+      reload: vi.fn().mockResolvedValue(undefined),
+      create: vi.fn().mockResolvedValue(undefined),
+    } as any;
+    const authenticateMethod = vi.fn(async (_params, navigate) => {
+      navigate(new URL('https://provider.example/auth'));
+    });
+
+    await _authenticateWithTransport({
+      clerk: clerk as any,
+      transport,
+      resource,
+      authenticateMethod,
+      params: {
+        strategy: 'oauth_google',
+        redirectUrl: 'some-ui-callback',
+        redirectUrlComplete: 'myapp://app/CLERK-ROUTER/VIRTUAL/sign-up#/settings/connections',
+      } as any,
+      callbackParams: {},
+    });
+
+    expect(authenticateMethod).toHaveBeenCalledWith(
+      expect.objectContaining({ redirectUrl: 'myapp://app/', redirectUrlComplete: 'myapp://app/' }),
+      expect.any(Function),
+    );
   });
 
   it('reloads without a nonce when the callback URL has no nonce', async () => {

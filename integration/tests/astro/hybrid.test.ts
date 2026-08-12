@@ -15,11 +15,11 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
 
     test.beforeAll(async () => {
       const m = createTestUtils({ app });
-      fakeAdmin = m.services.users.createFakeUser();
+      fakeAdmin = m.services.users.createFakeUser(test);
       const admin = await m.services.users.createBapiUser(fakeAdmin);
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
 
-      fakeAdmin2 = m.services.users.createFakeUser();
+      fakeAdmin2 = m.services.users.createFakeUser(test);
       const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
       fakeOrganization2 = await m.services.users.createFakeOrganization(admin2.id);
     });

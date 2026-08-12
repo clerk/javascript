@@ -4,11 +4,11 @@ import { durationVars, easingVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // Floating wrapper. Positioning styles are applied inline by the headless
-  // positioner; this only owns stacking and clears the focus outline the
-  // FloatingFocusManager places here.
+  // positioner; this only clears the focus outline the FloatingFocusManager places
+  // here. No z-index: portalled siblings stack by DOM order, so a menu opened from
+  // inside a popover paints above it.
   positioner: {
     outline: 'none',
-    zIndex: 50,
   },
 
   // The floating box, deliberately chrome-free: background, border, radius,

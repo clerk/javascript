@@ -44,6 +44,32 @@ describe('Mosaic Item', () => {
     expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'md');
   });
 
+  it('reflects the label variant as a data attribute, defaulting to primary', () => {
+    const { rerender } = render(<Item.Label>Clerk</Item.Label>);
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'primary');
+    rerender(<Item.Label variant='secondary'>Clerk</Item.Label>);
+    expect(screen.getByText('Clerk')).toHaveAttribute('data-variant', 'secondary');
+  });
+
+  // StyleX keeps only the last atom that declares a property, so the reset's `color: inherit`
+  // survives on the variant that declares no color of its own. That is what puts the secondary
+  // label on the row's color and carries it through the row's hover promotion. `Item.Content`
+  // declares no color either, so it stands in for the untouched reset.
+  it('lets the row color the secondary label, and not the primary one', () => {
+    render(
+      <Item.Content data-testid='reset-only'>
+        <Item.Label>Primary</Item.Label>
+        <Item.Label variant='secondary'>Secondary</Item.Label>
+      </Item.Content>,
+    );
+
+    const atoms = (element: HTMLElement) => element.className.split(' ');
+    const resetAtoms = atoms(screen.getByTestId('reset-only'));
+    const inherited = (text: string) => resetAtoms.filter(atom => atoms(screen.getByText(text)).includes(atom));
+
+    expect(inherited('Secondary')).toHaveLength(inherited('Primary').length + 1);
+  });
+
   it('wires consumer className/style through to the element', () => {
     render(
       <Item.Root
@@ -71,7 +97,7 @@ describe('Mosaic Item', () => {
         )}
       >
         <Item.Content>
-          <Item.Title>Settings</Item.Title>
+          <Item.Label>Settings</Item.Label>
         </Item.Content>
       </Item.Root>,
     );
@@ -95,7 +121,7 @@ describe('Mosaic Item', () => {
     render(
       <Item.Root>
         <Item.Content>
-          <Item.Title>Test Organization</Item.Title>
+          <Item.Label>Test Organization</Item.Label>
           <Item.Description>Member</Item.Description>
         </Item.Content>
         <Item.Actions>
@@ -103,7 +129,7 @@ describe('Mosaic Item', () => {
         </Item.Actions>
       </Item.Root>,
     );
-    expect(screen.getByText('Test Organization')).toHaveClass('cl-item-title');
+    expect(screen.getByText('Test Organization')).toHaveClass('cl-item-label');
     expect(screen.getByText('Member')).toHaveClass('cl-item-description');
     expect(screen.getByRole('button', { name: 'Manage' }).parentElement).toHaveClass('cl-item-actions');
   });

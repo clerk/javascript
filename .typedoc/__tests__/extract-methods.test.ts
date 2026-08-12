@@ -18,6 +18,7 @@ import { describe, expect, it } from 'vitest';
  * - `methods/check-authorization.mdx` – generic instantiation (`CheckAuthorization`)
  * - `methods/email-code-send-code.mdx` – qualified name from `@extractMethods` parent
  * - `methods/email-link.mdx`         – `@extractMethods` namespace index (non-callables)
+ * - `methods/remove-password.mdx`     – backend page format with omitted `@example` blocks
  * - `properties.mdx` (clerk)         – properties table sliced from already-prettified page
  * - `clerk.mdx`                      – main page after Properties has been stripped
  * - `properties.mdx` (user-resource) – properties with external type links and metadata
@@ -69,6 +70,11 @@ describe('extract-methods snapshots', () => {
   it('@extractMethods namespace index: signInFuture.emailLink', async () => {
     const content = await readGenerated('shared/sign-in-future-resource/methods/email-link.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/sign-in-future-resource-methods-email-link.mdx');
+  });
+
+  it('backend page format omits examples: users.removePassword()', async () => {
+    const content = await readGenerated('backend/user-api/methods/remove-password.mdx');
+    await expect(content).toMatchFileSnapshot('./__snapshots__/user-api-methods-remove-password.mdx');
   });
 
   it('properties extracted + prettier-aligned: clerk', async () => {
