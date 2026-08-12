@@ -44,8 +44,6 @@ export interface DrawerContextValue extends DialogContextValue {
   snapRestOffset: number | null;
   /** Callbacks a nested child `Drawer.Root` invokes on this (parent) drawer. */
   onNested: NestedDrawerCallbacks;
-  /** True when this drawer is itself nested inside another drawer. */
-  isNested: boolean;
   /** How many direct nested child drawers are currently open. */
   nestedOpenCount: number;
 }

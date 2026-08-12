@@ -271,6 +271,66 @@ describe('Dialog', () => {
     });
   });
 
+  describe('closedBy', () => {
+    // The viewport is the element outside the popup that a light dismiss lands on.
+    const pressOutside = async (user: ReturnType<typeof userEvent.setup>) =>
+      user.click(screen.getByTestId('dialog-viewport'));
+
+    it('defaults to dismissing on both Escape and outside press', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true });
+
+      await pressOutside(user);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closerequest dismisses on Escape but not outside press', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'closerequest' });
+
+      await pressOutside(user);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('none dismisses on neither', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'none' });
+
+      await pressOutside(user);
+      await user.keyboard('{Escape}');
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('leaves the Close button working regardless of closedBy', async () => {
+      const user = userEvent.setup();
+      renderDialog({ defaultOpen: true, closedBy: 'none' });
+
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('leaves controlled open authoritative regardless of closedBy', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      renderDialog({ open: true, closedBy: 'none', onOpenChange });
+
+      await pressOutside(user);
+      await user.keyboard('{Escape}');
+
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
   describe('focus management', () => {
     it('moves focus into dialog on open', async () => {
       const user = userEvent.setup();

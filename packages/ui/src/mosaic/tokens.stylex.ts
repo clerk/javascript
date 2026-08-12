@@ -203,6 +203,7 @@ export const space = stylex.defineVars({
   '3': step(3),
   '3.5': step(3.5),
   '4': step(4),
+  '4.5': step(4.5),
   '5': step(5),
   '6': step(6),
   '7': step(7),
@@ -312,9 +313,18 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // distance over few frames, so a sharper curve (In Quart, In Circ) leaves half of them
 // below the threshold of visible change and reads as a stall followed by a lurch.
 // Pair it with a shorter duration than the matching entrance.
+//
+// `--cl-ease-enter` is the entrance curve for surfaces that should NOT settle: the same
+// front-loaded deceleration, but landing exactly on target instead of carrying ~2% past it.
+// Use it where the overshoot is read as a correction rather than as physicality — a large
+// surface, or one whose arrival is already carried by a companion signal such as a scrim.
+// `Dialog` takes it for that reason; a small element moving a short distance still wants
+// `--cl-ease-default`, where the settle is the whole point. Same property rule applies: it
+// belongs on things that MOVE, and opacity still takes `linear`.
 
 const easingDefaults = {
   '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+  '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
   '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
 } as const;
 

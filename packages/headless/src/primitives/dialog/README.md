@@ -63,12 +63,35 @@ const [open, setOpen] = useState(false);
 
 ### `Dialog.Root`
 
-| Prop           | Type                      | Default | Description                             |
-| -------------- | ------------------------- | ------- | --------------------------------------- |
-| `open`         | `boolean`                 | —       | Controlled open state                   |
-| `defaultOpen`  | `boolean`                 | `false` | Initial open state (uncontrolled)       |
-| `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes          |
-| `modal`        | `boolean`                 | `true`  | Traps focus and blocks page interaction |
+| Prop           | Type                                | Default | Description                             |
+| -------------- | ----------------------------------- | ------- | --------------------------------------- |
+| `open`         | `boolean`                           | —       | Controlled open state                   |
+| `defaultOpen`  | `boolean`                           | `false` | Initial open state (uncontrolled)       |
+| `onOpenChange` | `(open: boolean) => void`           | —       | Called when open state changes          |
+| `modal`        | `boolean`                           | `true`  | Traps focus and blocks page interaction |
+| `closedBy`     | `'any' \| 'closerequest' \| 'none'` | `'any'` | Which gestures dismiss the dialog       |
+
+#### `closedBy`
+
+Mirrors the native `<dialog closedby>` attribute.
+
+| Value          | Escape | Outside press | Programmatic |
+| -------------- | ------ | ------------- | ------------ |
+| `any`          | ✅     | ✅            | ✅           |
+| `closerequest` | ✅     | ❌            | ✅           |
+| `none`         | ❌     | ❌            | ✅           |
+
+```tsx
+// A form dialog: Escape backs out, a stray backdrop click doesn't discard input.
+<Dialog.Root closedBy='closerequest'>{/* ... */}</Dialog.Root>
+```
+
+Reach for `closerequest` on anything holding user input or confirming a destructive action.
+Reserve `none` for flows the user genuinely must complete or explicitly acknowledge — it removes
+the keyboard exit, so it fails the usual expectation that Escape dismisses a modal.
+
+A single ordered enum rather than two booleans: it keeps the fourth combination — outside press
+dismisses but Escape does not — unrepresentable.
 
 ### `Dialog.Portal`
 
@@ -97,9 +120,14 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                   | Applies To                         | Description |
-| --------------------------- | ---------------------------------- | ----------- |
-| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
+| Attribute                   | Applies To                         | Description                                 |
+| --------------------------- | ---------------------------------- | ------------------------------------------- |
+| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state                                  |
+| `data-nested`               | Backdrop, Viewport, Popup          | Opened from inside another floating element |
+
+`data-nested` is what a stacked overlay styles itself from — chiefly so backdrops don't composite
+into an ever-darker scrim as the stack grows. It reflects any floating ancestor, not strictly a
+dialog one: the `FloatingTree` a Menu or Popover establishes counts too.
 
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
@@ -107,7 +135,7 @@ The headless parts are unstyled. Target a part with your own className (or `rend
 
 - **`Dialog.Popup` should be a child of `Dialog.Viewport`** for centered, scroll-locked modal behavior. The viewport hosts the fixed overlay container; the popup alone does not handle positioning or scroll lock.
 - **Title and Description are optional but recommended.** If omitted, `aria-labelledby` / `aria-describedby` are simply absent from the popup.
-- **Nested dialogs are supported.** The `FloatingTree` pattern handles nesting automatically.
+- **Nested dialogs are supported**, and covered by tests. The `FloatingTree` pattern handles it: `useDismiss` blocks both Escape and outside-press on a parent while any child is open, and `FloatingOverlay`'s scroll lock is refcounted, so the body stays locked until the last dialog closes.
 - **No positioning middleware.** Dialogs are centered via CSS, not Floating UI positioning.
 
 ## Authoring rule for new primitives

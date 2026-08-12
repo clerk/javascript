@@ -1,4 +1,4 @@
-export { type DialogProps, DialogRoot as Root } from './dialog-root';
+export { type DialogClosedBy, type DialogProps, DialogRoot as Root } from './dialog-root';
 export { type DialogTriggerProps, DialogTrigger as Trigger } from './dialog-trigger';
 export { type DialogPortalProps, DialogPortal as Portal } from './dialog-portal';
 export { type DialogBackdropProps, DialogBackdrop as Backdrop } from './dialog-backdrop';

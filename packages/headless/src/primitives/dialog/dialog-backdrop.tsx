@@ -12,9 +12,9 @@ export type DialogBackdropProps = ComponentProps<'div'>;
 export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropProps>(
   function DialogBackdrop(props, ref) {
     const { render, ...otherProps } = props;
-    const { open, mounted, transitionProps } = useDialogContext();
+    const { open, mounted, isNested, transitionProps } = useDialogContext();
 
-    const state = { open };
+    const state = { open, nested: isNested };
 
     const defaultProps = {
       ...transitionProps,
@@ -28,6 +28,7 @@ export const DialogBackdrop = React.forwardRef<HTMLDivElement, DialogBackdropPro
       state,
       stateAttributesMapping: {
         open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),
+        nested: (v: boolean): Record<string, string> | null => (v ? { 'data-nested': '' } : null),
       },
       props: mergeProps<'div'>(defaultProps, otherProps),
     });

@@ -18,6 +18,7 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     getFloatingProps,
     floatingContext,
     modal,
+    isNested,
     returnFocusRef,
     labelId,
     descriptionId,
@@ -30,7 +31,12 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     'aria-describedby': descriptionId,
   } satisfies DefaultProps<'div'>;
 
-  const defaultProps = { ...ownProps, ...getFloatingProps(), ...transitionProps };
+  const defaultProps = {
+    ...ownProps,
+    ...(isNested ? { 'data-nested': '' } : {}),
+    ...getFloatingProps(),
+    ...transitionProps,
+  };
 
   const element = useRender({
     defaultTagName: 'div',
