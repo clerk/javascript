@@ -56,8 +56,6 @@ export interface DialogHandle<Payload = unknown> {
   getTrigger(id: string): DialogTriggerRegistration<Payload> | undefined;
   /** @internal */
   getFirstTrigger(): DialogTriggerRegistration<Payload> | undefined;
-  /** @internal Bumps whenever the trigger registry changes; lets the root re-resolve its reference element. */
-  getRegistryVersion(): number;
   /** @internal */
   setRoot(controller: DialogRootController): () => void;
   /** @internal */
@@ -82,7 +80,6 @@ export function createDialogHandle<Payload = unknown>(): DialogHandle<Payload> {
   const listeners = new Set<() => void>();
   let root: DialogRootController | null = null;
   let state = CLOSED_STATE;
-  let registryVersion = 0;
 
   const notify = () => listeners.forEach(listener => listener());
 
@@ -98,19 +95,16 @@ export function createDialogHandle<Payload = unknown>(): DialogHandle<Payload> {
     },
     registerTrigger(registration) {
       triggers.set(registration.id, registration);
-      registryVersion++;
       notify();
       return () => {
         if (triggers.get(registration.id) === registration) {
           triggers.delete(registration.id);
-          registryVersion++;
           notify();
         }
       };
     },
     getTrigger: id => triggers.get(id),
     getFirstTrigger: () => triggers.values().next().value,
-    getRegistryVersion: () => registryVersion,
     setRoot(controller) {
       root = controller;
       return () => {

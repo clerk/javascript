@@ -30,7 +30,7 @@ export interface NestedDrawerCallbacks {
 // The dialog-only members are dropped: the drawer has no trigger registry (its detached
 // triggers go through `DrawerHandle`), and its triggers still wire through floating-ui's
 // reference props, which the dialog's no longer do.
-export interface DrawerContextValue extends Omit<DialogContextValue, 'store' | 'finalFocusResolverRef'> {
+export interface DrawerContextValue extends Omit<DialogContextValue, 'store'> {
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   backdropRef: React.RefObject<HTMLDivElement | null>;
   drag: DrawerDrag;

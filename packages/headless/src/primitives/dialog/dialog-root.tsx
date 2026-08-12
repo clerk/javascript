@@ -84,38 +84,25 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   const descriptionId = useId();
 
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const finalFocusResolverRef = useRef<((event: Event | undefined) => void) | null>(null);
 
   // Details for a change initiated through a trigger, staged by the controller below and
   // consumed by the floating `onOpenChange` the request funnels into.
   const pendingDetailsRef = useRef<DialogOpenChangeDetails | null>(null);
 
-  // The single funnel every open/close goes through — trigger activations, dismissals, and
-  // programmatic `setOpen` alike — so `onOpenChange` details and the `finalFocus` resolution
-  // both happen exactly once, synchronously, before any focus restoration can run.
-  const applyOpenChange = (nextOpen: boolean, details: DialogOpenChangeDetails) => {
-    if (!nextOpen) {
-      finalFocusResolverRef.current?.(details.event);
-    }
-    setOpenState(nextOpen);
-    onOpenChange?.(nextOpen, details);
-  };
-
+  // Every open/close funnels through `floatingContext.onOpenChange` — trigger activations,
+  // dismissals, and programmatic `setOpen` alike. floating-ui emits its `openchange` event
+  // synchronously before invoking this callback, which is what lets listeners (`useReturnFocus`,
+  // the popup's `finalFocus` resolution) see the change and its event before any focus
+  // restoration can run.
   const { refs, context: floatingContext } = useFloating({
     nodeId,
     open,
     onOpenChange: (nextOpen, event) => {
       const details = pendingDetailsRef.current ?? { trigger: null, triggerId: null, event };
       pendingDetailsRef.current = null;
-      applyOpenChange(nextOpen, details);
+      setOpenState(nextOpen);
+      onOpenChange?.(nextOpen, details);
     },
-  });
-
-  // Trigger requests arrive through the store, whose registration must be stable — so the
-  // controller closes over a ref that is repointed at the latest render's closures.
-  const latest = useRef({ applyOpenChange, activeTriggerId });
-  useLayoutEffect(() => {
-    latest.current = { applyOpenChange, activeTriggerId };
   });
 
   useLayoutEffect(() => {
@@ -135,9 +122,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
         pendingDetailsRef.current = { trigger: registration?.element ?? null, triggerId: id, event };
         floatingContext.onOpenChange(false, event, 'click');
       },
-      setOpen: nextOpen => {
-        latest.current.applyOpenChange(nextOpen, { trigger: null, triggerId: null, event: undefined });
-      },
+      setOpen: nextOpen => floatingContext.onOpenChange(nextOpen),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- floatingContext.onOpenChange, setActiveTriggerId and refs are stable
   }, [store]);
@@ -193,9 +178,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
 
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
-  const setOpen = useCallback((nextOpen: boolean) => {
-    latest.current.applyOpenChange(nextOpen, { trigger: null, triggerId: null, event: undefined });
-  }, []);
+  const setOpen = useCallback((nextOpen: boolean) => floatingContext.onOpenChange(nextOpen), [floatingContext]);
 
   const contextValue = useMemo<DialogContextValue>(
     () => ({
@@ -207,7 +190,6 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       popupRef,
       returnFocusRef,
       store,
-      finalFocusResolverRef,
       modal,
       isNested,
       labelId,

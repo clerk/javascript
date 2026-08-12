@@ -19,14 +19,6 @@ export interface DialogContextValue {
    * detached triggers hold the same object through their `handle` prop.
    */
   store: DialogHandle;
-  /**
-   * Set by `Dialog.Popup` when its `finalFocus` is a function, and invoked by the root
-   * synchronously on every close — dismissal or programmatic — with the event behind it, if
-   * any. Resolving inside the close call is what guarantees the result is in place before
-   * `FloatingFocusManager` restores focus; an effect can lose that race when close and unmount
-   * land in the same commit.
-   */
-  finalFocusResolverRef: React.MutableRefObject<((event: Event | undefined) => void) | null>;
   modal: boolean;
   /**
    * Whether this dialog opened from inside another floating element, so a stacked overlay can
