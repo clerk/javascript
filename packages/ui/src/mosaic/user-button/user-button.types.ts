@@ -139,7 +139,7 @@ export interface UserButtonBrandingProps {
    *
    * @default true
    */
-  branded?: boolean;
+  renderBranding?: boolean;
 }
 
 export interface UserButtonBusyState {

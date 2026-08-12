@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -34,6 +34,34 @@ export const styles = stylex.create({
     borderTopStyle: 'solid',
     borderTopWidth: '1px',
     width: '100%',
+  },
+  branding: {
+    paddingBlock: space['3'],
+    paddingInline: space['6'],
+    borderBlockStartColor: colorVars['--cl-color-border-faded'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
+    textAlign: 'center',
+  },
+  brandingText: {
+    color: colorVars['--cl-color-neutral-faded'],
+    display: 'inline-block',
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    textWrap: 'pretty',
+  },
+  brandingLink: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    outline: {
+      default: 'none',
+      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
+    },
+    alignItems: 'center',
+    color: 'inherit',
+    display: 'inline-flex',
+    outlineOffset: '2px',
+    verticalAlign: 'top',
+    height: space['4'],
   },
 });
 

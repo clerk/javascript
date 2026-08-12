@@ -48,33 +48,6 @@ export const styles = stylex.create({
     justifyContent: 'center',
     width: space['7'],
   },
-
-  branding: {
-    gap: space['2'],
-    paddingBlock: space['3'],
-    alignItems: 'center',
-    borderBlockStartColor: colorVars['--cl-color-border-faded'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: '1px',
-    color: colorVars['--cl-color-neutral-faded'],
-    display: 'flex',
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    justifyContent: 'center',
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    textAlign: 'center',
-  },
-
-  // Matches the trigger's ring, so the two focusable things the surface owns focus alike.
-  brandingLink: {
-    borderRadius: radiusVars['--cl-radius-sm'],
-    outline: {
-      default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-    },
-    color: 'inherit',
-    display: 'inline-flex',
-    outlineOffset: '2px',
-  },
 });
 
 // The trigger takes the corner of the workspace mark it carries: round for a person, squared for
