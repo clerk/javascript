@@ -131,8 +131,13 @@ export const styles = stylex.create({
    * It stays put on a `panel` because the popup itself never scrolls — see `sizes.panel`. An
    * absolutely positioned child of a scroll container scrolls away with the content, so the
    * scroll region has to live in the panel's children, not on the popup.
+   *
+   * Carried by a wrapper rather than by the button itself: `Button`'s touch target sets
+   * `position` inside a media query, which compiles to a class the button's own `stylex.props`
+   * call would have to dedupe against — unreachable from out here.
    */
   closeButton: {
+    display: 'flex',
     position: 'absolute',
     zIndex: 1,
   },

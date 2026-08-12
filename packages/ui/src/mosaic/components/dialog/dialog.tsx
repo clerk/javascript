@@ -186,23 +186,24 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
 ) {
   const size = React.useContext(DialogSizeContext);
   return (
-    <Primitive.Close
-      ref={ref}
-      aria-label={ariaLabel}
-      render={props => (
-        <Button
-          variant='ghost'
-          shape='circle'
-          size='sm'
-          xstyle={[styles.closeButton, closeInsets[size]]}
-          {...props}
-        />
-      )}
-      {...mergeStyleProps(themeProps('dialog-close-button'), className, style)}
-      {...rest}
-    >
-      <Icon name='close' />
-    </Primitive.Close>
+    <span {...stylex.props(styles.closeButton, closeInsets[size])}>
+      <Primitive.Close
+        ref={ref}
+        aria-label={ariaLabel}
+        render={props => (
+          <Button
+            variant='ghost'
+            shape='circle'
+            size='sm'
+            {...props}
+          />
+        )}
+        {...mergeStyleProps(themeProps('dialog-close-button'), className, style)}
+        {...rest}
+      >
+        <Icon name='close' />
+      </Primitive.Close>
+    </span>
   );
 });
 
