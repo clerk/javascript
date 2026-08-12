@@ -101,10 +101,6 @@ const panelBody = {
   padding: '1.5rem',
 } as const;
 
-// The triggers deliberately sit at three corners of the panel — two at the inline end, at
-// different heights, and one at the start edge near the bottom. Each card scales out of the
-// button that opened it, so spreading them apart is what makes that visible; stacked in a
-// column they would all resolve to nearly the same origin.
 const sectionHeader = {
   alignItems: 'center',
   display: 'flex',
@@ -112,7 +108,7 @@ const sectionHeader = {
   justifyContent: 'space-between',
 } as const;
 
-/** A `card` dialog opened from inside the `panel` — the shape the account profile uses. */
+/** A `prompt` dialog opened from inside the `panel` — the shape the account profile uses. */
 function AddValueDialog({
   trigger,
   title,
@@ -184,13 +180,13 @@ export function Nested() {
         <Item.Group>
           <Item.Root>
             <Item.Content>
-              <Item.Title>ada@example.com</Item.Title>
+              <Item.Label>ada@example.com</Item.Label>
               <Item.Description>Primary</Item.Description>
             </Item.Content>
           </Item.Root>
           <Item.Root>
             <Item.Content>
-              <Item.Title>ada.lovelace@work.example.com</Item.Title>
+              <Item.Label>ada.lovelace@work.example.com</Item.Label>
             </Item.Content>
           </Item.Root>
         </Item.Group>
@@ -207,7 +203,7 @@ export function Nested() {
         <Item.Group>
           <Item.Root>
             <Item.Content>
-              <Item.Title>+1 (555) 010-1842</Item.Title>
+              <Item.Label>+1 (555) 010-1842</Item.Label>
             </Item.Content>
           </Item.Root>
         </Item.Group>
@@ -325,7 +321,7 @@ export function PanelSidebar() {
                 {SESSIONS.map(session => (
                   <Item.Root key={session.id}>
                     <Item.Content>
-                      <Item.Title>{session.device}</Item.Title>
+                      <Item.Label>{session.device}</Item.Label>
                       <Item.Description>
                         {session.where} · {session.when}
                       </Item.Description>

@@ -314,7 +314,7 @@ export const sizes = stylex.create({
 /**
  * Enter/exit motion, keyed by size, because the two surfaces want opposite things.
  *
- * `card` scales from its centre. `panel` doesn't move at all — it is most of the
+ * `card` scales from its centre. `panel` fades without scaling — it is most of the
  * viewport, and the larger a surface is the worse a scale reads on it: the absolute travel
  * is `(1 − scale) ×` its own dimensions, so the same 2% that is a few pixels on a card is
  * tens of pixels on a panel, and it arrives as a zoom rather than an emergence.
@@ -327,7 +327,8 @@ export const sizes = stylex.create({
  * The backdrop's timing is bound to the popup's rather than chosen independently. The
  * headless transition watches the POPUP's animations to decide when to unmount, and the
  * whole subtree goes at once — so a backdrop that outlives its popup gets cut off
- * mid-fade. Panel is instant on both, or its scrim would be yanked away on close.
+ * mid-fade. Every size therefore fades its scrim over the same duration its popup runs for,
+ * `panel` included — which is why `popupMotion.panel` fades rather than being left inert.
  */
 export const backdropMotion = stylex.create({
   /**
@@ -370,7 +371,19 @@ export const backdropMotion = stylex.create({
     transitionTimingFunction: 'linear',
   },
 
-  panel: {},
+  /** Identical to `card` — the popup it accompanies fades on the same clock, it just does not scale. */
+  panel: {
+    opacity: {
+      default: 1,
+      ':where([data-starting-style], [data-ending-style])': 0,
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: 'opacity',
+    transitionTimingFunction: 'linear',
+  },
 });
 
 // The entering/exiting scale, and the radius that survives it. `transform: scale()` scales the
@@ -563,5 +576,25 @@ export const popupMotion = stylex.create({
     },
   },
 
-  panel: {},
+  /**
+   * Fade only, no scale — see the note above this map for why a surface this size should not
+   * scale. The fade is not optional the way an inert cell would be: the headless transition
+   * watches the POPUP to decide when to unmount, so with nothing running here the whole subtree,
+   * scrim included, is pulled on close before `backdropMotion.panel` can fade.
+   *
+   * No reduced-motion branch, matching `card` — under `reduce` the two shed their transform and
+   * are left with exactly this, so there is nothing here to drop.
+   */
+  panel: {
+    opacity: {
+      default: 1,
+      ':where([data-starting-style], [data-ending-style])': 0,
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: 'opacity',
+    transitionTimingFunction: 'linear',
+  },
 });

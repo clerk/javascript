@@ -19,7 +19,7 @@ Move the Mosaic `Dialog` onto StyleX, joining the other migrated components, and
 
 **On a phone.** Below `48rem` a `prompt` pins to the bottom of the viewport and slides up as a sheet, keeping the inset on all four sides. `card` and `panel` are unchanged at every width. When an on-screen keyboard opens, `Dialog.Viewport` measures how much of the viewport it covers and pads for it, so a sheet rises to sit on top of the keyboard, a card re-centres in the space that is left without being squashed, and a panel shrinks.
 
-**Motion.** `prompt` and `card` scale from their own centre, and corner radius no longer distorts during the scale. `panel` has no enter or exit animation, since the absolute travel of a scale is a proportion of the element's own size. Under `prefers-reduced-motion: reduce` the movement drops and the fade remains.
+**Motion.** Every size fades in and out. `prompt` and `card` also scale from their own centre, and corner radius no longer distorts during the scale. `panel` fades without scaling, since the absolute travel of a scale is a proportion of the element's own size. Under `prefers-reduced-motion: reduce` the movement drops and the fade remains.
 
 **New `--cl-ease-enter` token.** An entrance curve that decelerates onto its target instead of carrying past it, for surfaces where `--cl-ease-default`'s overshoot reads as a correction rather than as physicality — a large surface, or one whose arrival is already announced by a scrim. `Dialog` uses it for every entrance; nothing else changes curve. Retarget it like any other Mosaic token.
 
