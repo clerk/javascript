@@ -3,12 +3,12 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { HeadingProps } from '../components/heading';
-import { Heading } from '../components/heading';
-import { reset } from '../components/reset.styles';
-import type { MosaicComponentProps } from '../props';
-import { mergeStyleProps, themeProps } from '../props';
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+import type { MosaicComponentProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import type { HeadingProps } from '../heading';
+import { Heading } from '../heading';
+import { reset } from '../reset.styles';
 import { settingsItemsMarker } from './settings.markers.stylex';
 import { settingsVars } from './settings.vars.stylex';
 
@@ -359,7 +359,7 @@ const Actions = React.forwardRef<HTMLDivElement, SettingsActionsProps>(function 
 });
 
 /**
- * A settings block that fixes section semantics, surface treatment, row grouping,
+ * A settings component that fixes section semantics, surface treatment, row grouping,
  * and item layout while leaving each item's content composable.
  */
 export const Settings = { Root, Title, Group, Row, Items, Item, Media, Content, Label, Description, Actions };

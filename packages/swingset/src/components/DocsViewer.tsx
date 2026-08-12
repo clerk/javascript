@@ -29,7 +29,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   blocks: {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
-    settings: dynamic(() => import('../stories/settings.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -43,6 +42,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     icon: dynamic(() => import('../stories/icon.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
+    settings: dynamic(() => import('../stories/settings.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),

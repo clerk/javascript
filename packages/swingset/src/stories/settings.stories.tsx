@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
-import { Settings } from '@clerk/ui/mosaic/block/settings';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Settings } from '@clerk/ui/mosaic/components/settings';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -22,9 +22,9 @@ function ProviderIcon({ provider }: { provider: string }) {
 }
 
 export const meta: StoryMeta = {
-  group: 'Blocks',
+  group: 'Components',
   title: 'Settings',
-  source: 'packages/ui/src/mosaic/block/settings.tsx',
+  source: 'packages/ui/src/mosaic/components/settings/settings.tsx',
   styleEngine: 'stylex',
 };
 

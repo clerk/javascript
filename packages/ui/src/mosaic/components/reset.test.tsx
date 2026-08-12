@@ -3,7 +3,6 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Settings } from '../block/settings';
 import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
@@ -14,6 +13,7 @@ import { Icon } from './icon';
 import { Input } from './input';
 import { Item } from './item';
 import { reset } from './reset.styles';
+import { Settings } from './settings';
 import { Text } from './text';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a

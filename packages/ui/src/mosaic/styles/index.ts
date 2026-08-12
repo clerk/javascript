@@ -6,22 +6,6 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
-export { Settings, settingsVars } from '../block/settings';
-export type {
-  SettingsActionsProps,
-  SettingsContentProps,
-  SettingsDescriptionProps,
-  SettingsGroupProps,
-  SettingsItemProps,
-  SettingsItemsProps,
-  SettingsLabelProps,
-  SettingsMediaProps,
-  SettingsMediaSize,
-  SettingsRootProps,
-  SettingsRowProps,
-  SettingsTitleProps,
-} from '../block/settings';
-
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -50,6 +34,21 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Settings, settingsVars } from '../components/settings';
+export type {
+  SettingsActionsProps,
+  SettingsContentProps,
+  SettingsDescriptionProps,
+  SettingsGroupProps,
+  SettingsItemProps,
+  SettingsItemsProps,
+  SettingsLabelProps,
+  SettingsMediaProps,
+  SettingsMediaSize,
+  SettingsRootProps,
+  SettingsRowProps,
+  SettingsTitleProps,
+} from '../components/settings';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';

@@ -283,7 +283,6 @@ export const registry: StoryModule[] = [
   organizationProfileDeleteSectionModule,
   // Blocks
   destructiveModule,
-  settingsModule,
   // Components
   avatarModule,
   badgeModule,
@@ -296,6 +295,7 @@ export const registry: StoryModule[] = [
   iconModule,
   menuComponentModule,
   popoverComponentModule,
+  settingsModule,
   tabsComponentModule,
   textModule,
   fieldModule,

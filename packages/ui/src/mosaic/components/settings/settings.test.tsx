@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { colorVars } from '../tokens.stylex';
+import { colorVars } from '../../tokens.stylex';
 import { Settings, settingsVars } from './settings';
 
 describe('Settings', () => {
