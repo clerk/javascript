@@ -155,15 +155,6 @@ describe('Mosaic Dialog', () => {
 // real shape, so the `FloatingTree` nesting the headless README claims is exercised here
 // rather than assumed. Dismissal must reach the topmost dialog only, and the body must
 // stay locked until the last one closes.
-const addEmailTriggerShared = (props: MosaicComponentProps<'button'>) => (
-  <button
-    type='button'
-    {...props}
-  >
-    Add email
-  </button>
-);
-
 describe('nested Mosaic Dialogs', () => {
   const addEmailTrigger = (props: MosaicComponentProps<'button'>) => (
     <button
