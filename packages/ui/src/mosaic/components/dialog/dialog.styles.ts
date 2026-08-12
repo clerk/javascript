@@ -79,7 +79,19 @@ export const styles = stylex.create({
   // nulls the painting properties back out — see the note there.
   popup: {
     padding: space['6'],
-    borderRadius: radiusVars['--cl-radius-container'],
+    // Forced-colors mode discards `box-shadow` outright, and the ring above is the only thing
+    // separating the surface from the page — so in HCM the dialog would float edgeless over its
+    // own scrim (which is also discarded). A real border is the one edge the mode keeps. Set only
+    // inside the query so it costs nothing elsewhere, and `box-sizing: border-box` from `reset`
+    // means adding it moves nothing.
+    //
+    // Not an `outline`: the popup clears its outline on purpose (`FloatingFocusManager` focuses
+    // the popup itself when it holds no tabbable content), and reintroducing one here would put
+    // the edge and the focus ring on the same property.
+    borderColor: { default: null, '@media (forced-colors: active)': 'CanvasText' },
+    borderRadius: radiusVars['--cl-radius-xl'],
+    borderStyle: { default: null, '@media (forced-colors: active)': 'solid' },
+    borderWidth: { default: null, '@media (forced-colors: active)': '1px' },
     gap: space['3'],
     // Cleared because `FloatingFocusManager` focuses the popup itself when it holds no
     // tabbable content, which would otherwise draw a ring around the whole surface.
@@ -102,6 +114,10 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
+    // A dialog holds prose it did not author — an email address, an org slug, an API key — and a
+    // long unbroken string would otherwise push past the size's width clamp. Same reasoning as
+    // `Popover`, which is narrower and hit it first.
+    overflowWrap: 'anywhere',
     // The containing block for `Dialog.CloseButton`.
     position: 'relative',
     width: '100%',
@@ -382,7 +398,7 @@ export const backdropMotion = stylex.create({
 const SHEET_EXIT_EASE = 'ease-out';
 
 const ENTER_SCALE = 0.94;
-const popupRadius = radiusVars['--cl-radius-container'];
+const popupRadius = radiusVars['--cl-radius-xl'];
 
 export const popupMotion = stylex.create({
   /**
