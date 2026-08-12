@@ -102,7 +102,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     );
   });
 
-  test('if a feature is not mapped to any permissions it is added as is to the orgPermissions array', () => {
+  test('features without permissions use zero masks to preserve alignment', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
       v: 2,
@@ -112,7 +112,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,manage',
-        fpm: '1,3',
+        fpm: '1,3,0',
       },
     });
 
@@ -180,7 +180,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,manage',
-        fpm: '3',
+        fpm: '3,0',
       },
     });
 
@@ -254,7 +254,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,manage',
-        fpm: '1,2,3',
+        fpm: '1,2,3,0',
       },
     });
 
@@ -273,7 +273,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,create,update,delete,revoke',
-        fpm: '7,21',
+        fpm: '7,21,0',
       },
     });
 
@@ -316,6 +316,38 @@ describe('JWTPayloadToAuthObjectProperties', () => {
 
     expect(authObject.orgPermissions).toEqual([]);
     expect(has({ permission: 'org:feature:undefined' })).toBe(false);
+  });
+
+  test('keeps permission masks aligned when a targeted feature follows a feature without permissions', () => {
+    const authObject = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:repositories,o:impersonation,o:billing',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        per: 'manage,read,update',
+        fpm: '6,0,3',
+      },
+    });
+    const has = createCheckAuthorization({
+      userId: authObject.userId,
+      orgId: authObject.orgId,
+      orgRole: authObject.orgRole,
+      orgPermissions: authObject.orgPermissions,
+      factorVerificationAge: authObject.factorVerificationAge,
+      features: null,
+      plans: null,
+    });
+
+    expect(authObject.orgPermissions).toEqual([
+      'org:repositories:read',
+      'org:repositories:update',
+      'org:billing:manage',
+      'org:billing:read',
+    ]);
+    expect(has({ permission: 'org:impersonation:manage' })).toBe(false);
+    expect(has({ permission: 'org:billing:manage' })).toBe(true);
   });
 
   test.each([
