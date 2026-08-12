@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { surfaceVars } from '../../surface.vars.stylex';
 import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
@@ -65,9 +66,16 @@ export const styles = stylex.create({
   },
 });
 
+// A card is the surface an overlay paints, and overlays scale on open — on an ancestor, since
+// the floating box itself is chrome-free. `scale` scales the rendered radius too, so the corners
+// would read as 94% round for the whole transition. Dividing by the factor the ancestor publishes
+// draws them at their authored size at every step. Registered `<number>`, `initial-value: 1`, so
+// with no scaling ancestor this is a division by one and the card learns nothing about motion.
+const surfaceRadius = `calc(${radiusVars['--cl-radius-xl']} / ${surfaceVars['--_cl-surface-scale']})`;
+
 export const elevations = stylex.create({
   card: {
-    borderRadius: radiusVars['--cl-radius-xl'],
+    borderRadius: surfaceRadius,
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
@@ -75,13 +83,13 @@ export const elevations = stylex.create({
                 0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
   },
   flush: {
-    borderRadius: radiusVars['--cl-radius-xl'],
+    borderRadius: surfaceRadius,
     overflow: 'visible',
     backgroundColor: 'transparent',
     boxShadow: 'none',
   },
   overlay: {
-    borderRadius: radiusVars['--cl-radius-xl'],
+    borderRadius: surfaceRadius,
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
     boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
