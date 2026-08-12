@@ -48,6 +48,7 @@ const colorDefaults = {
 
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
+  '--cl-color-avatar-icon': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
 
   '--cl-color-input': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
   '--cl-color-input-placeholder': '#a3a3a3',

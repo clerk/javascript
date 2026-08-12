@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
+import { Button } from '@clerk/ui/mosaic/components/button';
+import { Icon } from '@clerk/ui/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -66,6 +68,32 @@ export function Fallback(props: Record<string, unknown>) {
         alt='@clerk'
       />
       <Avatar.Fallback>CL</Avatar.Fallback>
+    </Avatar.Root>
+  );
+}
+
+export function Interactive(props: Record<string, unknown>) {
+  return (
+    <Avatar.Root
+      {...knobsAsProps(props)}
+      size='lg'
+      render={
+        <Button
+          aria-label='Edit profile picture'
+          color='neutral'
+          shape='circle'
+          variant='ghost'
+        />
+      }
+    >
+      <Avatar.Image
+        src={IMAGE_SRC}
+        alt='@clerk'
+      />
+      <Avatar.Fallback>CL</Avatar.Fallback>
+      <Avatar.Icon>
+        <Icon name='pen' />
+      </Avatar.Icon>
     </Avatar.Root>
   );
 }

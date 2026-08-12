@@ -1,7 +1,9 @@
+import { useRender } from '@clerk/headless/utils';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../reset.styles';
 import { shapes, sizes, styles } from './avatar.styles';
@@ -23,34 +25,33 @@ function useAvatarContext(part: string): AvatarContextValue {
   return context;
 }
 
-export interface AvatarProps extends React.ComponentPropsWithRef<'span'> {
+export interface AvatarProps extends MosaicComponentProps<'span'> {
   shape?: 'circle' | 'square';
   size?: 'fit' | 'lg' | 'md' | 'sm' | 'xs';
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
-  { shape = 'circle', size = 'md', className, style, children, ...rest },
+  { shape = 'circle', size = 'md', render, className, style, ...rest },
   ref,
 ) {
   const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
   const value = React.useMemo<AvatarContextValue>(() => ({ status, onStatusChange: setStatus }), [status]);
+  const element = useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('avatar', { shape, size }),
+        stylex.props(reset.base, styles.base, shapes[shape], sizes[size]),
+        className,
+        style,
+      ),
+      ...rest,
+    },
+  });
 
-  return (
-    <AvatarContext.Provider value={value}>
-      <span
-        ref={ref}
-        {...mergeStyleProps(
-          themeProps('avatar', { shape, size }),
-          stylex.props(reset.base, styles.base, shapes[shape], sizes[size]),
-          className,
-          style,
-        )}
-        {...rest}
-      >
-        {children}
-      </span>
-    </AvatarContext.Provider>
-  );
+  return <AvatarContext.Provider value={value}>{element}</AvatarContext.Provider>;
 });
 
 export type AvatarImageProps = React.ComponentPropsWithRef<'img'>;
@@ -152,13 +153,33 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
   );
 });
 
+export type AvatarIconProps = React.ComponentPropsWithRef<'span'>;
+
+const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function MosaicAvatarIcon(
+  { className, style, ...rest },
+  ref,
+) {
+  useAvatarContext('Avatar.Icon');
+
+  return (
+    <span
+      ref={ref}
+      aria-hidden
+      {...mergeStyleProps(themeProps('avatar-icon'), stylex.props(reset.base, styles.icon), className, style)}
+      {...rest}
+    />
+  );
+});
+
 /**
- * Compound avatar. `Avatar.Root` clips and sizes the box; `Avatar.Image` renders
+ * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
  * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that pulses only while an image is actually on its way.
+ * placeholder that pulses only while an image is actually on its way; `Avatar.Icon`
+ * adds an optional corner affordance.
  */
 export const Avatar = {
   Root: AvatarRoot,
   Image: AvatarImage,
   Fallback: AvatarFallback,
+  Icon: AvatarIcon,
 };

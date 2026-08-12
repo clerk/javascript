@@ -3,16 +3,12 @@ import { meta as accordionMeta } from '../stories/accordion.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
+  Interactive as AvatarInteractive,
   meta as avatarMeta,
   Primary as AvatarPrimary,
   Shapes as AvatarShapes,
   Sizes as AvatarSizes,
 } from '../stories/avatar.stories';
-import {
-  Default as AvatarButtonDefault,
-  Fallback as AvatarButtonFallback,
-  meta as avatarButtonMeta,
-} from '../stories/avatar-button.stories';
 import {
   Colors as BadgeColors,
   meta as badgeMeta,
@@ -145,11 +141,6 @@ const settingsModule: StoryModule = {
   ConnectedAccounts: SettingsConnectedAccounts,
   Destructive: SettingsDestructive,
 };
-const avatarButtonModule: StoryModule = {
-  meta: avatarButtonMeta,
-  Default: AvatarButtonDefault,
-  Fallback: AvatarButtonFallback,
-};
 const organizationProfileLeaveSectionModule: StoryModule = {
   meta: organizationProfileLeaveSectionMeta,
   Default: OrganizationProfileLeaveSectionDefault,
@@ -185,6 +176,7 @@ const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: Car
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
+  Interactive: AvatarInteractive,
   Fallback: AvatarFallbackStory,
   Sizes: AvatarSizes,
   Shapes: AvatarShapes,
@@ -292,7 +284,6 @@ export const registry: StoryModule[] = [
   organizationProfileLeaveSectionModule,
   organizationProfileDeleteSectionModule,
   // Blocks
-  avatarButtonModule,
   destructiveModule,
   // Components
   avatarModule,

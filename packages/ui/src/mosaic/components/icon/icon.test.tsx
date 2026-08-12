@@ -41,15 +41,10 @@ describe('Mosaic Icon', () => {
     expect(svg).toHaveStyle({ marginTop: '8px' });
   });
 
-  it('renders the pen with its native 12px geometry', () => {
-    const { container } = wrap(
-      <Icon
-        name='pen'
-        size='xs'
-      />,
-    );
+  it('renders the pen at the default 16px size with its native geometry', () => {
+    const { container } = wrap(<Icon name='pen' />);
     const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('data-size', 'xs');
+    expect(svg).toHaveAttribute('data-size', 'md');
     expect(svg).toHaveAttribute('viewBox', '0 0 12 12');
     expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
   });
