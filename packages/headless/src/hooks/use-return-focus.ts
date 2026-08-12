@@ -32,9 +32,9 @@ export function useReturnFocus(
   }, [open, trigger]);
 
   useEffect(() => {
-    // Closes routed straight through the consumer's own state setter (a Close button, an
-    // item click) never reach floating-ui, so only what floating-ui itself drives can
-    // downgrade the default.
+    // Only a dismissal with a pointer event behind it downgrades the default. Programmatic
+    // closes never do: in Menu and Popover they go through the consumer's own state setter and
+    // never reach this bus; in Dialog they arrive here with no event.
     function onOpenChange({ open, event }: { open: boolean; event?: Event }) {
       if (!open && event && !isKeyboardEvent(event)) {
         returnFocusRef.current = null;
