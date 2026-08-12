@@ -180,18 +180,18 @@ user input, so a stray backdrop click cannot discard it.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                             |
-| -------------------- | --------------------- | ----------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State provider; owns `size`, open/close, `modal`, `closedBy`, `handle`. |
-| `Dialog.Trigger`     | —                     | Opens the dialog; accepts `render`.                                     |
-| `Dialog.Portal`      | —                     | Portals the overlay out of the tree.                                    |
-| `Dialog.Backdrop`    | `dialog-backdrop`     | The scrim behind the dialog.                                            |
-| `Dialog.Viewport`    | `dialog-viewport`     | Centering container; owns the scroll lock.                              |
-| `Dialog.Popup`       | `dialog-popup`        | The surface (`role="dialog"`, focus-trapped).                           |
-| `Dialog.Title`       | —                     | Heading; wired to the popup's `aria-labelledby`.                        |
-| `Dialog.Description` | —                     | Description; wired to the popup's `aria-describedby`.                   |
-| `Dialog.Close`       | —                     | Dismisses the dialog; unstyled, accepts a `render` prop.                |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X.                                                    |
+| Part                 | Slot                  | Description                                                   |
+| -------------------- | --------------------- | ------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State provider; owns `size`, open/close, `modal`, `closedBy`. |
+| `Dialog.Trigger`     | —                     | Opens the dialog; accepts `render`.                           |
+| `Dialog.Portal`      | —                     | Portals the overlay out of the tree.                          |
+| `Dialog.Backdrop`    | `dialog-backdrop`     | The scrim behind the dialog.                                  |
+| `Dialog.Viewport`    | `dialog-viewport`     | Centering container; owns the scroll lock.                    |
+| `Dialog.Popup`       | `dialog-popup`        | The surface (`role="dialog"`, focus-trapped).                 |
+| `Dialog.Title`       | —                     | Heading; wired to the popup's `aria-labelledby`.              |
+| `Dialog.Description` | —                     | Description; wired to the popup's `aria-describedby`.         |
+| `Dialog.Close`       | —                     | Dismisses the dialog; unstyled, accepts a `render` prop.      |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X.                                          |
 
 `Dialog.Title` and `Dialog.Description` are unstyled passthroughs from the headless layer — render
 them through your own typography (`Heading`, `Text`) via `render`.
@@ -221,7 +221,7 @@ State attributes from the headless layer are available for CSS targeting:
 | `data-closed`         | Trigger, Backdrop, Viewport, Popup | Present when closed (during exit)           |
 | `data-starting-style` | Backdrop, Viewport, Popup          | Present on the entering frame               |
 | `data-ending-style`   | Backdrop, Viewport, Popup          | Present during the exit animation           |
-| `data-size`           | Popup                              | Resolved size (`prompt` / `card` / `panel`) |
+| `data-size`           | Viewport, Popup                    | Resolved size (`prompt` / `card` / `panel`) |
 | `data-nested`         | Backdrop, Viewport, Popup          | Present when opened inside another overlay  |
 
 ### Motion
