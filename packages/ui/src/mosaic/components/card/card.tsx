@@ -23,14 +23,14 @@ const CardVariantContext = React.createContext<{ alignment: CardAlignment; eleva
 /** Signs the foot of the card with "Secured by Clerk". */
 function Branding() {
   return (
-    <div {...mergeStyleProps(themeProps('card-branding'), stylex.props(reset.base, styles.branding))}>
-      <span {...mergeStyleProps(themeProps('card-branding-text'), stylex.props(reset.base, styles.brandingText))}>
+    <div {...stylex.props(reset.base, styles.branding)}>
+      <span {...stylex.props(reset.base, styles.brandingText)}>
         Secured by{' '}
         <a
           href='https://go.clerk.com/components'
           target='_blank'
           rel='noopener noreferrer'
-          {...mergeStyleProps(themeProps('card-branding-link'), stylex.props(reset.base, styles.brandingLink))}
+          {...stylex.props(reset.base, styles.brandingLink)}
         >
           <ClerkLogo height={14} />
         </a>

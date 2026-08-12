@@ -145,10 +145,13 @@ describe('Mosaic Card', () => {
       </Card.Root>,
     );
 
-    const branding = screen.getByText('Secured by').closest('.cl-card-branding');
-    expect(branding).toBe(screen.getByTestId('root').lastElementChild);
+    // The mark closes the card out. Held by position rather than by a class: the branding
+    // carries no slot for a consumer to reach, so a test has none to reach for either.
+    const branding = screen.getByTestId('root').lastElementChild;
+    expect(branding).toHaveTextContent('Secured by');
 
     const logo = screen.getByRole('link', { name: 'Clerk' });
+    expect(branding).toContainElement(logo);
     expect(logo).toHaveAttribute('href', 'https://go.clerk.com/components');
     expect(logo).toHaveAttribute('target', '_blank');
     expect(logo).toHaveAttribute('rel', 'noopener noreferrer');
