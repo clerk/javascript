@@ -1,0 +1,17 @@
+import * as OrganizationBillingPanelStories from './organization-billing-panel.stories';
+
+# Organization Billing Panel
+
+The Billing tab panel of the Organization Profile — a tabbed shell hosting the Subscription, Statements, and Payments views. The Subscription tab lists an organization's subscriptions with their fees, seat usage, and next-payment overview, and owns the switch-plan and manage-subscription actions. It gates on `org:sys_billing:read` to view and `org:sys_billing:manage` to manage.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingPanelStories}
+  composition={[
+    {
+      name: 'OrganizationProfile',
+      href: '/organization/organization-profile',
+      layer: 'Organization',
+    },
+  ]}
+/>

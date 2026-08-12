@@ -1,0 +1,17 @@
+import * as OrganizationBillingPaymentMethodsSectionStories from './organization-billing-payment-methods-section.stories';
+
+# Organization Billing Payment Methods Section
+
+The saved payment-methods list of the organization billing panel. It shows each method with its default/expired badges and drives the make-default and remove mutations through their machines. Self-gating on the `org:sys_billing:manage` permission, so it renders nothing for read-only members.
+
+<Story
+  name='Default'
+  storyModule={OrganizationBillingPaymentMethodsSectionStories}
+  composition={[
+    {
+      name: 'OrganizationBillingPanel',
+      href: '/organization/organization-billing-panel',
+      layer: 'Organization',
+    },
+  ]}
+/>
