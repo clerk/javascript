@@ -35,6 +35,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 const IMAGE_SRC = 'https://github.com/clerk.png';
+const COLIN_IMAGE_SRC = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 
 export function Primary(props: Record<string, unknown>) {
   return (
@@ -87,8 +88,8 @@ export function Interactive(props: Record<string, unknown>) {
       }
     >
       <Avatar.Image
-        src={IMAGE_SRC}
-        alt='@clerk'
+        src={COLIN_IMAGE_SRC}
+        alt='Colin'
       />
       <Avatar.Fallback>CL</Avatar.Fallback>
       <Avatar.Icon>
