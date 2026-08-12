@@ -504,6 +504,15 @@ jobs:
             sudo apt-get install -y xvfb
           fi
 
+      - name: Configure test user cleanup
+        run: echo "INTEGRATION_TEST_RUN_KEY=${RUN_ID}-${RUN_ATTEMPT}-${TEST_NAME}-${TEST_PROJECT}-${NEXT_VERSION:-default}" >> "$GITHUB_ENV"
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          TEST_NAME: ${{ matrix.test-name }}
+          TEST_PROJECT: ${{ matrix.test-project }}
+          NEXT_VERSION: ${{ matrix.next-version }}
+
       - name: Run Integration Tests
         id: integration-tests
         timeout-minutes: 25
@@ -524,6 +533,14 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+      - name: Delete integration-test users
+        if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
+        timeout-minutes: 4
+        run: pnpm test:integration:cleanup
+        env:
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
       - name: Sanitize artifact name
         if: ${{ cancelled() || failure() }}
