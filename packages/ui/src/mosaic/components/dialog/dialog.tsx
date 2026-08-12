@@ -4,6 +4,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { Button } from '../button';
@@ -269,9 +270,26 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   ref,
 ) {
   const size = React.useContext(DialogSizeContext);
+  // Observed through state rather than a plain ref, because the warning has to re-run when the
+  // node arrives and a ref mutation does not re-render.
+  const [node, setNode] = React.useState<HTMLDivElement | null>(null);
+  useAccessibleNameWarning(node, 'Dialog');
+
+  const mergedRef = React.useCallback(
+    (element: HTMLDivElement | null) => {
+      setNode(element);
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        ref.current = element;
+      }
+    },
+    [ref],
+  );
+
   return (
     <Primitive.Popup
-      ref={ref}
+      ref={mergedRef}
       {...mergeStyleProps(
         themeProps('dialog-popup', { size }),
         stylex.props(reset.base, styles.popup, sizes[size], popupMotion[size]),

@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
 import { space } from '../../tokens.stylex';
@@ -10,6 +10,12 @@ import type { DialogSize } from './dialog';
 import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
+
+// The accessible-name warning defers by a task, so the assertions have to let one elapse.
+const settle = () =>
+  act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
 
 describe('Mosaic Dialog', () => {
   it('renders the trigger and opens the dialog on click', async () => {
@@ -523,5 +529,66 @@ describe('browser chrome sync', () => {
 
     await user.keyboard('{Escape}');
     expect(themeColor()).not.toBeNull();
+  });
+});
+
+describe('accessible name warning', () => {
+  it('warns when the dialog has no accessible name', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Dialog defaultOpen>Body</Dialog>);
+
+    await settle();
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
+    warn.mockRestore();
+  });
+
+  it('does not warn when a Dialog.Title supplies the name', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog defaultOpen>
+        <Dialog.Title>Confirm action</Dialog.Title>
+      </Dialog>,
+    );
+
+    await settle();
+
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  // The name can come from the consumer instead of from a Title, and an `aria-label` on the popup
+  // is the documented way to do that.
+  it('does not warn when aria-label supplies the name', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Viewport>
+            <Dialog.Popup aria-label='Confirm action'>Body</Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>,
+    );
+
+    await settle();
+
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('still forwards the popup ref alongside the observing one', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Viewport>
+            <Dialog.Popup ref={ref}>Body</Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>,
+    );
+
+    expect(ref.current).toBe(screen.getByText('Body'));
   });
 });
