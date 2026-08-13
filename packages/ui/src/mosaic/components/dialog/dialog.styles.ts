@@ -15,26 +15,39 @@ export const styles = stylex.create({
   // Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //
-  // ONE scrim for the whole stack: a stacked dialog paints none, and the root-level dialog's
-  // survives underneath it. The stack reads as depth through the surface beneath receding
-  // (`popupMotion.prompt`), not through the page going darker.
+  // A dialog opened over a `panel` or a `card` paints its OWN scrim, lighter than the base because
+  // the two COMPOSITE: alpha over alpha is `1 − (1 − a)(1 − b)`, so the nested value is solved for
+  // the intended total rather than picked by eye — `1 − 0.32/0.6 = 0.4667` lands two levels on
+  // 0.68. That is what separates a surface from the one it was opened from.
   //
-  // The alternative — each level painting a lighter scrim solved so the composite lands on an
-  // intended total — was here first, and worked only for the two-deep case it was solved for.
-  // Alpha over alpha is `1 − (1 − a)(1 − b)`, so every level compounds: a third took the same
-  // three-deep stack this feature exists for from an intended 0.68 to 0.83, and "how dark is the
-  // page" became a function of stack depth.
-  //
-  // Keyed on `data-stacked`, NOT `data-nested`: the latter reports any floating ancestor, so a
-  // dialog opened from a menu item would drop the only scrim it has. Both come from the headless
-  // layer.
+  // A STACK is the other case and wants the opposite — see `backdropStacked`.
   backdrop: {
     inset: 0,
     backgroundColor: {
       default: 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)',
-      ':where([data-stacked])': 'transparent',
+      ':where([data-nested])': 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)',
     },
     position: 'fixed',
+  },
+
+  /**
+   * A prompt stacked on a prompt paints NO scrim — one serves the whole stack.
+   *
+   * The two cases are different relationships, not one at two strengths. A prompt opened over a
+   * panel is a new surface over a page-like one, and a scrim of its own is what says so. A prompt
+   * over a prompt is the same conversation continuing one step further in, and darkening the page
+   * again for it makes depth a function of stack count: the composite compounds, so the
+   * three-deep `panel -> prompt -> alert` this exists for would land on 0.83 against the 0.68 the
+   * nested value above was solved for. The stack reads through the surface beneath receding and
+   * dimming instead.
+   *
+   * Applied by `Dialog.Backdrop` rather than keyed on `data-stacked`, because whether this is a
+   * stack depends on the size of the dialog beneath — which the headless layer has no notion of.
+   * It rides in the same `stylex.props` call as `backdrop`, so this `backgroundColor` replaces
+   * that one outright rather than the two both emitting.
+   */
+  backdropStacked: {
+    backgroundColor: 'transparent',
   },
 
   // Centering track inside the headless `FloatingOverlay`, which owns the fixed positioning and
@@ -111,11 +124,10 @@ export const styles = stylex.create({
      * paint over it and stay undimmed. Never interactive: the whole subtree is inert while a
      * stacked dialog holds focus, and `pointer-events: none` keeps it that way regardless.
      *
-     * Kept under `prefers-reduced-motion: reduce`, where the recede is dropped. A cross-fade is
-     * not the kind of motion that setting is about, and without it that mode would have no depth
-     * cue at all.
+     * The variable itself is set per size — only `prompt` sets it, in `sizes` below — so this
+     * reads `0` on a `panel` or a `card`, which have a scrim of their own to separate them from
+     * what they host and would double up.
      */
-    '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
     padding: space['6'],
     // Forced-colors mode discards `box-shadow` outright, and the ring above is the only thing
     // separating the surface from the page — so in HCM the dialog would float edgeless over its
@@ -165,7 +177,7 @@ export const styles = stylex.create({
       borderRadius: 'inherit',
       backgroundColor: colorVars['--cl-color-card'],
       content: '""',
-      opacity: 'var(--_cl-stack-veil)',
+      opacity: 'var(--_cl-stack-veil, 0)',
       pointerEvents: 'none',
       position: 'absolute',
       transitionDuration: durationVars['--cl-duration-base'],
@@ -286,6 +298,10 @@ export const viewportSizes = stylex.create({
 
 export const sizes = stylex.create({
   prompt: {
+    // Read by the veil on `styles.popup`. Set here rather than there so it applies to `prompt`
+    // alone: a `panel` or a `card` hosting a dialog gets a scrim between the two instead, and
+    // would otherwise dim as well as darken.
+    '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
     // Tighter than the popup's default 1.5rem. A prompt asks one thing, so its content box is
     // small and a 1.5rem surround reads as a disproportionate frame around two lines of text.
     // Overrides `styles.popup` by position — `sizes[size]` is spread after it in the same
@@ -490,6 +506,15 @@ const ENTER_SCALE = 0.94;
 const STACK_SCALE = 0.96;
 const STACK_LIFT = '-0.5rem';
 
+// How long a surface holds before starting its own exit while a dialog stacked on it is still
+// leaving. Without it a stack dismissed in one action — "discard", which closes the confirmation
+// and the form behind it together — leaves on a single frame, and the two surfaces read as one
+// thing vanishing rather than as a stack unwinding.
+//
+// Half the child's exit rather than all of it: the two overlapping is the point. Fully sequenced,
+// the dismissal takes twice as long and starts to feel like waiting.
+const STACK_EXIT_STAGGER = `calc(${durationVars['--cl-duration-fast']} / 2)`;
+
 const popupRadius = radiusVars['--cl-radius-xl'];
 
 export const popupMotion = stylex.create({
@@ -513,12 +538,12 @@ export const popupMotion = stylex.create({
         ':where([data-starting-style], [data-ending-style])': popupRadius,
       },
       // Both entrance branches resolve to the same value, so their order relative to each other
-      // cannot matter: there is no scale to counteract in either case. The stack branch is here
-      // for the same reason it is on `transform` — under `reduce` nothing scales, so there is
-      // nothing to correct.
+      // cannot matter: there is no scale to counteract in either case. The recede is the
+      // exception — it still applies under `reduce`, just without a duration — so its correction
+      // has to come with it.
       '@media (prefers-reduced-motion: reduce)': {
         default: popupRadius,
-        ':where([data-stack-base])': popupRadius,
+        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
         ':where([data-starting-style], [data-ending-style])': popupRadius,
       },
     },
@@ -577,13 +602,32 @@ export const popupMotion = stylex.create({
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
+      // The recede is NOT dropped here, unlike the entrance scale. `reduce` asks for no
+      // ANIMATION, not for no distinction: `transitionProperty` below narrows to `opacity` in
+      // this mode, so the recede lands in one frame with nothing interpolating. Dropping it
+      // outright leaves a stacked prompt sitting on an identical prompt with no scrim between
+      // them, which reads as a rendering fault rather than as a preference being honoured.
       '@media (prefers-reduced-motion: reduce)': {
         default: 'scale(1)',
-        // Reduced motion drops the recede entirely rather than snapping to it: the level below
-        // holds still and the stacked surface simply appears over it.
-        ':where([data-stack-base])': 'scale(1)',
+        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
+    },
+    /**
+     * Holds this surface's exit while a dialog stacked on it is still leaving, so a stack
+     * dismissed in one action unwinds instead of vanishing at once.
+     *
+     * Applies to every slot of `transitionProperty` rather than to the transform alone: what is
+     * being delayed is the whole departure. Under `reduce` that list narrows to `opacity`, so the
+     * stagger survives as a staggered fade.
+     *
+     * `data-stack-exiting` and not `data-stack-base`, and the difference is the whole reason the
+     * headless layer reports both: `data-stack-base` releases the moment its child closes, which
+     * is a frame before there is anything to stagger against.
+     */
+    transitionDelay: {
+      default: null,
+      ':where([data-stack-exiting][data-ending-style])': STACK_EXIT_STAGGER,
     },
     // The sheet travels its OWN HEIGHT rather than the ~11px a scale does, so it runs longer than
     // anything else here: `slow` in, `base` out, a 1.67:1 ratio in line with the rest of Mosaic.

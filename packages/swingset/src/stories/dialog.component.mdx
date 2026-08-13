@@ -249,24 +249,29 @@ difference and adds it to its own bottom padding, which gives each size the righ
 A card taller than the remaining space aligns to its top rather than losing its head. Pinch-zoom —
 which also shrinks the visual viewport — is excluded.
 
-### Stacked dialogs
+### Nested dialogs and stacks
 
-Only a `prompt` stacks. `panel` and `card` are root-level surfaces — they host a stack, they are
-never the thing stacked — and a dialog opened inside another one warns in development if it is any
-other size.
+Two different relationships, which look different on purpose.
 
-A stacked dialog carries `data-stacked` and paints **no** scrim: one backdrop serves the whole
-stack, so how dark the page goes never depends on how deep the stack is. The dialog beneath carries
-`data-stack-base`, and its contents dim toward its own background — enough on its own to read as a
-layer further back, which is what a `panel` gets, since a panel never moves. A `prompt` also
-recedes, scaling down slightly and lifting, with its radius divided by the same factor so the
-corners render unchanged.
+A **nested** dialog is one opened over a `panel` or a `card` — a new surface over a page-like one.
+It paints its own scrim, lighter than the base so the two composite to the intended darkness rather
+than doubling it. Nothing else changes.
 
-`data-stacked` is narrower than the older `data-nested`, which reports any floating ancestor: a
-dialog opened from a menu item is nested but not stacked, and still owns its scrim.
+A **stack** is successive `prompt`s: the confirmation over the form it is confirming. The same
+conversation, one step further in. A stacked prompt paints **no** scrim — one backdrop serves the
+whole stack, so how dark the page goes never depends on how deep the stack is. Depth comes from the
+prompt beneath instead: its contents dim toward its own background, and it recedes, scaling down
+slightly and lifting, with its radius divided by the same factor so the corners render unchanged.
 
-Under `prefers-reduced-motion: reduce` nothing recedes — the surface beneath holds still, keeping
-the dimming as its only cue.
+Whichever it is, the thing that opens is always a `prompt`. `panel` and `card` are root-level
+surfaces — they host, they are never hosted — and a dialog opened inside another one warns in
+development if it is any other size.
+
+Dismissing a stack in one action, as "discard" does, staggers the exits: the surface beneath holds
+briefly so the stack unwinds rather than vanishing on one frame.
+
+Under `prefers-reduced-motion: reduce` the recede still happens, it just arrives in a single frame
+with nothing interpolating — the setting asks for no animation, not for no distinction.
 
 ---
 
@@ -355,10 +360,10 @@ prompt.
   storyModule={DialogStories}
 />
 
-A `panel` never recedes, so what separates the two levels here is the dimming and the prompt's own
-shadow.
+This is the nested case, not a stack: the prompt paints its own scrim over the panel, and the panel
+neither dims nor recedes.
 
-Stack a prompt on a prompt and the one beneath moves instead — the shape a close confirmation
+Stack a prompt on a prompt and the relationship changes — the shape a close confirmation
 takes:
 
 <Story
