@@ -146,6 +146,11 @@ The sheet fades over the full length of its slide, while the backdrop keeps its 
 the scrim answers the tap first, then the sheet arrives into an already-dimmed page. Under
 `prefers-reduced-motion: reduce` the sheet holds flat and only the fade runs.
 
+A sheet arriving over another dialog takes the shorter desktop fade instead. The long one earns
+itself against the page, where it gives the travel somewhere to resolve into; over an opaque
+surface it just shows the dialog underneath through the one arriving, and the two read as one muddy
+surface. The slide is unchanged, and carries the arrival on its own.
+
 Drag-to-dismiss is deliberately absent — `Drawer` owns the drag engine, and a second one should not
 grow inside `Dialog`.
 
