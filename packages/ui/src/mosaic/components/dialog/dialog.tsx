@@ -315,7 +315,15 @@ export interface DialogProps extends Pick<
   size?: DialogSize;
 }
 
-function DialogContent({ children }: { children: DialogProps['children'] }) {
+/**
+ * Resolves the render-prop form of `children`. Shared with `AlertDialog`, which offers the same
+ * `close` contract and would otherwise carry a second implementation of it. Not exported from the
+ * folder's `index.ts`, for the same reason as {@link DialogPartNameContext}.
+ *
+ * Routed through the primitive's close funnel, so a controlled consumer's `onOpenChange` sees this
+ * close the same as Escape does — and can decline it.
+ */
+export function DialogContent({ children }: { children: DialogProps['children'] }) {
   const { setOpen } = useDialogContext();
   if (typeof children !== 'function') {
     return <>{children}</>;
