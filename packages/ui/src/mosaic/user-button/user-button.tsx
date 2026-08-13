@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { useSpinDelay } from '../hooks/useSpinDelay';
@@ -13,12 +13,19 @@ import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 export type UserButtonProps = UserButtonControllerOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
-  Pick<UserButtonModeProps, 'modePriority'>;
+  Pick<UserButtonModeProps, 'modePriority'> & {
+    /**
+     * Stands in while Clerk is still answering, so the space the button will take is held rather
+     * than appearing under whatever is beside it. Dropped once nobody is signed in, since that is
+     * an answer and not a wait.
+     */
+    fallback?: ReactNode;
+  };
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an account,
  * open the profile, and sign out. It reads the active session and organization from Clerk, so it takes
- * no data. It renders nothing until Clerk answers, and nothing at all when nobody is signed in.
+ * no data. It renders `fallback` until Clerk answers, and nothing at all when nobody is signed in.
  *
  * Each action is a request: the row you click spins, the others stand down, and the menu stays open on
  * the result. Only an action that navigates closes it.
@@ -50,6 +57,13 @@ export type UserButtonProps = UserButtonControllerOptions &
  * ```
  *
  * @example
+ * `fallback` holds the space while Clerk is still answering. Size it to the trigger to keep the row
+ * it sits in from moving. Nothing stands in once the answer is that nobody is signed in.
+ * ```tsx
+ * <UserButton fallback={<AvatarSkeleton />} />
+ * ```
+ *
+ * @example
  * `customMenuItems` adds your own rows to the foot of the menu, each one either an `onClick` action
  * or an `href` link, and `menuItemOrder` names the order the foot's rows run in.
  * ```tsx
@@ -63,7 +77,8 @@ export type UserButtonProps = UserButtonControllerOptions &
  * ```
  */
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, ...options } = props;
+  const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
+    props;
   const controller = useUserButtonController(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -71,8 +86,12 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   // Re-entry is guarded on the immediate `pendingKey`; only the view's feedback is delayed.
   const displayPendingKey = useSpinDelay(pendingKey);
 
-  // Loading and signed out are indistinguishable here, so render nothing rather than promise a button.
-  if (controller.status !== 'ready') {
+  if (controller.status === 'loading') {
+    return <>{fallback}</>;
+  }
+
+  // Signed out is an answer, so the placeholder goes too rather than promising a button.
+  if (controller.status === 'hidden') {
     return null;
   }
 
