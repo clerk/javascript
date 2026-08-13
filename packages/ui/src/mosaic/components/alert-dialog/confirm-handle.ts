@@ -26,6 +26,12 @@ export interface ConfirmHandle {
    * opening a second one — repeated Escapes against a guarded dialog would otherwise stack
    * confirmations, one per keypress. The options of the later call are ignored, since the
    * question on screen is already the one being answered.
+   *
+   * The `<AlertDialog.Confirm>` must be MOUNTED when this is called. It is what opens, and a
+   * `dialog.open()` with no root attached is a no-op — the promise would never settle. Since the
+   * confirmation belongs inside the dialog it guards, that means asking only from inside that
+   * dialog while it is open. A confirmation that unmounts with a question in flight answers
+   * `false` rather than hanging.
    */
   show(options: ConfirmOptions): Promise<boolean>;
   /** The dialog handle `<AlertDialog.Confirm>` mounts against. @internal */

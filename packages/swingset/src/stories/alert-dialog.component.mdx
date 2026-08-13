@@ -82,7 +82,7 @@ the same reason: a corner X is a way out without answering.
 Every close request — Escape or `AlertDialog.Close` — routes through `onOpenChange`, so a controlled
 consumer can decline one by not committing the state.
 
-## Confirming a close
+### Confirming a close
 
 A dialog holding unsaved work should ask before discarding it. That is three pieces: a handle, a
 hook that guards the close, and the confirmation itself.
@@ -127,7 +127,7 @@ silently — route those through `Dialog.Close`.
 `when()` is evaluated at each close request, so a close that no longer needs guarding (the form has
 just been submitted, the field cleared) passes straight through.
 
-### Asking without a close
+#### Asking without a close
 
 `show()` is the same confirmation, awaited directly — for a decision that is not about closing:
 
@@ -140,6 +140,11 @@ if (await confirm.show({ title: 'Delete this key?', description: 'Applications u
 It resolves `true` for the action and `false` for cancel or any dismissal. Calling it while a
 confirmation is already showing returns the in-flight promise rather than opening a second one, so
 repeated close requests ask once.
+
+**`AlertDialog.Confirm` must be mounted when `show()` is called** — it is the thing that opens, and
+a `show()` with nothing mounted to answer it never resolves. Since the confirmation lives inside the
+dialog it guards, that means asking from inside that dialog, while it is open. A confirmation that
+unmounts with a question in flight answers `false` rather than leaving the `await` hanging.
 
 ## Parts
 
@@ -155,7 +160,7 @@ repeated close requests ask once.
 | `AlertDialog.Description` | —                      | Description; wired to the popup's `aria-describedby`. Required.                                                                |
 | `AlertDialog.Close`       | —                      | Dismisses the alert; unstyled, accepts a `render` prop.                                                                        |
 | `AlertDialog.Actions`     | `alert-dialog-actions` | The response row. Cancel first.                                                                                                |
-| `AlertDialog.Confirm`     | `dialog-popup`         | A whole confirmation rendered from a `show()` call. See below.                               |
+| `AlertDialog.Confirm`     | `dialog-popup`         | A whole confirmation rendered from a `show()` call. See [Confirming a close](#confirming-a-close).                             |
 
 Every part except `Popup` and `Actions` is `Dialog`'s own component, not a wrapper around it — one
 implementation, so the two cannot drift. `Title` and `Description` are unstyled passthroughs from the
