@@ -528,6 +528,63 @@ describe('Dialog', () => {
 
       expect(screen.getByRole('dialog', { name: 'payload-b' })).toBeInTheDocument();
     });
+
+    // The programmatic counterpart of a trigger's payload, for an open that no element initiated —
+    // a confirmation raised by a close request, say, which has to say what it is asking.
+    describe('handle.open(payload)', () => {
+      function renderDetached() {
+        const handle = Dialog.createHandle<string>();
+        render(
+          <Dialog.Root handle={handle}>
+            {({ payload }) => (
+              <>
+                <Dialog.Trigger id='trigger-a'>Open A</Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Viewport>
+                    <Dialog.Popup>
+                      <Dialog.Title>{payload ?? 'no payload'}</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Portal>
+              </>
+            )}
+          </Dialog.Root>,
+        );
+        return handle;
+      }
+
+      it('delivers it to the children render function', () => {
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('survives the registry lookup that runs once the dialog is open', async () => {
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+        // The lookup effect re-runs on `open`; without a fallback it would resolve to `undefined`
+        // a commit later and blank the dialog.
+        await act(async () => {
+          await Promise.resolve();
+        });
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('is superseded by a trigger, which names its own payload', async () => {
+        const user = userEvent.setup();
+        const handle = renderDetached();
+
+        act(() => handle.open('from-handle'));
+        act(() => handle.close());
+        await user.click(screen.getByRole('button', { name: 'Open A' }));
+
+        expect(screen.getByRole('dialog', { name: 'no payload' })).toBeInTheDocument();
+      });
+    });
   });
 
   describe('initialFocus', () => {

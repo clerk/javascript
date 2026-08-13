@@ -98,6 +98,10 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // consumed by the floating `onOpenChange` the request funnels into.
   const pendingDetailsRef = useRef<DialogOpenChangeDetails | null>(null);
 
+  // The payload of the most recent programmatic `handle.open(payload)`, kept so the registry
+  // lookup below has something to fall back to when no trigger is involved.
+  const directPayloadRef = useRef<Payload | undefined>(undefined);
+
   // Every open/close funnels through `floatingContext.onOpenChange` — trigger activations,
   // dismissals, and programmatic `setOpen` alike. floating-ui emits its `openchange` event
   // synchronously before invoking this callback, which is what lets listeners (`useReturnFocus`,
@@ -119,6 +123,9 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       openFromTrigger: (id, event) => {
         const registration = store.getTrigger(id);
         setActiveTriggerId(id);
+        // A trigger names its own payload, so it supersedes anything a previous programmatic
+        // open supplied — otherwise the stale one would resurface through the effect below.
+        directPayloadRef.current = undefined;
         setActivePayload(registration?.getPayload());
         if (registration) {
           refs.setReference(registration.element);
@@ -131,7 +138,14 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
         pendingDetailsRef.current = { trigger: registration?.element ?? null, triggerId: id, event };
         floatingContext.onOpenChange(false, event, 'click');
       },
-      setOpen: nextOpen => floatingContext.onOpenChange(nextOpen),
+      setOpen: (nextOpen, payload) => {
+        // Held in a ref as well as in state because the payload effect below re-runs on `open`
+        // and would otherwise resolve a trigger-less open to `undefined`, wiping this a commit
+        // after it was set.
+        directPayloadRef.current = payload;
+        setActivePayload(payload);
+        floatingContext.onOpenChange(nextOpen);
+      },
     });
     // `floatingContext` is rebuilt on open/element changes; re-registering is an idempotent swap.
   }, [store, refs, floatingContext, setActiveTriggerId]);
@@ -157,7 +171,9 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // the time it reads, and the pre-paint re-render delivers their payload on the first frame.
   useLayoutEffect(() => {
     if (open) {
-      setActivePayload(activeTriggerId != null ? store.getTrigger(activeTriggerId)?.getPayload() : undefined);
+      setActivePayload(
+        activeTriggerId != null ? store.getTrigger(activeTriggerId)?.getPayload() : directPayloadRef.current,
+      );
     }
   }, [store, open, activeTriggerId]);
 

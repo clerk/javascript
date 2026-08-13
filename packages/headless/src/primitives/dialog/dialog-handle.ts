@@ -20,10 +20,10 @@ export interface DialogTriggerRegistration<Payload = unknown> {
  * requests made with no root attached are ignored, matching Base UI.
  * @internal
  */
-export interface DialogRootController {
+export interface DialogRootController<Payload = unknown> {
   openFromTrigger: (id: string, event: Event) => void;
   closeFromTrigger: (id: string, event: Event) => void;
-  setOpen: (open: boolean) => void;
+  setOpen: (open: boolean, payload?: Payload) => void;
 }
 
 /** The slice of root state a trigger renders from: its `data-open` / ARIA wiring. */
@@ -45,8 +45,16 @@ const CLOSED_STATE: DialogHandleState = { open: false, triggerId: null, popupId:
  * lets a `DialogHandle<Payload>` flow into contexts typed `DialogHandle<unknown>`.
  */
 export interface DialogHandle<Payload = unknown> {
-  /** Opens the attached root. Ignored while no root is mounted. */
-  open(): void;
+  /**
+   * Opens the attached root. Ignored while no root is mounted.
+   *
+   * The optional `payload` is the programmatic counterpart of a trigger's: it reaches the root's
+   * children-as-function as `{ payload }`, so an imperative open can carry the content the dialog
+   * is about — what a confirmation is asking, which record is being deleted — without the caller
+   * holding a second piece of state alongside `open`. A trigger-driven open supersedes it, since
+   * a trigger names its own payload.
+   */
+  open(payload?: Payload): void;
   /** Closes the attached root. Ignored while no root is mounted. */
   close(): void;
   /** Whether the attached root is open. `false` while no root is mounted. */
@@ -58,7 +66,7 @@ export interface DialogHandle<Payload = unknown> {
   /** @internal */
   getFirstTrigger(): DialogTriggerRegistration<Payload> | undefined;
   /** @internal */
-  setRoot(controller: DialogRootController): () => void;
+  setRoot(controller: DialogRootController<Payload>): () => void;
   /** @internal */
   requestOpen(id: string, event: Event): void;
   /** @internal */
@@ -79,14 +87,14 @@ export interface DialogHandle<Payload = unknown> {
 export function createDialogHandle<Payload = unknown>(): DialogHandle<Payload> {
   const triggers = new Map<string, DialogTriggerRegistration<Payload>>();
   const listeners = new Set<() => void>();
-  let root: DialogRootController | null = null;
+  let root: DialogRootController<Payload> | null = null;
   let state = CLOSED_STATE;
 
   const notify = () => listeners.forEach(listener => listener());
 
   return {
-    open() {
-      root?.setOpen(true);
+    open(payload) {
+      root?.setOpen(true, payload);
     },
     close() {
       root?.setOpen(false);
