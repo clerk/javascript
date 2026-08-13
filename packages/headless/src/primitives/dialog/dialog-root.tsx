@@ -141,9 +141,16 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       setOpen: (nextOpen, payload) => {
         // Held in a ref as well as in state because the payload effect below re-runs on `open`
         // and would otherwise resolve a trigger-less open to `undefined`, wiping this a commit
-        // after it was set.
+        // after it was set. Cleared on close as well, so the next payload-less open does not
+        // resurface this one.
         directPayloadRef.current = payload;
-        setActivePayload(payload);
+        // Published only on the way IN. A close carries no payload, and writing it would blank
+        // the children-as-function while the popup is still mounted for its exit transition —
+        // rendering the dialog empty as it leaves, or throwing in a consumer that dereferences
+        // the payload. The next open sets it afresh.
+        if (nextOpen) {
+          setActivePayload(payload);
+        }
         floatingContext.onOpenChange(nextOpen);
       },
     });
@@ -169,10 +176,20 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   // `defaultOpen` — the payload is looked up from the registry once the dialog is open. Runs
   // after the children's layout effects, so triggers rendered inside the root are registered by
   // the time it reads, and the pre-paint re-render delivers their payload on the first frame.
+  //
+  // An explicit programmatic payload wins over the registry lookup: `activeTriggerId` is never
+  // reset on close, so once any trigger has opened the dialog the lookup would otherwise overwrite
+  // every later `handle.open(payload)` with that trigger's payload. The mirror already holds —
+  // `openFromTrigger` clears `directPayloadRef`, so a trigger wins the other way.
   useLayoutEffect(() => {
     if (open) {
+      const direct = directPayloadRef.current;
       setActivePayload(
-        activeTriggerId != null ? store.getTrigger(activeTriggerId)?.getPayload() : directPayloadRef.current,
+        direct !== undefined
+          ? direct
+          : activeTriggerId != null
+            ? store.getTrigger(activeTriggerId)?.getPayload()
+            : undefined,
       );
     }
   }, [store, open, activeTriggerId]);

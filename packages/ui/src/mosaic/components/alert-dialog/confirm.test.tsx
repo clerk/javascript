@@ -275,6 +275,36 @@ describe('createConfirmHandle', () => {
     expect(screen.getByRole('alertdialog', { name: 'First' })).toBeInTheDocument();
   });
 
+  // An unanswered question poisons the handle: `show()` short-circuits on the in-flight promise,
+  // so the confirmation would never open again and a guarded dialog could no longer be closed.
+  it('answers false when the confirmation unmounts with a question in flight', async () => {
+    const handle = createConfirmHandle();
+    const answers: boolean[] = [];
+
+    function Harness({ mounted }: { mounted: boolean }) {
+      return (
+        <Dialog defaultOpen>
+          <Dialog.Title>Host</Dialog.Title>
+          {mounted ? <AlertDialog.Confirm handle={handle} /> : null}
+        </Dialog>
+      );
+    }
+    const { rerender } = render(<Harness mounted />);
+
+    await act(async () => {
+      void handle.show({ title: 'Sure?', description: 'No going back.' }).then(a => answers.push(a));
+    });
+    rerender(<Harness mounted={false} />);
+
+    await waitFor(() => expect(answers).toEqual([false]));
+    // And the handle is usable again rather than stuck on the dead promise.
+    rerender(<Harness mounted />);
+    await act(async () => {
+      void handle.show({ title: 'Again?', description: 'Still no going back.' }).then(a => answers.push(a));
+    });
+    expect(screen.getByRole('alertdialog', { name: 'Again?' })).toBeInTheDocument();
+  });
+
   it('stacks over the dialog it guards rather than replacing it', async () => {
     const user = userEvent.setup();
     render(<GuardedForm />);

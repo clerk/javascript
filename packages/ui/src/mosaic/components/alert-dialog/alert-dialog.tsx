@@ -1,5 +1,4 @@
 import type { DialogFocusTarget } from '@clerk/headless/dialog';
-import { useDialogContext } from '@clerk/headless/dialog';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
@@ -229,6 +228,12 @@ export interface AlertDialogConfirmProps {
  * styles and the refcounted scroll lock all read.
  */
 function Confirm({ handle, finalFocus }: AlertDialogConfirmProps) {
+  // A question can only be answered while the thing that asks it is on screen. Going away with one
+  // in flight would leave the promise unresolved forever, and `show()` short-circuits on an
+  // in-flight question — so the handle would never open a confirmation again, and a guarded dialog
+  // whose closes route through one could no longer be closed at all.
+  React.useEffect(() => () => handle.settle(false), [handle]);
+
   return (
     <Root
       handle={handle.dialog}

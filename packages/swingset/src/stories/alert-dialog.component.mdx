@@ -138,6 +138,11 @@ It resolves `true` for the action and `false` for cancel or any dismissal. Calli
 confirmation is already showing returns the in-flight promise rather than opening a second one, so
 repeated close requests ask once.
 
+**`AlertDialog.Confirm` must be mounted when `show()` is called** — it is the thing that opens, and
+a `show()` with nothing mounted to answer it never resolves. Since the confirmation lives inside the
+dialog it guards, that means asking from inside that dialog, while it is open. A confirmation that
+unmounts with a question in flight answers `false` rather than leaving the `await` hanging.
+
 ## Parts
 
 | Part                      | Slot                   | Description                                                                                  |
