@@ -1121,6 +1121,7 @@ export interface BillingAppliedDiscount {
    * after a fixed number of cycles.
    */
   cyclesRemaining: number | null;
+  durationInCycles?: number | null;
 }
 
 /**

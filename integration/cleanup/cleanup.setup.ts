@@ -5,8 +5,11 @@ import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
 
 import { appConfigs } from '../presets/';
+import { findE2ERunUsers, getE2ERunMarker } from '../testUtils/e2eRun';
+import { withRetry } from '../testUtils/retryableClerkClient';
 
 setup('cleanup instances ', async () => {
+  const runMarker = getE2ERunMarker();
   const entries = Array.from(appConfigs.secrets.instanceKeys.values())
     .map(({ pk, sk }) => {
       const secretKey = sk;
@@ -32,6 +35,9 @@ setup('cleanup instances ', async () => {
   }> = [];
 
   console.log('🧹 Starting E2E Test Cleanup Process...\n');
+  if (runMarker) {
+    console.log(`Cleaning users for run marker ${runMarker}\n`);
+  }
 
   for (const entry of entries) {
     const instanceSummary = {
@@ -43,29 +49,32 @@ setup('cleanup instances ', async () => {
     };
 
     try {
-      const clerkClient = createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl });
+      const clerkClient = withRetry(createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl }));
 
       // Get users with error handling
       let users: any[] = [];
       try {
-        const { data: usersWithEmail } = await clerkClient.users.getUserList({
-          orderBy: '-created_at',
-          query: 'clerkcookie',
-          limit: 150,
-        });
+        if (runMarker) {
+          users = await findE2ERunUsers(clerkClient, runMarker);
+        } else {
+          const { data: usersWithEmail } = await clerkClient.users.getUserList({
+            orderBy: '-created_at',
+            query: 'clerkcookie',
+            limit: 500,
+          });
 
-        const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
-          orderBy: '-created_at',
-          query: '55501',
-          limit: 150,
-        });
+          const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
+            orderBy: '-created_at',
+            query: '55501',
+            limit: 500,
+          });
 
-        // Deduplicate users by ID
-        const allUsersMap = new Map();
-        [...usersWithEmail, ...usersWithPhoneNumber].forEach(user => {
-          allUsersMap.set(user.id, user);
-        });
-        users = Array.from(allUsersMap.values());
+          const allUsersMap = new Map();
+          [...usersWithEmail, ...usersWithPhoneNumber].forEach(user => {
+            allUsersMap.set(user.id, user);
+          });
+          users = Array.from(allUsersMap.values());
+        }
       } catch (error) {
         instanceSummary.errors.push(`Failed to get users: ${error.message}`);
         console.error(`Error getting users for ${entry.instanceName}:`, error);
@@ -75,10 +84,14 @@ setup('cleanup instances ', async () => {
       // Get organizations with error handling
       let orgs: any[] = [];
       try {
-        const { data: orgsData } = await clerkClient.organizations.getOrganizationList({
-          limit: 150,
-        });
-        orgs = orgsData;
+        if (runMarker) {
+          orgs = [];
+        } else {
+          const { data: orgsData } = await clerkClient.organizations.getOrganizationList({
+            limit: 500,
+          });
+          orgs = orgsData;
+        }
       } catch (error) {
         // Treat 404 (not found) and 403 (forbidden) as "no orgs"
         // 404 = no organizations exist, 403 = no permission to access organizations
@@ -91,8 +104,11 @@ setup('cleanup instances ', async () => {
         }
       }
 
-      const usersToDelete = batchElements(skipObjectsThatWereCreatedWithinTheLast10Minutes(users), 5);
-      const orgsToDelete = batchElements(skipObjectsThatWereCreatedWithinTheLast10Minutes(orgs), 5);
+      const usersToDelete = batchElements(
+        runMarker ? users : skipObjectsThatWereCreatedWithinTheLast10Minutes(users),
+        5,
+      );
+      const orgsToDelete = batchElements(runMarker ? [] : skipObjectsThatWereCreatedWithinTheLast10Minutes(orgs), 5);
 
       // Delete users with tracking
       for (const batch of usersToDelete) {
@@ -140,6 +156,13 @@ setup('cleanup instances ', async () => {
           }),
         );
         await new Promise(r => setTimeout(r, 1000));
+      }
+
+      if (runMarker) {
+        const remainingUsers = await findE2ERunUsers(clerkClient, runMarker);
+        if (remainingUsers.length > 0) {
+          instanceSummary.errors.push(`Users remain after cleanup: ${remainingUsers.map(user => user.id).join(', ')}`);
+        }
       }
 
       // Report instance results

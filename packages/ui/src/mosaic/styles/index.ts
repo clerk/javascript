@@ -7,13 +7,29 @@
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
 export { Avatar } from '../components/avatar';
-export type { AvatarProps, AvatarImageProps, AvatarFallbackProps } from '../components/avatar';
+export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
 export type { CardProps } from '../components/card';
+export { Dialog } from '../components/dialog';
+export type {
+  DialogBackdropProps,
+  DialogCloseButtonProps,
+  DialogCloseProps,
+  DialogDescriptionProps,
+  DialogPopupProps,
+  DialogProps,
+  DialogRootProps,
+  DialogSize,
+  DialogTitleProps,
+  DialogTriggerProps,
+  DialogViewportProps,
+} from '../components/dialog';
+export { Field } from '../components/field';
+export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
@@ -32,11 +48,25 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Section } from '../components/section';
+export type {
+  SectionActionsProps,
+  SectionContentProps,
+  SectionDescriptionProps,
+  SectionGroupProps,
+  SectionItemProps,
+  SectionItemsProps,
+  SectionLabelProps,
+  SectionMediaProps,
+  SectionMediaSize,
+  SectionRootProps,
+  SectionRowProps,
+  SectionTitleProps,
+} from '../components/section';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
-
 export { Popover } from '../components/popover';
 export type {
   PopoverCloseProps,

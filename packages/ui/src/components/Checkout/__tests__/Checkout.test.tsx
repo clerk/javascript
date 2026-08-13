@@ -1764,6 +1764,7 @@ describe('Checkout', () => {
               percentOff: 20,
               promoCode: 'WELCOME20',
               cyclesRemaining: 1,
+              durationInCycles: 1,
             },
             total: money(2598, '25.98'),
           },

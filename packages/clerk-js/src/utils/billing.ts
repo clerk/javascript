@@ -123,6 +123,7 @@ const billingAppliedDiscountFromJSON = (data: BillingAppliedDiscountJSON): Billi
   amountOff: data.amount_off ? billingMoneyAmountFromJSON(data.amount_off) : undefined,
   promoCode: data.promo_code,
   cyclesRemaining: data.cycles_remaining,
+  durationInCycles: data.duration_in_cycles,
 });
 
 export const billingDiscountRedemptionFromJSON = (data: BillingDiscountRedemptionJSON): BillingDiscountRedemption => ({

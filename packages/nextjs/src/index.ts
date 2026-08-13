@@ -85,6 +85,8 @@ import type { ServerComponentsServerModuleTypes } from './components.server';
 export const ClerkProvider = ComponentsModule.ClerkProvider as ServerComponentsServerModuleTypes['ClerkProvider'];
 export const Show = ComponentsModule.Show as ServerComponentsServerModuleTypes['Show'];
 
+export { Protect, SignedIn, SignedOut } from './removedControlComponents';
+
 /**
  * `auth` is not available from this import path.
  *

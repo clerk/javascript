@@ -49,6 +49,7 @@ const nextPaymentTotalsJSON = (): BillingTotalsJSON => ({
       percent_off: 20,
       promo_code: 'WELCOME20',
       cycles_remaining: 2,
+      duration_in_cycles: 3,
     },
     total: moneyJSON(500),
   },
@@ -126,6 +127,7 @@ describe('billingPaymentTotalsFromJSON', () => {
           effect: 'fixed_amount',
           amount_off: moneyJSON(100),
           cycles_remaining: null,
+          duration_in_cycles: null,
         },
         total: moneyJSON(16),
       },
@@ -142,6 +144,7 @@ describe('billingPaymentTotalsFromJSON', () => {
       effect: 'fixed_amount',
       amountOff: { amount: 100, amountFormatted: '1.00', currency: 'USD', currencySymbol: '$' },
       cyclesRemaining: null,
+      durationInCycles: null,
     });
     expect(totals.discounts?.total.amount).toBe(16);
   });
@@ -243,6 +246,7 @@ describe('billingSubscriptionNextPaymentFromJSON', () => {
           percentOff: 20,
           promoCode: 'WELCOME20',
           cyclesRemaining: 2,
+          durationInCycles: 3,
         },
         total: { amount: 500 },
       },

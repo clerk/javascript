@@ -7,11 +7,13 @@ import { Avatar } from './avatar';
 import { Badge } from './badge';
 import { Button } from './button';
 import { Card } from './card';
+import { Field } from './field';
 import { Heading } from './heading';
 import { Icon } from './icon';
 import { Input } from './input';
 import { Item } from './item';
 import { reset } from './reset.styles';
+import { Section } from './section';
 import { Text } from './text';
 
 // StyleX generates the same atom for the same property+value across separate `create` calls, so a
@@ -43,6 +45,10 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Card.Header', <Card.Header key='card-header' />],
   ['Card.Content', <Card.Content key='card-content' />],
   ['Card.Footer', <Card.Footer key='card-footer' />],
+  ['Field.Root', <Field.Root key='field-root' />],
+  ['Field.Label', <Field.Label key='field-label' />],
+  ['Field.Description', <Field.Description key='field-description' />],
+  ['Field.Error', <Field.Error key='field-error' />],
   ['Heading', <Heading key='heading'>Title</Heading>],
   [
     'Icon',
@@ -55,6 +61,17 @@ const cases: Array<[string, React.ReactElement]> = [
   ['Item', <Item.Root key='item' />],
   ['Item.Group', <Item.Group key='item-group' />],
   ['Item.Separator', <Item.Separator key='item-separator' />],
+  ['Section', <Section.Root key='section' />],
+  ['Section.Title', <Section.Title key='section-title'>Account</Section.Title>],
+  ['Section.Group', <Section.Group key='section-group' />],
+  ['Section.Row', <Section.Row key='section-row' />],
+  ['Section.Items', <Section.Items key='section-items' />],
+  ['Section.Item', <Section.Item key='section-item' />],
+  ['Section.Media', <Section.Media key='section-media' />],
+  ['Section.Content', <Section.Content key='section-content' />],
+  ['Section.Label', <Section.Label key='section-label' />],
+  ['Section.Description', <Section.Description key='section-description' />],
+  ['Section.Actions', <Section.Actions key='section-actions' />],
   ['Text', <Text key='text'>Body copy</Text>],
 ];
 

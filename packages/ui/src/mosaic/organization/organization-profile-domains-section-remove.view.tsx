@@ -24,6 +24,7 @@ export function OrganizationProfileDomainsSectionRemoveView({
 
   return (
     <Dialog.Root
+      closedBy='closerequest'
       open={isOpen}
       onOpenChange={open => {
         if (!open) {

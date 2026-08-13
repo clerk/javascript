@@ -56,6 +56,7 @@ export function Destructive({
 
   return (
     <Dialog
+      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
       trigger={trigger}

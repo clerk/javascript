@@ -44,6 +44,8 @@ const colorDefaults = {
   '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
   '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
 
+  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
 
@@ -59,18 +61,15 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // =============================================================================
 // Radius Tokens
 // =============================================================================
-// Named by what a surface is, not by size, so the steps nest: `inner` for a mark
-// sitting inside a control, `control` for the control itself (button, avatar
-// square), `container` for anything wrapping controls. `control` is 6px — a step
-// the 4/8/12 progression doesn't land on, which is why it's its own token rather
-// than a reuse of `inner` or `element`.
+// `md` is 6px rather than a 4/8/12 step: it is the control radius (button, avatar
+// square), and neither neighbour sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
-  '--cl-radius-inner': '0.25rem',
-  '--cl-radius-control': '0.375rem',
-  '--cl-radius-element': '0.5rem',
-  '--cl-radius-container': '0.75rem',
+  '--cl-radius-sm': '0.25rem',
+  '--cl-radius-md': '0.375rem',
+  '--cl-radius-lg': '0.5rem',
+  '--cl-radius-xl': '0.75rem',
   '--cl-radius-full': 'calc(infinity * 1px)',
 } as const;
 
@@ -204,6 +203,7 @@ export const space = stylex.defineVars({
   '3': step(3),
   '3.5': step(3.5),
   '4': step(4),
+  '4.5': step(4.5),
   '5': step(5),
   '6': step(6),
   '7': step(7),
@@ -313,9 +313,18 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // distance over few frames, so a sharper curve (In Quart, In Circ) leaves half of them
 // below the threshold of visible change and reads as a stall followed by a lurch.
 // Pair it with a shorter duration than the matching entrance.
+//
+// `--cl-ease-enter` is the entrance curve for surfaces that should NOT settle: the same
+// front-loaded deceleration, but landing exactly on target instead of carrying ~2% past it.
+// Use it where the overshoot is read as a correction rather than as physicality — a large
+// surface, or one whose arrival is already carried by a companion signal such as a scrim.
+// `Dialog` takes it for that reason; a small element moving a short distance still wants
+// `--cl-ease-default`, where the settle is the whole point. Same property rule applies: it
+// belongs on things that MOVE, and opacity still takes `linear`.
 
 const easingDefaults = {
   '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+  '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
   '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
 } as const;
 

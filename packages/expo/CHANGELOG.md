@@ -1,5 +1,26 @@
 # Change Log
 
+## 4.2.7
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.39` to `1.1.0`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.0. ([#9400](https://github.com/clerk/javascript/pull/9400)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Align Android OkHttp dependencies to compatible versions so Clerk native networking and React Native can run without a mixed OkHttp 4 and 5 classpath. ([#9371](https://github.com/clerk/javascript/pull/9371)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.2.6
+
+### Patch Changes
+
+- Add an experimental `ClerkProvider` option to disable native client synchronization when Clerk native components are not used. ([#9396](https://github.com/clerk/javascript/pull/9396)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.6` to `1.3.7`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.7. ([#9390](https://github.com/clerk/javascript/pull/9390)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.7` to `1.3.8`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.8. ([#9395](https://github.com/clerk/javascript/pull/9395)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.28.1
+
 ## 4.2.5
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @clerk/tanstack-react-start
 
+## 1.5.0
+
+### Minor Changes
+
+- Raise the minimum supported peer dependencies to `@tanstack/react-start@^1.167.17` and `@tanstack/react-router@^1.168.10`. TanStack Start 1.167.17 ensures request middleware context, such as the `auth` value provided by `clerkMiddleware()`, cannot be overridden by client-provided context in server function execution paths ([TanStack/router#7135](https://github.com/TanStack/router/pull/7135)). ([#9362](https://github.com/clerk/javascript/pull/9362)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`167204b`](https://github.com/clerk/javascript/commit/167204b8b810a302364883a1aa048233a0216be8)]:
+  - @clerk/backend@3.16.4
+
 ## 1.4.31
 
 ### Patch Changes

@@ -962,12 +962,14 @@ function waitForClerkInstanceLoad(clerkInstance: SyncableClerkInstance): Promise
 }
 
 export function useNativeClientBootstrap({
+  enabled,
   publishableKey,
   nativeRefreshFromJsControllerRef,
   suppressTokenCacheNotificationsRef,
   tokenCache,
   clerkInstance,
 }: {
+  enabled: boolean;
   publishableKey: string;
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
   suppressTokenCacheNotificationsRef: MutableRefObject<number>;
@@ -982,6 +984,7 @@ export function useNativeClientBootstrap({
     isMountedRef.current = true;
 
     if (
+      enabled &&
       (Platform.OS === 'ios' || Platform.OS === 'android') &&
       publishableKey &&
       startedPublishableKeyRef.current !== publishableKey
@@ -1083,7 +1086,14 @@ export function useNativeClientBootstrap({
     return () => {
       isMountedRef.current = false;
     };
-  }, [publishableKey, nativeRefreshFromJsControllerRef, suppressTokenCacheNotificationsRef, tokenCache, clerkInstance]);
+  }, [
+    enabled,
+    publishableKey,
+    nativeRefreshFromJsControllerRef,
+    suppressTokenCacheNotificationsRef,
+    tokenCache,
+    clerkInstance,
+  ]);
 
   return {
     isMountedRef,
