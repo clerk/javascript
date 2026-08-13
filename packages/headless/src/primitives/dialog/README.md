@@ -237,6 +237,9 @@ alert stack, the middle dialog is stacked on one surface while another is stacke
 backdrop instead of compositing a darker one per level. `data-stack-base` is for whatever the
 surface underneath does to signal depth.
 
+`data-stacked` holds for as long as the dialog underneath is on screen, exit transition included —
+otherwise the one on top would paint a second scrim over the fading original.
+
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
 ## Important Notes

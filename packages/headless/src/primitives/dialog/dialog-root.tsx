@@ -89,8 +89,6 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
   const [activeTriggerId, setActiveTriggerId] = useControllableState<string | null>(props.triggerId, null);
   const [activePayload, setActivePayload] = useState<Payload | undefined>(undefined);
 
-  const nesting = useDialogNesting(open);
-
   const labelId = useId();
   const descriptionId = useId();
 
@@ -177,6 +175,10 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
     open,
     ref: popupRef,
   });
+
+  // Below `useTransition` because it needs `mounted`: what a stacked child has to key off is
+  // whether this dialog is still on screen, not whether it is still open.
+  const nesting = useDialogNesting(open, mounted);
 
   const dismiss = useDismiss(floatingContext, {
     outsidePressEvent: 'mousedown',

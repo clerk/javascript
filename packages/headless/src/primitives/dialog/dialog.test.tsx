@@ -745,6 +745,49 @@ describe('Dialog', () => {
       expect(screen.getByTestId('outer-popup')).not.toHaveAttribute('data-stack-base');
     });
 
+    it('stays stacked while the dialog beneath is exiting', () => {
+      // Keep an animation pending so the one beneath stays mounted for its exit instead of
+      // unmounting in the same commit.
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+        { finished: new Promise<void>(() => {}) },
+      ];
+      try {
+        const { rerender } = renderStack();
+
+        // The one beneath closes first. Its backdrop is still on screen for the length of the
+        // exit, so the one on top has to keep suppressing its own scrim rather than paint a
+        // second one over the fading original.
+        rerender(
+          <Dialog.Root open={false}>
+            <Dialog.Backdrop data-testid='outer-backdrop' />
+            <Dialog.Viewport>
+              <Dialog.Popup data-testid='outer-popup'>
+                <Dialog.Title>Outer</Dialog.Title>
+                <Dialog.Root open>
+                  <Dialog.Backdrop data-testid='inner-backdrop' />
+                  <Dialog.Viewport>
+                    <Dialog.Popup data-testid='inner-popup'>
+                      <Dialog.Title>Inner</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Root>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>,
+        );
+
+        expect(screen.getByTestId('outer-backdrop')).toBeInTheDocument();
+        expect(screen.getByTestId('inner-backdrop')).toHaveAttribute('data-stacked', '');
+      } finally {
+        if (original) {
+          (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+        } else {
+          delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        }
+      }
+    });
+
     it('is not stacked on a dialog that is closed', () => {
       // A confirmation root mounted beside its dialog's portal is inside the root but outlives
       // the open state; on its own it owns the scrim like any root-level dialog.
