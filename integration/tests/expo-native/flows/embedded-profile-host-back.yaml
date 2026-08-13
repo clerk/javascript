@@ -39,12 +39,8 @@ name: Embedded UserProfileView host back round trip
       - extendedWaitUntil:
           visible: 'Edit profile'
           timeout: 20000
-      - waitForAnimationToEnd:
-          timeout: 5000
       - tapOn:
-          containsChild:
-            text: 'Manage account'
-          retryTapIfNoChange: true
+          text: 'Manage account'
       - extendedWaitUntil:
           visible: 'EMAIL ADDRESSES|Add email address'
           timeout: 15000
