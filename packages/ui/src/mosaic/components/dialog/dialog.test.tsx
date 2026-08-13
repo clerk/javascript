@@ -261,17 +261,40 @@ describe('stacked backdrops', () => {
     );
   }
 
-  it('marks only the stacked backdrop, so one scrim paints for the whole stack', async () => {
+  // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
+  // that the same tree with only the hosting size changed produces different classes. Comparing
+  // rather than matching a class: StyleX names are content hashes and would pin the value.
+  async function innerBackdropClass(hostSize: DialogSize) {
     const user = userEvent.setup();
-    renderStack();
-
-    expect(document.querySelector('.cl-dialog-backdrop')).not.toHaveAttribute('data-stacked');
-
+    render(
+      <Dialog
+        defaultOpen
+        size={hostSize}
+      >
+        <Dialog.Title>Host</Dialog.Title>
+        <Dialog trigger={addEmailTrigger}>
+          <Dialog.Title>Add email address</Dialog.Title>
+        </Dialog>
+      </Dialog>,
+    );
     await user.click(screen.getByRole('button', { name: 'Add email' }));
+    const className = document.querySelectorAll('.cl-dialog-backdrop')[1].className;
+    cleanup();
+    return className;
+  }
 
-    const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
-    expect(backdrops[0]).not.toHaveAttribute('data-stacked');
-    expect(backdrops[1]).toHaveAttribute('data-stacked', '');
+  it('drops the scrim for a prompt over a prompt, and keeps it for one over a panel', async () => {
+    const overPrompt = await innerBackdropClass('prompt');
+    const overPanel = await innerBackdropClass('panel');
+
+    expect(overPrompt).not.toBe(overPanel);
+  });
+
+  it('keeps a prompt over a card on the nested scrim, same as over a panel', async () => {
+    const overCard = await innerBackdropClass('card');
+    const overPanel = await innerBackdropClass('panel');
+
+    expect(overCard).toBe(overPanel);
   });
 
   it('marks the popup beneath as the stack base, so it can recede', async () => {
