@@ -10,18 +10,24 @@ export const styles = stylex.create({
   // Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //
-  // A stacked dialog paints its OWN scrim rather than deferring to the one beneath it, so each
-  // level reads as a step further from the page. It is lighter than the base because the two
-  // COMPOSITE: alpha over alpha is `1 − (1 − a)(1 − b)`, so the nested value is solved for the
-  // intended total rather than picked by eye — `1 − 0.32/0.6 = 0.4667` lands two levels on 0.68.
-  // Exact for a two-deep stack, which is the shape that exists; a third level would go darker
-  // still, and wants its own value rather than a third application of this one.
-  // `data-nested` comes from the headless layer.
+  // ONE scrim for the whole stack: a stacked dialog paints none, and the root-level dialog's
+  // survives underneath it. The stack reads as depth through the surface beneath receding
+  // (`popupMotion.prompt`), not through the page going darker.
+  //
+  // The alternative — each level painting a lighter scrim solved so the composite lands on an
+  // intended total — was here first, and worked only for the two-deep case it was solved for.
+  // Alpha over alpha is `1 − (1 − a)(1 − b)`, so every level compounds: a third took the same
+  // three-deep stack this feature exists for from an intended 0.68 to 0.83, and "how dark is the
+  // page" became a function of stack depth.
+  //
+  // Keyed on `data-stacked`, NOT `data-nested`: the latter reports any floating ancestor, so a
+  // dialog opened from a menu item would drop the only scrim it has. Both come from the headless
+  // layer.
   backdrop: {
     inset: 0,
     backgroundColor: {
       default: 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)',
-      ':where([data-nested])': 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)',
+      ':where([data-stacked])': 'transparent',
     },
     position: 'fixed',
   },
@@ -424,6 +430,23 @@ export const backdropMotion = stylex.create({
 const SHEET_EXIT_EASE = 'ease-out';
 
 const ENTER_SCALE = 0.94;
+
+// How far a prompt recedes while another prompt is stacked on it, and the radius that survives
+// that scale — the same `r/s` correction `ENTER_SCALE` documents above, for the same reason.
+//
+// Shallower than the entrance scale on purpose: the entrance is a surface arriving from nowhere,
+// while this is a surface that stays legible the whole time and only has to read as further back.
+// The lift is what separates it from the entrance rather than the depth of the scale — a surface
+// that only shrinks reads as being pushed away, one that shrinks and rises reads as being layered
+// over, which is the relationship this actually is.
+//
+// A single step rather than a `--cl-stack-index` formula: the headless layer counts DIRECT
+// children, so a third level would report the same 1 as the second and every level below the top
+// would recede identically anyway. The formula and the cumulative count belong in the same change,
+// whenever a stack deep enough to need them turns up.
+const STACK_SCALE = 0.96;
+const STACK_LIFT = '-0.5rem';
+
 const popupRadius = radiusVars['--cl-radius-xl'];
 
 export const popupMotion = stylex.create({
@@ -437,15 +460,22 @@ export const popupMotion = stylex.create({
   prompt: {
     borderRadius: {
       default: popupRadius,
+      // The recede is the one scale that survives the phone band, so unlike the entrance its
+      // radius correction is NOT pinned flat there — see `transform` below.
+      ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
       ':where([data-starting-style], [data-ending-style])': `calc(${popupRadius} / ${ENTER_SCALE})`,
       '@media (max-width: 47.99rem)': {
         default: popupRadius,
+        ':where([data-stack-base])': `calc(${popupRadius} / ${STACK_SCALE})`,
         ':where([data-starting-style], [data-ending-style])': popupRadius,
       },
-      // Both branches resolve to the same value, so their order relative to each other cannot
-      // matter: there is no scale to counteract in either case.
+      // Both entrance branches resolve to the same value, so their order relative to each other
+      // cannot matter: there is no scale to counteract in either case. The stack branch is here
+      // for the same reason it is on `transform` — under `reduce` nothing scales, so there is
+      // nothing to correct.
       '@media (prefers-reduced-motion: reduce)': {
         default: popupRadius,
+        ':where([data-stack-base])': popupRadius,
         ':where([data-starting-style], [data-ending-style])': popupRadius,
       },
     },
@@ -481,13 +511,34 @@ export const popupMotion = stylex.create({
      */
     transform: {
       default: 'scale(1)',
+      /**
+       * The recede: what a prompt does while another prompt is stacked on it. There is no second
+       * scrim, so this and the stacked surface's own shadow are the entire depth cue.
+       *
+       * Kept ON the phone band, where the entrance scale is pinned flat. Those are different
+       * gestures and the reasoning does not carry over: the entrance pin exists because stacking a
+       * shrink on top of a full-height slide makes the sheet arrive small and settle. A sheet
+       * receding under another sheet is the familiar one — it is what vaul does — and on a phone,
+       * where a stacked sheet covers most of what is beneath it, dropping the recede would leave
+       * the level below with no depth cue at all.
+       *
+       * `@stylexjs/sort-keys` puts this branch before the entrance one, so an exit that somehow
+       * begins while a child is still open renders the exit scale rather than the recede. Nothing
+       * ordinary reaches that state — floating-ui blocks the parent's own dismissal while a child
+       * is open — and the exit scale is the better of the two to see if anything ever does.
+       */
+      ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
       ':where([data-starting-style], [data-ending-style])': `scale(${ENTER_SCALE})`,
       '@media (max-width: 47.99rem)': {
         default: 'scale(1)',
+        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
       '@media (prefers-reduced-motion: reduce)': {
         default: 'scale(1)',
+        // Reduced motion drops the recede entirely rather than snapping to it: the level below
+        // holds still and the stacked surface simply appears over it.
+        ':where([data-stack-base])': 'scale(1)',
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
     },
