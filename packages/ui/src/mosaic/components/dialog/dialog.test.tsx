@@ -245,27 +245,84 @@ describe('stacked backdrops', () => {
     </button>
   );
 
-  it('marks only the inner backdrop as nested, so the scrims do not compound', async () => {
+  function renderStack() {
+    return render(
+      <Dialog
+        defaultOpen
+        size='panel'
+      >
+        <Dialog.Title>Account</Dialog.Title>
+        <div>Outer body</div>
+        <Dialog trigger={addEmailTrigger}>
+          <Dialog.Title>Add email address</Dialog.Title>
+          <div>Inner body</div>
+        </Dialog>
+      </Dialog>,
+    );
+  }
+
+  it('marks only the stacked backdrop, so one scrim paints for the whole stack', async () => {
+    const user = userEvent.setup();
+    renderStack();
+
+    expect(document.querySelector('.cl-dialog-backdrop')).not.toHaveAttribute('data-stacked');
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
+    expect(backdrops[0]).not.toHaveAttribute('data-stacked');
+    expect(backdrops[1]).toHaveAttribute('data-stacked', '');
+  });
+
+  it('marks the popup beneath as the stack base, so it can recede', async () => {
+    const user = userEvent.setup();
+    renderStack();
+
+    const outerPopup = document.querySelector('.cl-dialog-popup');
+    expect(outerPopup).not.toHaveAttribute('data-stack-base');
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    const popups = document.querySelectorAll('.cl-dialog-popup');
+    expect(popups[0]).toHaveAttribute('data-stack-base', '');
+    expect(popups[1]).not.toHaveAttribute('data-stack-base');
+  });
+
+  it('warns when a stacked dialog is not a prompt', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
     render(
       <Dialog
         defaultOpen
         size='panel'
       >
+        <Dialog.Title>Account</Dialog.Title>
         <div>Outer body</div>
-        <Dialog trigger={addEmailTrigger}>
+        <Dialog
+          trigger={addEmailTrigger}
+          size='card'
+        >
+          <Dialog.Title>Add email address</Dialog.Title>
           <div>Inner body</div>
         </Dialog>
       </Dialog>,
     );
 
-    expect(document.querySelector('.cl-dialog-backdrop')).not.toHaveAttribute('data-nested');
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="card"'));
+    warn.mockRestore();
+  });
+
+  it('does not warn for a stacked prompt, or for a root-level panel', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderStack();
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
-    const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
-    expect(backdrops[0]).not.toHaveAttribute('data-nested');
-    expect(backdrops[1]).toHaveAttribute('data-nested', '');
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
 
