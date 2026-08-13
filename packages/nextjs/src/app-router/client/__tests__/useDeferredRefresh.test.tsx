@@ -1,5 +1,5 @@
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { useTransition } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useDeferredRefresh } from '../useDeferredRefresh';
@@ -11,10 +11,38 @@ vi.mock('next/navigation', () => ({
 }));
 
 let currentRefresh: (() => void) | undefined;
+let startHeldTransition: (() => void) | undefined;
+let finishHeldTransition: (() => void) | undefined;
+
+// Suspends inside a transition until the gate promise resolves, keeping
+// React's transition lanes pending (the state the deferral gate protects)
+const gate: { promise: Promise<void> | null; done: boolean } = { promise: null, done: false };
+
+const Suspender = () => {
+  if (!gate.done) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw gate.promise;
+  }
+  return null;
+};
 
 const Harness = () => {
   currentRefresh = useDeferredRefresh();
-  return null;
+  const [suspended, setSuspended] = React.useState(false);
+  const [, startTransition] = useTransition();
+  startHeldTransition = () => {
+    gate.done = false;
+    let resolveGate!: () => void;
+    gate.promise = new Promise<void>(res => {
+      resolveGate = res;
+    });
+    finishHeldTransition = () => {
+      gate.done = true;
+      resolveGate();
+    };
+    startTransition(() => setSuspended(true));
+  };
+  return <React.Suspense fallback={null}>{suspended ? <Suspender /> : null}</React.Suspense>;
 };
 
 const refresh = () => {
@@ -45,6 +73,35 @@ describe('useDeferredRefresh', () => {
     await waitFor(() => {
       expect(mockRefresh).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('does not dispatch router.refresh while another transition is pending', async () => {
+    render(<Harness />);
+
+    act(() => {
+      startHeldTransition!();
+    });
+
+    act(() => {
+      refresh();
+    });
+
+    // Let effects and microtasks run; the refresh must stay parked while the
+    // held transition keeps React's transition lanes pending
+    await act(async () => {
+      await new Promise(res => setTimeout(res, 20));
+    });
+    expect(mockRefresh).not.toHaveBeenCalled();
+    expect(window.__clerk_internal_refresh?.pending).toBe(true);
+
+    act(() => {
+      finishHeldTransition!();
+    });
+
+    await waitFor(() => {
+      expect(mockRefresh).toHaveBeenCalledTimes(1);
+    });
+    expect(window.__clerk_internal_refresh?.pending).toBe(false);
   });
 
   it('coalesces concurrent requests into a single router.refresh', async () => {
