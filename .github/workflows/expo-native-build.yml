@@ -233,10 +233,24 @@ jobs:
 
       - name: Install argent CLI
         if: steps.keys.outputs.pk != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           npm install -g "@swmansion/argent@$ARGENT_VERSION"
           argent telemetry disable || true
           argent --version
+          # The linux simulator-server bundled in the npm release predates the
+          # headless-linux fixes (it exits at spawn on CI), so pull the build
+          # from the release channel argent's own CI pins. Drop once upstream
+          # radon#118 ships the fixed binary in the npm package.
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            gh release download radon-daily \
+              --repo software-mansion-labs/simulator-server-releases \
+              --pattern simulator-server-argent-linux \
+              --output /tmp/simulator-server-argent-linux --clobber
+            ARGENT_DIR="$(npm root -g)/@swmansion/argent"
+            install -m 0755 /tmp/simulator-server-argent-linux "$ARGENT_DIR/bin/linux/simulator-server"
+          fi
 
       - name: Boot iOS simulator
         id: sim
@@ -383,8 +397,12 @@ jobs:
           adb shell settings put global transition_animation_scale 0
           adb shell settings put global animator_duration_scale 0
           cd "$GITHUB_WORKSPACE/$E2E_DIR"
+          rc=0
           E2E_DEBUG_OUTPUT="$RUNNER_TEMP/argent-debug" ./run-android-argent-flows.sh \
-            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
+            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk" || rc=$?
+          # Argent's own logs say why device backends died; ship them with the artifact.
+          cp "$HOME"/.argent/*.log "$RUNNER_TEMP/argent-debug/" 2>/dev/null || true
+          exit "$rc"
 
       # Runs before the artifact upload so the credentials are already dead
       # by the time the debug files become downloadable.
