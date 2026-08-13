@@ -1,5 +1,10 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as AlertDialogDefault,
+  DiscardChanges as AlertDialogDiscardChanges,
+  meta as alertDialogComponentMeta,
+} from '../stories/alert-dialog.component.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -108,6 +113,12 @@ const sectionModule: StoryModule = {
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
 
+const alertDialogComponentModule: StoryModule = {
+  meta: alertDialogComponentMeta,
+  Default: AlertDialogDefault,
+  DiscardChanges: AlertDialogDiscardChanges,
+};
+
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
 
 const avatarModule: StoryModule = {
@@ -215,6 +226,7 @@ export const registry: StoryModule[] = [
   inputModule,
   itemModule,
   dialogComponentModule,
+  alertDialogComponentModule,
   headingModule,
   iconModule,
   menuComponentModule,

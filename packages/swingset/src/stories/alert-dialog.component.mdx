@@ -1,0 +1,131 @@
+import * as AlertDialogStories from './alert-dialog.component.stories';
+
+# AlertDialog
+
+The Mosaic `AlertDialog` — a `Dialog` that interrupts to ask for a decision, and waits for one.
+Reach for it when continuing depends on the answer: confirming something destructive, or warning
+that leaving loses work. Anything the user can read and dismiss is a `Dialog`.
+
+It is composed from the same parts as `Dialog`, so the surface, the motion, the stacking and the
+scroll lock are all shared. What differs is fixed rather than configurable: it announces itself as
+`role="alertdialog"`, an outside press cannot dismiss it, and it is always the `prompt` size.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={AlertDialogStories}
+/>
+
+## Usage
+
+```tsx
+import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
+import { Button } from '@clerk/ui/mosaic/components/button';
+
+<AlertDialog trigger={props => <Button {...props} color='negative'>Delete</Button>}>
+  {({ close }) => (
+    <>
+      <AlertDialog.Title>Delete Acme Inc?</AlertDialog.Title>
+      <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
+      <AlertDialog.Actions>
+        <AlertDialog.Close render={<Button variant='outline' />}>Cancel</AlertDialog.Close>
+        <Button color='negative' onClick={close}>Delete organization</Button>
+      </AlertDialog.Actions>
+    </>
+  )}
+</AlertDialog>
+```
+
+`trigger` is optional, and usually absent — an alert is normally raised by something that already
+happened rather than by a button that exists to raise it. Drive those with `open` and
+`onOpenChange`.
+
+### A Title and a Description are both required
+
+An alert dialog is announced as an interruption, and its description is announced with its name at
+that moment — so a title and two buttons leave the user choosing between "Cancel" and "Delete" with
+nothing saying what is being deleted. Both are checked in development and warn when missing; neither
+can be required in the type system, since parts arrive as children.
+
+### The cancel comes first
+
+Render the cancel as the first child of `AlertDialog.Actions`. It is the least destructive choice,
+and being first makes it the first tabbable element — which is what the dialog opens focused on, with
+no `initialFocus` needed. It is also the visual order in both layouts, so the keyboard order and the
+screen agree.
+
+### The action does not close by itself
+
+`AlertDialog.Close` dismisses on press, which is what the cancel wants. The action usually starts
+work, so close it when that work resolves rather than on the press — the render-prop `close` above,
+or your own controlled state. That leaves room for a pending state on the button.
+
+### Returning focus
+
+`finalFocus` (and `initialFocus`) are accepted on the wrapper as well as on `AlertDialog.Popup`.
+Pass one whenever the alert has no trigger: focus returns to the trigger by default, and an alert
+raised by something that happened has none, so answering it would otherwise drop the user on the
+body. A confirmation guarding a form wants the caret back in the field it asked about — see
+[Confirming a discard](#confirming-a-discard) below.
+
+### Dismissal
+
+There is no `closedBy` prop. An outside press never dismisses an alert dialog: a question that needs
+an answer must not be answerable by clicking next to it. Escape still closes — it is the keyboard's
+equivalent of the cancel button, which is always present here. There is no `CloseButton` part for
+the same reason: a corner X is a way out without answering.
+
+Every close request — Escape or `AlertDialog.Close` — routes through `onOpenChange`, so a controlled
+consumer can decline one by not committing the state.
+
+## Parts
+
+| Part                      | Slot                   | Description                                                                                  |
+| ------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
+| `AlertDialog.Root`        | —                      | State provider; owns open/close, `modal`, `handle`. `role`, `closedBy` and `size` are fixed. |
+| `AlertDialog.Trigger`     | —                      | Opens the alert; accepts `render`, and `handle` + `payload` when detached.                   |
+| `AlertDialog.Portal`      | —                      | Portals the overlay out of the tree.                                                         |
+| `AlertDialog.Backdrop`    | `dialog-backdrop`      | The scrim behind the alert.                                                                  |
+| `AlertDialog.Viewport`    | `dialog-viewport`      | Centering container; owns the scroll lock.                                                   |
+| `AlertDialog.Popup`       | `dialog-popup`         | The surface (`role="alertdialog"`, focus-trapped); `initialFocus` / `finalFocus`.            |
+| `AlertDialog.Title`       | —                      | Heading; wired to the popup's `aria-labelledby`. Required.                                   |
+| `AlertDialog.Description` | —                      | Description; wired to the popup's `aria-describedby`. Required.                              |
+| `AlertDialog.Close`       | —                      | Dismisses the alert; unstyled, accepts a `render` prop.                                      |
+| `AlertDialog.Actions`     | `alert-dialog-actions` | The response row. Cancel first.                                                              |
+
+Every part except `Popup` and `Actions` is `Dialog`'s own component, not a wrapper around it — one
+implementation, so the two cannot drift. `Title` and `Description` are unstyled passthroughs from the
+headless layer; render them through your own typography (`Heading`, `Text`) via `render`.
+
+## Styling
+
+The alert dialog carries the same `.cl-dialog-*` slots as `Dialog`, and is themed the same way — see
+the [Dialog](/components/dialog) page for the surface, the motion, the inset, and the state
+attributes, all of which apply unchanged. Only the response row is its own:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-alert-dialog-actions {
+    margin-block-start: 1.5rem;
+  }
+}
+```
+
+`AlertDialog.Actions` is a grid rather than a flex row, which is what lets the row change shape
+without the buttons knowing. From `48rem` up the tracks size to their labels and sit at the inline
+end. Below it — where a `prompt` is a bottom sheet spanning the screen — the tracks split the row
+evenly, so the buttons are full width rather than a pair floating against one edge.
+
+---
+
+## Examples
+
+### Confirming a discard
+
+<Story
+  name='DiscardChanges'
+  storyModule={AlertDialogStories}
+/>
