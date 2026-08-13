@@ -1,4 +1,3 @@
-import { useDialogContext } from '@clerk/headless/dialog';
 import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode } from 'react';
@@ -18,9 +17,9 @@ import type {
   DialogViewportProps,
 } from '../dialog';
 import { Dialog } from '../dialog';
-// Deep import: the part-name context is how one Mosaic component wraps another and is
-// deliberately absent from `../dialog`'s public surface.
-import { DialogPartNameContext } from '../dialog/dialog';
+// Deep import: the part-name context and the content resolver are how one Mosaic component wraps
+// another and are deliberately absent from `../dialog`'s public surface.
+import { DialogContent, DialogPartNameContext } from '../dialog/dialog';
 import { reset } from '../reset.styles';
 import { styles } from './alert-dialog.styles';
 
@@ -50,16 +49,14 @@ export type AlertDialogActionsProps = MosaicComponentProps<'div'>;
 /** Owns the open state, and pins the three props that make a dialog an alert dialog. */
 function Root<Payload = unknown>({ children, ...rest }: AlertDialogRootProps<Payload>) {
   return (
-    <DialogPartNameContext.Provider value='AlertDialog'>
-      <Dialog.Root<Payload>
-        {...rest}
-        role='alertdialog'
-        closedBy='closerequest'
-        size='prompt'
-      >
-        {children}
-      </Dialog.Root>
-    </DialogPartNameContext.Provider>
+    <Dialog.Root<Payload>
+      {...rest}
+      role='alertdialog'
+      closedBy='closerequest'
+      size='prompt'
+    >
+      {children}
+    </Dialog.Root>
   );
 }
 
@@ -88,11 +85,16 @@ const Popup = React.forwardRef<HTMLDivElement, AlertDialogPopupProps>(function A
     [ref],
   );
 
+  // Scoped to the popup rather than to the whole root: this is the only place the name is read,
+  // and a plain `Dialog` nested inside an alert would otherwise inherit it and have its own
+  // warnings name `AlertDialog` parts that do not exist at that call site.
   return (
-    <Dialog.Popup
-      ref={mergedRef}
-      {...props}
-    />
+    <DialogPartNameContext.Provider value='AlertDialog'>
+      <Dialog.Popup
+        ref={mergedRef}
+        {...props}
+      />
+    </DialogPartNameContext.Provider>
   );
 });
 
@@ -137,16 +139,6 @@ export interface AlertDialogProps
    */
   trigger?: MosaicComponentProps<'button'>['render'];
   children: ReactNode | ((ctx: { close: () => void }) => ReactNode);
-}
-
-function AlertDialogContent({ children }: { children: AlertDialogProps['children'] }) {
-  const { setOpen } = useDialogContext();
-  if (typeof children !== 'function') {
-    return <>{children}</>;
-  }
-  // Routed through the primitive's close funnel, so a controlled consumer's `onOpenChange` sees
-  // this close the same as Escape does — and can decline it.
-  return <>{children({ close: () => setOpen(false) })}</>;
 }
 
 /**
@@ -203,7 +195,7 @@ export function AlertDialog({
             initialFocus={initialFocus}
             finalFocus={finalFocus}
           >
-            <AlertDialogContent>{children}</AlertDialogContent>
+            <DialogContent>{children}</DialogContent>
           </Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
