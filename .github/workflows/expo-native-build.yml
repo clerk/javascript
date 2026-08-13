@@ -336,11 +336,16 @@ jobs:
               weston xkb-data libxkbcommon0 seatd libgoogle-perftools4
           mkdir -p "$XDG_RUNTIME_DIR"
           chmod 700 "$XDG_RUNTIME_DIR"
-          nohup weston --backend=headless --socket=wayland-0 --width=1920 --height=1080 \
-            > /tmp/weston.log 2>&1 &
-          for i in $(seq 1 30); do
+          # weston >=10 takes --backend=headless; ubuntu 22.04 ships weston 9,
+          # which wants the plugin filename.
+          for backend in headless headless-backend.so; do
+            nohup weston --backend="$backend" --socket=wayland-0 --width=1920 --height=1080 \
+              >> /tmp/weston.log 2>&1 &
+            for i in $(seq 1 15); do
+              [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
+              sleep 1
+            done
             [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
-            sleep 1
           done
           test -S "$XDG_RUNTIME_DIR/wayland-0" || { cat /tmp/weston.log; exit 1; }
           ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
