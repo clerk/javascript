@@ -35,8 +35,8 @@ const gamma = {
 const beta = { kind: 'suggestion', id: 'sug_1', organizationId: 'org_4', name: 'Beta', status: 'pending' } as const;
 
 /**
- * Every callback the connected container passes, so a test opts a surface *out* of an affordance
- * rather than having to opt into it. `combined` is the container's own default.
+ * Every callback the connected controller passes, so a test opts a surface *out* of an affordance
+ * rather than having to opt into it. `combined` is the controller's own default.
  */
 function renderView(props: Partial<UserButtonProps> = {}) {
   return render(

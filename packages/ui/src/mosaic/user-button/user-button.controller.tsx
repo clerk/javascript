@@ -1,288 +1,161 @@
-import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
-import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
-import type { OrganizationResource, UserResource } from '@clerk/shared/types';
+'use client';
 
-import { populateParamFromObject } from '../../contexts/utils';
-import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
-import { useMosaicEnvironment } from '../hooks/useMosaicEnvironment';
-import { useMosaicRouter } from '../hooks/useMosaicRouter';
-import type {
-  UserButtonBrandingProps,
-  UserButtonCallbacks,
-  UserButtonData,
-  UserButtonInvitation,
-  UserButtonMembership,
-  UserButtonSession,
-  UserButtonSuggestion,
-} from './user-button.types';
+import type { ReactElement, ReactNode } from 'react';
+import { useState } from 'react';
 
-// Promise-returning so the container can drive busy state. Navigation callbacks stay fire-and-forget.
-interface UserButtonAsyncCallbacks {
-  onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
-  onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
-  onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
-  onSignOutAll?: () => void | Promise<unknown>;
-  onAcceptSuggestion?: (suggestionId: string) => void | Promise<unknown>;
-  onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
-}
+import { useSpinDelay } from '../hooks/useSpinDelay';
+import { type UserButtonModelOptions, useUserButtonModel } from './user-button.model';
+import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
+import type { UserButtonTriggerProps } from './user-button.view';
+import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 
-export type UserButtonController =
-  | { status: 'loading' }
-  | { status: 'hidden' }
-  | (UserButtonData &
-      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks &
-      UserButtonBrandingProps & {
-        status: 'ready';
-        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
-        organizationsEnabled: boolean;
-      });
-
-// Mirrors `<OrganizationSwitcher>`: a URL, a `:token` template resolved against the entity, or a builder.
-type AfterSelectUrl<T> = ((entity: T) => string) | string;
-
-/** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
-type UserProfileMode =
-  | { userProfileUrl: string; userProfileMode?: 'navigation' }
-  | { userProfileUrl?: never; userProfileMode?: 'modal' };
-
-type OrganizationProfileMode =
-  | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
-  | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
-
-type CreateOrganizationMode =
-  | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
-  | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
-
-export type UserButtonControllerOptions = UserProfileMode &
-  OrganizationProfileMode &
-  CreateOrganizationMode & {
-    afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
-    /** Where selecting the personal workspace lands. Resolved against the user, not an organization. */
-    afterSelectPersonalUrl?: AfterSelectUrl<UserResource>;
+/** Everything `<UserButton />` takes: profile routing, trigger content, and the app's own menu rows. */
+export type UserButtonProps = UserButtonModelOptions &
+  UserButtonTriggerProps &
+  UserButtonMenuProps &
+  Pick<UserButtonModeProps, 'modePriority'> & {
     /**
-     * Leaves the personal workspace out. An instance that forces organization selection withholds it
-     * either way, so this cannot opt back in.
+     * Stands in while Clerk is still answering, so the space the button will take is held rather
+     * than appearing under whatever is beside it. Dropped once nobody is signed in, since that is
+     * an answer and not a wait.
      */
-    hidePersonal?: boolean;
+    fallback?: ReactNode;
   };
 
-function resolveAfterSelectUrl<T extends object>(config: AfterSelectUrl<T> | undefined, entity: T): string | undefined {
-  if (typeof config === 'function') {
-    return config(entity);
-  }
-  if (config) {
-    return populateParamFromObject({ urlWithParam: config, entity });
-  }
-  return undefined;
-}
+/**
+ * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an account,
+ * open the profile, and sign out. It reads the active session and organization from Clerk, so it takes
+ * no data. It renders `fallback` until Clerk answers, and nothing at all when nobody is signed in.
+ *
+ * Each action is a request: the row you click spins, the others stand down, and the menu stays open on
+ * the result. Only an action that navigates closes it.
+ *
+ * @example
+ * ```tsx
+ * import { UserButton } from '@clerk/ui/mosaic';
+ *
+ * <UserButton />
+ * ```
+ *
+ * @example
+ * `modePriority` picks which switcher the menu leads with — in its header, and in the trigger beside
+ * the avatar. The other one is still listed.
+ * ```tsx
+ * <UserButton modePriority='user' />
+ * ```
+ *
+ * @example
+ * Passing a URL routes to a page of your own instead of opening Clerk's modal; that is the whole
+ * opt-in. `afterSelectOrganizationUrl` is where switching organization lands, and takes a `:param`
+ * template, a plain path, or a function.
+ * ```tsx
+ * <UserButton
+ *   userProfileUrl='/account'
+ *   organizationProfileUrl='/settings/organization'
+ *   afterSelectOrganizationUrl='/orgs/:slug'
+ * />
+ * ```
+ *
+ * @example
+ * `fallback` holds the space while Clerk is still answering. Size it to the trigger to keep the row
+ * it sits in from moving. Nothing stands in once the answer is that nobody is signed in.
+ * ```tsx
+ * <UserButton fallback={<AvatarSkeleton />} />
+ * ```
+ *
+ * @example
+ * `customMenuItems` adds your own rows to the foot of the menu, each one either an `onClick` action
+ * or an `href` link, and `menuItemOrder` names the order the foot's rows run in.
+ * ```tsx
+ * <UserButton
+ *   customMenuItems={[
+ *     { id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' },
+ *     { id: 'support', label: 'Contact support', icon: <ChatIcon />, onClick: () => openSupportChat() },
+ *   ]}
+ *   menuItemOrder={['docs', 'support', 'addAccount', 'signOutAll']}
+ * />
+ * ```
+ */
+export function UserButton(props: UserButtonProps = {}): ReactElement | null {
+  const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
+    props;
+  const model = useUserButtonModel(options);
+  const [open, setOpen] = useState(false);
+  const [pendingKey, setPendingKey] = useState<string | null>(null);
 
-/** Opens the modal unless a URL routes instead. An explicit mode wins; a URL on its own means navigation. */
-function openOrNavigate({
-  url,
-  mode,
-  openModal,
-  buildUrl,
-  navigate,
-}: {
-  url: string | undefined;
-  mode: 'navigation' | 'modal' | undefined;
-  openModal: () => void;
-  buildUrl: () => string;
-  navigate: (to: string) => unknown;
-}): () => void {
-  const resolved = mode ?? (url ? 'navigation' : 'modal');
-  return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
-}
+  // Re-entry is guarded on the immediate `pendingKey`; only the view's feedback is delayed.
+  const displayPendingKey = useSpinDelay(pendingKey);
 
-const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
-
-function displayName(user: UserResource): string {
-  return getFullName(user) || getIdentifier(user);
-}
-
-function toMembership(organization: OrganizationResource): UserButtonMembership {
-  return {
-    kind: 'membership',
-    organizationId: organization.id,
-    name: organization.name,
-    imageUrl: organization.imageUrl || undefined,
-    membersCount: organization.membersCount,
-  };
-}
-
-function toSession(sessionId: string, user: UserResource): UserButtonSession {
-  return {
-    sessionId,
-    name: displayName(user),
-    identifier: getIdentifier(user),
-    imageUrl: user.imageUrl,
-  };
-}
-
-export function useUserButtonController(options?: UserButtonControllerOptions): UserButtonController {
-  const { isLoaded: isUserLoaded, user } = useUser();
-  const { isLoaded: isSessionLoaded, session } = useSession();
-  const { isLoaded: isOrgLoaded, organization } = useOrganization();
-  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView();
-
-  const clerk = useClerk();
-  const router = useMosaicRouter();
-  // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
-  const getContainer = usePortalRoot();
-  const environment = useMosaicEnvironment();
-
-  const manageAccount = openOrNavigate({
-    url: options?.userProfileUrl,
-    mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer }),
-    buildUrl: () => clerk.buildUserProfileUrl(),
-    navigate: router.navigate,
-  });
-
-  const manageOrganization = openOrNavigate({
-    url: options?.organizationProfileUrl,
-    mode: options?.organizationProfileMode,
-    openModal: () => clerk.openOrganizationProfile({ getContainer }),
-    buildUrl: () => clerk.buildOrganizationProfileUrl(),
-    navigate: router.navigate,
-  });
-
-  const createOrganization = openOrNavigate({
-    url: options?.createOrganizationUrl,
-    mode: options?.createOrganizationMode,
-    openModal: () => clerk.openCreateOrganization({ getContainer }),
-    buildUrl: () => clerk.buildCreateOrganizationUrl(),
-    navigate: router.navigate,
-  });
-
-  // These all affect layout, so wait for every one and avoid a reshuffle.
-  if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded || !environment) {
-    return { status: 'loading' };
+  if (model.status === 'loading') {
+    return <>{fallback}</>;
   }
 
-  if (!user || !session) {
-    return { status: 'hidden' };
+  // Signed out is an answer, so the placeholder goes too rather than promising a button.
+  if (model.status === 'hidden') {
+    return null;
   }
 
-  const { displayConfig, authConfig, organizationSettings } = environment;
-  // clerk-js refuses `setActive({ organization: null })` when selection is forced, so there is no way back.
-  const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
-  const { singleSessionMode } = authConfig;
+  const close = () => setOpen(false);
 
-  const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION }) ?? false;
-  const membershipData = userMemberships.data ?? [];
-  const suggestionData = userSuggestions.data ?? [];
-  const invitationData = userInvitations.data ?? [];
-
-  const memberships: UserButtonMembership[] = membershipData.map(m => toMembership(m.organization));
-
-  const suggestions: UserButtonSuggestion[] = suggestionData.map(s => ({
-    kind: 'suggestion',
-    id: s.id,
-    organizationId: s.publicOrganizationData.id,
-    name: s.publicOrganizationData.name,
-    imageUrl: s.publicOrganizationData.imageUrl || undefined,
-    status: s.status,
-  }));
-
-  // Accepting is all a row offers, so a revoked or expired invitation has nothing to show.
-  const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
-    i.status === 'pending' || i.status === 'accepted'
-      ? [
-          {
-            kind: 'invitation',
-            id: i.id,
-            status: i.status,
-            organizationId: i.publicOrganizationData.id,
-            organizationName: i.publicOrganizationData.name,
-            imageUrl: i.publicOrganizationData.imageUrl || undefined,
+  // Whatever the app's action opens takes over from here, so the popover goes with it. Links navigate away.
+  const menuItems = customMenuItems?.map(item =>
+    item.href === undefined
+      ? {
+          ...item,
+          onClick: () => {
+            close();
+            item.onClick();
           },
-        ]
-      : [],
+        }
+      : item,
   );
 
-  // Organization requests are scoped to the active session, so another account's workspaces are unknowable.
-  const additionalSessions: UserButtonSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
-    const sessionUser = s.user;
-    if (!sessionUser || s.id === session.id) {
-      return [];
-    }
-    return [toSession(s.id, sessionUser)];
-  });
-
-  const afterSelectUrl = (organizationId: string | null): string | undefined => {
-    if (!organizationId) {
-      return resolveAfterSelectUrl(options?.afterSelectPersonalUrl, user);
-    }
-    const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
-    return selected ? resolveAfterSelectUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
-  };
-
-  return {
-    status: 'ready',
-    organizationsEnabled,
-    renderBranding: displayConfig.branded,
-    activeSession: toSession(session.id, user),
-    activeOrganization: organization ? toMembership(organization) : null,
-    // The user resource settles this before the paginated list answers; the count covers a stale resource.
-    hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
-    hidePersonal: forceOrganizationSelection || (options?.hidePersonal ?? false),
-    // Only true before the first page lands, which is the one window where empty and pending look alike.
-    organizationsLoading: userMemberships.isLoading || userInvitations.isLoading || userSuggestions.isLoading,
-    memberships,
-    suggestions,
-    invitations,
-    additionalSessions,
-    paging: {
-      ref,
-      hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
-    },
-    onSelectOrganization: organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
-    // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
-    // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
-    onSwitchSession: sessionId =>
-      clerk.setActive({
-        session: sessionId,
-        navigate: async ({ session, decorateUrl }) => {
-          const task = session.currentTask;
-          if (task) {
-            await router.navigate(buildTaskUrl(task, { base: clerk.buildSignInUrl() }));
+  // Only an action that ends the interaction closes the popover; the rest resolve into it.
+  const runAction = <Args extends unknown[]>(
+    keyFor: (...args: Args) => string,
+    fn: ((...args: Args) => void | Promise<unknown>) | undefined,
+    closeOnSuccess = false,
+  ) =>
+    fn
+      ? (...args: Args) => {
+          if (pendingKey) {
             return;
           }
-          // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
-          await router.navigate(decorateUrl(displayConfig.afterSwitchSessionUrl));
-        },
-      }),
-    onSignOutSession: sessionId =>
-      clerk.signOut({
-        sessionId,
-        // Other accounts stay signed in, so this is a single sign out rather than a full one.
-        redirectUrl:
-          additionalSessions.length > 0 ? clerk.buildAfterMultiSessionSingleSignOutUrl() : clerk.buildAfterSignOutUrl(),
-      }),
-    // Single-session apps cannot hold a second account, so both actions are meaningless there.
-    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
-    onManageAccount: manageAccount,
-    onManageOrganization: manageOrganization,
-    // Invite has no page of its own to route to, so it opens its modal even when management is routed.
-    onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
-    // Covers both restricted instances and users at their creation limit.
-    onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
-    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(clerk.buildSignInUrl()),
-    onAcceptSuggestion: suggestionId => {
-      const suggestion = suggestionData.find(s => s.id === suggestionId);
-      return Promise.resolve(suggestion?.accept()).finally(() => void userSuggestions.revalidate?.());
-    },
-    // Accepting joins the organization, so memberships are stale too. A suggestion joins nothing.
-    onAcceptInvitation: invitationId => {
-      const invitation = invitationData.find(i => i.id === invitationId);
-      return Promise.resolve(invitation?.accept()).finally(() => {
-        void userInvitations.revalidate?.();
-        void userMemberships.revalidate?.();
-      });
-    },
-  };
+          setPendingKey(keyFor(...args));
+          void Promise.resolve(fn(...args))
+            .then(closeOnSuccess ? close : () => {}, () => {})
+            .finally(() => setPendingKey(null));
+        }
+      : undefined;
+
+  const {
+    status: _status,
+    onSelectOrganization,
+    onSwitchSession,
+    onSignOutSession,
+    onSignOutAll,
+    onAcceptSuggestion,
+    onAcceptInvitation,
+    ...data
+  } = model;
+
+  return (
+    <UserButtonView
+      {...data}
+      renderTriggerLabel={renderTriggerLabel}
+      renderTriggerBadge={renderTriggerBadge}
+      modePriority={modePriority}
+      customMenuItems={menuItems}
+      menuItemOrder={menuItemOrder}
+      open={open}
+      onOpenChange={setOpen}
+      pendingKey={displayPendingKey}
+      onSelectOrganization={runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true)}
+      onSwitchSession={runAction(userButtonBusyKeys.switchSession, onSwitchSession)}
+      onSignOutSession={runAction(userButtonBusyKeys.signOutSession, onSignOutSession)}
+      onSignOutAll={runAction(userButtonBusyKeys.signOutAll, onSignOutAll)}
+      onAcceptSuggestion={runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion)}
+      onAcceptInvitation={runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation)}
+    />
+  );
 }
