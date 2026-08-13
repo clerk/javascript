@@ -42,6 +42,133 @@ final class ClerkInlineAuthLogoState {
   }
 }
 
+@MainActor
+@Observable
+final class ClerkUserProfileCustomPageState {
+  private(set) var views: [UIView] = []
+  @ObservationIgnored private var navigator: UserProfileNavigator<String>?
+  @ObservationIgnored private var navigateBackAction: (() -> Void)?
+  @ObservationIgnored private var pageEventHandler: ((String, String) -> Void)?
+
+  func insertView(_ view: UIView, at index: Int) {
+    view.removeFromSuperview()
+    views.insert(view, at: min(max(index, 0), views.count))
+  }
+
+  func removeView(_ view: UIView) {
+    guard let index = views.firstIndex(where: { $0 === view }) else { return }
+    view.removeFromSuperview()
+    views.remove(at: index)
+  }
+
+  func configureNavigation(
+    _ navigator: UserProfileNavigator<String>,
+    navigateBack: @escaping () -> Void
+  ) {
+    self.navigator = navigator
+    navigateBackAction = navigateBack
+  }
+
+  func setPageEventHandler(_ handler: @escaping (String, String) -> Void) {
+    pageEventHandler = handler
+  }
+
+  func sendPageEvent(type: String, path: String) {
+    pageEventHandler?(type, path)
+  }
+
+  func navigate(action: String, routeKey: String?) {
+    switch action {
+    case "back":
+      navigateBackAction?()
+    case "popToRoot":
+      navigator?.popToRoot()
+    case "push":
+      if let routeKey {
+        navigator?.push(routeKey)
+      }
+    default:
+      break
+    }
+  }
+}
+
+struct ClerkUserProfileCustomRowConfig: Decodable {
+  struct Placement: Decodable {
+    let type: String
+    let section: String?
+    let row: String?
+  }
+
+  let path: String
+  let label: String
+  let icon: String
+  let placement: Placement
+
+  var nativeRow: UserProfileCustomRow<String> {
+    UserProfileCustomRow(
+      route: path,
+      title: label,
+      icon: .system(name: systemIconName),
+      placement: nativePlacement
+    )
+  }
+
+  private var systemIconName: String {
+    switch icon {
+    case "user": "person"
+    case "profile": "person.crop.circle"
+    case "security": "shield"
+    case "billing": "creditcard"
+    case "key": "key"
+    case "lock": "lock"
+    case "email": "envelope"
+    case "phone": "phone"
+    case "add": "plus"
+    case "switch": "arrow.left.arrow.right"
+    case "users": "person.2"
+    case "warning": "exclamationmark.triangle"
+    case "info": "info.circle"
+    case "globe": "globe"
+    case "folder": "folder"
+    case "book": "book"
+    default: "gearshape"
+    }
+  }
+
+  private var nativePlacement: UserProfileCustomRowPlacement {
+    switch placement.type {
+    case "sectionStart": .sectionStart(nativeSection)
+    case "before": .before(nativeAnchorRow)
+    case "after": .after(nativeAnchorRow)
+    default: .sectionEnd(nativeSection)
+    }
+  }
+
+  private var nativeSection: UserProfileSection {
+    placement.section == "account" ? .account : .profile
+  }
+
+  private var nativeAnchorRow: UserProfileRow {
+    switch placement.row {
+    case "security": .security
+    case "switchAccount": .switchAccount
+    case "addAccount": .addAccount
+    case "signOut": .signOut
+    default: .manageAccount
+    }
+  }
+}
+
+func parseUserProfileCustomPages(_ json: String, pageCount: Int) -> [ClerkUserProfileCustomRowConfig] {
+  guard let data = json.data(using: .utf8),
+        let rows = try? JSONDecoder().decode([ClerkUserProfileCustomRowConfig].self, from: data)
+  else {
+    return []
+  }
+  return Array(rows.prefix(pageCount))
+}
+
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 
@@ -292,6 +419,8 @@ final class ClerkNativeBridge {
 
   func makeUserProfileViewController(
     dismissible: Bool,
+    customRows: [ClerkUserProfileCustomRowConfig],
+    customPageState: ClerkUserProfileCustomPageState,
     hostBackAction: (() -> Void)? = nil,
     onEvent: @escaping (ClerkNativeViewEvent, [String: Any]) -> Void
   ) -> UIViewController? {
@@ -302,19 +431,26 @@ final class ClerkNativeBridge {
         dismissible: dismissible,
         hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        customRows: customRows,
+        customPageState: customPageState
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
 
-  func makeUserButtonViewController() -> UIViewController? {
+  func makeUserButtonViewController(
+    customRows: [ClerkUserProfileCustomRowConfig],
+    customPageState: ClerkUserProfileCustomPageState
+  ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
 
     return makeHostingController(
       rootView: ClerkInlineUserButtonWrapperView(
         lightTheme: lightTheme,
-        darkTheme: darkTheme
+        darkTheme: darkTheme,
+        customRows: customRows,
+        customPageState: customPageState
       )
     )
   }
@@ -511,11 +647,21 @@ final class ClerkNativeBridge {
 struct ClerkInlineUserButtonWrapperView: View {
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let customRows: [ClerkUserProfileCustomRowConfig]
+  let customPageState: ClerkUserProfileCustomPageState
 
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let view = UserButton()
+      .userProfileRows(customRows.map(\.nativeRow))
+      .userProfileDestination { routeKey in
+        ClerkReactUserProfileCustomPage(
+          path: routeKey,
+          rows: customRows,
+          state: customPageState
+        )
+      }
       .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
@@ -644,11 +790,21 @@ struct ClerkInlineProfileWrapperView: View {
   let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
+  let customRows: [ClerkUserProfileCustomRowConfig]
+  let customPageState: ClerkUserProfileCustomPageState
 
   @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let view = UserProfileView(isDismissible: dismissible)
+      .userProfileRows(customRows.map(\.nativeRow))
+      .userProfileDestination { routeKey in
+        ClerkReactUserProfileCustomPage(
+          path: routeKey,
+          rows: customRows,
+          state: customPageState
+        )
+      }
       .environment(Clerk.shared)
       .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
@@ -660,5 +816,46 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
+  }
+}
+
+private struct ClerkReactUserProfileCustomPage: View {
+  @Environment(UserProfileNavigator<String>.self) private var navigator
+  @Environment(\.dismiss) private var dismiss
+
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+
+  var body: some View {
+    Group {
+      if let index = rows.firstIndex(where: { $0.path == path }),
+         state.views.indices.contains(index)
+      {
+        ClerkReactCustomPageView(view: state.views[index])
+      }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .onAppear {
+      state.configureNavigation(navigator) {
+        dismiss()
+      }
+      state.sendPageEvent(type: "presented", path: path)
+    }
+    .onDisappear {
+      state.sendPageEvent(type: "dismissed", path: path)
+    }
+  }
+}
+
+private struct ClerkReactCustomPageView: UIViewRepresentable {
+  let view: UIView
+
+  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
+    ClerkReactLogoContainerView(contentView: view)
+  }
+
+  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+    uiView.setContentView(view)
   }
 }
