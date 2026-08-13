@@ -53,7 +53,8 @@ jobs:
             runner: blacksmith-6vcpu-macos-26
           - expo-sdk: 57
             platform: android
-            runner: blacksmith-8vcpu-ubuntu-2204
+            # 24.04: argent's linux simulator-server needs glibc >= 2.39.
+            runner: blacksmith-8vcpu-ubuntu-2404
             run-e2e: true
           - expo-sdk: 57
             platform: ios
