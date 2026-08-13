@@ -180,7 +180,13 @@ export const styles = stylex.create({
       opacity: 'var(--_cl-stack-veil, 0)',
       pointerEvents: 'none',
       position: 'absolute',
-      transitionDuration: durationVars['--cl-duration-base'],
+      // Tracks the recede it accompanies rather than standing on its own: the two are halves of
+      // one gesture, and the phone band runs the transform at `slow`. Pinning the veil at `base`
+      // there finishes the dim 100ms before the surface stops moving, in both directions.
+      transitionDuration: {
+        default: durationVars['--cl-duration-base'],
+        '@media (max-width: 47.99rem)': durationVars['--cl-duration-slow'],
+      },
       transitionProperty: 'opacity',
       transitionTimingFunction: easingVars['--cl-ease-enter'],
       zIndex: 1,
