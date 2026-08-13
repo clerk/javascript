@@ -48,21 +48,21 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
-export { Settings, settingsVars } from '../components/settings';
+export { Section } from '../components/section';
 export type {
-  SettingsActionsProps,
-  SettingsContentProps,
-  SettingsDescriptionProps,
-  SettingsGroupProps,
-  SettingsItemProps,
-  SettingsItemsProps,
-  SettingsLabelProps,
-  SettingsMediaProps,
-  SettingsMediaSize,
-  SettingsRootProps,
-  SettingsRowProps,
-  SettingsTitleProps,
-} from '../components/settings';
+  SectionActionsProps,
+  SectionContentProps,
+  SectionDescriptionProps,
+  SectionGroupProps,
+  SectionItemProps,
+  SectionItemsProps,
+  SectionLabelProps,
+  SectionMediaProps,
+  SectionMediaSize,
+  SectionRootProps,
+  SectionRowProps,
+  SectionTitleProps,
+} from '../components/section';
 export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';

@@ -9,26 +9,23 @@ import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../
 import type { HeadingProps } from '../heading';
 import { Heading } from '../heading';
 import { reset } from '../reset.styles';
-import { settingsItemsMarker } from './settings.markers.stylex';
-import { settingsVars } from './settings.vars.stylex';
+import { sectionItemsMarker } from './section.markers.stylex';
 
-export { settingsVars } from './settings.vars.stylex';
-
-export type SettingsRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SettingsTitleProps = Omit<HeadingProps, 'size'>;
-export type SettingsGroupProps = MosaicComponentProps<'div'>;
-export type SettingsRowProps = MosaicComponentProps<'div'>;
-export type SettingsItemsProps = MosaicComponentProps<'div'>;
-export type SettingsItemProps = MosaicComponentProps<'div'>;
-export type SettingsMediaSize = 'sm' | 'md' | 'lg';
-export type SettingsMediaProps = MosaicComponentProps<'div'> & { size?: SettingsMediaSize };
-export type SettingsContentProps = MosaicComponentProps<'div'>;
-export type SettingsLabelProps = MosaicComponentProps<'div'>;
-export type SettingsDescriptionProps = MosaicComponentProps<'div'>;
-export type SettingsActionsProps = MosaicComponentProps<'div'>;
+export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
+export type SectionTitleProps = Omit<HeadingProps, 'size'>;
+export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionRowProps = MosaicComponentProps<'div'>;
+export type SectionItemsProps = MosaicComponentProps<'div'>;
+export type SectionItemProps = MosaicComponentProps<'div'>;
+export type SectionMediaSize = 'sm' | 'md' | 'lg';
+export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
+export type SectionContentProps = MosaicComponentProps<'div'>;
+export type SectionLabelProps = MosaicComponentProps<'div'>;
+export type SectionDescriptionProps = MosaicComponentProps<'div'>;
+export type SectionActionsProps = MosaicComponentProps<'div'>;
 
 /* eslint-disable @stylexjs/no-lookahead-selectors -- Mosaic's supported browsers include :has();
-   the marker keeps this selector scoped to Settings.Items. */
+   the marker keeps this selector scoped to Section.Items. */
 const styles = stylex.create({
   root: {
     display: 'flex',
@@ -42,7 +39,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: settingsVars['--cl-settings-background'],
+    backgroundColor: colorVars['--cl-color-background'],
     width: '100%',
   },
   row: {
@@ -57,10 +54,10 @@ const styles = stylex.create({
     flexDirection: 'column',
     paddingBlockEnd: {
       default: space['4'],
-      [stylex.when.descendant('[data-nested]', settingsItemsMarker)]: space['1'],
+      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
     },
     paddingBlockStart: space['4'],
-    rowGap: settingsVars['--cl-settings-items-gap'],
+    rowGap: space['2'],
     width: 'auto',
   },
   items: {
@@ -139,10 +136,10 @@ const mediaSizes = {
   lg: styles.mediaLg,
 };
 
-const SettingsTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
-const SettingsItemsContext = React.createContext(false);
+const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
+const SectionItemsContext = React.createContext(false);
 
-const Root = React.forwardRef<HTMLElement, SettingsRootProps>(function SettingsRoot(
+const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
   { render, className, style, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
@@ -153,23 +150,23 @@ const Root = React.forwardRef<HTMLElement, SettingsRootProps>(function SettingsR
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings'), stylex.props(reset.base, styles.root), className, style),
+      ...mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root), className, style),
       ...rest,
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleIds.join(' ') || undefined),
     },
   });
 
-  return <SettingsTitleContext.Provider value={setTitleIds}>{element}</SettingsTitleContext.Provider>;
+  return <SectionTitleContext.Provider value={setTitleIds}>{element}</SectionTitleContext.Provider>;
 });
 
-const Title = React.forwardRef<HTMLHeadingElement, SettingsTitleProps>(function SettingsTitle(
+const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
   { id: idProp, render, className, style, ...rest },
   ref,
 ) {
-  const setTitleIds = React.useContext(SettingsTitleContext);
+  const setTitleIds = React.useContext(SectionTitleContext);
   const generatedId = React.useId();
-  const id = idProp ?? (setTitleIds ? `cl-settings-${generatedId}-title` : undefined);
+  const id = idProp ?? (setTitleIds ? `cl-section-${generatedId}-title` : undefined);
 
   useSafeLayoutEffect(() => {
     if (!id || !setTitleIds) {
@@ -186,13 +183,13 @@ const Title = React.forwardRef<HTMLHeadingElement, SettingsTitleProps>(function 
       id={id}
       render={render ?? (props => <h4 {...props} />)}
       size='sm'
-      {...mergeStyleProps(themeProps('settings-title'), className, style)}
+      {...mergeStyleProps(themeProps('section-title'), className, style)}
       {...rest}
     />
   );
 });
 
-const Group = React.forwardRef<HTMLDivElement, SettingsGroupProps>(function SettingsGroup(
+const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -201,13 +198,13 @@ const Group = React.forwardRef<HTMLDivElement, SettingsGroupProps>(function Sett
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-group'), stylex.props(reset.base, styles.group), className, style),
+      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group), className, style),
       ...rest,
     },
   });
 });
 
-const Row = React.forwardRef<HTMLDivElement, SettingsRowProps>(function SettingsRow(
+const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -216,13 +213,13 @@ const Row = React.forwardRef<HTMLDivElement, SettingsRowProps>(function Settings
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-row'), stylex.props(reset.base, styles.row), className, style),
+      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row), className, style),
       ...rest,
     },
   });
 });
 
-const Items = React.forwardRef<HTMLDivElement, SettingsItemsProps>(function SettingsItems(
+const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function SectionItems(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -232,8 +229,8 @@ const Items = React.forwardRef<HTMLDivElement, SettingsItemsProps>(function Sett
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-items', { nested: true }),
-        stylex.props(reset.base, styles.items, settingsItemsMarker),
+        themeProps('section-items', { nested: true }),
+        stylex.props(reset.base, styles.items, sectionItemsMarker),
         className,
         style,
       ),
@@ -241,14 +238,14 @@ const Items = React.forwardRef<HTMLDivElement, SettingsItemsProps>(function Sett
     },
   });
 
-  return <SettingsItemsContext.Provider value>{element}</SettingsItemsContext.Provider>;
+  return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
 });
 
-const Item = React.forwardRef<HTMLDivElement, SettingsItemProps>(function SettingsItem(
+const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
   { render, className, style, ...rest },
   ref,
 ) {
-  const nested = React.useContext(SettingsItemsContext);
+  const nested = React.useContext(SectionItemsContext);
 
   return useRender({
     defaultTagName: 'div',
@@ -256,7 +253,7 @@ const Item = React.forwardRef<HTMLDivElement, SettingsItemProps>(function Settin
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-item', { nested }),
+        themeProps('section-item', { nested }),
         stylex.props(reset.base, styles.item, nested && styles.nestedItem),
         className,
         style,
@@ -266,7 +263,7 @@ const Item = React.forwardRef<HTMLDivElement, SettingsItemProps>(function Settin
   });
 });
 
-const Media = React.forwardRef<HTMLDivElement, SettingsMediaProps>(function SettingsMedia(
+const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
   { size = 'md', render, className, style, ...rest },
   ref,
 ) {
@@ -276,7 +273,7 @@ const Media = React.forwardRef<HTMLDivElement, SettingsMediaProps>(function Sett
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-media', { size }),
+        themeProps('section-media', { size }),
         stylex.props(reset.base, styles.mediaBase, mediaSizes[size]),
         className,
         style,
@@ -286,11 +283,11 @@ const Media = React.forwardRef<HTMLDivElement, SettingsMediaProps>(function Sett
   });
 });
 
-const Content = React.forwardRef<HTMLDivElement, SettingsContentProps>(function SettingsContent(
+const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function SectionContent(
   { render, className, style, ...rest },
   ref,
 ) {
-  const nested = React.useContext(SettingsItemsContext);
+  const nested = React.useContext(SectionItemsContext);
 
   return useRender({
     defaultTagName: 'div',
@@ -298,7 +295,7 @@ const Content = React.forwardRef<HTMLDivElement, SettingsContentProps>(function 
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-content', { nested }),
+        themeProps('section-content', { nested }),
         stylex.props(reset.base, styles.content, nested && styles.nestedContent),
         className,
         style,
@@ -308,7 +305,7 @@ const Content = React.forwardRef<HTMLDivElement, SettingsContentProps>(function 
   });
 });
 
-const Label = React.forwardRef<HTMLDivElement, SettingsLabelProps>(function SettingsLabel(
+const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -317,13 +314,13 @@ const Label = React.forwardRef<HTMLDivElement, SettingsLabelProps>(function Sett
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-label'), stylex.props(reset.base, styles.label), className, style),
+      ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label), className, style),
       ...rest,
     },
   });
 });
 
-const Description = React.forwardRef<HTMLDivElement, SettingsDescriptionProps>(function SettingsDescription(
+const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -333,7 +330,7 @@ const Description = React.forwardRef<HTMLDivElement, SettingsDescriptionProps>(f
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('settings-description'),
+        themeProps('section-description'),
         stylex.props(reset.base, styles.description),
         className,
         style,
@@ -343,7 +340,7 @@ const Description = React.forwardRef<HTMLDivElement, SettingsDescriptionProps>(f
   });
 });
 
-const Actions = React.forwardRef<HTMLDivElement, SettingsActionsProps>(function SettingsActions(
+const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
   { render, className, style, ...rest },
   ref,
 ) {
@@ -352,14 +349,14 @@ const Actions = React.forwardRef<HTMLDivElement, SettingsActionsProps>(function 
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('settings-actions'), stylex.props(reset.base, styles.actions), className, style),
+      ...mergeStyleProps(themeProps('section-actions'), stylex.props(reset.base, styles.actions), className, style),
       ...rest,
     },
   });
 });
 
 /**
- * A settings component that fixes section semantics, surface treatment, row grouping,
+ * A compound component that fixes section semantics, surface treatment, row grouping,
  * and item layout while leaving each item's content composable.
  */
-export const Settings = { Root, Title, Group, Row, Items, Item, Media, Content, Label, Description, Actions };
+export const Section = { Root, Title, Group, Row, Items, Item, Media, Content, Label, Description, Actions };
