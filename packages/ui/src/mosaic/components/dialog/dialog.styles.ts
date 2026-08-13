@@ -615,12 +615,29 @@ export const popupMotion = stylex.create({
     // `fast` and lands with the scrim, since the scale it accompanies barely moves. The third slot
     // is inert under the phone band (no scale, so no radius counter-scale) but still has to be
     // filled — the list is positional.
+    //
+    // EXCEPT for a sheet arriving over another dialog, which takes the desktop `fast` fade back.
+    // The long fade earns itself on the first sheet, where it gives the travel somewhere to
+    // resolve into against the page. Over an opaque surface it does the opposite: for a quarter of
+    // a second the dialog underneath shows through the one arriving, and two stacked surfaces
+    // read as one muddy one. There is already a surface there, so the fade has nothing left to do
+    // and the slide can carry the arrival alone.
+    //
+    // Keyed on `data-stacked` — over any open dialog, panel included — rather than on the narrower
+    // prompt-on-prompt stack the backdrop cares about. What makes the long fade wrong here is
+    // arriving over something opaque, and a panel is as opaque as a prompt.
+    //
+    // The combined exiting branch restates `base` because `@stylexjs/sort-keys` puts it after the
+    // plain `data-stacked` one, which would otherwise hand a stacked sheet the four-value entrance
+    // list on its way out and slow its exit slide.
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
       '@media (max-width: 47.99rem)': {
         default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
+        ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
+        ':where([data-stacked][data-ending-style])': durationVars['--cl-duration-base'],
       },
     },
     transitionProperty: {
