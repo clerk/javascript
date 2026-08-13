@@ -1,4 +1,5 @@
 import type * as SharedReact from '@clerk/shared/react';
+import type { CustomPage } from '@clerk/shared/types';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -183,8 +184,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function Harness(options: UserButtonControllerOptions = {}) {
-  const c = useUserButtonController(options);
+function Harness({ customPages, ...options }: UserButtonControllerOptions & { customPages?: CustomPage[] } = {}) {
+  const c = useUserButtonController(options, customPages);
   if (c.status !== 'ready') {
     return <output data-testid='status'>{c.status}</output>;
   }
@@ -631,6 +632,26 @@ describe('useUserButtonController', () => {
 
     fireEvent.click(screen.getByText('manage-org'));
     expect(openOrganizationProfile).toHaveBeenCalledWith({ getContainer });
+  });
+
+  // Custom pages are bridged into this DOM-callback form by the container, since it is the layer
+  // that can render their portals. All the controller owes them is a ride to the modal.
+  it('hands the profile modal the custom pages it was given', () => {
+    const customPages = [
+      {
+        label: 'Terms',
+        url: 'terms',
+        mount: vi.fn(),
+        unmount: vi.fn(),
+        mountIcon: vi.fn(),
+        unmountIcon: vi.fn(),
+      },
+    ];
+    render(<Harness customPages={customPages} />);
+
+    fireEvent.click(screen.getByText('manage-account'));
+
+    expect(openUserProfile).toHaveBeenCalledWith({ getContainer, customPages });
   });
 
   // A URL is the whole opt-in: passing one means navigation, with no mode to remember to pass
