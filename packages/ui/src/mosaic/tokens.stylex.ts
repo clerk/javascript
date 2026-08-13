@@ -44,7 +44,7 @@ const colorDefaults = {
   '--cl-color-warning-foreground': 'oklch(0.985 0 0)',
   '--cl-color-warning-faded': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
 
-  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.205 0 0))',
+  '--cl-color-background': 'light-dark(oklch(0.985 0 0), oklch(0.2686 0 0))',
 
   '--cl-color-card': 'light-dark(oklch(1 0 0), oklch(0.205 0 0))',
   '--cl-color-card-foreground': 'light-dark(oklch(0.145 0 0), oklch(0.985 0 0))',
@@ -53,7 +53,7 @@ const colorDefaults = {
   '--cl-color-input-placeholder': '#a3a3a3',
 
   '--cl-color-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
-  '--cl-color-border-faded': 'light-dark(oklch(0.9587 0.0027 286.35), oklch(0.296 0.0126 285.61))',
+  '--cl-color-border-faded': 'light-dark(oklch(0.9702 0 0), oklch(0.296 0.0126 285.61))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);

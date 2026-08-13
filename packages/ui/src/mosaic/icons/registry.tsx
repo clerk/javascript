@@ -94,6 +94,13 @@ const Plus = glyph(
   />,
 );
 
+const ArrowRightTop = glyph(
+  <path
+    d='M6.35014 5.40727L10.8285 5.17157M10.8285 5.17157L10.5928 9.64991M10.8285 5.17157L5.17163 10.8284'
+    {...strokeProps}
+  />,
+);
+
 const Pen = glyph(
   <path
     d='M12.03 3.972a1.59 1.59 0 0 0-2.261 0l-.01.01-5.056 4.89a1.25 1.25 0 0 0-.351.627l-.61 2.747 2.542-.598a1.25 1.25 0 0 0 .59-.325L12.085 6.2c.573-.638.549-1.62-.057-2.228M8.71 2.909a3.09 3.09 0 0 1 4.383.005 3.126 3.126 0 0 1 .06 4.341l-5.228 5.138a2.75 2.75 0 0 1-1.298.715l-3.705.872a.75.75 0 0 1-.904-.893l.87-3.914a2.75 2.75 0 0 1 .772-1.38z'
@@ -142,6 +149,7 @@ const AlertCircle = glyph(
 /** Runtime name → glyph map. `Icon`'s `name` prop is typed from these keys. */
 export const iconRegistry = {
   'alert-circle': AlertCircle,
+  'arrow-right-top': ArrowRightTop,
   'chevron-right': ChevronRight,
   'chevron-left': ChevronLeft,
   'chevron-down': ChevronDown,
