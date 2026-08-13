@@ -745,6 +745,13 @@ final class ClerkNativeBridge {
 
   @MainActor
   func getTrustedDeviceAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
+    guard Self.clerkConfigured else {
+      return [
+        "isAvailable": false,
+        "unavailableReason": "environment_unavailable",
+      ]
+    }
+
     let availability = try await Clerk.shared.trustedDevices.availability(
       id: id,
       identifierHint: identifierHint
@@ -759,6 +766,7 @@ final class ClerkNativeBridge {
 
   @MainActor
   func listTrustedDevices() async throws -> [[String: Any]] {
+    try Self.requireTrustedDeviceEnvironment()
     let trustedDevices = try await Clerk.shared.trustedDevices.list()
     return trustedDevices.map(Self.trustedDevicePayload)
   }
@@ -770,6 +778,8 @@ final class ClerkNativeBridge {
     reason: String?,
     policy: String
   ) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
+
     guard let trustedDevicePolicy = TrustedDevicePolicy(rawValue: policy) else {
       throw ClerkExpoTrustedDeviceError(
         code: "invalid_trusted_device_policy",
@@ -788,6 +798,7 @@ final class ClerkNativeBridge {
 
   @MainActor
   func revokeTrustedDevice(id: String) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
     let trustedDevice = try await Clerk.shared.trustedDevices.revoke(id: id)
     return Self.trustedDevicePayload(trustedDevice)
   }
@@ -798,6 +809,7 @@ final class ClerkNativeBridge {
     identifierHint: String?,
     reason: String?
   ) async throws -> [String: Any] {
+    try Self.requireTrustedDeviceEnvironment()
     let signIn = try await Clerk.shared.auth.signInWithTrustedDevice(
       id: id,
       identifierHint: identifierHint,
@@ -808,6 +820,16 @@ final class ClerkNativeBridge {
       "status": signIn.status.rawValue,
       "createdSessionId": Self.bridgeValue(signIn.createdSessionId),
     ]
+  }
+
+  @MainActor
+  private static func requireTrustedDeviceEnvironment() throws {
+    guard clerkConfigured else {
+      throw ClerkExpoTrustedDeviceError(
+        code: "environment_unavailable",
+        message: "Trusted-device operations are unavailable until Clerk finishes configuring."
+      )
+    }
   }
 
   private static func trustedDevicePayload(_ trustedDevice: TrustedDevice) -> [String: Any] {

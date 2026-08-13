@@ -1,4 +1,5 @@
 export type TrustedDeviceErrorCode =
+  | 'environment_unavailable'
   | 'unsupported_platform'
   | 'biometric_authentication_unavailable'
   | 'biometric_authentication_canceled'
