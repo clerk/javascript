@@ -3,7 +3,6 @@ appId: com.clerk.exponativebuildfixture
 ---
 - launchApp:
     clearState: true
-    clearKeychain: true
 - extendedWaitUntil:
     visible:
       id: 'auth-state'
