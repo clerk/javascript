@@ -267,9 +267,6 @@ Whichever it is, the thing that opens is always a `prompt`. `panel` and `card` a
 surfaces — they host, they are never hosted — and a dialog opened inside another one warns in
 development if it is any other size.
 
-Dismissing a stack in one action, as "discard" does, staggers the exits: the surface beneath holds
-briefly so the stack unwinds rather than vanishing on one frame.
-
 Under `prefers-reduced-motion: reduce` the recede still happens, it just arrives in a single frame
 with nothing interpolating — the setting asks for no animation, not for no distinction.
 
