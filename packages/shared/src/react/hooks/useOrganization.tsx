@@ -61,6 +61,15 @@ export type UseOrganizationParams = {
    * </ul>
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
+  /**
+   * Whether the hook may turn organizations on for the instance. On a development instance that has
+   * them disabled, reading this hook opens a prompt offering to enable them. Set to `false` in a
+   * surface that reads organizations only when the instance already has them, so an instance that
+   * does not use organizations is never asked about them.
+   *
+   * @default true
+   */
+  enabled?: boolean;
 };
 
 /**
@@ -275,10 +284,11 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
+    enabled,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
-  useAttemptToEnableOrganizations('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization', enabled);
 
   const organization = useOrganizationBase();
   const session = useSessionBase();
