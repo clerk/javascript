@@ -6,6 +6,19 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
+export { AlertDialog } from '../components/alert-dialog';
+export type {
+  AlertDialogActionsProps,
+  AlertDialogBackdropProps,
+  AlertDialogCloseProps,
+  AlertDialogDescriptionProps,
+  AlertDialogPopupProps,
+  AlertDialogProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+  AlertDialogViewportProps,
+} from '../components/alert-dialog';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
