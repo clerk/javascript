@@ -246,7 +246,7 @@ function useNestedSizeWarning(isNestedInDialog: boolean, size: DialogSize) {
       return;
     }
     console.warn(
-      `Mosaic: a Dialog opened inside another Dialog should be size="prompt", but this one is size="${size}". ` +
+      `[clerk] a Dialog opened inside another Dialog should be size="prompt", but this one is size="${size}". ` +
         'Only prompts are meant to open over another dialog; the rest are root-level surfaces.',
     );
   }, [isNestedInDialog, size]);
