@@ -11,7 +11,12 @@ import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useSt
  * floating ancestor but sits on the bare page, and must still paint its own scrim.
  */
 export interface DialogNestingContextValue {
-  /** Whether the surrounding dialog is itself open. */
+  /**
+   * Whether the surrounding dialog is still covering the page — open, or closed but still
+   * mounted for its exit transition. Not the raw `open` flag: a child that un-suppressed its
+   * backdrop the instant the parent started closing would paint a second scrim over the
+   * parent's still-fading one.
+   */
   open: boolean;
   /**
    * Called by a dialog rendered inside this one, for as long as it is open. Returns the release.
@@ -41,7 +46,7 @@ export interface DialogNesting {
  * Joins a dialog root to the stack it belongs to, in both directions: up, to report itself to
  * the dialog it renders inside, and down, to count the dialogs that render inside it.
  */
-export function useDialogNesting(open: boolean): DialogNesting {
+export function useDialogNesting(open: boolean, mounted: boolean): DialogNesting {
   const parent = useContext(DialogNestingContext);
   const [stackedChildCount, setStackedChildCount] = useState(0);
 
@@ -70,13 +75,15 @@ export function useDialogNesting(open: boolean): DialogNesting {
     return registerWithParent();
   }, [open, registerWithParent]);
 
+  const covering = open || mounted;
+
   const context = useMemo<DialogNestingContextValue>(
-    () => ({ open, registerStackedChild }),
-    [open, registerStackedChild],
+    () => ({ open: covering, registerStackedChild }),
+    [covering, registerStackedChild],
   );
 
   return {
-    // A closed parent is not something to sit on top of: the child owns the scrim in that case,
+    // A parent that is closed AND gone is not something to sit on top of: the child owns the scrim,
     // which is what a confirmation root mounted beside its dialog's portal relies on.
     isStacked: parent !== null && parent.open,
     stackedChildCount,
