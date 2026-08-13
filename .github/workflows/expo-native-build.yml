@@ -355,11 +355,7 @@ jobs:
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
-          # clerk-android reveals pushed screens with a Compose alpha animation, which
-          # never runs at animator_duration_scale 0, so the incoming screen stays
-          # invisible. Window/transition scales stay at 0 to keep taps fast.
           script: >-
-            adb shell settings put global animator_duration_scale 1.0 &&
             cd integration/tests/expo-native &&
             MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
             "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
