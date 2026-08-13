@@ -316,47 +316,69 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: AVD cache
-        id: avd-cache
+      # Argent's Android touch backend (simulator-server) only supports
+      # emulators argent boots itself: headless qemu with argent's GPU mode
+      # under a Wayland compositor. An externally booted emulator (e.g.
+      # reactivecircus with swiftshader_indirect) makes every gesture-tap
+      # fail with "simulator-server exited before becoming ready", so this
+      # mirrors argent's own wayland-e2e.yml recipe instead.
+      - name: Prepare Android emulator (Weston + SDK + AVD)
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34-google_apis-x86_64-v1
-
-      - name: Create AVD snapshot
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+        env:
+          XDG_RUNTIME_DIR: /tmp/xdg-runtime
+        run: |
+          sudo apt-get update -y
+          # libgoogle-perftools ships libtcmalloc_minimal.so.4, which
+          # qemu-system-x86_64 links against (t64 naming on ubuntu 24.04+).
+          sudo apt-get install -y --no-install-recommends \
+            weston xkb-data libxkbcommon0 seatd libgoogle-perftools4t64 \
+            || sudo apt-get install -y --no-install-recommends \
+              weston xkb-data libxkbcommon0 seatd libgoogle-perftools4
+          mkdir -p "$XDG_RUNTIME_DIR"
+          chmod 700 "$XDG_RUNTIME_DIR"
+          nohup weston --backend=headless --socket=wayland-0 --width=1920 --height=1080 \
+            > /tmp/weston.log 2>&1 &
+          for i in $(seq 1 30); do
+            [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
+            sleep 1
+          done
+          test -S "$XDG_RUNTIME_DIR/wayland-0" || { cat /tmp/weston.log; exit 1; }
+          ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          set -e
+          (yes || true) | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "emulator" "platforms;android-34" \
+            "system-images;android-34;google_apis;x86_64" >/dev/null
+          mkdir -p "$HOME/.android"
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" -v create avd \
+            -n argent-test -k "system-images;android-34;google_apis;x86_64" --force
+          {
+            echo "hw.ramSize=4096"
+            echo "hw.cpu.ncore=4"
+          } >> "$HOME/.android/avd/argent-test.avd/config.ini"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/emulator" >> "$GITHUB_PATH"
 
       - name: Run Android e2e (Argent)
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         env:
           ARGENT_SECRET_CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
           ARGENT_SECRET_CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: true
-          # The action runs each script line in a separate sh -c; the folded
-          # scalar (>-) plus && keeps everything in one shell invocation.
-          script: >-
-            cd integration/tests/expo-native &&
-            E2E_DEBUG_OUTPUT="$RUNNER_TEMP/argent-debug" ./run-android-argent-flows.sh
+          ARGENT_EMULATOR_NO_WINDOW: '1'
+          XDG_RUNTIME_DIR: /tmp/xdg-runtime
+          WAYLAND_DISPLAY: wayland-0
+          # The emulator's bundled Qt has no wayland plugin; offscreen keeps
+          # it from SIGABRTing with WAYLAND_DISPLAY set.
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          argent run boot-device --avdName argent-test
+          adb wait-for-device
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          cd "$GITHUB_WORKSPACE/$E2E_DIR"
+          E2E_DEBUG_OUTPUT="$RUNNER_TEMP/argent-debug" ./run-android-argent-flows.sh \
             "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
 
       # Runs before the artifact upload so the credentials are already dead
