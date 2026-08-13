@@ -2,17 +2,10 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
 
-// The stack state a surface beneath a stacked prompt takes on: how far its contents are veiled
-// toward its own background, and how far it lifts. Declared up here rather than beside
-// `STACK_SCALE` further down because `styles` and `sizes` read them, and StyleX requires a
-// referenced constant to be declared before the `create()` call that reads it.
+// How far the contents of a surface beneath a stacked prompt are veiled toward its own background.
+// Declared up here rather than beside `STACK_SCALE` further down because `sizes` reads it, and
+// StyleX requires a referenced constant to be declared before the `create()` call that reads it.
 const STACK_VEIL_OPACITY = 0.4;
-const STACK_LIFT = '-0.5rem';
-
-// The lift rides a custom property rather than being written into each `transform` value, because
-// the exit branch has to carry it too and cannot know whether there was ever a stacked child. The
-// variable is set per state in `sizes.prompt`; every `transform` below just composes it.
-const STACK_TRANSLATE = 'translateY(var(--_cl-stack-lift, 0rem))';
 
 export const styles = stylex.create({
   // The scrim. A black wash over `transparent` rather than a percentage of a neutral
@@ -308,13 +301,7 @@ export const sizes = stylex.create({
     // Read by the veil on `styles.popup`. Set here rather than there so it applies to `prompt`
     // alone: a `panel` or a `card` hosting a dialog gets a scrim between the two instead, and
     // would otherwise dim as well as darken.
-    // Both held through `data-stack-exiting` as well as `data-stack-base`, and that is the whole
-    // reason the stagger is visible. The base releases the instant its child closes, so keyed on
-    // it alone the surface beneath un-dims and drops forward WHILE it is fading out — moving
-    // toward the viewer at the moment it should be receding away, which reads as a glitch and
-    // buries any stagger under it.
-    '--_cl-stack-lift': { default: '0rem', ':where([data-stack-base], [data-stack-exiting])': STACK_LIFT },
-    '--_cl-stack-veil': { default: 0, ':where([data-stack-base], [data-stack-exiting])': STACK_VEIL_OPACITY },
+    '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
     // Tighter than the popup's default 1.5rem. A prompt asks one thing, so its content box is
     // small and a 1.5rem surround reads as a disproportionate frame around two lines of text.
     // Overrides `styles.popup` by position — `sizes[size]` is spread after it in the same
@@ -517,16 +504,7 @@ const ENTER_SCALE = 0.94;
 // would recede identically anyway. The formula and the cumulative count belong in the same change,
 // whenever a stack deep enough to need them turns up.
 const STACK_SCALE = 0.96;
-
-// How long a surface holds before starting its own exit while a dialog stacked on it is still
-// leaving. Without it a stack dismissed in one action — "discard", which closes the confirmation
-// and the form behind it together — leaves on a single frame, and the two surfaces read as one
-// thing vanishing rather than as a stack unwinding.
-//
-// A full `fast` — the same length as the child's exit — so the surface beneath starts leaving as
-// the one above finishes. Half of it was tried first and `fast` is only 0.1s, so the separation
-// came to about a frame and a half and read as nothing at all.
-const STACK_EXIT_STAGGER = durationVars['--cl-duration-fast'];
+const STACK_LIFT = '-0.5rem';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 
@@ -591,7 +569,7 @@ export const popupMotion = stylex.create({
      * free to reorder them.
      */
     transform: {
-      default: `scale(1) ${STACK_TRANSLATE}`,
+      default: 'scale(1)',
       /**
        * The recede: what a prompt does while another prompt is stacked on it. There is no second
        * scrim, so this and the stacked surface's own shadow are the entire depth cue.
@@ -608,12 +586,12 @@ export const popupMotion = stylex.create({
        * ordinary reaches that state — floating-ui blocks the parent's own dismissal while a child
        * is open — and the exit scale is the better of the two to see if anything ever does.
        */
-      ':where([data-stack-base])': `scale(${STACK_SCALE}) ${STACK_TRANSLATE}`,
-      ':where([data-starting-style], [data-ending-style])': `scale(${ENTER_SCALE}) ${STACK_TRANSLATE}`,
+      ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
+      ':where([data-starting-style], [data-ending-style])': `scale(${ENTER_SCALE})`,
       '@media (max-width: 47.99rem)': {
-        default: `scale(1) ${STACK_TRANSLATE}`,
-        ':where([data-stack-base])': `scale(${STACK_SCALE}) ${STACK_TRANSLATE}`,
-        ':where([data-starting-style], [data-ending-style])': `scale(1) ${STACK_TRANSLATE}`,
+        default: 'scale(1)',
+        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
+        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
       // The recede is NOT dropped here, unlike the entrance scale. `reduce` asks for no
       // ANIMATION, not for no distinction: `transitionProperty` below narrows to `opacity` in
@@ -621,26 +599,10 @@ export const popupMotion = stylex.create({
       // outright leaves a stacked prompt sitting on an identical prompt with no scrim between
       // them, which reads as a rendering fault rather than as a preference being honoured.
       '@media (prefers-reduced-motion: reduce)': {
-        default: `scale(1) ${STACK_TRANSLATE}`,
-        ':where([data-stack-base])': `scale(${STACK_SCALE}) ${STACK_TRANSLATE}`,
-        ':where([data-starting-style], [data-ending-style])': `scale(1) ${STACK_TRANSLATE}`,
+        default: 'scale(1)',
+        ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
+        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
-    },
-    /**
-     * Holds this surface's exit while a dialog stacked on it is still leaving, so a stack
-     * dismissed in one action unwinds instead of vanishing at once.
-     *
-     * Applies to every slot of `transitionProperty` rather than to the transform alone: what is
-     * being delayed is the whole departure. Under `reduce` that list narrows to `opacity`, so the
-     * stagger survives as a staggered fade.
-     *
-     * `data-stack-exiting` and not `data-stack-base`, and the difference is the whole reason the
-     * headless layer reports both: `data-stack-base` releases the moment its child closes, which
-     * is a frame before there is anything to stagger against.
-     */
-    transitionDelay: {
-      default: null,
-      ':where([data-stack-exiting][data-ending-style])': STACK_EXIT_STAGGER,
     },
     // The sheet travels its OWN HEIGHT rather than the ~11px a scale does, so it runs longer than
     // anything else here: `slow` in, `base` out, a 1.67:1 ratio in line with the rest of Mosaic.
