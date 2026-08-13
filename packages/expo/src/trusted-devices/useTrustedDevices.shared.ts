@@ -28,10 +28,42 @@ function toTrustedDevice(device: NativeTrustedDevice): TrustedDevice {
     ...device,
     createdAt: new Date(device.createdAt),
     updatedAt: new Date(device.updatedAt),
-    lastUsedAt: device.lastUsedAt === null ? null : new Date(device.lastUsedAt),
-    revokedAt: device.revokedAt === null ? null : new Date(device.revokedAt),
+    lastUsedAt: device.lastUsedAt == null ? null : new Date(device.lastUsedAt),
+    revokedAt: device.revokedAt == null ? null : new Date(device.revokedAt),
   };
 }
+
+const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
+  getAvailability: params =>
+    Promise.resolve().then(() =>
+      getNativeModule().getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null),
+    ),
+  list: async () => {
+    const devices = await getNativeModule().listTrustedDevices();
+    return devices.map(toTrustedDevice);
+  },
+  enroll: async params => {
+    const device = await getNativeModule().enrollTrustedDevice(
+      params?.deviceName ?? null,
+      params?.identifierHint ?? null,
+      params?.reason ?? null,
+      params?.policy ?? DEFAULT_POLICY,
+    );
+    return toTrustedDevice(device);
+  },
+  revoke: async id => {
+    const device = await getNativeModule().revokeTrustedDevice(id);
+    return toTrustedDevice(device);
+  },
+  signIn: params =>
+    Promise.resolve().then(() =>
+      getNativeModule().signInWithTrustedDevice(
+        params?.id ?? null,
+        params?.identifierHint ?? null,
+        params?.reason ?? null,
+      ),
+    ),
+});
 
 /**
  * Accesses biometric trusted-device enrollment and sign-in on iOS and Android.
@@ -39,35 +71,5 @@ function toTrustedDevice(device: NativeTrustedDevice): TrustedDevice {
  * The private key and biometric prompt are managed by Clerk's native SDK.
  */
 export function useTrustedDevices(): UseTrustedDevicesReturn {
-  return {
-    getAvailability: params =>
-      Promise.resolve().then(() =>
-        getNativeModule().getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null),
-      ),
-    list: async () => {
-      const devices = await getNativeModule().listTrustedDevices();
-      return devices.map(toTrustedDevice);
-    },
-    enroll: async params => {
-      const device = await getNativeModule().enrollTrustedDevice(
-        params?.deviceName ?? null,
-        params?.identifierHint ?? null,
-        params?.reason ?? null,
-        params?.policy ?? DEFAULT_POLICY,
-      );
-      return toTrustedDevice(device);
-    },
-    revoke: async id => {
-      const device = await getNativeModule().revokeTrustedDevice(id);
-      return toTrustedDevice(device);
-    },
-    signIn: params =>
-      Promise.resolve().then(() =>
-        getNativeModule().signInWithTrustedDevice(
-          params?.id ?? null,
-          params?.identifierHint ?? null,
-          params?.reason ?? null,
-        ),
-      ),
-  };
+  return trustedDevices;
 }

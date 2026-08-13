@@ -74,6 +74,25 @@ describe('useTrustedDevices on iOS', () => {
     });
   });
 
+  test('maps omitted optional native timestamps to null', async () => {
+    mocks.nativeModule.listTrustedDevices.mockResolvedValue([
+      {
+        ...nativeTrustedDevice,
+        lastUsedAt: undefined,
+        revokedAt: undefined,
+      },
+    ]);
+
+    const [trustedDevice] = await useTrustedDevicesOnIos().list();
+
+    expect(trustedDevice.lastUsedAt).toBeNull();
+    expect(trustedDevice.revokedAt).toBeNull();
+  });
+
+  test('returns stable operation identities', () => {
+    expect(useTrustedDevicesOnIos()).toBe(useTrustedDevicesOnIos());
+  });
+
   test('enrolls with the safe default authentication policy', async () => {
     mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeTrustedDevice);
 
@@ -172,11 +191,13 @@ describe('useTrustedDevices on iOS', () => {
     const signInWithTrustedDevice = mocks.nativeModule.signInWithTrustedDevice;
     Object.assign(mocks.nativeModule, { signInWithTrustedDevice: undefined });
 
-    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
-      'Biometric trusted devices require a development build containing a compatible version of @clerk/expo.',
-    );
-
-    Object.assign(mocks.nativeModule, { signInWithTrustedDevice });
+    try {
+      await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+        'Biometric trusted devices require a development build containing a compatible version of @clerk/expo.',
+      );
+    } finally {
+      Object.assign(mocks.nativeModule, { signInWithTrustedDevice });
+    }
   });
 });
 
@@ -215,6 +236,10 @@ describe('useTrustedDevices on Android', () => {
 });
 
 describe('useTrustedDevices on unsupported platforms', () => {
+  test('returns stable operation identities', () => {
+    expect(useTrustedDevicesOnUnsupportedPlatform()).toBe(useTrustedDevicesOnUnsupportedPlatform());
+  });
+
   test('reports unsupported availability without invoking native code', async () => {
     const availability = await useTrustedDevicesOnUnsupportedPlatform().getAvailability();
 

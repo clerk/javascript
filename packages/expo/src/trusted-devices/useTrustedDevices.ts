@@ -14,17 +14,19 @@ function rejectUnsupported(): Promise<never> {
   return Promise.resolve().then(unsupported);
 }
 
+const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
+  getAvailability: () => Promise.resolve(unsupportedAvailability),
+  list: rejectUnsupported,
+  enroll: rejectUnsupported,
+  revoke: rejectUnsupported,
+  signIn: rejectUnsupported,
+});
+
 /**
  * Accesses biometric trusted-device enrollment and sign-in.
  *
  * Trusted devices are currently supported on iOS and Android.
  */
 export function useTrustedDevices(): UseTrustedDevicesReturn {
-  return {
-    getAvailability: () => Promise.resolve(unsupportedAvailability),
-    list: rejectUnsupported,
-    enroll: rejectUnsupported,
-    revoke: rejectUnsupported,
-    signIn: rejectUnsupported,
-  };
+  return trustedDevices;
 }

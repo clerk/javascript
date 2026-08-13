@@ -43,6 +43,8 @@ describe('useAuthViewState', () => {
 
   afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   test('loads and observes native auth-flow completion state', async () => {
@@ -97,5 +99,35 @@ describe('useAuthViewState', () => {
     await waitFor(() => {
       expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
     });
+  });
+
+  test('falls back to JS session state when the native auth-flow state rejects', async () => {
+    const error = new Error('native failure');
+    vi.stubGlobal('__DEV__', true);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.getAuthFlowState.mockRejectedValue(error);
+
+    const { result } = renderHook(() => useAuthViewState());
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
+    });
+    expect(consoleError).toHaveBeenCalledWith('[useAuthViewState] Failed to get native auth-flow state:', error);
+  });
+
+  test('falls back to JS session state when the native listener cannot be installed', async () => {
+    const error = new Error('listener failure');
+    vi.stubGlobal('__DEV__', true);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.moduleAddListener.mockImplementation(() => {
+      throw error;
+    });
+
+    const { result } = renderHook(() => useAuthViewState());
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
+    });
+    expect(consoleError).toHaveBeenCalledWith('[useAuthViewState] Failed to observe native auth-flow state:', error);
   });
 });
