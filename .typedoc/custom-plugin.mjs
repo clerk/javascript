@@ -21,6 +21,7 @@ const FILES_WITHOUT_HEADINGS = [
   'organization-membership-public-user-data.mdx',
   'checkout-signal-value.mdx',
   'checkout-flow-resource.mdx',
+  'update-checkout-params.mdx',
   'use-checkout-options.mdx',
   'use-payment-element-return.mdx',
   'use-payment-methods-return.mdx',

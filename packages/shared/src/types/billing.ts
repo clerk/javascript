@@ -1420,16 +1420,20 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type UpdateCheckoutParams = WithOptionalOrgType<{
+export type UpdateCheckoutParams = {
   /**
    * The unique identifier for the checkout session.
    */
   id: string;
   /**
+   * The Organization ID to perform the request on.
+   */
+  orgId?: string;
+  /**
    * The promo code to apply. Use an empty string to remove the applied promo code.
    */
   promoCode: string;
-}>;
+};
 
 /**
  * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
@@ -1510,7 +1514,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   totals: BillingTotals;
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<BillingCheckoutResource>;
   /**
@@ -1660,12 +1664,12 @@ export interface CheckoutFlowFinalizeParams {
  */
 interface CheckoutFlowMethods {
   /**
-   * Updates the current checkout. Use an empty promo code to remove the applied promo code.
+   * Updates the current checkout. Use an empty promo code to remove the applied promo code. [Learn more.](/docs/reference/types/billing-checkout-resource#update)
    */
   update: (params: Pick<UpdateCheckoutParams, 'promoCode'>) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
 
