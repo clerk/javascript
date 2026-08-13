@@ -365,6 +365,11 @@ prompt.
 This is the nested case, not a stack: the prompt paints its own scrim over the panel, and the panel
 neither dims nor recedes.
 
+Type into **Add email address** and then try to close it — Escape, the corner X, or Cancel — and a
+confirmation stacks on top instead, making the panel → prompt → prompt case reachable. The veto is
+a controlled `open` whose `onOpenChange` declines to commit; every close request routes through it,
+so one check covers all of them.
+
 Stack a prompt on a prompt and the relationship changes — the shape a close confirmation
 takes:
 
