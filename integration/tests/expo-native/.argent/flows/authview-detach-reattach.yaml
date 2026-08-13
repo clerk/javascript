@@ -1,0 +1,28 @@
+# Dismiss the native AuthView mid-flow and reopen it: the native view must
+# survive detach/reattach and still complete a sign-in afterwards. Dismissal
+# is the platform-native gesture: Android's system back button (doubling as
+# the back-dismisses-AuthView regression), iOS's sheet Close control
+# (clerk-ios exposes the stable clerk.dismissButton identifier).
+# Also asserts the custom `logo` React element is rehosted into the native
+# logo slot, both on first mount and after reattach.
+steps:
+  - run: subflows/open-app
+  - tap: { id: open-auth-view-button }
+  - await: { visible: { text: { matches: 'Welcome! Sign in to continue' } }, timeout: 25000 }
+  # Retrying wait: the rehosted logo is sized on the first RN layout pass,
+  # so it can lag the welcome copy by a frame or two.
+  - await: { visible: { text: E2E Custom Logo }, timeout: 10000 }
+  - when: { platform: android }
+    steps:
+      - tool: button
+        args: { button: back }
+  - when: { platform: ios }
+    steps:
+      - tap: { id: clerk.dismissButton }
+  - await: { visible: { id: open-auth-view-button }, timeout: 15000 }
+  - tap: { id: open-auth-view-button }
+  - await: { visible: { text: E2E Custom Logo }, timeout: 15000 }
+  - run: subflows/sign-in-email-password
+  - run: subflows/assert-signed-in
+  - tap: { id: sign-out-button }
+  - run: subflows/assert-signed-out

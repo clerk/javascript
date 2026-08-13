@@ -1,0 +1,5 @@
+# Subflow: assert the JS layer observed the native sign-in (bridge sync).
+executionPrerequisite: A sign-in just completed in the native AuthView
+steps:
+  - await: { visible: { text: signed in }, timeout: 30000 }
+  - assert: { exists: { id: user-id } }

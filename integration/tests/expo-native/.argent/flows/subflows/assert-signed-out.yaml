@@ -1,0 +1,4 @@
+# Subflow: assert the JS layer is signed out.
+executionPrerequisite: A sign-out was just triggered
+steps:
+  - await: { visible: { text: signed out }, timeout: 20000 }

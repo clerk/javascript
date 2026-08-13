@@ -1,0 +1,8 @@
+# Cold-boot warmup, not a test. Lets the JS bundle parse and the native
+# accessibility tree populate once, so the first real flow doesn't eat the
+# cold-start cost and flake its in-flow waits. Lives in subflows/ so the
+# per-flow loop in run-argent-flows.sh never runs it as a test.
+steps:
+  - echo: Warmup only; state was reset by run-argent-flows.sh before this run
+  - launch: com.clerk.exponativebuildfixture
+  - await: { visible: { id: auth-state }, timeout: 90000 }

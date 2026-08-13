@@ -1,0 +1,11 @@
+# Subflow: cold-launch and land signed out. Argent's launch restarts the
+# process but never clears app data, so the clean state (fresh install +
+# cleared keychain / pm clear) is prepared by run-argent-flows.sh before
+# each flow.
+steps:
+  - echo: Cold launch after run-argent-flows.sh reset the app state
+  - launch: com.clerk.exponativebuildfixture
+  - await: { visible: { id: auth-state }, timeout: 30000 }
+  # Wait out clerk-js init ('loading') before asserting the signed-out state.
+  - await: { visible: { text: { matches: 'signed (in|out)' } }, timeout: 45000 }
+  - await: { visible: { text: signed out } }

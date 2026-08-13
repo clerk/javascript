@@ -1,0 +1,15 @@
+# Sign in via the native AuthView, restart WITHOUT clearing state, and assert
+# the session is restored from secure-store with no re-auth (bridge + token
+# cache persistence). Argent's launch is terminate + relaunch and never
+# clears data, which is exactly the restart this flow needs.
+steps:
+  - run: subflows/open-app
+  - tap: { id: open-auth-view-button }
+  - run: subflows/sign-in-email-password
+  - run: subflows/assert-signed-in
+  - launch: com.clerk.exponativebuildfixture
+  - await: { visible: { text: signed in }, timeout: 45000 }
+  - assert: { exists: { id: user-id } }
+  # Leave the app signed out for whichever flow runs next.
+  - tap: { id: sign-out-button }
+  - run: subflows/assert-signed-out

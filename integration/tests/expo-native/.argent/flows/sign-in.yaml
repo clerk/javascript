@@ -1,0 +1,9 @@
+# Native AuthView email+password sign-in, asserting the native->JS session
+# sync, then JS-side sign-out asserting the reverse direction.
+steps:
+  - run: subflows/open-app
+  - tap: { id: open-auth-view-button }
+  - run: subflows/sign-in-email-password
+  - run: subflows/assert-signed-in
+  - tap: { id: sign-out-button }
+  - run: subflows/assert-signed-out

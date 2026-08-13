@@ -1,0 +1,32 @@
+# Embedded UserProfileView (onHostBack): internal navigation stays native,
+# and the host-supplied root back button closes the screen from JS.
+steps:
+  - run: subflows/open-app
+  - tap: { id: open-auth-view-button }
+  - run: subflows/sign-in-email-password
+  - run: subflows/assert-signed-in
+  - tap: { id: open-embedded-profile-button }
+  # The internal push differs per platform: clerk-ios pushes a Security screen
+  # from the profile root, clerk-android uses tabs at the root and pushes the
+  # Manage account screen instead. The double-Back contract below is the same:
+  # both back buttons read 'Back' but only one exists at a time, so the first
+  # tap pops Clerk's internal stack and the second is the host chevron firing
+  # onHostBack.
+  - when: { platform: ios }
+    steps:
+      - await: { visible: { text: Security }, timeout: 20000 }
+      - tap: { text: Security }
+      - await: { visible: { text: { matches: 'Password|Passkeys|Two-step verification|Active devices' } }, timeout: 15000 }
+      - tap: { text: Back }
+      - await: { visible: { text: Security }, timeout: 15000 }
+  - when: { platform: android }
+    steps:
+      - await: { visible: { text: Edit profile }, timeout: 20000 }
+      - tap: { text: Manage account }
+      - await: { visible: { text: { matches: 'EMAIL ADDRESSES|Add email address' } }, timeout: 15000 }
+      - tap: { text: Back }
+      - await: { visible: { text: Edit profile }, timeout: 15000 }
+  - tap: { text: Back }
+  - await: { visible: { id: open-embedded-profile-button }, timeout: 15000 }
+  - tap: { id: sign-out-button }
+  - run: subflows/assert-signed-out

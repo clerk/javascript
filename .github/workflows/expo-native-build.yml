@@ -27,7 +27,7 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.8.0'
+  ARGENT_VERSION: '0.20.0'
 
 jobs:
   native-build:
@@ -137,7 +137,7 @@ jobs:
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
           pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
-          # launcher (unreachable Metro in CI), which stalls every Maestro
+          # launcher (unreachable Metro in CI), which stalls every e2e
           # flow on a blank screen. Skip it on e2e jobs only.
           DEV_CLIENT="expo-dev-client"
           if [ "$RUN_E2E" = "true" ]; then DEV_CLIENT=""; fi
@@ -214,32 +214,29 @@ jobs:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
-      - name: Cache maestro CLI
+      # setup-node above only runs on a native-build cache miss; argent needs
+      # Node 20.12+ regardless, so guarantee it on the e2e path.
+      - name: Set up Node for argent
+        if: steps.keys.outputs.pk != ''
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+
+      # ~/.argent holds the proprietary device backends (simulator-server,
+      # native devtools) that the first run otherwise downloads.
+      - name: Cache argent binaries
         if: steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.maestro
-          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
+          path: ~/.argent
+          key: argent-${{ runner.os }}-${{ env.ARGENT_VERSION }}
 
-      - name: Install maestro CLI
+      - name: Install argent CLI
         if: steps.keys.outputs.pk != ''
         run: |
-          set -o pipefail
-          if [ -x "$HOME/.maestro/bin/maestro" ]; then
-            echo "Using cached Maestro"
-          else
-            installed=0
-            for i in 1 2 3; do
-              if curl -fLs --retry 3 --retry-delay 5 "https://get.maestro.mobile.dev" | MAESTRO_VERSION="$MAESTRO_VERSION" bash; then
-                if [ -x "$HOME/.maestro/bin/maestro" ]; then installed=1; break; fi
-              fi
-              echo "Maestro install attempt $i failed (or binary missing); retrying"
-              sleep 5
-            done
-            [ "$installed" = 1 ] || { echo "::error::Maestro install failed after 3 attempts"; exit 1; }
-          fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          "$HOME/.maestro/bin/maestro" --version
+          npm install -g "@swmansion/argent@$ARGENT_VERSION"
+          argent telemetry disable || true
+          argent --version
 
       - name: Boot iOS simulator
         id: sim
@@ -277,36 +274,38 @@ jobs:
             echo "user_id=$user_id"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Run iOS e2e (Maestro)
+      - name: Run iOS e2e (Argent)
         id: run_e2e_ios
         if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
         working-directory: ${{ env.FIXTURE_DIR }}
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          ARGENT_SECRET_CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
+          ARGENT_SECRET_CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
           SIM_UDID: ${{ steps.sim.outputs.udid }}
         run: |
           echo "Using simulator $SIM_UDID"
+          # Reboot through argent so it applies its accessibility settings and
+          # warms its simulator-server before the first flow.
+          argent run boot-device --udid "$SIM_UDID" --force true
           # Kill animations + predictive keyboard: animations add latency to
-          # every tap; predictive text hijacks inputText targets.
+          # every tap; predictive text hijacks typed text.
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.UIKit UIAnimationDragCoefficient -float 0.01 || true
           xcrun simctl spawn "$SIM_UDID" defaults write -g ApplePersistenceIgnoreState -bool YES || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.ContinuousPath -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCapitalization -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.AutoCorrection -bool NO || true
           xcrun simctl spawn "$SIM_UDID" defaults write com.apple.keyboard.Prediction -bool NO || true
-          xcrun simctl install "$SIM_UDID" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
           # Stream the app's console output into the debug artifact so a hang has
           # actionable evidence (keychain/network errors) instead of just screenshots.
-          mkdir -p "$RUNNER_TEMP/maestro-debug"
+          mkdir -p "$RUNNER_TEMP/argent-debug"
           xcrun simctl spawn "$SIM_UDID" log stream --style compact \
             --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-            > "$RUNNER_TEMP/maestro-debug/sim-console.log" 2>&1 &
+            > "$RUNNER_TEMP/argent-debug/sim-console.log" 2>&1 &
           LOG_PID=$!
+          APP_PATH="$GITHUB_WORKSPACE/$FIXTURE_DIR/ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app"
           cd "$GITHUB_WORKSPACE/$E2E_DIR"
           rc=0
-          MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-flows.sh \
-            xcrun simctl terminate "$SIM_UDID" com.clerk.exponativebuildfixture || rc=$?
+          E2E_DEBUG_OUTPUT="$RUNNER_TEMP/argent-debug" ./run-argent-flows.sh ios "$SIM_UDID" "$APP_PATH" || rc=$?
           kill "$LOG_PID" 2>/dev/null || true
           exit "$rc"
 
@@ -339,13 +338,13 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run Android e2e (Maestro)
+      - name: Run Android e2e (Argent)
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          ARGENT_SECRET_CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
+          ARGENT_SECRET_CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         with:
           api-level: 34
           target: google_apis
@@ -357,7 +356,7 @@ jobs:
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
             cd integration/tests/expo-native &&
-            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
+            E2E_DEBUG_OUTPUT="$RUNNER_TEMP/argent-debug" ./run-android-argent-flows.sh
             "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
 
       # Runs before the artifact upload so the credentials are already dead
@@ -371,26 +370,27 @@ jobs:
           curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
             -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
 
-      # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents.
-      - name: Scrub test credentials from Maestro debug output
+      # Argent redacts resolved {{secret:...}} values from its own reports,
+      # but the logcat / sim-console captures are ours; scrub them the same
+      # way as before. add-mask only covers step logs, not artifact contents.
+      - name: Scrub test credentials from Argent debug output
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
-          [ -d "$RUNNER_TEMP/maestro-debug" ] || exit 0
+          [ -d "$RUNNER_TEMP/argent-debug" ] || exit 0
           [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
           # shellcheck disable=SC2016
-          find "$RUNNER_TEMP/maestro-debug" -type f \
+          find "$RUNNER_TEMP/argent-debug" -type f \
             \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts on e2e failure
+      - name: Upload Argent artifacts on e2e failure
         if: always() && (steps.run_e2e_ios.outcome == 'failure' || steps.run_e2e_android.outcome == 'failure')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: maestro-${{ matrix.platform }}
-          path: ${{ runner.temp }}/maestro-debug
+          name: argent-${{ matrix.platform }}
+          path: ${{ runner.temp }}/argent-debug
           retention-days: 7
 
       - name: Report e2e outcome
@@ -401,7 +401,7 @@ jobs:
         run: |
           outcome="$IOS_OUTCOME"
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
-          echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Argent e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
+            echo "::error::Argent e2e failed. See the argent-${{ matrix.platform }} artifact."
           fi

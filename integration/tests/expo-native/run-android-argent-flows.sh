@@ -9,6 +9,7 @@ command -v adb >/dev/null 2>&1 || {
 }
 
 adb install -r "$apk_path"
+serial=$(adb get-serialno)
 
 logcat_pid=
 stop_logcat() {
@@ -18,11 +19,11 @@ stop_logcat() {
 }
 trap stop_logcat EXIT
 
-if [ -n "${MAESTRO_DEBUG_OUTPUT:-}" ]; then
-  mkdir -p "$MAESTRO_DEBUG_OUTPUT"
+if [ -n "${E2E_DEBUG_OUTPUT:-}" ]; then
+  mkdir -p "$E2E_DEBUG_OUTPUT"
   adb logcat -c || true
-  adb logcat -v threadtime > "$MAESTRO_DEBUG_OUTPUT/android-logcat.log" 2>&1 &
+  adb logcat -v threadtime > "$E2E_DEBUG_OUTPUT/android-logcat.log" 2>&1 &
   logcat_pid=$!
 fi
 
-./run-flows.sh adb shell am force-stop com.clerk.exponativebuildfixture
+./run-argent-flows.sh android "$serial"
