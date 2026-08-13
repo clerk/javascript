@@ -4,6 +4,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../../test-utils/axe';
+import { Popover } from '../popover';
 import { Dialog } from './index';
 
 afterEach(() => cleanup());
@@ -668,6 +669,166 @@ describe('Dialog', () => {
       act(() => handle.close());
 
       expect(finalFocus).toHaveBeenCalledWith('');
+    });
+  });
+
+  describe('role', () => {
+    it('renders role=alertdialog when asked', () => {
+      renderDialog({ defaultOpen: true, role: 'alertdialog' });
+
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('stacking', () => {
+    // Two dialogs, the inner one rendered inside the outer's popup. `outer`/`inner` prefixes on
+    // the test ids because both levels render the same parts.
+    function renderStack({ outerOpen = true, innerOpen = true }: { outerOpen?: boolean; innerOpen?: boolean } = {}) {
+      return render(
+        <Dialog.Root open={outerOpen}>
+          <Dialog.Backdrop data-testid='outer-backdrop' />
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='outer-popup'>
+              <Dialog.Title>Outer</Dialog.Title>
+              <Dialog.Root open={innerOpen}>
+                <Dialog.Backdrop data-testid='inner-backdrop' />
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='inner-popup'>
+                    <Dialog.Title>Inner</Dialog.Title>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+    }
+
+    it('marks the dialog on top stacked and the one beneath a stack base', () => {
+      renderStack();
+
+      expect(screen.getByTestId('inner-popup')).toHaveAttribute('data-stacked', '');
+      expect(screen.getByTestId('inner-popup')).not.toHaveAttribute('data-stack-base');
+      expect(screen.getByTestId('outer-popup')).toHaveAttribute('data-stack-base', '');
+      expect(screen.getByTestId('outer-popup')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('marks the stacked backdrop, so only one scrim in the stack paints', () => {
+      renderStack();
+
+      expect(screen.getByTestId('inner-backdrop')).toHaveAttribute('data-stacked', '');
+      expect(screen.getByTestId('outer-backdrop')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('drops the stack base marking when the dialog on top closes', () => {
+      const { rerender } = renderStack();
+      expect(screen.getByTestId('outer-popup')).toHaveAttribute('data-stack-base', '');
+
+      rerender(
+        <Dialog.Root open>
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='outer-popup'>
+              <Dialog.Title>Outer</Dialog.Title>
+              <Dialog.Root open={false}>
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='inner-popup'>
+                    <Dialog.Title>Inner</Dialog.Title>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+
+      expect(screen.getByTestId('outer-popup')).not.toHaveAttribute('data-stack-base');
+    });
+
+    it('is not stacked on a dialog that is closed', () => {
+      // A confirmation root mounted beside its dialog's portal is inside the root but outlives
+      // the open state; on its own it owns the scrim like any root-level dialog.
+      render(
+        <Dialog.Root open={false}>
+          <Dialog.Root open>
+            <Dialog.Backdrop data-testid='inner-backdrop' />
+            <Dialog.Viewport>
+              <Dialog.Popup data-testid='inner-popup'>
+                <Dialog.Title>Inner</Dialog.Title>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Root>
+        </Dialog.Root>,
+      );
+
+      expect(screen.getByTestId('inner-popup')).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('inner-backdrop')).not.toHaveAttribute('data-stacked');
+    });
+
+    it('marks the middle of a three-deep stack as both', () => {
+      render(
+        <Dialog.Root open>
+          <Dialog.Viewport>
+            <Dialog.Popup data-testid='bottom-popup'>
+              <Dialog.Title>Bottom</Dialog.Title>
+              <Dialog.Root open>
+                <Dialog.Viewport>
+                  <Dialog.Popup data-testid='middle-popup'>
+                    <Dialog.Title>Middle</Dialog.Title>
+                    <Dialog.Root open>
+                      <Dialog.Viewport>
+                        <Dialog.Popup data-testid='top-popup'>
+                          <Dialog.Title>Top</Dialog.Title>
+                        </Dialog.Popup>
+                      </Dialog.Viewport>
+                    </Dialog.Root>
+                  </Dialog.Popup>
+                </Dialog.Viewport>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Root>,
+      );
+
+      const middle = screen.getByTestId('middle-popup');
+      expect(middle).toHaveAttribute('data-stacked', '');
+      expect(middle).toHaveAttribute('data-stack-base', '');
+      expect(screen.getByTestId('bottom-popup')).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('top-popup')).not.toHaveAttribute('data-stack-base');
+    });
+
+    it('does not treat a floating but non-dialog ancestor as a stack', async () => {
+      // The distinction `data-nested` cannot make: a dialog opened from a popover has a floating
+      // ancestor, but it sits on the bare page and still owns its scrim.
+      const user = userEvent.setup();
+      render(
+        <Popover.Root>
+          <Popover.Trigger>Open popover</Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner>
+              <Popover.Popup>
+                <Dialog.Root>
+                  <Dialog.Trigger>Open dialog</Dialog.Trigger>
+                  <Dialog.Backdrop data-testid='dialog-backdrop' />
+                  <Dialog.Viewport>
+                    <Dialog.Popup data-testid='dialog-popup'>
+                      <Dialog.Title>Dialog in a popover</Dialog.Title>
+                    </Dialog.Popup>
+                  </Dialog.Viewport>
+                </Dialog.Root>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Open popover' }));
+      await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+      const popup = screen.getByTestId('dialog-popup');
+      expect(popup).toHaveAttribute('data-nested', '');
+      expect(popup).not.toHaveAttribute('data-stacked');
+      expect(screen.getByTestId('dialog-backdrop')).not.toHaveAttribute('data-stacked');
     });
   });
 

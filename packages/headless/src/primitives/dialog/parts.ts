@@ -1,4 +1,10 @@
-export { type DialogClosedBy, type DialogOpenChangeDetails, type DialogProps, DialogRoot as Root } from './dialog-root';
+export {
+  type DialogClosedBy,
+  type DialogOpenChangeDetails,
+  type DialogProps,
+  type DialogRole,
+  DialogRoot as Root,
+} from './dialog-root';
 export { type DialogTriggerProps, DialogTrigger as Trigger } from './dialog-trigger';
 export { createDialogHandle as createHandle, type DialogHandle } from './dialog-handle';
 export { type DialogPortalProps, DialogPortal as Portal } from './dialog-portal';

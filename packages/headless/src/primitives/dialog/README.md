@@ -137,16 +137,17 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 
 ### `Dialog.Root`
 
-| Prop           | Type                                                        | Default | Description                                                           |
-| -------------- | ----------------------------------------------------------- | ------- | --------------------------------------------------------------------- |
-| `open`         | `boolean`                                                   | —       | Controlled open state                                                 |
-| `defaultOpen`  | `boolean`                                                   | `false` | Initial open state (uncontrolled)                                     |
-| `onOpenChange` | `(open: boolean, details: DialogOpenChangeDetails) => void` | —       | Called when open state changes; `details` names the trigger behind it |
-| `modal`        | `boolean`                                                   | `true`  | Traps focus and blocks page interaction                               |
-| `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'` | Which gestures dismiss the dialog                                     |
-| `handle`       | `DialogHandle`                                              | —       | Connects detached triggers (see `Dialog.createHandle()`)              |
-| `triggerId`    | `string \| null`                                            | —       | Controls which trigger the open is attributed to                      |
-| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —       | Content, or a render function of the active trigger's `payload`       |
+| Prop           | Type                                                        | Default    | Description                                                           |
+| -------------- | ----------------------------------------------------------- | ---------- | --------------------------------------------------------------------- |
+| `open`         | `boolean`                                                   | —          | Controlled open state                                                 |
+| `defaultOpen`  | `boolean`                                                   | `false`    | Initial open state (uncontrolled)                                     |
+| `onOpenChange` | `(open: boolean, details: DialogOpenChangeDetails) => void` | —          | Called when open state changes; `details` names the trigger behind it |
+| `modal`        | `boolean`                                                   | `true`     | Traps focus and blocks page interaction                               |
+| `role`         | `'dialog' \| 'alertdialog'`                                 | `'dialog'` | The popup's ARIA role                                                 |
+| `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                     |
+| `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)              |
+| `triggerId`    | `string \| null`                                            | —          | Controls which trigger the open is attributed to                      |
+| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active trigger's `payload`       |
 
 #### `closedBy`
 
@@ -218,10 +219,23 @@ No additional props beyond standard HTML attributes and the `render` prop.
 | --------------------------- | ---------------------------------- | ------------------------------------------- |
 | `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state                                  |
 | `data-nested`               | Backdrop, Viewport, Popup          | Opened from inside another floating element |
+| `data-stacked`              | Backdrop, Popup                    | Layered over an open dialog                 |
+| `data-stack-base`           | Popup                              | Has an open dialog layered over it          |
 
-`data-nested` is what a stacked overlay styles itself from — chiefly so backdrops don't composite
-into an ever-darker scrim as the stack grows. It reflects any floating ancestor, not strictly a
-dialog one: the `FloatingTree` a Menu or Popover establishes counts too.
+`data-nested` reflects any floating ancestor: the `FloatingTree` a Menu or Popover establishes
+counts too.
+
+`data-stacked` and `data-stack-base` are narrower, and are what stacking styles should use. They
+describe dialog-on-dialog specifically, in the two directions of the same relationship — the one
+on top, and the one it covers. A dialog opened from a menu item is `data-nested` but not
+`data-stacked`: it has a floating ancestor, yet it sits on the bare page and still owns its scrim.
+
+Both can be set at once, and that is the ordinary case rather than an edge — in a panel → prompt →
+alert stack, the middle dialog is stacked on one surface while another is stacked on it.
+
+`data-stacked` exists chiefly so the stack shows one scrim: the dialog on top drops its own
+backdrop instead of compositing a darker one per level. `data-stack-base` is for whatever the
+surface underneath does to signal depth.
 
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
@@ -229,7 +243,7 @@ The headless parts are unstyled. Target a part with your own className (or `rend
 
 - **`Dialog.Popup` should be a child of `Dialog.Viewport`** for centered, scroll-locked modal behavior. The viewport hosts the fixed overlay container; the popup alone does not handle positioning or scroll lock.
 - **Title and Description are optional but recommended.** If omitted, `aria-labelledby` / `aria-describedby` are simply absent from the popup.
-- **Nested dialogs are supported**, and covered by tests. The `FloatingTree` pattern handles it: `useDismiss` blocks both Escape and outside-press on a parent while any child is open, and `FloatingOverlay`'s scroll lock is refcounted, so the body stays locked until the last dialog closes.
+- **Nested dialogs are supported**, and covered by tests. The `FloatingTree` pattern handles it: `useDismiss` blocks both Escape and outside-press on a parent while any child is open, and `FloatingOverlay`'s scroll lock is refcounted, so the body stays locked until the last dialog closes. Style the stack with `data-stacked` / `data-stack-base`, not `data-nested`.
 - **No positioning middleware.** Dialogs are centered via CSS, not Floating UI positioning.
 
 ## Authoring rule for new primitives
@@ -238,5 +252,5 @@ Each styleable surface = one part. Layout infrastructure (overlay, scroll lock, 
 
 ## ARIA
 
-- Popup: `role="dialog"`, `aria-labelledby` (from Title), `aria-describedby` (from Description)
+- Popup: `role="dialog"` (or `"alertdialog"`, via the root's `role`), `aria-labelledby` (from Title), `aria-describedby` (from Description)
 - Trigger: `aria-expanded`, `aria-haspopup="dialog"`, `aria-controls`

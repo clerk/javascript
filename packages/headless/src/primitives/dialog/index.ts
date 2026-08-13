@@ -14,6 +14,7 @@ export type {
   DialogPopupProps,
   DialogPortalProps,
   DialogProps,
+  DialogRole,
   DialogTitleProps,
   DialogTriggerProps,
   DialogViewportProps,
