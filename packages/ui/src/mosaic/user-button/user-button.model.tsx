@@ -17,7 +17,7 @@ import type {
   UserButtonSuggestion,
 } from './user-button.types';
 
-// Promise-returning so the container can drive busy state. Navigation callbacks stay fire-and-forget.
+// Promise-returning so the controller can drive busy state. Navigation callbacks stay fire-and-forget.
 interface UserButtonAsyncCallbacks {
   onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
   onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
@@ -27,7 +27,7 @@ interface UserButtonAsyncCallbacks {
   onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
 }
 
-export type UserButtonController =
+export type UserButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (UserButtonData &
@@ -55,7 +55,7 @@ type CreateOrganizationMode =
   | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
   | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
 
-export type UserButtonControllerOptions = UserProfileMode &
+export type UserButtonModelOptions = UserProfileMode &
   OrganizationProfileMode &
   CreateOrganizationMode & {
     afterSelectOrganizationUrl?: AfterSelectUrl<OrganizationResource>;
@@ -121,7 +121,7 @@ function toSession(sessionId: string, user: UserResource): UserButtonSession {
   };
 }
 
-export function useUserButtonController(options?: UserButtonControllerOptions): UserButtonController {
+export function useUserButtonModel(options?: UserButtonModelOptions): UserButtonModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const { isLoaded: isOrgLoaded, organization } = useOrganization();

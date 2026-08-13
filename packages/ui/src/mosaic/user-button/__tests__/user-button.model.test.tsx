@@ -2,8 +2,8 @@ import type * as SharedReact from '@clerk/shared/react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { UserButtonControllerOptions } from '../user-button.controller';
-import { useUserButtonController } from '../user-button.controller';
+import type { UserButtonModelOptions } from '../user-button.model';
+import { useUserButtonModel } from '../user-button.model';
 
 interface FakeUser {
   id: string;
@@ -46,7 +46,7 @@ let singleSessionMode: boolean;
 let branded: boolean;
 let forceOrganizationSelection: boolean;
 let organizationsEnabled: boolean;
-// False stands for the window before clerk-js has hydrated it, which the controller has to sit out.
+// False stands for the window before clerk-js has hydrated it, which the model has to sit out.
 let environmentHydrated: boolean;
 
 // Built per read rather than once, so a test setting any of the flags above is answered by it.
@@ -100,7 +100,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-// The controller reads its three paginated lists through the shared in-view helper, so the fetch
+// The model reads its three paginated lists through the shared in-view helper, so the fetch
 // boundary is stubbed there rather than at `useOrganizationList`.
 vi.mock('../../../hooks/useOrganizationListInView', () => ({
   useOrganizationListInView: () => ({ userMemberships, userInvitations, userSuggestions, ref: pagingRef }),
@@ -183,8 +183,8 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function Harness(options: UserButtonControllerOptions = {}) {
-  const c = useUserButtonController(options);
+function Harness(options: UserButtonModelOptions = {}) {
+  const c = useUserButtonModel(options);
   if (c.status !== 'ready') {
     return <output data-testid='status'>{c.status}</output>;
   }
@@ -298,7 +298,7 @@ function activeOrganization() {
   return JSON.parse(screen.getByTestId('active-org').textContent ?? 'null');
 }
 
-describe('useUserButtonController', () => {
+describe('useUserButtonModel', () => {
   it('is loading until the user, session, and organization are all loaded', () => {
     isUserLoaded = false;
     const { rerender } = render(<Harness />);

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
-// Session-backed, discriminated resource rows. 1:1 with `useUserButtonController()`'s output, so the
-// controller and the view agree on a shape neither one owns.
+// Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
+// model and the view agree on a shape neither one owns.
 
 export interface UserButtonSession {
   sessionId: string;

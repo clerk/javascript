@@ -38,12 +38,12 @@ import type {
 import { applyOrder } from './user-button.utils';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
-// what the controller and the view agree on, so neither file owns them.
+// what the model and the view agree on, so neither file owns them.
 export type * from './user-button.types';
 
 /**
- * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
- * container (which sets `pendingKey`) and the view (which matches against it).
+ * Stable keys naming which affordance owns the single in-flight action. Shared by the
+ * controller (which sets `pendingKey`) and the view (which matches against it).
  */
 export const userButtonBusyKeys = {
   selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
@@ -601,7 +601,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
           // Every other affordance here swaps its icon for a spinner, but this one is a labelled
           // button, so the spinner goes inside it rather than taking the row's trailing edge — the
           // press and the thing that reports it stay the same element. `pendingKey` is already
-          // spin-delayed by the container, so this asks for no second delay of its own.
+          // spin-delayed by the controller, so this asks for no second delay of its own.
           <SubmitButton
             type='button'
             variant='outline'

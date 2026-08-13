@@ -4,13 +4,13 @@ import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { useSpinDelay } from '../hooks/useSpinDelay';
-import { type UserButtonControllerOptions, useUserButtonController } from './user-button.controller';
+import { type UserButtonModelOptions, useUserButtonModel } from './user-button.model';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonTriggerProps } from './user-button.view';
 import { userButtonBusyKeys, UserButtonView } from './user-button.view';
 
 /** Everything `<UserButton />` takes: profile routing, trigger content, and the app's own menu rows. */
-export type UserButtonProps = UserButtonControllerOptions &
+export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
   UserButtonMenuProps &
   Pick<UserButtonModeProps, 'modePriority'> & {
@@ -79,19 +79,19 @@ export type UserButtonProps = UserButtonControllerOptions &
 export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   const { renderTriggerLabel, renderTriggerBadge, modePriority, customMenuItems, menuItemOrder, fallback, ...options } =
     props;
-  const controller = useUserButtonController(options);
+  const model = useUserButtonModel(options);
   const [open, setOpen] = useState(false);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 
   // Re-entry is guarded on the immediate `pendingKey`; only the view's feedback is delayed.
   const displayPendingKey = useSpinDelay(pendingKey);
 
-  if (controller.status === 'loading') {
+  if (model.status === 'loading') {
     return <>{fallback}</>;
   }
 
   // Signed out is an answer, so the placeholder goes too rather than promising a button.
-  if (controller.status === 'hidden') {
+  if (model.status === 'hidden') {
     return null;
   }
 
@@ -137,7 +137,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     onAcceptSuggestion,
     onAcceptInvitation,
     ...data
-  } = controller;
+  } = model;
 
   return (
     <UserButtonView
