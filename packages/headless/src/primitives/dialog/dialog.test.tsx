@@ -539,6 +539,12 @@ describe('Dialog', () => {
             {({ payload }) => (
               <>
                 <Dialog.Trigger id='trigger-a'>Open A</Dialog.Trigger>
+                <Dialog.Trigger
+                  id='trigger-b'
+                  payload='from-trigger-b'
+                >
+                  Open B
+                </Dialog.Trigger>
                 <Dialog.Portal>
                   <Dialog.Viewport>
                     <Dialog.Popup>
@@ -583,6 +589,46 @@ describe('Dialog', () => {
         await user.click(screen.getByRole('button', { name: 'Open A' }));
 
         expect(screen.getByRole('dialog', { name: 'no payload' })).toBeInTheDocument();
+      });
+
+      it('supersedes the trigger that opened the dialog last', async () => {
+        const user = userEvent.setup();
+        const handle = renderDetached();
+
+        // `activeTriggerId` is never reset on close, so without an explicit precedence the
+        // registry lookup would hand this open the previous trigger's payload back.
+        await user.click(screen.getByRole('button', { name: 'Open B' }));
+        act(() => handle.close());
+        act(() => handle.open('from-handle'));
+        await act(async () => {
+          await Promise.resolve();
+        });
+
+        expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+      });
+
+      it('survives a `handle.close()` for the length of the exit transition', () => {
+        // Keep an animation pending so the popup stays mounted after the close.
+        const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+        (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [
+          { finished: new Promise<void>(() => {}) },
+        ];
+        try {
+          const handle = renderDetached();
+
+          act(() => handle.open('from-handle'));
+          act(() => handle.close());
+
+          // `close()` carries no payload; blanking it here would render the dialog empty on its
+          // way out, or throw in a children function that dereferences it.
+          expect(screen.getByRole('dialog', { name: 'from-handle' })).toBeInTheDocument();
+        } finally {
+          if (original) {
+            (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+          } else {
+            delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+          }
+        }
       });
     });
   });
