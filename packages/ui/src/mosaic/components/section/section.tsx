@@ -58,7 +58,6 @@ const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '75px',
     paddingBlockEnd: {
       default: space['4'],
       [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
@@ -68,6 +67,7 @@ const styles = stylex.create({
       default: space['2'],
       [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['3'],
     },
+    minHeight: `calc(${space['18.5']} + 1px)`,
     width: 'auto',
   },
   items: {
