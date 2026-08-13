@@ -146,11 +146,16 @@ export const styles = stylex.create({
   },
 });
 
-/** Distance from the popup's corner, per surface. */
+/**
+ * Positions the ICON the surface's inset from the corner, not the button box: the `sm` circle
+ * carries `(space[7] - space[4]) / 2` = `space[1.5]` of its own padding around the glyph, so each
+ * inset runs that much shy of the distance the eye should read (`4` for prompt/card, `4.5` for
+ * panel). The hit target hangs past the icon toward the corner, which only helps.
+ */
 export const closeInsets = stylex.create({
-  prompt: { insetBlockStart: space['4'], insetInlineEnd: space['4'] },
-  card: { insetBlockStart: space['4'], insetInlineEnd: space['4'] },
-  panel: { insetBlockStart: space['4.5'], insetInlineEnd: space['4.5'] },
+  prompt: { insetBlockStart: space['2.5'], insetInlineEnd: space['2.5'] },
+  card: { insetBlockStart: space['2.5'], insetInlineEnd: space['2.5'] },
+  panel: { insetBlockStart: space['3'], insetInlineEnd: space['3'] },
 });
 
 /**
