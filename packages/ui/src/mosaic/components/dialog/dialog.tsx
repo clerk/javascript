@@ -206,16 +206,40 @@ const Viewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(function 
   );
 });
 
+/**
+ * Warns when a dialog stacked on another one is not a `prompt`.
+ *
+ * Only `prompt` stacks. `panel` and `card` are root-level surfaces: they host a stack, and the
+ * styles that make one work — dropping the scrim, receding behind the surface above — exist for
+ * `prompt` alone, so a `panel` opened inside a dialog silently renders with neither.
+ *
+ * One rule stated on the child covers every case, without having to enumerate which sizes may
+ * host what.
+ */
+function useStackedSizeWarning(isStacked: boolean, size: DialogSize) {
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !isStacked || size === 'prompt') {
+      return;
+    }
+    console.warn(
+      `Mosaic: a Dialog opened inside another Dialog should be size="prompt", but this one is size="${size}". ` +
+        'Only prompts are styled to stack — this dialog will paint no backdrop and the surface beneath it will not recede.',
+    );
+  }, [isStacked, size]);
+}
+
 /** The dialog surface: `role="dialog"`, focus-trapped, and the element that paints. */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
   { className, style, ...rest },
   ref,
 ) {
   const size = React.useContext(DialogSizeContext);
+  const { isStacked } = useDialogContext();
   // Observed through state rather than a plain ref, because the warning has to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
   useAccessibleNameWarning(node, 'Dialog');
+  useStackedSizeWarning(isStacked, size);
 
   const mergedRef = React.useCallback(
     (element: HTMLDivElement | null) => {

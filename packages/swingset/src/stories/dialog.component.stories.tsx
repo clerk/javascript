@@ -154,7 +154,7 @@ function AddValueDialog({
   );
 }
 
-/** A `panel` account surface with `card` dialogs opened from inside it. */
+/** A `panel` account surface with `prompt` dialogs opened from inside it. */
 export function Nested() {
   return (
     <Dialog
@@ -251,6 +251,73 @@ const SESSIONS = Array.from({ length: 40 }, (_, index) => ({
   where: SESSION_PLACES[index % SESSION_PLACES.length],
   when: SESSION_TIMES[index % SESSION_TIMES.length],
 }));
+
+const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
+
+const discardTrigger = (props: RenderProps) => (
+  <Button
+    variant='outline'
+    {...props}
+  >
+    Cancel
+  </Button>
+);
+
+/**
+ * A prompt stacked on a prompt — the shape a close confirmation takes. The second prompt paints
+ * no scrim of its own; the one beneath it recedes instead.
+ */
+export function StackedPrompts() {
+  return (
+    <Dialog
+      trigger={editProfileTrigger}
+      closedBy='closerequest'
+    >
+      {({ close }) => (
+        <>
+          <Dialog.CloseButton />
+          <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
+          <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
+          <Input
+            defaultValue='Ada Lovelace'
+            placeholder='Your name'
+          />
+          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <Dialog
+              trigger={discardTrigger}
+              closedBy='closerequest'
+            >
+              {({ close: closeConfirmation }) => (
+                <>
+                  <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
+                  <Dialog.Description render={<Text />}>Your edits will be lost.</Dialog.Description>
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <Button
+                      variant='outline'
+                      onClick={closeConfirmation}
+                    >
+                      Keep editing
+                    </Button>
+                    <Button
+                      color='negative'
+                      onClick={() => {
+                        closeConfirmation();
+                        close();
+                      }}
+                    >
+                      Discard
+                    </Button>
+                  </div>
+                </>
+              )}
+            </Dialog>
+            <Button onClick={close}>Save</Button>
+          </div>
+        </>
+      )}
+    </Dialog>
+  );
+}
 
 /** The panel clips rather than scrolling, so the scroll region is composed inside it. */
 export function PanelSidebar() {
