@@ -78,6 +78,17 @@ const detail = Dialog.createHandle<{ name: string }>();
 </Dialog.Root>
 ```
 
+An open with no trigger behind it can supply the payload directly: `handle.open(payload)` is the
+programmatic counterpart, for a dialog raised by something that happened rather than by an element
+— a confirmation that has to say what it is asking. A trigger-driven open supersedes it, since a
+trigger names its own payload.
+
+```tsx
+const confirmation = Dialog.createHandle<{ question: string }>();
+
+confirmation.open({ question: 'Discard changes?' });
+```
+
 In controlled mode, track which trigger is active with `triggerId` — `onOpenChange`'s second
 argument reports the trigger behind each change:
 

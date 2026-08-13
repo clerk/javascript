@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import type { RenderProps } from '@clerk/headless/utils';
-import { AlertDialog } from '@clerk/ui/mosaic/components/alert-dialog';
+import { AlertDialog, createConfirmHandle, useConfirmedClose } from '@clerk/ui/mosaic/components/alert-dialog';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
@@ -62,75 +62,80 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
  * The case the stack was built for: a form prompt raising a confirmation over itself rather than
  * discarding what was typed.
  *
- * The veto is a controlled `open` whose `onOpenChange` declines to commit — every close request
- * lands there, so Escape, the corner X and `Dialog.Close` are all covered by the one branch. The
- * `AlertDialog` is rendered inside the dialog it guards, which is what puts the two in the same
- * floating tree: escape ordering, the stacking styles and the refcounted scroll lock all depend
- * on it.
+ * `useConfirmedClose` wraps the dialog's own `onOpenChange`, so every close the dialog owns —
+ * Escape, the corner X, `Dialog.Close` — is guarded by the one hook, and the veto is simply the
+ * absence of a commit. `AlertDialog.Confirm` renders inside the dialog it guards, which is what
+ * puts the two in the same floating tree: escape ordering, the stacking styles and the refcounted
+ * scroll lock all depend on it.
+ *
+ * `finalFocus` puts the caret back in the field. Without it there is nowhere to return to — the
+ * confirmation is raised by a close request rather than by a trigger — so keeping editing would
+ * leave focus on the body, at the top of the page rather than where the work was.
  */
 export function DiscardChanges() {
+  const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [open, setOpen] = React.useState(false);
-  const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const discard = () => {
-    setValue('');
-    setConfirmOpen(false);
-    setOpen(false);
-  };
+  const onOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => value.trim() !== '',
+    onOpenChange: next => {
+      setOpen(next);
+      if (!next) {
+        setValue('');
+      }
+    },
+    confirm: {
+      title: 'Discard changes?',
+      description: 'You have not finished adding this address. It will not be saved.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
 
   return (
     <Dialog
       trigger={addEmailTrigger}
       closedBy='closerequest'
       open={open}
-      onOpenChange={next => {
-        if (!next && value.trim() !== '') {
-          setConfirmOpen(true);
-          return;
-        }
-        setOpen(next);
-      }}
+      onOpenChange={onOpenChange}
     >
-      <Dialog.CloseButton />
-      <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
-      <Dialog.Description render={<Text />}>
-        You will need to verify this address before it can be used.
-      </Dialog.Description>
-      <Input
-        ref={inputRef}
-        placeholder='name@example.com'
-        value={value}
-        onChange={event => setValue(event.target.value)}
-      />
-      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-        <Button onClick={discard}>Add</Button>
-      </div>
+      {({ close }) => (
+        <>
+          <Dialog.CloseButton />
+          <Dialog.Title render={<Heading size='sm' />}>Add email address</Dialog.Title>
+          <Dialog.Description render={<Text />}>
+            You will need to verify this address before it can be used.
+          </Dialog.Description>
+          <Input
+            ref={inputRef}
+            placeholder='name@example.com'
+            value={value}
+            onChange={event => setValue(event.target.value)}
+          />
+          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+            {/* Adding is the one close that must NOT be questioned, so it clears the field the
+                guard reads before closing. */}
+            <Button
+              onClick={() => {
+                setValue('');
+                close();
+              }}
+            >
+              Add
+            </Button>
+          </div>
 
-      {/* `finalFocus` puts the caret back in the field. Without it there is nowhere to return to —
-          this alert is raised by the veto rather than by a trigger — so keeping editing would
-          leave focus on the body, at the top of the page rather than where the work was. */}
-      <AlertDialog
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        finalFocus={inputRef}
-      >
-        <AlertDialog.Title render={<Heading size='sm' />}>Discard changes?</AlertDialog.Title>
-        <AlertDialog.Description render={<Text />}>
-          You have not finished adding this address. It will not be saved.
-        </AlertDialog.Description>
-        <AlertDialog.Actions>
-          <AlertDialog.Close render={<Button variant='outline' />}>Keep editing</AlertDialog.Close>
-          <Button
-            color='negative'
-            onClick={discard}
-          >
-            Discard
-          </Button>
-        </AlertDialog.Actions>
-      </AlertDialog>
+          <AlertDialog.Confirm
+            handle={confirm}
+            finalFocus={inputRef}
+          />
+        </>
+      )}
     </Dialog>
   );
 }
