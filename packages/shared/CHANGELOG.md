@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.29.0
+
+### Minor Changes
+
+- Internal improvements to Clerk Protect. No action is required, and instances that do not use Protect are unaffected. ([#9299](https://github.com/clerk/javascript/pull/9299)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+### Patch Changes
+
+- Billing applied-discount snapshots now include optional `durationInCycles`. Payment attempt and statement UIs use the original discount length instead of cycles remaining, and omit the duration copy when it is unavailable. ([#9401](https://github.com/clerk/javascript/pull/9401)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Ensure organization permission checks remain accurate when JWT v2 permission masks exceed JavaScript's safe integer range. ([#9381](https://github.com/clerk/javascript/pull/9381)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
 ## 4.28.1
 
 ### Patch Changes
