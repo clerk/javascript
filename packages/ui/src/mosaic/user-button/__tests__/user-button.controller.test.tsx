@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { UserButton } from '../user-button';
+import { UserButton } from '../user-button.controller';
 import type { UserButtonModel } from '../user-button.model';
 
 let model: UserButtonModel;
