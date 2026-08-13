@@ -341,6 +341,9 @@ jobs:
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
         env:
           XDG_RUNTIME_DIR: /tmp/xdg-runtime
+          # Newer cmdline-tools default ANDROID_USER_HOME to ~/.config/.android,
+          # which diverges from the ~/.android paths used below and at boot.
+          ANDROID_USER_HOME: /home/runner/.android
         run: |
           sudo apt-get update -y
           # libgoogle-perftools ships libtcmalloc_minimal.so.4, which
@@ -388,6 +391,7 @@ jobs:
           ARGENT_EMULATOR_NO_WINDOW: '1'
           XDG_RUNTIME_DIR: /tmp/xdg-runtime
           WAYLAND_DISPLAY: wayland-0
+          ANDROID_USER_HOME: /home/runner/.android
           # The emulator's bundled Qt has no wayland plugin; offscreen keeps
           # it from SIGABRTing with WAYLAND_DISPLAY set.
           QT_QPA_PLATFORM: offscreen
