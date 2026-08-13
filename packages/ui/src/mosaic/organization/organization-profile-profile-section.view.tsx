@@ -36,8 +36,8 @@ export function OrganizationProfileProfileSectionView({
   const confirm = useMemo(() => createConfirmHandle(), []);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Closing this form used to discard the edits silently — Escape, or the corner X, and the typing
-  // was gone. Every close the dialog owns funnels through here, so one guard covers them all.
+  // Closing this form used to discard the edits silently — Escape, or Cancel, and the typing was
+  // gone. Every close the dialog owns funnels through here, so one guard covers them all.
   //
   // Not asked while saving: `CANCEL` is not a transition the `saving` state accepts, so the dialog
   // stays open regardless, and a question whose answer changes nothing is worse than no question.

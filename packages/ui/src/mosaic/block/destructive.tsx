@@ -108,6 +108,10 @@ export function Destructive({
               <Button
                 onClick={close}
                 variant='outline'
+                // The block enforces the invariant on the Dialog above rather than leaving it to
+                // each consumer's machine to drop a `CANCEL` it has no transition for: `closedBy`
+                // rules out Escape and outside press, and this is the only other way out.
+                disabled={isDeleting}
               >
                 Cancel
               </Button>
