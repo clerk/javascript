@@ -114,10 +114,11 @@ attributes, all of which apply unchanged. Only the response row is its own:
 }
 ```
 
-`AlertDialog.Actions` is a grid rather than a flex row, which is what lets the row change shape
-without the buttons knowing. From `48rem` up the tracks size to their labels and sit at the inline
-end. Below it — where a `prompt` is a bottom sheet spanning the screen — the tracks split the row
-evenly, so the buttons are full width rather than a pair floating against one edge.
+`AlertDialog.Actions` is a grid rather than a flex row, which is what lets one declaration cover
+both cases without the buttons knowing anything. Every button takes an equal share of the row, so a
+single action fills it and two split it in half, at every width — the convention for a `prompt`
+generally, not a rule about alert dialogs. Nothing about it is media-scoped, so a third button
+divides the same row into thirds rather than finding an edge case.
 
 ---
 
