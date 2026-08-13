@@ -37,7 +37,7 @@ describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
     expect(jwk).toMatchObject(mockPEMJwk);
   });
 
-  it('caches PEM keys separately for different kids', () => {
+  it('derives a separate JWK per kid', () => {
     const jwk1 = loadClerkJwkFromPem({ kid: 'ins_1', pem: mockPEMKey }) as JsonWebKey & { kid: string };
     expect(jwk1.kid).toBe('local-ins_1');
     expect(jwk1.n).toBe(mockPEMJwk.n);
@@ -45,37 +45,32 @@ describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
     const jwk2 = loadClerkJwkFromPem({ kid: 'ins_2', pem: mockPEMJwtKey }) as JsonWebKey & { kid: string };
     expect(jwk2.kid).toBe('local-ins_2');
     expect(jwk2.n).toBe(mockPEMJwk.n);
-
-    // Verify both are cached independently
-    const jwk1Cached = loadClerkJwkFromPem({ kid: 'ins_1', pem: mockPEMKey });
-    const jwk2Cached = loadClerkJwkFromPem({ kid: 'ins_2', pem: mockPEMJwtKey });
-
-    expect(jwk1Cached).toBe(jwk1);
-    expect(jwk2Cached).toBe(jwk2); // Same object reference means its cached
   });
 
-  it('returns cached JWK on subsequent calls with same kid', () => {
-    const jwk1 = loadClerkJwkFromPem({ kid: 'cache-test', pem: mockPEMKey });
-    const jwk2 = loadClerkJwkFromPem({ kid: 'cache-test', pem: mockPEMKey });
-    // Should return the exact same reference
-    expect(jwk1).toBe(jwk2);
+  // Regression test for SDK-148. A cache keyed on `kid` alone (an untrusted token-header
+  // value) served the first caller's key to every later caller presenting the same kid,
+  // regardless of the pem they supplied.
+  it('always derives the JWK from the provided pem, even for a previously seen kid', () => {
+    const otherModulus = 'x'.repeat(342);
+    const otherPem = `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA${otherModulus}IDAQAB`;
+
+    const jwkA = loadClerkJwkFromPem({ kid: 'ins_same_kid', pem: mockPEMKey }) as JsonWebKey & { kid: string };
+    expect(jwkA.n).toBe(mockPEMJwk.n);
+
+    const jwkB = loadClerkJwkFromPem({ kid: 'ins_same_kid', pem: otherPem }) as JsonWebKey & { kid: string };
+    expect(jwkB.n).toBe(otherModulus);
   });
 
-  it('uses "local-" prefix to avoid cache collision with remote keys', () => {
+  it('uses "local-" prefix to distinguish the JWK from remote keys', () => {
     const localJwk = loadClerkJwkFromPem({ kid: 'test-kid', pem: mockPEMKey }) as JsonWebKey & { kid: string };
     expect(localJwk.kid).toBe('local-test-kid');
   });
 
-  it('creates separate cache entries for different kids even with same PEM', () => {
-    // Two JWT keys might theoretically use the same PEM (unlikely but possible)
+  it('derives separate JWKs for different kids even with same PEM', () => {
     const jwkA = loadClerkJwkFromPem({ kid: 'ins_key_a', pem: mockPEMKey }) as JsonWebKey & { kid: string };
     const jwkB = loadClerkJwkFromPem({ kid: 'ins_key_b', pem: mockPEMKey }) as JsonWebKey & { kid: string };
 
-    // They should be different objects
-    expect(jwkA).not.toBe(jwkB);
-    // But have the same modulus
     expect(jwkA.n).toBe(jwkB.n);
-    // And different prefixed kids
     expect(jwkA.kid).toBe('local-ins_key_a');
     expect(jwkB.kid).toBe('local-ins_key_b');
   });
@@ -288,6 +283,68 @@ describe('tokens.loadClerkJWKFromRemote(options)', () => {
     await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_a', kid: mockRsaJwkKid });
     await loadClerkJWKFromRemote({ secretKey: 'sk_ttl_b', kid: mockRsaJwkKid });
     expect(fetchCount).toBe(2);
+  });
+
+  it('keeps a separate cache per apiUrl', async () => {
+    const fetches = { com: 0, test: 0 };
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          fetches.com++;
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          fetches.test++;
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_url', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ com: 1, test: 0 });
+
+    // The same kid under another apiUrl must not be served from the first scope's cache.
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_url', apiUrl: 'https://api.clerk.test', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ com: 1, test: 1 });
+
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_url', kid: mockRsaJwkKid });
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_url', apiUrl: 'https://api.clerk.test', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ com: 1, test: 1 });
+  });
+
+  it('keeps a separate cache per apiVersion', async () => {
+    const fetches = { v1: 0, v2: 0 };
+    server.use(
+      http.get(
+        'https://api.clerk.com/v1/jwks',
+        validateHeaders(() => {
+          fetches.v1++;
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+      http.get(
+        'https://api.clerk.com/v2/jwks',
+        validateHeaders(() => {
+          fetches.v2++;
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_version', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ v1: 1, v2: 0 });
+
+    // The same kid under another apiVersion must not be served from the first scope's cache.
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_version', apiVersion: 'v2', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ v1: 1, v2: 1 });
+
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_version', kid: mockRsaJwkKid });
+    await loadClerkJWKFromRemote({ secretKey: 'sk_api_version', apiVersion: 'v2', kid: mockRsaJwkKid });
+    expect(fetches).toEqual({ v1: 1, v2: 1 });
   });
 
   it('cache TTLs do not conflict', async () => {

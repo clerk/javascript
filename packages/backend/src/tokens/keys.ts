@@ -33,15 +33,18 @@ type RemoteJwksCache = {
  */
 const remoteCaches = new Map<string, RemoteJwksCache>();
 
-/** Local PEM keys are not tied to a secret key, and never expire. */
-const localCache: JsonWebKeyCache = {};
-
 /**
  * The scope is held in memory only as a Map key. It is never logged or surfaced in errors.
  */
 function getRemoteCache(scope: string): RemoteJwksCache {
   let cache = remoteCaches.get(scope);
   if (!cache) {
+    // Evict expired scopes on new-scope creation so one-off scopes cannot grow the Map forever.
+    for (const [key, entry] of remoteCaches) {
+      if (cacheHasExpired(entry)) {
+        remoteCaches.delete(key);
+      }
+    }
     cache = { keys: {}, lastUpdatedAt: 0 };
     remoteCaches.set(scope, cache);
   }
@@ -60,20 +63,11 @@ type LoadClerkJwkFromPemOptions = {
 
 /**
  * Loads a local PEM key usually from process.env and transform it to JsonWebKey format.
- * The result is cached on the module level to avoid unnecessary computations in subsequent invocations.
+ * Derived fresh on every call: a cache keyed on `kid` (which comes from the untrusted token
+ * header) served one instance's key to another instance's verifier, and derivation is cheap.
  */
 export function loadClerkJwkFromPem(params: LoadClerkJwkFromPemOptions): JsonWebKey {
   const { kid, pem } = params;
-
-  // We use a cache key that includes the local prefix in order to avoid
-  // cache conflicts when loadClerkJwkFromPem and loadClerkJWKFromRemote
-  // are called with the same kid
-  const prefixedKid = `local-${kid}`;
-  const cachedJwk = localCache[prefixedKid];
-
-  if (cachedJwk) {
-    return cachedJwk;
-  }
 
   if (!pem) {
     throw new TokenVerificationError({
@@ -93,8 +87,8 @@ export function loadClerkJwkFromPem(params: LoadClerkJwkFromPemOptions): JsonWeb
     .replace(/\//g, '_');
 
   // https://datatracker.ietf.org/doc/html/rfc7517
-  const jwk = { kid: prefixedKid, kty: 'RSA', alg: 'RS256', n: modulus, e: 'AQAB' };
-  localCache[prefixedKid] = jwk;
+  // The 'local-' kid prefix distinguishes locally derived JWKs from remote ones.
+  const jwk: JsonWebKeyWithKid = { kid: `local-${kid}`, kty: 'RSA', alg: 'RS256', n: modulus, e: 'AQAB' };
   return jwk;
 }
 
