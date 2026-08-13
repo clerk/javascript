@@ -257,16 +257,16 @@ other size.
 
 A stacked dialog carries `data-stacked` and paints **no** scrim: one backdrop serves the whole
 stack, so how dark the page goes never depends on how deep the stack is. The dialog beneath carries
-`data-stack-base`, and if it is a `prompt` it recedes — scaling down slightly and lifting, with its
-radius divided by the same factor so the corners render unchanged. That recede and the stacked
-surface's own shadow are the entire depth cue, so a stacked prompt over a `panel` (which never
-recedes) leans on the shadow alone.
+`data-stack-base`, and its contents dim toward its own background — enough on its own to read as a
+layer further back, which is what a `panel` gets, since a panel never moves. A `prompt` also
+recedes, scaling down slightly and lifting, with its radius divided by the same factor so the
+corners render unchanged.
 
 `data-stacked` is narrower than the older `data-nested`, which reports any floating ancestor: a
 dialog opened from a menu item is nested but not stacked, and still owns its scrim.
 
-Under `prefers-reduced-motion: reduce` nothing recedes — the surface beneath holds still and the
-stacked one simply appears over it.
+Under `prefers-reduced-motion: reduce` nothing recedes — the surface beneath holds still, keeping
+the dimming as its only cue.
 
 ---
 
@@ -355,7 +355,8 @@ prompt.
   storyModule={DialogStories}
 />
 
-A `panel` never recedes, so what separates the two levels here is the prompt's own shadow.
+A `panel` never recedes, so what separates the two levels here is the dimming and the prompt's own
+shadow.
 
 Stack a prompt on a prompt and the one beneath moves instead — the shape a close confirmation
 takes:

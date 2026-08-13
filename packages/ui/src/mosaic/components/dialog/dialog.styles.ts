@@ -2,6 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
 
+// How far the surface beneath a stacked prompt is veiled toward its own background. Declared up
+// here because `styles.popup` needs it; it belongs with `STACK_SCALE` / `STACK_LIFT` further down,
+// which drive the other half of the same effect.
+const STACK_VEIL_OPACITY = 0.4;
+
 export const styles = stylex.create({
   // The scrim. A black wash over `transparent` rather than a percentage of a neutral
   // token: it composites over whatever the host app renders, so the same value reads
@@ -87,6 +92,30 @@ export const styles = stylex.create({
   // raw content rather than a `Card` and the surface has to come from somewhere. `sizes.card`
   // nulls the painting properties back out — see the note there.
   popup: {
+    /**
+     * The other half of the recede: while a prompt is stacked on this surface, its contents dim
+     * toward the surface's own background, so the layer beneath reads as further back rather than
+     * merely smaller.
+     *
+     * A veil rather than `opacity` on the popup, because those are different effects. Fading the
+     * popup fades the SURFACE — its background and its shadow — and the scrim shows through, which
+     * reads as the dialog dissolving. Painting the background colour back over the contents leaves
+     * the surface at full strength and dims only what sits on it.
+     *
+     * Driven by a private custom property rather than by a state branch on the pseudo-element:
+     * a `:where()` nested inside a `::after` block would describe the pseudo-element's own state,
+     * not the popup's. Setting the variable on the popup — where the state actually lives — and
+     * reading it here is the only shape that says what is meant.
+     *
+     * `zIndex` so it also covers `Dialog.CloseButton`, which is positioned and would otherwise
+     * paint over it and stay undimmed. Never interactive: the whole subtree is inert while a
+     * stacked dialog holds focus, and `pointer-events: none` keeps it that way regardless.
+     *
+     * Kept under `prefers-reduced-motion: reduce`, where the recede is dropped. A cross-fade is
+     * not the kind of motion that setting is about, and without it that mode would have no depth
+     * cue at all.
+     */
+    '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
     padding: space['6'],
     // Forced-colors mode discards `box-shadow` outright, and the ring above is the only thing
     // separating the surface from the page — so in HCM the dialog would float edgeless over its
@@ -130,6 +159,20 @@ export const styles = stylex.create({
     // The containing block for `Dialog.CloseButton`.
     position: 'relative',
     width: '100%',
+    '::after': {
+      inset: 0,
+      // Follows the popup's own radius, counter-scale included.
+      borderRadius: 'inherit',
+      backgroundColor: colorVars['--cl-color-card'],
+      content: '""',
+      opacity: 'var(--_cl-stack-veil)',
+      pointerEvents: 'none',
+      position: 'absolute',
+      transitionDuration: durationVars['--cl-duration-base'],
+      transitionProperty: 'opacity',
+      transitionTimingFunction: easingVars['--cl-ease-enter'],
+      zIndex: 1,
+    },
   },
 
   /**
