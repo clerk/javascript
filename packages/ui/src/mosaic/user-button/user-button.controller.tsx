@@ -1,3 +1,4 @@
+import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
 import type { OrganizationResource, UserResource } from '@clerk/shared/types';
@@ -240,8 +241,21 @@ export function useUserButtonController(options?: UserButtonControllerOptions): 
     },
     onSelectOrganization: organizationId =>
       clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
+    // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
+    // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
     onSwitchSession: sessionId =>
-      clerk.setActive({ session: sessionId, redirectUrl: displayConfig.afterSwitchSessionUrl }),
+      clerk.setActive({
+        session: sessionId,
+        navigate: async ({ session, decorateUrl }) => {
+          const task = session.currentTask;
+          if (task) {
+            await router.navigate(buildTaskUrl(task, { base: clerk.buildSignInUrl() }));
+            return;
+          }
+          // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+          await router.navigate(decorateUrl(displayConfig.afterSwitchSessionUrl));
+        },
+      }),
     onSignOutSession: sessionId =>
       clerk.signOut({
         sessionId,

@@ -577,6 +577,30 @@ describe('useUserButtonController', () => {
     expect(signOut).toHaveBeenCalledWith({ sessionId: 'sess_2', redirectUrl: '/after-sign-out' });
   });
 
+  // The session switched to can land on a task of its own. A plain `redirectUrl` routes past it and
+  // strands the account, so the switch hands `setActive` a callback that answers both cases.
+  it('routes a switched session to its pending task, and to the after-switch URL when it has none', async () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByText('switch'));
+
+    expect(setActive).toHaveBeenCalledWith({ session: 'sess_2', navigate: expect.any(Function) });
+    const navigateOnSetActive = setActive.mock.calls[0][0].navigate;
+    const decorateUrl = vi.fn((url: string) => url);
+
+    await act(async () => {
+      await navigateOnSetActive({ session: { currentTask: { key: 'choose-organization' } }, decorateUrl });
+    });
+    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/sign-in'));
+    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/tasks/choose-organization'));
+
+    await act(async () => {
+      await navigateOnSetActive({ session: { currentTask: null }, decorateUrl });
+    });
+    expect(navigate).toHaveBeenCalledWith('/after-switch');
+    // `redirectUrl` was decorated for us; taking the callback takes the Safari ITP refresh with it.
+    expect(decorateUrl).toHaveBeenCalledWith('/after-switch');
+  });
+
   // An instance can restrict who may open an organization, and a user at their creation limit is
   // restricted the same way. Offering the action anyway lands them on a page that turns them away.
   it('drops create-organization for a user who cannot open one', () => {
