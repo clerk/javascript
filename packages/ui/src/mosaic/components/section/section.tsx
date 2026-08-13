@@ -17,7 +17,7 @@ export type SectionGroupProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'div'>;
 export type SectionItemProps = MosaicComponentProps<'div'>;
-export type SectionMediaSize = 'sm' | 'md' | 'lg';
+export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
 export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'>;
@@ -33,13 +33,19 @@ const styles = stylex.create({
     rowGap: space['2'],
     width: '100%',
   },
+  title: {
+    alignItems: 'center',
+    display: 'flex',
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    minHeight: space['8'],
+  },
   group: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-card'],
     width: '100%',
   },
   row: {
@@ -52,12 +58,16 @@ const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
+    minHeight: '75px',
     paddingBlockEnd: {
       default: space['4'],
       [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
     },
     paddingBlockStart: space['4'],
-    rowGap: space['2'],
+    rowGap: {
+      default: space['2'],
+      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['3'],
+    },
     width: 'auto',
   },
   items: {
@@ -74,7 +84,7 @@ const styles = stylex.create({
     width: '100%',
   },
   nestedItem: {
-    minHeight: space['11'],
+    paddingBlock: space['1'],
   },
   mediaBase: {
     alignItems: 'center',
@@ -96,6 +106,10 @@ const styles = stylex.create({
     height: space['8'],
     width: space['8'],
   },
+  mediaXl: {
+    height: space['10'],
+    width: space['10'],
+  },
   content: {
     display: 'flex',
     flexDirection: 'column',
@@ -103,9 +117,6 @@ const styles = stylex.create({
     justifyContent: 'center',
     rowGap: space['0.5'],
     minWidth: 0,
-  },
-  nestedContent: {
-    paddingBlock: space['3'],
   },
   label: {
     color: colorVars['--cl-color-card-foreground'],
@@ -116,7 +127,7 @@ const styles = stylex.create({
   description: {
     color: colorVars['--cl-color-neutral-faded'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'balance',
   },
@@ -134,6 +145,7 @@ const mediaSizes = {
   sm: styles.mediaSm,
   md: styles.mediaMd,
   lg: styles.mediaLg,
+  xl: styles.mediaXl,
 };
 
 const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
@@ -183,7 +195,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       id={id}
       render={render ?? (props => <h4 {...props} />)}
       size='sm'
-      {...mergeStyleProps(themeProps('section-title'), className, style)}
+      {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title), className, style)}
       {...rest}
     />
   );
@@ -296,7 +308,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
     props: {
       ...mergeStyleProps(
         themeProps('section-content', { nested }),
-        stylex.props(reset.base, styles.content, nested && styles.nestedContent),
+        stylex.props(reset.base, styles.content),
         className,
         style,
       ),
