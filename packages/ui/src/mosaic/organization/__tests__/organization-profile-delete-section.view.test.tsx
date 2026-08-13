@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Snapshot } from '../../machine/types';
@@ -95,5 +96,36 @@ describe('OrganizationProfileDeleteSectionView', () => {
     );
 
     expect(screen.getByText('Delete failed')).toBeInTheDocument();
+  });
+  // The delete request cannot be called back, so nothing may dismiss the dialog while it is in
+  // flight — closing would leave it running behind a surface that is gone. Asserted on the event
+  // rather than on the dialog going away: `open` is controlled from the machine, which is mocked
+  // here, so the surface stays either way and only the request to close distinguishes them.
+  it('does not request a close while the delete is in flight', async () => {
+    const user = userEvent.setup();
+    const { send } = renderView(
+      snapshot({
+        value: 'deleting',
+        context: {
+          organizationName: 'Acme Inc',
+          confirmationValue: 'Acme Inc',
+          destroyOrganization: async () => {},
+          error: null,
+        },
+      }),
+    );
+
+    await user.keyboard('{Escape}');
+
+    expect(send).not.toHaveBeenCalledWith({ type: 'CANCEL' });
+  });
+
+  it('still dismisses with Escape before the delete starts', async () => {
+    const user = userEvent.setup();
+    const { send } = renderView(snapshot());
+
+    await user.keyboard('{Escape}');
+
+    expect(send).toHaveBeenCalledWith({ type: 'CANCEL' });
   });
 });

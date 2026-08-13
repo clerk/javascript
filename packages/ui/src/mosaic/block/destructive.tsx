@@ -56,7 +56,11 @@ export function Destructive({
 
   return (
     <Dialog
-      closedBy='closerequest'
+      // Nothing dismisses this while the delete is in flight. The request cannot be called back, so
+      // closing would leave it running behind a surface that is gone — and there is no question
+      // worth asking either, since the answer changes nothing. `closerequest` the rest of the time:
+      // a stray backdrop click must not discard the resource name the user typed to confirm.
+      closedBy={isDeleting ? 'none' : 'closerequest'}
       open={open}
       onOpenChange={onOpenChange}
       trigger={trigger}

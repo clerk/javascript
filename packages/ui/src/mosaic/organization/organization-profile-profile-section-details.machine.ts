@@ -35,6 +35,13 @@ const dataChanged = (context: OrganizationProfileProfileSectionDetailsContext): 
   effectiveName(context) !== context.committedName ||
   (context.slugEnabled && effectiveSlug(context) !== context.committedSlug);
 
+/**
+ * Whether closing would throw away work. Exported so the view can ask before letting a close
+ * through, while the definition of "changed" stays here with the guard that already depends on it —
+ * the two must not be able to disagree about what an edit is.
+ */
+export const hasUnsavedEdits = dataChanged;
+
 const canSave = (context: OrganizationProfileProfileSectionDetailsContext): boolean =>
   dataChanged(context) && effectiveName(context).trim() !== '';
 

@@ -1,5 +1,7 @@
 import type { FormEvent } from 'react';
+import { useMemo, useRef } from 'react';
 
+import { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
 import { Box } from '../components/box';
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
@@ -10,6 +12,7 @@ import type {
   OrganizationProfileProfileSectionDetailsContext,
   OrganizationProfileProfileSectionDetailsEvent,
 } from './organization-profile-profile-section-details.machine';
+import { hasUnsavedEdits } from './organization-profile-profile-section-details.machine';
 
 interface OrganizationProfileProfileSectionViewProps {
   snapshot: Snapshot<OrganizationProfileProfileSectionDetailsContext>;
@@ -29,6 +32,27 @@ export function OrganizationProfileProfileSectionView({
   // The draft holds the user's edits; a null draft falls through to the committed value.
   const nameValue = draftName ?? committedName;
   const slugValue = draftSlug ?? committedSlug;
+
+  const confirm = useMemo(() => createConfirmHandle(), []);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Closing this form used to discard the edits silently — Escape, or the corner X, and the typing
+  // was gone. Every close the dialog owns funnels through here, so one guard covers them all.
+  //
+  // Not asked while saving: `CANCEL` is not a transition the `saving` state accepts, so the dialog
+  // stays open regardless, and a question whose answer changes nothing is worse than no question.
+  const onOpenChange = useConfirmedClose({
+    handle: confirm,
+    when: () => !isSaving && hasUnsavedEdits(snapshot.context),
+    onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
+    confirm: {
+      title: 'Discard changes?',
+      description: 'The edits to this profile have not been saved.',
+      actionLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    },
+  });
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -82,7 +106,7 @@ export function OrganizationProfileProfileSectionView({
         <Dialog
           closedBy='closerequest'
           open={isOpen}
-          onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+          onOpenChange={onOpenChange}
           trigger={props => (
             <Button
               variant='outline'
@@ -118,6 +142,7 @@ export function OrganizationProfileProfileSectionView({
             >
               Name
               <Input
+                ref={nameInputRef}
                 value={nameValue}
                 onChange={e => send({ type: 'TYPE_NAME', value: e.target.value })}
                 disabled={isSaving}
@@ -150,13 +175,19 @@ export function OrganizationProfileProfileSectionView({
                 columnGap: t.spacing(2),
               })}
             >
-              <Button
-                onClick={() => send({ type: 'CANCEL' })}
-                variant='outline'
-                disabled={isSaving}
+              {/* `Dialog.Close`, not a bare `send({ type: 'CANCEL' })`. A button that closes the
+                  form itself goes around `onOpenChange`, which is where the unsaved-edits guard
+                  lives — this was the one way out that discarded the edits without asking. */}
+              <Dialog.Close
+                render={
+                  <Button
+                    variant='outline'
+                    disabled={isSaving}
+                  />
+                }
               >
                 Cancel
-              </Button>
+              </Dialog.Close>
               <Button
                 type='submit'
                 disabled={!canSubmit}
@@ -165,6 +196,10 @@ export function OrganizationProfileProfileSectionView({
               </Button>
             </Box>
           </form>
+          <AlertDialog.Confirm
+            handle={confirm}
+            finalFocus={nameInputRef}
+          />
         </Dialog>
       </Box>
     </Box>
