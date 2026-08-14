@@ -1,3 +1,5 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
 package expo.modules.clerk
 
 import android.content.Context
@@ -6,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.ClerkConfigurationOptions
+import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
@@ -135,7 +138,10 @@ class ClerkExpoModule : Module() {
             }
         }
 
-        return ClerkConfigurationOptions(proxyUrl = proxyUrl).withCustomHeaders(customHeaders)
+        // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
+        return ClerkConfigurationOptions(proxyUrl = proxyUrl)
+            .withForegroundRefreshDisabled()
+            .withCustomHeaders(customHeaders)
     }
 
     private fun startClientStateObserver() {

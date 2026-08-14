@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
 import { Heading } from '@clerk/ui/mosaic/components/heading';
@@ -15,7 +14,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Popover',
   source: 'packages/ui/src/mosaic/components/popover/popover.tsx',
-  styleEngine: 'stylex',
 };
 
 export function Default() {

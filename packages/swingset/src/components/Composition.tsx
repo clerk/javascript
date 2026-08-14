@@ -5,15 +5,15 @@ import Link from 'next/link';
 export interface CompositionPiece {
   /** Display name of the piece (e.g. `Destructive`). */
   name: string;
-  /** Route to the piece's page in swingset (e.g. `/blocks/destructive`). */
+  /** Route to the piece's page in swingset (e.g. `/components/button`). */
   href: string;
-  /** Which Mosaic layer the piece lives in (e.g. `Blocks`, `Components`, `Primitives`). */
+  /** Which Mosaic layer the piece lives in (e.g. `User`, `Components`, `Primitives`). */
   layer: string;
 }
 
 // Mosaic layers, high → low. Drives the order the composition groups render in.
 // Matches the sidebar group names.
-const LAYER_ORDER = ['Organization', 'Blocks', 'Components', 'Primitives'];
+const LAYER_ORDER = ['User', 'Components', 'Styles', 'Primitives'];
 
 function layerRank(layer: string): number {
   const i = LAYER_ORDER.indexOf(layer);

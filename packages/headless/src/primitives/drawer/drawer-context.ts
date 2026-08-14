@@ -1,5 +1,6 @@
 'use client';
 
+import type { UseInteractionsReturn } from '@floating-ui/react';
 import { createContext, type PointerEventHandler, useContext } from 'react';
 
 import type { DialogContextValue } from '../dialog/dialog-context';
@@ -26,7 +27,11 @@ export interface NestedDrawerCallbacks {
   onNestedRelease: (childOpen: boolean) => void;
 }
 
-export interface DrawerContextValue extends DialogContextValue {
+// The dialog-only members are dropped: the drawer has no trigger registry (its detached
+// triggers go through `DrawerHandle`), and its triggers still wire through floating-ui's
+// reference props, which the dialog's no longer do.
+export interface DrawerContextValue extends Omit<DialogContextValue, 'store'> {
+  getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   backdropRef: React.RefObject<HTMLDivElement | null>;
   drag: DrawerDrag;
   /** When true (default), a downward release past threshold closes the drawer. */
@@ -44,8 +49,6 @@ export interface DrawerContextValue extends DialogContextValue {
   snapRestOffset: number | null;
   /** Callbacks a nested child `Drawer.Root` invokes on this (parent) drawer. */
   onNested: NestedDrawerCallbacks;
-  /** True when this drawer is itself nested inside another drawer. */
-  isNested: boolean;
   /** How many direct nested child drawers are currently open. */
   nestedOpenCount: number;
 }

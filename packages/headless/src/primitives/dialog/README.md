@@ -45,6 +45,80 @@ const [open, setOpen] = useState(false);
 <Dialog.Root modal={false}>{/* Focus is not trapped, page remains interactive */}</Dialog.Root>
 ```
 
+### Detached triggers
+
+A trigger does not have to be nested inside its root. `Dialog.createHandle()` returns a handle;
+pass the same handle to both, and the trigger drives the root from anywhere in the tree. The
+handle also has imperative `open()` / `close()` / `isOpen` members; calls made while no root is
+mounted are ignored.
+
+```tsx
+const feedbackDialog = Dialog.createHandle();
+
+<Dialog.Trigger handle={feedbackDialog}>Give feedback</Dialog.Trigger>;
+
+<Dialog.Root handle={feedbackDialog}>{/* ... */}</Dialog.Root>;
+```
+
+### Multiple triggers and payloads
+
+Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
+the active trigger's payload, so one dialog renders per-trigger content. Type the payload through
+the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
+dialog; for data that can change while it is open, carry an id and read live state inside.
+
+```tsx
+const detail = Dialog.createHandle<{ name: string }>();
+
+<Dialog.Trigger handle={detail} id='a' payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
+<Dialog.Trigger handle={detail} id='b' payload={{ name: 'Bob' }}>Bob</Dialog.Trigger>
+
+<Dialog.Root handle={detail}>
+  {({ payload }) => <Dialog.Popup>{payload?.name}</Dialog.Popup>}
+</Dialog.Root>
+```
+
+In controlled mode, track which trigger is active with `triggerId` — `onOpenChange`'s second
+argument reports the trigger behind each change:
+
+```tsx
+const [open, setOpen] = useState(false);
+const [triggerId, setTriggerId] = useState<string | null>(null);
+
+<Dialog.Root
+  open={open}
+  triggerId={triggerId}
+  onOpenChange={(next, details) => {
+    setOpen(next);
+    setTriggerId(details.triggerId);
+  }}
+>
+  {/* ... */}
+</Dialog.Root>;
+```
+
+Setting `triggerId` alongside a programmatic `open` also attributes the open to that trigger —
+the dialog returns focus to it on close, exactly as if it had been clicked.
+
+### Custom focus management
+
+`initialFocus` and `finalFocus` on `Dialog.Popup` control where focus moves on open and close.
+Each accepts `true` (the default behaviour), `false` (do not move focus), a ref, or a function of
+the interaction type behind the open/close (`'mouse' | 'touch' | 'pen' | 'keyboard' | ''`, empty
+for programmatic) returning any of those:
+
+```tsx
+<Dialog.Popup
+  initialFocus={interactionType => (interactionType === 'keyboard' ? firstFieldRef.current : false)}
+  finalFocus={finalFocusRef}
+>
+  {/* ... */}
+</Dialog.Popup>
+```
+
+The defaults stay what they were: first tabbable element on open; on close, the trigger — unless
+the close was pointer-driven, where focus is left where the pointer put it (see `useReturnFocus`).
+
 ## Parts
 
 | Part                 | Default Element | Description                                     |
@@ -63,12 +137,38 @@ const [open, setOpen] = useState(false);
 
 ### `Dialog.Root`
 
-| Prop           | Type                      | Default | Description                             |
-| -------------- | ------------------------- | ------- | --------------------------------------- |
-| `open`         | `boolean`                 | —       | Controlled open state                   |
-| `defaultOpen`  | `boolean`                 | `false` | Initial open state (uncontrolled)       |
-| `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes          |
-| `modal`        | `boolean`                 | `true`  | Traps focus and blocks page interaction |
+| Prop           | Type                                                        | Default | Description                                                           |
+| -------------- | ----------------------------------------------------------- | ------- | --------------------------------------------------------------------- |
+| `open`         | `boolean`                                                   | —       | Controlled open state                                                 |
+| `defaultOpen`  | `boolean`                                                   | `false` | Initial open state (uncontrolled)                                     |
+| `onOpenChange` | `(open: boolean, details: DialogOpenChangeDetails) => void` | —       | Called when open state changes; `details` names the trigger behind it |
+| `modal`        | `boolean`                                                   | `true`  | Traps focus and blocks page interaction                               |
+| `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'` | Which gestures dismiss the dialog                                     |
+| `handle`       | `DialogHandle`                                              | —       | Connects detached triggers (see `Dialog.createHandle()`)              |
+| `triggerId`    | `string \| null`                                            | —       | Controls which trigger the open is attributed to                      |
+| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —       | Content, or a render function of the active trigger's `payload`       |
+
+#### `closedBy`
+
+Mirrors the native `<dialog closedby>` attribute.
+
+| Value          | Escape | Outside press | Programmatic |
+| -------------- | ------ | ------------- | ------------ |
+| `any`          | ✅     | ✅            | ✅           |
+| `closerequest` | ✅     | ❌            | ✅           |
+| `none`         | ❌     | ❌            | ✅           |
+
+```tsx
+// A form dialog: Escape backs out, a stray backdrop click doesn't discard input.
+<Dialog.Root closedBy='closerequest'>{/* ... */}</Dialog.Root>
+```
+
+Reach for `closerequest` on anything holding user input or confirming a destructive action.
+Reserve `none` for flows the user genuinely must complete or explicitly acknowledge — it removes
+the keyboard exit, so it fails the usual expectation that Escape dismisses a modal.
+
+A single ordered enum rather than two booleans: it keeps the fourth combination — outside press
+dismisses but Escape does not — unrepresentable.
 
 ### `Dialog.Portal`
 
@@ -84,7 +184,24 @@ When `root` is provided, the dialog is portaled into that container instead of `
 | ------------ | --------- | ------- | ------------------------------- |
 | `lockScroll` | `boolean` | `true`  | Prevents body scroll while open |
 
-### `Dialog.Backdrop`, `Dialog.Trigger`, `Dialog.Popup`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
+### `Dialog.Trigger`
+
+| Prop      | Type           | Default | Description                                              |
+| --------- | -------------- | ------- | -------------------------------------------------------- |
+| `handle`  | `DialogHandle` | —       | Drives a root elsewhere in the tree (detached trigger)   |
+| `id`      | `string`       | auto    | Names this trigger for the root's `triggerId`            |
+| `payload` | `Payload`      | —       | Delivered to the root's children render function on open |
+
+### `Dialog.Popup`
+
+| Prop           | Type                | Default | Description                             |
+| -------------- | ------------------- | ------- | --------------------------------------- |
+| `initialFocus` | `DialogFocusTarget` | `true`  | Where focus moves when the dialog opens |
+| `finalFocus`   | `DialogFocusTarget` | `true`  | Where focus returns when it closes      |
+
+`DialogFocusTarget` is `boolean | RefObject | (interactionType) => boolean | void | HTMLElement | null`.
+
+### `Dialog.Backdrop`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
 
 No additional props beyond standard HTML attributes and the `render` prop.
 
@@ -97,9 +214,14 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute                   | Applies To                         | Description |
-| --------------------------- | ---------------------------------- | ----------- |
-| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state  |
+| Attribute                   | Applies To                         | Description                                 |
+| --------------------------- | ---------------------------------- | ------------------------------------------- |
+| `data-open` / `data-closed` | Trigger, Backdrop, Viewport, Popup | Open state                                  |
+| `data-nested`               | Backdrop, Viewport, Popup          | Opened from inside another floating element |
+
+`data-nested` is what a stacked overlay styles itself from — chiefly so backdrops don't composite
+into an ever-darker scrim as the stack grows. It reflects any floating ancestor, not strictly a
+dialog one: the `FloatingTree` a Menu or Popover establishes counts too.
 
 The headless parts are unstyled. Target a part with your own className (or `render` prop) and combine it with the `data-*` state attributes above.
 
@@ -107,7 +229,7 @@ The headless parts are unstyled. Target a part with your own className (or `rend
 
 - **`Dialog.Popup` should be a child of `Dialog.Viewport`** for centered, scroll-locked modal behavior. The viewport hosts the fixed overlay container; the popup alone does not handle positioning or scroll lock.
 - **Title and Description are optional but recommended.** If omitted, `aria-labelledby` / `aria-describedby` are simply absent from the popup.
-- **Nested dialogs are supported.** The `FloatingTree` pattern handles nesting automatically.
+- **Nested dialogs are supported**, and covered by tests. The `FloatingTree` pattern handles it: `useDismiss` blocks both Escape and outside-press on a parent while any child is open, and `FloatingOverlay`'s scroll lock is refcounted, so the body stays locked until the last dialog closes.
 - **No positioning middleware.** Dialogs are centered via CSS, not Floating UI positioning.
 
 ## Authoring rule for new primitives

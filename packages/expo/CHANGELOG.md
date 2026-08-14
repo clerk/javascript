@@ -1,5 +1,65 @@
 # Change Log
 
+## 4.2.8
+
+### Patch Changes
+
+- Fix a race on Android where the native module refreshed the client every time the app returned to the foreground, which could mint a duplicate client during browser SSO completion and cause `401 authentication_invalid` errors right after signing in. The native SDK is now initialized with its foreground client refresh disabled, since the JavaScript layer owns client state. Session token refresh and shared session sync are unaffected. ([#9438](https://github.com/clerk/javascript/pull/9438)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.0` to `1.1.2`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.2. ([#9445](https://github.com/clerk/javascript/pull/9445)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.8` to `1.3.9`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.9. ([#9423](https://github.com/clerk/javascript/pull/9423)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`81840b3`](https://github.com/clerk/javascript/commit/81840b3b28bf89fdd6afcc155a84bc641dcd3b69), [`b7fb564`](https://github.com/clerk/javascript/commit/b7fb56455a657b209c0bb292bf05145e6dcde790), [`44edcc9`](https://github.com/clerk/javascript/commit/44edcc961664e83b8ff7d3c946b880fbb5a7d897)]:
+  - @clerk/shared@4.29.0
+  - @clerk/clerk-js@6.29.0
+  - @clerk/react@6.14.2
+
+## 4.2.7
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.0.39` to `1.1.0`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.0. ([#9400](https://github.com/clerk/javascript/pull/9400)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Align Android OkHttp dependencies to compatible versions so Clerk native networking and React Native can run without a mixed OkHttp 4 and 5 classpath. ([#9371](https://github.com/clerk/javascript/pull/9371)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.2.6
+
+### Patch Changes
+
+- Add an experimental `ClerkProvider` option to disable native client synchronization when Clerk native components are not used. ([#9396](https://github.com/clerk/javascript/pull/9396)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.6` to `1.3.7`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.7. ([#9390](https://github.com/clerk/javascript/pull/9390)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.7` to `1.3.8`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.3.8. ([#9395](https://github.com/clerk/javascript/pull/9395)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.28.1
+
+## 4.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`131edec`](https://github.com/clerk/javascript/commit/131edec6fe84830ea76f2f0a1a21cf5a0618ff6c)]:
+  - @clerk/clerk-js@6.28.1
+  - @clerk/shared@4.28.1
+  - @clerk/react@6.14.1
+
+## 4.2.4
+
+### Patch Changes
+
+- Keep a cached environment when the app starts offline and only the client cache is empty. Previously both resources fell back to placeholder data, so instance settings were lost until the app was restarted with a working network. ([#9284](https://github.com/clerk/javascript/pull/9284)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Repeated unauthenticated responses now share one native recovery attempt within a few seconds of each other, instead of reading native state and refetching the client for every response.
+
+  Fix the `tokenCache` prop documentation: the cache stores the client JWT, not the session token.
+
+- Updated dependencies [[`aa86d9f`](https://github.com/clerk/javascript/commit/aa86d9f39c93514ecd9db9b44db403dd0a5046d4), [`8c61153`](https://github.com/clerk/javascript/commit/8c61153bc69b3e677613ab3e1e4c45948cf93405), [`52ec5cd`](https://github.com/clerk/javascript/commit/52ec5cd29343f6fe068fccb1b8c9ee52c97d9332), [`6464fe7`](https://github.com/clerk/javascript/commit/6464fe7b4889a9c87ea594d2491731e137a51d20)]:
+  - @clerk/clerk-js@6.28.0
+  - @clerk/shared@4.28.0
+  - @clerk/react@6.14.0
+
 ## 4.2.3
 
 ### Patch Changes

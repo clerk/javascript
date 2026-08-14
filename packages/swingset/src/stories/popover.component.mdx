@@ -145,16 +145,37 @@ centering on it.
 Cross-axis flipping is only enabled for aligned placements, so `bottom-start` may become
 `bottom-end` near a viewport edge while a plain `bottom` will not.
 
+`alignOffset` nudges the popup along that alignment axis, the way `sideOffset` does along the side.
+Use it to cancel padding inside the popup so its content, rather than its edge, lines up with the
+trigger — a negative value pulls a `-start` placement further left.
+
+```tsx
+<Popover.Root
+  placement='bottom-start'
+  alignOffset={-8}
+>
+  <Popover.Trigger>Open</Popover.Trigger>
+  <Popover.Popup aria-label='Account'>
+    <Card>
+      <Card.Content>Pulled 8px left of the trigger's start edge.</Card.Content>
+    </Card>
+  </Popover.Popup>
+</Popover.Root>;
+```
+
+It is a preference like placement is: `shift` still claws the popup back when the nudge would push
+it out of view.
+
 ## Parts
 
-| Part                  | Slot            | Description                                                             |
-| --------------------- | --------------- | ----------------------------------------------------------------------- |
-| `Popover.Root`        | —               | State provider; owns open/close, `placement`, `sideOffset`, `modal`.    |
-| `Popover.Trigger`     | —               | Anchor element; renders a `<button>` and accepts a `render` prop.       |
-| `Popover.Popup`       | `popover-popup` | The floating box; owns `size`, viewport clamps, and the enter/exit run. |
-| `Popover.Close`       | —               | Dismisses the popover; accepts a `render` prop.                         |
-| `Popover.Title`       | —               | Heading; wired to the popup's `aria-labelledby`.                        |
-| `Popover.Description` | —               | Description; wired to the popup's `aria-describedby`.                   |
+| Part                  | Slot              | Description                                                                         |
+| --------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| `Popover.Root`        | —                 | State provider; owns open/close, `placement`, `sideOffset`, `alignOffset`, `modal`. |
+| `Popover.Trigger`     | `popover-trigger` | Anchor element; renders a `<button>` and accepts a `render` prop.                   |
+| `Popover.Popup`       | `popover-popup`   | The floating box; owns `size`, viewport clamps, and the enter/exit run.             |
+| `Popover.Close`       | —                 | Dismisses the popover; accepts a `render` prop.                                     |
+| `Popover.Title`       | —                 | Heading; wired to the popup's `aria-labelledby`.                                    |
+| `Popover.Description` | —                 | Description; wired to the popup's `aria-describedby`.                               |
 
 `Popover.Popup` renders the portal and the floating positioner internally. The positioner carries
 the `popover-positioner` slot and is the `role="dialog"` element, which is why the popup's
@@ -165,7 +186,7 @@ them through your own typography (`Heading`, `Text`) inside the surface.
 
 ## Styling
 
-Unlike the slot-recipe components, the Mosaic popover is themed with **StyleX**. Each styled part
+The Mosaic popover is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots in the table above) alongside the StyleX atoms.
 Consumers never target the hashed atomic classes — override by targeting the `.cl-*` slot from a
 CSS layer that wins over `@clerk/ui/styles.css`:

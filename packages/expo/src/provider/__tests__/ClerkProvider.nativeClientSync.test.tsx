@@ -178,6 +178,33 @@ describe('ClerkProvider native client sync', () => {
     });
   });
 
+  test('does not start native client synchronization when disabled', async () => {
+    const originalHandleUnauthenticated = mocks.clerkInstance.handleUnauthenticated;
+
+    render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+        __experimental_disableNativeClientSync
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mocks.configure).not.toHaveBeenCalled();
+    expect(mocks.getClientToken).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.addListener).not.toHaveBeenCalled();
+    expect(mocks.clerkInstance.handleUnauthenticated).toBe(originalHandleUnauthenticated);
+
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'client-token');
+    });
+
+    expect(mocks.syncClientStateFromJs).not.toHaveBeenCalled();
+  });
+
   test('configures native once with the cached device token during StrictMode bootstrap', async () => {
     mocks.tokenCache.getToken.mockResolvedValue('client-token');
     mocks.getClientToken.mockResolvedValue('client-token');

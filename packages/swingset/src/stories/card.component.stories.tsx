@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Button } from '@clerk/ui/mosaic/components/button';
 import type { CardProps } from '@clerk/ui/mosaic/components/card';
 import { Card } from '@clerk/ui/mosaic/components/card';
@@ -15,15 +14,16 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Card',
   source: 'packages/ui/src/mosaic/components/card/card.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       alignment: { start: {}, center: {} },
       elevation: { card: {}, flush: {}, overlay: {} },
+      renderBranding: { true: {}, false: {} },
     },
     _defaultVariants: {
       alignment: 'start',
       elevation: 'card',
+      renderBranding: true,
     },
   },
 };

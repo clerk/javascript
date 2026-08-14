@@ -9,6 +9,7 @@ config({ path: path.resolve(__dirname, '.env.local') });
 export default defineConfig({
   ...common,
   testDir: './cleanup',
+  retries: 0,
   projects: [
     {
       name: 'setup',

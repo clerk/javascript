@@ -962,6 +962,7 @@ function waitForClerkInstanceLoad(clerkInstance: SyncableClerkInstance): Promise
 }
 
 export function useNativeClientBootstrap({
+  enabled,
   publishableKey,
   proxyUrl,
   nativeRefreshFromJsControllerRef,
@@ -969,6 +970,7 @@ export function useNativeClientBootstrap({
   tokenCache,
   clerkInstance,
 }: {
+  enabled: boolean;
   publishableKey: string;
   proxyUrl?: string | ((url: URL) => string);
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
@@ -987,6 +989,7 @@ export function useNativeClientBootstrap({
     isMountedRef.current = true;
 
     if (
+      enabled &&
       (Platform.OS === 'ios' || Platform.OS === 'android') &&
       publishableKey &&
       startedConfigKeyRef.current !== configKey
@@ -1102,6 +1105,7 @@ export function useNativeClientBootstrap({
       isMountedRef.current = false;
     };
   }, [
+    enabled,
     publishableKey,
     configKey,
     nativeProxyUrl,

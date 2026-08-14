@@ -10,22 +10,8 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  organization: {
-    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
-    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
-    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
-    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
-    'organization-profile-profile-section': dynamic(
-      () => import('../stories/organization-profile-profile-section.mdx'),
-    ),
-    'organization-profile-domains-section': dynamic(
-      () => import('../stories/organization-profile-domains-section.mdx'),
-    ),
-    'organization-profile-leave-section': dynamic(() => import('../stories/organization-profile-leave-section.mdx')),
-    'organization-profile-delete-section': dynamic(() => import('../stories/organization-profile-delete-section.mdx')),
-  },
-  blocks: {
-    destructive: dynamic(() => import('../stories/destructive.mdx')),
+  user: {
+    'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
@@ -39,8 +25,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     icon: dynamic(() => import('../stories/icon.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
-    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    section: dynamic(() => import('../stories/section.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    field: dynamic(() => import('../stories/field.component.mdx')),
   },
   primitives: {
     // Headless primitives — alphabetical.
