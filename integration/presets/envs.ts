@@ -8,38 +8,11 @@ import fs from 'fs-extra';
 import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
 import { environmentConfig } from '../models/environment';
+import { instanceKeys } from './instanceKeys';
 import type { PlatformApplication, PlatformApplicationConfig } from './platformApplication';
 import { createApplicationFromConfig } from './platformApplication';
 
-const getInstanceKeys = () => {
-  let keys: Record<string, { pk: string; sk: string }>;
-  try {
-    keys = constants.INTEGRATION_INSTANCE_KEYS
-      ? JSON.parse(constants.INTEGRATION_INSTANCE_KEYS)
-      : fs.readJSONSync(resolve(import.meta.dirname, '..', '.keys.json')) || null;
-  } catch (e) {
-    console.log('Could not find .keys.json file', e);
-  }
-  if (!keys) {
-    throw new Error('Missing instance keys. Is your env or .keys.json file populated?');
-  }
-
-  // Merge staging keys if available
-  try {
-    const stagingKeys: Record<string, { pk: string; sk: string }> = constants.INTEGRATION_STAGING_INSTANCE_KEYS
-      ? JSON.parse(constants.INTEGRATION_STAGING_INSTANCE_KEYS)
-      : fs.readJSONSync(resolve(import.meta.dirname, '..', '.keys.staging.json')) || null;
-    if (stagingKeys) {
-      Object.assign(keys, stagingKeys);
-    }
-  } catch {
-    // Staging keys are optional
-  }
-
-  return new Map(Object.entries(keys));
-};
-
-export const instanceKeys = getInstanceKeys();
+export { instanceKeys };
 
 const STAGING_API_URL = 'https://api.clerkstage.dev';
 const STAGING_KEY_PREFIX = 'clerkstage-';

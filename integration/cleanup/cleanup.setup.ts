@@ -5,14 +5,14 @@ import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
 
 import { constants } from '../constants';
-import { appConfigs } from '../presets/';
+import { instanceKeys } from '../presets/instanceKeys';
 import { deleteApplication, listApplications } from '../presets/platformApplication';
 import { findE2ERunUsers, getE2EApplicationRunMarker, getE2ERunMarker } from '../testUtils/e2eRun';
 import { withRetry } from '../testUtils/retryableClerkClient';
 
 setup('cleanup instances ', async () => {
   const runMarker = getE2ERunMarker();
-  const entries = Array.from(appConfigs.secrets.instanceKeys.values())
+  const entries = Array.from(instanceKeys.values())
     .map(({ pk, sk }) => {
       const secretKey = sk;
       if (!secretKey) {
