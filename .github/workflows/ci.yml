@@ -19,7 +19,7 @@ concurrency:
 jobs:
   # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -48,7 +48,7 @@ jobs:
   pre-checks:
     needs: [check-permissions]
     name: Formatting | Dedupe | Changeset
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -61,7 +61,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Fetch main branch for changeset comparison
@@ -104,7 +104,7 @@ jobs:
   build-packages:
     needs: [check-permissions]
     name: Build Packages
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     permissions:
       contents: read
     defaults:
@@ -122,7 +122,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -152,7 +152,7 @@ jobs:
     name: Bundle size
     permissions:
       contents: read
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -165,7 +165,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -196,7 +196,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -212,7 +212,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -249,7 +249,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -263,11 +263,11 @@ jobs:
       matrix:
         include:
           - node-version: 24.15.0
-            test-filter: "**"
-            filter-label: "**"
+            test-filter: '**'
+            filter-label: '**'
           - node-version: 20.19.0
-            test-filter: "**"
-            filter-label: "**"
+            test-filter: '**'
+            filter-label: '**'
 
     steps:
       - name: Checkout Repo
@@ -276,7 +276,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -328,7 +328,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -339,46 +339,46 @@ jobs:
       matrix:
         test-name:
           [
-            "generic",
-            "express",
-            "fastify",
-            "ap-flows",
-            "localhost",
-            "sessions",
-            "sessions:staging",
-            "handshake",
-            "handshake:staging",
-            "astro",
-            "tanstack-react-start",
-            "vue",
-            "nuxt",
-            "react-router",
-            "custom",
-            "hono",
-            "chrome-extension",
-            "electron",
+            'generic',
+            'express',
+            'fastify',
+            'ap-flows',
+            'localhost',
+            'sessions',
+            'sessions:staging',
+            'handshake',
+            'handshake:staging',
+            'astro',
+            'tanstack-react-start',
+            'vue',
+            'nuxt',
+            'react-router',
+            'custom',
+            'hono',
+            'chrome-extension',
+            'electron',
           ]
-        test-project: ["chrome"]
+        test-project: ['chrome']
         include:
-          - test-name: "billing"
-            test-project: "chrome"
-          - test-name: "machine"
-            test-project: "chrome"
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "15"
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "16"
-          - test-name: "quickstart"
-            test-project: "chrome"
-            next-version: "15"
-          - test-name: "quickstart"
-            test-project: "chrome"
-            next-version: "16"
-          - test-name: "cache-components"
-            test-project: "chrome"
-            next-version: "16"
+          - test-name: 'billing'
+            test-project: 'chrome'
+          - test-name: 'machine'
+            test-project: 'chrome'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'cache-components'
+            test-project: 'chrome'
+            next-version: '16'
 
     steps:
       - name: Checkout Repo
@@ -387,7 +387,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -413,8 +413,8 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: "latest"
-          E2E_CLERK_UI_VERSION: "latest"
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -478,8 +478,8 @@ jobs:
       - name: Write all ENV certificates to files in integration/certs
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
-          INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
-          INTEGRATION_ROOT_CA: "${{secrets.INTEGRATION_ROOT_CA}}"
+          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
+          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
         with:
           script: |
             const fs = require('fs');
@@ -525,11 +525,11 @@ jobs:
         env:
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
-          E2E_DEBUG: "1"
+          E2E_DEBUG: '1'
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: "latest"
-          E2E_CLERK_UI_VERSION: "latest"
+          E2E_CLERK_JS_VERSION: 'latest'
+          E2E_CLERK_UI_VERSION: 'latest'
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -541,6 +541,7 @@ jobs:
         timeout-minutes: 4
         run: pnpm test:integration:cleanup
         env:
+          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
@@ -565,7 +566,7 @@ jobs:
   pkg-pr-new:
     name: Publish with pkg-pr-new
     needs: [check-permissions, build-packages]
-    runs-on: "blacksmith-8vcpu-ubuntu-2204"
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
         shell: bash
@@ -580,7 +581,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup Node

@@ -77,7 +77,6 @@ const getPlatformApplication = async (
     return application;
   }
   const cacheKey = createHash('sha256')
-    .update(platformApiKey)
     .update(keyName)
     .update(JSON.stringify(definition.config))
     .update(constants.INTEGRATION_TEST_RUN_KEY || '')
