@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { NativeClientEvent } from '../../hooks/useNativeClientEvents';
 import {
+  __internal_resetNativeClientSyncCoordinator,
   registerNativeToJsSyncHandler,
   synchronizeNativeClientToJs,
   trackPendingJsToNativeSync,
@@ -34,7 +35,12 @@ function nativeClientEvent(issuedAt: number): NativeClientEvent {
 
 let unregister: (() => void) | undefined;
 
+beforeEach(() => {
+  __internal_resetNativeClientSyncCoordinator();
+});
+
 afterEach(() => {
+  vi.useRealTimers();
   unregister?.();
   unregister = undefined;
 });
@@ -57,6 +63,32 @@ describe('native client sync coordinator', () => {
     trackPendingJsToNativeSync(Promise.resolve());
 
     olderSync.reject(new Error('stale native sync failure'));
+
+    await expect(waitForPendingJsToNativeSync()).resolves.toBeUndefined();
+  });
+
+  test('rejects with environment unavailable when JS-to-native synchronization times out', async () => {
+    vi.useFakeTimers();
+    const pendingSync = deferred();
+    trackPendingJsToNativeSync(pendingSync.promise);
+
+    const waiting = expect(waitForPendingJsToNativeSync()).rejects.toMatchObject({
+      code: 'environment_unavailable',
+      message: 'Timed out waiting for the native Clerk client to synchronize.',
+    });
+
+    await vi.advanceTimersByTimeAsync(5_000);
+    await waiting;
+    pendingSync.resolve();
+  });
+
+  test('ignores pending synchronization outcomes from before a reset', async () => {
+    const staleSync = rejectableDeferred();
+    trackPendingJsToNativeSync(staleSync.promise);
+
+    __internal_resetNativeClientSyncCoordinator();
+    trackPendingJsToNativeSync(Promise.resolve());
+    staleSync.reject(new Error('stale native sync failure'));
 
     await expect(waitForPendingJsToNativeSync()).resolves.toBeUndefined();
   });

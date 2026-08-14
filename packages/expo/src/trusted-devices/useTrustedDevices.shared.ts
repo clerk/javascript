@@ -86,13 +86,17 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
 
     const clerk = getClerkInstance();
     if (!clerk) {
-      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+      return errorThrower.throw(
+        'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the Clerk instance is unavailable.',
+      );
     }
 
     const client = clerk.client;
     const signIn = client?.signIn;
     if (!client || !signIn) {
-      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+      return errorThrower.throw(
+        'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
+      );
     }
 
     if (nativeSignIn.status === 'complete') {
@@ -100,10 +104,14 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
         !nativeSignIn.createdSessionId ||
         !client.signedInSessions.some(session => session.id === nativeSignIn.createdSessionId)
       ) {
-        return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+        return errorThrower.throw(
+          'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the created session is missing.',
+        );
       }
     } else if (!signIn.id || signIn.id !== nativeSignIn.id) {
-      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+      return errorThrower.throw(
+        'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the sign-in attempt does not match.',
+      );
     }
 
     return {

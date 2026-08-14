@@ -4,7 +4,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { ClerkProvider } from '../ClerkProvider';
-import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../nativeClientSyncCoordinator';
+import {
+  __internal_resetNativeClientSyncCoordinator,
+  synchronizeNativeClientToJs,
+  waitForPendingJsToNativeSync,
+} from '../nativeClientSyncCoordinator';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -128,6 +132,7 @@ function deferred(): { promise: Promise<void>; resolve: () => void } {
 
 describe('ClerkProvider native client sync', () => {
   beforeEach(() => {
+    __internal_resetNativeClientSyncCoordinator();
     vi.clearAllMocks();
     mocks.nativeClientEvent = null;
     mocks.configure.mockResolvedValue(undefined);

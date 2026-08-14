@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { registerNativeToJsSyncHandler, trackPendingJsToNativeSync } from '../../provider/nativeClientSyncCoordinator';
+import {
+  __internal_resetNativeClientSyncCoordinator,
+  registerNativeToJsSyncHandler,
+  trackPendingJsToNativeSync,
+} from '../../provider/nativeClientSyncCoordinator';
 import { isTrustedDeviceError } from '../errors';
 import { useTrustedDevices as useTrustedDevicesOnUnsupportedPlatform } from '../useTrustedDevices';
 import { useTrustedDevices as useTrustedDevicesOnAndroid } from '../useTrustedDevices.android';
@@ -59,6 +63,7 @@ const nativeTrustedDevice = {
 let unregisterNativeToJsSyncHandler: (() => void) | undefined;
 
 beforeEach(() => {
+  __internal_resetNativeClientSyncCoordinator();
   unregisterNativeToJsSyncHandler = registerNativeToJsSyncHandler(mocks.synchronizeNativeClientToJs);
   mocks.synchronizeNativeClientToJs.mockResolvedValue(undefined);
   mocks.getClerkInstance.mockReturnValue({
@@ -74,6 +79,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   unregisterNativeToJsSyncHandler?.();
 });
 
@@ -117,6 +123,24 @@ describe('useTrustedDevices on iOS', () => {
     finishNativeSync();
     await expect(availability).resolves.toEqual({ isAvailable: true, unavailableReason: null });
     expect(mocks.nativeModule.getTrustedDeviceAvailability).toHaveBeenCalledTimes(1);
+  });
+
+  test('rejects availability when native client synchronization times out', async () => {
+    vi.useFakeTimers();
+    let finishNativeSync!: () => void;
+    const nativeSync = new Promise<void>(resolve => {
+      finishNativeSync = resolve;
+    });
+    trackPendingJsToNativeSync(nativeSync);
+
+    const availability = expect(useTrustedDevicesOnIos().getAvailability()).rejects.toMatchObject({
+      code: 'environment_unavailable',
+    });
+
+    await vi.advanceTimersByTimeAsync(5_000);
+    await availability;
+    expect(mocks.nativeModule.getTrustedDeviceAvailability).not.toHaveBeenCalled();
+    finishNativeSync();
   });
 
   test('lists trusted devices and converts native timestamps to dates', async () => {
@@ -295,7 +319,7 @@ describe('useTrustedDevices on iOS', () => {
     });
 
     await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client.',
+      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the created session is missing.',
     );
   });
 
@@ -390,7 +414,7 @@ describe('useTrustedDevices on iOS', () => {
     });
 
     await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client.',
+      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the sign-in attempt does not match.',
     );
   });
 
@@ -403,7 +427,23 @@ describe('useTrustedDevices on iOS', () => {
     mocks.getClerkInstance.mockReturnValueOnce(undefined);
 
     await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client.',
+      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the Clerk instance is unavailable.',
+    );
+  });
+
+  test('rejects when the Clerk JS client is unavailable after synchronization', async () => {
+    mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
+      id: 'sia_native',
+      status: 'complete',
+      createdSessionId: 'sess_native',
+    });
+    mocks.getClerkInstance.mockReturnValueOnce({
+      client: undefined,
+      setActive: mocks.setActive,
+    });
+
+    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
     );
   });
 

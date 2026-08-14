@@ -11,26 +11,35 @@ type NativeToJsSyncRegistration = {
 };
 
 const pendingJsToNativeSyncs = new Set<Promise<void>>();
+const pendingJsToNativeSyncTimeoutMs = 5_000;
 let jsToNativeSyncGeneration = 0;
 let latestSettledJsToNativeSyncGeneration = 0;
 let latestJsToNativeSyncFailure: { error: unknown; generation: number } | null = null;
 let nativeToJsSyncRegistration: NativeToJsSyncRegistration | null = null;
+let jsToNativeSyncEpoch = 0;
 
 function removePendingSync(pendingSyncs: Set<Promise<void>>, sync: Promise<void>): void {
   pendingSyncs.delete(sync);
 }
 
+function createPendingJsToNativeSyncTimeoutError(): Error & { code: 'environment_unavailable' } {
+  return Object.assign(new Error('Timed out waiting for the native Clerk client to synchronize.'), {
+    code: 'environment_unavailable' as const,
+  });
+}
+
 export function trackPendingJsToNativeSync(sync: Promise<unknown>): void {
+  const epoch = jsToNativeSyncEpoch;
   const generation = ++jsToNativeSyncGeneration;
   const trackedSync = sync.then(
     () => {
-      if (generation >= latestSettledJsToNativeSyncGeneration) {
+      if (epoch === jsToNativeSyncEpoch && generation >= latestSettledJsToNativeSyncGeneration) {
         latestSettledJsToNativeSyncGeneration = generation;
         latestJsToNativeSyncFailure = null;
       }
     },
     error => {
-      if (generation >= latestSettledJsToNativeSyncGeneration) {
+      if (epoch === jsToNativeSyncEpoch && generation >= latestSettledJsToNativeSyncGeneration) {
         latestSettledJsToNativeSyncGeneration = generation;
         latestJsToNativeSyncFailure = { error, generation };
       }
@@ -42,13 +51,39 @@ export function trackPendingJsToNativeSync(sync: Promise<unknown>): void {
 }
 
 export async function waitForPendingJsToNativeSync(): Promise<void> {
+  const deadline = Date.now() + pendingJsToNativeSyncTimeoutMs;
   while (pendingJsToNativeSyncs.size > 0) {
-    await Promise.all(pendingJsToNativeSyncs);
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) {
+      throw createPendingJsToNativeSyncTimeoutError();
+    }
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_resolve, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(createPendingJsToNativeSyncTimeoutError());
+      }, remainingMs);
+    });
+
+    try {
+      await Promise.race([Promise.all(pendingJsToNativeSyncs), timeout]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   if (latestJsToNativeSyncFailure) {
     throw latestJsToNativeSyncFailure.error;
   }
+}
+
+export function __internal_resetNativeClientSyncCoordinator(): void {
+  jsToNativeSyncEpoch += 1;
+  pendingJsToNativeSyncs.clear();
+  jsToNativeSyncGeneration = 0;
+  latestSettledJsToNativeSyncGeneration = 0;
+  latestJsToNativeSyncFailure = null;
+  nativeToJsSyncRegistration = null;
 }
 
 export function registerNativeToJsSyncHandler(handler: NativeToJsSyncHandler): () => void {
