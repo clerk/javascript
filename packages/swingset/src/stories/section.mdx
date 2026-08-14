@@ -53,6 +53,26 @@ Use `Section.Items` for a nested value list beneath a row's header item. The row
   ]}
 />
 
+### Managing the addresses in a row
+
+The row's action opens a `prompt` dialog holding the same list, one `Item` per address with its own
+menu. Both paths out of it stack over that dialog rather than replacing it, so the list stays on
+screen behind them: adding opens a second `prompt` with its field focused
+(`section → prompt → prompt`), and removing raises an `AlertDialog` to confirm
+(`section → prompt → alert`).
+
+<Story
+  name='ManageEmails'
+  storyModule={SectionStories}
+  composition={[
+    { name: 'AlertDialog', href: '/components/alert-dialog', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  ]}
+/>
+
 ### Connected accounts
 
 <Story

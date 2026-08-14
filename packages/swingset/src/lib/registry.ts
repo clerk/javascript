@@ -82,6 +82,7 @@ import {
   ConnectedAccounts as SectionConnectedAccounts,
   Default as SectionDefault,
   Destructive as SectionDestructive,
+  ManageEmails as SectionManageEmails,
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
@@ -108,6 +109,7 @@ const sectionModule: StoryModule = {
   meta: sectionMeta,
   Default: SectionDefault,
   MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
+  ManageEmails: SectionManageEmails,
   ConnectedAccounts: SectionConnectedAccounts,
   Destructive: SectionDestructive,
 };
