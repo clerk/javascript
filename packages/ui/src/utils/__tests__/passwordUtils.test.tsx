@@ -161,6 +161,65 @@ describe('createPasswordError() constructs error that password', () => {
     );
   });
 
+  it('matches one of the account identifiers', async () => {
+    const { wrapper: Wrapper } = await createFixtures();
+
+    const wrapperBefore = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider value={{ localization: {} }}>{children}</OptionsProvider>
+      </Wrapper>
+    );
+
+    const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
+
+    const res = createPasswordError(
+      [{ code: 'form_password_matches_identifier', message: 'server message' }],
+      createLocalizationConfig(result.current.t),
+    );
+    expect(res).toBe(
+      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
+    );
+  });
+
+  it('falls back to the server message for a code with no complexity mapping', async () => {
+    const { wrapper: Wrapper } = await createFixtures();
+
+    const wrapperBefore = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider value={{ localization: {} }}>{children}</OptionsProvider>
+      </Wrapper>
+    );
+
+    const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
+
+    const res = createPasswordError(
+      [{ code: 'form_password_some_future_rule', message: 'Server explains the rule.' }],
+      createLocalizationConfig(result.current.t),
+    );
+    expect(res).toBe('Server explains the rule.');
+  });
+
+  it('ignores unmapped codes that accompany a mapped one', async () => {
+    const { wrapper: Wrapper } = await createFixtures();
+
+    const wrapperBefore = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider value={{ localization: {} }}>{children}</OptionsProvider>
+      </Wrapper>
+    );
+
+    const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
+
+    const res = createPasswordError(
+      [
+        { code: 'form_password_no_uppercase', message: '' },
+        { code: 'form_password_some_future_rule', message: 'Server explains the rule.' },
+      ],
+      createLocalizationConfig(result.current.t),
+    );
+    expect(res).toBe('Your password must contain an uppercase letter.');
+  });
+
   //
   // zxcvbn
   //

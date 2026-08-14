@@ -40,7 +40,8 @@ export const createPasswordError = (errors: ClerkAPIError[], localizationConfig:
   if (
     errors?.[0]?.code === 'form_password_size_in_bytes_exceeded' ||
     errors?.[0]?.code === 'form_password_pwned' ||
-    errors?.[0]?.code === 'form_new_password_matches_current'
+    errors?.[0]?.code === 'form_new_password_matches_current' ||
+    errors?.[0]?.code === 'form_password_matches_identifier'
   ) {
     return `${t(localizationKeys(`unstable__errors.${errors?.[0]?.code}` as any)) || errors?.[0]?.message}`;
   }
@@ -58,8 +59,16 @@ export const createPasswordError = (errors: ClerkAPIError[], localizationConfig:
   // show min length error first by itself
   const minLenErrors = errors.filter(e => e.code === 'form_password_length_too_short');
 
-  const message = (minLenErrors.length ? minLenErrors : errors).map((s: any) => {
-    const localizedKey = (mapComplexityErrors(passwordSettings) as any)[s.code];
+  const complexityErrors = mapComplexityErrors(passwordSettings);
+  const knownErrors = (minLenErrors.length ? minLenErrors : errors).filter(e => e.code in complexityErrors);
+
+  // an unmapped code would otherwise render the prefix with an empty list, eg "Your password must contain ."
+  if (!knownErrors.length) {
+    return errors?.[0]?.longMessage || errors?.[0]?.message || '';
+  }
+
+  const message = knownErrors.map((s: any) => {
+    const localizedKey = (complexityErrors as any)[s.code];
 
     if (Array.isArray(localizedKey)) {
       const [lk, attr, val] = localizedKey;

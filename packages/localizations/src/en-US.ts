@@ -1787,6 +1787,8 @@ export const enUS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
+    form_password_matches_identifier:
+      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_or_identifier_incorrect: undefined,
     form_password_pwned:
