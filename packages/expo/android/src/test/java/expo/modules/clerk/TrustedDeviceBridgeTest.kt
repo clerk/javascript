@@ -14,6 +14,18 @@ import org.junit.Test
 
 class TrustedDeviceBridgeTest {
     @Test
+    fun `requires Clerk initialization before trusted-device operations`() {
+        assertEquals(
+            TrustedDeviceBridgeError(
+                code = "environment_unavailable",
+                message = "Trusted-device operations are unavailable until Clerk finishes configuring."
+            ),
+            trustedDeviceEnvironmentError(isInitialized = false)
+        )
+        assertNull(trustedDeviceEnvironmentError(isInitialized = true))
+    }
+
+    @Test
     fun `maps trusted-device availability to the JavaScript contract`() {
         assertEquals(
             mapOf("isAvailable" to true, "unavailableReason" to null),
@@ -72,7 +84,11 @@ class TrustedDeviceBridgeTest {
     @Test
     fun `maps trusted-device sign-in results`() {
         assertEquals(
-            mapOf("status" to "complete", "createdSessionId" to "sess_123"),
+            mapOf(
+                "id" to "sia_123",
+                "status" to "complete",
+                "createdSessionId" to "sess_123"
+            ),
             trustedDeviceSignInPayload(
                 SignIn(
                     id = "sia_123",

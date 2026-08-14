@@ -1,8 +1,6 @@
-import type {
-  TrustedDeviceAvailability,
-  TrustedDevicePolicy,
-  TrustedDeviceSignInResult,
-} from '../trusted-devices/types';
+import type { SignInStatus } from '@clerk/shared/types';
+
+import type { TrustedDeviceAvailability, TrustedDevicePolicy } from '../trusted-devices/types';
 
 export type NativeAuthFlowState = {
   isLoaded: boolean;
@@ -16,15 +14,21 @@ export type NativeAuthFlowModule = {
 export type NativeTrustedDevice = {
   id: string;
   object: 'trusted_device';
-  platform: 'ios' | 'android' | (string & {});
+  platform: string;
   appIdentifier: string;
   name: string | null;
   algorithm: 'ES256' | (string & {});
-  status: 'active' | 'revoked' | (string & {});
+  status: string;
   createdAt: number;
   updatedAt: number;
   lastUsedAt: number | null;
   revokedAt: number | null;
+};
+
+export type NativeTrustedDeviceSignInResult = {
+  id: string;
+  status: SignInStatus | (string & {});
+  createdSessionId: string | null;
 };
 
 export type NativeTrustedDeviceModule = {
@@ -41,5 +45,5 @@ export type NativeTrustedDeviceModule = {
     id: string | null,
     identifierHint: string | null,
     reason: string | null,
-  ): Promise<TrustedDeviceSignInResult>;
+  ): Promise<NativeTrustedDeviceSignInResult>;
 };

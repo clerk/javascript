@@ -1,4 +1,4 @@
-import type { SignInStatus } from '@clerk/shared/types';
+import type { SetActive, SignInResource, SignInStatus } from '@clerk/shared/types';
 
 export type TrustedDeviceUnavailableReason =
   | 'environment_unavailable'
@@ -19,9 +19,9 @@ export type TrustedDeviceAvailability = {
 
 export type TrustedDevicePolicy = 'biometry_current_set' | 'biometry_any' | 'biometry_or_device_passcode';
 
-export type TrustedDevicePlatform = 'ios' | 'android' | (string & {});
+export type TrustedDevicePlatform = 'ios' | 'android' | 'unknown';
 
-export type TrustedDeviceStatus = 'active' | 'revoked' | (string & {});
+export type TrustedDeviceStatus = 'active' | 'revoked' | 'unknown';
 
 export type TrustedDevice = {
   id: string;
@@ -58,6 +58,10 @@ export type SignInWithTrustedDeviceParams = {
 export type TrustedDeviceSignInResult = {
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
+  /** The synchronized JS sign-in resource used to continue any remaining authentication steps. */
+  signIn: SignInResource;
+  /** Activates a session after the sign-in reaches `complete`. */
+  setActive: SetActive;
 };
 
 export type UseTrustedDevicesReturn = {

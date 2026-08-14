@@ -52,7 +52,7 @@ For further information, guides, and examples visit the [Expo reference document
 
 Biometric trusted-device enrollment and sign-in are supported in development builds on iOS and Android. Android requires Android 9 (API 28) or later and an enrolled Class 3 biometric.
 
-Trusted-device operations preserve Clerk API and native biometric error codes. Use `isTrustedDeviceError(error)` to safely inspect `error.code`; unrecognized codes and resource values remain available for forward compatibility.
+Trusted-device operations preserve Clerk API and native biometric error codes. Use `isTrustedDeviceError(error)` to safely inspect `error.code`; unrecognized error codes remain available for forward compatibility, while unfamiliar platform and status values are normalized to `unknown`.
 
 #### Face ID on iOS
 

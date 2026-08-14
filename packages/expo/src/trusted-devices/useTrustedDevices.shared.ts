@@ -1,9 +1,19 @@
+import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../provider/nativeClientSyncCoordinator';
+import { getClerkInstance } from '../provider/singleton';
 import type { NativeTrustedDevice, NativeTrustedDeviceModule } from '../specs/NativeClerkModule.types';
 import { errorThrower } from '../utils/errors';
 import { ClerkExpoModule } from '../utils/native-module';
-import type { TrustedDevice, UseTrustedDevicesReturn } from './types';
+import type { TrustedDevice, TrustedDevicePlatform, TrustedDeviceStatus, UseTrustedDevicesReturn } from './types';
 
 const DEFAULT_POLICY = 'biometry_or_device_passcode';
+
+function toTrustedDevicePlatform(platform: string): TrustedDevicePlatform {
+  return platform === 'ios' || platform === 'android' ? platform : 'unknown';
+}
+
+function toTrustedDeviceStatus(status: string): TrustedDeviceStatus {
+  return status === 'active' || status === 'revoked' ? status : 'unknown';
+}
 
 function getNativeModule(): NativeTrustedDeviceModule {
   const nativeModule = ClerkExpoModule;
@@ -26,6 +36,8 @@ function getNativeModule(): NativeTrustedDeviceModule {
 function toTrustedDevice(device: NativeTrustedDevice): TrustedDevice {
   return {
     ...device,
+    platform: toTrustedDevicePlatform(device.platform),
+    status: toTrustedDeviceStatus(device.status),
     createdAt: new Date(device.createdAt),
     updatedAt: new Date(device.updatedAt),
     lastUsedAt: device.lastUsedAt == null ? null : new Date(device.lastUsedAt),
@@ -34,16 +46,21 @@ function toTrustedDevice(device: NativeTrustedDevice): TrustedDevice {
 }
 
 const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
-  getAvailability: params =>
-    Promise.resolve().then(() =>
-      getNativeModule().getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null),
-    ),
+  getAvailability: async params => {
+    const nativeModule = getNativeModule();
+    await waitForPendingJsToNativeSync();
+    return nativeModule.getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null);
+  },
   list: async () => {
-    const devices = await getNativeModule().listTrustedDevices();
+    const nativeModule = getNativeModule();
+    await waitForPendingJsToNativeSync();
+    const devices = await nativeModule.listTrustedDevices();
     return devices.map(toTrustedDevice);
   },
   enroll: async params => {
-    const device = await getNativeModule().enrollTrustedDevice(
+    const nativeModule = getNativeModule();
+    await waitForPendingJsToNativeSync();
+    const device = await nativeModule.enrollTrustedDevice(
       params?.deviceName ?? null,
       params?.identifierHint ?? null,
       params?.reason ?? null,
@@ -52,17 +69,50 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
     return toTrustedDevice(device);
   },
   revoke: async id => {
-    const device = await getNativeModule().revokeTrustedDevice(id);
+    const nativeModule = getNativeModule();
+    await waitForPendingJsToNativeSync();
+    const device = await nativeModule.revokeTrustedDevice(id);
     return toTrustedDevice(device);
   },
-  signIn: params =>
-    Promise.resolve().then(() =>
-      getNativeModule().signInWithTrustedDevice(
-        params?.id ?? null,
-        params?.identifierHint ?? null,
-        params?.reason ?? null,
-      ),
-    ),
+  signIn: async params => {
+    const nativeModule = getNativeModule();
+    await waitForPendingJsToNativeSync();
+    const nativeSignIn = await nativeModule.signInWithTrustedDevice(
+      params?.id ?? null,
+      params?.identifierHint ?? null,
+      params?.reason ?? null,
+    );
+    await synchronizeNativeClientToJs();
+
+    const clerk = getClerkInstance();
+    if (!clerk) {
+      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+    }
+
+    const client = clerk.client;
+    const signIn = client?.signIn;
+    if (!client || !signIn) {
+      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+    }
+
+    if (nativeSignIn.status === 'complete') {
+      if (
+        !nativeSignIn.createdSessionId ||
+        !client.signedInSessions.some(session => session.id === nativeSignIn.createdSessionId)
+      ) {
+        return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+      }
+    } else if (!signIn.id || signIn.id !== nativeSignIn.id) {
+      return errorThrower.throw('Unable to synchronize the trusted-device sign-in with the Clerk JS client.');
+    }
+
+    return {
+      status: signIn.status ?? nativeSignIn.status,
+      createdSessionId: signIn.createdSessionId ?? nativeSignIn.createdSessionId,
+      signIn,
+      setActive: clerk.setActive,
+    };
+  },
 });
 
 /**

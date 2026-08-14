@@ -101,6 +101,45 @@ describe('useAuthViewState', () => {
     });
   });
 
+  test('resumes native tracking when a valid event arrives after falling back', async () => {
+    mocks.getAuthFlowState.mockResolvedValue({ isLoaded: true });
+
+    const { result } = renderHook(() => useAuthViewState());
+
+    await waitFor(() => {
+      expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
+    });
+
+    act(() => {
+      mocks.listener?.({ isLoaded: true, isAuthFlowComplete: false });
+    });
+
+    expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: false });
+  });
+
+  test('keeps native tracking when the initial snapshot rejects after a valid event', async () => {
+    let rejectSnapshot!: (error: Error) => void;
+    mocks.getAuthFlowState.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectSnapshot = reject;
+      }),
+    );
+
+    const { result } = renderHook(() => useAuthViewState());
+
+    act(() => {
+      mocks.listener?.({ isLoaded: true, isAuthFlowComplete: false });
+    });
+    expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: false });
+
+    await act(async () => {
+      rejectSnapshot(new Error('late native failure'));
+      await Promise.resolve();
+    });
+
+    expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: false });
+  });
+
   test('falls back to JS session state when the native auth-flow state rejects', async () => {
     const error = new Error('native failure');
     vi.stubGlobal('__DEV__', true);

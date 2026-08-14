@@ -67,6 +67,7 @@ export function useAuthViewState(): UseAuthViewStateReturn {
 
         didReceiveEvent = true;
         setNativeState(state);
+        setUseJsFallback(false);
       });
 
       void nativeModule
@@ -83,7 +84,7 @@ export function useAuthViewState(): UseAuthViewStateReturn {
           }
         })
         .catch(error => {
-          if (!isMounted) {
+          if (!isMounted || didReceiveEvent) {
             return;
           }
 

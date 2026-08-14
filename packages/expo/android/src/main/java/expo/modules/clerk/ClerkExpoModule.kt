@@ -75,6 +75,7 @@ internal fun trustedDevicePayload(trustedDevice: TrustedDevice): Map<String, Any
 
 internal fun trustedDeviceSignInPayload(signIn: SignIn): Map<String, Any?> {
     return mapOf(
+        "id" to signIn.id,
         "status" to signIn.status.name.lowercase(),
         "createdSessionId" to signIn.createdSessionId
     )
@@ -93,6 +94,17 @@ internal data class TrustedDeviceBridgeError(
     val code: String,
     val message: String
 )
+
+internal fun trustedDeviceEnvironmentError(isInitialized: Boolean): TrustedDeviceBridgeError? {
+    if (isInitialized) {
+        return null
+    }
+
+    return TrustedDeviceBridgeError(
+        code = "environment_unavailable",
+        message = "Trusted-device operations are unavailable until Clerk finishes configuring."
+    )
+}
 
 internal fun trustedDeviceKeyManagerErrorCode(
     code: TrustedDeviceKeyManagerException.Code
@@ -578,6 +590,10 @@ class ClerkExpoModule : Module() {
     }
 
     private fun listTrustedDevices(promise: Promise) {
+        if (!requireTrustedDeviceEnvironment(promise)) {
+            return
+        }
+
         coroutineScope.launch {
             try {
                 when (val result = Clerk.trustedDevices.list()) {
@@ -607,6 +623,10 @@ class ClerkExpoModule : Module() {
         policy: String,
         promise: Promise
     ) {
+        if (!requireTrustedDeviceEnvironment(promise)) {
+            return
+        }
+
         val trustedDevicePolicy = trustedDevicePolicy(policy)
         if (trustedDevicePolicy == null) {
             promise.reject(
@@ -619,6 +639,9 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                if (!attachCurrentActivityForTrustedDevice(promise)) {
+                    return@launch
+                }
                 when (
                     val result = Clerk.trustedDevices.enroll(
                         deviceName = deviceName,
@@ -647,6 +670,10 @@ class ClerkExpoModule : Module() {
     }
 
     private fun revokeTrustedDevice(id: String, promise: Promise) {
+        if (!requireTrustedDeviceEnvironment(promise)) {
+            return
+        }
+
         coroutineScope.launch {
             try {
                 when (val result = Clerk.trustedDevices.revoke(id)) {
@@ -675,8 +702,15 @@ class ClerkExpoModule : Module() {
         reason: String?,
         promise: Promise
     ) {
+        if (!requireTrustedDeviceEnvironment(promise)) {
+            return
+        }
+
         coroutineScope.launch {
             try {
+                if (!attachCurrentActivityForTrustedDevice(promise)) {
+                    return@launch
+                }
                 when (
                     val result = Clerk.trustedDevices.signIn(
                         id = id,
@@ -701,6 +735,27 @@ class ClerkExpoModule : Module() {
                 )
             }
         }
+    }
+
+    private fun requireTrustedDeviceEnvironment(promise: Promise): Boolean {
+        val error = trustedDeviceEnvironmentError(Clerk.isInitialized.value) ?: return true
+        promise.reject(error.code, error.message, null)
+        return false
+    }
+
+    private fun attachCurrentActivityForTrustedDevice(promise: Promise): Boolean {
+        val activity = appContext.currentActivity
+        if (activity == null) {
+            promise.reject(
+                "environment_unavailable",
+                "Trusted-device authentication requires an active Android activity",
+                null
+            )
+            return false
+        }
+
+        Clerk.attachActivity(activity)
+        return true
     }
 
     private fun rejectTrustedDeviceFailure(
