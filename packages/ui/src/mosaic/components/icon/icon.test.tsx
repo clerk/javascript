@@ -2,16 +2,14 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import type { MosaicAppearance } from '../../appearance';
+import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
 import { Icon } from './icon';
 
-const wrap = (ui: React.ReactElement, appearance?: MosaicAppearance) =>
-  render(<MosaicProvider appearance={appearance}>{ui}</MosaicProvider>);
+const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
+  render(<MosaicProvider icons={icons}>{ui}</MosaicProvider>);
 
-const override: MosaicAppearance = {
-  icons: { 'chevron-right': <span data-testid='override' /> },
-};
+const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
   it('renders the default glyph for a known name', () => {
@@ -105,14 +103,12 @@ describe('Mosaic Icon', () => {
         className='call-site'
       />,
       {
-        icons: {
-          'chevron-right': (
-            <span
-              data-testid='override'
-              className='consumer-glyph'
-            />
-          ),
-        },
+        'chevron-right': (
+          <span
+            data-testid='override'
+            className='consumer-glyph'
+          />
+        ),
       },
     );
     expect(getByTestId('override')).toHaveClass('cl-icon', 'call-site', 'consumer-glyph');
@@ -131,7 +127,7 @@ describe('Mosaic Icon', () => {
 
   it('falls through to the default when a different name is overridden', () => {
     const { container, queryByTestId } = wrap(<Icon name='chevron-right' />, {
-      icons: { 'chevron-left': <span data-testid='override' /> },
+      'chevron-left': <span data-testid='override' />,
     });
     expect(queryByTestId('override')).toBeNull();
     expect(container.querySelector('svg.cl-icon')).not.toBeNull();

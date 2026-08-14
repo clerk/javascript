@@ -8,9 +8,9 @@ import { Dialog } from './index';
 
 afterEach(() => cleanup());
 
-// Headless parts no longer emit `data-cl-slot` — slot identity is applied by the styled
-// (mosaic) layer. Tests locate the surface-only parts (backdrop, viewport, trigger) via
-// `data-testid` and everything else via its accessible role or text.
+// Headless parts carry no slot identity — that is applied by the styled (mosaic) layer.
+// Tests locate the surface-only parts (backdrop, viewport, trigger) via `data-testid` and
+// everything else via its accessible role or text.
 function renderDialog(props: Partial<React.ComponentProps<typeof Dialog.Root>> = {}) {
   return render(
     <Dialog.Root {...props}>

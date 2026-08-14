@@ -17,7 +17,6 @@ interface PropTableProps {
   extra?: ExtraProp[];
 }
 
-const SX_ROW: ExtraProp = { name: 'sx', type: 'StyleRule | (theme) => StyleRule' };
 const STYLEX_ROWS: ExtraProp[] = [
   { name: 'className', type: 'string' },
   { name: 'style', type: 'CSSProperties' },
@@ -39,7 +38,7 @@ export function PropTable({ meta, extra = [] }: PropTableProps) {
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    ...(meta.styleEngine === 'stylex' ? STYLEX_ROWS : [SX_ROW]),
+    ...STYLEX_ROWS,
   ];
 
   return (

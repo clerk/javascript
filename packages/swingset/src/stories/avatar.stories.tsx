@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Icon } from '@clerk/ui/mosaic/components/icon';

@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
@@ -25,7 +24,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Section',
   source: 'packages/ui/src/mosaic/components/section/section.tsx',
-  styleEngine: 'stylex',
 };
 
 export function Default() {

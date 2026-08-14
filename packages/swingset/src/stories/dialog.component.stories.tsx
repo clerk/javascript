@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Card } from '@clerk/ui/mosaic/components/card';
@@ -23,7 +22,6 @@ export const meta: StoryMeta = {
   group: 'Components',
   title: 'Dialog',
   source: 'packages/ui/src/mosaic/components/dialog/dialog.tsx',
-  styleEngine: 'stylex',
   styles: {
     _variants: {
       size: { prompt: {}, card: {}, panel: {} },
