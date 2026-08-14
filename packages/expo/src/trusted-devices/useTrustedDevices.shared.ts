@@ -99,7 +99,8 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
       );
     }
 
-    if (nativeSignIn.status === 'complete') {
+    const isComplete = nativeSignIn.status === 'complete';
+    if (isComplete) {
       if (
         !nativeSignIn.createdSessionId ||
         !client.signedInSessions.some(session => session.id === nativeSignIn.createdSessionId)
@@ -115,8 +116,10 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
     }
 
     return {
-      status: signIn.status ?? nativeSignIn.status,
-      createdSessionId: signIn.createdSessionId ?? nativeSignIn.createdSessionId,
+      status: isComplete ? nativeSignIn.status : (signIn.status ?? nativeSignIn.status),
+      createdSessionId: isComplete
+        ? nativeSignIn.createdSessionId
+        : (signIn.createdSessionId ?? nativeSignIn.createdSessionId),
       signIn,
       setActive: clerk.setActive,
     };

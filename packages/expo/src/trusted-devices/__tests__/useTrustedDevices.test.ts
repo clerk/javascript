@@ -290,6 +290,27 @@ describe('useTrustedDevices on iOS', () => {
     expect(result.setActive).toBe(mocks.setActive);
   });
 
+  test('keeps a completed native result authoritative when the current JS sign-in changes', async () => {
+    mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
+      id: 'sia_native',
+      status: 'complete',
+      createdSessionId: 'sess_123',
+    });
+    Object.assign(mocks.jsSignIn, {
+      id: 'sia_other',
+      status: 'needs_second_factor',
+      createdSessionId: 'sess_other',
+    });
+
+    const result = await useTrustedDevicesOnIos().signIn();
+
+    expect(result).toMatchObject({
+      status: 'complete',
+      createdSessionId: 'sess_123',
+      signIn: mocks.jsSignIn,
+    });
+  });
+
   test('accepts a completed sign-in when the synchronized client only contains its session', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
