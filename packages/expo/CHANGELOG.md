@@ -1,5 +1,42 @@
 # Change Log
 
+## 4.3.0
+
+### Minor Changes
+
+- Add custom user profile pages to the native `UserProfileView` and `UserButton` components. Use `content` to render a React Native screen or `href` to open an external URL. ([#9448](https://github.com/clerk/javascript/pull/9448)) by [@swolfand](https://github.com/swolfand)
+
+  ```tsx
+  import { UserButton, UserProfileView } from '@clerk/expo/native';
+  import type { UserProfileCustomPage } from '@clerk/expo/native';
+
+  const customPages: UserProfileCustomPage[] = [
+    {
+      path: 'api-keys',
+      label: 'API keys',
+      icon: 'key',
+      content: <APIKeysView />,
+    },
+    {
+      path: 'docs',
+      label: 'Docs',
+      icon: 'book',
+      href: 'https://clerk.com/docs',
+    },
+  ];
+
+  <UserProfileView customPages={customPages} />;
+
+  <UserButton userProfileProps={{ customPages }} />;
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+  - @clerk/clerk-js@6.29.1
+  - @clerk/react@6.14.3
+
 ## 4.2.8
 
 ### Patch Changes

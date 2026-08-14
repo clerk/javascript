@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.30.3
+
+### Patch Changes
+
+- Add a "Back" action to the sign-in second-factor and client-trust steps, letting a stuck user abandon the attempt and return to the sign-in start. ([#9190](https://github.com/clerk/javascript/pull/9190)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`7f5c294`](https://github.com/clerk/javascript/commit/7f5c2947e2b3b2ac9677116ff7eede61a1dab649)]:
+  - @clerk/shared@4.29.1
+  - @clerk/localizations@4.15.3
+
 ## 1.30.2
 
 ### Patch Changes
