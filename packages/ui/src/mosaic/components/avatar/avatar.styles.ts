@@ -110,6 +110,7 @@ export const sizes = stylex.create({
   xs: { fontSize: '0.5rem', height: space['5'], width: space['5'] },
   sm: { fontSize: '0.6875rem', height: space['7'], width: space['7'] },
   md: { fontSize: '0.875rem', height: space['9'], width: space['9'] },
-  lg: { fontSize: '1rem', height: space['12'], width: space['12'] },
+  lg: { fontSize: '1rem', height: space['10'], width: space['10'] },
+  xl: { fontSize: '1rem', height: space['12'], width: space['12'] },
   fit: { fontSize: '0.75rem', height: '100%', width: '100%' },
 });
