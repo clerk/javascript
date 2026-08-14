@@ -181,7 +181,7 @@ describe('createPasswordError() constructs error that password', () => {
     );
   });
 
-  it('falls back to the server message for a code with no complexity mapping', async () => {
+  it('returns the error itself for a code with no complexity mapping, so translateError handles it', async () => {
     const { wrapper: Wrapper } = await createFixtures();
 
     const wrapperBefore = ({ children }) => (
@@ -192,11 +192,12 @@ describe('createPasswordError() constructs error that password', () => {
 
     const { result } = renderHook(() => useLocalizations(), { wrapper: wrapperBefore });
 
-    const res = createPasswordError(
-      [{ code: 'form_password_some_future_rule', message: 'Server explains the rule.' }],
-      createLocalizationConfig(result.current.t),
-    );
-    expect(res).toBe('Server explains the rule.');
+    const error = { code: 'form_password_some_future_rule', message: 'Server explains the rule.' };
+    const res = createPasswordError([error], createLocalizationConfig(result.current.t));
+
+    expect(res).toBe(error);
+    // setError() pipes the result through translateError, which falls back to the API message
+    expect(result.current.translateError(res)).toBe('Server explains the rule.');
   });
 
   it('ignores unmapped codes that accompany a mapped one', async () => {

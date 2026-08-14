@@ -30,7 +30,10 @@ type LocalizationConfigProps = {
   passwordSettings: Pick<PasswordSettingsData, 'max_length' | 'min_length'>;
 };
 
-export const createPasswordError = (errors: ClerkAPIError[], localizationConfig: LocalizationConfigProps) => {
+export const createPasswordError = (
+  errors: ClerkAPIError[],
+  localizationConfig: LocalizationConfigProps,
+): ClerkAPIError | string | undefined => {
   if (!localizationConfig) {
     return errors[0].longMessage;
   }
@@ -60,11 +63,14 @@ export const createPasswordError = (errors: ClerkAPIError[], localizationConfig:
   const minLenErrors = errors.filter(e => e.code === 'form_password_length_too_short');
 
   const complexityErrors = mapComplexityErrors(passwordSettings);
-  const knownErrors = (minLenErrors.length ? minLenErrors : errors).filter(e => e.code in complexityErrors);
+  const knownErrors = (minLenErrors.length ? minLenErrors : errors).filter(e =>
+    Object.hasOwn(complexityErrors, e.code),
+  );
 
-  // an unmapped code would otherwise render the prefix with an empty list, eg "Your password must contain ."
+  // returning the error lets translateError localize by code before falling back to the API message;
+  // building the sentence here would render the prefix with an empty list, eg "Your password must contain ."
   if (!knownErrors.length) {
-    return errors?.[0]?.longMessage || errors?.[0]?.message || '';
+    return errors?.[0];
   }
 
   const message = knownErrors.map((s: any) => {

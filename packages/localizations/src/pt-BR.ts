@@ -1765,6 +1765,7 @@ export const ptBR: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Senha incorreta.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_or_identifier_incorrect:
       'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',

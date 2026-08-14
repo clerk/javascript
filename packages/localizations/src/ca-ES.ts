@@ -1760,6 +1760,7 @@ export const caES: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_or_identifier_incorrect:
       "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",

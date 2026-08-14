@@ -1760,6 +1760,7 @@ export const esMX: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Contraseña incorrecta.',
     form_password_length_too_short: 'La contraseña es muy corta.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',
     form_password_or_identifier_incorrect:
       'La contraseña o la dirección de correo electrónico es incorrecta. Inténtalo de nuevo o usa otro método.',

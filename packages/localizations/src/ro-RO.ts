@@ -1766,6 +1766,7 @@ export const roRO: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
     form_password_or_identifier_incorrect:
       'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',

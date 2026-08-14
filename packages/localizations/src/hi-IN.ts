@@ -1768,6 +1768,7 @@ export const hiIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
     form_password_or_identifier_incorrect:
       'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',

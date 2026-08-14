@@ -1751,6 +1751,7 @@ export const mnMN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_or_identifier_incorrect:
       'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',

@@ -1750,6 +1750,7 @@ export const bgBG: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невалидна парола. Моля, опитайте отново.',
     form_password_length_too_short: 'Паролата е твърде кратка. Моля, въведете поне 8 символа.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough:
       'Паролата трябва да съдържа поне една главна буква, една цифра и един специален символ.',
     form_password_or_identifier_incorrect:

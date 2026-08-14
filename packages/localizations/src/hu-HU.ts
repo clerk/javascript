@@ -1774,6 +1774,7 @@ export const huHU: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'A jelszavad túl rövid. Legalább 8 karakter hosszúnak kell lennie.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_or_identifier_incorrect:
       'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
