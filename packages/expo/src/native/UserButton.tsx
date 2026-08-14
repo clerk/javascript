@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentType, Ref } from 'react';
+import type { ComponentProps, ComponentType, JSX, Ref } from 'react';
 import { useRef } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -59,7 +59,7 @@ export interface UserButtonProps {
  * @see {@link UserProfileView} The profile view to render in your own presentation surface
  * @see {@link https://clerk.com/docs/components/user/user-button} Clerk UserButton Documentation
  */
-export function UserButton({ userProfileProps }: UserButtonProps) {
+export function UserButton({ userProfileProps }: UserButtonProps): JSX.Element | null {
   const nativeViewRef = useRef<NativeUserProfileNavigationHandle>(null);
   const customPages = userProfileProps?.customPages ?? [];
   const { activePath, onCustomPageEvent } = useUserProfileCustomPages(customPages, nativeViewRef);

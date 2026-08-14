@@ -133,4 +133,23 @@ describe('UserProfileView', () => {
       expect(mocks.navigateCustomPage).toHaveBeenCalledWith('back');
     });
   });
+
+  test('warns when an href page cannot be opened and returns to the profile root', async () => {
+    const error = new Error('Unable to open URL');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    mocks.openURL.mockRejectedValueOnce(error);
+
+    render(<UserProfileView customPages={[{ path: 'docs', label: 'Docs', href: 'https://clerk.com/docs' }]} />);
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'docs' } });
+    });
+
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith('Could not open custom user profile page "docs".', error);
+      expect(mocks.navigateCustomPage).toHaveBeenCalledWith('back');
+    });
+
+    warn.mockRestore();
+  });
 });

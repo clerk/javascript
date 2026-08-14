@@ -96,6 +96,16 @@ export function useUserProfileCustomPageNavigation(): UserProfileCustomPageNavig
 }
 
 export function serializeUserProfileCustomPages(customPages: UserProfileCustomPage[]): string {
+  const paths = new Set<string>();
+
+  for (const { path } of customPages) {
+    if (paths.has(path)) {
+      throw new Error(`User profile custom page path "${path}" must be unique.`);
+    }
+
+    paths.add(path);
+  }
+
   return JSON.stringify(
     customPages.map(page => ({
       path: page.path,
@@ -134,7 +144,9 @@ export function useUserProfileCustomPages(
 
         openingPaths.current.add(path);
         void Linking.openURL(page.href)
-          .catch(() => undefined)
+          .catch(error => {
+            console.warn(`Could not open custom user profile page "${path}".`, error);
+          })
           .finally(() => {
             openingPaths.current.delete(path);
             void navigationHandleRef.current?.navigateCustomPage('back');

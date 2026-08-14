@@ -82,6 +82,60 @@ public class ClerkNativeViewHost: ExpoView {
   }
 }
 
+public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
+  private var currentCustomPages: String = "[]"
+  let customPageState = ClerkUserProfileCustomPageState()
+  let onCustomPageEvent = EventDispatcher()
+
+  public required init(appContext: AppContext? = nil) {
+    super.init(appContext: appContext)
+    customPageState.setPageEventHandler { [weak self] type, path in
+      self?.onCustomPageEvent(["type": type, "path": path])
+    }
+  }
+
+  func setCustomPages(_ customPages: String?) {
+    let newCustomPages = customPages ?? "[]"
+    guard newCustomPages != currentCustomPages else { return }
+    currentCustomPages = newCustomPages
+    setNeedsHostedViewUpdate()
+  }
+
+  func navigateCustomPage(action: String, routeKey: String?) {
+    customPageState.navigate(action: action, routeKey: routeKey)
+  }
+
+  func customRows() -> [ClerkUserProfileCustomRowConfig] {
+    parseUserProfileCustomPages(currentCustomPages, pageCount: customPageState.views.count)
+  }
+
+#if RCT_NEW_ARCH_ENABLED
+  override public func mountChildComponentView(_ childComponentView: UIView, index: Int) {
+    customPageState.insertView(childComponentView, at: index)
+    setNeedsHostedViewUpdate()
+  }
+
+  override public func unmountChildComponentView(_ childComponentView: UIView, index: Int) {
+    customPageState.removeView(childComponentView)
+    setNeedsHostedViewUpdate()
+  }
+#else
+  override public func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    super.insertReactSubview(subview, at: atIndex)
+    customPageState.insertView(subview, at: atIndex)
+    setNeedsHostedViewUpdate()
+  }
+
+  override public func removeReactSubview(_ subview: UIView!) {
+    customPageState.removeView(subview)
+    super.removeReactSubview(subview)
+    setNeedsHostedViewUpdate()
+  }
+
+  override public func didUpdateReactSubviews() {}
+#endif
+}
+
 private final class ClerkNativeHostingCoordinator {
   private weak var containerView: UIView?
   private var hostingController: UIViewController?

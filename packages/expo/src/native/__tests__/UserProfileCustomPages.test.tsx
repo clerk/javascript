@@ -49,4 +49,13 @@ describe('serializeUserProfileCustomPages', () => {
     expect(JSON.parse(result).map((page: { path: string }) => page.path)).toEqual(['support', 'billing']);
     expect(JSON.parse(result)[1].placement).toEqual({ type: 'before', row: 'signOut' });
   });
+
+  test('rejects duplicate page paths', () => {
+    expect(() =>
+      serializeUserProfileCustomPages([
+        { path: 'billing', label: 'Billing', content: null },
+        { path: 'billing', label: 'Invoices', content: null },
+      ]),
+    ).toThrow('User profile custom page path "billing" must be unique.');
+  });
 });

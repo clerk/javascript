@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentType, Ref } from 'react';
+import type { ComponentProps, ComponentType, JSX, Ref } from 'react';
 import { useCallback, useRef } from 'react';
 import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
@@ -101,7 +101,7 @@ export function UserProfileView({
   onDismiss,
   onHostBack,
   customPages = [],
-}: UserProfileViewProps) {
+}: UserProfileViewProps): JSX.Element {
   const nativeViewRef = useRef<NativeUserProfileNavigationHandle>(null);
   const { activePath, onCustomPageEvent } = useUserProfileCustomPages(customPages, nativeViewRef);
   const handleProfileEvent = useCallback(

@@ -722,16 +722,16 @@ struct ClerkInlineAuthWrapperView: View {
 private struct ClerkReactLogoView: UIViewRepresentable {
   let view: UIView
 
-  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
-    return ClerkReactLogoContainerView(contentView: view)
+  func makeUIView(context: Context) -> ClerkReactContentContainerView {
+    return ClerkReactContentContainerView(contentView: view)
   }
 
-  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+  func updateUIView(_ uiView: ClerkReactContentContainerView, context: Context) {
     uiView.setContentView(view)
   }
 }
 
-private final class ClerkReactLogoContainerView: UIView {
+private final class ClerkReactContentContainerView: UIView {
   private var contentView: UIView?
 
   init(contentView: UIView) {
@@ -851,11 +851,11 @@ private struct ClerkReactUserProfileCustomPage: View {
 private struct ClerkReactCustomPageView: UIViewRepresentable {
   let view: UIView
 
-  func makeUIView(context: Context) -> ClerkReactLogoContainerView {
-    ClerkReactLogoContainerView(contentView: view)
+  func makeUIView(context: Context) -> ClerkReactContentContainerView {
+    ClerkReactContentContainerView(contentView: view)
   }
 
-  func updateUIView(_ uiView: ClerkReactLogoContainerView, context: Context) {
+  func updateUIView(_ uiView: ClerkReactContentContainerView, context: Context) {
     uiView.setContentView(view)
   }
 }
