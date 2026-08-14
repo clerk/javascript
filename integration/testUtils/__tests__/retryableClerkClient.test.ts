@@ -47,26 +47,50 @@ describe('withRetry', () => {
   });
 
   describe('retryOnFailure — retryable status codes', () => {
-    it.each([429, 502, 503, 504])('retries on status %d up to MAX_RETRIES then throws', async status => {
-      const error = makeClerkAPIError(status);
+    it.each([429, 502, 503, 504])(
+      'retries on status %d until the retry budget is exhausted, then throws',
+      async status => {
+        vi.spyOn(Math, 'random').mockReturnValue(0);
+        const error = makeClerkAPIError(status);
+        const mock = mockDeferredReject(error);
+        const client = makeMockClient({ getUser: mock });
+        const wrapped = withRetry(client);
+
+        const promise = (wrapped.users as any).getUser('user_123');
+
+        // Attach handler before advancing timers to avoid unhandled rejection
+        const expectation = expect(promise).rejects.toBe(error);
+
+        // Backoff of 1s + 2s + 4s + 8s = 15s elapsed; the next 16s delay would exceed the 20s budget
+        for (const delayMs of [1000, 2000, 4000, 8000]) {
+          await vi.advanceTimersByTimeAsync(delayMs);
+        }
+        await vi.advanceTimersByTimeAsync(0);
+
+        await expectation;
+
+        // 1 initial call + 4 retries = 5 total
+        expect(mock).toHaveBeenCalledTimes(5);
+      },
+    );
+
+    it('gives up once the elapsed time plus the next delay would exceed the total budget', async () => {
+      const error = makeClerkAPIError(429, { retryAfter: 60 });
       const mock = mockDeferredReject(error);
       const client = makeMockClient({ getUser: mock });
       const wrapped = withRetry(client);
 
       const promise = (wrapped.users as any).getUser('user_123');
-
-      // Attach handler before advancing timers to avoid unhandled rejection
       const expectation = expect(promise).rejects.toBe(error);
 
-      // Advance through all 6 attempts (initial + 5 retries)
-      for (let i = 0; i < 6; i++) {
-        await vi.advanceTimersByTimeAsync(60_000);
-      }
+      // Two capped 10s waits exhaust the 20s budget, so the third failure is not retried
+      await vi.advanceTimersByTimeAsync(10_000);
+      await vi.advanceTimersByTimeAsync(10_000);
+      await vi.advanceTimersByTimeAsync(0);
 
       await expectation;
 
-      // 1 initial call + 5 retries = 6 total
-      expect(mock).toHaveBeenCalledTimes(6);
+      expect(mock).toHaveBeenCalledTimes(3);
     });
 
     it('succeeds on retry after transient failure', async () => {
@@ -158,7 +182,7 @@ describe('withRetry', () => {
       expect(mock).toHaveBeenCalledTimes(2);
     });
 
-    it('caps retryAfter delay at MAX_RETRY_DELAY_MS (30s)', async () => {
+    it('caps retryAfter delay at MAX_RETRY_DELAY_MS (10s)', async () => {
       const error = makeClerkAPIError(429, { retryAfter: 60 });
       const mock = vi
         .fn()
@@ -169,8 +193,8 @@ describe('withRetry', () => {
 
       const promise = (wrapped.users as any).getUser('user_123');
 
-      // Even though retryAfter is 60s, delay should be capped at 30s
-      await vi.advanceTimersByTimeAsync(30_000);
+      // Even though retryAfter is 60s, delay should be capped at 10s
+      await vi.advanceTimersByTimeAsync(10_000);
       await vi.advanceTimersByTimeAsync(0);
 
       await expect(promise).resolves.toEqual({ id: 'user_123' });

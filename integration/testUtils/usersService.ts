@@ -1,9 +1,41 @@
-import type { APIKey, ClerkClient, Organization, User } from '@clerk/backend';
+import type { APIKey, ClerkClient, User } from '@clerk/backend';
 import { faker } from '@faker-js/faker';
 import type { TestInfo } from '@playwright/test';
 
 import { fakerPassword, hash } from '../models/helpers';
 import { getE2ERunMarker } from './e2eRun';
+
+/**
+ * Leftover users are reaped by the scheduled `Cleanup e2e instances` workflow, so a slow or failing
+ * teardown must never fail the suite (or out-wait Playwright's 30s hook timeout) on its own.
+ */
+const TEARDOWN_TIMEOUT_MS = 5_000;
+
+async function bestEffortCleanup(operation: string, fn: () => Promise<unknown>): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const work = fn().then(() => 'done' as const);
+  work.catch(() => {});
+
+  try {
+    const result = await Promise.race([
+      work,
+      new Promise<'timeout'>(resolve => {
+        timer = setTimeout(() => resolve('timeout'), TEARDOWN_TIMEOUT_MS);
+      }),
+    ]);
+    if (result === 'timeout') {
+      console.warn(
+        `[usersService] ${operation} did not finish within ${TEARDOWN_TIMEOUT_MS}ms, leaving it to the scheduled e2e cleanup`,
+      );
+    }
+  } catch (e: any) {
+    console.warn(
+      `[usersService] ${operation} failed (${e?.status ?? 'unknown status'}: ${e?.message}), leaving it to the scheduled e2e cleanup`,
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 async function withErrorLogging<T>(operation: string, fn: () => Promise<T>): Promise<T> {
   try {
@@ -68,6 +100,9 @@ export type FakeUser = {
   username?: string;
   phoneNumber?: string;
   privateMetadata?: UserPrivateMetadata;
+  /**
+   * Best-effort cleanup: resolves even if the deletion fails or times out.
+   */
   deleteIfExists: () => Promise<void>;
 };
 
@@ -76,7 +111,10 @@ export type FakeUserWithEmail = FakeUser & { email: string };
 export type FakeOrganization = {
   name: string;
   organization: { id: string };
-  delete: () => Promise<Organization>;
+  /**
+   * Best-effort cleanup: resolves even if the deletion fails or times out.
+   */
+  delete: () => Promise<void>;
 };
 
 export type FakeAPIKey = {
@@ -154,7 +192,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
           line,
           ...(runMarker ? { e2eRunMarker: runMarker } : {}),
         },
-        deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
+        deleteIfExists: () => bestEffortCleanup('deleteIfExists', () => self.deleteIfExists({ email, phoneNumber })),
       };
     },
     createBapiUser: async fakeUser => {
@@ -246,7 +284,9 @@ export const createUserService = (clerkClient: ClerkClient) => {
         name,
         organization,
         delete: () =>
-          withErrorLogging('deleteOrganization', () => clerkClient.organizations.deleteOrganization(organization.id)),
+          bestEffortCleanup('deleteOrganization', () =>
+            withErrorLogging('deleteOrganization', () => clerkClient.organizations.deleteOrganization(organization.id)),
+          ),
       } satisfies FakeOrganization;
     },
     createFakeAPIKey: async (userId: string) => {

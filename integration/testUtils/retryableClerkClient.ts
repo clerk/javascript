@@ -4,7 +4,12 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 const MAX_RETRIES = 5;
 const BASE_DELAY_MS = 1000;
 const JITTER_MAX_MS = 500;
-const MAX_RETRY_DELAY_MS = 30_000;
+const MAX_RETRY_DELAY_MS = 10_000;
+/**
+ * Playwright's default test/hook timeout is 30s, so a single call must never be able to
+ * out-wait it — otherwise a rate limited instance surfaces as an opaque hook timeout.
+ */
+const MAX_TOTAL_RETRY_MS = 20_000;
 const RETRYABLE_STATUS_CODES = new Set([429, 502, 503, 504]);
 
 const retryStats = { totalRetries: 0, callsRetried: new Set<string>() };
@@ -38,6 +43,7 @@ export function printRetrySummary(): void {
 }
 
 async function retryOnFailure<T>(firstAttempt: Promise<T>, fn: () => Promise<T>, path: string): Promise<T> {
+  const startedAt = Date.now();
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       return attempt === 0 ? await firstAttempt : await fn();
@@ -46,8 +52,15 @@ async function retryOnFailure<T>(firstAttempt: Promise<T>, fn: () => Promise<T>,
       if (!isRetryable || attempt === MAX_RETRIES) {
         throw error;
       }
-      recordRetry(path);
       const delayMs = getRetryDelay(error, attempt);
+      const elapsedMs = Date.now() - startedAt;
+      if (elapsedMs + delayMs > MAX_TOTAL_RETRY_MS) {
+        console.warn(
+          `[Retry] ${error.status} for ${path}, giving up after ${Math.round(elapsedMs)}ms (retry budget of ${MAX_TOTAL_RETRY_MS}ms exhausted)`,
+        );
+        throw error;
+      }
+      recordRetry(path);
       console.warn(
         `[Retry] ${error.status} for ${path}, attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${Math.round(delayMs)}ms`,
       );
