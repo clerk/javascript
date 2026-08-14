@@ -2,6 +2,7 @@ package expo.modules.clerk
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -90,6 +91,21 @@ abstract class ClerkComposeNativeViewHost(context: Context, appContext: AppConte
   protected open fun localViewModelStoreOwner(): ViewModelStoreOwner? = activity
 
   protected open fun onHostDetachedFromWindow() {}
+
+  protected fun layoutAndroidViewHandler(view: View) {
+    view.post {
+      val holder = view.parent as? View ?: return@post
+      val handler = holder.parent as? View ?: return@post
+      val owner = handler.parent as? View ?: return@post
+
+      // AndroidView's handler can enter the hierarchy after its Compose owner was laid out.
+      handler.measure(
+        View.MeasureSpec.makeMeasureSpec(owner.width, View.MeasureSpec.EXACTLY),
+        View.MeasureSpec.makeMeasureSpec(owner.height, View.MeasureSpec.EXACTLY),
+      )
+      handler.layout(0, 0, owner.width, owner.height)
+    }
+  }
 
   @Composable
   protected abstract fun Content()

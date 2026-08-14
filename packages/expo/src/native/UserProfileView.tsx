@@ -1,10 +1,30 @@
-import { useCallback } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import type { ComponentProps, ComponentType, JSX, Ref } from 'react';
+import { useCallback, useRef } from 'react';
+import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
 import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
 import { isNativeSupported } from '../utils/native-module';
 import type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
+import type {
+  NativeUserProfileNavigationHandle,
+  UserProfileCustomPage,
+  UserProfileCustomPageEvent,
+} from './UserProfileCustomPages';
+import {
+  serializeUserProfileCustomPages,
+  UserProfileCustomPageHosts,
+  useUserProfileCustomPages,
+} from './UserProfileCustomPages';
+
+type CustomizableNativeUserProfileProps = ComponentProps<NonNullable<typeof NativeClerkUserProfileView>> & {
+  customPages?: string;
+  onCustomPageEvent?: (event: NativeSyntheticEvent<UserProfileCustomPageEvent>) => void;
+  ref?: Ref<NativeUserProfileNavigationHandle>;
+};
+
+const CustomizableNativeClerkUserProfileView =
+  NativeClerkUserProfileView as ComponentType<CustomizableNativeUserProfileProps> | null;
 
 /**
  * Props for the UserProfileView component.
@@ -29,6 +49,9 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
    * Called when the user dismisses the native profile view.
    */
   onDismiss?: () => void;
+
+  /** Custom pages displayed as rows in the root profile screen. */
+  customPages?: UserProfileCustomPage[];
 }
 
 /**
@@ -58,13 +81,29 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  *     if (!isSignedIn) router.replace('/sign-in');
  *   }, [isSignedIn]);
  *
- *   return <UserProfileView style={{ flex: 1 }} />;
+ *   return (
+ *     <UserProfileView
+ *       style={{ flex: 1 }}
+ *       customPages={[
+ *         { path: 'api-keys', label: 'API keys', icon: 'key', content: <APIKeysView /> },
+ *         { path: 'docs', label: 'Docs', icon: 'book', href: 'https://clerk.com/docs' },
+ *       ]}
+ *     />
+ *   );
  * }
  * ```
  *
  * @see {@link https://clerk.com/docs/components/user/user-profile} Clerk UserProfile Documentation
  */
-export function UserProfileView({ isDismissible = true, style, onDismiss, onHostBack }: UserProfileViewProps) {
+export function UserProfileView({
+  isDismissible = true,
+  style,
+  onDismiss,
+  onHostBack,
+  customPages = [],
+}: UserProfileViewProps): JSX.Element {
+  const nativeViewRef = useRef<NativeUserProfileNavigationHandle>(null);
+  const { activePath, onCustomPageEvent } = useUserProfileCustomPages(customPages, nativeViewRef);
   const handleProfileEvent = useCallback(
     (event: { nativeEvent: { type: string } }) => {
       if (event.nativeEvent.type === 'dismissed') {
@@ -74,7 +113,7 @@ export function UserProfileView({ isDismissible = true, style, onDismiss, onHost
     [onDismiss],
   );
 
-  if (!isNativeSupported || !NativeClerkUserProfileView) {
+  if (!isNativeSupported || !CustomizableNativeClerkUserProfileView) {
     return (
       <View style={[styles.container, style]}>
         <Text style={styles.text}>
@@ -87,13 +126,22 @@ export function UserProfileView({ isDismissible = true, style, onDismiss, onHost
   }
 
   return (
-    <NativeClerkUserProfileView
+    <CustomizableNativeClerkUserProfileView
+      ref={nativeViewRef}
       style={[styles.container, style]}
       isDismissible={isDismissible}
       hostBackButton={!!onHostBack}
+      customPages={serializeUserProfileCustomPages(customPages)}
       onProfileEvent={handleProfileEvent}
+      onCustomPageEvent={onCustomPageEvent}
       onHostBack={onHostBack ? () => onHostBack() : undefined}
-    />
+    >
+      <UserProfileCustomPageHosts
+        customPages={customPages}
+        activePath={activePath}
+        navigationHandleRef={nativeViewRef}
+      />
+    </CustomizableNativeClerkUserProfileView>
   );
 }
 
