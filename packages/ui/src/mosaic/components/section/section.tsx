@@ -104,8 +104,8 @@ const styles = stylex.create({
     width: space['8'],
   },
   mediaXl: {
-    height: space['10'],
-    width: space['10'],
+    height: space['10.5'],
+    width: space['10.5'],
   },
   content: {
     display: 'flex',
