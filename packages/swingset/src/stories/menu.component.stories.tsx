@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import { Icon } from '@clerk/ui/mosaic/components/icon';
 import { Menu } from '@clerk/ui/mosaic/components/menu';
 

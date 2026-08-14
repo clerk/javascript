@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useMosaicIcons } from '../../appearance';
+import { useMosaicIcons } from '../../icons/overrides';
 import type { IconName } from '../../icons/registry';
 import { iconRegistry } from '../../icons/registry';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -16,7 +16,7 @@ export interface IconProps extends React.ComponentPropsWithRef<'svg'> {
 }
 
 /**
- * Renders a Mosaic icon by name. The glyph can be swapped per-name via `appearance.icons` on
+ * Renders a Mosaic icon by name. The glyph can be swapped per-name via the `icons` prop on
  * `MosaicProvider`; Mosaic's sizing is applied to the override exactly as it is to the built-in
  * glyph, so the two stay visually consistent.
  *

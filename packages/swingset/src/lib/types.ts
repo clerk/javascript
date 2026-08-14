@@ -50,11 +50,9 @@ export interface StoryMeta {
    */
   source?: string;
   /**
-   * Which styling engine the documented component is built on. Drives the prop rows that
-   * are engine-specific: Emotion components take `sx`, StyleX components take `className`
-   * and `style`. Defaults to `'emotion'` — set `'stylex'` once a component is migrated.
+   * The component's variant surface, described by hand. Drives the playground knobs and
+   * the `<PropTable>` rows. StyleX has no runtime recipe to derive this from.
    */
-  styleEngine?: 'emotion' | 'stylex';
   styles?: {
     _variants: Record<string, Record<string, unknown>>;
     _defaultVariants?: Record<string, unknown>;

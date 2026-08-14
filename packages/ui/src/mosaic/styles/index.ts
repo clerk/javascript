@@ -34,6 +34,7 @@ export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
 export { Icon } from '../components/icon';
 export type { IconProps } from '../components/icon';
+export type { MosaicIconOverride, MosaicIconOverrides } from '../icons/overrides';
 export { Input } from '../components/input';
 export type { InputProps } from '../components/input';
 export { Item } from '../components/item';
