@@ -53,7 +53,7 @@ export function Default() {
       <Section.Title>Profile</Section.Title>
       <Section.Group>
         <Section.Row>
-          <Section.Item style={{ columnGap: 'calc(var(--cl-spacing) * 4)' }}>
+          <Section.Item>
             <Section.Media size='xl'>
               <Avatar.Root size='fit'>
                 <Avatar.Image
@@ -143,7 +143,7 @@ export function MultipleEmailAndPhoneNumbers() {
       <Section.Title>Profile</Section.Title>
       <Section.Group>
         <Section.Row>
-          <Section.Item style={{ columnGap: 'calc(var(--cl-spacing) * 4)' }}>
+          <Section.Item>
             <Section.Media size='xl'>
               <Avatar.Root size='fit'>
                 <Avatar.Image
