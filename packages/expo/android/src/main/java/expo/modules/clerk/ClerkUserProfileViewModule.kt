@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,6 +34,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 private const val TAG = "ClerkUserProfileViewModule"
+
+private fun matchParentLayoutParams() =
+  FrameLayout.LayoutParams(
+    ViewGroup.LayoutParams.MATCH_PARENT,
+    ViewGroup.LayoutParams.MATCH_PARENT,
+  )
 
 private fun debugLog(tag: String, message: String) {
   if (BuildConfig.DEBUG) {
@@ -186,9 +193,17 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
     AndroidView(
       modifier = Modifier.fillMaxSize(),
-      factory = {
+      // React Native views never self-measure, so Compose sizes the interop holder to
+      // zero and the rehosted subtree ends up with no layout bounds.
+      factory = { context ->
         (view.parent as? ViewGroup)?.removeView(view)
-        view
+        FrameLayout(context).apply { addView(view, matchParentLayoutParams()) }
+      },
+      update = { holder ->
+        if (view.parent !== holder) {
+          (view.parent as? ViewGroup)?.removeView(view)
+          holder.addView(view, matchParentLayoutParams())
+        }
       },
     )
   }
