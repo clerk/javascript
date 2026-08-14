@@ -14,6 +14,7 @@ vi.mock('node:child_process', async importOriginal => {
 import { execSync, spawnSync } from 'node:child_process';
 
 import { loadConfig } from '../../config.js';
+import { renderDebug } from '../../render.js';
 import { runCodemods, runScans } from '../../runner.js';
 import { createTempFixture } from '../helpers/create-fixture.js';
 
@@ -346,6 +347,39 @@ describe('runScans', () => {
 
     const file = path.relative(process.cwd(), path.join(fixture.path, 'run'));
     expect(results.flatMap(result => result.instances).some(instance => instance.file === file)).toBe(true);
+  });
+
+  it('logs and falls back to normal scanning when git ignored output exceeds the child process buffer', async () => {
+    const { execSync: actualExecSync } = await vi.importActual('node:child_process');
+    let gitError;
+
+    vi.mocked(execSync).mockImplementationOnce((command, options) => {
+      expect(command).toBe('git ls-files --others --ignored --exclude-standard --directory');
+
+      try {
+        return actualExecSync(
+          `"${process.execPath}" -e "process.stdout.write('ignored-file\\\\n'.repeat(100000))"`,
+          options,
+        );
+      } catch (error) {
+        gitError = error;
+        throw error;
+      }
+    });
+
+    fs.writeFileSync(path.join(fixture.path, '.gitignore'), 'run\n', 'utf8');
+    fs.writeFileSync(path.join(fixture.path, 'run'), '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', {
+      dir: fixture.path,
+      ignore: [],
+    });
+
+    const file = path.relative(process.cwd(), path.join(fixture.path, 'run'));
+    expect(results.flatMap(result => result.instances).some(instance => instance.file === file)).toBe(true);
+    expect(gitError).toBeDefined();
+    expect(renderDebug).toHaveBeenCalledWith(expect.stringContaining('Skipping .gitignore support for scans'));
+    expect(renderDebug).toHaveBeenCalledWith(expect.stringContaining(gitError.message));
   });
 
   it('includes both changes with and without matchers', async () => {
