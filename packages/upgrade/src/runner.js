@@ -169,12 +169,12 @@ async function getFilesToScan(cwd, options) {
   // - https://github.com/SuperchupuDev/tinyglobby/issues/92
   function gitIgnored() {
     try {
-      return execSync('git ls-files --others --ignored --exclude-standard --directory', {
+      return execSync('git ls-files -z --others --ignored --exclude-standard --directory', {
         cwd,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
       })
-        .split('\n')
+        .split('\0')
         .filter(Boolean)
         .map(file => escapePath(file));
     } catch (error) {

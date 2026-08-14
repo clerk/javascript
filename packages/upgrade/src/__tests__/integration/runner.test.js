@@ -291,6 +291,25 @@ describe('runScans', () => {
     expect(results.flatMap(result => result.instances).every(instance => instance.file !== skipped)).toBe(true);
   });
 
+  it('respects ignored files with unusual characters in their path', async () => {
+    // Guard as this test assumes git is available
+    if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) {
+      return;
+    }
+
+    const gitPath = fs.mkdtempSync(path.join(fixture.path, 'gitignore-'));
+    const ignoredFile = path.join(gitPath, 'ignored-\n-file');
+
+    expect(spawnSync('git', ['init', '-q'], { cwd: gitPath, stdio: 'ignore' }).status).toBe(0);
+    fs.writeFileSync(path.join(gitPath, '.gitignore'), 'ignored-*\n', 'utf8');
+    fs.writeFileSync(ignoredFile, '#!/usr/bin/env node\nafterSignInUrl\n', 'utf8');
+
+    const results = await runScans(createScanConfig(), 'nextjs', { dir: gitPath, ignore: [] });
+
+    const skipped = path.relative(process.cwd(), ignoredFile);
+    expect(results.flatMap(result => result.instances).every(instance => instance.file !== skipped)).toBe(true);
+  });
+
   it('can skip using .gitignore files', async () => {
     // Guard as this test assumes git is available
     if (spawnSync('git', ['--version'], { stdio: 'ignore' }).status !== 0) return;
@@ -354,7 +373,7 @@ describe('runScans', () => {
     let gitError;
 
     vi.mocked(execSync).mockImplementationOnce((command, options) => {
-      expect(command).toBe('git ls-files --others --ignored --exclude-standard --directory');
+      expect(command).toBe('git ls-files -z --others --ignored --exclude-standard --directory');
 
       try {
         return actualExecSync(
