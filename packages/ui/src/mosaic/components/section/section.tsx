@@ -34,10 +34,7 @@ const styles = stylex.create({
     width: '100%',
   },
   title: {
-    alignItems: 'center',
-    display: 'flex',
     fontWeight: fontWeightVars['--cl-font-medium'],
-    minHeight: space['8'],
   },
   group: {
     borderColor: colorVars['--cl-color-border'],
