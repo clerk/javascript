@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import fs from 'fs-extra';
@@ -6,13 +8,15 @@ import fs from 'fs-extra';
 import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
 import { environmentConfig } from '../models/environment';
+import type { PlatformApplication, PlatformApplicationConfig } from './platformApplication';
+import { createApplicationFromConfig } from './platformApplication';
 
 const getInstanceKeys = () => {
   let keys: Record<string, { pk: string; sk: string }>;
   try {
     keys = constants.INTEGRATION_INSTANCE_KEYS
       ? JSON.parse(constants.INTEGRATION_INSTANCE_KEYS)
-      : fs.readJSONSync(resolve(__dirname, '..', '.keys.json')) || null;
+      : fs.readJSONSync(resolve(import.meta.dirname, '..', '.keys.json')) || null;
   } catch (e) {
     console.log('Could not find .keys.json file', e);
   }
@@ -24,7 +28,7 @@ const getInstanceKeys = () => {
   try {
     const stagingKeys: Record<string, { pk: string; sk: string }> = constants.INTEGRATION_STAGING_INSTANCE_KEYS
       ? JSON.parse(constants.INTEGRATION_STAGING_INSTANCE_KEYS)
-      : fs.readJSONSync(resolve(__dirname, '..', '.keys.staging.json')) || null;
+      : fs.readJSONSync(resolve(import.meta.dirname, '..', '.keys.staging.json')) || null;
     if (stagingKeys) {
       Object.assign(keys, stagingKeys);
     }
@@ -39,6 +43,80 @@ export const instanceKeys = getInstanceKeys();
 
 const STAGING_API_URL = 'https://api.clerkstage.dev';
 const STAGING_KEY_PREFIX = 'clerkstage-';
+const platformApplicationCachePaths = new Set<string>();
+
+export const removePlatformApplicationCache = async () => {
+  await Promise.all([...platformApplicationCachePaths].map(cachePath => fs.remove(cachePath)));
+};
+
+const isPlatformApplication = (value: unknown): value is PlatformApplication => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const application = value as Partial<PlatformApplication>;
+  return Boolean(application.applicationId && application.instanceId && application.pk && application.sk);
+};
+
+const getPlatformApplication = async (
+  keyName: string,
+  definition: PlatformApplicationConfig,
+): Promise<PlatformApplication> => {
+  const platformApiKey = constants.CLERK_PLATFORM_API_KEY;
+  if (!platformApiKey) {
+    throw new Error('CLERK_PLATFORM_API_KEY is required to create a Platform API application.');
+  }
+  if (!constants.E2E_APP_ID) {
+    const application = await createApplicationFromConfig(
+      platformApiKey,
+      keyName,
+      definition,
+      constants.INTEGRATION_TEST_RUN_KEY,
+    );
+    console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
+    return application;
+  }
+  const cacheKey = createHash('sha256')
+    .update(platformApiKey)
+    .update(keyName)
+    .update(JSON.stringify(definition.config))
+    .update(constants.INTEGRATION_TEST_RUN_KEY || '')
+    .update(constants.E2E_APP_ID)
+    .digest('hex');
+  const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
+  platformApplicationCachePaths.add(cachePath);
+  const cached = (await fs.pathExists(cachePath)) ? await fs.readJSON(cachePath, { throws: false }) : null;
+
+  if (isPlatformApplication(cached)) {
+    console.log(`Using Platform API application ${cached.applicationId} for ${keyName}.`);
+    return cached;
+  }
+
+  const application = await createApplicationFromConfig(
+    platformApiKey,
+    keyName,
+    definition,
+    constants.INTEGRATION_TEST_RUN_KEY,
+  );
+  await fs.outputJSON(cachePath, application, { mode: 0o600 });
+  console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
+  return application;
+};
+
+const loadPlatformApplicationConfig = async (configPath: string): Promise<PlatformApplicationConfig> => {
+  const configModule = (await import(pathToFileURL(configPath).href)) as { default?: PlatformApplicationConfig };
+  const definition = configModule.default;
+
+  if (!definition || typeof definition !== 'object' || !('config' in definition)) {
+    throw new Error(`${configPath} must export a default configuration created with defineConfig().`);
+  }
+
+  if (definition.setup !== undefined && typeof definition.setup !== 'function') {
+    throw new Error(`${configPath} setup must be a function.`);
+  }
+
+  return definition;
+};
 
 /**
  * Check whether an env config is ready for staging tests.
@@ -47,22 +125,31 @@ const STAGING_KEY_PREFIX = 'clerkstage-';
  * (indicated by CLERK_API_URL being set to the staging URL).
  */
 export function isStagingReady(env: EnvironmentConfig): boolean {
-  if (process.env.E2E_STAGING !== '1') return true;
+  if (process.env.E2E_STAGING !== '1') {
+    return true;
+  }
   return env.privateVariables.get('CLERK_API_URL') === STAGING_API_URL;
 }
 
 /**
- * Sets PK/SK from the instance keys map and handles staging environment swapping.
+ * Creates an application from a matching config file or sets PK/SK from the instance keys map.
  * When E2E_STAGING=1 is set, swaps PK/SK to staging keys (looked up as `clerkstage-<keyName>`)
  * and adds CLERK_API_URL. If the staging key doesn't exist, removes any inherited CLERK_API_URL
  * so the config falls back to production and is filtered from long-running apps by isStagingReady.
  * In non-staging mode, sets the production PK/SK and returns.
  */
-function withInstanceKeys(keyName: string, env: EnvironmentConfig): EnvironmentConfig {
-  const keys = instanceKeys.get(keyName)!;
+async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
+  const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
+  const keys =
+    process.env.E2E_STAGING !== '1' && (await fs.pathExists(configPath)) && constants.CLERK_PLATFORM_API_KEY
+      ? await getPlatformApplication(keyName, await loadPlatformApplicationConfig(configPath))
+      : instanceKeys.get(keyName)!;
+  instanceKeys.set(keyName, keys);
   env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
 
-  if (process.env.E2E_STAGING !== '1') return env;
+  if (process.env.E2E_STAGING !== '1') {
+    return env;
+  }
 
   const stagingKeyName = STAGING_KEY_PREFIX + keyName;
   if (!instanceKeys.has(stagingKeyName)) {
@@ -96,7 +183,7 @@ automatedEnvironmentVariables.forEach(name => {
   withKeyless.setEnvVariable('private', name, 'false');
 });
 
-const withEmailCodes = withInstanceKeys(
+const withEmailCodes = await withInstanceKeys(
   'with-email-codes',
   base
     .clone()
@@ -104,7 +191,7 @@ const withEmailCodes = withInstanceKeys(
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const sessionsProd1 = withInstanceKeys(
+const sessionsProd1 = await withInstanceKeys(
   'sessions-prod-1',
   base
     .clone()
@@ -122,9 +209,9 @@ const withSharedUIVariant = withEmailCodes
   .setId('withSharedUIVariant')
   .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
 
-const withEmailLinks = withInstanceKeys('with-email-links', base.clone().setId('withEmailLinks'));
+const withEmailLinks = await withInstanceKeys('with-email-links', base.clone().setId('withEmailLinks'));
 
-const withEnterpriseSso = withInstanceKeys(
+const withEnterpriseSso = await withInstanceKeys(
   'with-enterprise-sso',
   base
     .clone()
@@ -132,7 +219,7 @@ const withEnterpriseSso = withInstanceKeys(
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const withCustomRoles = withInstanceKeys(
+const withCustomRoles = await withInstanceKeys(
   'with-custom-roles',
   base
     .clone()
@@ -141,7 +228,7 @@ const withCustomRoles = withInstanceKeys(
     .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js'),
 );
 
-const withReverification = withInstanceKeys(
+const withReverification = await withInstanceKeys(
   'with-reverification',
   base
     .clone()
@@ -187,11 +274,14 @@ const withDynamicKeys = withEmailCodes
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
   .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', withEmailCodes.privateVariables.get('CLERK_SECRET_KEY'));
 
-const withRestrictedMode = withInstanceKeys('with-restricted-mode', withEmailCodes.clone().setId('withRestrictedMode'));
+const withRestrictedMode = await withInstanceKeys(
+  'with-restricted-mode',
+  withEmailCodes.clone().setId('withRestrictedMode'),
+);
 
-const withLegalConsent = withInstanceKeys('with-legal-consent', base.clone().setId('withLegalConsent'));
+const withLegalConsent = await withInstanceKeys('with-legal-consent', base.clone().setId('withLegalConsent'));
 
-const withWaitlistMode = withInstanceKeys('with-waitlist-mode', withEmailCodes.clone().setId('withWaitlistMode'));
+const withWaitlistMode = await withInstanceKeys('with-waitlist-mode', withEmailCodes.clone().setId('withWaitlistMode'));
 
 const withEmailCodesProxy = withEmailCodes
   .clone()
@@ -208,7 +298,7 @@ const withSignInOrUpEmailLinksFlow = withEmailLinks
   .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
-const withSignInOrUpwithRestrictedModeFlow = withInstanceKeys(
+const withSignInOrUpwithRestrictedModeFlow = await withInstanceKeys(
   'with-restricted-mode',
   withEmailCodes
     .clone()
@@ -216,7 +306,7 @@ const withSignInOrUpwithRestrictedModeFlow = withInstanceKeys(
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined),
 );
 
-const withSessionTasks = withInstanceKeys(
+const withSessionTasks = await withInstanceKeys(
   'with-session-tasks',
   base
     .clone()
@@ -224,12 +314,12 @@ const withSessionTasks = withInstanceKeys(
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const withSessionTasksResetPassword = withInstanceKeys(
+const withSessionTasksResetPassword = await withInstanceKeys(
   'with-session-tasks-reset-password',
   base.clone().setId('withSessionTasksResetPassword'),
 );
 
-const withSessionTasksSetupMfa = withInstanceKeys(
+const withSessionTasksSetupMfa = await withInstanceKeys(
   'with-session-tasks-setup-mfa',
   base
     .clone()
@@ -237,19 +327,25 @@ const withSessionTasksSetupMfa = withInstanceKeys(
     .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key'),
 );
 
-const withBillingJwtV2 = withInstanceKeys('with-billing', base.clone().setId('withBillingJwtV2'));
+const withBillingJwtV2 = await withInstanceKeys('with-billing', base.clone().setId('withBillingJwtV2'));
 
-const withBilling = withInstanceKeys('with-billing', base.clone().setId('withBilling'));
+const withBilling = await withInstanceKeys('with-billing', base.clone().setId('withBilling'));
 
-const withWhatsappPhoneCode = withInstanceKeys('with-whatsapp-phone-code', base.clone().setId('withWhatsappPhoneCode'));
+const withWhatsappPhoneCode = await withInstanceKeys(
+  'with-whatsapp-phone-code',
+  base.clone().setId('withWhatsappPhoneCode'),
+);
 
-const withAPIKeys = withInstanceKeys('with-api-keys', base.clone().setId('withAPIKeys'));
+const withAPIKeys = await withInstanceKeys('with-api-keys', base.clone().setId('withAPIKeys'));
 
-const withProtectService = withInstanceKeys('with-protect-service', base.clone().setId('withProtectService'));
+const withProtectService = await withInstanceKeys('with-protect-service', base.clone().setId('withProtectService'));
 
-const withNeedsClientTrust = withInstanceKeys('with-needs-client-trust', base.clone().setId('withNeedsClientTrust'));
+const withNeedsClientTrust = await withInstanceKeys(
+  'with-needs-client-trust',
+  base.clone().setId('withNeedsClientTrust'),
+);
 
-const withPasskeys = withInstanceKeys('with-passkeys', base.clone().setId('withPasskeys'));
+const withPasskeys = await withInstanceKeys('with-passkeys', base.clone().setId('withPasskeys'));
 
 export const envs = {
   base,

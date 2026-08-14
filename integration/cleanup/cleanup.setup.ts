@@ -4,7 +4,9 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
 
+import { constants } from '../constants';
 import { appConfigs } from '../presets/';
+import { deleteApplication, listApplications } from '../presets/platformApplication';
 import { findE2ERunUsers, getE2ERunMarker } from '../testUtils/e2eRun';
 import { withRetry } from '../testUtils/retryableClerkClient';
 
@@ -193,13 +195,48 @@ setup('cleanup instances ', async () => {
     cleanupSummary.push(instanceSummary);
   }
 
+  const applicationCleanupErrors: string[] = [];
+  let applicationsDeleted = 0;
+  if (constants.CLERK_PLATFORM_API_KEY) {
+    try {
+      const applications = await listApplications(constants.CLERK_PLATFORM_API_KEY);
+      console.log(`Found ${applications.length} Platform API applications.`);
+
+      if (constants.INTEGRATION_TEST_RUN_KEY) {
+        const applicationNameSuffix = `-${constants.INTEGRATION_TEST_RUN_KEY}`;
+        const applicationsToDelete = applications.filter(application =>
+          application.name.endsWith(applicationNameSuffix),
+        );
+
+        for (const application of applicationsToDelete) {
+          try {
+            await deleteApplication(constants.CLERK_PLATFORM_API_KEY, application.application_id);
+            applicationsDeleted++;
+            console.log(`Deleted Platform API application ${application.application_id} (${application.name}).`);
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            applicationCleanupErrors.push(`${application.application_id}: ${message}`);
+          }
+        }
+      } else {
+        console.log('INTEGRATION_TEST_RUN_KEY is not set. Skipping Platform API application deletion.');
+      }
+    } catch (error) {
+      applicationCleanupErrors.push(error instanceof Error ? error.message : String(error));
+    }
+  } else {
+    console.log('CLERK_PLATFORM_API_KEY is not set. Skipping Platform API application cleanup.');
+  }
+
   // Final summary
   const totalUsersDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.usersDeleted, 0);
   const totalOrgsDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.orgsDeleted, 0);
   const errorInstances = cleanupSummary.filter(instance => instance.status === 'error').length;
   const unauthorizedInstances = cleanupSummary.filter(instance => instance.status === 'unauthorized').length;
 
-  console.log(`\n📊 Summary: ${totalUsersDeleted} users, ${totalOrgsDeleted} orgs deleted`);
+  console.log(
+    `\n📊 Summary: ${totalUsersDeleted} users, ${totalOrgsDeleted} orgs, ${applicationsDeleted} applications deleted`,
+  );
   if (errorInstances > 0 || unauthorizedInstances > 0) {
     console.log(`   ${errorInstances} errors, ${unauthorizedInstances} unauthorized`);
   }
@@ -214,7 +251,12 @@ setup('cleanup instances ', async () => {
     });
   }
 
-  if (errorInstances === 0 && unauthorizedInstances === 0) {
+  if (applicationCleanupErrors.length > 0) {
+    console.log('\nPlatform application cleanup errors:');
+    applicationCleanupErrors.forEach(error => console.log(`  - ${error}`));
+  }
+
+  if (errorInstances === 0 && unauthorizedInstances === 0 && applicationCleanupErrors.length === 0) {
     console.log('\n✅ Cleanup completed successfully with no errors');
   }
 });

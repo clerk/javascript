@@ -523,6 +523,8 @@ jobs:
             pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
           fi
         env:
+          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           E2E_DEBUG: "1"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
@@ -539,6 +541,7 @@ jobs:
         timeout-minutes: 4
         run: pnpm test:integration:cleanup
         env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 

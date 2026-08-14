@@ -331,7 +331,7 @@ If you need to run a test suite inside a different environment (e.g. a different
 1. Inside `presets/envs.ts`, create a new environment config wrapped with `withInstanceKeys`:
 
    ```ts
-   const yourConciseName = withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
+   const yourConciseName = await withInstanceKeys('your-concise-name', base.clone().setId('yourConciseName'));
    ```
 
    The `withInstanceKeys` wrapper sets PK/SK from the instance keys map and automatically swaps to staging keys when `E2E_STAGING=1` is set. The first argument is the production key name — the staging key is looked up as `clerkstage-your-concise-name`. See [Running tests against staging](#running-tests-against-staging) for more details.
@@ -562,7 +562,7 @@ await app.withEnv(appConfigs.envs.withEmailCodes);
 Inside [`presets/envs.ts`](../integration/presets/envs.ts) you can also create a completely new environment config. All new configs should be wrapped with `withInstanceKeys` to enable staging environment swapping:
 
 ```ts
-const withCustomRoles = withInstanceKeys(
+const withCustomRoles = await withInstanceKeys(
   'with-custom-roles',
   base
     .clone()
@@ -571,6 +571,27 @@ const withCustomRoles = withInstanceKeys(
     .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up'),
 );
 ```
+
+For non-staging tests, when `CLERK_PLATFORM_API_KEY` is set and `integration/configs/<key-name>.js` exists, `withInstanceKeys` creates a development application through the Platform API. It applies the exported configuration and uses the keys from the new application. If the file does not exist, the wrapper uses the existing instance keys map.
+
+Use `defineConfig` for configuration files. JavaScript configuration files can read environment variables. The optional `setup` function receives a `ClerkClient` after the instance configuration is applied. Omit `setup` when no additional operations are required.
+
+```js
+import { defineConfig } from '../presets/platformApplication.js';
+
+export default defineConfig({
+  config: {
+    session: {
+      lifetime: Number(process.env.CLERK_E2E_SESSION_LIFETIME || 3600),
+    },
+  },
+  setup: async clerkClient => {
+    await clerkClient.allowlistIdentifiers.createAllowlistIdentifier({ identifier: 'allowed@example.com' });
+  },
+});
+```
+
+The application name includes `INTEGRATION_TEST_RUN_KEY` when it is available. Otherwise, it uses a random suffix. Application keys are cached during `E2E_APP_ID` runs because their setup and test workers must use the same instance. Global teardown removes the cache file.
 
 When `E2E_STAGING=1`, this will automatically look up `clerkstage-with-custom-roles` from the staging keys and swap the PK, SK, and API URL. If the staging key doesn't exist, the config will not be staging-ready and any long running apps using it will be gracefully skipped.
 
