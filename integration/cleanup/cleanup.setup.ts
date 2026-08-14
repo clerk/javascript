@@ -7,7 +7,7 @@ import { test as setup } from '@playwright/test';
 import { constants } from '../constants';
 import { appConfigs } from '../presets/';
 import { deleteApplication, listApplications } from '../presets/platformApplication';
-import { findE2ERunUsers, getE2ERunMarker } from '../testUtils/e2eRun';
+import { findE2ERunUsers, getE2EApplicationRunMarker, getE2ERunMarker } from '../testUtils/e2eRun';
 import { withRetry } from '../testUtils/retryableClerkClient';
 
 setup('cleanup instances ', async () => {
@@ -202,8 +202,9 @@ setup('cleanup instances ', async () => {
       const applications = await listApplications(constants.CLERK_PLATFORM_API_KEY);
       console.log(`Found ${applications.length} Platform API applications.`);
 
-      if (constants.INTEGRATION_TEST_RUN_KEY) {
-        const applicationNameSuffix = `-${constants.INTEGRATION_TEST_RUN_KEY}`;
+      const applicationRunMarker = getE2EApplicationRunMarker(constants.INTEGRATION_TEST_RUN_KEY);
+      if (applicationRunMarker) {
+        const applicationNameSuffix = `-${applicationRunMarker}`;
         const applicationsToDelete = applications.filter(application =>
           application.name.endsWith(applicationNameSuffix),
         );

@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto';
 import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 
+import { getE2EApplicationRunMarker } from '../testUtils/e2eRun';
+
 const PLATFORM_API_URL = 'https://api.clerk.com';
 
 export type InstanceKeys = { pk: string; sk: string };
@@ -52,7 +54,10 @@ export const createApplicationFromConfig = async (
   runKey?: string,
 ): Promise<PlatformApplication> => {
   const { config, setup } = definition;
-  const applicationName = `e2e-${keyName}-${runKey || randomBytes(4).toString('hex')}`;
+  const applicationRunMarker =
+    getE2EApplicationRunMarker(runKey) ||
+    `random-${Array.from(randomBytes(10), byte => String.fromCharCode(97 + (byte % 26))).join('')}`;
+  const applicationName = `e2e-${keyName}-${applicationRunMarker}`;
   const createUrl = new URL('/v1/platform/applications', PLATFORM_API_URL);
   const createResponse = await platformApiRequest(platformApiKey, createUrl, {
     method: 'POST',

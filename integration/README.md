@@ -591,7 +591,7 @@ export default defineConfig({
 });
 ```
 
-The application name includes `INTEGRATION_TEST_RUN_KEY` when it is available. Otherwise, it uses a random suffix. Application keys are cached during `E2E_APP_ID` runs because their setup and test workers must use the same instance. Global teardown removes the cache file.
+The application name includes a deterministic, letter-only token derived from `INTEGRATION_TEST_RUN_KEY` when it is available. Otherwise, it uses a random letter-only suffix. Application keys are cached during `E2E_APP_ID` runs because their setup and test workers must use the same instance. Global teardown removes the cache file.
 
 When `E2E_STAGING=1`, this will automatically look up `clerkstage-with-custom-roles` from the staging keys and swap the PK, SK, and API URL. If the staging key doesn't exist, the config will not be staging-ready and any long running apps using it will be gracefully skipped.
 
