@@ -179,7 +179,10 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
     val rows = customRows()
     val view = customPageViews.getOrNull(rows.indexOfFirst { it.routeKey == routeKey }) ?: return
 
-    LaunchedEffect(routeKey) { sendCustomPageEvent("presented", routeKey) }
+    LaunchedEffect(routeKey) {
+      layoutAndroidViewHandler(view)
+      sendCustomPageEvent("presented", routeKey)
+    }
     DisposableEffect(routeKey) {
       onDispose { sendCustomPageEvent("dismissed", routeKey) }
     }
