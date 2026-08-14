@@ -29,7 +29,7 @@ const styles = stylex.create({
 function ProviderIcon({ provider }: { provider: string }) {
   return (
     <Section.Media
-      size='xl'
+      size='lg'
       {...stylex.props(styles.providerMedia)}
     >
       <img
@@ -54,7 +54,7 @@ export function Default() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <Section.Media size='xl'>
+            <Section.Media size='lg'>
               <Avatar.Root size='fit'>
                 <Avatar.Image
                   alt='Preston Booth'
@@ -144,7 +144,7 @@ export function MultipleEmailAndPhoneNumbers() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <Section.Media size='xl'>
+            <Section.Media size='lg'>
               <Avatar.Root size='fit'>
                 <Avatar.Image
                   alt='Preston Booth'

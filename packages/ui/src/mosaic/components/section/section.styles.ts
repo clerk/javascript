@@ -79,12 +79,12 @@ export const styles = stylex.create({
     width: space['6'],
   },
   mediaLg: {
-    height: space['8'],
-    width: space['8'],
+    height: space['10'],
+    width: space['10'],
   },
   mediaXl: {
-    height: space['10.5'],
-    width: space['10.5'],
+    height: space['12'],
+    width: space['12'],
   },
   content: {
     display: 'flex',
