@@ -85,12 +85,15 @@ public class ClerkNativeViewHost: ExpoView {
 public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
   private var currentCustomPages: String = "[]"
   let customPageState = ClerkUserProfileCustomPageState()
-  let onCustomPageEvent = EventDispatcher()
+
+  // Expo resolves event dispatchers through `Mirror(reflecting:).children`, which skips
+  // inherited properties, so subclasses must own the dispatcher and surface it here.
+  var customPageEventDispatcher: EventDispatcher? { nil }
 
   public required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
     customPageState.setPageEventHandler { [weak self] type, path in
-      self?.onCustomPageEvent(["type": type, "path": path])
+      self?.customPageEventDispatcher?(["type": type, "path": path])
     }
   }
 

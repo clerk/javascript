@@ -2,6 +2,10 @@ import ExpoModulesCore
 import UIKit
 
 public class ClerkUserButtonNativeView: ClerkUserProfileCustomPageHost {
+  let onCustomPageEvent = EventDispatcher()
+
+  override var customPageEventDispatcher: EventDispatcher? { onCustomPageEvent }
+
   override func makeHostedController() -> UIViewController? {
     return ClerkNativeBridge.shared.makeUserButtonViewController(
       customRows: customRows(),

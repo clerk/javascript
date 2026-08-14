@@ -8,6 +8,9 @@ public class ClerkUserProfileNativeView: ClerkUserProfileCustomPageHost {
 
   let onProfileEvent = EventDispatcher()
   let onHostBack = EventDispatcher()
+  let onCustomPageEvent = EventDispatcher()
+
+  override var customPageEventDispatcher: EventDispatcher? { onCustomPageEvent }
 
   func setDismissible(_ isDismissible: Bool?) {
     let newDismissible = isDismissible ?? true
