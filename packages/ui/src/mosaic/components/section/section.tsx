@@ -133,7 +133,6 @@ const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'flex-end',
-    marginInlineStart: space['3'],
   },
 });
 /* eslint-enable @stylexjs/no-lookahead-selectors */
