@@ -89,6 +89,10 @@ import {
   Default as OrganizationProfileProfileSectionDefault,
   meta as organizationProfileProfileSectionMeta,
 } from '../stories/organization-profile-profile-section.stories';
+import {
+  Default as OrganizationProfileSecurityPanelDefault,
+  meta as organizationProfileSecurityPanelMeta,
+} from '../stories/organization-profile-security-panel.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -169,6 +173,10 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
 const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Default: OrganizationProfileMembersPanelDefault,
+};
+const organizationProfileSecurityPanelModule: StoryModule = {
+  meta: organizationProfileSecurityPanelMeta,
+  Default: OrganizationProfileSecurityPanelDefault,
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault, Centered: CardCentered };
@@ -279,6 +287,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
   organizationProfileProfileSectionModule,
   organizationProfileDomainsSectionModule,
   organizationProfileLeaveSectionModule,

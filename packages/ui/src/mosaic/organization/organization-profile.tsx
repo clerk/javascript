@@ -8,10 +8,15 @@ import { OrganizationProfileGeneralPanel } from './organization-profile-general-
 import { OrganizationProfileLeaveSection } from './organization-profile-leave-section';
 import { OrganizationProfileMembersPanel } from './organization-profile-members-panel';
 import { OrganizationProfileProfileSection } from './organization-profile-profile-section';
+import { OrganizationProfileSecurityPanel } from './organization-profile-security-panel';
+import { useOrganizationProfileSecurityGate } from './organization-profile-security-panel.controller';
 import { OrganizationProfileView } from './organization-profile-view';
 
 function OrganizationProfileRoot(): ReactElement | null {
   const controller = useOrganizationProfileController();
+  // Gate the Security tab on the same decision the panel gates its body on; only pass
+  // the slot once the gate is definitively `visible` so the tab never appears then hides.
+  const securityGate = useOrganizationProfileSecurityGate();
   if (controller.status !== 'ready') {
     return null;
   }
@@ -20,6 +25,7 @@ function OrganizationProfileRoot(): ReactElement | null {
       general={<OrganizationProfileGeneralPanel />}
       members={<OrganizationProfileMembersPanel />}
       apiKeys={<OrganizationProfileApiKeysPanel />}
+      security={securityGate.status === 'visible' ? <OrganizationProfileSecurityPanel /> : undefined}
     />
   );
 }
@@ -41,4 +47,5 @@ export const OrganizationProfile = Object.assign(OrganizationProfileRoot, {
   DeleteSection: OrganizationProfileDeleteSection,
   ApiKeysPanel: OrganizationProfileApiKeysPanel,
   MembersPanel: OrganizationProfileMembersPanel,
+  SecurityPanel: OrganizationProfileSecurityPanel,
 });

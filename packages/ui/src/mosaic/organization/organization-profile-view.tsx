@@ -10,15 +10,26 @@ interface OrganizationProfileViewProps {
   members: ReactNode;
   /** The API keys tab's panel content. */
   apiKeys: ReactNode;
+  /**
+   * The Security tab's panel content. The tab and panel render ONLY when this is
+   * provided — the caller gates it on the enterprise-SSO feature flag + permission, so
+   * an unauthorized or feature-off user never sees an empty, clickable Security tab.
+   */
+  security?: ReactNode;
 }
 
 /**
  * The organization profile shell: a heading and a tabbed layout that hosts each
- * panel's content in the General, Members, and API keys tabs. Layout only — the
- * caller supplies each tab's panel via the `general`, `members`, and `apiKeys`
+ * panel's content in the General, Members, and API keys tabs (and Security, when the
+ * caller supplies it). Layout only — the caller supplies each tab's panel via the
  * slots, so this component holds no data or Clerk state itself.
  */
-export function OrganizationProfileView({ general, members, apiKeys }: OrganizationProfileViewProps): ReactElement {
+export function OrganizationProfileView({
+  general,
+  members,
+  apiKeys,
+  security,
+}: OrganizationProfileViewProps): ReactElement {
   return (
     <Box
       sx={{
@@ -40,10 +51,12 @@ export function OrganizationProfileView({ general, members, apiKeys }: Organizat
           <Tabs.Tab value='general'>General</Tabs.Tab>
           <Tabs.Tab value='members'>Members</Tabs.Tab>
           <Tabs.Tab value='api-keys'>API keys</Tabs.Tab>
+          {security != null && <Tabs.Tab value='security'>Security</Tabs.Tab>}
         </Tabs.List>
         <Tabs.Panel value='general'>{general}</Tabs.Panel>
         <Tabs.Panel value='members'>{members}</Tabs.Panel>
         <Tabs.Panel value='api-keys'>{apiKeys}</Tabs.Panel>
+        {security != null && <Tabs.Panel value='security'>{security}</Tabs.Panel>}
       </Tabs.Root>
     </Box>
   );

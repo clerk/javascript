@@ -1,0 +1,17 @@
+import * as OrganizationProfileSecurityPanelStories from './organization-profile-security-panel.stories';
+
+# Organization Profile Security Panel
+
+The Security tab panel of the Organization Profile — the Enterprise SSO overview (status badge, activate / deactivate / remove, domain chips) and the full ConfigureSSO wizard (`verify-domain → configure → test → activate`). It gates on the enterprise-SSO feature flag plus `org:sys_entconns:manage`, so the tab renders only for admins on an org with self-serve SSO enabled. Click **Edit** to open the wizard.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileSecurityPanelStories}
+  composition={[
+    {
+      name: 'OrganizationProfile',
+      href: '/organization/organization-profile',
+      layer: 'Organization',
+    },
+  ]}
+/>
