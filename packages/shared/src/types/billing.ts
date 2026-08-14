@@ -1109,7 +1109,8 @@ export interface BillingAppliedDiscount {
    */
   percentOff?: number;
   /**
-   * The monetary value deducted when `effect` is `'fixed_amount'`.
+   * The configured fixed amount off when `effect` is `'fixed_amount'`. This is the discount's configured value, which
+   * can differ from the `amount` actually applied to the transaction.
    */
   amountOff?: BillingMoneyAmount;
   /**
@@ -1121,6 +1122,10 @@ export interface BillingAppliedDiscount {
    * after a fixed number of cycles.
    */
   cyclesRemaining: number | null;
+  /**
+   * The originally configured duration in billing cycles. `null` means the discount does not expire after a fixed
+   * number of cycles.
+   */
   durationInCycles?: number | null;
 }
 
@@ -1163,7 +1168,8 @@ export interface BillingDiscountRedemption {
    */
   percentOff?: number;
   /**
-   * The monetary value deducted when `effect` is `'fixed_amount'`.
+   * The configured fixed amount off when `effect` is `'fixed_amount'`. This is the discount's configured value, which
+   * can differ from the `amount` actually applied to the transaction.
    */
   amountOff?: BillingMoneyAmount;
   /**
@@ -1515,7 +1521,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   totals: BillingTotals;
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](/docs/reference/types/billing-checkout-resource#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<BillingCheckoutResource>;
   /**
@@ -1665,12 +1671,12 @@ export interface CheckoutFlowFinalizeParams {
  */
 interface CheckoutFlowMethods {
   /**
-   * Updates the current checkout. Use an empty promo code to remove the applied promo code. [Learn more.](/docs/reference/types/billing-checkout-resource#update)
+   * Updates the current checkout. Use an empty promo code to remove the applied promo code. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#update)
    */
   update: (params: Pick<UpdateCheckoutParams, 'promoCode'>) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](/docs/reference/types/billing-checkout-resource#confirm)
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](https://clerk.com/docs/reference/types/billing-checkout-resource#confirm)
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
 

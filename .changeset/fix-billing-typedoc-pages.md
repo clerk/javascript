@@ -2,4 +2,4 @@
 '@clerk/shared': patch
 ---
 
-Fix the Billing checkout Typedoc links.
+Fix broken Billing TypeDoc links and add missing JSDoc descriptions for the credit and discount types.
