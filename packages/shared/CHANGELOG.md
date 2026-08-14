@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.29.1
+
+### Patch Changes
+
+- Fix broken Billing TypeDoc links and add missing JSDoc descriptions for the credit and discount types. ([#9393](https://github.com/clerk/javascript/pull/9393)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
 ## 4.29.0
 
 ### Minor Changes
