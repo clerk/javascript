@@ -80,6 +80,7 @@ export function OrganizationProfileProfileSectionView({
           )}
         </Box>
         <Dialog
+          closedBy='closerequest'
           open={isOpen}
           onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
           trigger={props => (

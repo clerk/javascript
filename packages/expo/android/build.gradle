@@ -20,8 +20,10 @@ def clerkExpoVersion = clerkExpoPackageJson.version.toString()
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
 ext {
   kotlinxCoroutinesVersion = "1.7.3"
-  clerkAndroidApiVersion = "1.0.39"
-  clerkAndroidUiVersion = "1.0.39"
+  clerkAndroidApiVersion = "1.1.2"
+  clerkAndroidUiVersion = "1.1.2"
+  okhttpVersion = "5.4.0"
+  okhttpUrlConnectionVersion = "5.0.0-alpha.16"
   composeVersion = "1.7.0"
   activityComposeVersion = "1.9.0"
   lifecycleVersion = "2.8.0"
@@ -107,7 +109,7 @@ dependencies {
 
   // Clerk Android SDK with prebuilt UI
   // Exclude kotlin-stdlib to prevent 2.3.0 from polluting the project
-  // Exclude okhttp to prevent version conflict with React Native's okhttp
+  // Exclude transitive OkHttp modules so the compatible versions below control resolution.
   implementation("com.clerk:clerk-android-ui:$clerkAndroidUiVersion") {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib'
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
@@ -124,6 +126,16 @@ dependencies {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     exclude group: 'com.squareup.okhttp3', module: 'okhttp'
     exclude group: 'com.squareup.okhttp3', module: 'okhttp-urlconnection'
+  }
+
+  implementation('com.squareup.okhttp3:okhttp') {
+    version { strictly(okhttpVersion) }
+  }
+  implementation('com.squareup.okhttp3:logging-interceptor') {
+    version { strictly(okhttpVersion) }
+  }
+  implementation('com.squareup.okhttp3:okhttp-urlconnection') {
+    version { strictly(okhttpUrlConnectionVersion) }
   }
 
   // Jetpack Compose for wrapping Clerk views

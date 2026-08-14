@@ -1,5 +1,6 @@
 import type {
   BillingCredits,
+  BillingDiscountRedemption,
   BillingMoneyAmount,
   BillingSubscriptionItemJSON,
   BillingSubscriptionItemNextPayment,
@@ -18,6 +19,7 @@ import { unixEpochToDate } from '@/utils/date';
 
 import {
   billingCreditsFromJSON,
+  billingDiscountRedemptionFromJSON,
   billingMoneyAmountFromJSON,
   billingPerUnitTotalTierFromJSON,
   billingSubscriptionItemNextPaymentFromJSON,
@@ -85,6 +87,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
   };
   seats?: BillingSubscriptionItemSeats;
   credits?: BillingCredits;
+  appliedDiscount?: BillingDiscountRedemption;
   nextPayment?: BillingSubscriptionItemNextPayment | null;
   isFreeTrial!: boolean;
 
@@ -122,6 +125,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
       : undefined;
 
     this.credits = data.credits ? billingCreditsFromJSON(data.credits) : undefined;
+    this.appliedDiscount = data.applied_discount ? billingDiscountRedemptionFromJSON(data.applied_discount) : undefined;
     this.nextPayment =
       data.next_payment === undefined
         ? undefined

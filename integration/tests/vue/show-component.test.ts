@@ -14,12 +14,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
 
     // Create a member user (not admin) for fallback tests
-    memberUser = u.services.users.createFakeUser();
+    memberUser = u.services.users.createFakeUser(test);
     const bapiMember = await u.services.users.createBapiUser(memberUser);
     await u.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,

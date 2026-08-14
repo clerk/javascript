@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "4.2.2",
+  "version": "4.2.8",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",

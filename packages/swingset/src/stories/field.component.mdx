@@ -1,0 +1,61 @@
+import * as FieldStories from './field.component.stories';
+
+# Field
+
+The Mosaic `Field` provides StyleX-themed parts for composing labels, supporting text, and validation errors around a form control. Its context automatically connects Mosaic controls to the rendered label and messages.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={FieldStories}
+/>
+
+## Usage
+
+Compose one Mosaic control inside each `Field.Root` to generate its ID, the label's `htmlFor`, and the message relationships. Rendering multiple controls logs a development warning. The caller owns validation and decides when to render an error. Use a separate `Field.Root` for each control; grouped controls should use native `<fieldset>` and `<legend>` semantics until dedicated Mosaic `Fieldset` and `Field.Item` components are available.
+
+```tsx
+import { Field } from '@clerk/ui/mosaic/components/field';
+import { Input } from '@clerk/ui/mosaic/components/input';
+
+<Field.Root>
+  <Field.Label>Email address</Field.Label>
+  <Input
+    name='email'
+    type='email'
+    required
+    aria-invalid={Boolean(error)}
+  />
+  {error ? <Field.Error>{error}</Field.Error> : <Field.Description>Used for account notifications.</Field.Description>}
+</Field.Root>;
+```
+
+Explicit `id`, `htmlFor`, `aria-labelledby`, and `aria-describedby` values remain supported. Field preserves explicit IDs after hydration and merges external ARIA references with its generated relationships. During server rendering, Field emits its generated control ID and native label relationship; explicit control IDs and generated label and message ARIA references finalize during hydration. `name` still identifies the submitted form value and is typically what form libraries use for registration.
+
+Field does not validate controls or render errors automatically. Its parts may also be used independently without `Field.Root`.
+
+## Parts
+
+| Part                | Stable slot class       | Description                                       |
+| ------------------- | ----------------------- | ------------------------------------------------- |
+| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.        |
+| `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control. |
+| `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control. |
+| `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.          |
+
+## Styling
+
+The Mosaic field is themed with **StyleX**. Each styled part carries the stable public slot class shown above alongside the generated StyleX atoms. Consumers never target the hashed atomic classes—override a `.cl-field-*` class from a CSS layer that wins over `@clerk/ui/styles.css`:
+
+```css
+@import '@clerk/ui/styles.css' layer(components);
+
+@layer overrides {
+  .cl-field-label {
+    font-weight: 600;
+  }
+}
+```
+
+`Field.Root` ships no layout. Higher-level blocks own how its parts are arranged; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.

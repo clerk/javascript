@@ -103,8 +103,11 @@ export const csCZ: LocalizationResource = {
       'Nelze se přihlásit k tomuto plánu s měsíční platbou. Abyste se k němu přihlásili, musíte zvolit roční platbu.',
     cannotSubscribeUnrecoverable: undefined,
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Vaše platba byla úspěšná.',
       description__subscriptionSuccessful: 'Vaše nové předplatné je nastaveno.',
+      discount: undefined,
       downgradeNotice:
         'Současné předplatné a jeho funkce si ponecháte do konce fakturačního cyklu, poté budete převedeni na toto předplatné.',
       emailForm: {
@@ -120,6 +123,8 @@ export const csCZ: LocalizationResource = {
       },
       pastDueNotice: 'Vaše předchozí předplatné bylo po splatnosti, bez platby.',
       perMonth: 'měsíčně',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pokladna',
       title__paymentSuccessful: 'Platba byla úspěšná!',
       title__subscriptionSuccessful: 'Úspěch!',
@@ -130,6 +135,9 @@ export const csCZ: LocalizationResource = {
     credit: 'Kredit',
     creditRemainder: 'Kredit za zbytek vašeho současného předplatného.',
     defaultFreePlanActive: 'Aktuálně používáte bezplatný plán',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Zdarma',
     getStarted: 'Začít',
     highlightedPlanBadge: 'Populární',
@@ -141,6 +149,7 @@ export const csCZ: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Měsíčně',
+    months: undefined,
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
     payerCreditRemainder: undefined,
@@ -219,6 +228,7 @@ export const csCZ: LocalizationResource = {
     year: 'Rok',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
   },
   configureSSO: {
     activate: {
@@ -940,6 +950,7 @@ export const csCZ: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
