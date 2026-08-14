@@ -83,8 +83,7 @@ describe('CSP Header Utils', () => {
         const result = createContentSecurityPolicyHeaders(testHost, { strict });
         const directives = result.headers[0][1].split('; ');
 
-        // connect-src carries the port wildcard because those hosts are also requested on
-        // ports other than 443, which a portless source would not match.
+        // connect-src carries the port wildcard: those hosts are also requested on non-443 ports.
         for (const [directiveName, expectedSource] of [
           ['script-src', 'https://*.protect.clerk.com'],
           ['connect-src', 'https://*.protect.clerk.com:*'],
