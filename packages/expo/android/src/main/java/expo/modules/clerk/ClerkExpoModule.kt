@@ -301,7 +301,8 @@ class ClerkExpoModule : Module() {
                 }
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
-                if (activePublishableKey != null && (activePublishableKey != pubKey || configuredProxyUrl != normalizedProxyUrl)) {
+                val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
+                if (activePublishableKey != null && (activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl)) {
                     Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
