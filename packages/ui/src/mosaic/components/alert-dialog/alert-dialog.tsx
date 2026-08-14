@@ -252,8 +252,10 @@ function Confirm({ handle, finalFocus }: AlertDialogConfirmProps) {
             <Dialog.Backdrop />
             <Dialog.Viewport>
               <Popup finalFocus={finalFocus}>
-                <Dialog.Title render={<Heading size='sm' />}>{payload.title}</Dialog.Title>
-                <Dialog.Description render={<Text />}>{payload.description}</Dialog.Description>
+                <div {...stylex.props(reset.base, styles.header)}>
+                  <Dialog.Title render={<Heading size='lg' />}>{payload.title}</Dialog.Title>
+                  <Dialog.Description render={<Text />}>{payload.description}</Dialog.Description>
+                </div>
                 <Actions>
                   <Dialog.Close render={<Button variant='outline' />}>{payload.cancelLabel ?? 'Cancel'}</Dialog.Close>
                   <Button

@@ -4,6 +4,15 @@ import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   /**
+   * The question and the detail under it are one block, not two paragraphs, so they keep only the
+   * space their line heights give them rather than the popup's gap between every child.
+   */
+  header: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  /**
    * The response row. An alert dialog exists to be answered, so its buttons are anatomy rather
    * than content — the one part `Dialog` deliberately does not ship, because a dialog's footer is
    * whatever the consumer composes and an alert dialog's is always the same two choices.
