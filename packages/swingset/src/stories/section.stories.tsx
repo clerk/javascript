@@ -1,7 +1,7 @@
 import { Avatar } from '@clerk/ui/mosaic/components/avatar';
 import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
 import { Section } from '@clerk/ui/mosaic/components/section';
 import * as stylex from '@stylexjs/stylex';
 
@@ -346,6 +346,32 @@ export function ConnectedAccounts() {
                 />
               </Button>
             </Section.Actions>
+          </Section.Item>
+        </Section.Row>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
+export function IconFrameMedia() {
+  return (
+    <Section.Root style={{ maxWidth: 560 }}>
+      <Section.Title>Team</Section.Title>
+      <Section.Group>
+        <Section.Row>
+          <Section.Item>
+            <Section.Media size='lg'>
+              <IconFrame>
+                <Icon
+                  name='users'
+                  size='lg'
+                />
+              </IconFrame>
+            </Section.Media>
+            <Section.Content>
+              <Section.Label>Engineering</Section.Label>
+              <Section.Description>12 members</Section.Description>
+            </Section.Content>
           </Section.Item>
         </Section.Row>
       </Section.Group>
