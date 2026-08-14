@@ -456,6 +456,48 @@ describe('ClerkProvider native client sync', () => {
     expect(mocks.configure).toHaveBeenCalledTimes(2);
   });
 
+  test('does not wait for an active native refresh after switching publishable keys', async () => {
+    const obsoleteRefresh = rejectableDeferred();
+    const obsoleteRefreshError = new Error('obsolete native refresh failed');
+
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', null));
+    await waitForPendingJsToNativeSync();
+
+    mocks.syncClientStateFromJs.mockReturnValueOnce(obsoleteRefresh.promise);
+    await act(async () => {
+      await mocks.clerkOptions?.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, 'obsolete-client-token');
+    });
+    await waitFor(() => {
+      expect(mocks.syncClientStateFromJs).toHaveBeenCalledWith(
+        'obsolete-client-token',
+        expect.any(String),
+        false,
+        true,
+      );
+    });
+
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_456'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() => expect(mocks.configure).toHaveBeenCalledWith('pk_test_456', null));
+    await expect(waitForPendingJsToNativeSync()).resolves.toBeUndefined();
+
+    obsoleteRefresh.reject(obsoleteRefreshError);
+    await Promise.resolve();
+    await expect(waitForPendingJsToNativeSync()).resolves.toBeUndefined();
+  });
+
   test('retries a transient native configure failure', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const configureError = new Error('transient native refresh failure');

@@ -828,13 +828,8 @@ export function NativeClientSync({
   }, [enabled, queueNativeRefreshFromJs]);
 
   useEffect(() => {
-    return () => {
-      pendingNativeRefreshBeforeReadyRef.current = null;
-      pendingNativeRefreshBeforeReadyCompletionRef.current?.invalidateTracking();
-      pendingNativeRefreshBeforeReadyCompletionRef.current?.resolve();
-      pendingNativeRefreshBeforeReadyCompletionRef.current = null;
-    };
-  }, []);
+    return cancelNativeRefreshFromJs;
+  }, [cancelNativeRefreshFromJs]);
 
   useEffect(() => {
     const listener: DeviceTokenCacheListener = deviceToken => {
