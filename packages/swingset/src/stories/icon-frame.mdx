@@ -1,0 +1,68 @@
+import * as IconFrameStories from './icon-frame.stories';
+
+# IconFrame
+
+IconFrame places an icon or other visual in a square Mosaic surface. The child owns its size and artwork, while the frame adds padding, border, radius, centering, and a default background. Customize the surface through native `style` or `className` overrides.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={IconFrameStories}
+/>
+
+## Props
+
+<PropTable
+  meta={IconFrameStories.meta}
+  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+/>
+
+## Usage
+
+```tsx
+import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
+import { colorVars } from '@clerk/ui/mosaic/styles';
+
+<IconFrame
+  style={{
+    backgroundColor: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-primary-foreground'],
+  }}
+>
+  <Icon name='check' size='lg' />
+</IconFrame>
+```
+
+---
+
+## Examples
+
+### Icon sizes
+
+<Story
+  name='IconSizes'
+  storyModule={IconFrameStories}
+  composition={[{ name: 'Icon', href: '/components/icon', layer: 'Components' }]}
+/>
+
+### Custom surface
+
+<Story
+  name='CustomSurface'
+  storyModule={IconFrameStories}
+/>
+
+### Multiple treatments
+
+<Story
+  name='MultipleTreatments'
+  storyModule={IconFrameStories}
+/>
+
+### Brand icons
+
+<Story
+  name='BrandIcons'
+  storyModule={IconFrameStories}
+/>
