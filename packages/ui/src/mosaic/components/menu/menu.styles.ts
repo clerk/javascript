@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // Positioning is applied inline by the headless positioner; this only clears the
@@ -71,10 +79,9 @@ export const styles = stylex.create({
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     position: 'relative',
     textAlign: 'start',
-    transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
-    },
+    // Ungated: the only thing moving is a fill, which is not what `prefers-reduced-motion`
+    // is about. Matches `Button`, whose highlight transitions the same way.
+    transitionDuration: durationVars['--cl-duration-base'],
     transitionProperty: 'background-color',
     height: space['7'],
     width: '100%',
