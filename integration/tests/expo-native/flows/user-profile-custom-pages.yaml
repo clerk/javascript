@@ -1,0 +1,52 @@
+# A custom page's React Native content is mounted as a child of the native
+# host and rehosted into the destination that the custom row pushes. Asserts
+# the row renders from the serialized config, the RN content appears inside
+# the native screen, and the profile root still has the row after going back.
+appId: com.clerk.exponativebuildfixture
+name: UserProfileView renders a custom page
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'open-auth-view-button'
+- runFlow: subflows/sign-in-email-password.yaml
+- runFlow: subflows/assert-signed-in.yaml
+- tapOn:
+    id: 'open-embedded-profile-button'
+# Retrying wait (not assertVisible): the row list is built from the serialized
+# customPages prop, which can land a frame after the native profile paints.
+- extendedWaitUntil:
+    visible: 'E2E Custom Page'
+    timeout: 20000
+- tapOn:
+    text: 'E2E Custom Page'
+# The assertion that matters: the RN child is rehosted into the native
+# destination rather than left in the host's own view hierarchy.
+- extendedWaitUntil:
+    visible: 'Rehosted RN body'
+    timeout: 15000
+# Leaving the custom page differs per platform: clerk-ios pushes it onto its
+# own NavigationStack so it gets the standard back chevron, while the Android
+# destination is a bare AndroidView with no chrome, so system back is the only
+# way out.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: 'Back'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+- extendedWaitUntil:
+    visible: 'E2E Custom Page'
+    timeout: 15000
+# The host chevron firing onHostBack: this one reads 'Back' on both platforms.
+- tapOn: 'Back'
+- extendedWaitUntil:
+    visible:
+      id: 'open-embedded-profile-button'
+    timeout: 15000
+- tapOn:
+    id: 'sign-out-button'
+- runFlow: subflows/assert-signed-out.yaml
