@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clerk.api.Clerk
 import com.clerk.ui.userprofile.custom.LocalUserProfileCustomNavigator
-import com.clerk.ui.userprofile.custom.UserProfileCustomNavigator
 import com.clerk.ui.userprofile.custom.UserProfileCustomRow
 import com.clerk.ui.userbutton.UserButton
 import expo.modules.kotlin.AppContext
@@ -22,10 +23,13 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.viewevent.EventDispatcher
 
 class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
-  var customPagesJson: String = "[]"
+  private var customPagesJson: String = "[]"
   private val customPageViews = mutableListOf<View>()
-  private var customNavigator: UserProfileCustomNavigator? = null
   private val onCustomPageEvent by EventDispatcher()
+  private val customPageState =
+    ClerkUserProfileCustomPageState { type, path ->
+      onCustomPageEvent(mapOf("type" to type, "path" to path))
+    }
 
   init {
     activity?.let { Clerk.attachActivity(it) }
@@ -33,6 +37,10 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
 
   @Composable
   override fun Content() {
+    val user by Clerk.userFlow.collectAsStateWithLifecycle()
+
+    LaunchedEffect(user?.id) { customPageState.userDidChange(user?.id) }
+
     Box(
       modifier = Modifier.fillMaxSize(),
       contentAlignment = Alignment.Center,
@@ -63,26 +71,41 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
 
   fun customPageCount(): Int = customPageViews.size
 
+  fun setCustomPages(customPages: String) {
+    if (customPagesJson == customPages) return
+    val validPaths = runCatching { userProfileCustomPagePaths(customPages) }.getOrDefault(emptySet())
+    customPageState.reconcileCustomPagePaths(validPaths)
+    customPagesJson = customPages
+  }
+
   fun navigateCustomPage(action: String, routeKey: String?) {
-    when (action) {
-      "back" -> customNavigator?.navigateBack()
-      "popToRoot" -> customNavigator?.popToRoot()
-      "push" -> routeKey?.let { customNavigator?.push(it) }
-    }
+    customPageState.navigate(action, routeKey)
   }
 
   @Composable
   private fun CustomPageDestination(routeKey: String) {
-    customNavigator = LocalUserProfileCustomNavigator.current
+    val customNavigator = LocalUserProfileCustomNavigator.current
     val pages = customPages()
-    val view = customPageViews.getOrNull(pages.indexOfFirst { it.routeKey == routeKey }) ?: return
+    val view = customPageViews.getOrNull(pages.indexOfFirst { it.routeKey == routeKey })
 
-    LaunchedEffect(routeKey) {
+    LaunchedEffect(routeKey, customNavigator, view) {
+      customPageState.configureNavigation(
+        navigateBack = customNavigator::navigateBack,
+        popToRoot = customNavigator::popToRoot,
+        push = customNavigator::push,
+      )
+      if (view == null) {
+        customNavigator.popToRoot()
+        return@LaunchedEffect
+      }
       layoutAndroidViewHandler(view)
-      sendCustomPageEvent("presented", routeKey)
+      customPageState.pageDidPresent(routeKey)
     }
+
+    if (view == null) return
+
     DisposableEffect(routeKey) {
-      onDispose { sendCustomPageEvent("dismissed", routeKey) }
+      onDispose { customPageState.pageDidDismiss(routeKey) }
     }
 
     AndroidView(
@@ -98,10 +121,6 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
 
   private fun customPages(): List<ClerkUserProfileCustomPageConfig> =
     runCatching { parseUserProfileCustomPages(customPagesJson, customPageViews.size) }.getOrDefault(emptyList())
-
-  private fun sendCustomPageEvent(type: String, path: String) {
-    onCustomPageEvent(mapOf("type" to type, "path" to path))
-  }
 }
 
 class ClerkUserButtonViewModule : Module() {
@@ -120,7 +139,7 @@ class ClerkUserButtonViewModule : Module() {
       }
 
       Prop("customPages") { view: ClerkUserButtonNativeView, customPages: String ->
-        view.customPagesJson = customPages
+        view.setCustomPages(customPages)
       }
 
       AsyncFunction("navigateCustomPage") {
