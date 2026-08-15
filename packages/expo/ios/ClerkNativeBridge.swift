@@ -112,22 +112,31 @@ final class ClerkUserProfileCustomPageState {
 
   func pageDidDismiss(path: String) {
     guard pagePresentation?.path == path else { return }
-    dismissPresentedPage()
+    dismissPage(path)
   }
 
   func navigationDepthDidChange(_ navigationDepth: Int) {
-    retainedCustomPagePathsByDepth = retainedCustomPagePathsByDepth.filter {
+    let removedPaths = retainedCustomPagePathsByDepth
+      .filter { $0.key > navigationDepth }
+      .sorted { $0.key > $1.key }
+      .map(\.value)
+    let remainingPathsByDepth = retainedCustomPagePathsByDepth.filter {
       $0.key <= navigationDepth
     }
+    let remainingPaths = Set(remainingPathsByDepth.values)
+    retainedCustomPagePathsByDepth = remainingPathsByDepth
 
-    guard let pagePresentation,
-          let presentedDepth = pagePresentation.navigationDepth,
-          navigationDepth < presentedDepth
-    else {
-      return
+    var dismissedPaths = Set<String>()
+    for path in removedPaths where !remainingPaths.contains(path) && dismissedPaths.insert(path).inserted {
+      dismissPage(path)
     }
 
-    dismissPresentedPage()
+    if let pagePresentation,
+       let presentedDepth = pagePresentation.navigationDepth,
+       navigationDepth < presentedDepth
+    {
+      self.pagePresentation = nil
+    }
   }
 
   /// Expo can rebuild its hosting controller when a tab detaches. The live path starts
@@ -190,16 +199,32 @@ final class ClerkUserProfileCustomPageState {
   }
 
   private func invalidateNavigation() {
+    var dismissedPaths = retainedCustomPagePathsByDepth
+      .sorted { $0.key > $1.key }
+      .map(\.value)
+    if let presentedPath = pagePresentation?.path,
+       !dismissedPaths.contains(presentedPath)
+    {
+      dismissedPaths.insert(presentedPath, at: 0)
+    }
+
     retainedNavigationPath = NavigationPath()
     retainedCustomPagePathsByDepth.removeAll()
     popToRootAction?()
-    dismissPresentedPage()
+    var uniqueDismissedPaths: [String] = []
+    for path in dismissedPaths where !uniqueDismissedPaths.contains(path) {
+      uniqueDismissedPaths.append(path)
+    }
+    for path in uniqueDismissedPaths {
+      dismissPage(path)
+    }
   }
 
-  private func dismissPresentedPage() {
-    guard let pagePresentation else { return }
-    self.pagePresentation = nil
-    pageEventHandler?("dismissed", pagePresentation.path)
+  private func dismissPage(_ path: String) {
+    if pagePresentation?.path == path {
+      pagePresentation = nil
+    }
+    pageEventHandler?("dismissed", path)
   }
 }
 
@@ -214,6 +239,11 @@ struct ClerkUserProfileCustomRowConfig: Decodable {
   let label: String
   let icon: String
   let placement: Placement
+  let showAsRow: Bool?
+
+  var shouldShowAsRow: Bool {
+    showAsRow ?? true
+  }
 
   var nativeRow: UserProfileCustomRow<String> {
     UserProfileCustomRow(
@@ -777,7 +807,7 @@ struct ClerkInlineUserButtonWrapperView: View {
 
   var body: some View {
     let view = UserButton()
-      .userProfileRows(customRows.map(\.nativeRow))
+      .userProfileRows(customRows.filter(\.shouldShowAsRow).map(\.nativeRow))
       .userProfileDestination { routeKey in
         ClerkReactUserProfileCustomPage(
           path: routeKey,
@@ -932,7 +962,7 @@ struct ClerkInlineProfileWrapperView: View {
         isDismissible: dismissible,
         navigationPath: $navigationPath
       )
-      .userProfileRows(customRows.map(\.nativeRow))
+      .userProfileRows(customRows.filter(\.shouldShowAsRow).map(\.nativeRow))
       .navigationDestination(for: String.self) { routeKey in
         ClerkReactEmbeddedUserProfileCustomPage(
           path: routeKey,

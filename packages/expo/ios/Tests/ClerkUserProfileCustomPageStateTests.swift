@@ -127,7 +127,25 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
     XCTAssertEqual(state.navigationPathForRestoration().count, 0)
     XCTAssertEqual(
       events,
-      ["presented:billing", "presented:preferences", "dismissed:preferences"]
+      ["presented:billing", "presented:preferences", "dismissed:preferences", "dismissed:billing"]
+    )
+  }
+
+  @MainActor
+  func testPoppingMultipleCustomPagesDismissesEachRetainedPage() {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.pageDidPresent(path: "billing", navigationDepth: 1)
+    state.pageDidPresent(path: "preferences", navigationDepth: 2)
+
+    state.navigationDepthDidChange(0)
+
+    XCTAssertEqual(
+      events,
+      ["presented:billing", "presented:preferences", "dismissed:preferences", "dismissed:billing"]
     )
   }
 
@@ -165,6 +183,21 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
     )
 
     XCTAssertEqual(userProfileCustomPageLabel(for: "billing", rows: rows), "Billing details")
+  }
+
+  func testPushOnlyDestinationsKeepTheirTitleWithoutCreatingRows() {
+    let pages = parseUserProfileCustomPages(
+      """
+      [
+        {"path":"billing","label":"Billing","icon":"billing","placement":{"type":"sectionEnd","section":"profile"}},
+        {"path":"invoice-details","label":"Invoice details","icon":"settings","placement":{"type":"sectionEnd","section":"profile"},"showAsRow":false}
+      ]
+      """,
+      pageCount: 2
+    )
+
+    XCTAssertEqual(pages.filter(\.shouldShowAsRow).map(\.path), ["billing"])
+    XCTAssertEqual(userProfileCustomPageLabel(for: "invoice-details", rows: pages), "Invoice details")
   }
 
   private func makeNavigationPath(_ routes: String...) -> NavigationPath {

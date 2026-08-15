@@ -1,7 +1,8 @@
-import { act, render, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { useUserProfileCustomPageNavigation } from '../UserProfileCustomPages';
 import { UserProfileView } from '../UserProfileView';
 
 const mocks = vi.hoisted(() => {
@@ -41,7 +42,35 @@ function lastNativeProps() {
   return mocks.nativeProps.mock.calls.at(-1)?.[0];
 }
 
+function BillingPage() {
+  const { push } = useUserProfileCustomPageNavigation();
+
+  return (
+    <button
+      type='button'
+      onClick={() => void push('invoice-details')}
+    >
+      View invoice
+    </button>
+  );
+}
+
+function InvoiceDetailsPage() {
+  const { popToRoot } = useUserProfileCustomPageNavigation();
+
+  return (
+    <button
+      type='button'
+      onClick={() => void popToRoot()}
+    >
+      Done
+    </button>
+  );
+}
+
 describe('UserProfileView', () => {
+  afterEach(cleanup);
+
   beforeEach(() => {
     mocks.navigateCustomPage.mockClear();
     mocks.nativeProps.mockClear();
@@ -119,6 +148,68 @@ describe('UserProfileView', () => {
       lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'api-keys' } });
     });
     expect(result.queryByText('API keys page')).toBeNull();
+  });
+
+  test('pushes a destination that is not exposed as a profile row', () => {
+    const result = render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <BillingPage /> }]}
+        customDestinations={[
+          { path: 'invoice-details', label: 'Invoice details', content: <div>Invoice details page</div> },
+        ]}
+      />,
+    );
+
+    expect(JSON.parse(lastNativeProps().customPages)[1]).toMatchObject({
+      path: 'invoice-details',
+      showAsRow: false,
+    });
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+    fireEvent.click(result.getByText('View invoice'));
+    expect(mocks.navigateCustomPage).toHaveBeenCalledWith('push', 'invoice-details');
+    expect(result.getByText('Invoice details page')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'billing' } });
+    });
+    expect(result.getByText('View invoice')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'invoice-details' } });
+    });
+    expect(result.getByText('Invoice details page')).toBeDefined();
+    expect(result.getByText('View invoice')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'invoice-details' } });
+    });
+    expect(result.queryByText('Invoice details page')).toBeNull();
+    expect(result.getByText('View invoice')).toBeDefined();
+  });
+
+  test('unmounts the retained custom page stack after returning to the profile root', () => {
+    const result = render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <BillingPage /> }]}
+        customDestinations={[{ path: 'invoice-details', label: 'Invoice details', content: <InvoiceDetailsPage /> }]}
+      />,
+    );
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+    fireEvent.click(result.getByText('View invoice'));
+    fireEvent.click(result.getByText('Done'));
+    expect(mocks.navigateCustomPage).toHaveBeenLastCalledWith('popToRoot');
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'invoice-details' } });
+    });
+    expect(result.queryByText('View invoice')).toBeNull();
+    expect(result.queryByText('Done')).toBeNull();
   });
 
   test('opens href pages externally and returns to the profile root', async () => {

@@ -40,17 +40,38 @@ private fun debugLog(tag: String, message: String) {
   }
 }
 
-internal fun parseUserProfileCustomPages(customPagesJson: String, customPageCount: Int): List<UserProfileCustomRow> {
+internal data class ClerkUserProfileCustomPageConfig(
+  val routeKey: String,
+  val title: String,
+  val icon: Int,
+  val placement: UserProfileCustomRowPlacement,
+  val showAsRow: Boolean,
+) {
+  val nativeRow: UserProfileCustomRow
+    get() =
+      UserProfileCustomRow(
+        routeKey = routeKey,
+        title = title,
+        icon = UserProfileRowIcon.Resource(icon),
+        placement = placement,
+      )
+}
+
+internal fun parseUserProfileCustomPages(
+  customPagesJson: String,
+  customPageCount: Int,
+): List<ClerkUserProfileCustomPageConfig> {
   val pages = JSONArray(customPagesJson)
   return buildList {
     for (index in 0 until minOf(pages.length(), customPageCount)) {
       val page = pages.getJSONObject(index)
       add(
-        UserProfileCustomRow(
+        ClerkUserProfileCustomPageConfig(
           routeKey = page.getString("path"),
           title = page.getString("label"),
-          icon = UserProfileRowIcon.Resource(userProfileCustomRowIcon(page.optString("icon"))),
+          icon = userProfileCustomRowIcon(page.optString("icon")),
           placement = userProfileCustomRowPlacement(page.optJSONObject("placement")),
+          showAsRow = page.optBoolean("showAsRow", true),
         ),
       )
     }
@@ -176,8 +197,8 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   @Composable
   private fun CustomPageDestination(routeKey: String) {
     customNavigator = LocalUserProfileCustomNavigator.current
-    val rows = customRows()
-    val view = customPageViews.getOrNull(rows.indexOfFirst { it.routeKey == routeKey }) ?: return
+    val pages = customPages()
+    val view = customPageViews.getOrNull(pages.indexOfFirst { it.routeKey == routeKey }) ?: return
 
     LaunchedEffect(routeKey) {
       layoutAndroidViewHandler(view)
@@ -197,6 +218,10 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   }
 
   private fun customRows(): List<UserProfileCustomRow> {
+    return customPages().filter { it.showAsRow }.map { it.nativeRow }
+  }
+
+  private fun customPages(): List<ClerkUserProfileCustomPageConfig> {
     return runCatching {
         parseUserProfileCustomPages(customPagesJson, customPageViews.size)
       }

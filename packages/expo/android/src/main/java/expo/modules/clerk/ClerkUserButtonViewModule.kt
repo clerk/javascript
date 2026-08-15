@@ -74,8 +74,8 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
   @Composable
   private fun CustomPageDestination(routeKey: String) {
     customNavigator = LocalUserProfileCustomNavigator.current
-    val rows = customRows()
-    val view = customPageViews.getOrNull(rows.indexOfFirst { it.routeKey == routeKey }) ?: return
+    val pages = customPages()
+    val view = customPageViews.getOrNull(pages.indexOfFirst { it.routeKey == routeKey }) ?: return
 
     LaunchedEffect(routeKey) {
       layoutAndroidViewHandler(view)
@@ -94,7 +94,9 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
     )
   }
 
-  private fun customRows(): List<UserProfileCustomRow> =
+  private fun customRows(): List<UserProfileCustomRow> = customPages().filter { it.showAsRow }.map { it.nativeRow }
+
+  private fun customPages(): List<ClerkUserProfileCustomPageConfig> =
     runCatching { parseUserProfileCustomPages(customPagesJson, customPageViews.size) }.getOrDefault(emptyList())
 
   private fun sendCustomPageEvent(type: String, path: String) {
