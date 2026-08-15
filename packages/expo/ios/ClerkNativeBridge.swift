@@ -45,10 +45,21 @@ final class ClerkInlineAuthLogoState {
 @MainActor
 @Observable
 final class ClerkUserProfileCustomPageState {
+  private struct PagePresentation {
+    let path: String
+    let navigationDepth: Int?
+  }
+
   private(set) var views: [UIView] = []
-  @ObservationIgnored private var navigator: UserProfileNavigator<String>?
   @ObservationIgnored private var navigateBackAction: (() -> Void)?
+  @ObservationIgnored private var popToRootAction: (() -> Void)?
+  @ObservationIgnored private var pushAction: ((String) -> Void)?
   @ObservationIgnored private var pageEventHandler: ((String, String) -> Void)?
+  @ObservationIgnored private var pagePresentation: PagePresentation?
+  @ObservationIgnored private var retainedNavigationPath = NavigationPath()
+  @ObservationIgnored private var retainedCustomPagePathsByDepth: [Int: String] = [:]
+  @ObservationIgnored private var hasObservedUserID = false
+  @ObservationIgnored private var observedUserID: String?
 
   func insertView(_ view: UIView, at index: Int) {
     view.removeFromSuperview()
@@ -65,16 +76,92 @@ final class ClerkUserProfileCustomPageState {
     _ navigator: UserProfileNavigator<String>,
     navigateBack: @escaping () -> Void
   ) {
-    self.navigator = navigator
-    navigateBackAction = navigateBack
+    configureNavigation(
+      navigateBack: navigateBack,
+      popToRoot: navigator.popToRoot,
+      push: navigator.push
+    )
+  }
+
+  func configureNavigation(_ navigationPath: Binding<NavigationPath>) {
+    configureNavigation(
+      navigateBack: {
+        guard !navigationPath.wrappedValue.isEmpty else { return }
+        navigationPath.wrappedValue.removeLast()
+      },
+      popToRoot: {
+        navigationPath.wrappedValue = NavigationPath()
+      },
+      push: {
+        navigationPath.wrappedValue.append($0)
+      }
+    )
   }
 
   func setPageEventHandler(_ handler: @escaping (String, String) -> Void) {
     pageEventHandler = handler
   }
 
-  func sendPageEvent(type: String, path: String) {
-    pageEventHandler?(type, path)
+  func pageDidPresent(path: String, navigationDepth: Int? = nil) {
+    pagePresentation = PagePresentation(path: path, navigationDepth: navigationDepth)
+    if let navigationDepth {
+      retainedCustomPagePathsByDepth[navigationDepth] = path
+    }
+    pageEventHandler?("presented", path)
+  }
+
+  func pageDidDismiss(path: String) {
+    guard pagePresentation?.path == path else { return }
+    dismissPresentedPage()
+  }
+
+  func navigationDepthDidChange(_ navigationDepth: Int) {
+    retainedCustomPagePathsByDepth = retainedCustomPagePathsByDepth.filter {
+      $0.key <= navigationDepth
+    }
+
+    guard let pagePresentation,
+          let presentedDepth = pagePresentation.navigationDepth,
+          navigationDepth < presentedDepth
+    else {
+      return
+    }
+
+    dismissPresentedPage()
+  }
+
+  /// Expo can rebuild its hosting controller when a tab detaches. The live path starts
+  /// empty in each new controller so ClerkKitUI captures the correct zero-depth baseline,
+  /// while this retained snapshot is restored after that first appearance.
+  func navigationPathForRestoration() -> NavigationPath {
+    retainedNavigationPath
+  }
+
+  func navigationPathDidChange(_ navigationPath: NavigationPath) {
+    retainedNavigationPath = navigationPath
+    navigationDepthDidChange(navigationPath.count)
+  }
+
+  func userDidChange(to userID: String?) {
+    guard hasObservedUserID else {
+      observedUserID = userID
+      hasObservedUserID = true
+      return
+    }
+
+    guard observedUserID != userID else { return }
+    observedUserID = userID
+    invalidateNavigation()
+  }
+
+  func reconcileCustomPagePaths(_ validPaths: Set<String>) {
+    var retainedPaths = Set(retainedCustomPagePathsByDepth.values)
+    if let presentedPath = pagePresentation?.path {
+      retainedPaths.insert(presentedPath)
+    }
+    guard !retainedPaths.isSubset(of: validPaths) else { return }
+
+    invalidateNavigation()
   }
 
   func navigate(action: String, routeKey: String?) {
@@ -82,14 +169,37 @@ final class ClerkUserProfileCustomPageState {
     case "back":
       navigateBackAction?()
     case "popToRoot":
-      navigator?.popToRoot()
+      popToRootAction?()
     case "push":
       if let routeKey {
-        navigator?.push(routeKey)
+        pushAction?(routeKey)
       }
     default:
       break
     }
+  }
+
+  private func configureNavigation(
+    navigateBack: @escaping () -> Void,
+    popToRoot: @escaping () -> Void,
+    push: @escaping (String) -> Void
+  ) {
+    navigateBackAction = navigateBack
+    popToRootAction = popToRoot
+    pushAction = push
+  }
+
+  private func invalidateNavigation() {
+    retainedNavigationPath = NavigationPath()
+    retainedCustomPagePathsByDepth.removeAll()
+    popToRootAction?()
+    dismissPresentedPage()
+  }
+
+  private func dismissPresentedPage() {
+    guard let pagePresentation else { return }
+    self.pagePresentation = nil
+    pageEventHandler?("dismissed", pagePresentation.path)
   }
 }
 
@@ -160,13 +270,24 @@ struct ClerkUserProfileCustomRowConfig: Decodable {
   }
 }
 
-func parseUserProfileCustomPages(_ json: String, pageCount: Int) -> [ClerkUserProfileCustomRowConfig] {
+func decodeUserProfileCustomPages(_ json: String) -> [ClerkUserProfileCustomRowConfig] {
   guard let data = json.data(using: .utf8),
         let rows = try? JSONDecoder().decode([ClerkUserProfileCustomRowConfig].self, from: data)
   else {
     return []
   }
-  return Array(rows.prefix(pageCount))
+  return rows
+}
+
+func parseUserProfileCustomPages(_ json: String, pageCount: Int) -> [ClerkUserProfileCustomRowConfig] {
+  Array(decodeUserProfileCustomPages(json).prefix(pageCount))
+}
+
+func userProfileCustomPageLabel(
+  for path: String,
+  rows: [ClerkUserProfileCustomRowConfig]
+) -> String {
+  rows.first(where: { $0.path == path })?.label ?? ""
 }
 
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
@@ -417,6 +538,7 @@ final class ClerkNativeBridge {
     )
   }
 
+  @MainActor
   func makeUserProfileViewController(
     dismissible: Bool,
     customRows: [ClerkUserProfileCustomRowConfig],
@@ -434,7 +556,8 @@ final class ClerkNativeBridge {
         darkTheme: darkTheme,
         customRows: customRows,
         customPageState: customPageState
-      ),
+      )
+      .environment(Clerk.shared),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
   }
@@ -786,6 +909,9 @@ private final class ClerkNativeHostingController<Content: View>: UIHostingContro
 // MARK: - Inline Profile View Wrapper (for embedded rendering)
 
 struct ClerkInlineProfileWrapperView: View {
+  @Environment(Clerk.self) private var clerk
+  @Environment(\.colorScheme) private var colorScheme
+
   let dismissible: Bool
   let hostBackAction: ClerkHostBackAction?
   let lightTheme: ClerkTheme?
@@ -793,20 +919,30 @@ struct ClerkInlineProfileWrapperView: View {
   let customRows: [ClerkUserProfileCustomRowConfig]
   let customPageState: ClerkUserProfileCustomPageState
 
-  @Environment(\.colorScheme) private var colorScheme
+  @State private var navigationPath = NavigationPath()
+  @State private var didRestoreNavigation = false
+
+  private var userID: String? {
+    clerk.user?.id
+  }
 
   var body: some View {
-    let view = UserProfileView(isDismissible: dismissible)
+    let view = NavigationStack(path: $navigationPath) {
+      UserProfileView(
+        isDismissible: dismissible,
+        navigationPath: $navigationPath
+      )
       .userProfileRows(customRows.map(\.nativeRow))
-      .userProfileDestination { routeKey in
-        ClerkReactUserProfileCustomPage(
+      .navigationDestination(for: String.self) { routeKey in
+        ClerkReactEmbeddedUserProfileCustomPage(
           path: routeKey,
           rows: customRows,
-          state: customPageState
+          state: customPageState,
+          navigationPath: $navigationPath
         )
       }
-      .environment(Clerk.shared)
-      .environment(\.clerkHostBackAction, hostBackAction)
+    }
+    .environment(\.clerkHostBackAction, hostBackAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -816,6 +952,26 @@ struct ClerkInlineProfileWrapperView: View {
       }
     }
     themedView
+      .onAppear {
+        customPageState.configureNavigation($navigationPath)
+        customPageState.userDidChange(to: userID)
+      }
+      .onChange(of: navigationPath.count) { _, _ in
+        customPageState.navigationPathDidChange(navigationPath)
+      }
+      .onChange(of: userID) { _, newUserID in
+        customPageState.userDidChange(to: newUserID)
+      }
+      .task(restoreNavigationIfNeeded)
+  }
+
+  @MainActor
+  private func restoreNavigationIfNeeded() async {
+    guard !didRestoreNavigation else { return }
+    await Task.yield()
+    guard !Task.isCancelled else { return }
+    navigationPath = customPageState.navigationPathForRestoration()
+    didRestoreNavigation = true
   }
 }
 
@@ -823,6 +979,40 @@ private struct ClerkReactUserProfileCustomPage: View {
   @Environment(UserProfileNavigator<String>.self) private var navigator
   @Environment(\.dismiss) private var dismiss
 
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+
+  var body: some View {
+    ClerkReactUserProfileCustomPageContent(path: path, rows: rows, state: state)
+      .onAppear {
+        state.configureNavigation(navigator) {
+          dismiss()
+        }
+        state.pageDidPresent(path: path)
+      }
+      .onDisappear {
+        state.pageDidDismiss(path: path)
+      }
+  }
+}
+
+private struct ClerkReactEmbeddedUserProfileCustomPage: View {
+  let path: String
+  let rows: [ClerkUserProfileCustomRowConfig]
+  let state: ClerkUserProfileCustomPageState
+  @Binding var navigationPath: NavigationPath
+
+  var body: some View {
+    ClerkReactUserProfileCustomPageContent(path: path, rows: rows, state: state)
+      .onAppear {
+        state.configureNavigation($navigationPath)
+        state.pageDidPresent(path: path, navigationDepth: navigationPath.count)
+      }
+  }
+}
+
+private struct ClerkReactUserProfileCustomPageContent: View {
   let path: String
   let rows: [ClerkUserProfileCustomRowConfig]
   let state: ClerkUserProfileCustomPageState
@@ -836,15 +1026,8 @@ private struct ClerkReactUserProfileCustomPage: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .onAppear {
-      state.configureNavigation(navigator) {
-        dismiss()
-      }
-      state.sendPageEvent(type: "presented", path: path)
-    }
-    .onDisappear {
-      state.sendPageEvent(type: "dismissed", path: path)
-    }
+    .navigationTitle(userProfileCustomPageLabel(for: path, rows: rows))
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 
