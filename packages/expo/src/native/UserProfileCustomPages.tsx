@@ -84,7 +84,10 @@ export interface UserProfileCustomPageNavigation {
   /** Returns to the root user profile screen. */
   popToRoot: () => Promise<void>;
 
-  /** Pushes another registered custom page or custom destination by path. */
+  /**
+   * Pushes another registered custom page or custom destination by path.
+   * Rejects when that path is already active in the navigation stack.
+   */
   push: (path: string) => Promise<void>;
 }
 
@@ -238,7 +241,13 @@ export function useUserProfileCustomPages(
           );
         }
 
-        updatePresentedPaths(currentPaths => (currentPaths.includes(path) ? currentPaths : [...currentPaths, path]));
+        if (presentedPathStack.current.includes(path)) {
+          return Promise.reject(
+            new Error(`Custom user profile page or destination "${path}" is already in the navigation stack.`),
+          );
+        }
+
+        updatePresentedPaths(currentPaths => [...currentPaths, path]);
 
         return navigationHandle.navigateCustomPage('push', path).catch(error => {
           updatePresentedPaths(currentPaths =>

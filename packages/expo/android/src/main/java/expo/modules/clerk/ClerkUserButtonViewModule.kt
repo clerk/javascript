@@ -27,7 +27,7 @@ class ClerkUserButtonNativeView(context: Context, appContext: AppContext) : Cler
   private val customPageViews = mutableListOf<View>()
   private val onCustomPageEvent by EventDispatcher()
   private val customPageState =
-    ClerkUserProfileCustomPageState { type, path ->
+    ClerkUserProfileCustomPageState(resetCoveredPathsWhenInactive = true) { type, path ->
       onCustomPageEvent(mapOf("type" to type, "path" to path))
     }
 

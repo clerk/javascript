@@ -58,6 +58,8 @@ final class ClerkUserProfileCustomPageState {
   @ObservationIgnored private var pagePresentation: PagePresentation?
   @ObservationIgnored private var retainedNavigationPath = NavigationPath()
   @ObservationIgnored private var retainedCustomPagePathsByDepth: [Int: String] = [:]
+  @ObservationIgnored private var retainedNavigatorPaths: [String] = []
+  @ObservationIgnored private var pendingNavigatorResetTask: Task<Void, Never>?
   @ObservationIgnored private var hasObservedUserID = false
   @ObservationIgnored private var observedUserID: String?
 
@@ -103,6 +105,10 @@ final class ClerkUserProfileCustomPageState {
   }
 
   func pageDidPresent(path: String, navigationDepth: Int? = nil) {
+    if navigationDepth == nil {
+      cancelPendingNavigatorReset()
+      retainNavigatorPath(path)
+    }
     pagePresentation = PagePresentation(path: path, navigationDepth: navigationDepth)
     if let navigationDepth {
       retainedCustomPagePathsByDepth[navigationDepth] = path
@@ -112,6 +118,11 @@ final class ClerkUserProfileCustomPageState {
 
   func pageDidDismiss(path: String) {
     guard pagePresentation?.path == path else { return }
+    let usesNavigator = pagePresentation?.navigationDepth == nil
+    if usesNavigator, retainedNavigatorPaths.last == path {
+      retainedNavigatorPaths.removeLast()
+      scheduleNavigatorResetIfInactive()
+    }
     dismissPage(path)
   }
 
@@ -165,6 +176,7 @@ final class ClerkUserProfileCustomPageState {
 
   func reconcileCustomPagePaths(_ validPaths: Set<String>) {
     var retainedPaths = Set(retainedCustomPagePathsByDepth.values)
+    retainedPaths.formUnion(retainedNavigatorPaths)
     if let presentedPath = pagePresentation?.path {
       retainedPaths.insert(presentedPath)
     }
@@ -181,6 +193,12 @@ final class ClerkUserProfileCustomPageState {
       popToRootAction?()
     case "push":
       if let routeKey {
+        guard !retainedCustomPagePathsByDepth.values.contains(routeKey),
+              !retainedNavigatorPaths.contains(routeKey)
+        else { return }
+        if let pagePresentation, pagePresentation.navigationDepth == nil {
+          retainNavigatorPath(routeKey)
+        }
         pushAction?(routeKey)
       }
     default:
@@ -202,6 +220,7 @@ final class ClerkUserProfileCustomPageState {
     var dismissedPaths = retainedCustomPagePathsByDepth
       .sorted { $0.key > $1.key }
       .map(\.value)
+    dismissedPaths.append(contentsOf: retainedNavigatorPaths.reversed())
     if let presentedPath = pagePresentation?.path,
        !dismissedPaths.contains(presentedPath)
     {
@@ -210,12 +229,55 @@ final class ClerkUserProfileCustomPageState {
 
     retainedNavigationPath = NavigationPath()
     retainedCustomPagePathsByDepth.removeAll()
+    retainedNavigatorPaths.removeAll()
+    cancelPendingNavigatorReset()
     popToRootAction?()
     var uniqueDismissedPaths: [String] = []
     for path in dismissedPaths where !uniqueDismissedPaths.contains(path) {
       uniqueDismissedPaths.append(path)
     }
     for path in uniqueDismissedPaths {
+      dismissPage(path)
+    }
+  }
+
+  private func retainNavigatorPath(_ path: String) {
+    guard let retainedIndex = retainedNavigatorPaths.lastIndex(of: path) else {
+      retainedNavigatorPaths.append(path)
+      return
+    }
+
+    let removedPaths = Array(retainedNavigatorPaths.suffix(from: retainedIndex + 1).reversed())
+    retainedNavigatorPaths.removeSubrange((retainedIndex + 1)..<retainedNavigatorPaths.endIndex)
+    for removedPath in removedPaths {
+      dismissPage(removedPath)
+    }
+  }
+
+  private func scheduleNavigatorResetIfInactive() {
+    pendingNavigatorResetTask?.cancel()
+    pendingNavigatorResetTask = Task { @MainActor [weak self] in
+      await Task.yield()
+      guard !Task.isCancelled else { return }
+      self?.resetInactiveNavigatorPaths()
+    }
+  }
+
+  private func cancelPendingNavigatorReset() {
+    pendingNavigatorResetTask?.cancel()
+    pendingNavigatorResetTask = nil
+  }
+
+  private func resetInactiveNavigatorPaths() {
+    pendingNavigatorResetTask = nil
+    guard pagePresentation == nil else { return }
+
+    let dismissedPaths = retainedNavigatorPaths.reversed()
+    retainedNavigatorPaths.removeAll()
+    navigateBackAction = nil
+    popToRootAction = nil
+    pushAction = nil
+    for path in dismissedPaths {
       dismissPage(path)
     }
   }
@@ -592,6 +654,7 @@ final class ClerkNativeBridge {
     )
   }
 
+  @MainActor
   func makeUserButtonViewController(
     customRows: [ClerkUserProfileCustomRowConfig],
     customPageState: ClerkUserProfileCustomPageState
@@ -605,6 +668,7 @@ final class ClerkNativeBridge {
         customRows: customRows,
         customPageState: customPageState
       )
+      .environment(Clerk.shared)
     )
   }
 
@@ -798,12 +862,17 @@ final class ClerkNativeBridge {
 // MARK: - Inline User Button Wrapper (for embedded rendering)
 
 struct ClerkInlineUserButtonWrapperView: View {
+  @Environment(Clerk.self) private var clerk
+  @Environment(\.colorScheme) private var colorScheme
+
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let customRows: [ClerkUserProfileCustomRowConfig]
   let customPageState: ClerkUserProfileCustomPageState
 
-  @Environment(\.colorScheme) private var colorScheme
+  private var userID: String? {
+    clerk.user?.id
+  }
 
   var body: some View {
     let view = UserButton()
@@ -815,7 +884,6 @@ struct ClerkInlineUserButtonWrapperView: View {
           state: customPageState
         )
       }
-      .environment(Clerk.shared)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {
@@ -826,6 +894,12 @@ struct ClerkInlineUserButtonWrapperView: View {
     }
     themedView
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+      .onAppear {
+        customPageState.userDidChange(to: userID)
+      }
+      .onChange(of: userID) { _, newUserID in
+        customPageState.userDidChange(to: newUserID)
+      }
   }
 }
 

@@ -96,6 +96,26 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
   }
 
   @MainActor
+  func testUserIdentityChangeInvalidatesTheEntireUserButtonStack() {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.userDidChange(to: "user_1")
+    state.pageDidPresent(path: "billing")
+    state.navigate(action: "push", routeKey: "preferences")
+    state.pageDidDismiss(path: "billing")
+    state.pageDidPresent(path: "preferences")
+    events.removeAll()
+
+    state.userDidChange(to: "user_2")
+    state.userDidChange(to: "user_2")
+
+    XCTAssertEqual(events, ["dismissed:preferences", "dismissed:billing"])
+  }
+
+  @MainActor
   func testRemovingThePresentedCustomPageInvalidatesNavigation() {
     let state = ClerkUserProfileCustomPageState()
     var events: [String] = []
@@ -129,6 +149,83 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
       events,
       ["presented:billing", "presented:preferences", "dismissed:preferences", "dismissed:billing"]
     )
+  }
+
+  @MainActor
+  func testRemovingAnEarlierUserButtonPageInvalidatesTheRetainedStack() {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.pageDidPresent(path: "billing")
+    state.navigate(action: "push", routeKey: "preferences")
+    state.pageDidDismiss(path: "billing")
+    state.pageDidPresent(path: "preferences")
+    events.removeAll()
+
+    state.reconcileCustomPagePaths(["preferences"])
+
+    XCTAssertEqual(events, ["dismissed:preferences", "dismissed:billing"])
+  }
+
+  @MainActor
+  func testClosingUserButtonProfileDismissesCoveredPages() async {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.pageDidPresent(path: "billing")
+    state.navigate(action: "push", routeKey: "preferences")
+    state.pageDidDismiss(path: "billing")
+    state.pageDidPresent(path: "preferences")
+    events.removeAll()
+
+    state.pageDidDismiss(path: "preferences")
+    await drainPendingTasks()
+
+    XCTAssertEqual(events, ["dismissed:preferences", "dismissed:billing"])
+  }
+
+  @MainActor
+  func testReturningToCoveredUserButtonPageKeepsItRetained() async {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.pageDidPresent(path: "billing")
+    state.navigate(action: "push", routeKey: "preferences")
+    state.pageDidDismiss(path: "billing")
+    state.pageDidPresent(path: "preferences")
+    events.removeAll()
+
+    state.pageDidDismiss(path: "preferences")
+    state.pageDidPresent(path: "billing")
+    await drainPendingTasks()
+    state.reconcileCustomPagePaths(["billing"])
+
+    XCTAssertEqual(events, ["dismissed:preferences", "presented:billing"])
+  }
+
+  @MainActor
+  func testPushingAUserButtonPathAlreadyInTheStackDoesNotCollapseLaterPaths() {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.pageDidPresent(path: "billing")
+    state.navigate(action: "push", routeKey: "preferences")
+    state.pageDidDismiss(path: "billing")
+    state.pageDidPresent(path: "preferences")
+    events.removeAll()
+
+    state.navigate(action: "push", routeKey: "billing")
+    state.reconcileCustomPagePaths(["billing", "preferences"])
+
+    XCTAssertEqual(events, [])
   }
 
   @MainActor
@@ -206,5 +303,12 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
       navigationPath.append(route)
     }
     return navigationPath
+  }
+
+  @MainActor
+  private func drainPendingTasks() async {
+    for _ in 0..<3 {
+      await Task.yield()
+    }
   }
 }

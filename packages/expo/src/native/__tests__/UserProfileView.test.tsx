@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { UserProfileCustomPageNavigation } from '../UserProfileCustomPages';
 import { useUserProfileCustomPageNavigation } from '../UserProfileCustomPages';
 import { UserProfileView } from '../UserProfileView';
 
@@ -68,6 +69,21 @@ function InvoiceDetailsPage() {
   );
 }
 
+let latestNavigation: UserProfileCustomPageNavigation | null = null;
+
+function NavigationCapture() {
+  latestNavigation = useUserProfileCustomPageNavigation();
+  return null;
+}
+
+function getLatestNavigation(): UserProfileCustomPageNavigation {
+  if (!latestNavigation) {
+    throw new Error('Expected custom page navigation to be available.');
+  }
+
+  return latestNavigation;
+}
+
 describe('UserProfileView', () => {
   afterEach(cleanup);
 
@@ -75,6 +91,7 @@ describe('UserProfileView', () => {
     mocks.navigateCustomPage.mockClear();
     mocks.nativeProps.mockClear();
     mocks.openURL.mockClear();
+    latestNavigation = null;
   });
 
   test('calls onDismiss when the native profile view emits dismissed', () => {
@@ -188,6 +205,28 @@ describe('UserProfileView', () => {
     });
     expect(result.queryByText('Invoice details page')).toBeNull();
     expect(result.getByText('View invoice')).toBeDefined();
+  });
+
+  test('rejects pushing a path that is already in the active stack', async () => {
+    render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <NavigationCapture /> }]}
+        customDestinations={[{ path: 'invoice-details', label: 'Invoice details', content: <NavigationCapture /> }]}
+      />,
+    );
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+
+    await act(async () => {
+      await getLatestNavigation().push('invoice-details');
+    });
+
+    await expect(getLatestNavigation().push('billing')).rejects.toThrow(
+      'Custom user profile page or destination "billing" is already in the navigation stack.',
+    );
+    expect(mocks.navigateCustomPage).toHaveBeenCalledTimes(1);
+    expect(mocks.navigateCustomPage).toHaveBeenCalledWith('push', 'invoice-details');
   });
 
   test('unmounts the retained custom page stack after returning to the profile root', () => {

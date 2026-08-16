@@ -29,6 +29,71 @@ class ClerkUserProfileCustomPageStateTest {
   }
 
   @Test
+  fun closingUserButtonProfileDismissesCoveredPages() {
+    val events = mutableListOf<String>()
+    val pendingResets = mutableListOf<() -> Unit>()
+    val state =
+      state(
+        events,
+        resetCoveredPathsWhenInactive = true,
+        postInactiveReset = pendingResets::add,
+      )
+    state.pageDidPresent("billing")
+    state.navigate("push", "invoice-details")
+    state.pageDidDismiss("billing")
+    state.pageDidPresent("invoice-details")
+    events.clear()
+
+    state.pageDidDismiss("invoice-details")
+    pendingResets.single().invoke()
+
+    assertEquals(emptyList<String>(), state.retainedPathsForTesting())
+    assertEquals(listOf("dismissed:invoice-details", "dismissed:billing"), events)
+  }
+
+  @Test
+  fun returningToCoveredUserButtonPageCancelsInactiveReset() {
+    val events = mutableListOf<String>()
+    val pendingResets = mutableListOf<() -> Unit>()
+    val state =
+      state(
+        events,
+        resetCoveredPathsWhenInactive = true,
+        postInactiveReset = pendingResets::add,
+      )
+    state.pageDidPresent("billing")
+    state.navigate("push", "invoice-details")
+    state.pageDidDismiss("billing")
+    state.pageDidPresent("invoice-details")
+    events.clear()
+
+    state.pageDidDismiss("invoice-details")
+    state.pageDidPresent("billing")
+    pendingResets.single().invoke()
+
+    assertEquals(listOf("billing"), state.retainedPathsForTesting())
+    assertEquals(listOf("dismissed:invoice-details", "presented:billing"), events)
+  }
+
+  @Test
+  fun pushingAPathAlreadyInTheStackDoesNotPushOrCollapseIt() {
+    val events = mutableListOf<String>()
+    val pushedPaths = mutableListOf<String>()
+    val state = state(events, push = pushedPaths::add)
+    state.pageDidPresent("billing")
+    state.navigate("push", "invoice-details")
+    state.pageDidDismiss("billing")
+    state.pageDidPresent("invoice-details")
+    events.clear()
+
+    state.navigate("push", "billing")
+
+    assertEquals(listOf("billing", "invoice-details"), state.retainedPathsForTesting())
+    assertEquals(listOf("invoice-details"), pushedPaths)
+    assertEquals(emptyList<String>(), events)
+  }
+
+  @Test
   fun popToRootDismissesEveryRetainedPageDeepestFirst() {
     val events = mutableListOf<String>()
     var popToRootCount = 0
@@ -85,8 +150,13 @@ class ClerkUserProfileCustomPageStateTest {
     events: MutableList<String>,
     popToRoot: () -> Unit = {},
     push: (String) -> Unit = {},
+    resetCoveredPathsWhenInactive: Boolean = false,
+    postInactiveReset: ((() -> Unit) -> Unit) = { it() },
   ): ClerkUserProfileCustomPageState {
-    return ClerkUserProfileCustomPageState { type, path -> events.add("$type:$path") }.also {
+    return ClerkUserProfileCustomPageState(
+      resetCoveredPathsWhenInactive = resetCoveredPathsWhenInactive,
+      postInactiveReset = postInactiveReset,
+    ) { type, path -> events.add("$type:$path") }.also {
       it.configureNavigation(navigateBack = {}, popToRoot = popToRoot, push = push)
     }
   }
