@@ -2,4 +2,4 @@
 '@clerk/expo-google-signin': patch
 ---
 
-Fix Android Google Sign-In provider failures being reported as user cancellation.
+Pass the underlying Android Credential Manager message through when a sign-in is cancelled, so `@clerk/expo` can tell a provider failure apart from a dismissed account chooser. Upgrade `@clerk/expo` alongside this and rebuild your native app to get the fix.
