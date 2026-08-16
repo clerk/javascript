@@ -45,6 +45,9 @@ final class ClerkInlineAuthLogoState {
 @MainActor
 @Observable
 final class ClerkUserProfileCustomPageState {
+  typealias InactiveResetAction = @MainActor () -> Void
+  typealias PostInactiveReset = (@escaping InactiveResetAction) -> Void
+
   private struct PagePresentation {
     let path: String
     let navigationDepth: Int?
@@ -59,9 +62,21 @@ final class ClerkUserProfileCustomPageState {
   @ObservationIgnored private var retainedNavigationPath = NavigationPath()
   @ObservationIgnored private var retainedCustomPagePathsByDepth: [Int: String] = [:]
   @ObservationIgnored private var retainedNavigatorPaths: [String] = []
-  @ObservationIgnored private var pendingNavigatorResetTask: Task<Void, Never>?
+  @ObservationIgnored private var navigatorResetGeneration = 0
   @ObservationIgnored private var hasObservedUserID = false
   @ObservationIgnored private var observedUserID: String?
+  private let postInactiveReset: PostInactiveReset
+
+  init(
+    postInactiveReset: @escaping PostInactiveReset = { action in
+      Task { @MainActor in
+        await Task.yield()
+        action()
+      }
+    }
+  ) {
+    self.postInactiveReset = postInactiveReset
+  }
 
   func insertView(_ view: UIView, at index: Int) {
     view.removeFromSuperview()
@@ -255,21 +270,19 @@ final class ClerkUserProfileCustomPageState {
   }
 
   private func scheduleNavigatorResetIfInactive() {
-    pendingNavigatorResetTask?.cancel()
-    pendingNavigatorResetTask = Task { @MainActor [weak self] in
-      await Task.yield()
-      guard !Task.isCancelled else { return }
-      self?.resetInactiveNavigatorPaths()
+    navigatorResetGeneration += 1
+    let generation = navigatorResetGeneration
+    postInactiveReset { [weak self] in
+      guard let self, generation == navigatorResetGeneration else { return }
+      resetInactiveNavigatorPaths()
     }
   }
 
   private func cancelPendingNavigatorReset() {
-    pendingNavigatorResetTask?.cancel()
-    pendingNavigatorResetTask = nil
+    navigatorResetGeneration += 1
   }
 
   private func resetInactiveNavigatorPaths() {
-    pendingNavigatorResetTask = nil
     guard pagePresentation == nil else { return }
 
     let dismissedPaths = retainedNavigatorPaths.reversed()

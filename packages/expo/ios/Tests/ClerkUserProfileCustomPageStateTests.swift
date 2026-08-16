@@ -170,8 +170,9 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
   }
 
   @MainActor
-  func testClosingUserButtonProfileDismissesCoveredPages() async {
-    let state = ClerkUserProfileCustomPageState()
+  func testClosingUserButtonProfileDismissesCoveredPages() {
+    var pendingResets: [ClerkUserProfileCustomPageState.InactiveResetAction] = []
+    let state = ClerkUserProfileCustomPageState { pendingResets.append($0) }
     var events: [String] = []
     state.setPageEventHandler { type, path in
       events.append("\(type):\(path)")
@@ -183,14 +184,16 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
     events.removeAll()
 
     state.pageDidDismiss(path: "preferences")
-    await drainPendingTasks()
+    XCTAssertEqual(pendingResets.count, 1)
+    pendingResets.removeFirst()()
 
     XCTAssertEqual(events, ["dismissed:preferences", "dismissed:billing"])
   }
 
   @MainActor
-  func testReturningToCoveredUserButtonPageKeepsItRetained() async {
-    let state = ClerkUserProfileCustomPageState()
+  func testReturningToCoveredUserButtonPageKeepsItRetained() {
+    var pendingResets: [ClerkUserProfileCustomPageState.InactiveResetAction] = []
+    let state = ClerkUserProfileCustomPageState { pendingResets.append($0) }
     var events: [String] = []
     state.setPageEventHandler { type, path in
       events.append("\(type):\(path)")
@@ -203,7 +206,8 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
 
     state.pageDidDismiss(path: "preferences")
     state.pageDidPresent(path: "billing")
-    await drainPendingTasks()
+    XCTAssertEqual(pendingResets.count, 1)
+    pendingResets.removeFirst()()
     state.reconcileCustomPagePaths(["billing"])
 
     XCTAssertEqual(events, ["dismissed:preferences", "presented:billing"])
@@ -303,12 +307,5 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
       navigationPath.append(route)
     }
     return navigationPath
-  }
-
-  @MainActor
-  private func drainPendingTasks() async {
-    for _ in 0..<3 {
-      await Task.yield()
-    }
   }
 }
