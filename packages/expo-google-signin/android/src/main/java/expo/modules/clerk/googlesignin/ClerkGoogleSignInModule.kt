@@ -98,7 +98,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCredentialCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -145,7 +145,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCredentialCancellation(promise, e)
       } catch (e: NoCredentialException) {
         promise.reject("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", e)
       } catch (e: GetCredentialException) {
@@ -191,7 +191,7 @@ class ClerkGoogleSignInModule : Module() {
 
         handleSignInResult(result, promise)
       } catch (e: GetCredentialCancellationException) {
-        promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", e)
+        rejectCredentialCancellation(promise, e)
       } catch (e: GetCredentialException) {
         promise.reject("GOOGLE_SIGN_IN_ERROR", e.message ?: "Unknown error", e)
       } catch (e: Exception) {
@@ -214,6 +214,17 @@ class ClerkGoogleSignInModule : Module() {
   }
 
   // MARK: - Helpers
+
+  private fun rejectCredentialCancellation(promise: Promise, exception: GetCredentialCancellationException) {
+    val message = exception.message ?: "Google Sign-In failed"
+
+    if (isExplicitUserCancellation(message)) {
+      promise.reject("SIGN_IN_CANCELLED", "User cancelled the sign-in flow", exception)
+      return
+    }
+
+    promise.reject("GOOGLE_SIGN_IN_ERROR", message, exception)
+  }
 
   private fun handleSignInResult(result: GetCredentialResponse, promise: Promise) {
     when (val credential = result.credential) {
@@ -255,3 +266,9 @@ class ClerkGoogleSignInModule : Module() {
     }
   }
 }
+
+private val explicitUserCancellationPattern =
+  Regex("^(?:\\[\\d+]\\s*)?cancel(?:l)?ed by user\\.?$", RegexOption.IGNORE_CASE)
+
+internal fun isExplicitUserCancellation(message: String): Boolean =
+  explicitUserCancellationPattern.matches(message.trim())
