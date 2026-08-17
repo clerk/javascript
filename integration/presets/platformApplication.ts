@@ -36,7 +36,9 @@ const platformApiRequest = async (platformApiKey: string, url: URL, init?: Reque
   const response = await fetch(url, { ...init, headers });
 
   if (!response.ok) {
-    throw new Error(`${init?.method || 'GET'} ${url} failed (${response.status}): ${await response.text()}`);
+    const cfRay = response.headers.get('cf-ray');
+    const responseDetails = cfRay ? `${response.status}, cf-ray: ${cfRay}` : response.status;
+    throw new Error(`${init?.method || 'GET'} ${url} failed (${responseDetails}): ${await response.text()}`);
   }
 
   return response;
