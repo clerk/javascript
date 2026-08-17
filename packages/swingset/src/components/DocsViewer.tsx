@@ -12,6 +12,7 @@ import { ViewSource } from './ViewSource';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   user: {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
+    'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
