@@ -2,4 +2,4 @@
 '@clerk/astro': patch
 ---
 
-Fix the `optimizeDeps.esbuildOptions` deprecation warning logged by Vite 8 on Astro 7.
+Remove the Vite `optimizeDeps` target override, which is no longer needed and logged a deprecation warning on Astro 7.

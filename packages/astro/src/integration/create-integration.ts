@@ -1,34 +1,11 @@
-import { createRequire } from 'node:module';
-
 import type { ClerkOptions } from '@clerk/shared/types';
-import type { AstroConfig, AstroIntegration } from 'astro';
+import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
 import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
-
-type ViteOptimizeDeps = NonNullable<NonNullable<AstroConfig['vite']>['optimizeDeps']>;
-
-function getAstroMajorVersion(): number {
-  try {
-    return Number.parseInt(createRequire(import.meta.url)('astro/package.json').version, 10);
-  } catch {
-    return 0;
-  }
-}
-
-/**
- * Sets the `target` we need for top-level await. Astro 7 ships Vite 8, which prebundles
- * dependencies with Rolldown and deprecates `optimizeDeps.esbuildOptions`.
- */
-const buildOptimizeDepsConfig = (): ViteOptimizeDeps => {
-  const target = 'es2022';
-  return getAstroMajorVersion() >= 7
-    ? ({ rolldownOptions: { transform: { target } } } as ViteOptimizeDeps)
-    : { esbuildOptions: { target } };
-};
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
@@ -96,8 +73,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 external: ['node:async_hooks'],
               },
 
-              // We need this for top-level await
-              optimizeDeps: buildOptimizeDepsConfig(),
               build: {
                 target: 'es2022',
                 rollupOptions: {
