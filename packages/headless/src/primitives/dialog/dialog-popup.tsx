@@ -137,6 +137,8 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     floatingContext,
     modal,
     isNested,
+    isStacked,
+    stackedChildCount,
     returnFocusRef,
     labelId,
     descriptionId,
@@ -155,6 +157,11 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
   const defaultProps = {
     ...ownProps,
     ...(isNested ? { 'data-nested': '' } : {}),
+    // Both can be set at once, and that is the ordinary case rather than an edge: in a
+    // panel -> prompt -> alert stack the middle dialog is stacked on one surface while another
+    // is stacked on it.
+    ...(isStacked ? { 'data-stacked': '' } : {}),
+    ...(stackedChildCount > 0 ? { 'data-stack-base': '' } : {}),
     ...getFloatingProps(),
     ...transitionProps,
   };

@@ -30,7 +30,12 @@ export interface NestedDrawerCallbacks {
 // The dialog-only members are dropped: the drawer has no trigger registry (its detached
 // triggers go through `DrawerHandle`), and its triggers still wire through floating-ui's
 // reference props, which the dialog's no longer do.
-export interface DrawerContextValue extends Omit<DialogContextValue, 'store'> {
+//
+// The stacking pair goes with them. A drawer already counts its own nesting as
+// `nestedOpenCount` / `onNested`, which is a different question from the dialog's: `isStacked`
+// asks whether a DIALOG sits above, and a drawer's stacked-child styling has nothing to read it
+// from. Inheriting them would oblige every drawer root to publish two values no drawer part uses.
+export interface DrawerContextValue extends Omit<DialogContextValue, 'isStacked' | 'stackedChildCount' | 'store'> {
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   backdropRef: React.RefObject<HTMLDivElement | null>;
   drag: DrawerDrag;

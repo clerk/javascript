@@ -1759,6 +1759,7 @@ export const esUY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'La contraseña ingresada es incorrecta. Por favor, intentá de nuevo.',
     form_password_length_too_short: 'Tu contraseña es demasiado corta. Debe tener al menos 8 caracteres.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Tu contraseña no es lo suficientemente fuerte.',
     form_password_or_identifier_incorrect:
       'La contraseña o la dirección de correo electrónico es incorrecta. Intentá de nuevo o usá otro método.',

@@ -105,7 +105,14 @@ const sectionHeader = {
   justifyContent: 'space-between',
 } as const;
 
-/** A `prompt` dialog opened from inside the `panel` — the shape the account profile uses. */
+/**
+ * A `prompt` dialog opened from inside the `panel` — the shape the account profile uses.
+ *
+ * With `confirmDiscard`, closing it while the field holds anything opens a confirmation stacked on
+ * top rather than closing: `panel -> prompt -> prompt`, and the veto is nothing more than a
+ * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose — it is
+ * what the `AlertDialog` and close-confirmation work is meant to replace.
+ */
 function AddValueDialog({
   trigger,
   title,
@@ -113,6 +120,7 @@ function AddValueDialog({
   placeholder,
   confirmLabel = 'Continue',
   confirmColor,
+  confirmDiscard = false,
 }: {
   trigger: (props: RenderProps) => React.ReactElement;
   title: string;
@@ -120,39 +128,87 @@ function AddValueDialog({
   placeholder: string;
   confirmLabel?: string;
   confirmColor?: 'negative';
+  confirmDiscard?: boolean;
 }) {
+  const [open, setOpen] = React.useState(false);
+  const [discardOpen, setDiscardOpen] = React.useState(false);
+  const [value, setValue] = React.useState('');
+
+  const dismiss = () => {
+    setValue('');
+    setOpen(false);
+  };
+
   return (
     <Dialog
       trigger={trigger}
       closedBy='closerequest'
+      open={open}
+      onOpenChange={next => {
+        // The veto. Every close request lands here — Escape, the corner X, `Dialog.Close` — so
+        // declining to commit covers all of them at once. A footer button wired to a bare
+        // `setOpen(false)` would go around it, which is the argument for `Dialog.Close`.
+        if (!next && confirmDiscard && value.trim() !== '') {
+          setDiscardOpen(true);
+          return;
+        }
+        if (!next) {
+          setValue('');
+        }
+        setOpen(next);
+      }}
     >
-      {({ close }) => (
-        <>
-          <Dialog.CloseButton />
-          <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
-          <Dialog.Description render={<Text />}>{description}</Dialog.Description>
-          <Input placeholder={placeholder} />
+      <Dialog.CloseButton />
+      <Dialog.Title render={<Heading size='sm' />}>{title}</Dialog.Title>
+      <Dialog.Description render={<Text />}>{description}</Dialog.Description>
+      <Input
+        placeholder={placeholder}
+        value={value}
+        onChange={event => setValue(event.target.value)}
+      />
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+        <Button
+          color={confirmColor}
+          onClick={dismiss}
+        >
+          {confirmLabel}
+        </Button>
+      </div>
+      {confirmDiscard ? (
+        <Dialog
+          open={discardOpen}
+          onOpenChange={setDiscardOpen}
+          closedBy='closerequest'
+        >
+          <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
+          <Dialog.Description render={<Text />}>
+            You have not finished adding this address. It will not be saved.
+          </Dialog.Description>
           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
             <Button
               variant='outline'
-              onClick={close}
+              onClick={() => setDiscardOpen(false)}
             >
-              Cancel
+              Keep editing
             </Button>
             <Button
-              color={confirmColor}
-              onClick={close}
+              color='negative'
+              onClick={() => {
+                setDiscardOpen(false);
+                dismiss();
+              }}
             >
-              {confirmLabel}
+              Discard
             </Button>
           </div>
-        </>
-      )}
+        </Dialog>
+      ) : null}
     </Dialog>
   );
 }
 
-/** A `panel` account surface with `card` dialogs opened from inside it. */
+/** A `panel` account surface with `prompt` dialogs opened from inside it. */
 export function Nested() {
   return (
     <Dialog
@@ -171,6 +227,7 @@ export function Nested() {
             title='Add email address'
             description="We'll send a verification code to this address."
             placeholder='you@example.com'
+            confirmDiscard
           />
         </div>
         <Item.Group>
@@ -249,6 +306,73 @@ const SESSIONS = Array.from({ length: 40 }, (_, index) => ({
   where: SESSION_PLACES[index % SESSION_PLACES.length],
   when: SESSION_TIMES[index % SESSION_TIMES.length],
 }));
+
+const editProfileTrigger = (props: RenderProps) => <Button {...props}>Edit profile</Button>;
+
+const discardTrigger = (props: RenderProps) => (
+  <Button
+    variant='outline'
+    {...props}
+  >
+    Cancel
+  </Button>
+);
+
+/**
+ * A prompt stacked on a prompt — the shape a close confirmation takes. The second prompt paints
+ * no scrim of its own; the one beneath it recedes instead.
+ */
+export function StackedPrompts() {
+  return (
+    <Dialog
+      trigger={editProfileTrigger}
+      closedBy='closerequest'
+    >
+      {({ close }) => (
+        <>
+          <Dialog.CloseButton />
+          <Dialog.Title render={<Heading size='sm' />}>Update profile</Dialog.Title>
+          <Dialog.Description render={<Text />}>Change the name people see on your account.</Dialog.Description>
+          <Input
+            defaultValue='Ada Lovelace'
+            placeholder='Your name'
+          />
+          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            <Dialog
+              trigger={discardTrigger}
+              closedBy='closerequest'
+            >
+              {({ close: closeConfirmation }) => (
+                <>
+                  <Dialog.Title render={<Heading size='sm' />}>Discard changes?</Dialog.Title>
+                  <Dialog.Description render={<Text />}>Your edits will be lost.</Dialog.Description>
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <Button
+                      variant='outline'
+                      onClick={closeConfirmation}
+                    >
+                      Keep editing
+                    </Button>
+                    <Button
+                      color='negative'
+                      onClick={() => {
+                        closeConfirmation();
+                        close();
+                      }}
+                    >
+                      Discard
+                    </Button>
+                  </div>
+                </>
+              )}
+            </Dialog>
+            <Button onClick={close}>Save</Button>
+          </div>
+        </>
+      )}
+    </Dialog>
+  );
+}
 
 /** The panel clips rather than scrolling, so the scroll region is composed inside it. */
 export function PanelSidebar() {

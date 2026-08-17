@@ -1751,6 +1751,7 @@ export const enGB: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_or_identifier_incorrect: 'Password or email address is incorrect. Try again, or use another method.',
     form_password_pwned:

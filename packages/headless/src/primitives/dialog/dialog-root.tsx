@@ -17,6 +17,7 @@ import { useReturnFocus } from '../../hooks/use-return-focus';
 import { useTransition } from '../../hooks/use-transition';
 import { DialogContext, type DialogContextValue } from './dialog-context';
 import { createDialogHandle, type DialogHandle } from './dialog-handle';
+import { DialogNestingContext, useDialogNesting } from './dialog-nesting';
 
 /**
  * Which gestures dismiss the dialog, mirroring the native `<dialog closedby>` attribute.
@@ -30,6 +31,12 @@ import { createDialogHandle, type DialogHandle } from './dialog-handle';
  * keyboard is not something to offer.
  */
 export type DialogClosedBy = 'any' | 'closerequest' | 'none';
+
+/**
+ * The popup's ARIA role. `alertdialog` is for a dialog interrupting the user to confirm or warn,
+ * which assistive technology announces more urgently; everything else is a `dialog`.
+ */
+export type DialogRole = 'dialog' | 'alertdialog';
 
 /** What accompanies an `onOpenChange` call, mirroring Base UI's event details. */
 export interface DialogOpenChangeDetails {
@@ -53,6 +60,8 @@ export interface DialogProps<Payload = unknown> {
   modal?: boolean;
   /** Which gestures dismiss the dialog. Default: `any` */
   closedBy?: DialogClosedBy;
+  /** The popup's ARIA role. Default: `dialog` */
+  role?: DialogRole;
   /**
    * Connects this root to triggers rendered outside it. Create with `Dialog.createHandle()`
    * and pass the same handle to each `Dialog.Trigger`.
@@ -71,7 +80,7 @@ export interface DialogProps<Payload = unknown> {
 
 function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean }) {
   const nodeId = useFloatingNodeId();
-  const { modal = true, closedBy = 'any', isNested, children, onOpenChange } = props;
+  const { modal = true, closedBy = 'any', role: ariaRole = 'dialog', isNested, children, onOpenChange } = props;
 
   const fallbackStore = useMemo(() => createDialogHandle<Payload>(), []);
   const store = props.handle ?? fallbackStore;
@@ -167,12 +176,16 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
     ref: popupRef,
   });
 
+  // Below `useTransition` because it needs `mounted`: what a stacked child has to key off is
+  // whether this dialog is still on screen, not whether it is still open.
+  const nesting = useDialogNesting(open, mounted);
+
   const dismiss = useDismiss(floatingContext, {
     outsidePressEvent: 'mousedown',
     escapeKey: closedBy !== 'none',
     outsidePress: closedBy === 'any',
   });
-  const role = useRole(floatingContext);
+  const role = useRole(floatingContext, { role: ariaRole });
 
   const { getFloatingProps } = useInteractions([dismiss, role]);
 
@@ -193,6 +206,8 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       store,
       modal,
       isNested,
+      isStacked: nesting.isStacked,
+      stackedChildCount: nesting.stackedChildCount,
       labelId,
       descriptionId,
       mounted,
@@ -208,6 +223,8 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
       store,
       modal,
       isNested,
+      nesting.isStacked,
+      nesting.stackedChildCount,
       labelId,
       descriptionId,
       mounted,
@@ -219,7 +236,9 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
 
   return (
     <FloatingNode id={nodeId}>
-      <DialogContext.Provider value={contextValue}>{content}</DialogContext.Provider>
+      <DialogContext.Provider value={contextValue}>
+        <DialogNestingContext.Provider value={nesting.context}>{content}</DialogNestingContext.Provider>
+      </DialogContext.Provider>
     </FloatingNode>
   );
 }

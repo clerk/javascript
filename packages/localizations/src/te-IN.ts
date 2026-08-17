@@ -1773,6 +1773,7 @@ export const teIN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_or_identifier_incorrect:
       'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',

@@ -1740,6 +1740,7 @@ export const kkKZ: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Құпия сөз қате.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
     form_password_or_identifier_incorrect:
       'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',

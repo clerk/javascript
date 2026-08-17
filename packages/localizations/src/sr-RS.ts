@@ -1748,6 +1748,7 @@ export const srRS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
     form_password_length_too_short: 'Lozinka je prekratka.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_or_identifier_incorrect:
       'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',
