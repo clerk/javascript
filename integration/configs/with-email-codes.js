@@ -379,7 +379,10 @@ export default defineConfig({
       },
     },
   },
-  setup: async ({ applicationName, publishableKey, patchConfig }) => {
+  setup: async ({ applicationName, clerkClient, publishableKey, patchConfig }) => {
+    // setup allowed origins for the electron tests
+    await clerkClient.instance.update({ allowedOrigins: ['clerk://app'] });
+
     const parsedPublishableKey = parsePublishableKey(publishableKey);
     if (!parsedPublishableKey) {
       throw new Error('The created application has an invalid publishable key.');
