@@ -291,6 +291,8 @@ type BootstrapSignedOutParams = {
  * `isSatellite` / `domain` / `proxyUrl` are carried through so that cross-origin
  * satellite redirects produced by `createRedirect` include the `__clerk_status=needs-sync`
  * marker required for the return-trip handshake.
+ *
+ * @deprecated No longer used by `@clerk/nextjs`; kept for older published SDK versions. Remove in the next major.
  */
 export function createBootstrapSignedOutState({
   signInUrl = '',
