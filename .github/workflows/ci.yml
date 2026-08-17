@@ -536,16 +536,6 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
-      - name: Delete integration-test users
-        if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
-        timeout-minutes: 4
-        run: pnpm test:integration:cleanup
-        env:
-          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
-          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
-          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
-
       - name: Sanitize artifact name
         if: ${{ cancelled() || failure() }}
         id: sanitize
@@ -562,6 +552,16 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: test-results
           retention-days: 1
+
+      - name: Delete integration-test users
+        if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
+        timeout-minutes: 4
+        run: pnpm test:integration:cleanup
+        env:
+          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
   pkg-pr-new:
     name: Publish with pkg-pr-new
