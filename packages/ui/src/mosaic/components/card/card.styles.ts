@@ -7,13 +7,13 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-card-foreground'],
     display: 'flex',
     flexDirection: 'column',
-    rowGap: space['5'],
     width: '100%',
   },
   header: {
     paddingInline: space['4'],
     display: 'flex',
     flexDirection: 'column',
+    paddingBlockEnd: space['5'],
     paddingBlockStart: space['5'],
   },
   content: {
@@ -21,6 +21,7 @@ export const styles = stylex.create({
     flexBasis: 'auto',
     flexGrow: '1',
     flexShrink: '1',
+    paddingBlockEnd: space['5'],
   },
   footer: {
     gap: space['2'],
