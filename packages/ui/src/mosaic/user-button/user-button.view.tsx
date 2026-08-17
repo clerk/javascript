@@ -1004,11 +1004,7 @@ export function UserButtonPopup(): ReactElement {
 
   return (
     <Popover.Popup aria-label={m.popup.label}>
-      {/* The card lays its children out with a row gap; the rows read as one continuous list. */}
-      <Card.Root
-        style={{ rowGap: 0 }}
-        renderBranding={renderBranding}
-      >
+      <Card.Root renderBranding={renderBranding}>
         <Header />
         <OrganizationSection />
         <SessionSection />
