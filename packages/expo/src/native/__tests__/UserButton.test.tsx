@@ -39,6 +39,13 @@ describe('UserButton', () => {
               content: <div>API keys page</div>,
             },
           ],
+          customDestinations: [
+            {
+              path: 'api-key-details',
+              label: 'API key details',
+              content: <div>API key details page</div>,
+            },
+          ],
         }}
       />,
     );
@@ -50,6 +57,13 @@ describe('UserButton', () => {
         label: 'API keys',
         icon: 'key',
         placement: { type: 'sectionEnd', section: 'profile' },
+      },
+      {
+        path: 'api-key-details',
+        label: 'API key details',
+        icon: 'settings',
+        placement: { type: 'sectionEnd', section: 'profile' },
+        showAsRow: false,
       },
     ]);
   });
