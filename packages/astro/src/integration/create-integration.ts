@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module';
+
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { AstroConfig, AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
@@ -5,18 +7,25 @@ import { envField } from 'astro/config';
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
 import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
-import { usesRolldownDepOptimizer } from './vite-flavor';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
 type ViteOptimizeDeps = NonNullable<NonNullable<AstroConfig['vite']>['optimizeDeps']>;
 
+function getAstroMajorVersion(): number {
+  try {
+    return Number.parseInt(createRequire(import.meta.url)('astro/package.json').version, 10);
+  } catch {
+    return 0;
+  }
+}
+
 /**
- * Vite 8 replaced the esbuild dependency prebundler with Rolldown, so the `target` needed for
- * top-level await has to be set under a different option depending on the installed Vite.
+ * Sets the `target` we need for top-level await. Astro 7 ships Vite 8, which prebundles
+ * dependencies with Rolldown and deprecates `optimizeDeps.esbuildOptions`.
  */
 const buildOptimizeDepsConfig = (): ViteOptimizeDeps => {
   const target = 'es2022';
-  return usesRolldownDepOptimizer()
+  return getAstroMajorVersion() >= 7
     ? ({ rolldownOptions: { transform: { target } } } as ViteOptimizeDeps)
     : { esbuildOptions: { target } };
 };
