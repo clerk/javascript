@@ -1,45 +1,52 @@
 import * as stylex from '@stylexjs/stylex';
 
-import {
-  colorVars,
-  durationVars,
-  fontFamilyVars,
-  fontWeightVars,
-  radiusVars,
-  space,
-  typeScaleVars,
-} from '../../tokens.stylex';
+import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
-const interactionBorderColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 20%, transparent)`;
+const hoverBorderColor = 'light-dark(#bebebe, #525252)';
+const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
+const invalidFocusShadow = `0 0 0 3px light-dark(
+  color-mix(in oklab, ${colorVars['--cl-color-negative']} 12%, transparent),
+  color-mix(in oklab, ${colorVars['--cl-color-negative']} 15%, transparent)
+)`;
 
 export const styles = stylex.create({
   base: {
     borderColor: {
       default: colorVars['--cl-color-border'],
-      ':focus-visible': interactionBorderColor,
+      ':focus-visible': hoverBorderColor,
       ':focus-visible:where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       ':where([aria-invalid="true"])': colorVars['--cl-color-negative'],
       '@media (hover: hover)': {
-        ':hover:not([aria-invalid="true"])': interactionBorderColor,
+        ':hover:not([aria-invalid="true"])': hoverBorderColor,
       },
     },
     borderStyle: 'solid',
-    borderWidth: {
-      default: '1px',
-      ':where([aria-invalid="true"])': '2px',
-    },
+    borderWidth: '1px',
     outline: {
       default: 'none',
-      ':focus-visible': `2px solid ${colorVars['--cl-color-primary']}`,
-      ':focus-visible:where([aria-invalid="true"])': 'none',
+      '@media (forced-colors: active)': {
+        default: null,
+        ':focus-visible': '2px solid CanvasText',
+      },
     },
     backgroundColor: colorVars['--cl-color-input'],
+    boxShadow: {
+      default: null,
+      ':focus-visible': focusShadow,
+      ':focus-visible:where([aria-invalid="true"])': invalidFocusShadow,
+    },
     display: 'block',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
-    outlineOffset: '2px',
-    transitionDuration: durationVars['--cl-duration-base'],
-    transitionProperty: 'color, background-color, border-color',
+    outlineOffset: {
+      default: null,
+      '@media (forced-colors: active)': {
+        default: null,
+        ':focus-visible': '2px',
+      },
+    },
+    transitionDuration: '0.2s',
+    transitionProperty: 'color, background-color, border-color, box-shadow',
     minWidth: 0,
     width: '100%',
     '::file-selector-button': {
