@@ -5,6 +5,13 @@
 import ExpoModulesCore
 import Foundation
 
+// MARK: - Records
+
+struct ConfigureOptions: Record {
+  @Field var bearerToken: String?
+  @Field var proxyUrl: String?
+}
+
 // MARK: - Module
 
 public class ClerkExpoModule: Module {
@@ -31,8 +38,13 @@ public class ClerkExpoModule: Module {
       }
     }
 
+    // Keeps the pre-proxy signature so OTA-updated JS on older binaries keeps working.
     AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
-      self.configure(publishableKey, bearerToken: bearerToken, promise: promise)
+      self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: nil, promise: promise)
+    }
+
+    AsyncFunction("configureWithOptions") { (publishableKey: String, options: ConfigureOptions, promise: Promise) in
+      self.configure(publishableKey, bearerToken: options.bearerToken, proxyUrl: options.proxyUrl, promise: promise)
     }
 
     AsyncFunction("getClientToken") { (promise: Promise) in
@@ -57,10 +69,11 @@ public class ClerkExpoModule: Module {
 
   // MARK: - configure
 
-  private func configure(_ publishableKey: String, bearerToken: String?, promise: Promise) {
+  private func configure(_ publishableKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
     Task {
       do {
-        try await ClerkNativeBridge.shared.configure(publishableKey: publishableKey, bearerToken: bearerToken)
+        try await ClerkNativeBridge.shared.configure(
+          publishableKey: publishableKey, bearerToken: bearerToken, proxyUrl: proxyUrl)
         promise.resolve()
       } catch {
         promise.reject("E_CONFIGURE_FAILED", error.localizedDescription)

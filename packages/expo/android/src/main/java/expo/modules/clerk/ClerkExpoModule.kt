@@ -18,6 +18,8 @@ import com.clerk.api.ui.ClerkTheme
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.records.Field
+import expo.modules.kotlin.records.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,12 +41,19 @@ private fun debugLog(tag: String, message: String) {
     }
 }
 
+internal class ConfigureOptions : Record {
+    @Field val bearerToken: String? = null
+
+    @Field val proxyUrl: String? = null
+}
+
 class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var clientStateObserverJob: Job? = null
     private var lastObservedClientState: ClientStateSnapshot? = null
     private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
+    private var configuredProxyUrl: String? = null
 
     private data class ClientStateSnapshot(
         val client: Client?,
@@ -88,8 +97,13 @@ class ClerkExpoModule : Module() {
             clientStateObserverJob = null
         }
 
+        // Keeps the pre-proxy signature so OTA-updated JS on older binaries keeps working.
         AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
-            configure(pubKey, bearerToken, promise)
+            configure(pubKey, bearerToken, null, promise)
+        }
+
+        AsyncFunction("configureWithOptions") { pubKey: String, options: ConfigureOptions, promise: Promise ->
+            configure(pubKey, options.bearerToken, options.proxyUrl, promise)
         }
 
         AsyncFunction("getClientToken") { promise: Promise ->
@@ -115,7 +129,7 @@ class ClerkExpoModule : Module() {
     private val reactContext: Context?
         get() = appContext.reactContext
 
-    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+    private fun clerkConfigurationOptions(proxyUrl: String?): ClerkConfigurationOptions {
         val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
         val customHeaders = buildMap {
             put(HOST_SDK_HEADER, HOST_SDK)
@@ -125,7 +139,7 @@ class ClerkExpoModule : Module() {
         }
 
         // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
-        return ClerkConfigurationOptions()
+        return ClerkConfigurationOptions(proxyUrl = proxyUrl)
             .withForegroundRefreshDisabled()
             .withCustomHeaders(customHeaders)
     }
@@ -213,7 +227,7 @@ class ClerkExpoModule : Module() {
 
     // MARK: - configure
 
-    private fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+    private fun configure(pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
         val context = reactContext ?: run {
             promise.reject("E_INIT_FAILED", "React context is not available", null)
             return
@@ -222,6 +236,7 @@ class ClerkExpoModule : Module() {
         coroutineScope.launch {
             try {
                 val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+                val normalizedProxyUrl = proxyUrl?.trim()?.takeIf { it.isNotEmpty() }
 
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
@@ -233,7 +248,7 @@ class ClerkExpoModule : Module() {
                             .apply()
                     }
 
-                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
@@ -278,6 +293,7 @@ class ClerkExpoModule : Module() {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
                         configuredPublishableKey = pubKey
+                        configuredProxyUrl = normalizedProxyUrl
                         lastObservedClientState = clientStateSnapshot()
                         promise.resolve(null)
                     }
@@ -285,8 +301,9 @@ class ClerkExpoModule : Module() {
                 }
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
-                if (activePublishableKey != null && activePublishableKey != pubKey) {
-                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
+                if (activePublishableKey != null && (activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl)) {
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     loadThemeFromAssets(context)
@@ -331,6 +348,7 @@ class ClerkExpoModule : Module() {
                     }
 
                     configuredPublishableKey = pubKey
+                    configuredProxyUrl = normalizedProxyUrl
                     lastObservedClientState = clientStateSnapshot()
                     promise.resolve(null)
                     return@launch

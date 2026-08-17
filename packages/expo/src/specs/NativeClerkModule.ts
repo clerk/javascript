@@ -5,6 +5,11 @@ export interface Spec {
   // This is not part of the public @clerk/expo API.
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
+  // Absent on binaries built before proxy support; feature-detect and fall back to configure().
+  configureWithOptions?(
+    publishableKey: string,
+    options: { bearerToken: string | null; proxyUrl: string | null },
+  ): Promise<void>;
   getClientToken(): Promise<string | null>;
   syncClientStateFromJs(
     deviceToken: string | null,
