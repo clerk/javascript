@@ -23,6 +23,22 @@ function NativeBuildFixture() {
       <View style={styles.container}>
         <View style={styles.embeddedProfile}>
           <UserProfileView
+            customPages={[
+              {
+                path: 'e2e-custom-page',
+                label: 'E2E Custom Page',
+                icon: 'key',
+                placement: { type: 'after', row: 'security' },
+                content: (
+                  <View
+                    testID='custom-page-content'
+                    style={styles.customPage}
+                  >
+                    <Text style={styles.customPageText}>Rehosted RN body</Text>
+                  </View>
+                ),
+              },
+            ]}
             isDismissible={false}
             onHostBack={() => setIsProfileOpen(false)}
           />
@@ -117,6 +133,16 @@ const styles = StyleSheet.create({
   },
   customLogoText: {
     color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  customPage: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  customPageText: {
     fontSize: 16,
     fontWeight: '600',
   },

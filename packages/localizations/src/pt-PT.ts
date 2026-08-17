@@ -1771,6 +1771,7 @@ export const ptPT: LocalizationResource = {
       'Esta palavra-passe foi comprometida numa violação de dados. Escolha outra para continuar.',
     form_password_incorrect: 'Palavra-passe incorreta.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_or_identifier_incorrect:
       'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou utilize outro método.',

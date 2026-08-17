@@ -1772,6 +1772,7 @@ export const nbNO: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Passordet ditt er for kort. Det må være minst 8 tegn langt.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_or_identifier_incorrect:
       'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',

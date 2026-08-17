@@ -1753,6 +1753,7 @@ export const svSE: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
     form_password_length_too_short: 'Lösenordet är för kort.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
     form_password_or_identifier_incorrect:
       'Lösenordet eller e-postadressen är felaktig. Försök igen eller använd en annan metod.',

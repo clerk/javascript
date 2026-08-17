@@ -245,27 +245,107 @@ describe('stacked backdrops', () => {
     </button>
   );
 
-  it('marks only the inner backdrop as nested, so the scrims do not compound', async () => {
+  function renderStack() {
+    return render(
+      <Dialog
+        defaultOpen
+        size='panel'
+      >
+        <Dialog.Title>Account</Dialog.Title>
+        <div>Outer body</div>
+        <Dialog trigger={addEmailTrigger}>
+          <Dialog.Title>Add email address</Dialog.Title>
+          <div>Inner body</div>
+        </Dialog>
+      </Dialog>,
+    );
+  }
+
+  // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
+  // that the same tree with only the hosting size changed produces different classes. Comparing
+  // rather than matching a class: StyleX names are content hashes and would pin the value.
+  async function innerBackdropClass(hostSize: DialogSize) {
+    const user = userEvent.setup();
+    render(
+      <Dialog
+        defaultOpen
+        size={hostSize}
+      >
+        <Dialog.Title>Host</Dialog.Title>
+        <Dialog trigger={addEmailTrigger}>
+          <Dialog.Title>Add email address</Dialog.Title>
+        </Dialog>
+      </Dialog>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+    const className = document.querySelectorAll('.cl-dialog-backdrop')[1].className;
+    cleanup();
+    return className;
+  }
+
+  it('drops the scrim for a prompt over a prompt, and keeps it for one over a panel', async () => {
+    const overPrompt = await innerBackdropClass('prompt');
+    const overPanel = await innerBackdropClass('panel');
+
+    expect(overPrompt).not.toBe(overPanel);
+  });
+
+  it('keeps a prompt over a card on the nested scrim, same as over a panel', async () => {
+    const overCard = await innerBackdropClass('card');
+    const overPanel = await innerBackdropClass('panel');
+
+    expect(overCard).toBe(overPanel);
+  });
+
+  it('marks the popup beneath as the stack base, so it can recede', async () => {
+    const user = userEvent.setup();
+    renderStack();
+
+    const outerPopup = document.querySelector('.cl-dialog-popup');
+    expect(outerPopup).not.toHaveAttribute('data-stack-base');
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    const popups = document.querySelectorAll('.cl-dialog-popup');
+    expect(popups[0]).toHaveAttribute('data-stack-base', '');
+    expect(popups[1]).not.toHaveAttribute('data-stack-base');
+  });
+
+  it('warns when a stacked dialog is not a prompt', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const user = userEvent.setup();
     render(
       <Dialog
         defaultOpen
         size='panel'
       >
+        <Dialog.Title>Account</Dialog.Title>
         <div>Outer body</div>
-        <Dialog trigger={addEmailTrigger}>
+        <Dialog
+          trigger={addEmailTrigger}
+          size='card'
+        >
+          <Dialog.Title>Add email address</Dialog.Title>
           <div>Inner body</div>
         </Dialog>
       </Dialog>,
     );
 
-    expect(document.querySelector('.cl-dialog-backdrop')).not.toHaveAttribute('data-nested');
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('size="card"'));
+    warn.mockRestore();
+  });
+
+  it('does not warn for a stacked prompt, or for a root-level panel', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderStack();
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
-    const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
-    expect(backdrops[0]).not.toHaveAttribute('data-nested');
-    expect(backdrops[1]).toHaveAttribute('data-nested', '');
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
 

@@ -1767,6 +1767,7 @@ export const viVN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_or_identifier_incorrect:
       'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
