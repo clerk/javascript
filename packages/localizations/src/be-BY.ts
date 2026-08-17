@@ -1757,6 +1757,7 @@ export const beBY: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Невірны пароль.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
     form_password_or_identifier_incorrect:
       'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
