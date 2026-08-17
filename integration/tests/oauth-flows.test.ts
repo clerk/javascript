@@ -1,4 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
@@ -6,6 +7,12 @@ import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { createUserService } from '../testUtils/usersService';
+
+const grantOAuthConsent = async (page: Page) => {
+  const allowAccessButton = page.getByRole('button', { name: 'Allow' });
+  await expect(allowAccessButton).toBeVisible();
+  await allowAccessButton.click();
+};
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
@@ -46,9 +53,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
 
-    const allowAccessButton = u.page.getByRole('button', { name: 'Allow' });
-    await expect(allowAccessButton).toBeVisible();
-    await allowAccessButton.click();
+    await grantOAuthConsent(u.page);
 
     // We can't use our `expect.toBeSignedIn` first because that would result in `true` on the OAuth provider instance.
     // We want to assert that we're signed in on our app instance, which will render the text 'SignedIn'.
@@ -66,6 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     // We can't use our `expect.toBeSignedIn` first because that would result in `true` on the OAuth provider instance.
     // We want to assert that we're signed in on our app instance, which will render the text 'SignedIn'.
@@ -89,6 +95,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     await u.page.waitForAppUrl('/protected');
 
@@ -150,6 +157,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     await u.page.waitForAppUrl('/protected');
   });
@@ -186,6 +194,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     // Should redirect to the sign in redirect URL since we already had an account
     await u.page.waitForAppUrl('/?from=signin');
@@ -213,6 +222,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
       await popupUtils.po.signIn.continue();
       await popupUtils.po.signIn.enterTestOtpCode();
+      await grantOAuthConsent(popupUtils.page);
 
       await u.page.waitForAppUrl('/protected');
 
