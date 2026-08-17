@@ -10,11 +10,11 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   providerMedia: {
-    backgroundColor: 'var(--cl-color-background)',
     borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
     borderRadius: 'var(--cl-radius-lg)',
     borderStyle: 'solid',
     borderWidth: '1px',
+    backgroundColor: 'var(--cl-color-background)',
   },
   providerIcon: {
     display: 'block',
