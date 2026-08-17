@@ -18,8 +18,8 @@ export const styles = stylex.create({
   },
   providerIcon: {
     display: 'block',
-    height: '20px',
-    width: '20px',
+    height: space['5'],
+    width: space['5'],
   },
   root: {
     gap: space['6'],
