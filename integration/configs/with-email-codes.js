@@ -1,6 +1,9 @@
+import { parsePublishableKey } from '@clerk/shared/keys';
+
 import { defineConfig } from '../presets/platformApplication.js';
 
-const customOAuthClientSecret = process.env.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET;
+// this is the oauth-provider instance in the integration testing workspace
+const oauthProviderUrl = 'https://honest-wildcat-44.clerk.accounts.dev';
 
 export default defineConfig({
   config: {
@@ -313,26 +316,6 @@ export default defineConfig({
       client_secret: '',
       enabled: false,
     },
-    connections_oauth_custom: {
-      e2e_oauth_provider: {
-        auth_url: 'https://honest-wildcat-44.clerk.accounts.dev/oauth/authorize',
-        authenticatable: true,
-        base_scopes: [],
-        client_id: 'dqDPafoayDXekse9',
-        client_secret: customOAuthClientSecret,
-        discovery_url: 'https://honest-wildcat-44.clerk.accounts.dev/.well-known/openid-configuration',
-        enabled: true,
-        name: 'E2E OAuth Provider',
-        requires_pkce: false,
-        token_url: 'https://honest-wildcat-44.clerk.accounts.dev/oauth/token',
-        user_info_url: 'https://honest-wildcat-44.clerk.accounts.dev/oauth/userinfo',
-        user_mapping: {
-          id: {
-            path: 'user_id',
-          },
-        },
-      },
-    },
     organization_settings: {
       admin_delete_enabled: true,
       creator_role: 'org:admin',
@@ -395,5 +378,52 @@ export default defineConfig({
         required: false,
       },
     },
+  },
+  setup: async ({ applicationName, publishableKey, patchConfig }) => {
+    const parsedPublishableKey = parsePublishableKey(publishableKey);
+    if (!parsedPublishableKey) {
+      throw new Error('The created application has an invalid publishable key.');
+    }
+
+    const registrationResponse = await fetch(`${oauthProviderUrl}/oauth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_name: applicationName,
+        redirect_uris: [`https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`],
+      }),
+    });
+
+    if (!registrationResponse.ok) {
+      throw new Error(`OAuth client registration failed: ${await registrationResponse.text()}`);
+    }
+
+    const client = await registrationResponse.json();
+    if (typeof client.client_id !== 'string' || typeof client.client_secret !== 'string') {
+      throw new Error('The OAuth client registration response does not contain a client ID and secret.');
+    }
+
+    await patchConfig({
+      connections_oauth_custom: {
+        e2e_oauth_provider: {
+          auth_url: `${oauthProviderUrl}/oauth/authorize`,
+          authenticatable: true,
+          base_scopes: [],
+          client_id: client.client_id,
+          client_secret: client.client_secret,
+          discovery_url: `${oauthProviderUrl}/.well-known/openid-configuration`,
+          enabled: true,
+          name: 'E2E OAuth Provider',
+          requires_pkce: false,
+          token_url: `${oauthProviderUrl}/oauth/token`,
+          user_info_url: `${oauthProviderUrl}/oauth/userinfo`,
+          user_mapping: {
+            id: {
+              path: 'user_id',
+            },
+          },
+        },
+      },
+    });
   },
 });

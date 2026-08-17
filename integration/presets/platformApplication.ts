@@ -14,9 +14,17 @@ export type PlatformApplicationListItem = {
   name: string;
   instances: Array<{ environment_type?: string; instance_id?: string }>;
 };
+export type PlatformApplicationSetupContext = {
+  applicationId: string;
+  applicationName: string;
+  clerkClient: ClerkClient;
+  instanceId: string;
+  publishableKey: string;
+  patchConfig: (config: unknown) => Promise<void>;
+};
 export type PlatformApplicationConfig = {
   config: unknown;
-  setup?: (clerkClient: ClerkClient) => Promise<void> | void;
+  setup?: (context: PlatformApplicationSetupContext) => Promise<void> | void;
 };
 
 export const defineConfig = (config: PlatformApplicationConfig): PlatformApplicationConfig => config;
@@ -94,24 +102,30 @@ export const createApplicationFromConfig = async (
     `${applicationPath}/instances/${encodeURIComponent(developmentInstance.instance_id)}/config`,
     PLATFORM_API_URL,
   );
-  await platformApiRequest(platformApiKey, configUrl, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(config),
-  });
+  const patchConfig = async (config: unknown) => {
+    await platformApiRequest(platformApiKey, configUrl, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+  };
+  await patchConfig(config);
 
   const organizationSettings = (config as { organization_settings?: { force_organization_selection?: boolean } })
     .organization_settings;
   if (organizationSettings?.force_organization_selection === false) {
-    await platformApiRequest(platformApiKey, configUrl, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ organization_settings: { force_organization_selection: false } }),
-    });
+    await patchConfig({ organization_settings: { force_organization_selection: false } });
   }
 
   if (setup) {
-    await setup(createClerkClient({ secretKey: developmentInstance.secret_key }));
+    await setup({
+      applicationId: created.application_id,
+      applicationName,
+      clerkClient: createClerkClient({ secretKey: developmentInstance.secret_key }),
+      instanceId: developmentInstance.instance_id,
+      publishableKey: developmentInstance.publishable_key,
+      patchConfig,
+    });
   }
 
   return {

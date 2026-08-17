@@ -46,6 +46,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
 
+    const allowAccessButton = u.page.getByRole('button', { name: 'Allow' });
+    await expect(allowAccessButton).toBeVisible();
+    await allowAccessButton.click();
+
     // We can't use our `expect.toBeSignedIn` first because that would result in `true` on the OAuth provider instance.
     // We want to assert that we're signed in on our app instance, which will render the text 'SignedIn'.
     await u.page.getByText('SignedIn').waitFor();
