@@ -1267,6 +1267,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Nincs ezekből egyik sem?',
       blockButton__backupCode: 'Tartalék kód használata',
       blockButton__emailCode: 'Email kód küldése: {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Passkey használata',
       blockButton__password: 'Folytatás jelszóval',
       blockButton__phoneCode: 'SMS kód küldése: {{identifier}}',
@@ -1289,6 +1290,29 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be az e-mail címedre küldött kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Nem lehet folytatni az ellenőrzést. Nincs konfigurált hitelesítési módszer.',

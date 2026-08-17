@@ -1266,6 +1266,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes acceso a este método? Prueba otra opción.',
       blockButton__backupCode: 'Usar código de respaldo',
       blockButton__emailCode: 'Usar código de correo electrónico',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Usar contraseña',
       blockButton__phoneCode: 'Usar código de teléfono',
@@ -1288,6 +1289,29 @@ export const esES: LocalizationResource = {
       resendButton: 'Reenviar código',
       subtitle: 'Revisa tu bandeja de entrada para el código de verificación.',
       title: 'Verificación por correo electrónico',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',

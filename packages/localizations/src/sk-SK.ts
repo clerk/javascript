@@ -1257,6 +1257,7 @@ export const skSK: LocalizationResource = {
       actionText: 'Nemáte prístup k žiadnej z týchto metód?',
       blockButton__backupCode: 'Použiť záložný kód',
       blockButton__emailCode: 'Odoslať overovací kód na email {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'Použiť Passkey',
       blockButton__password: 'Pokračovať pomocou hesla',
       blockButton__phoneCode: 'Poslať SMS kód na telefónne číslo {{identifier}}',
@@ -1279,6 +1280,29 @@ export const skSK: LocalizationResource = {
       resendButton: 'Nedostali ste kód? Znova odoslať',
       subtitle: 'Pre pokračovanie vložte kód odoslaný na váš email',
       title: 'Vyžaduje sa overenie',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Nemožno pokračovať v overení. Nie je nastavená žiadna dostupná autentifikačná metóda.',

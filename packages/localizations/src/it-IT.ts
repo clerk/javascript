@@ -1266,6 +1266,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Usa un metodo di verifica alternativo',
       blockButton__backupCode: 'Verifica con il codice di backup',
       blockButton__emailCode: 'Verifica con il codice via email',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Verifica con la password',
       blockButton__phoneCode: 'Verifica con il codice SMS',
@@ -1287,6 +1288,29 @@ export const itIT: LocalizationResource = {
       resendButton: 'Invia di nuovo il codice',
       subtitle: 'Controlla la tua email per il codice di verifica.',
       title: 'Verifica con il codice email',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Non sono disponibili metodi di verifica.',

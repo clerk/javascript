@@ -1270,6 +1270,7 @@ export const taIN: LocalizationResource = {
       actionText: 'இவற்றில் எதுவும் இல்லையா?',
       blockButton__backupCode: 'காப்புக் குறியீட்டைப் பயன்படுத்தவும்',
       blockButton__emailCode: '{{identifier}} க்கு மின்னஞ்சல் குறியீடு',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
       blockButton__password: 'உங்கள் கடவுச்சொல்லுடன் தொடரவும்',
       blockButton__phoneCode: '{{identifier}} க்கு SMS குறியீடு அனுப்பவும்',
@@ -1292,6 +1293,29 @@ export const taIN: LocalizationResource = {
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
       subtitle: 'தொடர உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட குறியீட்டை உள்ளிடவும்',
       title: 'சரிபார்ப்பு தேவை',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'சரிபார்ப்பைத் தொடர முடியாது. பொருத்தமான அங்கீகார காரணி எதுவும் கட்டமைக்கப்படவில்லை',

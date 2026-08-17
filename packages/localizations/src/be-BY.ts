@@ -1261,6 +1261,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Паспрабуйце іншы метад для верыфікацыі.',
       blockButton__backupCode: 'Увядзіце код з рэзервовага кода',
       blockButton__emailCode: 'Увядзіце код, адправлены на электронную пошту',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Увядзіце пароль',
       blockButton__phoneCode: 'Увядзіце код, адправлены на тэлефон',
@@ -1282,6 +1283,29 @@ export const beBY: LocalizationResource = {
       resendButton: 'Пераадправіць код на email',
       subtitle: 'Калі ласка, праверце вашу электронную пошту для кода.',
       title: 'Код з email',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Няма даступных метадаў для верыфікацыі.',

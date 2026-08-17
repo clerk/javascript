@@ -1257,6 +1257,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Nie używasz żadnej z tych metod?',
       blockButton__backupCode: 'Użyj kodu zapasowego',
       blockButton__emailCode: 'Wyślij kod e-mailem do {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Zaloguj się za pomocą hasła',
       blockButton__phoneCode: 'Wyślij kod SMS-em do {{identifier}}',
@@ -1279,6 +1280,29 @@ export const plPL: LocalizationResource = {
       resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
       subtitle: 'Wprowadź kod wysłany na Twój adres e-mail, aby kontynuować',
       title: 'Wymagana weryfikacja',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Nie można kontynuować weryfikacji. Brak dostępnych czynników uwierzytelniania.',

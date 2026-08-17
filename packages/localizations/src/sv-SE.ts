@@ -1257,6 +1257,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget av dessa?',
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__emailLink: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Fortsätt med ditt lösenord',
       blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
@@ -1279,6 +1280,29 @@ export const svSE: LocalizationResource = {
       resendButton: 'Fick du ingen kod? Skicka igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',

@@ -1264,6 +1264,7 @@ export const faIR: LocalizationResource = {
       actionText: 'هیچ کدام از اینها را ندارید؟',
       blockButton__backupCode: 'از کد پشتیبان استفاده کنید',
       blockButton__emailCode: 'کد را به {{identifier}} ایمیل کنید',
+      blockButton__emailLink: undefined,
       blockButton__passkey: 'از کلید عبور خود استفاده کنید',
       blockButton__password: 'با رمز عبور خود ادامه دهید',
       blockButton__phoneCode: 'ارسال کد پیامکی به {{identifier}}',
@@ -1286,6 +1287,29 @@ export const faIR: LocalizationResource = {
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
       subtitle: 'برای ادامه، کد ارسال شده به ایمیل خود را وارد کنید',
       title: 'تایید هویت الزامی است',
+    },
+    emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      expired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      failed: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formSubtitle: undefined,
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+      verified: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     noAvailableMethods: {
       message: 'امکان ادامه تأیید وجود ندارد. هیچ عامل احراز هویت مناسبی پیکربندی نشده است.',
