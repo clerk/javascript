@@ -3,10 +3,9 @@ import type { AccountlessApplication } from '@clerk/backend';
 import { cookies, headers } from 'next/headers';
 import { redirect, RedirectType } from 'next/navigation';
 
-import { errorThrower } from '../server/errorThrower';
+import { keylessMissingEnvVars } from '../server/errors';
 import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
-import { clerkDevelopmentCache, createKeylessModeMessage } from '../server/keyless-log-cache';
 import { keyless } from '../server/keyless-node';
 import { canUseKeyless } from '../utils/feature-flags';
 
@@ -54,38 +53,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-  let result;
-  try {
-    result = await keyless().getOrCreateKeys();
-  } catch {
-    result = null;
-  }
-
-  if (!result) {
-    errorThrower.throwMissingPublishableKeyError();
-    return null;
-  }
-
-  /**
-   * Notify developers.
-   */
-  clerkDevelopmentCache?.log({
-    cacheKey: result.publishableKey,
-    msg: createKeylessModeMessage(result),
-  });
-
-  const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
-  void (await cookies()).set(
-    await getKeylessCookieName(),
-    JSON.stringify({ claimUrl, publishableKey, secretKey }),
-    keylessCookieConfig,
-  );
-
-  return {
-    claimUrl,
-    publishableKey,
-    apiKeysUrl,
-  };
+  throw new Error(keylessMissingEnvVars);
 }
 
 export async function deleteKeylessAction() {

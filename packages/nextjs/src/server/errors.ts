@@ -34,6 +34,14 @@ For more details, see https://clerk.com/err/auth-middleware
 `;
 };
 
+export const keylessMissingEnvVars = `Clerk: Missing environment variables (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY).
+
+To set up Clerk for this project, run:
+
+  npx clerk@latest init
+
+This creates a Clerk application and writes the required keys to your .env.local file, then restart your dev server. If you already have a Clerk application, copy the keys from https://dashboard.clerk.com into .env.local instead. (code=missing_env_keys)`;
+
 export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/reference/nextjs/clerk-middleware. (code=auth_signature_invalid)`;
 
 export const encryptionKeyInvalid = `Clerk: Unable to decrypt request data, this usually means the encryption key is invalid. Ensure the encryption key is properly set. For more information, see: https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys. (code=encryption_key_invalid)`;
