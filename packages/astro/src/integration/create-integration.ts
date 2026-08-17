@@ -1,11 +1,25 @@
 import type { ClerkOptions } from '@clerk/shared/types';
-import type { AstroIntegration } from 'astro';
+import type { AstroConfig, AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
 import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
+import { usesRolldownDepOptimizer } from './vite-flavor';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
+
+type ViteOptimizeDeps = NonNullable<NonNullable<AstroConfig['vite']>['optimizeDeps']>;
+
+/**
+ * Vite 8 replaced the esbuild dependency prebundler with Rolldown, so the `target` needed for
+ * top-level await has to be set under a different option depending on the installed Vite.
+ */
+const buildOptimizeDepsConfig = (): ViteOptimizeDeps => {
+  const target = 'es2022';
+  return usesRolldownDepOptimizer()
+    ? ({ rolldownOptions: { transform: { target } } } as ViteOptimizeDeps)
+    : { esbuildOptions: { target } };
+};
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
@@ -74,11 +88,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
               },
 
               // We need this for top-level await
-              optimizeDeps: {
-                esbuildOptions: {
-                  target: 'es2022',
-                },
-              },
+              optimizeDeps: buildOptimizeDepsConfig(),
               build: {
                 target: 'es2022',
                 rollupOptions: {
