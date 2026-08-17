@@ -25,12 +25,10 @@ export const styles = stylex.create({
     gap: space['4'],
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
   },
   sections: {
     gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
   },
 });
