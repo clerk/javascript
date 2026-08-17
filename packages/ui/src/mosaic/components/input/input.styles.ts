@@ -1,6 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-primary']} 5%, transparent)`;
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
@@ -45,8 +54,15 @@ export const styles = stylex.create({
         ':focus-visible': '2px',
       },
     },
-    transitionDuration: '0.2s',
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      ':focus-visible': durationVars['--cl-duration-fast'],
+    },
     transitionProperty: 'color, background-color, border-color, box-shadow',
+    transitionTimingFunction: {
+      default: 'linear',
+      ':focus-visible': `linear, linear, linear, ${easingVars['--cl-ease-default']}`,
+    },
     minWidth: 0,
     width: '100%',
     '::file-selector-button': {
