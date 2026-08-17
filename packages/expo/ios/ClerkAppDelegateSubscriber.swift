@@ -9,9 +9,7 @@ public class ClerkAppDelegateSubscriber: ExpoAppDelegateSubscriber {
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
-    Task { @MainActor in
-      ClerkNativeBridge.shared.handle(url: url)
-    }
+    ClerkNativeBridge.shared.handle(url: url)
     // Returning false leaves the URL available to React Native's Linking.
     return false
   }

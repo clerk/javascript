@@ -283,15 +283,10 @@ final class ClerkNativeBridge {
     handle(url: url)
   }
 
-  /// Routes an inbound deep link to the native SDK.
-  ///
-  /// The SDK completes native magic link flows only from the callback URL, and its prebuilt
-  /// `AuthView` reaches `Clerk.handle(_:)` through SwiftUI's `.onOpenURL`, which never fires for a
-  /// UIKit-hosted controller. Unrecognized URLs are ignored by `handle(_:)`.
+  /// `AuthView` only reaches `Clerk.handle(_:)` from `.onOpenURL`, which never fires for a UIKit-hosted controller.
   @MainActor
   func handle(url: URL) {
-    // A cold launch delivers the callback before JS calls `configure`. The pending flow is
-    // persisted by the SDK, so replaying the URL after configuration still completes it.
+    // A cold launch delivers the callback before JS calls `configure`.
     guard Self.clerkConfigured else {
       pendingURL = url
       return
@@ -299,7 +294,7 @@ final class ClerkNativeBridge {
 
     Task { @MainActor in
       do {
-        _ = try await Clerk.shared.handle(url)
+        try await Clerk.shared.handle(url)
       } catch {
         NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
       }
