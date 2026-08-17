@@ -203,6 +203,7 @@ final class ClerkNativeBridge {
   private var lastObservedClientState: ClientStateSnapshot?
   private var configurationDepth = 0
   private var jsOriginatedClientSyncDepth = 0
+  private var pendingURL: URL?
 
   private init() {}
 
@@ -245,7 +246,7 @@ final class ClerkNativeBridge {
 
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-      Self.postConfiguredNotification()
+      finishConfiguration()
       return
     }
 
@@ -270,7 +271,39 @@ final class ClerkNativeBridge {
 
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
+    finishConfiguration()
+  }
+
+  @MainActor
+  private func finishConfiguration() {
     Self.postConfiguredNotification()
+
+    guard let url = pendingURL else { return }
+    pendingURL = nil
+    handle(url: url)
+  }
+
+  /// Routes an inbound deep link to the native SDK.
+  ///
+  /// The SDK completes native magic link flows only from the callback URL, and its prebuilt
+  /// `AuthView` reaches `Clerk.handle(_:)` through SwiftUI's `.onOpenURL`, which never fires for a
+  /// UIKit-hosted controller. Unrecognized URLs are ignored by `handle(_:)`.
+  @MainActor
+  func handle(url: URL) {
+    // A cold launch delivers the callback before JS calls `configure`. The pending flow is
+    // persisted by the SDK, so replaying the URL after configuration still completes it.
+    guard Self.clerkConfigured else {
+      pendingURL = url
+      return
+    }
+
+    Task { @MainActor in
+      do {
+        _ = try await Clerk.shared.handle(url)
+      } catch {
+        NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
+      }
+    }
   }
 
   @MainActor
