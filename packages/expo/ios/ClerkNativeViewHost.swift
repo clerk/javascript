@@ -100,6 +100,8 @@ public class ClerkUserProfileCustomPageHost: ClerkNativeViewHost {
   func setCustomPages(_ customPages: String?) {
     let newCustomPages = customPages ?? "[]"
     guard newCustomPages != currentCustomPages else { return }
+    let validPaths = Set(decodeUserProfileCustomPages(newCustomPages).map(\.path))
+    customPageState.reconcileCustomPagePaths(validPaths)
     currentCustomPages = newCustomPages
     setNeedsHostedViewUpdate()
   }

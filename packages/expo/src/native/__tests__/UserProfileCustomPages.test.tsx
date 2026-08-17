@@ -50,12 +50,44 @@ describe('serializeUserProfileCustomPages', () => {
     expect(JSON.parse(result)[1].placement).toEqual({ type: 'before', row: 'signOut' });
   });
 
+  test('serializes push-only destinations without exposing profile rows', () => {
+    const result = serializeUserProfileCustomPages(
+      [{ path: 'billing', label: 'Billing', content: null }],
+      [{ path: 'invoice-details', label: 'Invoice details', content: null }],
+    );
+
+    expect(JSON.parse(result)).toEqual([
+      {
+        path: 'billing',
+        label: 'Billing',
+        icon: 'settings',
+        placement: { type: 'sectionEnd', section: 'profile' },
+      },
+      {
+        path: 'invoice-details',
+        label: 'Invoice details',
+        icon: 'settings',
+        placement: { type: 'sectionEnd', section: 'profile' },
+        showAsRow: false,
+      },
+    ]);
+  });
+
   test('rejects duplicate page paths', () => {
     expect(() =>
       serializeUserProfileCustomPages([
         { path: 'billing', label: 'Billing', content: null },
         { path: 'billing', label: 'Invoices', content: null },
       ]),
+    ).toThrow('User profile custom page path "billing" must be unique.');
+  });
+
+  test('rejects duplicate paths across pages and destinations', () => {
+    expect(() =>
+      serializeUserProfileCustomPages(
+        [{ path: 'billing', label: 'Billing', content: null }],
+        [{ path: 'billing', label: 'Billing details', content: null }],
+      ),
     ).toThrow('User profile custom page path "billing" must be unique.');
   });
 });

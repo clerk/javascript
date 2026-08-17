@@ -36,6 +36,7 @@ export type { UserButtonProps, UserButtonUserProfileProps } from './UserButton';
 export { useUserProfileCustomPageNavigation } from './UserProfileCustomPages';
 export type {
   UserProfileCustomPageNavigation,
+  UserProfileCustomDestination,
   UserProfileCustomPage,
   UserProfileCustomPageIcon,
   UserProfileCustomPagePlacement,
