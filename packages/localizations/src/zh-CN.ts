@@ -1733,6 +1733,7 @@ export const zhCN: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '您的密码强度不够。',
     form_password_or_identifier_incorrect: '密码或电子邮件地址不正确。请重试或使用其他方法。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',

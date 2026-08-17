@@ -1756,6 +1756,7 @@ export const skSK: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_or_identifier_incorrect:
       'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',

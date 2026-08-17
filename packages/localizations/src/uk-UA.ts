@@ -1748,6 +1748,7 @@ export const ukUA: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_or_identifier_incorrect:
       'Пароль або адреса електронної пошти невірні. Спробуйте ще раз або використайте інший метод.',

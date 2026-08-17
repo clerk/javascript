@@ -1755,6 +1755,7 @@ export const plPL: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
     form_password_or_identifier_incorrect:
       'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
