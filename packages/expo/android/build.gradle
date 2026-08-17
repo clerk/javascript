@@ -20,8 +20,8 @@ def clerkExpoVersion = clerkExpoPackageJson.version.toString()
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
 ext {
   kotlinxCoroutinesVersion = "1.7.3"
-  clerkAndroidApiVersion = "1.1.2"
-  clerkAndroidUiVersion = "1.1.2"
+  clerkAndroidApiVersion = "1.1.3"
+  clerkAndroidUiVersion = "1.1.3"
   okhttpVersion = "5.4.0"
   okhttpUrlConnectionVersion = "5.0.0-alpha.16"
   composeVersion = "1.7.0"
@@ -102,6 +102,8 @@ try {
 }
 
 dependencies {
+  testImplementation "junit:junit:4.13.2"
+
   implementation project(':expo-modules-core')
 
   // Coroutines for async operations
