@@ -2,18 +2,21 @@ import * as AlertDialogStories from './alert-dialog.component.stories';
 
 # AlertDialog
 
-The Mosaic `AlertDialog` — a `Dialog` that interrupts to ask for a decision, and waits for one.
+The Mosaic `AlertDialog` is a `Dialog` that interrupts to ask for a decision, and waits for one.
 Reach for it when continuing depends on the answer: confirming something destructive, or warning
 that leaving loses work. Anything the user can read and dismiss is a `Dialog`.
-
-It is composed from the same parts as `Dialog`, so the surface, the motion, the stacking and the
-scroll lock are all shared. What differs is fixed rather than configurable: it announces itself as
-`role="alertdialog"`, an outside press cannot dismiss it, and it is always the `prompt` size.
 
 ## Example
 
 <Story
   name='Default'
+  storyModule={AlertDialogStories}
+/>
+
+### Confirming a discard
+
+<Story
+  name='DiscardChanges'
   storyModule={AlertDialogStories}
 />
 
@@ -67,7 +70,7 @@ or your own controlled state. That leaves room for a pending state on the button
 Pass one whenever the alert has no trigger: focus returns to the trigger by default, and an alert
 raised by something that happened has none, so answering it would otherwise drop the user on the
 body. A confirmation guarding a form wants the caret back in the field it asked about — see
-[Confirming a discard](#confirming-a-discard) below.
+[Confirming a discard](#confirming-a-discard) above.
 
 ### Dismissal
 
@@ -81,18 +84,18 @@ consumer can decline one by not committing the state.
 
 ## Parts
 
-| Part                      | Slot                   | Description                                                                                  |
-| ------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- |
-| `AlertDialog.Root`        | —                      | State provider; owns open/close, `modal`, `handle`. `role`, `closedBy` and `size` are fixed. |
-| `AlertDialog.Trigger`     | —                      | Opens the alert; accepts `render`, and `handle` + `payload` when detached.                   |
-| `AlertDialog.Portal`      | —                      | Portals the overlay out of the tree.                                                         |
-| `AlertDialog.Backdrop`    | `dialog-backdrop`      | The scrim behind the alert.                                                                  |
-| `AlertDialog.Viewport`    | `dialog-viewport`      | Centering container; owns the scroll lock.                                                   |
-| `AlertDialog.Popup`       | `dialog-popup`         | The surface (`role="alertdialog"`, focus-trapped); `initialFocus` / `finalFocus`.            |
-| `AlertDialog.Title`       | —                      | Heading; wired to the popup's `aria-labelledby`. Required.                                   |
-| `AlertDialog.Description` | —                      | Description; wired to the popup's `aria-describedby`. Required.                              |
-| `AlertDialog.Close`       | —                      | Dismisses the alert; unstyled, accepts a `render` prop.                                      |
-| `AlertDialog.Actions`     | `alert-dialog-actions` | The response row. Cancel first.                                                              |
+| Part                      | Slot                   | Description                                                                                                                    |
+| ------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `AlertDialog.Root`        | —                      | State provider; owns open/close, `modal`, `handle`. `role` is `alertdialog`, `closedBy` is `closerequest`, `size` is `prompt`. |
+| `AlertDialog.Trigger`     | —                      | Opens the alert; accepts `render`, and `handle` + `payload` when detached.                                                     |
+| `AlertDialog.Portal`      | —                      | Portals the overlay out of the tree.                                                                                           |
+| `AlertDialog.Backdrop`    | `dialog-backdrop`      | The scrim behind the alert.                                                                                                    |
+| `AlertDialog.Viewport`    | `dialog-viewport`      | Centering container; owns the scroll lock.                                                                                     |
+| `AlertDialog.Popup`       | `dialog-popup`         | The surface (`role="alertdialog"`, focus-trapped); `initialFocus` / `finalFocus`.                                              |
+| `AlertDialog.Title`       | —                      | Heading; wired to the popup's `aria-labelledby`. Required.                                                                     |
+| `AlertDialog.Description` | —                      | Description; wired to the popup's `aria-describedby`. Required.                                                                |
+| `AlertDialog.Close`       | —                      | Dismisses the alert; unstyled, accepts a `render` prop.                                                                        |
+| `AlertDialog.Actions`     | `alert-dialog-actions` | The response row. Cancel first.                                                                                                |
 
 Every part except `Popup` and `Actions` is `Dialog`'s own component, not a wrapper around it — one
 implementation, so the two cannot drift. `Title` and `Description` are unstyled passthroughs from the
@@ -119,14 +122,3 @@ both cases without the buttons knowing anything. Every button takes an equal sha
 single action fills it and two split it in half, at every width — the convention for a `prompt`
 generally, not a rule about alert dialogs. Nothing about it is media-scoped, so a third button
 divides the same row into thirds rather than finding an edge case.
-
----
-
-## Examples
-
-### Confirming a discard
-
-<Story
-  name='DiscardChanges'
-  storyModule={AlertDialogStories}
-/>

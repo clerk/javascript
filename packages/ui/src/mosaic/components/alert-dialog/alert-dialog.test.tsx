@@ -38,6 +38,24 @@ describe('Mosaic AlertDialog', () => {
     expect(popup).toHaveAccessibleDescription('This address has not been saved.');
   });
 
+  it('keeps the alertdialog role when a consumer passes one to the popup', () => {
+    render(
+      <AlertDialog.Root defaultOpen>
+        <AlertDialog.Backdrop />
+        <AlertDialog.Viewport>
+          {/* `role` is omitted from AlertDialogPopupProps; the cast is how a JS consumer gets here. */}
+          <AlertDialog.Popup {...({ role: 'dialog' } as Record<string, string>)}>
+            <AlertDialog.Title>Discard changes?</AlertDialog.Title>
+            <AlertDialog.Description>This address has not been saved.</AlertDialog.Description>
+          </AlertDialog.Popup>
+        </AlertDialog.Viewport>
+      </AlertDialog.Root>,
+    );
+
+    expect(screen.getByRole('alertdialog', { name: 'Discard changes?' })).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('carries the dialog slot classes, so it inherits the surface and its motion', () => {
     render(<Confirm />);
 

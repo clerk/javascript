@@ -56,16 +56,8 @@ export function Default() {
 
 const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email address</Button>;
 
-/**
- * The case the stack was built for: a form prompt raising a confirmation over itself rather than
- * discarding what was typed.
- *
- * The veto is a controlled `open` whose `onOpenChange` declines to commit — every close request
- * lands there, so Escape, the corner X and `Dialog.Close` are all covered by the one branch. The
- * `AlertDialog` is rendered inside the dialog it guards, which is what puts the two in the same
- * floating tree: escape ordering, the stacking styles and the refcounted scroll lock all depend
- * on it.
- */
+// The AlertDialog is rendered INSIDE the dialog it guards so the two share a floating tree —
+// escape ordering, the stacking styles and the refcounted scroll lock all depend on it.
 export function DiscardChanges() {
   const [open, setOpen] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);

@@ -40,7 +40,7 @@ export type AlertDialogRootProps<Payload = unknown> = Omit<DialogRootProps<Paylo
 export type AlertDialogTriggerProps<Payload = unknown> = DialogTriggerProps<Payload>;
 export type AlertDialogBackdropProps = DialogBackdropProps;
 export type AlertDialogViewportProps = DialogViewportProps;
-export type AlertDialogPopupProps = DialogPopupProps;
+export type AlertDialogPopupProps = Omit<DialogPopupProps, 'role'>;
 export type AlertDialogTitleProps = DialogTitleProps;
 export type AlertDialogDescriptionProps = DialogDescriptionProps;
 export type AlertDialogCloseProps = DialogCloseProps;
@@ -90,9 +90,12 @@ const Popup = React.forwardRef<HTMLDivElement, AlertDialogPopupProps>(function A
   // warnings name `AlertDialog` parts that do not exist at that call site.
   return (
     <DialogPartNameContext.Provider value='AlertDialog'>
+      {/* After the spread on purpose: `mergeProps` lets consumer props win, so a `role` passed
+          here would otherwise downgrade the alert back to a plain dialog. */}
       <Dialog.Popup
         ref={mergedRef}
         {...props}
+        role='alertdialog'
       />
     </DialogPartNameContext.Provider>
   );
