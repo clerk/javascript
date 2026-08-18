@@ -19,6 +19,8 @@ export { default as __source } from './user-button.stories?raw';
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserButton',
+  label: 'User button',
+  navigation: { family: 'User button', category: 'Compositions', order: 10 },
   source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
 };
 
