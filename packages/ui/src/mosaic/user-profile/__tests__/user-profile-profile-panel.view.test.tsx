@@ -151,7 +151,7 @@ describe('UserProfileProfilePanelView', () => {
     ).toHaveAttribute('src', 'https://example.com/google.svg');
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
-    expect(screen.getByText('Permanently delete this profile and all its data. This cannot be undone.')).toHaveClass(
+    expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
