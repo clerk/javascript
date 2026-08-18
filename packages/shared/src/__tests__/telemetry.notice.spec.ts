@@ -21,12 +21,14 @@ describe('maybeShowTelemetryNotice', () => {
   beforeEach(() => {
     originalCIEnv = Object.fromEntries(CI_VARS.map(name => [name, process.env[name]]));
     clearCIEnv();
+    delete process.env.CLERK_TELEMETRY_NOTICE_DISABLED;
     __resetTelemetryNoticeForTests();
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
     logSpy.mockRestore();
+    delete process.env.CLERK_TELEMETRY_NOTICE_DISABLED;
     for (const [name, value] of Object.entries(originalCIEnv)) {
       if (typeof value === 'string') {
         process.env[name] = value;
@@ -110,5 +112,29 @@ describe('maybeShowTelemetryNotice', () => {
     });
 
     expect(() => maybeShowTelemetryNotice()).not.toThrow();
+  });
+
+  test('skips when CLERK_TELEMETRY_NOTICE_DISABLED is set to 1', () => {
+    process.env.CLERK_TELEMETRY_NOTICE_DISABLED = '1';
+
+    maybeShowTelemetryNotice();
+
+    expect(logSpy).not.toHaveBeenCalled();
+  });
+
+  test('skips when CLERK_TELEMETRY_NOTICE_DISABLED is set to true', () => {
+    process.env.CLERK_TELEMETRY_NOTICE_DISABLED = 'true';
+
+    maybeShowTelemetryNotice();
+
+    expect(logSpy).not.toHaveBeenCalled();
+  });
+
+  test('still prints when CLERK_TELEMETRY_NOTICE_DISABLED is falsy', () => {
+    process.env.CLERK_TELEMETRY_NOTICE_DISABLED = 'false';
+
+    maybeShowTelemetryNotice();
+
+    expect(logSpy).toHaveBeenCalled();
   });
 });
