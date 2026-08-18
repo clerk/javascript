@@ -11,10 +11,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-security-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileSecurityPanel',
   label: 'Security panel',
-  navigation: { family: 'User profile', category: 'Compositions', order: 20 },
+  navigation: { category: 'Panels' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-security-panel.view.tsx',
 };
 

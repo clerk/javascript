@@ -1,9 +1,11 @@
 'use client';
 
+import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -15,78 +17,113 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
-import type { StoryModule } from '@/lib/types';
 
 const groups = getSidebarGroups();
 
-type SidebarEntry = { mod: StoryModule; componentSlug: string };
+const COLLAPSED_BY_DEFAULT = new Set(['Primitives', 'Components', 'Styles', 'Hooks']);
 
-function getNavigationFamilies(components: SidebarEntry[]) {
-  const families = new Map<string, Map<string, SidebarEntry[]>>();
+type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
 
+// Partitions a group's entries by `meta.navigation.category` into subheaded runs. Category and
+// entry order both follow first appearance in the registry; uncategorized entries get no subheading.
+function byCategory(components: SidebarEntry[]) {
+  const categories: { category: string; components: SidebarEntry[] }[] = [];
   for (const component of components) {
-    const family = component.mod.meta.navigation?.family ?? '';
     const category = component.mod.meta.navigation?.category ?? '';
-    const categories = families.get(family) ?? new Map<string, SidebarEntry[]>();
-    const entries = categories.get(category) ?? [];
-
-    entries.push(component);
-    categories.set(category, entries);
-    families.set(family, categories);
+    const bucket = categories.find(c => c.category === category);
+    if (bucket) {
+      bucket.components.push(component);
+    } else {
+      categories.push({ category, components: [component] });
+    }
   }
-
-  return Array.from(families, ([family, categories]) => ({
-    family,
-    categories: Array.from(categories, ([category, components]) => ({
-      category,
-      components: components.sort(
-        (a, b) =>
-          (a.mod.meta.navigation?.order ?? Number.MAX_SAFE_INTEGER) -
-          (b.mod.meta.navigation?.order ?? Number.MAX_SAFE_INTEGER),
-      ),
-    })),
-  }));
+  return categories;
 }
 
-function SidebarEntryLink({
-  entry,
-  groupSlug,
-  pathname,
-}: {
-  entry: SidebarEntry;
-  groupSlug: string;
-  pathname: string;
-}) {
-  const { mod, componentSlug } = entry;
-  const href = `/${groupSlug}/${componentSlug}`;
-  const usage = mod.meta.label
-    ? mod.meta.label
-    : mod.meta.group === 'Hooks'
-      ? `${mod.meta.title}()`
-      : mod.meta.group === 'Styles'
-        ? mod.meta.title
-        : `<${mod.meta.title} />`;
+function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: string; isActive: boolean }) {
+  const labelRef = React.useRef<HTMLSpanElement>(null);
+  const [isTruncated, setIsTruncated] = React.useState(false);
+
+  React.useEffect(() => {
+    const label = labelRef.current;
+    if (!label) {
+      return;
+    }
+    const check = () => setIsTruncated(label.scrollWidth > label.clientWidth);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(label);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        className='h-auto items-start py-1 text-xs leading-relaxed'
-        isActive={pathname === href}
-        render={<Link href={href} />}
-      >
-        <span
-          className={
-            mod.meta.label
-              ? 'whitespace-normal text-[11px] leading-relaxed'
-              : 'whitespace-normal! break-all font-mono text-[10px] leading-relaxed'
+      <Tooltip disabled={!isTruncated}>
+        <TooltipTrigger
+          delay={300}
+          render={
+            <SidebarMenuButton
+              className='h-auto py-1 text-xs'
+              isActive={isActive}
+              render={<Link href={href} />}
+            >
+              <span
+                ref={labelRef}
+                className='truncate font-mono text-[10px] leading-relaxed'
+              >
+                {usage}
+              </span>
+            </SidebarMenuButton>
           }
+        />
+        <TooltipContent
+          side='right'
+          className='font-mono text-[10px]'
         >
           {usage}
-        </span>
-      </SidebarMenuButton>
+        </TooltipContent>
+      </Tooltip>
     </SidebarMenuItem>
+  );
+}
+
+function SidebarEntryMenu({
+  components,
+  groupSlug,
+  pathname,
+}: {
+  components: SidebarEntry[];
+  groupSlug: string;
+  pathname: string;
+}) {
+  return (
+    <SidebarMenu>
+      {components.map(({ mod, componentSlug }) => {
+        const href = `/${groupSlug}/${componentSlug}`;
+        // How an entry is USED differs by layer, so the label follows the layer rather
+        // than a guess at the title: hooks are called, atomic styles are a set of
+        // exports with no single call form worth privileging, and everything else is a
+        // component rendered as JSX.
+        const usage =
+          mod.meta.group === 'Hooks'
+            ? `${mod.meta.title}()`
+            : mod.meta.group === 'Styles'
+              ? mod.meta.title
+              : `<${mod.meta.title} />`;
+        return (
+          <SidebarUsageItem
+            key={mod.meta.title}
+            usage={usage}
+            href={href}
+            isActive={pathname === href}
+          />
+        );
+      })}
+    </SidebarMenu>
   );
 }
 
@@ -129,43 +166,69 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className='gap-0'>
         {groups.map(({ group, groupSlug, components }) => (
-          <SidebarGroup
-            key={group}
-            className='py-1'
-            data-section={group}
-          >
-            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-              {group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              {getNavigationFamilies(components).map(({ family, categories }) => (
-                <div key={family || group}>
-                  {family ? (
-                    <div className='text-sidebar-foreground/80 px-2 pb-1 pt-3 text-[11px] font-semibold'>{family}</div>
-                  ) : null}
-                  {categories.map(({ category, components }) => (
-                    <div key={category || group}>
-                      {category ? (
-                        <div className='text-sidebar-foreground/45 px-3 pb-1 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
-                          {category}
-                        </div>
-                      ) : null}
-                      <SidebarMenu className={category ? 'px-1' : undefined}>
-                        {components.map(entry => (
-                          <SidebarEntryLink
-                            key={entry.mod.meta.title}
-                            entry={entry}
-                            groupSlug={groupSlug}
-                            pathname={pathname}
-                          />
-                        ))}
-                      </SidebarMenu>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <React.Fragment key={group}>
+            {group === 'Components' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
+            <Collapsible
+              defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
+              className='group/collapsible'
+            >
+              <SidebarGroup
+                className='py-1'
+                data-section={group}
+              >
+                <SidebarGroupLabel
+                  className='text-sidebar-foreground/50 hover:text-sidebar-foreground/80 h-auto w-full px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'
+                  render={<CollapsibleTrigger />}
+                >
+                  {group}
+                  <ChevronRightIcon className='size-3! ml-auto transition-transform group-data-[open]/collapsible:rotate-90' />
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    {byCategory(components).map(({ category, components }) =>
+                      category ? (
+                        <Collapsible
+                          key={category}
+                          // Collapsed by default, unless it holds the page being viewed.
+                          defaultOpen={components.some(
+                            ({ componentSlug }) => pathname === `/${groupSlug}/${componentSlug}`,
+                          )}
+                          className='group/category'
+                        >
+                          <CollapsibleTrigger className='text-sidebar-foreground/40 hover:text-sidebar-foreground/70 flex w-full items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
+                            <span
+                              aria-hidden='true'
+                              className='font-mono text-[10px] leading-none'
+                            >
+                              └
+                            </span>
+                            {category}
+                            <ChevronRightIcon className='size-2.5! ml-auto transition-transform group-data-[open]/category:rotate-90' />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className='border-sidebar-border ml-3 border-l pl-1'>
+                              <SidebarEntryMenu
+                                components={components}
+                                groupSlug={groupSlug}
+                                pathname={pathname}
+                              />
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ) : (
+                        <SidebarEntryMenu
+                          key={group}
+                          components={components}
+                          groupSlug={groupSlug}
+                          pathname={pathname}
+                        />
+                      ),
+                    )}
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+          </React.Fragment>
         ))}
       </SidebarContent>
       <SidebarRail />

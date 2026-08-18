@@ -7,10 +7,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-active-devices-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileActiveDevicesSection',
   label: 'Active devices',
-  navigation: { family: 'User profile', category: 'Sections', order: 50 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-active-devices-section.view.tsx',
 };
 

@@ -5,10 +5,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-password-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfilePasswordSection',
   label: 'Password',
-  navigation: { family: 'User profile', category: 'Sections', order: 20 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-password-section.view.tsx',
 };
 
