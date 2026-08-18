@@ -63,7 +63,7 @@ const feedbackDialog = Dialog.createHandle();
 ### Multiple triggers and payloads
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
-the active trigger's payload, so one dialog renders per-trigger content. Type the payload through
+the active payload, so one dialog renders per-trigger content. Type the payload through
 the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
 dialog; for data that can change while it is open, carry an id and read live state inside.
 
@@ -158,7 +158,7 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 | `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                     |
 | `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)              |
 | `triggerId`    | `string \| null`                                            | —          | Controls which trigger the open is attributed to                      |
-| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active trigger's `payload`       |
+| `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active `payload`                 |
 
 #### `closedBy`
 

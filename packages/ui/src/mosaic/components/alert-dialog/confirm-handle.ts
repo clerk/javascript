@@ -28,10 +28,10 @@ export interface ConfirmHandle {
    * question on screen is already the one being answered.
    *
    * The `<AlertDialog.Confirm>` must be MOUNTED when this is called. It is what opens, and a
-   * `dialog.open()` with no root attached is a no-op — the promise would never settle. Since the
-   * confirmation belongs inside the dialog it guards, that means asking only from inside that
-   * dialog while it is open. A confirmation that unmounts with a question in flight answers
-   * `false` rather than hanging.
+   * `dialog.open()` with no root attached is a no-op. Since the confirmation belongs inside the
+   * dialog it guards, that means asking only from inside that dialog while it is open. Calling it
+   * with nothing mounted resolves `false` and warns in development; a confirmation that unmounts
+   * with a question in flight answers `false` too, rather than hanging.
    */
   show(options: ConfirmOptions): Promise<boolean>;
   /** The dialog handle `<AlertDialog.Confirm>` mounts against. @internal */
@@ -73,6 +73,17 @@ export function createConfirmHandle(): ConfirmHandle {
     show(options) {
       if (pending) {
         return pending.promise;
+      }
+      // `dialog.open` is a no-op with no root attached, so storing `pending` first would leave a
+      // promise nothing can ever settle — and every later `show()` would return that dead promise,
+      // outliving the mistake. Answer no instead.
+      if (!dialog.hasRoot) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(
+            '[clerk] `confirm.show()` was called with no `<AlertDialog.Confirm>` mounted against this handle, so there is nothing to open. It resolved `false`. Render `<AlertDialog.Confirm handle={…} />` inside the dialog it guards, and ask only while that dialog is open.',
+          );
+        }
+        return Promise.resolve(false);
       }
       let resolve!: (confirmed: boolean) => void;
       const promise = new Promise<boolean>(res => {

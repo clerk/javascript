@@ -74,7 +74,7 @@ export interface DialogProps<Payload = unknown> {
    * open programmatically as if a given trigger had been activated.
    */
   triggerId?: string | null;
-  /** Content, or a function of `{ payload }` — the `payload` of the active trigger — for per-trigger content. */
+  /** Content, or a function of `{ payload }` — the active trigger's, or the one `handle.open()` supplied. */
   children: ReactNode | ((ctx: { payload: Payload | undefined }) => ReactNode);
 }
 

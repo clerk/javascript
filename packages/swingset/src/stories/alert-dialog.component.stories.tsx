@@ -60,19 +60,23 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 // corner X, `Dialog.Close` — is guarded by one hook and a veto is just the absence of a commit.
 // `AlertDialog.Confirm` renders INSIDE the dialog it guards so the two share a floating tree, which
 // escape ordering, the stacking styles and the refcounted scroll lock all depend on. `finalFocus` is
-// required: a confirmation raised by a close request has no trigger to return the caret to.
+// optional but wanted here: a confirmation raised by a close request has no trigger to return to.
 export function DiscardChanges() {
   const confirm = React.useMemo(() => createConfirmHandle(), []);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
+  // Adding is the one close that must not be questioned. A ref rather than clearing `value`,
+  // because `when` runs before React has re-rendered and would still read the old state.
+  const bypassGuardRef = React.useRef(false);
 
   const onOpenChange = useConfirmedClose({
     handle: confirm,
-    when: () => value.trim() !== '',
+    when: () => !bypassGuardRef.current && value.trim() !== '',
     onOpenChange: next => {
       setOpen(next);
       if (!next) {
+        bypassGuardRef.current = false;
         setValue('');
       }
     },
@@ -107,11 +111,9 @@ export function DiscardChanges() {
           />
           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
             <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-            {/* Adding is the one close that must NOT be questioned, so it clears the field the
-                guard reads before closing. */}
             <Button
               onClick={() => {
-                setValue('');
+                bypassGuardRef.current = true;
                 close();
               }}
             >

@@ -305,6 +305,28 @@ describe('createConfirmHandle', () => {
     expect(screen.getByRole('alertdialog', { name: 'Again?' })).toBeInTheDocument();
   });
 
+  it('answers false and warns when nothing is mounted to ask, leaving the handle usable', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const handle = createConfirmHandle();
+
+    await expect(handle.show({ title: 'Sure?', description: 'No going back.' })).resolves.toBe(false);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('<AlertDialog.Confirm>'));
+
+    // Not poisoned: the unanswerable request is not retained, so mounting one still works.
+    render(
+      <Dialog defaultOpen>
+        <Dialog.Title>Host</Dialog.Title>
+        <AlertDialog.Confirm handle={handle} />
+      </Dialog>,
+    );
+    await act(async () => {
+      void handle.show({ title: 'Again?', description: 'Still no going back.' });
+    });
+    expect(screen.getByRole('alertdialog', { name: 'Again?' })).toBeInTheDocument();
+
+    warn.mockRestore();
+  });
+
   it('stacks over the dialog it guards rather than replacing it', async () => {
     const user = userEvent.setup();
     render(<GuardedForm />);

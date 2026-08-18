@@ -59,6 +59,12 @@ export interface DialogHandle<Payload = unknown> {
   close(): void;
   /** Whether the attached root is open. `false` while no root is mounted. */
   readonly isOpen: boolean;
+  /**
+   * Whether a root is mounted and attached. `open`/`close` are ignored while this is `false`,
+   * so a caller that must not silently no-op can check first.
+   * @internal
+   */
+  readonly hasRoot: boolean;
   /** @internal */
   registerTrigger(registration: DialogTriggerRegistration<Payload>): () => void;
   /** @internal */
@@ -101,6 +107,9 @@ export function createDialogHandle<Payload = unknown>(): DialogHandle<Payload> {
     },
     get isOpen() {
       return state.open;
+    },
+    get hasRoot() {
+      return root !== null;
     },
     registerTrigger(registration) {
       triggers.set(registration.id, registration);
