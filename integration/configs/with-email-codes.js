@@ -70,6 +70,7 @@ export default defineConfig({
       domains_enabled: true,
       domains_enrollment_modes: ['manual_invitation', 'automatic_invitation', 'automatic_suggestion'],
       enabled: true,
+      force_organization_selection: false,
       max_allowed_memberships: 3,
       organization_creation_defaults: {
         detect_from_email_domain: {
