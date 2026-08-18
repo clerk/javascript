@@ -4,7 +4,6 @@ import { parse as parseCookie } from 'cookie';
 import type { UNSAFE_DataWithResponseInit } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
-import { canUseKeyless } from '../utils/feature-flags';
 import type { AdditionalStateOptions } from './types';
 
 // AppLoadContext was removed from React Router v8. Keep a structural type for the context shape we use.
@@ -94,7 +93,7 @@ export function getResponseClerkState(
 ) {
   const { reason, message, isSignedIn, ...rest } = requestState;
   const envVars = getPublicEnvVariables(context);
-  const { __keylessClaimUrl, __keylessApiKeysUrl, ...redirectUrlOptions } = additionalStateOptions;
+  const redirectUrlOptions = additionalStateOptions;
 
   const baseState: Record<string, unknown> = {
     __clerk_ssr_state: rest.toAuth(),
@@ -118,11 +117,6 @@ export function getResponseClerkState(
     __telemetryDebug: envVars.telemetryDebug,
     __unsafeDisableDevelopmentModeConsoleWarning: envVars.unsafeDisableDevelopmentModeConsoleWarning,
   };
-
-  if (canUseKeyless && __keylessClaimUrl) {
-    baseState.__keylessClaimUrl = __keylessClaimUrl;
-    baseState.__keylessApiKeysUrl = __keylessApiKeysUrl;
-  }
 
   const clerkState = wrapWithClerkState(baseState);
 

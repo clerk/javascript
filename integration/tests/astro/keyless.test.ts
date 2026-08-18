@@ -1,12 +1,7 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
 
 const commonSetup = appConfigs.astro.node.clone();
 
@@ -21,15 +16,11 @@ test.describe('Keyless mode @astro', () => {
   });
 
   let app: Application;
-  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
-      dashboardUrl = 'https://dashboard.clerkstage.dev/';
-    }
     await app.dev();
   });
 
@@ -37,18 +28,13 @@ test.describe('Keyless mode @astro', () => {
     await app?.teardown();
   });
 
-  test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'astro' });
-  });
-
-  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+  test('Without keys, the app fails with the missing env vars error instead of keyless bootstrap.', async ({
     page,
-    context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
-  });
-
-  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+    const response = await page.goto(`${app.serverUrl}/`);
+    expect(response?.status()).toBe(500);
+    const content = await page.content();
+    expect(content).toContain('Publishable key is missing');
+    expect(content).toContain('npx clerk@latest init');
   });
 });

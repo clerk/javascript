@@ -73,7 +73,8 @@ export async function loader(args: Route.LoaderArgs) {
 `);
 
 export const noSecretKeyError = createErrorMessage(`
-A secretKey must be provided in order to use SSR and the exports from @clerk/react-router/api.');
+A secretKey must be provided in order to use SSR and the exports from @clerk/react-router/api.
+To set up Clerk for this project, run \`npx clerk@latest init\` — it is non-interactive, requires no Clerk account or login, and writes the required keys to your .env file.
 If your runtime supports environment variables, you can add a CLERK_SECRET_KEY variable to your config.
 Otherwise, you can pass a secretKey parameter to rootAuthLoader or getAuth.
 `);

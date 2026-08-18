@@ -26,8 +26,6 @@ export type ClerkState = {
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
     __unsafeDisableDevelopmentModeConsoleWarning: boolean | undefined;
-    __keylessClaimUrl?: string;
-    __keylessApiKeysUrl?: string;
   };
 };
 

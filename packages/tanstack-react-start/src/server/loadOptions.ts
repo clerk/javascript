@@ -5,7 +5,6 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 
 import { errorThrower } from '../utils';
-import { canUseKeyless } from '../utils/feature-flags';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 
@@ -30,10 +29,11 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  // In keyless mode, don't throw if secretKey is missing - ClerkProvider will handle it
-  if (!secretKey && !canUseKeyless) {
+  if (!secretKey) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw errorThrower.throw('Clerk: no secret key provided');
+    throw errorThrower.throw(
+      'Clerk: no secret key provided. To set up Clerk for this project, run `npx clerk@latest init` — it is non-interactive, requires no Clerk account or login, and writes the required keys to your .env file.',
+    );
   }
 
   if (isSatellite && !proxyUrl && !domain) {

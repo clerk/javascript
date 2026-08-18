@@ -8,7 +8,6 @@ import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
 
 import { clerkClient } from './clerkClient';
-import { resolveKeysWithKeylessFallback } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { AdditionalStateOptions, ClerkMiddlewareOptions } from './types';
 
@@ -35,20 +34,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
   return async (args, next) => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
-
-    const {
-      publishableKey,
-      secretKey,
-      claimUrl: __keylessClaimUrl,
-      apiKeysUrl: __keylessApiKeysUrl,
-    } = await resolveKeysWithKeylessFallback(loadedOptions.publishableKey, loadedOptions.secretKey, args, options);
-
-    if (publishableKey) {
-      loadedOptions.publishableKey = publishableKey;
-    }
-    if (secretKey) {
-      loadedOptions.secretKey = secretKey;
-    }
 
     // Pick only the properties needed by authenticateRequest.
     // Used when manually providing options to the middleware.
@@ -102,8 +87,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     args.context.set(requestStateContext, {
       requestState,
       additionalState: {
-        __keylessClaimUrl,
-        __keylessApiKeysUrl,
         signInForceRedirectUrl: loadedOptions.signInForceRedirectUrl,
         signUpForceRedirectUrl: loadedOptions.signUpForceRedirectUrl,
         signInFallbackRedirectUrl: loadedOptions.signInFallbackRedirectUrl,

@@ -9,7 +9,6 @@ import type { MiddlewareFunction } from 'react-router';
 
 import { getPublicEnvVariables } from '../utils/env';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
-import { canUseKeyless } from '../utils/feature-flags';
 import type { ClerkMiddlewareOptions } from './types';
 
 export type DataFunctionArgs = Parameters<MiddlewareFunction<Response>>[0];
@@ -56,7 +55,7 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  if (!secretKey && !canUseKeyless) {
+  if (!secretKey) {
     throw new Error(noSecretKeyError);
   }
   if (isSatellite && !proxyUrl && !domain) {
