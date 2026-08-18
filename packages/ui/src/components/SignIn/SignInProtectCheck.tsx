@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/shared/types';
+import { useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -19,50 +20,46 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useSpinDelay } from '../../hooks';
+import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
+import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { isSignInPendingOAuthTransfer, resumeSignInAfterProtectCheck } from './handleProtectCheck';
 
-/**
- * Routes the user to the next step after a protect check has been resolved (or short-circuits
- * to the same route to handle a chained challenge).
- *
- * After the gate clears, the client should retry the operation that was gated.
- * For most steps (factor-one/factor-two cards), the underlying card uses `useFetch` to call
- * `prepareFirstFactor`/`prepareSecondFactor` on mount, so navigating back is sufficient to
- * re-trigger the gated work.
- */
-function navigateNext(signIn: SignInResource, navigate: (to: string) => Promise<unknown>): Promise<unknown> {
-  // Chained challenge — stay here and re-run the new challenge on next render. Both
-  // signals are checked: `protectCheck` is the authoritative field, and
-  // `'needs_protect_check'` is the SDK-version-gated status.
-  if (signIn.protectCheck || signIn.status === 'needs_protect_check') {
-    return navigate('.');
-  }
-
-  switch (signIn.status) {
-    case 'needs_first_factor':
-      return navigate('../factor-one');
-    case 'needs_second_factor':
-      return navigate('../factor-two');
-    case 'needs_client_trust':
-      return navigate('../client-trust');
-    case 'needs_new_password':
-      return navigate('../reset-password');
-    case 'complete':
-      // Finalization is handled by the caller via setActive; just bounce to index.
-      return navigate('..');
-    default:
-      return navigate('..');
-  }
-}
-
-function SignInProtectCheckInternal(): JSX.Element {
+function SignInProtectCheckInternal(): JSX.Element | null {
   const card = useCardState();
   const { t } = useLocalizations();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
-  const { setActive } = useClerk();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const clerk = useClerk();
+  const { setActive, __internal_resumeAfterProtectCheck } = clerk;
+  const ctx = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = ctx;
+
+  // Latched at mount, BEFORE the challenge is submitted. `SignIn.fromJSON` replaces
+  // `firstFactorVerification` wholesale on every write, so the transferable marker that routed
+  // us here is not guaranteed to survive `submitProtectCheck` — and it is the only thing that
+  // distinguishes "an OAuth sign-up is in progress" from "an ordinary gated sign-in".
+  const startedAsOAuthTransfer = useRef(isSignInPendingOAuthTransfer(signIn));
+
+  // Latches that a protect check existed at some point, so the resolution race
+  // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for a stale
+  // visit. Mirrors SignUpProtectCheck, which has had this since it shipped. State adjusted
+  // during render (guarded) rather than a ref write, which React disallows in the render body.
+  const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signIn.protectCheck);
+  const didStartNoCheckFallbackRef = useRef(false);
+
+  if (signIn.protectCheck && !everSawProtectCheck) {
+    setEverSawProtectCheck(true);
+  }
+
+  useEffect(() => {
+    if (!signIn.protectCheck && !everSawProtectCheck && !didStartNoCheckFallbackRef.current) {
+      didStartNoCheckFallbackRef.current = true;
+      void navigateToFlowStart();
+    }
+  }, [everSawProtectCheck, navigateToFlowStart, signIn.protectCheck]);
 
   const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignInResource>({
     getProtectCheck: () => signIn.protectCheck,
@@ -85,7 +82,18 @@ function SignInProtectCheckInternal(): JSX.Element {
         });
         return;
       }
-      await navigateNext(updatedSignIn, navigate);
+      await resumeSignInAfterProtectCheck(updatedSignIn, {
+        navigate,
+        startedAsOAuthTransfer: startedAsOAuthTransfer.current,
+        // No isCancelled() guard around this one: completing the transfer calls setActive,
+        // which flips the withRedirectToAfterSignIn guard and blanks this card. That unmount
+        // must not abort the continuation — the router owns its navigation from here.
+        resumeOAuthContinuation: () =>
+          __internal_resumeAfterProtectCheck(
+            { ...buildSignInOAuthCallbackParams(ctx), continuation: 'transfer_to_sign_up' },
+            navigate,
+          ),
+      });
     },
   });
 
@@ -95,6 +103,13 @@ function SignInProtectCheckInternal(): JSX.Element {
   // visible duration must never outrank the handshake's "spinner is gone when the promise
   // resolves" guarantee, nor keep a spinner next to the retry button.
   const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+
+  // Stale/direct visit that never had a check: render nothing while the flow-start redirect
+  // scheduled above kicks in, instead of flashing the card shell for one paint. Must stay
+  // below every hook call.
+  if (!signIn.protectCheck && !everSawProtectCheck) {
+    return null;
+  }
 
   return (
     <Flow.Part part='protectCheck'>

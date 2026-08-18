@@ -36,3 +36,78 @@ export function navigateOnSignInProtectGate(
   }
   return false;
 }
+
+/**
+ * Whether this sign-in is waiting to become a sign-up.
+ *
+ * An OAuth sign-in for an identity that has no account yet comes back as a *transferable*
+ * first-factor verification: the server has recorded the account transfer and the client is
+ * expected to complete it as a sign-up. It is not a sign-in that can continue on its own,
+ * and none of the interactive sign-in steps apply to it.
+ *
+ * Read this BEFORE clearing a gate, never after — see `resumeSignInAfterProtectCheck`.
+ */
+export function isSignInPendingOAuthTransfer(signIn: SignInResource): boolean {
+  return signIn.firstFactorVerification?.status === 'transferable';
+}
+
+/**
+ * The exit choke point, and the counterpart to `navigateOnSignInProtectGate` above.
+ *
+ * The gate has two halves and both live in this file: one for routing *into* the challenge,
+ * one for routing *out* of it. A new caller needs both — a card that enters through the
+ * helper and then hand-rolls its own exit is exactly the shape that produced the outage this
+ * function was written for.
+ *
+ * `resumeOAuthContinuation` is how the card hands back to the redirect-callback router. It is
+ * injected rather than called directly so this module stays free of the Clerk instance.
+ */
+export function resumeSignInAfterProtectCheck(
+  signIn: SignInResource,
+  {
+    navigate,
+    resumeOAuthContinuation,
+    startedAsOAuthTransfer,
+  }: {
+    navigate: (to: string) => Promise<unknown>;
+    resumeOAuthContinuation: () => Promise<unknown>;
+    startedAsOAuthTransfer: boolean;
+  },
+): Promise<unknown> {
+  // Chained challenge — stay here and re-run the new challenge on next render. Both
+  // signals are checked: `protectCheck` is the authoritative field, and
+  // `'needs_protect_check'` is the SDK-version-gated status.
+  if (isSignInProtectGated(signIn)) {
+    return navigate('.');
+  }
+
+  switch (signIn.status) {
+    case 'needs_first_factor':
+      return navigate('../factor-one');
+    case 'needs_second_factor':
+      return navigate('../factor-two');
+    case 'needs_client_trust':
+      return navigate('../client-trust');
+    case 'needs_new_password':
+      return navigate('../reset-password');
+    case 'complete':
+      // Finalization is handled by the caller via setActive; just bounce to index.
+      return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
+        ? resumeOAuthContinuation()
+        : navigate('..');
+    default:
+      // Everything above is an interactive sign-in step the user can be shown. Anything
+      // else means this sign-in cannot continue on its own, and today that is an OAuth
+      // account transfer: `needs_identifier` carrying a transferable first-factor
+      // verification, whose continuation lives in the redirect-callback router.
+      //
+      // Returning to the start form instead is not merely a wrong destination — the start
+      // card renders the transfer's `external_account_not_found` error and then calls
+      // `signIn.create({})` to clear it, which replaces the attempt and discards the only
+      // reference to the pending transfer. The user is then stranded permanently, and every
+      // retry reproduces it.
+      return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
+        ? resumeOAuthContinuation()
+        : navigate('..');
+  }
+}

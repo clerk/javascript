@@ -29,8 +29,21 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {
-        handleError(e, [], card.setError);
+        // Schedule the bounce FIRST, and never let the error reporting escape this handler.
+        //
+        // `handleError` re-throws anything it does not recognise, and the callback's own
+        // "did not complete" guards throw a plain `Error` — which it does not. A throw from
+        // inside this `.catch` skipped BOTH statements below, so the user got no message and
+        // no recovery: the card sat on its spinner indefinitely while the failure surfaced
+        // only as an unhandled rejection in the console. Every callback dead-end was
+        // invisible for that reason, which is a bad property for a route whose whole job is
+        // to be the last step of somebody's sign-in.
         timeoutId = setTimeout(() => void navigate('../'), 4000);
+        try {
+          handleError(e, [], card.setError);
+        } catch {
+          card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+        }
       });
     }
 
