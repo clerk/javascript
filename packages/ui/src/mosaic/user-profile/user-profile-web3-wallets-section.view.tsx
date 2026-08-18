@@ -7,6 +7,7 @@ import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-profile-panel.styles';
+import { UserProfileProviderIcon } from './user-profile-provider-icon';
 
 export interface UserProfileWeb3Wallet {
   id: string;
@@ -74,18 +75,7 @@ export function UserProfileWeb3WalletsSectionView({
           return (
             <Section.Row key={wallet.id}>
               <Section.Item>
-                {wallet.iconUrl ? (
-                  <Section.Media
-                    size='xl'
-                    {...stylex.props(styles.providerMedia)}
-                  >
-                    <img
-                      alt=''
-                      src={wallet.iconUrl}
-                      {...stylex.props(styles.providerIcon)}
-                    />
-                  </Section.Media>
-                ) : null}
+                {wallet.iconUrl ? <UserProfileProviderIcon iconUrl={wallet.iconUrl} /> : null}
                 <Section.Content>
                   <Section.Label>
                     <span {...stylex.props(styles.contactValue)}>

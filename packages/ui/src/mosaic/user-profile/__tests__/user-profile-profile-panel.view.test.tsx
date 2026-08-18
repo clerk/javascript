@@ -31,8 +31,7 @@ describe('UserProfileProfilePanelView', () => {
   it('composes the profile content without profile navigation', () => {
     renderView({ onEditProfilePicture: vi.fn(), onNameChange: vi.fn(), onUsernameChange: vi.fn() });
 
-    expect(screen.queryByRole('heading', { name: 'Account' })).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'Profile' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
       document.querySelector('.cl-section-group'),
     );
@@ -44,14 +43,14 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByRole('button', { name: 'Edit username' })).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Email' })).getByText('Primary')).toBeInTheDocument();
+    expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
     expect(screen.getByText('+1 801-888-8181')).toBeInTheDocument();
     expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
     expect(screen.getByText('Email')).toHaveClass('cl-section-label');
     expect(screen.getByText('Phone')).toHaveClass('cl-section-label');
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-description')).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Edit profile picture' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
     const profilePicture = screen.getByText('Profile picture').closest('.cl-section-item');
     expect(profilePicture?.querySelector('.cl-section-media')).toHaveAttribute('data-size', 'lg');
     expect(profilePicture?.querySelector('.cl-avatar')).toHaveAttribute('data-size', 'fit');
@@ -59,14 +58,76 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('heading', { name: 'User Profile' })).toBeNull();
   });
 
-  it('edits the profile picture when the avatar is clicked', async () => {
+  it('edits the profile picture when Upload is clicked', async () => {
     const onEditProfilePicture = vi.fn();
     const user = userEvent.setup();
     renderView({ onEditProfilePicture });
 
-    await user.click(screen.getByRole('button', { name: 'Edit profile picture' }));
+    await user.click(screen.getByRole('button', { name: 'Upload' }));
 
     expect(onEditProfilePicture).toHaveBeenCalledOnce();
+  });
+
+  it('breaks out both contact types when either has multiple entries', () => {
+    renderView({ onAddEmail: vi.fn(), onAddPhone: vi.fn() });
+
+    const accountSection = screen.getByRole('region', { name: 'Account' });
+    const emailSection = screen.getByRole('region', { name: 'Email' });
+    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+
+    expect(accountSection).not.toContainElement(emailSection);
+    expect(accountSection).not.toContainElement(phoneSection);
+    expect(emailSection).toHaveTextContent('item1@clerk.dev');
+    expect(emailSection).toHaveTextContent('item2@clerk.dev');
+    expect(phoneSection).toHaveTextContent('+1 801-888-8181');
+    expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
+    expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toHaveTextContent('Add');
+  });
+
+  it('keeps both contact types inside Account when neither has multiple entries', () => {
+    renderView({
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      onManageEmail: vi.fn(),
+      onManagePhone: vi.fn(),
+    });
+
+    const accountSection = screen.getByRole('region', { name: 'Account' });
+
+    expect(accountSection).toHaveTextContent('item1@clerk.dev');
+    expect(accountSection).toHaveTextContent('+1 801-888-8181');
+    expect(within(accountSection).getByRole('button', { name: 'Update email' })).toBeInTheDocument();
+    expect(within(accountSection).getByRole('button', { name: 'Update phone number' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Phone' })).not.toBeInTheDocument();
+  });
+
+  it('forwards inline contact update and add actions', async () => {
+    const onAddEmail = vi.fn();
+    const onManagePhone = vi.fn();
+    const user = userEvent.setup();
+    renderView({
+      emails: [],
+      onAddEmail,
+      onManagePhone,
+    });
+
+    expect(screen.getByText('No email addresses added')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+    await user.click(screen.getByRole('button', { name: 'Update phone number' }));
+
+    expect(onAddEmail).toHaveBeenCalledOnce();
+    expect(onManagePhone).toHaveBeenCalledWith('phone_1');
+  });
+
+  it('renders an actionable empty state when no phone number exists', () => {
+    renderView({ phones: [], onAddPhone: vi.fn() });
+
+    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+    const emptyState = within(phoneSection).getByText('No phone numbers added');
+
+    expect(emptyState.closest('.cl-section-items')).not.toBeNull();
+    expect(emptyState.closest('.cl-section-item')).not.toContainElement(within(phoneSection).getByText('Phone'));
+    expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
   it('renders connected accounts and the danger zone when provided', async () => {
@@ -76,7 +137,7 @@ describe('UserProfileProfilePanelView', () => {
     const user = userEvent.setup();
     renderView({
       connectedAccounts: [
-        { id: 'google', provider: 'Google', identifier: 'test@google.com' },
+        { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
         { id: 'apple', provider: 'Apple', connected: false },
       ],
       onConnectAccount,
@@ -85,6 +146,9 @@ describe('UserProfileProfilePanelView', () => {
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Connected accounts' }).querySelector('.cl-section-media[data-size="lg"] img'),
+    ).toHaveAttribute('src', 'https://example.com/google.svg');
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this profile and all its data. This cannot be undone.')).toHaveClass(
@@ -112,6 +176,7 @@ describe('UserProfileProfilePanelView', () => {
           id: 'primary',
           address: '0x1234567890abcdef1234567890abcdef12345678',
           provider: 'MetaMask',
+          iconUrl: 'https://example.com/metamask.svg',
           isPrimary: true,
           isVerified: true,
         },
@@ -134,6 +199,9 @@ describe('UserProfileProfilePanelView', () => {
 
     expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
     expect(screen.getByText('MetaMask')).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Web3 wallets' }).querySelector('.cl-section-media[data-size="lg"] img'),
+    ).toHaveAttribute('src', 'https://example.com/metamask.svg');
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
     expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
 
@@ -185,7 +253,7 @@ describe('UserProfileProfilePanelView', () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
-    await user.click(within(screen.getByRole('region', { name: 'Email' })).getByRole('button', { name: 'Add email' }));
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
     await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
     expect(onManageEmail).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
