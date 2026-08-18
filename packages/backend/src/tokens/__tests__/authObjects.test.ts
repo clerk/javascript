@@ -463,6 +463,14 @@ describe('getAuthObjectForAcceptedToken', () => {
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).tokenType).toBe('m2m_token');
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).id).toBeNull();
   });
+
+  it('carries debug data over to the downgraded auth object', () => {
+    const machineResult = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'm2m_token' });
+    expect(machineResult.debug()).toMatchObject({ foo: 'bar' });
+
+    const sessionResult = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'session_token' });
+    expect(sessionResult.debug()).toMatchObject({ foo: 'bar' });
+  });
 });
 
 describe('getToken with expiresInSeconds support', () => {
