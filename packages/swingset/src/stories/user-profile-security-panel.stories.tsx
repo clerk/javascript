@@ -84,7 +84,6 @@ export function Default() {
       onChangePassword={() => undefined}
       onDeleteAccount={() => undefined}
       onManageDevice={() => undefined}
-      onManageMfaMethod={() => undefined}
       onManagePasskey={() => undefined}
       onRegenerateBackupCodes={() =>
         setMfaMethods(current =>
