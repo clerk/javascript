@@ -94,6 +94,13 @@ const Plus = glyph(
   />,
 );
 
+const CreditCard = glyph(
+  <path
+    d='M2.75 6.75V10.25C2.75 11.3546 3.64543 12.25 4.75 12.25H11.25C12.3546 12.25 13.25 11.3546 13.25 10.25V6.75M2.75 6.75V5.75C2.75 4.64543 3.64543 3.75 4.75 3.75H11.25C12.3546 3.75 13.25 4.64543 13.25 5.75V6.75M2.75 6.75H13.25M5.75 9.25H6.25'
+    {...strokeProps}
+  />,
+);
+
 const SecurityPasskey = glyph(
   <>
     <path
@@ -277,6 +284,7 @@ export const iconRegistry = {
   'chevron-up-down': ChevronUpDown,
   check: Check,
   close: Close,
+  'credit-card': CreditCard,
   ellipsis: Ellipsis,
   pen: Pen,
   plus: Plus,

@@ -14,11 +14,16 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
+    'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
     'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
     'user-profile-active-devices-section': dynamic(() => import('../stories/user-profile-active-devices-section.mdx')),
+    'user-profile-subscription-section': dynamic(() => import('../stories/user-profile-subscription-section.mdx')),
+    'user-profile-payment-methods-section': dynamic(
+      () => import('../stories/user-profile-payment-methods-section.mdx'),
+    ),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
