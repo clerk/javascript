@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../components/button';
-import { Icon } from '../components/icon';
+import { Icon, IconFrame } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
@@ -46,15 +46,14 @@ export function UserProfileConnectedAccountsSectionView({
             <Section.Row key={account.id}>
               <Section.Item>
                 {account.iconUrl ? (
-                  <Section.Media
-                    size='xl'
-                    {...stylex.props(styles.providerMedia)}
-                  >
-                    <img
-                      alt=''
-                      src={account.iconUrl}
-                      {...stylex.props(styles.providerIcon)}
-                    />
+                  <Section.Media size='lg'>
+                    <IconFrame>
+                      <img
+                        alt=''
+                        src={account.iconUrl}
+                        {...stylex.props(styles.providerIcon)}
+                      />
+                    </IconFrame>
                   </Section.Media>
                 ) : null}
                 <Section.Content>

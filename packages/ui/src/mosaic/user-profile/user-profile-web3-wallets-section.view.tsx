@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
-import { Icon } from '../components/icon';
+import { Icon, IconFrame } from '../components/icon';
 import { Section } from '../components/section';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
@@ -75,15 +75,14 @@ export function UserProfileWeb3WalletsSectionView({
             <Section.Row key={wallet.id}>
               <Section.Item>
                 {wallet.iconUrl ? (
-                  <Section.Media
-                    size='xl'
-                    {...stylex.props(styles.providerMedia)}
-                  >
-                    <img
-                      alt=''
-                      src={wallet.iconUrl}
-                      {...stylex.props(styles.providerIcon)}
-                    />
+                  <Section.Media size='lg'>
+                    <IconFrame>
+                      <img
+                        alt=''
+                        src={wallet.iconUrl}
+                        {...stylex.props(styles.providerIcon)}
+                      />
+                    </IconFrame>
                   </Section.Media>
                 ) : null}
                 <Section.Content>

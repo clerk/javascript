@@ -3,7 +3,7 @@ import { Badge } from '@clerk/ui/mosaic/components/badge';
 import { Button } from '@clerk/ui/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
 import { Section } from '@clerk/ui/mosaic/components/section';
-import * as stylex from '@stylexjs/stylex';
+import { space } from '@clerk/ui/mosaic/styles';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,32 +11,16 @@ export { default as __source } from './section.stories?raw';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
-const styles = stylex.create({
-  providerMedia: {
-    backgroundColor: 'var(--cl-color-background)',
-    borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
-    borderRadius: 'var(--cl-radius-lg)',
-    borderStyle: 'solid',
-    borderWidth: '1px',
-  },
-  providerIcon: {
-    display: 'block',
-    height: '20px',
-    width: '20px',
-  },
-});
-
-function ProviderIcon({ provider }: { provider: string }) {
+function ProviderMedia({ provider }: { provider: string }) {
   return (
-    <Section.Media
-      size='lg'
-      {...stylex.props(styles.providerMedia)}
-    >
-      <img
-        alt=''
-        src={providerIconUrl(provider)}
-        {...stylex.props(styles.providerIcon)}
-      />
+    <Section.Media size='lg'>
+      <IconFrame>
+        <img
+          alt=''
+          src={providerIconUrl(provider)}
+          style={{ display: 'block', height: space['5'], width: space['5'] }}
+        />
+      </IconFrame>
     </Section.Media>
   );
 }
@@ -308,7 +292,7 @@ export function ConnectedAccounts() {
       <Section.Group>
         <Section.Row>
           <Section.Item>
-            <ProviderIcon provider='google' />
+            <ProviderMedia provider='google' />
             <Section.Content>
               <Section.Label>Google</Section.Label>
               <Section.Description>test@google.com</Section.Description>
@@ -328,7 +312,7 @@ export function ConnectedAccounts() {
         </Section.Row>
         <Section.Row>
           <Section.Item>
-            <ProviderIcon provider='apple' />
+            <ProviderMedia provider='apple' />
             <Section.Content>
               <Section.Label>Apple</Section.Label>
             </Section.Content>
