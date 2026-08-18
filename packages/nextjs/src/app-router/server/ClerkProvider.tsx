@@ -3,6 +3,7 @@ import type { InitialState, Without } from '@clerk/shared/types';
 import React, { Suspense } from 'react';
 
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { keylessMissingEnvVars } from '../../server/errors';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { ClientClerkProvider } from '../client/ClerkProvider';
@@ -52,6 +53,9 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
   ) : undefined;
 
   if (shouldRunAsKeyless) {
+    if (!propsWithEnvs.publishableKey) {
+      throw new Error(keylessMissingEnvVars);
+    }
     return (
       <KeylessProvider
         rest={propsWithEnvs}

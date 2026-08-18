@@ -27,9 +27,11 @@ test.describe('Keyless mode | middleware authorization @nextjs', () => {
     await app.teardown();
   });
 
-  test('auth.protect() in middleware redirects to sign-in during keyless bootstrap', async ({ page }) => {
-    await page.goto(`${app.serverUrl}/protected`);
-    await page.waitForURL(/\/sign-in/);
-    await expect(page.getByTestId('protected')).not.toBeVisible();
+  test('requests without keys fail with the missing env vars error instead of keyless bootstrap', async ({ page }) => {
+    const response = await page.goto(`${app.serverUrl}/protected`);
+    expect(response?.status()).toBe(500);
+    const content = await page.content();
+    expect(content).toContain('Missing environment variables');
+    expect(content).toContain('npx clerk@latest init');
   });
 });

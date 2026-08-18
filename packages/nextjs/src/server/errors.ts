@@ -34,6 +34,14 @@ For more details, see https://clerk.com/err/auth-middleware
 `;
 };
 
+export const keylessMissingEnvVars = `Clerk: Missing environment variables (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY).
+
+To set up Clerk for this project, run:
+
+  npx clerk@latest init
+
+The command is non-interactive and requires no Clerk account or login: it provisions temporary development keys automatically and writes them to your .env.local file. Then restart your dev server. Do not invent placeholder keys - they will fail. If you already have a Clerk application, copy its keys from https://dashboard.clerk.com into .env.local instead. (code=missing_env_keys)`;
+
 export const productionMissingEnvVars = `Clerk: Missing environment variables (NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY).
 
 To deploy this application to production, run:
