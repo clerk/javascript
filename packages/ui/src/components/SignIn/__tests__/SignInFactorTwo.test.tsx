@@ -3,7 +3,7 @@ import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
@@ -43,20 +43,17 @@ describe('SignInFactorTwo', () => {
       await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 500 });
     });
 
-    it('does not navigate to the start card when a setActive completes while it is mounted', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.startSignInFactorTwo();
-      });
-      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-      const { rerender } = render(<SignInFactorTwo />, { wrapper });
-
+    it('does not navigate to the start card when a setActive running on mount restores a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
       fixtures.clerk.__internal_setActiveInProgress = true;
-      fixtures.signIn.status = null;
-      rerender(<SignInFactorTwo />);
+      render(<SignInFactorTwo />, { wrapper });
 
+      fixtures.signIn.status = 'needs_second_factor';
       fixtures.clerk.__internal_setActiveInProgress = false;
-      rerender(<SignInFactorTwo />);
+
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      });
 
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
     });

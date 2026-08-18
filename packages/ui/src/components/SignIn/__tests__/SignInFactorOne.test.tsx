@@ -90,22 +90,17 @@ describe('SignInFactorOne', () => {
       await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 500 });
     });
 
-    it('does not navigate to the start card when a setActive completes while it is mounted', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withPreferredSignInStrategy({ strategy: 'otp' });
-        f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
-      });
-      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-      const { rerender } = render(<SignInFactorOne />, { wrapper });
-
+    it('does not navigate to the start card when a setActive running on mount restores a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
       fixtures.clerk.__internal_setActiveInProgress = true;
-      fixtures.signIn.status = null;
-      rerender(<SignInFactorOne />);
+      render(<SignInFactorOne />, { wrapper });
 
+      fixtures.signIn.status = 'needs_first_factor';
       fixtures.clerk.__internal_setActiveInProgress = false;
-      rerender(<SignInFactorOne />);
+
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      });
 
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
     });
