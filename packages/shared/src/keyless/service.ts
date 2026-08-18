@@ -128,6 +128,8 @@ export interface KeylessService {
    * @param configuredPublishableKey - The publishable key from options or environment
    * @param configuredSecretKey - The secret key from options or environment
    * @returns The resolved keys (either configured or from keyless mode)
+   *
+   * @deprecated Keyless mode is no longer activated by the framework SDKs; kept for older published SDK versions. Remove in the next major.
    */
   resolveKeysWithKeylessFallback: (
     configuredPublishableKey: string | undefined,

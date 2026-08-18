@@ -1,5 +1,8 @@
 import type { AccountlessApplicationJSON } from './JSON';
 
+/**
+ * @deprecated Keyless mode is no longer activated by the framework SDKs. Kept for the claimed-keys migration path and older published SDK versions; remove in the next major.
+ */
 export class AccountlessApplication {
   constructor(
     readonly publishableKey: string,

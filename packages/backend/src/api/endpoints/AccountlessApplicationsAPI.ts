@@ -9,6 +9,9 @@ type AccountlessApplicationParams = {
   source?: string;
 };
 
+/**
+ * @deprecated Keyless mode is no longer activated by the framework SDKs. Kept for the claimed-keys migration path and older published SDK versions; remove in the next major.
+ */
 export class AccountlessApplicationAPI extends AbstractAPI {
   public async createAccountlessApplication(params?: AccountlessApplicationParams): Promise<AccountlessApplication> {
     const headerParams = params?.requestHeaders ? Object.fromEntries(params.requestHeaders.entries()) : undefined;

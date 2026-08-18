@@ -17,6 +17,8 @@ export interface KeylessResult {
  * @param keylessService - The keyless service instance (or null if unavailable)
  * @param canUseKeyless - Whether keyless mode is enabled in the current environment
  * @returns The resolved keys (either configured or from keyless mode)
+ *
+ * @deprecated Keyless mode is no longer activated by the framework SDKs; kept for older published SDK versions. Remove in the next major.
  */
 export async function resolveKeysWithKeylessFallback(
   configuredPublishableKey: string | undefined,

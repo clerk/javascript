@@ -48,6 +48,9 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
   const request = buildRequest(options);
 
   return {
+    /**
+     * @deprecated Keyless mode is no longer activated by the framework SDKs. Kept for the claimed-keys migration path and older published SDK versions; remove in the next major.
+     */
     __experimental_accountlessApplications: new AccountlessApplicationAPI(
       buildRequest({ ...options, requireSecretKey: false }),
     ),
