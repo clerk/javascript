@@ -46,7 +46,7 @@ describe('loadClerkJsScript(options)', () => {
 
   test('throws error when publishableKey is missing', async () => {
     await expect(loadClerkJsScript({} as any)).rejects.toThrow(
-      '@clerk/react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/react: Missing publishableKey. To set up Clerk for this project, run:',
     );
   });
 
@@ -310,7 +310,7 @@ describe('loadClerkUIScript(options)', () => {
 
   test('throws error when publishableKey is missing', async () => {
     await expect(loadClerkUIScript({} as any)).rejects.toThrow(
-      '@clerk/react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/react: Missing publishableKey. To set up Clerk for this project, run:',
     );
   });
 

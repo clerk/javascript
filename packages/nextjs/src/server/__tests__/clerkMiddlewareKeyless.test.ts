@@ -46,15 +46,20 @@ describe('clerkMiddleware when Clerk env vars are missing', () => {
     await expect(runMiddleware({ authorization: 'Bearer mt_xxxxxxxx' })).rejects.toThrow(/npx clerk@latest init/);
   });
 
-  it('falls back to the standard missing-key error when keyless is unavailable', async () => {
+  it('throws the deploy error pointing at the CLI in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
-    await expect(runMiddleware()).rejects.toThrow(/publishableKey/i);
+    await expect(runMiddleware()).rejects.toThrow(/npx clerk@latest deploy/);
+    await expect(runMiddleware()).rejects.toThrow(/\(code=missing_env_keys_production\)/);
   });
 
   it('names both env vars and the CLI command in the message', async () => {
-    const { keylessMissingEnvVars } = await import('../errors.js');
-    expect(keylessMissingEnvVars).toContain('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
-    expect(keylessMissingEnvVars).toContain('CLERK_SECRET_KEY');
+    const { keylessMissingEnvVars, productionMissingEnvVars } = await import('../errors.js');
+    for (const message of [keylessMissingEnvVars, productionMissingEnvVars]) {
+      expect(message).toContain('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
+      expect(message).toContain('CLERK_SECRET_KEY');
+    }
     expect(keylessMissingEnvVars).toContain('npx clerk@latest init');
+    expect(productionMissingEnvVars).toContain('npx clerk@latest deploy');
+    expect(productionMissingEnvVars).toContain('npx clerk@latest env pull --instance prod');
   });
 });

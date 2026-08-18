@@ -24,6 +24,7 @@ import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shar
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isAutoProxyDisabledFromEnvironment, shouldAutoProxy } from '@clerk/shared/proxy';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -37,7 +38,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
-import { keylessMissingEnvVars } from './errors';
+import { keylessMissingEnvVars, productionMissingEnvVars } from './errors';
 import { errorThrower } from './errorThrower';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
@@ -148,13 +149,19 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () =>
-        errorThrower.throwMissingPublishableKeyError(),
-      );
+      const publishableKey = assertKey(resolvedParams.publishableKey || PUBLISHABLE_KEY, () => {
+        if (isDevelopmentEnvironment()) {
+          return errorThrower.throwMissingPublishableKeyError();
+        }
+        throw new Error(productionMissingEnvVars);
+      });
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () =>
-        errorThrower.throwMissingSecretKeyError(),
-      );
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY, () => {
+        if (isDevelopmentEnvironment()) {
+          return errorThrower.throwMissingSecretKeyError();
+        }
+        throw new Error(productionMissingEnvVars);
+      });
 
       // Handle Frontend API proxy requests early, before authentication
       const requestUrl = new URL(request.nextUrl.href);

@@ -22,7 +22,7 @@ describe('ErrorThrower', () => {
 
   it('throws the correct error message and interpolates pkg if no parameters are provided', () => {
     expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
-      '@clerk/test-package: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/test-package: Missing publishableKey. To set up Clerk for this project, run:',
     );
   });
 
