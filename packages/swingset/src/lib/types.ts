@@ -37,6 +37,8 @@ export type KnobValues = Record<string, string | boolean | number>;
 export interface StoryMeta {
   group: string;
   title: string;
+  /** Controls the documentation canvas width. Wide compositions still keep prose at a readable measure. */
+  layout?: 'default' | 'wide';
   /**
    * Optional human-friendly label shown in the sidebar. Falls back to `title` when
    * omitted. Use this when the desired sidebar text differs from the component name

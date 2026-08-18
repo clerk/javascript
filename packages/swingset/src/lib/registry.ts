@@ -96,6 +96,7 @@ import {
   Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
+import { Default as UserPageDefault, meta as userPageMeta } from '../stories/user-page.stories';
 import {
   Default as UserProfileAccountSectionDefault,
   meta as userProfileAccountSectionMeta,
@@ -104,6 +105,11 @@ import {
   Default as UserProfileActiveDevicesSectionDefault,
   meta as userProfileActiveDevicesSectionMeta,
 } from '../stories/user-profile-active-devices-section.stories';
+import {
+  Default as UserProfileApiKeysPanelDefault,
+  Empty as UserProfileApiKeysPanelEmpty,
+  meta as userProfileApiKeysPanelMeta,
+} from '../stories/user-profile-api-keys-panel.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
   Empty as UserProfileBillingHistorySectionEmpty,
@@ -264,6 +270,16 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const userProfileApiKeysPanelModule: StoryModule = {
+  meta: userProfileApiKeysPanelMeta,
+  Default: UserProfileApiKeysPanelDefault,
+  Empty: UserProfileApiKeysPanelEmpty,
+};
+const userPageModule: StoryModule = {
+  meta: userPageMeta,
+  Default: UserPageDefault,
+};
+
 const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
@@ -328,9 +344,11 @@ const userProfileDeleteSectionModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User
   userButtonModule,
+  userPageModule,
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
   userProfileBillingPanelModule,
+  userProfileApiKeysPanelModule,
   userProfileAccountSectionModule,
   userProfilePasswordSectionModule,
   userProfilePasskeysSectionModule,
