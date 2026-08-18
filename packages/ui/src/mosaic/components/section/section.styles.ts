@@ -35,6 +35,9 @@ export const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
+    width: 'auto',
+  },
+  rowDefault: {
     paddingBlockEnd: {
       default: space['4'],
       [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
@@ -45,7 +48,6 @@ export const styles = stylex.create({
       [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['3'],
     },
     minHeight: `calc(${space['18.5']} + 1px)`,
-    width: 'auto',
   },
   rowList: {
     paddingBlock: 0,
