@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.16.7
+
+### Patch Changes
+
+- Fix `Cookie` header parsing in `authenticateRequest()` to follow RFC 6265 and guard against a non-string `iss`. Legitimate cookies and JWTs are unaffected. ([#9466](https://github.com/clerk/javascript/pull/9466)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+
 ## 3.16.6
 
 ### Patch Changes
