@@ -20,6 +20,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
     'user-profile-active-devices-section': dynamic(() => import('../stories/user-profile-active-devices-section.mdx')),
+    'user-profile-billing-history-section': dynamic(
+      () => import('../stories/user-profile-billing-history-section.mdx'),
+    ),
     'user-profile-subscription-section': dynamic(() => import('../stories/user-profile-subscription-section.mdx')),
     'user-profile-payment-methods-section': dynamic(
       () => import('../stories/user-profile-payment-methods-section.mdx'),

@@ -1,4 +1,5 @@
 import type {
+  UserProfileBillingHistoryItem,
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/ui/mosaic/user-profile/user-profile-billing-panel.view';
@@ -29,12 +30,67 @@ const initialPaymentMethods: UserProfilePaymentMethod[] = [
   { id: 'mastercard', label: 'Mastercard •••• 1212', expiryLabel: 'Expires 02/2029' },
 ];
 
+const historyItems: UserProfileBillingHistoryItem[] = [
+  {
+    id: 'stmt_202605_0644',
+    dateLabel: 'May 26, 2026',
+    invoiceLabel: 'stmt_202605_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202606_0644',
+    dateLabel: 'Jun 3, 2026',
+    invoiceLabel: 'stmt_202606_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202607_0644',
+    dateLabel: 'Jun 10, 2026',
+    invoiceLabel: 'stmt_202607_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202608_0644',
+    dateLabel: 'Jun 18, 2026',
+    invoiceLabel: 'stmt_202608_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202609_0644',
+    dateLabel: 'Jul 1, 2026',
+    invoiceLabel: 'stmt_202609_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202610_0644',
+    dateLabel: 'Jul 9, 2026',
+    invoiceLabel: 'stmt_202610_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+  {
+    id: 'stmt_202611_0644',
+    dateLabel: 'Jul 23, 2026',
+    invoiceLabel: 'stmt_202611_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+];
+
 export function Default() {
   const [subscription, setSubscription] = useState(initialSubscription);
   const [paymentMethods, setPaymentMethods] = useState(initialPaymentMethods);
+  const [historyPageSize, setHistoryPageSize] = useState(10);
 
   return (
     <UserProfileBillingPanelView
+      historyItems={historyItems}
+      historyPagination={{ page: 1, pageCount: 1, pageSize: historyPageSize }}
       paymentMethods={paymentMethods}
       subscription={subscription}
       onAddPaymentMethod={() =>
@@ -55,6 +111,8 @@ export function Default() {
         setPaymentMethods(current => current.map(method => ({ ...method, isDefault: method.id === id })))
       }
       onRemovePaymentMethod={id => setPaymentMethods(current => current.filter(method => method.id !== id))}
+      onBillingHistoryPageSizeChange={setHistoryPageSize}
+      onViewInvoice={() => {}}
     />
   );
 }
