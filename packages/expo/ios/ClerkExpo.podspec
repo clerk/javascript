@@ -52,6 +52,7 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkAppDelegateSubscriber.swift",
                    "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",
                    "ClerkAuthNativeView.swift",

@@ -429,6 +429,8 @@ final class ClerkNativeBridge {
   private var lastObservedClientState: ClientStateSnapshot?
   private var configurationDepth = 0
   private var jsOriginatedClientSyncDepth = 0
+  private var pendingURL: URL?
+  private var shouldFlushPendingURL = false
 
   private init() {}
 
@@ -459,6 +461,13 @@ final class ClerkNativeBridge {
     defer {
       lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
       configurationDepth = max(0, configurationDepth - 1)
+
+      // Overlapping calls can finish out of order, so replay once the last one settles and any
+      // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
+      if configurationDepth == 0, shouldFlushPendingURL {
+        shouldFlushPendingURL = false
+        flushPendingURL()
+      }
     }
 
     loadThemes()
@@ -472,6 +481,7 @@ final class ClerkNativeBridge {
       let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
       await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
       Self.postConfiguredNotification()
+      shouldFlushPendingURL = true
       return
     }
 
@@ -486,6 +496,7 @@ final class ClerkNativeBridge {
         _ = try await Clerk.shared.refreshClient()
         await Self.waitForLoadedClient()
       }
+      shouldFlushPendingURL = true
       return
     }
 
@@ -497,6 +508,32 @@ final class ClerkNativeBridge {
     let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
     Self.postConfiguredNotification()
+    shouldFlushPendingURL = true
+  }
+
+  @MainActor
+  private func flushPendingURL() {
+    guard let url = pendingURL else { return }
+    pendingURL = nil
+    handle(url: url)
+  }
+
+  /// `AuthView` only reaches `Clerk.handle(_:)` from `.onOpenURL`, which never fires for a UIKit-hosted controller.
+  @MainActor
+  func handle(url: URL) {
+    // A cold launch delivers the callback before, or partway through, JS calling `configure`.
+    guard Self.clerkConfigured, configurationDepth == 0 else {
+      pendingURL = url
+      return
+    }
+
+    Task { @MainActor in
+      do {
+        try await Clerk.shared.handle(url)
+      } catch {
+        NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
+      }
+    }
   }
 
   @MainActor
