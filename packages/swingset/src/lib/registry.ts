@@ -110,6 +110,10 @@ import {
   meta as userProfileActiveDevicesSectionMeta,
 } from '../stories/user-profile-active-devices-section.stories';
 import {
+  Default as UserProfileBillingPanelDefault,
+  meta as userProfileBillingPanelMeta,
+} from '../stories/user-profile-billing-panel.stories';
+import {
   Default as UserProfileConnectedAccountsSectionDefault,
   meta as userProfileConnectedAccountsSectionMeta,
 } from '../stories/user-profile-connected-accounts-section.stories';
@@ -132,6 +136,11 @@ import {
   meta as userProfilePasswordSectionMeta,
 } from '../stories/user-profile-password-section.stories';
 import {
+  Default as UserProfilePaymentMethodsSectionDefault,
+  Empty as UserProfilePaymentMethodsSectionEmpty,
+  meta as userProfilePaymentMethodsSectionMeta,
+} from '../stories/user-profile-payment-methods-section.stories';
+import {
   Default as UserProfileProfilePanelDefault,
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
@@ -139,6 +148,10 @@ import {
   Default as UserProfileSecurityPanelDefault,
   meta as userProfileSecurityPanelMeta,
 } from '../stories/user-profile-security-panel.stories';
+import {
+  Default as UserProfileSubscriptionSectionDefault,
+  meta as userProfileSubscriptionSectionMeta,
+} from '../stories/user-profile-subscription-section.stories';
 import {
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
@@ -269,6 +282,10 @@ const userProfileSecurityPanelModule: StoryModule = {
   meta: userProfileSecurityPanelMeta,
   Default: UserProfileSecurityPanelDefault,
 };
+const userProfileBillingPanelModule: StoryModule = {
+  meta: userProfileBillingPanelMeta,
+  Default: UserProfileBillingPanelDefault,
+};
 const userProfilePasswordSectionModule: StoryModule = {
   meta: userProfilePasswordSectionMeta,
   Default: UserProfilePasswordSectionDefault,
@@ -286,6 +303,15 @@ const userProfileMfaSectionModule: StoryModule = {
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,
   Default: UserProfileActiveDevicesSectionDefault,
+};
+const userProfileSubscriptionSectionModule: StoryModule = {
+  meta: userProfileSubscriptionSectionMeta,
+  Default: UserProfileSubscriptionSectionDefault,
+};
+const userProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: userProfilePaymentMethodsSectionMeta,
+  Default: UserProfilePaymentMethodsSectionDefault,
+  Empty: UserProfilePaymentMethodsSectionEmpty,
 };
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
@@ -305,11 +331,14 @@ export const registry: StoryModule[] = [
   userButtonModule,
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
+  userProfileBillingPanelModule,
   userProfileAccountSectionModule,
   userProfilePasswordSectionModule,
   userProfilePasskeysSectionModule,
   userProfileMfaSectionModule,
   userProfileActiveDevicesSectionModule,
+  userProfileSubscriptionSectionModule,
+  userProfilePaymentMethodsSectionModule,
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
