@@ -19,13 +19,16 @@ describe('Mosaic Icon', () => {
     expect(svg?.querySelector('path')).not.toBeNull();
   });
 
-  it.each(['security-phone', 'security-lock-square'] as const)('renders the %s glyph on its 18px canvas', name => {
-    const { container } = wrap(<Icon name={name} />);
-    const svg = container.querySelector('svg');
+  it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
+    'renders the %s glyph on its 18px canvas',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+      const svg = container.querySelector('svg');
 
-    expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
-    expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
-  });
+      expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
+      expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
+    },
+  );
 
   it.each([
     ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
