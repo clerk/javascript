@@ -7,6 +7,8 @@ export { default as __source } from './user-profile-delete-section.stories?raw';
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserProfileDeleteSection',
+  label: 'Danger zone',
+  navigation: { family: 'User profile', category: 'Sections', order: 80 },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-delete-section.view.tsx',
 };
 

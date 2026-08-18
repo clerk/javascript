@@ -12,6 +12,8 @@ export { default as __source } from './user-profile-profile-panel.stories?raw';
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserProfileProfilePanel',
+  label: 'Profile panel',
+  navigation: { family: 'User profile', category: 'Compositions', order: 10 },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-profile-panel.view.tsx',
 };
 
