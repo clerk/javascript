@@ -9,10 +9,11 @@ export const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: space['2'],
+    rowGap: space['3'],
     width: '100%',
   },
   title: {
+    color: colorVars['--cl-color-neutral'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
@@ -46,6 +47,11 @@ export const styles = stylex.create({
     minHeight: `calc(${space['18.5']} + 1px)`,
     width: 'auto',
   },
+  rowList: {
+    paddingBlock: 0,
+    rowGap: 0,
+    minHeight: 0,
+  },
   items: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,6 +67,21 @@ export const styles = stylex.create({
   },
   nestedItem: {
     paddingBlock: space['1'],
+  },
+  listHeader: {
+    paddingBlock: space['3'],
+    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndStyle: 'solid',
+    borderBlockEndWidth: '1px',
+  },
+  listItem: {
+    paddingBlock: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '1px',
+      ':first-child': '0px',
+    },
   },
   mediaBase: {
     alignItems: 'center',
