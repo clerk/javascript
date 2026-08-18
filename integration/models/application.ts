@@ -79,6 +79,9 @@ export const application = (
       return state.env;
     },
     withEnv: async (env: EnvironmentConfig) => {
+      console.log(
+        `>>instance-key-usage event=withEnv keyName=${env.instanceKeyName || 'none'} envId=${env.id || 'none'} appName=${name}`,
+      );
       state.env = env;
       return envWriter(appDirPath, env);
     },

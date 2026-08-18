@@ -5,7 +5,9 @@ type EnvironmentVariables = {
 
 export type EnvironmentConfig = {
   get id(): string;
+  get instanceKeyName(): string;
   setId(newId: string): EnvironmentConfig;
+  setInstanceKeyName(newInstanceKeyName: string): EnvironmentConfig;
   setEnvVariable(type: keyof EnvironmentVariables, name: string, value: any): EnvironmentConfig;
   get publicVariables(): EnvironmentVariables['public'];
   get privateVariables(): EnvironmentVariables['private'];
@@ -16,6 +18,7 @@ export type EnvironmentConfig = {
 
 export const environmentConfig = () => {
   let id = '';
+  let instanceKeyName = '';
   const envVars: EnvironmentVariables = {
     public: new Map<string, string>(),
     private: new Map<string, string>(),
@@ -28,6 +31,13 @@ export const environmentConfig = () => {
     },
     get id() {
       return id;
+    },
+    setInstanceKeyName: (newInstanceKeyName: string) => {
+      instanceKeyName = newInstanceKeyName;
+      return self;
+    },
+    get instanceKeyName() {
+      return instanceKeyName;
     },
     setEnvVariable: (type, name, value) => {
       envVars[type].set(name, value);
@@ -51,7 +61,7 @@ export const environmentConfig = () => {
       return self;
     },
     clone: () => {
-      const res = environmentConfig();
+      const res = environmentConfig().setInstanceKeyName(instanceKeyName);
       envVars.private.forEach((v, k) => res.setEnvVariable('private', k, v));
       envVars.public.forEach((v, k) => res.setEnvVariable('public', k, v));
       return res;
