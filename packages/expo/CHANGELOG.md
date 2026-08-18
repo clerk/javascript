@@ -1,5 +1,77 @@
 # Change Log
 
+## 4.5.0
+
+### Minor Changes
+
+- Add iOS and Android APIs for biometric trusted-device enrollment, sign-in, availability, listing, and revocation, including structured native error codes. Trusted-device sign-in synchronizes the JS client before resolving and returns the JS sign-in resource and `setActive()` so apps can continue second-factor, new-password, or client-trust steps. Add `useAuthViewState()` for keeping a non-dismissible root `<AuthView />` mounted through an optional trusted-device enrollment prompt, and support configuring the Face ID permission message through the Expo config plugin. ([#9257](https://github.com/clerk/javascript/pull/9257)) by [@seanperez29](https://github.com/seanperez29)
+
+  ```tsx
+  import { useTrustedDevices } from '@clerk/expo';
+
+  export function useBiometricSignIn(identifierHint: string) {
+    const { enroll, getAvailability, signIn } = useTrustedDevices();
+
+    // Call after the user completes a normal sign-in.
+    const enableBiometricSignIn = () =>
+      enroll({
+        identifierHint,
+        reason: 'Use biometrics to sign in next time.',
+      });
+
+    // Call when the user returns to sign in.
+    const signInWithBiometrics = async () => {
+      const { isAvailable } = await getAvailability({ identifierHint });
+
+      if (!isAvailable) {
+        return null;
+      }
+
+      const result = await signIn({
+        identifierHint,
+        reason: 'Use biometrics to sign in.',
+      });
+
+      // Continue any remaining steps through result.signIn.
+      return result;
+    };
+
+    return { enableBiometricSignIn, signInWithBiometrics };
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.29.2
+
+## 4.4.0
+
+### Minor Changes
+
+- Surface Android Google Sign-In provider failures instead of silently treating them as a cancelled sign-in. ([#9464](https://github.com/clerk/javascript/pull/9464)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Android's Credential Manager reports failures such as an unregistered OAuth client through the same cancellation exception it uses for a dismissed account chooser, so `startGoogleAuthenticationFlow()` resolved with no session and no error. Those failures now reject with a `GOOGLE_SIGN_IN_ERROR`, while dismissing the chooser still resolves with `createdSessionId: null`.
+
+  If you call `startGoogleAuthenticationFlow()` without a `try`/`catch`, add one to handle the rejection.
+
+- Add push-only `customDestinations` to the native `UserProfileView` and `UserButton`, allowing custom profile pages to navigate forward without adding another row to the profile root. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.2` to `1.1.3`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.3. ([#9472](https://github.com/clerk/javascript/pull/9472)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.9` to `1.4.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.0. ([#9473](https://github.com/clerk/javascript/pull/9473)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Preserve native user profile custom pages across tab switches and display their labels as native navigation titles on iOS. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix email link sign-in never completing on iOS. Callback URLs opened by the "Return to App" button are now forwarded to the native SDK, including on a cold launch, so a flow started from `<AuthView />` signs the user in instead of leaving them signed out with no error. ([#9470](https://github.com/clerk/javascript/pull/9470)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
 ## 4.3.0
 
 ### Minor Changes

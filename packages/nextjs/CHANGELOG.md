@@ -1,5 +1,23 @@
 # Change Log
 
+## 7.7.8
+
+### Patch Changes
+
+- Allow Clerk's abuse and fraud protection hosts on all ports in the generated `connect-src` directive. The `contentSecurityPolicy` option previously emitted `https://*.protect.clerk.com`, which matches port 443 only, so requests to those hosts on other ports were blocked by the resulting policy. ([#9458](https://github.com/clerk/javascript/pull/9458)) by [@mwickett](https://github.com/mwickett)
+
+- Updated dependencies [[`4ebcff3`](https://github.com/clerk/javascript/commit/4ebcff39c7a9ba532307e50b8ab673637d9f7540)]:
+  - @clerk/backend@3.16.8
+
+## 7.7.7
+
+### Patch Changes
+
+- Updated dependencies [[`daae528`](https://github.com/clerk/javascript/commit/daae5281dc3babb3e4f93ff05861736c3b784d0e), [`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/backend@3.16.7
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+
 ## 7.7.6
 
 ### Patch Changes
