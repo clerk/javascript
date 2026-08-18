@@ -56,7 +56,10 @@ export function useSignInStepGuard({ redirectStatuses, onLeave }: UseSignInStepG
       return;
     }
 
-    // The flag is not reactive, so wait for the in-flight setActive to settle.
+    // If the setActive that was running on mount never finishes in a way that
+    // closes the signIn, for example when it's unrelated to the signIn process,
+    // or fails, the component could get stuck in a loading state forever.
+    // This timer is there to prevent that.
     const intervalId = setInterval(() => {
       if (clerk.__internal_setActiveInProgress) {
         return;
