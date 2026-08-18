@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +19,7 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
 
 const groups = getSidebarGroups();
@@ -50,7 +50,9 @@ function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: stri
 
   React.useEffect(() => {
     const label = labelRef.current;
-    if (!label) return;
+    if (!label) {
+      return;
+    }
     const check = () => setIsTruncated(label.scrollWidth > label.clientWidth);
     check();
     const observer = new ResizeObserver(check);
