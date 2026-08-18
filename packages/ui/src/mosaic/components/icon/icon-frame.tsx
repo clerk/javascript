@@ -4,7 +4,7 @@ import React from 'react';
 
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../reset.styles';
+import { reset } from '../../utils/reset.styles';
 import { styles } from './icon-frame.styles';
 
 export type IconFrameProps = MosaicComponentProps<'span'>;

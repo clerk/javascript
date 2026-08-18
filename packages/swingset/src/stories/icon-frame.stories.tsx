@@ -1,5 +1,5 @@
 import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { colorVars } from '@clerk/ui/mosaic/styles';
+import { colorVars, space } from '@clerk/ui/mosaic/styles';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -7,12 +7,12 @@ export { default as __source } from './icon-frame.stories?raw';
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
-function ProviderIcon({ provider }: { provider: string }) {
+function ProviderLogo({ provider }: { provider: string }) {
   return (
     <img
       alt=''
       src={providerIconUrl(provider)}
-      style={{ display: 'block', height: 20, objectFit: 'contain', width: 20 }}
+      style={{ display: 'block', height: space['5'], objectFit: 'contain', width: space['5'] }}
     />
   );
 }
@@ -123,10 +123,10 @@ export function BrandIcons() {
   return (
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
       <IconFrame aria-label='Apple'>
-        <ProviderIcon provider='apple' />
+        <ProviderLogo provider='apple' />
       </IconFrame>
       <IconFrame aria-label='GitHub'>
-        <ProviderIcon provider='github' />
+        <ProviderLogo provider='github' />
       </IconFrame>
     </div>
   );
