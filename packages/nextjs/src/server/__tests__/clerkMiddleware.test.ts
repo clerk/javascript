@@ -266,7 +266,7 @@ describe('clerkMiddleware(params)', () => {
   it('propagates middleware dynamic keys to the next request', async () => {
     const options = {
       secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
-      publishableKey: 'pk_test_xxxxxxxxxxxxx',
+      publishableKey: 'pk_test_ZHluYW1pYy1rZXlzLmNsZXJrLmFjY291bnRzLmRldiQ',
       signInUrl: '/foo',
       signUpUrl: '/bar',
     };
@@ -286,7 +286,7 @@ describe('clerkMiddleware(params)', () => {
     it('with synchronous callback', async () => {
       const options = {
         secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
-        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        publishableKey: 'pk_test_ZHluYW1pYy1rZXlzLmNsZXJrLmFjY291bnRzLmRldiQ',
         signInUrl: '/foo',
         signUpUrl: '/bar',
       };
@@ -313,7 +313,7 @@ describe('clerkMiddleware(params)', () => {
     it('with asynchronous callback', async () => {
       const options = {
         secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
-        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        publishableKey: 'pk_test_ZHluYW1pYy1rZXlzLmNsZXJrLmFjY291bnRzLmRldiQ',
         signInUrl: '/foo',
         signUpUrl: '/bar',
       };

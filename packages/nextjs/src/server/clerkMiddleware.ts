@@ -39,7 +39,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
-import { errorThrower } from './errorThrower';
+import { invalidEnvKeys, missingEnvVars } from './errors';
 import { getHeader } from './headers-utils';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -155,12 +155,18 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
-        () => errorThrower.throwMissingPublishableKeyError(),
+        () => {
+          throw new Error(missingEnvVars);
+        },
       );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
-        errorThrower.throwMissingSecretKeyError(),
-      );
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () => {
+        throw new Error(missingEnvVars);
+      });
+
+      if (!parsePublishableKey(publishableKey)) {
+        throw new Error(invalidEnvKeys);
+      }
 
       // Handle Frontend API proxy requests early, before authentication
       const requestUrl = new URL(request.nextUrl.href);
