@@ -23,4 +23,16 @@ describe('UserVerificationEmailLinkVerify', () => {
     screen.getByText('Verification complete');
     screen.getByText('Return to the original tab to continue.');
   });
+
+  it('tells the user to request a new link when the verification link has expired', async () => {
+    window.history.replaceState({}, '', '/account/billing?__clerk_status=expired');
+    const { wrapper } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+
+    render(<UserVerificationEmailLinkVerify />, { wrapper });
+
+    screen.getByText('This verification link has expired');
+    screen.getByText('Return to the original tab and request a new link.');
+  });
 });
