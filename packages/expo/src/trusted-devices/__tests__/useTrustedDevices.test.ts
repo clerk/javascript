@@ -1,3 +1,4 @@
+import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
@@ -20,7 +21,7 @@ const mocks = vi.hoisted(() => ({
     resetPassword: vi.fn(),
   },
   jsSignedInSessions: [{ id: 'sess_123' }],
-  getClerkInstance: vi.fn(),
+  useClerk: vi.fn(),
   setActive: vi.fn(),
   synchronizeNativeClientToJs: vi.fn(),
   nativeModule: {
@@ -32,8 +33,8 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('../../provider/singleton', () => ({
-  getClerkInstance: mocks.getClerkInstance,
+vi.mock('@clerk/react', () => ({
+  useClerk: mocks.useClerk,
 }));
 
 vi.mock('../../utils/native-module', () => ({
@@ -60,13 +61,17 @@ const nativeTrustedDevice = {
   revokedAt: null,
 };
 
+function renderTrustedDevices(useHook = useTrustedDevicesOnIos) {
+  return renderHook(() => useHook()).result.current;
+}
+
 let unregisterNativeToJsSyncHandler: (() => void) | undefined;
 
 beforeEach(() => {
   __internal_resetNativeClientSyncCoordinator();
   unregisterNativeToJsSyncHandler = registerNativeToJsSyncHandler(mocks.synchronizeNativeClientToJs);
   mocks.synchronizeNativeClientToJs.mockResolvedValue(undefined);
-  mocks.getClerkInstance.mockReturnValue({
+  mocks.useClerk.mockReturnValue({
     client: { signIn: mocks.jsSignIn, signedInSessions: mocks.jsSignedInSessions },
     setActive: mocks.setActive,
   });
@@ -94,7 +99,7 @@ describe('useTrustedDevices on iOS', () => {
       unavailableReason: null,
     });
 
-    const trustedDevices = useTrustedDevicesOnIos();
+    const trustedDevices = renderTrustedDevices();
     const availability = await trustedDevices.getAvailability({
       id: 'td_123',
       identifierHint: 'sean@example.com',
@@ -115,7 +120,7 @@ describe('useTrustedDevices on iOS', () => {
       unavailableReason: null,
     });
 
-    const availability = useTrustedDevicesOnIos().getAvailability();
+    const availability = renderTrustedDevices().getAvailability();
     await Promise.resolve();
 
     expect(mocks.nativeModule.getTrustedDeviceAvailability).not.toHaveBeenCalled();
@@ -133,7 +138,7 @@ describe('useTrustedDevices on iOS', () => {
     });
     trackPendingJsToNativeSync(nativeSync);
 
-    const availability = expect(useTrustedDevicesOnIos().getAvailability()).rejects.toMatchObject({
+    const availability = expect(renderTrustedDevices().getAvailability()).rejects.toMatchObject({
       code: 'environment_unavailable',
     });
 
@@ -146,7 +151,7 @@ describe('useTrustedDevices on iOS', () => {
   test('lists trusted devices and converts native timestamps to dates', async () => {
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeTrustedDevice]);
 
-    const [trustedDevice] = await useTrustedDevicesOnIos().list();
+    const [trustedDevice] = await renderTrustedDevices().list();
 
     expect(trustedDevice).toEqual({
       ...nativeTrustedDevice,
@@ -166,7 +171,7 @@ describe('useTrustedDevices on iOS', () => {
       },
     ]);
 
-    const [trustedDevice] = await useTrustedDevicesOnIos().list();
+    const [trustedDevice] = await renderTrustedDevices().list();
 
     expect(trustedDevice.lastUsedAt).toBeNull();
     expect(trustedDevice.revokedAt).toBeNull();
@@ -180,7 +185,7 @@ describe('useTrustedDevices on iOS', () => {
     trackPendingJsToNativeSync(nativeSync);
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeTrustedDevice]);
 
-    const listing = useTrustedDevicesOnIos().list();
+    const listing = renderTrustedDevices().list();
     await Promise.resolve();
 
     expect(mocks.nativeModule.listTrustedDevices).not.toHaveBeenCalled();
@@ -191,13 +196,18 @@ describe('useTrustedDevices on iOS', () => {
   });
 
   test('returns stable operation identities', () => {
-    expect(useTrustedDevicesOnIos()).toBe(useTrustedDevicesOnIos());
+    const { result, rerender } = renderHook(() => useTrustedDevicesOnIos());
+    const initialTrustedDevices = result.current;
+
+    rerender();
+
+    expect(result.current).toBe(initialTrustedDevices);
   });
 
   test('enrolls with the safe default authentication policy', async () => {
     mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeTrustedDevice);
 
-    const trustedDevice = await useTrustedDevicesOnIos().enroll({
+    const trustedDevice = await renderTrustedDevices().enroll({
       deviceName: "Sean's iPhone",
       identifierHint: 'sean@example.com',
       reason: 'Use Face ID to trust this device.',
@@ -220,7 +230,7 @@ describe('useTrustedDevices on iOS', () => {
     trackPendingJsToNativeSync(nativeSync);
     mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeTrustedDevice);
 
-    const enrollment = useTrustedDevicesOnIos().enroll();
+    const enrollment = renderTrustedDevices().enroll();
     await Promise.resolve();
 
     expect(mocks.nativeModule.enrollTrustedDevice).not.toHaveBeenCalled();
@@ -237,7 +247,7 @@ describe('useTrustedDevices on iOS', () => {
       revokedAt: 1_700_000_300_000,
     });
 
-    const trustedDevice = await useTrustedDevicesOnIos().revoke('td_123');
+    const trustedDevice = await renderTrustedDevices().revoke('td_123');
 
     expect(mocks.nativeModule.revokeTrustedDevice).toHaveBeenCalledWith('td_123');
     expect(trustedDevice.status).toBe('revoked');
@@ -255,7 +265,7 @@ describe('useTrustedDevices on iOS', () => {
       status: 'revoked',
     });
 
-    const revocation = useTrustedDevicesOnIos().revoke('td_123');
+    const revocation = renderTrustedDevices().revoke('td_123');
     await Promise.resolve();
 
     expect(mocks.nativeModule.revokeTrustedDevice).not.toHaveBeenCalled();
@@ -272,7 +282,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_123',
     });
 
-    const result = await useTrustedDevicesOnIos().signIn({
+    const result = await renderTrustedDevices().signIn({
       identifierHint: 'sean@example.com',
       reason: 'Use Face ID to sign in.',
     });
@@ -302,7 +312,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_other',
     });
 
-    const result = await useTrustedDevicesOnIos().signIn();
+    const result = await renderTrustedDevices().signIn();
 
     expect(result).toMatchObject({
       status: 'complete',
@@ -323,7 +333,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    const result = await useTrustedDevicesOnIos().signIn();
+    const result = await renderTrustedDevices().signIn();
 
     expect(result).toMatchObject({
       status: 'complete',
@@ -339,7 +349,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_missing',
     });
 
-    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
       'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the created session is missing.',
     );
   });
@@ -356,7 +366,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_123',
     });
 
-    const signIn = useTrustedDevicesOnIos().signIn();
+    const signIn = renderTrustedDevices().signIn();
     await Promise.resolve();
 
     expect(mocks.nativeModule.signInWithTrustedDevice).not.toHaveBeenCalled();
@@ -385,7 +395,7 @@ describe('useTrustedDevices on iOS', () => {
       return Promise.resolve();
     });
 
-    const result = await useTrustedDevicesOnIos().signIn();
+    const result = await renderTrustedDevices().signIn();
 
     expect(result).toMatchObject({
       status,
@@ -409,7 +419,7 @@ describe('useTrustedDevices on iOS', () => {
     );
 
     let didResolve = false;
-    const signIn = useTrustedDevicesOnIos()
+    const signIn = renderTrustedDevices()
       .signIn()
       .then(result => {
         didResolve = true;
@@ -434,22 +444,34 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
       'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the sign-in attempt does not match.',
     );
   });
 
-  test('rejects when the Clerk JS instance is unavailable after synchronization', async () => {
+  test('uses the Clerk instance from the React provider after synchronization', async () => {
+    const providerSetActive = vi.fn();
+    const providerSignIn = {
+      ...mocks.jsSignIn,
+      id: 'sia_provider',
+    };
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
-      id: 'sia_native',
+      id: 'sia_provider',
       status: 'complete',
-      createdSessionId: 'sess_native',
+      createdSessionId: 'sess_provider',
     });
-    mocks.getClerkInstance.mockReturnValueOnce(undefined);
+    mocks.useClerk.mockReturnValue({
+      client: {
+        signIn: providerSignIn,
+        signedInSessions: [{ id: 'sess_provider' }],
+      },
+      setActive: providerSetActive,
+    });
 
-    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the Clerk instance is unavailable.',
-    );
+    const result = await renderTrustedDevices().signIn();
+
+    expect(result.signIn).toBe(providerSignIn);
+    expect(result.setActive).toBe(providerSetActive);
   });
 
   test('rejects when the Clerk JS client is unavailable after synchronization', async () => {
@@ -458,12 +480,12 @@ describe('useTrustedDevices on iOS', () => {
       status: 'complete',
       createdSessionId: 'sess_native',
     });
-    mocks.getClerkInstance.mockReturnValueOnce({
+    mocks.useClerk.mockReturnValue({
       client: undefined,
       setActive: mocks.setActive,
     });
 
-    await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
       'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
     );
   });
@@ -488,7 +510,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    const trustedDevices = useTrustedDevicesOnIos();
+    const trustedDevices = renderTrustedDevices();
     const [device] = await trustedDevices.list();
     const signIn = await trustedDevices.signIn();
 
@@ -506,7 +528,7 @@ describe('useTrustedDevices on iOS', () => {
     });
     mocks.nativeModule.signInWithTrustedDevice.mockRejectedValue(nativeError);
 
-    const operation = useTrustedDevicesOnIos().signIn();
+    const operation = renderTrustedDevices().signIn();
 
     await expect(operation).rejects.toBe(nativeError);
     await operation.catch(error => {
@@ -522,7 +544,7 @@ describe('useTrustedDevices on iOS', () => {
     Object.assign(mocks.nativeModule, { signInWithTrustedDevice: undefined });
 
     try {
-      await expect(useTrustedDevicesOnIos().signIn()).rejects.toThrow(
+      await expect(renderTrustedDevices().signIn()).rejects.toThrow(
         'Biometric trusted devices require a development build containing a compatible version of @clerk/expo.',
       );
     } finally {
@@ -553,7 +575,7 @@ describe('useTrustedDevices on Android', () => {
     });
     mocks.jsSignedInSessions.splice(0, mocks.jsSignedInSessions.length, { id: 'sess_android' });
 
-    const trustedDevices = useTrustedDevicesOnAndroid();
+    const trustedDevices = renderTrustedDevices(useTrustedDevicesOnAndroid);
 
     await expect(trustedDevices.getAvailability({ identifierHint: 'sean@example.com' })).resolves.toEqual({
       isAvailable: true,
