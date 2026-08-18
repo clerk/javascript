@@ -11,6 +11,8 @@ import { ViewSource } from './ViewSource';
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   user: {
+    'user-page': dynamic(() => import('../stories/user-page.mdx')),
+    'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
@@ -96,7 +98,9 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       key={`${group}/${slug}`}
       meta={meta}
     >
-      <article className='prose relative mx-auto w-full min-w-0 max-w-3xl p-8'>
+      <article
+        className={`prose relative mx-auto w-full min-w-0 p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+      >
         {meta?.source ? (
           <div className='absolute right-8 top-8'>
             <ViewSource source={meta.source} />
