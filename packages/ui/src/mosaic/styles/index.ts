@@ -6,6 +6,23 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
+export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
+export type {
+  ConfirmHandle,
+  ConfirmOptions,
+  UseConfirmedCloseOptions,
+  AlertDialogActionsProps,
+  AlertDialogBackdropProps,
+  AlertDialogCloseProps,
+  AlertDialogConfirmProps,
+  AlertDialogDescriptionProps,
+  AlertDialogPopupProps,
+  AlertDialogProps,
+  AlertDialogRootProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+  AlertDialogViewportProps,
+} from '../components/alert-dialog';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
