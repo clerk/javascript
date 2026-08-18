@@ -24,6 +24,7 @@ import {
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath } from '@clerk/backend/proxy';
 import { isProductionFromPublishableKey, parsePublishableKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
+import { isDevelopmentEnvironment } from '@clerk/shared/utils';
 import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import { isAutoProxyDisabledFromEnvironment, shouldAutoProxy } from '@clerk/shared/proxy';
 import { notFound as nextjsNotFound } from 'next/navigation';
@@ -41,6 +42,7 @@ import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_UR
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getHeader } from './headers-utils';
+import { invalidEnvKeys, productionInvalidEnvKeys, productionMissingEnvVars } from './errors';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
@@ -155,12 +157,24 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
-        () => errorThrower.throwMissingPublishableKeyError(),
+        () => {
+          if (isDevelopmentEnvironment()) {
+            return errorThrower.throwMissingPublishableKeyError();
+          }
+          throw new Error(productionMissingEnvVars);
+        },
       );
 
-      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () =>
-        errorThrower.throwMissingSecretKeyError(),
-      );
+      const secretKey = assertKey(resolvedParams.secretKey || SECRET_KEY || keyless?.secretKey, () => {
+        if (isDevelopmentEnvironment()) {
+          return errorThrower.throwMissingSecretKeyError();
+        }
+        throw new Error(productionMissingEnvVars);
+      });
+
+      if (!parsePublishableKey(publishableKey)) {
+        throw new Error(isDevelopmentEnvironment() ? invalidEnvKeys : productionInvalidEnvKeys);
+      }
 
       // Handle Frontend API proxy requests early, before authentication
       const requestUrl = new URL(request.nextUrl.href);
