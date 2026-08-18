@@ -20,7 +20,6 @@ export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
-  onManage?: (id: string) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void;
 }
@@ -37,7 +36,6 @@ export function UserProfileMfaSectionView({
   methods,
   sectionTitle,
   onAdd,
-  onManage,
   onRegenerateBackupCodes,
   onRemove,
 }: UserProfileMfaSectionViewProps) {
@@ -97,13 +95,8 @@ export function UserProfileMfaSectionView({
               onClick: onRegenerateBackupCodes,
             });
           }
-        } else {
-          if (onManage) {
-            actions.push({ label: 'Manage', onClick: () => onManage(method.id) });
-          }
-          if (onRemove) {
-            actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
-          }
+        } else if (onRemove) {
+          actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
         }
 
         return (

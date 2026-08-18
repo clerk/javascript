@@ -177,11 +177,14 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     expect(screen.getByText('Backup codes')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
+    expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
 
+    expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
-    expect(onRemoveMfaMethod).not.toHaveBeenCalled();
   });
 });

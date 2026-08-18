@@ -40,7 +40,6 @@ export function Default() {
           ];
         })
       }
-      onManage={() => undefined}
       onRegenerateBackupCodes={() =>
         setMethods(current =>
           current.map(method => (method.type === 'backup-codes' ? { ...method, description: 'Just now' } : method)),
