@@ -16,7 +16,7 @@ describe('ErrorThrower', () => {
 
   it('throws the correct error message and interpolates pkg and known parameters', () => {
     expect(() => errorThrower.throwInvalidPublishableKeyError({ key: 'whatever' })).toThrow(
-      '@clerk/test-package: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=whatever)',
+      '@clerk/test-package: The publishableKey passed to Clerk is invalid (key=whatever). To create a Clerk application with valid keys, run:',
     );
   });
 

@@ -38,7 +38,7 @@ import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { DOMAIN, PROXY_URL, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
-import { keylessMissingEnvVars, productionMissingEnvVars } from './errors';
+import { invalidEnvKeys, keylessMissingEnvVars, productionInvalidEnvKeys, productionMissingEnvVars } from './errors';
 import { errorThrower } from './errorThrower';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
@@ -162,6 +162,10 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         }
         throw new Error(productionMissingEnvVars);
       });
+
+      if (!parsePublishableKey(publishableKey)) {
+        throw new Error(isDevelopmentEnvironment() ? invalidEnvKeys : productionInvalidEnvKeys);
+      }
 
       // Handle Frontend API proxy requests early, before authentication
       const requestUrl = new URL(request.nextUrl.href);

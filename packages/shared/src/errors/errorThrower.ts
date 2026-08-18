@@ -1,6 +1,10 @@
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
-  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
+  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid (key={{key}}). To create a Clerk application with valid keys, run:
+
+  npx clerk@latest init
+
+Do not invent placeholder keys - they will fail. If you already have a Clerk application, copy its Publishable key from https://dashboard.clerk.com/last-active?path=api-keys instead.`,
   MissingPublishableKeyErrorMessage: `Missing publishableKey. To set up Clerk for this project, run:
 
   npx clerk@latest init
