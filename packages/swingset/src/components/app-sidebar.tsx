@@ -1,9 +1,12 @@
 'use client';
 
+import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Sidebar,
   SidebarContent,
@@ -15,10 +18,58 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { getSidebarGroups } from '@/lib/registry';
 
 const groups = getSidebarGroups();
+
+const COLLAPSED_BY_DEFAULT = new Set(['Primitives', 'Components', 'Styles', 'Hooks']);
+
+function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: string; isActive: boolean }) {
+  const labelRef = React.useRef<HTMLSpanElement>(null);
+  const [isTruncated, setIsTruncated] = React.useState(false);
+
+  React.useEffect(() => {
+    const label = labelRef.current;
+    if (!label) return;
+    const check = () => setIsTruncated(label.scrollWidth > label.clientWidth);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(label);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <SidebarMenuItem>
+      <Tooltip disabled={!isTruncated}>
+        <TooltipTrigger
+          delay={300}
+          render={
+            <SidebarMenuButton
+              className='h-auto py-1 text-xs'
+              isActive={isActive}
+              render={<Link href={href} />}
+            >
+              <span
+                ref={labelRef}
+                className='truncate font-mono text-[10px] leading-relaxed'
+              >
+                {usage}
+              </span>
+            </SidebarMenuButton>
+          }
+        />
+        <TooltipContent
+          side='right'
+          className='font-mono text-[10px]'
+        >
+          {usage}
+        </TooltipContent>
+      </Tooltip>
+    </SidebarMenuItem>
+  );
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -59,45 +110,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className='gap-0'>
         {groups.map(({ group, groupSlug, components }) => (
-          <SidebarGroup
-            key={group}
-            className='py-1'
-            data-section={group}
-          >
-            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-              {group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {components.map(({ mod, componentSlug }) => {
-                  const href = `/${groupSlug}/${componentSlug}`;
-                  // How an entry is USED differs by layer, so the label follows the layer rather
-                  // than a guess at the title: hooks are called, atomic styles are a set of
-                  // exports with no single call form worth privileging, and everything else is a
-                  // component rendered as JSX.
-                  const usage =
-                    mod.meta.group === 'Hooks'
-                      ? `${mod.meta.title}()`
-                      : mod.meta.group === 'Styles'
-                        ? mod.meta.title
-                        : `<${mod.meta.title} />`;
-                  return (
-                    <SidebarMenuItem key={mod.meta.title}>
-                      <SidebarMenuButton
-                        className='h-auto items-start py-1 text-xs leading-relaxed'
-                        isActive={pathname === href}
-                        render={<Link href={href} />}
-                      >
-                        <span className='whitespace-normal! break-all font-mono text-[10px] leading-relaxed'>
-                          {usage}
-                        </span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <React.Fragment key={group}>
+            {group === 'Components' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
+            <Collapsible
+              defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
+              className='group/collapsible'
+            >
+              <SidebarGroup
+                className='py-1'
+                data-section={group}
+              >
+                <SidebarGroupLabel
+                  className='text-sidebar-foreground/50 hover:text-sidebar-foreground/80 h-auto w-full px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'
+                  render={<CollapsibleTrigger />}
+                >
+                  {group}
+                  <ChevronRightIcon className='size-3! ml-auto transition-transform group-data-[open]/collapsible:rotate-90' />
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {components.map(({ mod, componentSlug }) => {
+                        const href = `/${groupSlug}/${componentSlug}`;
+                        // How an entry is USED differs by layer, so the label follows the layer rather
+                        // than a guess at the title: hooks are called, atomic styles are a set of
+                        // exports with no single call form worth privileging, and everything else is a
+                        // component rendered as JSX.
+                        const usage =
+                          mod.meta.group === 'Hooks'
+                            ? `${mod.meta.title}()`
+                            : mod.meta.group === 'Styles'
+                              ? mod.meta.title
+                              : `<${mod.meta.title} />`;
+                        return (
+                          <SidebarUsageItem
+                            key={mod.meta.title}
+                            usage={usage}
+                            href={href}
+                            isActive={pathname === href}
+                          />
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+          </React.Fragment>
         ))}
       </SidebarContent>
       <SidebarRail />

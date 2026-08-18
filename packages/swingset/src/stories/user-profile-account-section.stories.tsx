@@ -5,7 +5,7 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-account-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileAccountSection',
   source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section.view.tsx',
 };
