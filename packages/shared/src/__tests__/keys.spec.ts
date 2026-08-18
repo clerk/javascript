@@ -60,7 +60,7 @@ describe('parsePublishableKey(key)', () => {
   it('throws an error for keys with extra characters after $ when fatal: true', () => {
     expect(() =>
       parsePublishableKey('pk_live_ZmFrZS1jbGVyay1tYWxmb3JtZWQuY2xlcmsuYWNjb3VudHMuZGV2JGV4dHJh', { fatal: true }),
-    ).toThrowError('Publishable key not valid.');
+    ).toThrowError('Publishable key not valid');
   });
 
   it('returns null for keys with multiple $ characters', () => {
@@ -72,18 +72,16 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('throws an error if the key cannot be decoded when fatal: true', () => {
-    expect(() => parsePublishableKey('pk_live_invalid!@#$', { fatal: true })).toThrowError(
-      'Publishable key not valid.',
-    );
+    expect(() => parsePublishableKey('pk_live_invalid!@#$', { fatal: true })).toThrowError('Publishable key not valid');
   });
 
   it('throws an error if the key is not a valid publishable key, when fatal: true', () => {
-    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid.');
+    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid');
   });
 
   it('throws an error if the publishable key is missing, when fatal: true', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
-      'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
+      'Publishable key is missing. To create a Clerk application with valid keys, run:\n\n  npx clerk@latest init',
     );
   });
 
