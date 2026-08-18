@@ -48,7 +48,7 @@ function toTrustedDevice(device: NativeTrustedDevice): TrustedDevice {
 }
 
 function createTrustedDevices(clerk: ReturnType<typeof useClerk>): UseTrustedDevicesReturn {
-  return Object.freeze({
+  return {
     getAvailability: async params => {
       const nativeModule = getNativeModule();
       await waitForPendingJsToNativeSync();
@@ -120,7 +120,7 @@ function createTrustedDevices(clerk: ReturnType<typeof useClerk>): UseTrustedDev
         setActive: clerk.setActive,
       };
     },
-  });
+  };
 }
 
 /**
