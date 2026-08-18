@@ -6,10 +6,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-subscription-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileSubscriptionSection',
   label: 'Subscription',
-  navigation: { family: 'User profile', category: 'Billing sections', order: 10 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-subscription-section.view.tsx',
 };
 

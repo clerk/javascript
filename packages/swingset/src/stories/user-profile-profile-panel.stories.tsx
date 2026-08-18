@@ -10,10 +10,10 @@ const profileImageUrl = 'https://avatars.githubusercontent.com/u/51144033?v=4';
 export { default as __source } from './user-profile-profile-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
-  navigation: { family: 'User profile', category: 'Compositions', order: 10 },
+  navigation: { category: 'Panels' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-profile-panel.view.tsx',
 };
 

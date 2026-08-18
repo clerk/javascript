@@ -11,10 +11,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-billing-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileBillingPanel',
   label: 'Billing panel',
-  navigation: { family: 'User profile', category: 'Compositions', order: 30 },
+  navigation: { category: 'Panels' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-billing-panel.view.tsx',
 };
 

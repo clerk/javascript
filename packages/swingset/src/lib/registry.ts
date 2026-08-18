@@ -353,13 +353,16 @@ const userProfileDeleteSectionModule: StoryModule = {
 };
 
 export const registry: StoryModule[] = [
-  // User
+  // User Button
   userButtonModule,
+  // User Profile
   userPageModule,
+  // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
   userProfileBillingPanelModule,
   userProfileApiKeysPanelModule,
+  // User Profile · Sections
   userProfileAccountSectionModule,
   userProfilePasswordSectionModule,
   userProfilePasskeysSectionModule,

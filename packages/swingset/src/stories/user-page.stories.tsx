@@ -19,11 +19,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-page.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserPage',
   label: 'User page',
   layout: 'wide',
-  navigation: { family: 'User profile', category: 'Compositions', order: 0 },
   source: 'packages/ui/src/mosaic/user-profile/user-page.view.tsx',
 };
 

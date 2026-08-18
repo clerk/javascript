@@ -10,24 +10,26 @@ import { ViewSource } from './ViewSource';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  user: {
-    'user-page': dynamic(() => import('../stories/user-page.mdx')),
-    'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
+  'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
+  },
+  'user-profile': {
+    'user-page': dynamic(() => import('../stories/user-page.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
+    'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
     'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
     'user-profile-active-devices-section': dynamic(() => import('../stories/user-profile-active-devices-section.mdx')),
-    'user-profile-billing-history-section': dynamic(
-      () => import('../stories/user-profile-billing-history-section.mdx'),
-    ),
     'user-profile-subscription-section': dynamic(() => import('../stories/user-profile-subscription-section.mdx')),
     'user-profile-payment-methods-section': dynamic(
       () => import('../stories/user-profile-payment-methods-section.mdx'),
+    ),
+    'user-profile-billing-history-section': dynamic(
+      () => import('../stories/user-profile-billing-history-section.mdx'),
     ),
     'user-profile-connected-accounts-section': dynamic(
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
