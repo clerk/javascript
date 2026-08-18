@@ -87,6 +87,84 @@ describe('OrganizationSwitcher', () => {
       expect(getByText('Test Organization')).toBeInTheDocument();
     });
 
+    it('shows the active organization plan name when enabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Test Organization',
+              id: '1',
+              role: 'admin',
+              permissions: ['org:sys_billing:read'],
+            },
+          ],
+        });
+      });
+
+      props.setProps({ renderPlanBadge: true });
+      fixtures.environment.commerceSettings.billing.organization.enabled = true;
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
+        id: 'sub_1',
+        subscriptionItems: [
+          {
+            id: 'sub_item_1',
+            status: 'active',
+            plan: {
+              name: 'Pro Plan',
+              slug: 'pro-plan',
+              isDefault: false,
+            },
+          },
+        ],
+      } as any);
+
+      const { findByText } = render(<OrganizationSwitcher />, { wrapper });
+      const planName = await findByText('Pro Plan');
+
+      expect(planName.closest('.cl-organizationSwitcherTriggerBadge')).toBeInTheDocument();
+    });
+
+    it('does not show a plan badge when organization billing is disabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Test Organization',
+              id: '1',
+              role: 'admin',
+              permissions: ['org:sys_billing:read'],
+            },
+          ],
+        });
+      });
+
+      props.setProps({ renderPlanBadge: true });
+      fixtures.environment.commerceSettings.billing.organization.enabled = false;
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
+        id: 'sub_1',
+        subscriptionItems: [
+          {
+            id: 'sub_item_1',
+            status: 'active',
+            plan: {
+              name: 'Pro Plan',
+              slug: 'pro-plan',
+              isDefault: false,
+            },
+          },
+        ],
+      } as any);
+
+      const { container } = render(<OrganizationSwitcher />, { wrapper });
+
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(container.querySelector('.cl-badge')).not.toBeInTheDocument();
+    });
+
     it('shows PersonalWorkspacePreview when user has no active organization and hidePersonal is false', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
