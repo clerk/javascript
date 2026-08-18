@@ -5,10 +5,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-delete-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileDeleteSection',
   label: 'Danger zone',
-  navigation: { family: 'User profile', category: 'Sections', order: 80 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-delete-section.view.tsx',
 };
 

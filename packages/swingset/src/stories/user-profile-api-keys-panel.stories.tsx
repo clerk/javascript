@@ -7,10 +7,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-api-keys-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileApiKeysPanel',
   label: 'API keys panel',
-  navigation: { family: 'User profile', category: 'Compositions', order: 40 },
+  navigation: { category: 'Panels' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-api-keys-panel.view.tsx',
 };
 

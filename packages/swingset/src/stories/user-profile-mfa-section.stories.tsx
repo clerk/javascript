@@ -7,10 +7,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-mfa-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileMfaSection',
   label: '2-step verification',
-  navigation: { family: 'User profile', category: 'Sections', order: 40 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-mfa-section.view.tsx',
 };
 

@@ -7,10 +7,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-payment-methods-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfilePaymentMethodsSection',
   label: 'Payment methods',
-  navigation: { family: 'User profile', category: 'Billing sections', order: 20 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-payment-methods-section.view.tsx',
 };
 

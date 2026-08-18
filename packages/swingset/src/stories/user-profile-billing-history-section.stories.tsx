@@ -7,10 +7,10 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './user-profile-billing-history-section.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'User',
+  group: 'User Profile',
   title: 'UserProfileBillingHistorySection',
   label: 'Billing history',
-  navigation: { family: 'User profile', category: 'Billing sections', order: 30 },
+  navigation: { category: 'Sections' },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-billing-history-section.view.tsx',
 };
 
