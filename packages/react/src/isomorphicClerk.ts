@@ -49,6 +49,7 @@ import type {
   ProtectAssertion,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -1592,6 +1593,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
+    }
+  };
+
+  __internal_resumeAfterProtectCheck = async (params?: ResumeAfterProtectCheckParams): Promise<void> => {
+    const callback = () => this.clerkjs?.__internal_resumeAfterProtectCheck(params);
+    if (this.clerkjs && this.loaded) {
+      void callback()?.catch(() => {
+        // Same React 18 strict-mode double-mount caveat as handleRedirectCallback above.
+      });
+    } else {
+      this.premountMethodCalls.set('__internal_resumeAfterProtectCheck', callback);
     }
   };
 

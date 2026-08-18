@@ -90,7 +90,15 @@ function SignInProtectCheckInternal(): JSX.Element | null {
         // must not abort the continuation — the router owns its navigation from here.
         resumeOAuthContinuation: () =>
           __internal_resumeAfterProtectCheck(
-            { ...buildSignInOAuthCallbackParams(ctx), continuation: 'transfer_to_sign_up' },
+            {
+              ...buildSignInOAuthCallbackParams(ctx),
+              continuation: 'transfer_to_sign_up',
+              // Carried for the same reason the social buttons carry it: without it a
+              // completed transfer whose session has a pending task is routed with the
+              // component's base URL rather than its mounted route, which lands on
+              // `#/tasks/...` instead of `#/create/tasks/...` in the combined flow.
+              __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+            },
             navigate,
           ),
       });
