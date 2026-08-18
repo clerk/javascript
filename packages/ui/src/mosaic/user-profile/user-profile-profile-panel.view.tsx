@@ -67,7 +67,7 @@ export function UserProfileProfilePanelView({
         render={props => <h3 {...props} />}
         size='2xl'
       >
-        Profile
+        Account
       </Heading>
       <div {...stylex.props(styles.sections)}>
         <UserProfileAccountSectionView
