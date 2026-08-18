@@ -88,6 +88,29 @@ describe('Section', () => {
     expect(screen.getByTestId('nested-content')).toHaveAttribute('data-nested');
   });
 
+  it('supports a divided list row', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row
+            data-testid='row'
+            variant='list'
+          >
+            <Section.Item>Email</Section.Item>
+            <Section.Items>
+              <Section.Item>one@example.com</Section.Item>
+              <Section.Item>two@example.com</Section.Item>
+            </Section.Items>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    expect(screen.getByTestId('row')).toHaveAttribute('data-variant', 'list');
+    expect(screen.getByText('one@example.com')).toHaveAttribute('data-nested');
+    expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
+  });
+
   it('lets consumer props win and forwards refs and custom elements', () => {
     const rootRef = React.createRef<HTMLElement>();
     const groupRef = React.createRef<HTMLDivElement>();
