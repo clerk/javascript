@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.15.4
+
+### Patch Changes
+
+- Display a proper message when a password is rejected for matching one of the account's identifiers. Previously this error rendered as the incomplete sentence "Your password must contain ." on sign-up, reset password, and the user profile password form. The new message is available under the `unstable__errors.form_password_matches_identifier` localization key, and any password error the UI does not recognize now falls back to the message returned by the API instead of an empty sentence. ([#9453](https://github.com/clerk/javascript/pull/9453)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+
 ## 4.15.3
 
 ### Patch Changes

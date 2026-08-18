@@ -1,5 +1,11 @@
 # @clerk/expo-google-signin
 
+## 1.0.1
+
+### Patch Changes
+
+- Pass the underlying Android Credential Manager message through when a sign-in is cancelled, so `@clerk/expo` can tell a provider failure apart from a dismissed account chooser. Upgrade `@clerk/expo` alongside this and rebuild your native app to get the fix. ([#9464](https://github.com/clerk/javascript/pull/9464)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,15 @@
 # @clerk/astro
 
+## 4.0.14
+
+### Patch Changes
+
+- Remove the Vite `optimizeDeps` target override, which is no longer needed and logged a deprecation warning on Astro 7. ([#9465](https://github.com/clerk/javascript/pull/9465)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`daae528`](https://github.com/clerk/javascript/commit/daae5281dc3babb3e4f93ff05861736c3b784d0e), [`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/backend@3.16.7
+  - @clerk/shared@4.29.2
+
 ## 4.0.13
 
 ### Patch Changes
