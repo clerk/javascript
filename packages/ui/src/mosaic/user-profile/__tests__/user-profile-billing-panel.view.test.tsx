@@ -26,10 +26,21 @@ const paymentMethods = [
   },
 ];
 
+const historyItems = [
+  {
+    id: 'stmt_202605_0644',
+    dateLabel: 'May 26, 2026',
+    invoiceLabel: 'stmt_202605_...us64a',
+    amountLabel: '$25.00',
+    statusLabel: 'Paid',
+  },
+];
+
 function renderView(overrides: Partial<React.ComponentProps<typeof UserProfileBillingPanelView>> = {}) {
   return render(
     <MosaicProvider>
       <UserProfileBillingPanelView
+        historyItems={historyItems}
         paymentMethods={paymentMethods}
         subscription={subscription}
         {...overrides}
@@ -39,7 +50,7 @@ function renderView(overrides: Partial<React.ComponentProps<typeof UserProfileBi
 }
 
 describe('UserProfileBillingPanelView', () => {
-  it('composes subscription and payment methods without history', () => {
+  it('composes subscription, payment methods, and billing history', () => {
     renderView();
 
     expect(screen.getByRole('heading', { level: 3, name: 'Billing' })).toBeInTheDocument();
@@ -49,7 +60,9 @@ describe('UserProfileBillingPanelView', () => {
     expect(screen.getByText('$12.00')).toBeInTheDocument();
     expect(screen.getByText('Visa •••• 0644')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
-    expect(screen.queryByText('History')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 4, name: 'History' })).toBeInTheDocument();
+    expect(screen.getByText('May 26, 2026')).toBeInTheDocument();
+    expect(screen.getByText('Paid')).toBeInTheDocument();
   });
 
   it('forwards subscription and payment method actions', async () => {
@@ -57,6 +70,7 @@ describe('UserProfileBillingPanelView', () => {
     const onAdd = vi.fn();
     const onMakeDefault = vi.fn();
     const onRemove = vi.fn();
+    const onViewInvoice = vi.fn();
     const user = userEvent.setup();
 
     renderView({
@@ -64,6 +78,7 @@ describe('UserProfileBillingPanelView', () => {
       onAddPaymentMethod: onAdd,
       onMakeDefaultPaymentMethod: onMakeDefault,
       onRemovePaymentMethod: onRemove,
+      onViewInvoice,
     });
 
     await user.click(screen.getByRole('button', { name: 'Change plan' }));
@@ -72,11 +87,13 @@ describe('UserProfileBillingPanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Make default' }));
     await user.click(screen.getByRole('button', { name: 'Manage Mastercard •••• 1212' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove payment method' }));
+    await user.click(screen.getByRole('button', { name: 'View' }));
 
     expect(onChangePlan).toHaveBeenCalledOnce();
     expect(onAdd).toHaveBeenCalledOnce();
     expect(onMakeDefault).toHaveBeenCalledWith('mastercard');
     expect(onRemove).toHaveBeenCalledWith('mastercard');
+    expect(onViewInvoice).toHaveBeenCalledWith('stmt_202605_0644');
   });
 
   it('keeps an empty payment method list actionable', () => {
@@ -84,5 +101,25 @@ describe('UserProfileBillingPanelView', () => {
 
     expect(screen.getByText('No payment methods added')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add payment method' })).toBeInTheDocument();
+  });
+
+  it('forwards billing history pagination', async () => {
+    const onPageChange = vi.fn();
+    const onPageSizeChange = vi.fn();
+    const user = userEvent.setup();
+
+    renderView({
+      historyPagination: { page: 2, pageCount: 3, pageSize: 10, pageSizeOptions: [10, 25] },
+      onBillingHistoryPageChange: onPageChange,
+      onBillingHistoryPageSizeChange: onPageSizeChange,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Previous invoice page' }));
+    await user.click(screen.getByRole('button', { name: 'Next invoice page' }));
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Results per page' }), '25');
+
+    expect(onPageChange).toHaveBeenNthCalledWith(1, 1);
+    expect(onPageChange).toHaveBeenNthCalledWith(2, 3);
+    expect(onPageSizeChange).toHaveBeenCalledWith(25);
   });
 });
