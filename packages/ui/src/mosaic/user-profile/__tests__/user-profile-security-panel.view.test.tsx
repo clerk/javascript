@@ -146,6 +146,16 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
+  it('does not render actions for the current device', () => {
+    renderView({
+      onManageDevice: vi.fn(),
+      onSignOutDevice: vi.fn(),
+    });
+
+    expect(screen.queryByRole('button', { name: 'Manage Safari on macOS' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
+  });
+
   it('only shows backup codes with another verification method and only allows regeneration', async () => {
     const onRegenerateBackupCodes = vi.fn();
     const onRemoveMfaMethod = vi.fn();

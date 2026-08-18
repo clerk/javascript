@@ -39,10 +39,7 @@ export function UserProfileActiveDevicesSectionView({
           {currentDevices.length > 0 ? (
             currentDevices.map(device => (
               <Section.Row key={device.id}>
-                <DeviceItem
-                  device={device}
-                  onManage={onManageDevice}
-                />
+                <DeviceItem device={device} />
               </Section.Row>
             ))
           ) : (
