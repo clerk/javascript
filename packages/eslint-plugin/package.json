@@ -73,7 +73,7 @@
     "eslint": "9.31.0",
     "tsdown": "catalog:repo",
     "typescript": "catalog:repo",
-    "vitest": "3.2.4"
+    "vitest": "3.2.7"
   },
   "peerDependencies": {
     "eslint": ">=9"
