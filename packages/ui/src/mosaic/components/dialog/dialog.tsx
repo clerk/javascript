@@ -40,6 +40,14 @@ const DialogSizeContext = React.createContext<DialogSize>('prompt');
  */
 const DialogParentSizeContext = React.createContext<DialogSize>('prompt');
 
+/**
+ * The compound component the popup's dev warnings speak in. `AlertDialog` is composed from these
+ * same parts, so a message hardcoded to `Dialog` would name parts that do not exist at the call
+ * site it is complaining about. Not exported from the folder's `index.ts`: it is how one Mosaic
+ * component wraps another, not something a consumer sets.
+ */
+export const DialogPartNameContext = React.createContext('Dialog');
+
 /** Whether this dialog is a prompt stacked on a prompt — see {@link DialogParentSizeContext}. */
 function useIsStacked() {
   const { isStacked } = useDialogContext();
@@ -264,7 +272,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // Observed through state rather than a plain ref, because the warning has to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog');
+  useAccessibleNameWarning(node, React.useContext(DialogPartNameContext));
   useNestedSizeWarning(isNestedInDialog, size);
 
   const mergedRef = React.useCallback(
@@ -307,7 +315,15 @@ export interface DialogProps extends Pick<
   size?: DialogSize;
 }
 
-function DialogContent({ children }: { children: DialogProps['children'] }) {
+/**
+ * Resolves the render-prop form of `children`. Shared with `AlertDialog`, which offers the same
+ * `close` contract and would otherwise carry a second implementation of it. Not exported from the
+ * folder's `index.ts`, for the same reason as {@link DialogPartNameContext}.
+ *
+ * Routed through the primitive's close funnel, so a controlled consumer's `onOpenChange` sees this
+ * close the same as Escape does — and can decline it.
+ */
+export function DialogContent({ children }: { children: DialogProps['children'] }) {
   const { setOpen } = useDialogContext();
   if (typeof children !== 'function') {
     return <>{children}</>;
