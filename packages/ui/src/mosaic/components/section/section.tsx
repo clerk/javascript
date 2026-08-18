@@ -33,7 +33,7 @@ const mediaSizes = {
 };
 
 const rowVariants = {
-  default: null,
+  default: styles.rowDefault,
   list: styles.rowList,
 };
 
