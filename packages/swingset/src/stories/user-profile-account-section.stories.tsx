@@ -12,6 +12,8 @@ export { default as __source } from './user-profile-account-section.stories?raw'
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserProfileAccountSection',
+  label: 'Account',
+  navigation: { family: 'User profile', category: 'Sections', order: 10 },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-account-section.view.tsx',
 };
 

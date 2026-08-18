@@ -43,6 +43,11 @@ export interface StoryMeta {
    * (which still drives the slug and the `<Title />` tag).
    */
   label?: string;
+  navigation?: {
+    family?: string;
+    category?: string;
+    order?: number;
+  };
   /**
    * Path to the file that exports the documented component, relative to the monorepo
    * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View

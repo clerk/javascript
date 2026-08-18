@@ -17,8 +17,78 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { getSidebarGroups } from '@/lib/registry';
+import type { StoryModule } from '@/lib/types';
 
 const groups = getSidebarGroups();
+
+type SidebarEntry = { mod: StoryModule; componentSlug: string };
+
+function getNavigationFamilies(components: SidebarEntry[]) {
+  const families = new Map<string, Map<string, SidebarEntry[]>>();
+
+  for (const component of components) {
+    const family = component.mod.meta.navigation?.family ?? '';
+    const category = component.mod.meta.navigation?.category ?? '';
+    const categories = families.get(family) ?? new Map<string, SidebarEntry[]>();
+    const entries = categories.get(category) ?? [];
+
+    entries.push(component);
+    categories.set(category, entries);
+    families.set(family, categories);
+  }
+
+  return Array.from(families, ([family, categories]) => ({
+    family,
+    categories: Array.from(categories, ([category, components]) => ({
+      category,
+      components: components.sort(
+        (a, b) =>
+          (a.mod.meta.navigation?.order ?? Number.MAX_SAFE_INTEGER) -
+          (b.mod.meta.navigation?.order ?? Number.MAX_SAFE_INTEGER),
+      ),
+    })),
+  }));
+}
+
+function SidebarEntryLink({
+  entry,
+  groupSlug,
+  pathname,
+}: {
+  entry: SidebarEntry;
+  groupSlug: string;
+  pathname: string;
+}) {
+  const { mod, componentSlug } = entry;
+  const href = `/${groupSlug}/${componentSlug}`;
+  const usage = mod.meta.label
+    ? mod.meta.label
+    : mod.meta.group === 'Hooks'
+      ? `${mod.meta.title}()`
+      : mod.meta.group === 'Styles'
+        ? mod.meta.title
+        : `<${mod.meta.title} />`;
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        className='h-auto items-start py-1 text-xs leading-relaxed'
+        isActive={pathname === href}
+        render={<Link href={href} />}
+      >
+        <span
+          className={
+            mod.meta.label
+              ? 'whitespace-normal text-[11px] leading-relaxed'
+              : 'whitespace-normal! break-all font-mono text-[10px] leading-relaxed'
+          }
+        >
+          {usage}
+        </span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -68,34 +138,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {group}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {components.map(({ mod, componentSlug }) => {
-                  const href = `/${groupSlug}/${componentSlug}`;
-                  // How an entry is USED differs by layer, so the label follows the layer rather
-                  // than a guess at the title: hooks are called, atomic styles are a set of
-                  // exports with no single call form worth privileging, and everything else is a
-                  // component rendered as JSX.
-                  const usage =
-                    mod.meta.group === 'Hooks'
-                      ? `${mod.meta.title}()`
-                      : mod.meta.group === 'Styles'
-                        ? mod.meta.title
-                        : `<${mod.meta.title} />`;
-                  return (
-                    <SidebarMenuItem key={mod.meta.title}>
-                      <SidebarMenuButton
-                        className='h-auto items-start py-1 text-xs leading-relaxed'
-                        isActive={pathname === href}
-                        render={<Link href={href} />}
-                      >
-                        <span className='whitespace-normal! break-all font-mono text-[10px] leading-relaxed'>
-                          {usage}
-                        </span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
+              {getNavigationFamilies(components).map(({ family, categories }) => (
+                <div key={family || group}>
+                  {family ? (
+                    <div className='text-sidebar-foreground/80 px-2 pb-1 pt-3 text-[11px] font-semibold'>{family}</div>
+                  ) : null}
+                  {categories.map(({ category, components }) => (
+                    <div key={category || group}>
+                      {category ? (
+                        <div className='text-sidebar-foreground/45 px-3 pb-1 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
+                          {category}
+                        </div>
+                      ) : null}
+                      <SidebarMenu className={category ? 'px-1' : undefined}>
+                        {components.map(entry => (
+                          <SidebarEntryLink
+                            key={entry.mod.meta.title}
+                            entry={entry}
+                            groupSlug={groupSlug}
+                            pathname={pathname}
+                          />
+                        ))}
+                      </SidebarMenu>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </SidebarGroupContent>
           </SidebarGroup>
         ))}

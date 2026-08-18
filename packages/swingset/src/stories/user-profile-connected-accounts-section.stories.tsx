@@ -7,6 +7,8 @@ export { default as __source } from './user-profile-connected-accounts-section.s
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserProfileConnectedAccountsSection',
+  label: 'Connected accounts',
+  navigation: { family: 'User profile', category: 'Sections', order: 60 },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-connected-accounts-section.view.tsx',
 };
 

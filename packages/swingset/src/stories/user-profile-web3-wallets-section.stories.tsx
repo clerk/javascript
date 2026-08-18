@@ -7,6 +7,8 @@ export { default as __source } from './user-profile-web3-wallets-section.stories
 export const meta: StoryMeta = {
   group: 'User',
   title: 'UserProfileWeb3WalletsSection',
+  label: 'Web3 wallets',
+  navigation: { family: 'User profile', category: 'Sections', order: 70 },
   source: 'packages/ui/src/mosaic/user-profile/user-profile-web3-wallets-section.view.tsx',
 };
 
