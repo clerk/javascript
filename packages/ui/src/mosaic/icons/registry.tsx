@@ -108,6 +108,27 @@ const CreditCard = glyph(
   />,
 );
 
+const UserCircle = glyph(
+  <path
+    d='M11.1786 12.1788C10.4001 11.3023 9.26453 10.75 8 10.75C6.73547 10.75 5.59993 11.3023 4.82141 12.1788M11.1786 12.1788C12.4375 11.2197 13.25 9.70474 13.25 8C13.25 5.10051 10.8995 2.75 8 2.75C5.10051 2.75 2.75 5.10051 2.75 8C2.75 9.70474 3.56251 11.2197 4.82141 12.1788M11.1786 12.1788C10.2963 12.8509 9.19476 13.25 8 13.25C6.80524 13.25 5.7037 12.8509 4.82141 12.1788M9.25 7C9.25 7.69036 8.69036 8.25 8 8.25C7.30964 8.25 6.75 7.69036 6.75 7C6.75 6.30964 7.30964 5.75 8 5.75C8.69036 5.75 9.25 6.30964 9.25 7Z'
+    {...strokeProps}
+  />,
+);
+
+const ShieldCheck = glyph(
+  <path
+    d='M13.25 5.9L8 2.75L2.75 5.9C2.75 5.9 3 12 7.25 13.25M9.75 10.85L11.15 12.25L13.25 8.75'
+    {...strokeProps}
+  />,
+);
+
+const Code = glyph(
+  <path
+    d='M5.25 5.75L2.75 8L5.25 10.25M10.75 5.75L13.25 8L10.75 10.25'
+    {...strokeProps}
+  />,
+);
+
 const SecurityPasskey = glyph(
   <>
     <path
@@ -291,11 +312,13 @@ export const iconRegistry = {
   'chevron-up-down': ChevronUpDown,
   check: Check,
   close: Close,
+  code: Code,
   'credit-card': CreditCard,
   ellipsis: Ellipsis,
   pen: Pen,
   plus: Plus,
   search: Search,
+  'shield-check': ShieldCheck,
   'log-out': LogOut,
   cog: Cog,
   'device-laptop': DeviceLaptop,
@@ -305,6 +328,7 @@ export const iconRegistry = {
   'security-passkey': SecurityPasskey,
   'security-phone': SecurityPhone,
   users: Users,
+  'user-circle': UserCircle,
 } satisfies Record<string, IconComponent>;
 
 export type IconName = keyof typeof iconRegistry;
