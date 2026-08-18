@@ -110,8 +110,9 @@ const sectionHeader = {
  *
  * With `confirmDiscard`, closing it while the field holds anything opens a confirmation stacked on
  * top rather than closing: `panel -> prompt -> prompt`, and the veto is nothing more than a
- * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose — it is
- * what the `AlertDialog` and close-confirmation work is meant to replace.
+ * controlled `open` whose `onOpenChange` declines to commit. Hand-rolled here on purpose, to show
+ * that a veto needs no machinery; `AlertDialog`'s `useConfirmedClose` is the same thing packaged,
+ * and its page has the composed version.
  */
 function AddValueDialog({
   trigger,

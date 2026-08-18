@@ -6,11 +6,15 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 
-export { AlertDialog } from '../components/alert-dialog';
+export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
 export type {
+  ConfirmHandle,
+  ConfirmOptions,
+  UseConfirmedCloseOptions,
   AlertDialogActionsProps,
   AlertDialogBackdropProps,
   AlertDialogCloseProps,
+  AlertDialogConfirmProps,
   AlertDialogDescriptionProps,
   AlertDialogPopupProps,
   AlertDialogProps,
