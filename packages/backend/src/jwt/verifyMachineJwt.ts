@@ -17,6 +17,8 @@ import { TokenType } from '../tokens/tokenTypes';
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
   jwtKey?: string;
   clockSkewInMs?: number;
+  /** When provided, verification additionally requires the token to be scoped for this machine (`mch_...`). */
+  machineId?: string;
 };
 
 /**
@@ -109,8 +111,24 @@ export async function verifyM2MJwt(
     return { data: undefined, tokenType: TokenType.M2MToken, errors: [result.error] };
   }
 
+  const m2mToken = M2MToken.fromJwtPayload(result.payload, options.clockSkewInMs);
+
+  // Mirror the receiver check BAPI enforces on machine-authenticated verification.
+  if (options.machineId && !m2mToken.scopes.includes(options.machineId)) {
+    return {
+      data: undefined,
+      tokenType: TokenType.M2MToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: `M2M token is not scoped for machine "${options.machineId}".`,
+        }),
+      ],
+    };
+  }
+
   return {
-    data: M2MToken.fromJwtPayload(result.payload, options.clockSkewInMs),
+    data: m2mToken,
     tokenType: TokenType.M2MToken,
     errors: undefined,
   };

@@ -679,6 +679,76 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.tokenType).toBe('m2m_token');
     });
 
+    describe('machineId scope enforcement', () => {
+      beforeEach(() => {
+        server.use(
+          http.get(
+            'https://api.clerk.test/v1/jwks',
+            validateHeaders(() => {
+              return HttpResponse.json(mockJwks);
+            }),
+          ),
+        );
+      });
+
+      it('verifies an M2M JWT when machineId is in the token scopes', async () => {
+        const m2mJwt = await createSignedM2MJwt();
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          machineId: 'mch_1xxxxx',
+        });
+
+        expect(result.errors).toBeUndefined();
+        expect(result.tokenType).toBe('m2m_token');
+        expect((result.data as M2MToken).scopes).toContain('mch_1xxxxx');
+      });
+
+      it('rejects an M2M JWT that is not scoped for the provided machineId', async () => {
+        const m2mJwt = await createSignedM2MJwt();
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          machineId: 'mch_not_in_scopes',
+        });
+
+        expect(result.data).toBeUndefined();
+        expect(result.tokenType).toBe('m2m_token');
+        expect(result.errors?.[0].code).toBe('token-invalid');
+        expect(result.errors?.[0].message).toContain('mch_not_in_scopes');
+      });
+
+      it('falls back to aud when the scopes claim is missing', async () => {
+        const { scopes: _scopes, ...payloadWithoutScopes } = mockM2MJwtPayload;
+        const m2mJwt = await createSignedM2MJwt(payloadWithoutScopes as typeof mockM2MJwtPayload);
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          machineId: 'mch_2xxxxx',
+        });
+
+        expect(result.errors).toBeUndefined();
+        expect(result.tokenType).toBe('m2m_token');
+      });
+
+      it('rejects an M2M JWT without any scope claims when machineId is provided', async () => {
+        const { scopes: _scopes, aud: _aud, ...payloadWithoutScopeClaims } = mockM2MJwtPayload;
+        const m2mJwt = await createSignedM2MJwt(payloadWithoutScopeClaims as typeof mockM2MJwtPayload);
+
+        const result = await verifyMachineAuthToken(m2mJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          machineId: 'mch_1xxxxx',
+        });
+
+        expect(result.data).toBeUndefined();
+        expect(result.errors?.[0].code).toBe('token-invalid');
+      });
+    });
+
     describe.each([
       ['session-token', 'cl_B7d4PD111AAA'],
       ['jwt-template', 'cl_B7d4PD222AAA'],
