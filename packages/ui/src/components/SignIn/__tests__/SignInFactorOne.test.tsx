@@ -70,6 +70,66 @@ describe('SignInFactorOne', () => {
       render(<SignInFactorOne />, { wrapper });
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
+
+    it('does not navigate to the start card when it mounts while setActive is in progress', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorOne />, { wrapper });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when a setActive running on mount finishes without restoring a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorOne />, { wrapper });
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 500 });
+    });
+
+    it('does not navigate to the start card when a setActive completes while it is mounted', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+      const { rerender } = render(<SignInFactorOne />, { wrapper });
+
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      fixtures.signIn.status = null;
+      rerender(<SignInFactorOne />);
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+      rerender(<SignInFactorOne />);
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when setActive completes and the sign-in was abandoned', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withMultiSessionMode();
+        f.withEmailAddress();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: false });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+      const { rerender } = render(<SignInFactorOne />, { wrapper });
+
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      rerender(<SignInFactorOne />);
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+      fixtures.signIn.status = 'needs_identifier';
+      rerender(<SignInFactorOne />);
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    });
   });
 
   describe('Submitting', () => {

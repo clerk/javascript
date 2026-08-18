@@ -18,8 +18,77 @@ describe('SignInFactorTwo', () => {
   });
 
   describe('Navigation', () => {
-    //This isn't yet implemented in the component
-    it.todo('navigates to SignInStart component if user lands on SignInFactorTwo page but they should not');
+    it('navigates to SignInStart if the user lands on SignInFactorTwo without a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      render(<SignInFactorTwo />, { wrapper });
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    });
+
+    it('does not navigate to the start card when it mounts while setActive is in progress', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorTwo />, { wrapper });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when a setActive running on mount finishes without restoring a sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      render(<SignInFactorTwo />, { wrapper });
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'), { timeout: 500 });
+    });
+
+    it('does not navigate to the start card when a setActive completes while it is mounted', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInFactorTwo();
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+      const { rerender } = render(<SignInFactorTwo />, { wrapper });
+
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      fixtures.signIn.status = null;
+      rerender(<SignInFactorTwo />);
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+      rerender(<SignInFactorTwo />);
+
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to the start card when setActive completes and the sign-in returned to factor one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withMultiSessionMode();
+        f.startSignInFactorTwo();
+      });
+      fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+      const { rerender } = render(<SignInFactorTwo />, { wrapper });
+
+      fixtures.clerk.__internal_setActiveInProgress = true;
+      rerender(<SignInFactorTwo />);
+
+      fixtures.clerk.__internal_setActiveInProgress = false;
+      fixtures.signIn.status = 'needs_first_factor';
+      rerender(<SignInFactorTwo />);
+
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    });
+
+    it('navigates to afterSignInUrl when already signed in with a reset sign-in', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withMultiSessionMode();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      props.setProps({ forceRedirectUrl: 'https://example.com/after-sign-in' });
+      render(<SignInFactorTwo />, { wrapper });
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('https://example.com/after-sign-in');
+    });
   });
 
   describe('Submitting', () => {
