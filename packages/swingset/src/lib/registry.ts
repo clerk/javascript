@@ -106,6 +106,10 @@ import {
   meta as userProfileAccountSectionMeta,
 } from '../stories/user-profile-account-section.stories';
 import {
+  Default as UserProfileActiveDevicesSectionDefault,
+  meta as userProfileActiveDevicesSectionMeta,
+} from '../stories/user-profile-active-devices-section.stories';
+import {
   Default as UserProfileConnectedAccountsSectionDefault,
   meta as userProfileConnectedAccountsSectionMeta,
 } from '../stories/user-profile-connected-accounts-section.stories';
@@ -114,9 +118,27 @@ import {
   meta as userProfileDeleteSectionMeta,
 } from '../stories/user-profile-delete-section.stories';
 import {
+  Default as UserProfileMfaSectionDefault,
+  Empty as UserProfileMfaSectionEmpty,
+  meta as userProfileMfaSectionMeta,
+} from '../stories/user-profile-mfa-section.stories';
+import {
+  Default as UserProfilePasskeysSectionDefault,
+  Empty as UserProfilePasskeysSectionEmpty,
+  meta as userProfilePasskeysSectionMeta,
+} from '../stories/user-profile-passkeys-section.stories';
+import {
+  Default as UserProfilePasswordSectionDefault,
+  meta as userProfilePasswordSectionMeta,
+} from '../stories/user-profile-password-section.stories';
+import {
   Default as UserProfileProfilePanelDefault,
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileSecurityPanelDefault,
+  meta as userProfileSecurityPanelMeta,
+} from '../stories/user-profile-security-panel.stories';
 import {
   Default as UserProfileWeb3WalletsSectionDefault,
   meta as userProfileWeb3WalletsSectionMeta,
@@ -243,6 +265,28 @@ const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
   Default: UserProfileProfilePanelDefault,
 };
+const userProfileSecurityPanelModule: StoryModule = {
+  meta: userProfileSecurityPanelMeta,
+  Default: UserProfileSecurityPanelDefault,
+};
+const userProfilePasswordSectionModule: StoryModule = {
+  meta: userProfilePasswordSectionMeta,
+  Default: UserProfilePasswordSectionDefault,
+};
+const userProfilePasskeysSectionModule: StoryModule = {
+  meta: userProfilePasskeysSectionMeta,
+  Default: UserProfilePasskeysSectionDefault,
+  Empty: UserProfilePasskeysSectionEmpty,
+};
+const userProfileMfaSectionModule: StoryModule = {
+  meta: userProfileMfaSectionMeta,
+  Default: UserProfileMfaSectionDefault,
+  Empty: UserProfileMfaSectionEmpty,
+};
+const userProfileActiveDevicesSectionModule: StoryModule = {
+  meta: userProfileActiveDevicesSectionMeta,
+  Default: UserProfileActiveDevicesSectionDefault,
+};
 const userProfileConnectedAccountsSectionModule: StoryModule = {
   meta: userProfileConnectedAccountsSectionMeta,
   Default: UserProfileConnectedAccountsSectionDefault,
@@ -260,7 +304,12 @@ export const registry: StoryModule[] = [
   // User
   userButtonModule,
   userProfileProfilePanelModule,
+  userProfileSecurityPanelModule,
   userProfileAccountSectionModule,
+  userProfilePasswordSectionModule,
+  userProfilePasskeysSectionModule,
+  userProfileMfaSectionModule,
+  userProfileActiveDevicesSectionModule,
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
