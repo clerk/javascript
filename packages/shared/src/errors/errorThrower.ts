@@ -1,8 +1,20 @@
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
-  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
-  MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
-  MissingSecretKeyErrorMessage: `Missing secretKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
+  InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid (key={{key}}). To create a Clerk application with valid keys, run:
+
+  npx clerk@latest init
+
+Do not invent placeholder keys - they will fail. If you already have a Clerk application, copy its Publishable key from https://dashboard.clerk.com/last-active?path=api-keys instead.`,
+  MissingPublishableKeyErrorMessage: `Missing publishableKey. To set up Clerk for this project, run:
+
+  npx clerk@latest init
+
+This creates a Clerk application and writes the required keys to your env file. If you already have a Clerk application, copy the keys from https://dashboard.clerk.com/last-active?path=api-keys instead.`,
+  MissingSecretKeyErrorMessage: `Missing secretKey. To set up Clerk for this project, run:
+
+  npx clerk@latest init
+
+This creates a Clerk application and writes the required keys to your env file. If you already have a Clerk application, copy the keys from https://dashboard.clerk.com/last-active?path=api-keys instead.`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
 });
 
