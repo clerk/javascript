@@ -2,6 +2,7 @@ import type { OrganizationPagePanels } from '@clerk/ui/mosaic/organization-profi
 import { OrganizationPageView } from '@clerk/ui/mosaic/organization-profile/organization-page.view';
 import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-general-panel.view';
 import { OrganizationProfileMembersPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-members-panel.view';
+import { OrganizationProfileSecurityPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-security-panel.view';
 import type { OrganizationProfilePanelId } from '@clerk/ui/mosaic/organization-profile/organization-profile-sidebar';
 import { useState } from 'react';
 
@@ -59,7 +60,20 @@ export function Default() {
         onSelectionChange={setSelectedMemberIds}
       />
     ),
-    security: <PlaceholderPanel title='Security' />,
+    security: (
+      <OrganizationProfileSecurityPanelView
+        sso={{
+          connections: [{ id: 'sso', domain: 'clerk.dev', protocol: 'SAML' }],
+          onAdd: () => undefined,
+          onManage: () => undefined,
+        }}
+        verifiedDomains={{
+          domains: [{ id: 'domain', name: 'clerk.dev', enrollmentModeLabel: 'Automatic invitations' }],
+          onAdd: () => undefined,
+          onManage: () => undefined,
+        }}
+      />
+    ),
     billing: <PlaceholderPanel title='Billing' />,
     'api-keys': <PlaceholderPanel title='API Keys' />,
   };

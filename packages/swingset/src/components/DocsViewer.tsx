@@ -14,12 +14,17 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-page': dynamic(() => import('../stories/organization-page.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
     'organization-profile-details-section': dynamic(
       () => import('../stories/organization-profile-details-section.mdx'),
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-members-section': dynamic(
       () => import('../stories/organization-profile-members-section.mdx'),
+    ),
+    'organization-profile-sso-section': dynamic(() => import('../stories/organization-profile-sso-section.mdx')),
+    'organization-profile-verified-domains-section': dynamic(
+      () => import('../stories/organization-profile-verified-domains-section.mdx'),
     ),
   },
   'user-button': {

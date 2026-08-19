@@ -83,6 +83,20 @@ import {
   Empty as OrganizationProfileMembersSectionEmpty,
   meta as organizationProfileMembersSectionMeta,
 } from '../stories/organization-profile-members-section.stories';
+import {
+  Default as OrganizationProfileSecurityPanelDefault,
+  meta as organizationProfileSecurityPanelMeta,
+} from '../stories/organization-profile-security-panel.stories';
+import {
+  Default as OrganizationProfileSsoSectionDefault,
+  Empty as OrganizationProfileSsoSectionEmpty,
+  meta as organizationProfileSsoSectionMeta,
+} from '../stories/organization-profile-sso-section.stories';
+import {
+  Default as OrganizationProfileVerifiedDomainsSectionDefault,
+  Empty as OrganizationProfileVerifiedDomainsSectionEmpty,
+  meta as organizationProfileVerifiedDomainsSectionMeta,
+} from '../stories/organization-profile-verified-domains-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -316,6 +330,10 @@ const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Default: OrganizationProfileMembersPanelDefault,
 };
+const organizationProfileSecurityPanelModule: StoryModule = {
+  meta: organizationProfileSecurityPanelMeta,
+  Default: OrganizationProfileSecurityPanelDefault,
+};
 const organizationProfileDetailsSectionModule: StoryModule = {
   meta: organizationProfileDetailsSectionMeta,
   Default: OrganizationProfileDetailsSectionDefault,
@@ -328,6 +346,16 @@ const organizationProfileMembersSectionModule: StoryModule = {
   meta: organizationProfileMembersSectionMeta,
   Default: OrganizationProfileMembersSectionDefault,
   Empty: OrganizationProfileMembersSectionEmpty,
+};
+const organizationProfileSsoSectionModule: StoryModule = {
+  meta: organizationProfileSsoSectionMeta,
+  Default: OrganizationProfileSsoSectionDefault,
+  Empty: OrganizationProfileSsoSectionEmpty,
+};
+const organizationProfileVerifiedDomainsSectionModule: StoryModule = {
+  meta: organizationProfileVerifiedDomainsSectionMeta,
+  Default: OrganizationProfileVerifiedDomainsSectionDefault,
+  Empty: OrganizationProfileVerifiedDomainsSectionEmpty,
 };
 
 const userProfileApiKeysPanelModule: StoryModule = {
@@ -410,10 +438,13 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
   // Organization Profile · Sections
   organizationProfileDetailsSectionModule,
   organizationProfileDangerSectionModule,
   organizationProfileMembersSectionModule,
+  organizationProfileSsoSectionModule,
+  organizationProfileVerifiedDomainsSectionModule,
   // User Profile
   userPageModule,
   // User Profile · Panels
