@@ -74,6 +74,15 @@ import {
   Default as OrganizationProfileGeneralPanelDefault,
   meta as organizationProfileGeneralPanelMeta,
 } from '../stories/organization-profile-general-panel.stories';
+import {
+  Default as OrganizationProfileMembersPanelDefault,
+  meta as organizationProfileMembersPanelMeta,
+} from '../stories/organization-profile-members-panel.stories';
+import {
+  Default as OrganizationProfileMembersSectionDefault,
+  Empty as OrganizationProfileMembersSectionEmpty,
+  meta as organizationProfileMembersSectionMeta,
+} from '../stories/organization-profile-members-section.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -303,6 +312,10 @@ const organizationProfileGeneralPanelModule: StoryModule = {
   meta: organizationProfileGeneralPanelMeta,
   Default: OrganizationProfileGeneralPanelDefault,
 };
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Default: OrganizationProfileMembersPanelDefault,
+};
 const organizationProfileDetailsSectionModule: StoryModule = {
   meta: organizationProfileDetailsSectionMeta,
   Default: OrganizationProfileDetailsSectionDefault,
@@ -310,6 +323,11 @@ const organizationProfileDetailsSectionModule: StoryModule = {
 const organizationProfileDangerSectionModule: StoryModule = {
   meta: organizationProfileDangerSectionMeta,
   Default: OrganizationProfileDangerSectionDefault,
+};
+const organizationProfileMembersSectionModule: StoryModule = {
+  meta: organizationProfileMembersSectionMeta,
+  Default: OrganizationProfileMembersSectionDefault,
+  Empty: OrganizationProfileMembersSectionEmpty,
 };
 
 const userProfileApiKeysPanelModule: StoryModule = {
@@ -391,9 +409,11 @@ export const registry: StoryModule[] = [
   organizationPageModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileDetailsSectionModule,
   organizationProfileDangerSectionModule,
+  organizationProfileMembersSectionModule,
   // User Profile
   userPageModule,
   // User Profile · Panels

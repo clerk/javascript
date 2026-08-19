@@ -2,8 +2,7 @@ import * as Stories from './organization-page.stories';
 
 # OrganizationPage
 
-The Organization profile shell from the General frame. It owns the organization navigation and composes
-independent panels; the General panel is split into Organization details and Danger zone sections.
+The Organization profile shell. It owns the organization navigation and composes independent panels.
 
 <Story
   name='Default'
@@ -12,6 +11,11 @@ independent panels; the General panel is split into Organization details and Dan
     {
       name: 'General panel',
       href: '/organization-profile/organization-profile-general-panel',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Members panel',
+      href: '/organization-profile/organization-profile-members-panel',
       layer: 'Organization Profile',
     },
   ]}
