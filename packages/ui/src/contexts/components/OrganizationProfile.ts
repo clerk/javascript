@@ -28,6 +28,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isSecurityPageRoot: boolean;
   shouldShowBilling: boolean;
   shouldShowSelfServeSSO: boolean;
+  shouldShowAccessOnboarding: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -62,6 +63,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const shouldShowSelfServeSSO =
     environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
+  const shouldShowAccessOnboarding = Boolean(ctx.__internal_accessOnboarding);
+
   const pages = useMemo(
     () =>
       createOrganizationProfileCustomPages(
@@ -70,8 +73,9 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
         shouldShowBilling,
         environment,
         shouldShowSelfServeSSO,
+        shouldShowAccessOnboarding,
       ),
-    [customPages, shouldShowBilling, shouldShowSelfServeSSO],
+    [customPages, shouldShowBilling, shouldShowSelfServeSSO, shouldShowAccessOnboarding],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -98,5 +102,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
+    shouldShowAccessOnboarding,
   };
 };

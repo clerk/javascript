@@ -49,6 +49,12 @@ const OrganizationSecurityPage = lazy(() =>
   })),
 );
 
+const AccessOnboardingPage = lazy(() =>
+  import(/* webpackChunkName: "op-access-page"*/ './AccessOnboarding/AccessOnboardingPage').then(module => ({
+    default: module.AccessOnboardingPage,
+  })),
+);
+
 type OrganizationProfileRoutesProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
@@ -63,6 +69,7 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
+    shouldShowAccessOnboarding,
     apiKeysProps,
   } = useOrganizationProfileContext();
 
@@ -172,6 +179,19 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
                 <Route index>
                   <Suspense fallback={''}>
                     <OrganizationSecurityPage contentRef={contentRef} />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
+        ) : null}
+        {shouldShowAccessOnboarding ? (
+          <Protect condition={has => has({ permission: 'org:sys_domains:manage' })}>
+            <Route path='organization-access'>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <AccessOnboardingPage />
                   </Suspense>
                 </Route>
               </Switch>

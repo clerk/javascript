@@ -2107,6 +2107,12 @@ export type OrganizationProfileProps = RoutingOptions & {
      */
     hide?: boolean;
   };
+  /**
+   * Shows the Access & onboarding prototype page.
+   *
+   * @internal
+   */
+  __internal_accessOnboarding?: boolean;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps> & {

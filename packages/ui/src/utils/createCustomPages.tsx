@@ -10,7 +10,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared
 
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
-import { Building, Code, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
+import { Building, Code, Connections, CreditCard, ShieldCheck, UserCircle, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -53,10 +53,12 @@ type CreateCustomPagesParams = {
     commerce,
     apiKeys,
     security,
+    accessOnboarding,
   }: {
     commerce: boolean;
     apiKeys: boolean;
     security: boolean;
+    accessOnboarding?: boolean;
   }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
@@ -87,6 +89,7 @@ export const createOrganizationProfileCustomPages = (
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
   shouldShowSelfServeSSO = false,
+  shouldShowAccessOnboarding = false,
 ) => {
   return createCustomPages(
     {
@@ -100,6 +103,7 @@ export const createOrganizationProfileCustomPages = (
     environment,
     true,
     shouldShowSelfServeSSO,
+    shouldShowAccessOnboarding,
   );
 };
 
@@ -110,6 +114,7 @@ const createCustomPages = (
   environment?: EnvironmentResource,
   organization?: boolean,
   shouldShowSelfServeSSO = false,
+  shouldShowAccessOnboarding = false,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
     commerce: organization
@@ -119,6 +124,7 @@ const createCustomPages = (
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
     security: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
+    accessOnboarding: organization ? shouldShowAccessOnboarding : false,
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -329,10 +335,12 @@ const getOrganizationProfileDefaultRoutes = ({
   commerce,
   apiKeys,
   security,
+  accessOnboarding,
 }: {
   commerce: boolean;
   apiKeys: boolean;
   security: boolean;
+  accessOnboarding?: boolean;
 }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
@@ -370,6 +378,15 @@ const getOrganizationProfileDefaultRoutes = ({
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: ShieldCheck,
       path: 'organization-security',
+    });
+  }
+  if (accessOnboarding) {
+    // Prototype page; raw string title, no localization key yet.
+    INITIAL_ROUTES.push({
+      name: 'Access & onboarding',
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.ACCESS,
+      icon: Connections,
+      path: 'organization-access',
     });
   }
 
