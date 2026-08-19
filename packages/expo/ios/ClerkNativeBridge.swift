@@ -961,8 +961,8 @@ final class ClerkNativeBridge {
         logoMaxHeight: logoMaxHeight
       )
       .environment(
-        \.clerkAuthCompletionAction,
-        ClerkAuthCompletionAction { onEvent(.dismissed, [:]) }
+        \.clerkAuthFlowCompletionAction,
+        ClerkAuthFlowCompletionAction { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
