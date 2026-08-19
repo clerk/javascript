@@ -3,6 +3,17 @@ type Message = {
   subject: string;
 };
 
+const isMessage = (value: unknown): value is Message => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '_id' in value &&
+    typeof value._id === 'string' &&
+    'subject' in value &&
+    typeof value.subject === 'string'
+  );
+};
+
 export const createEmailService = () => {
   const cleanEmail = (email: string) => {
     return email.replace(/\+.*@/, '@');
@@ -24,10 +35,14 @@ export const createEmailService = () => {
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
         const res = await fetcher(url);
-        const json = (await res.json()) as unknown as Message[] | { messages?: Message[] };
-        const messages = Array.isArray(json) ? json : (json.messages ?? []);
+        const json: unknown = await res.json();
+        const messages = Array.isArray(json)
+          ? json
+          : typeof json === 'object' && json !== null && 'messages' in json && Array.isArray(json.messages)
+            ? json.messages
+            : [];
         const message = messages[0];
-        if (!message) {
+        if (!isMessage(message)) {
           throw new Error('message not found');
         }
         return message;
