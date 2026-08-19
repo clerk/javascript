@@ -939,6 +939,7 @@ final class ClerkNativeBridge {
 
   // MARK: - Inline View Creation
 
+  @MainActor
   func makeAuthViewController(
     mode: String,
     dismissible: Bool,
