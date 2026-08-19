@@ -20,7 +20,8 @@ test.describe('Keyless mode | middleware authorization @nextjs', () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
