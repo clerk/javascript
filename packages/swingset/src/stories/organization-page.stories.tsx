@@ -1,5 +1,6 @@
 import type { OrganizationPagePanels } from '@clerk/ui/mosaic/organization-profile/organization-page.view';
 import { OrganizationPageView } from '@clerk/ui/mosaic/organization-profile/organization-page.view';
+import { OrganizationProfileBillingPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-billing-panel.view';
 import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-general-panel.view';
 import { OrganizationProfileMembersPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-members-panel.view';
 import { OrganizationProfileSecurityPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-security-panel.view';
@@ -8,7 +9,10 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { invoices } from './organization-profile-invoices-section.stories';
 import { members } from './organization-profile-members-section.stories';
+import { paymentMethods } from './organization-profile-payment-methods-section.stories';
+import { subscription } from './organization-profile-subscription-section.stories';
 
 export { default as __source } from './organization-page.stories?raw';
 
@@ -74,7 +78,25 @@ export function Default() {
         }}
       />
     ),
-    billing: <PlaceholderPanel title='Billing' />,
+    billing: (
+      <OrganizationProfileBillingPanelView
+        invoices={{
+          invoices,
+          pagination: { page: 1, pageCount: 2, pageSize: 10, pageSizeOptions: [10, 25, 50] },
+          onDownloadAll: () => undefined,
+          onPageChange: () => undefined,
+          onPageSizeChange: () => undefined,
+          onView: () => undefined,
+        }}
+        paymentMethods={{ paymentMethods, onAdd: () => undefined, onManage: () => undefined }}
+        subscription={{
+          subscription,
+          onChangePlan: () => undefined,
+          onManagePlan: () => undefined,
+          onManageSeats: () => undefined,
+        }}
+      />
+    ),
     'api-keys': <PlaceholderPanel title='API Keys' />,
   };
 

@@ -13,6 +13,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'organization-profile': {
     'organization-page': dynamic(() => import('../stories/organization-page.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-billing-panel': dynamic(() => import('../stories/organization-profile-billing-panel.mdx')),
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
     'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
     'organization-profile-details-section': dynamic(
@@ -22,7 +23,16 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-members-section': dynamic(
       () => import('../stories/organization-profile-members-section.mdx'),
     ),
+    'organization-profile-invoices-section': dynamic(
+      () => import('../stories/organization-profile-invoices-section.mdx'),
+    ),
+    'organization-profile-payment-methods-section': dynamic(
+      () => import('../stories/organization-profile-payment-methods-section.mdx'),
+    ),
     'organization-profile-sso-section': dynamic(() => import('../stories/organization-profile-sso-section.mdx')),
+    'organization-profile-subscription-section': dynamic(
+      () => import('../stories/organization-profile-subscription-section.mdx'),
+    ),
     'organization-profile-verified-domains-section': dynamic(
       () => import('../stories/organization-profile-verified-domains-section.mdx'),
     ),

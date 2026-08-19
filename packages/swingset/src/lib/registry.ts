@@ -63,6 +63,10 @@ import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../s
 import { meta as menuMeta } from '../stories/menu.stories';
 import { Default as OrganizationPageDefault, meta as organizationPageMeta } from '../stories/organization-page.stories';
 import {
+  Default as OrganizationProfileBillingPanelDefault,
+  meta as organizationProfileBillingPanelMeta,
+} from '../stories/organization-profile-billing-panel.stories';
+import {
   Default as OrganizationProfileDangerSectionDefault,
   meta as organizationProfileDangerSectionMeta,
 } from '../stories/organization-profile-danger-section.stories';
@@ -75,6 +79,11 @@ import {
   meta as organizationProfileGeneralPanelMeta,
 } from '../stories/organization-profile-general-panel.stories';
 import {
+  Default as OrganizationProfileInvoicesSectionDefault,
+  Empty as OrganizationProfileInvoicesSectionEmpty,
+  meta as organizationProfileInvoicesSectionMeta,
+} from '../stories/organization-profile-invoices-section.stories';
+import {
   Default as OrganizationProfileMembersPanelDefault,
   meta as organizationProfileMembersPanelMeta,
 } from '../stories/organization-profile-members-panel.stories';
@@ -84,6 +93,11 @@ import {
   meta as organizationProfileMembersSectionMeta,
 } from '../stories/organization-profile-members-section.stories';
 import {
+  Default as OrganizationProfilePaymentMethodsSectionDefault,
+  Empty as OrganizationProfilePaymentMethodsSectionEmpty,
+  meta as organizationProfilePaymentMethodsSectionMeta,
+} from '../stories/organization-profile-payment-methods-section.stories';
+import {
   Default as OrganizationProfileSecurityPanelDefault,
   meta as organizationProfileSecurityPanelMeta,
 } from '../stories/organization-profile-security-panel.stories';
@@ -92,6 +106,10 @@ import {
   Empty as OrganizationProfileSsoSectionEmpty,
   meta as organizationProfileSsoSectionMeta,
 } from '../stories/organization-profile-sso-section.stories';
+import {
+  Default as OrganizationProfileSubscriptionSectionDefault,
+  meta as organizationProfileSubscriptionSectionMeta,
+} from '../stories/organization-profile-subscription-section.stories';
 import {
   Default as OrganizationProfileVerifiedDomainsSectionDefault,
   Empty as OrganizationProfileVerifiedDomainsSectionEmpty,
@@ -326,6 +344,10 @@ const organizationProfileGeneralPanelModule: StoryModule = {
   meta: organizationProfileGeneralPanelMeta,
   Default: OrganizationProfileGeneralPanelDefault,
 };
+const organizationProfileBillingPanelModule: StoryModule = {
+  meta: organizationProfileBillingPanelMeta,
+  Default: OrganizationProfileBillingPanelDefault,
+};
 const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Default: OrganizationProfileMembersPanelDefault,
@@ -347,10 +369,24 @@ const organizationProfileMembersSectionModule: StoryModule = {
   Default: OrganizationProfileMembersSectionDefault,
   Empty: OrganizationProfileMembersSectionEmpty,
 };
+const organizationProfileInvoicesSectionModule: StoryModule = {
+  meta: organizationProfileInvoicesSectionMeta,
+  Default: OrganizationProfileInvoicesSectionDefault,
+  Empty: OrganizationProfileInvoicesSectionEmpty,
+};
+const organizationProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: organizationProfilePaymentMethodsSectionMeta,
+  Default: OrganizationProfilePaymentMethodsSectionDefault,
+  Empty: OrganizationProfilePaymentMethodsSectionEmpty,
+};
 const organizationProfileSsoSectionModule: StoryModule = {
   meta: organizationProfileSsoSectionMeta,
   Default: OrganizationProfileSsoSectionDefault,
   Empty: OrganizationProfileSsoSectionEmpty,
+};
+const organizationProfileSubscriptionSectionModule: StoryModule = {
+  meta: organizationProfileSubscriptionSectionMeta,
+  Default: OrganizationProfileSubscriptionSectionDefault,
 };
 const organizationProfileVerifiedDomainsSectionModule: StoryModule = {
   meta: organizationProfileVerifiedDomainsSectionMeta,
@@ -439,11 +475,15 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileMembersPanelModule,
   organizationProfileSecurityPanelModule,
+  organizationProfileBillingPanelModule,
   // Organization Profile · Sections
   organizationProfileDetailsSectionModule,
   organizationProfileDangerSectionModule,
+  organizationProfileInvoicesSectionModule,
   organizationProfileMembersSectionModule,
+  organizationProfilePaymentMethodsSectionModule,
   organizationProfileSsoSectionModule,
+  organizationProfileSubscriptionSectionModule,
   organizationProfileVerifiedDomainsSectionModule,
   // User Profile
   userPageModule,
