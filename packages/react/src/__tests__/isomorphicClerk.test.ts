@@ -229,6 +229,19 @@ describe('isomorphicClerk', () => {
     expect(catchSpy).toHaveBeenCalledTimes(1);
   });
 
+  // This wrapper is always defined on IsomorphicClerk, so it cannot itself signal whether the
+  // loaded runtime supports the call. An older clerk-js has no such method, and calling straight
+  // through would throw a TypeError at a host caller instead of doing nothing.
+  it('does nothing when the loaded clerk-js predates __internal_resumeAfterProtectCheck', async () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = { loaded: true } as unknown as BrowserClerk;
+
+    await expect(
+      isomorphicClerk.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' }),
+    ).resolves.toBeUndefined();
+  });
+
   it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
     const signInOrUp = {} as unknown as SignInResource;
     const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };

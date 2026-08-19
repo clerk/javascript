@@ -1602,8 +1602,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   ): Promise<void> => {
     // Caught inside `callback` so the queued arm carries it too: replayInterceptedInvocations
     // discards what its callbacks return, leaving a rejection there with nobody to reach.
-    const callback = () =>
-      void this.clerkjs?.__internal_resumeAfterProtectCheck(params, customNavigate)?.catch(() => {});
+    // Presence-checked like __internal_windowNavigate above: this wrapper always exists, but an
+    // older clerk-js has no such method, and calling straight through would throw rather than
+    // no-op. The prebuilt UI never reaches this path -- clerk-js hands it the real Clerk.
+    const callback = () => {
+      const clerkjs = this.clerkjs;
+      if (typeof clerkjs?.__internal_resumeAfterProtectCheck !== 'function') {
+        return;
+      }
+      void clerkjs.__internal_resumeAfterProtectCheck(params, customNavigate)?.catch(() => {});
+    };
     if (this.clerkjs && this.loaded) {
       callback();
     } else {

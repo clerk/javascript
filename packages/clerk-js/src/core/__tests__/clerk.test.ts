@@ -1993,7 +1993,9 @@ describe('Clerk singleton', () => {
         await waitFor(() =>
           expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
         );
-        expect(mockNavigate).not.toHaveBeenCalledWith(expect.stringContaining('protect-check'), expect.anything());
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
       });
 
       it('does not bounce back into the challenge when a stale gate is still on the resource', async () => {
@@ -2028,7 +2030,9 @@ describe('Clerk singleton', () => {
         await waitFor(() =>
           expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
         );
-        expect(mockNavigate).not.toHaveBeenCalledWith(expect.stringContaining('protect-check'), expect.anything());
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
       });
 
       it('still honours transferable: false', async () => {
