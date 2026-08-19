@@ -1,8 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import React from 'react';
 
-import { styles } from '../profile-page.styles';
-import { mergeStyleProps, themeProps } from '../props';
+import type { ProfilePageRootProps } from '../profile-page';
+import { ProfilePage } from '../profile-page';
 import type { OrganizationProfileApiKeysPanelViewProps } from './organization-profile-api-keys-panel.view';
 import { OrganizationProfileApiKeysPanelView } from './organization-profile-api-keys-panel.view';
 import type { OrganizationProfileBillingPanelViewProps } from './organization-profile-billing-panel.view';
@@ -24,7 +23,7 @@ export interface OrganizationPagePanels {
   apiKeys?: OrganizationProfileApiKeysPanelViewProps;
 }
 
-export interface OrganizationPageViewProps {
+export interface OrganizationPageViewProps extends Omit<ProfilePageRootProps, 'children' | 'value' | 'onValueChange'> {
   activePanel: OrganizationProfilePanelId;
   panels: OrganizationPagePanels;
   onPanelChange: (panel: OrganizationProfilePanelId) => void;
@@ -41,7 +40,13 @@ function getAvailablePanels(panels: OrganizationPagePanels): OrganizationProfile
   ];
 }
 
-function Panel({ panel, panels }: { panel: OrganizationProfilePanelId; panels: OrganizationPagePanels }): ReactElement {
+function Panel({
+  panel,
+  panels,
+}: {
+  panel: OrganizationProfilePanelId;
+  panels: OrganizationPagePanels;
+}): React.ReactElement {
   switch (panel) {
     case 'members':
       return panels.members ? (
@@ -72,31 +77,48 @@ function Panel({ panel, panels }: { panel: OrganizationProfilePanelId; panels: O
   }
 }
 
-export function OrganizationPageView({
-  activePanel,
-  panels,
-  onPanelChange,
-  renderBranding = true,
-}: OrganizationPageViewProps): ReactElement {
-  const availablePanels = getAvailablePanels(panels);
-  const resolvedPanel = availablePanels.includes(activePanel) ? activePanel : 'general';
+export const OrganizationPageView = React.forwardRef<HTMLDivElement, OrganizationPageViewProps>(
+  function OrganizationPageView(
+    { activePanel, panels, onPanelChange, renderBranding = true, render, className, style, ...rest },
+    ref,
+  ) {
+    const availablePanels = getAvailablePanels(panels);
+    const resolvedPanel = availablePanels.includes(activePanel) ? activePanel : 'general';
+    const handlePanelChange = (value: string) => {
+      const panel = availablePanels.find(candidate => candidate === value);
+      if (panel) {
+        onPanelChange(panel);
+      }
+    };
 
-  return (
-    <div {...mergeStyleProps(themeProps('organization-page'), stylex.props(styles.root))}>
-      <OrganizationProfileSidebar
-        activePanel={resolvedPanel}
-        panels={availablePanels}
-        renderBranding={renderBranding}
-        onPanelChange={onPanelChange}
-      />
-      <main {...stylex.props(styles.main)}>
-        <div {...stylex.props(styles.content)}>
-          <Panel
-            panel={resolvedPanel}
-            panels={panels}
-          />
-        </div>
-      </main>
-    </div>
-  );
-}
+    return (
+      <ProfilePage.Root
+        ref={ref}
+        value={resolvedPanel}
+        onValueChange={handlePanelChange}
+        render={render}
+        className={className}
+        style={style}
+        {...rest}
+      >
+        <OrganizationProfileSidebar
+          panels={availablePanels}
+          renderBranding={renderBranding}
+        />
+        <ProfilePage.Content>
+          {availablePanels.map(panel => (
+            <ProfilePage.Panel
+              key={panel}
+              value={panel}
+            >
+              <Panel
+                panel={panel}
+                panels={panels}
+              />
+            </ProfilePage.Panel>
+          ))}
+        </ProfilePage.Content>
+      </ProfilePage.Root>
+    );
+  },
+);

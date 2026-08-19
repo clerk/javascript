@@ -30,9 +30,15 @@ describe('OrganizationPageView', () => {
     renderView();
 
     expect(screen.getByRole('navigation', { name: 'Organization profile' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'General' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Members' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Security' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
+    const generalTab = screen.getByRole('tab', { name: 'General' });
+    const generalPanel = screen.getByRole('tabpanel');
+
+    expect(generalTab).toHaveAttribute('aria-selected', 'true');
+    expect(generalTab).toHaveAttribute('aria-controls', generalPanel.id);
+    expect(screen.getByRole('tab', { name: 'Members' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Security' })).not.toBeInTheDocument();
+    expect(generalPanel).toHaveAccessibleName('General');
     expect(screen.getByRole('heading', { level: 3, name: 'General' })).toBeInTheDocument();
     expect(screen.getByText('Secured by')).toBeInTheDocument();
   });
@@ -42,8 +48,20 @@ describe('OrganizationPageView', () => {
     const user = userEvent.setup();
     renderView({ onPanelChange });
 
-    await user.click(screen.getByRole('button', { name: 'Members' }));
+    await user.click(screen.getByRole('tab', { name: 'Members' }));
 
+    expect(onPanelChange).toHaveBeenCalledWith('members');
+  });
+
+  it('supports sidebar keyboard navigation through the tabs primitive', async () => {
+    const onPanelChange = vi.fn();
+    const user = userEvent.setup();
+    renderView({ onPanelChange });
+
+    screen.getByRole('tab', { name: 'General' }).focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('tab', { name: 'Members' })).toHaveFocus();
     expect(onPanelChange).toHaveBeenCalledWith('members');
   });
 
@@ -57,7 +75,7 @@ describe('OrganizationPageView', () => {
   it('falls back to General when the requested panel is unavailable', () => {
     renderView({ activePanel: 'billing', panels: { general } });
 
-    expect(screen.getByRole('button', { name: 'General' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('heading', { level: 3, name: 'General' })).toBeInTheDocument();
   });
 

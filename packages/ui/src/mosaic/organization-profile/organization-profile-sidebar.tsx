@@ -1,12 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import React from 'react';
 
-import { ClerkLogo } from '../components/clerk-logo';
-import { Icon } from '../components/icon';
-import { reset } from '../components/reset.styles';
 import type { IconName } from '../icons/registry';
-import { styles } from '../profile-page.styles';
-import { mergeStyleProps, themeProps } from '../props';
+import type { ProfilePageSidebarProps } from '../profile-page';
+import { ProfilePage } from '../profile-page';
 
 export type OrganizationProfilePanelId = 'general' | 'members' | 'security' | 'billing' | 'api-keys';
 
@@ -18,61 +14,20 @@ const destinations: Record<OrganizationProfilePanelId, { label: string; icon: Ic
   'api-keys': { label: 'API Keys', icon: 'code' },
 };
 
-export interface OrganizationProfileSidebarProps {
-  activePanel: OrganizationProfilePanelId;
+export interface OrganizationProfileSidebarProps extends Omit<ProfilePageSidebarProps, 'items' | 'navigationLabel'> {
   panels: readonly OrganizationProfilePanelId[];
-  onPanelChange: (panel: OrganizationProfilePanelId) => void;
   renderBranding?: boolean;
 }
 
-export function OrganizationProfileSidebar({
-  activePanel,
-  panels,
-  onPanelChange,
-  renderBranding = true,
-}: OrganizationProfileSidebarProps): ReactElement {
-  return (
-    <aside {...mergeStyleProps(themeProps('organization-profile-sidebar'), stylex.props(reset.base, styles.sidebar))}>
-      <nav
-        aria-label='Organization profile'
-        {...stylex.props(reset.base, styles.navigation)}
-      >
-        {panels.map(panel => {
-          const destination = destinations[panel];
-          const active = panel === activePanel;
-
-          return (
-            <button
-              key={panel}
-              aria-current={active ? 'page' : undefined}
-              type='button'
-              {...stylex.props(reset.base, styles.navigationItem, active && styles.navigationItemActive)}
-              onClick={() => onPanelChange(panel)}
-            >
-              <Icon
-                aria-hidden
-                name={destination.icon}
-                size='sm'
-              />
-              <span>{destination.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-      {renderBranding ? (
-        <div {...stylex.props(reset.base, styles.branding)}>
-          <span>Secured by</span>
-          <a
-            aria-label='Clerk'
-            href='https://go.clerk.com/components'
-            rel='noopener noreferrer'
-            target='_blank'
-            {...stylex.props(reset.base, styles.brandingLink)}
-          >
-            <ClerkLogo height={12} />
-          </a>
-        </div>
-      ) : null}
-    </aside>
-  );
-}
+export const OrganizationProfileSidebar = React.forwardRef<HTMLElement, OrganizationProfileSidebarProps>(
+  function OrganizationProfileSidebar({ panels, ...rest }, ref) {
+    return (
+      <ProfilePage.Sidebar
+        ref={ref}
+        items={panels.map(value => ({ value, ...destinations[value] }))}
+        navigationLabel='Organization profile'
+        {...rest}
+      />
+    );
+  },
+);
