@@ -23,15 +23,23 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
   const { navigate } = useRouter();
   const card = useCardState();
 
-  // Held in a ref, not a local: the cleanup below runs long before the async `.catch` assigns it,
-  // so a superseded run's bounce would otherwise never be cleared and could yank the user back.
   const bounceTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   React.useEffect(() => {
+    // Cleanup runs while `handleRedirectCallback` is still pending, so a superseded run's `.catch`
+    // fires AFTER it. Clearing a stored id cannot help -- the stale timer does not exist yet. The
+    // run has to know it was superseded and decline to schedule at all, or its bounce pulls the
+    // user off the route the newer run just reached.
+    let cancelled = false;
+
     if (__internal_setActiveInProgress !== true) {
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {
+        if (cancelled) {
+          return;
+        }
+
         // Schedule the bounce FIRST, and never let the error reporting escape this handler.
         //
         // `handleError` re-throws anything it does not recognise, and the callback's own
@@ -50,7 +58,10 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
       });
     }
 
-    return () => clearTimeout(bounceTimeoutRef.current);
+    return () => {
+      cancelled = true;
+      clearTimeout(bounceTimeoutRef.current);
+    };
   }, [handleError, handleRedirectCallback]);
 
   return (
