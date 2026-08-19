@@ -34,9 +34,12 @@ export const createEmailService = () => {
     }
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 7; attempt++) {
       try {
         const res = await fetcher(url);
+        if (!res.ok) {
+          throw new Error(`Email inbox request failed with status ${res.status}`);
+        }
         const json: unknown = await res.json();
         const messages = Array.isArray(json)
           ? json
@@ -49,7 +52,7 @@ export const createEmailService = () => {
         }
         return message;
       } catch (error) {
-        if (attempt === 4) {
+        if (attempt === 6) {
           throw error;
         }
         await new Promise(res => setTimeout(res, 750 * 2 ** attempt));
