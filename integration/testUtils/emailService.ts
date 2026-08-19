@@ -1,7 +1,7 @@
 type Message = {
   _id: string;
+  originalInbox: string;
   subject: string;
-  to: Array<{ address: string }>;
 };
 
 const isMessage = (value: unknown): value is Message => {
@@ -10,17 +10,10 @@ const isMessage = (value: unknown): value is Message => {
     value !== null &&
     '_id' in value &&
     typeof value._id === 'string' &&
+    'originalInbox' in value &&
+    typeof value.originalInbox === 'string' &&
     'subject' in value &&
-    typeof value.subject === 'string' &&
-    'to' in value &&
-    Array.isArray(value.to) &&
-    value.to.every(
-      recipient =>
-        typeof recipient === 'object' &&
-        recipient !== null &&
-        'address' in recipient &&
-        typeof recipient.address === 'string',
-    )
+    typeof value.subject === 'string'
   );
 };
 
@@ -52,7 +45,7 @@ export const createEmailService = () => {
         const message = messages.find(
           value =>
             isMessage(value) &&
-            value.to.some(recipient => recipient.address.toLowerCase() === normalizedEmail) &&
+            value.originalInbox.toLowerCase() === normalizedEmail &&
             (!normalizedSubject || value.subject.toLowerCase().includes(normalizedSubject)),
         );
         if (!message) {
