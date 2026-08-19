@@ -106,6 +106,8 @@ export type {
 
 export { OrganizationPageView } from '../organization-profile/organization-page.view';
 export type { OrganizationPagePanels, OrganizationPageViewProps } from '../organization-profile/organization-page.view';
+export { OrganizationProfileApiKeysPanelView } from '../organization-profile/organization-profile-api-keys-panel.view';
+export type { OrganizationProfileApiKeysPanelViewProps } from '../organization-profile/organization-profile-api-keys-panel.view';
 export { OrganizationProfileApiKeysSectionView } from '../organization-profile/organization-profile-api-keys-section.view';
 export type {
   OrganizationProfileApiKey,
