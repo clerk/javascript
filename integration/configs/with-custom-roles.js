@@ -32,6 +32,7 @@ export default defineConfig({
     },
     organization_settings: {
       enabled: true,
+      force_organization_selection: false,
       max_allowed_memberships: 5,
       organization_creation_defaults: {
         detect_from_email_domain: {
