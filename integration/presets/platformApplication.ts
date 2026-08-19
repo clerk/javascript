@@ -72,7 +72,7 @@ export const createApplicationFromConfig = async (
   const createResponse = await platformApiRequest(platformApiKey, createUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: applicationName, from_source: 'cli' }),
+    body: JSON.stringify({ name: applicationName, from_source: 'javascript_e2e' }),
   });
   const created = (await createResponse.json()) as { application_id?: string };
 
