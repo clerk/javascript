@@ -58,6 +58,7 @@ export function OrganizationProfileSsoSectionView({
             <Section.Items>
               {connections.map(connection => (
                 <Section.Item key={connection.id}>
+                  {/* TODO: Temporary provider-media frame; replace with Mosaic IconFrame while preserving image and fallback icons. */}
                   <Section.Media
                     size='lg'
                     {...stylex.props(styles.iconFrame)}

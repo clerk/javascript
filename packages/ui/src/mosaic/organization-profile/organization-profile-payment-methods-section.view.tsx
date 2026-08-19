@@ -57,6 +57,7 @@ export function OrganizationProfilePaymentMethodsSectionView({
             {paymentMethods.length > 0 ? (
               paymentMethods.map(paymentMethod => (
                 <Section.Item key={paymentMethod.id}>
+                  {/* TODO: Temporary provider-media frame; replace with Mosaic IconFrame while preserving image and fallback icons. */}
                   <Section.Media
                     size='lg'
                     {...stylex.props(styles.iconFrame)}

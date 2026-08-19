@@ -59,6 +59,7 @@ export function OrganizationProfileVerifiedDomainsSectionView({
             <Section.Items>
               {domains.map(domain => (
                 <Section.Item key={domain.id}>
+                  {/* TODO: Temporary provider-media frame; replace with Mosaic IconFrame while preserving image and fallback icons. */}
                   <Section.Media
                     size='lg'
                     {...stylex.props(styles.iconFrame)}
