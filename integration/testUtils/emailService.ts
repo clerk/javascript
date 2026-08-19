@@ -1,7 +1,18 @@
 type Message = {
   _id: string;
+  links: string[];
   subject: string;
 };
+
+type InboxPageData = {
+  props?: {
+    pageProps?: {
+      seedInboxMessages?: unknown[];
+    };
+  };
+};
+
+const consumedMessageIds = new Set<string>();
 
 function isMessage(value: unknown): value is Message {
   return (
@@ -9,47 +20,43 @@ function isMessage(value: unknown): value is Message {
     value !== null &&
     '_id' in value &&
     typeof value._id === 'string' &&
+    'links' in value &&
+    Array.isArray(value.links) &&
+    value.links.every(link => typeof link === 'string') &&
     'subject' in value &&
     typeof value.subject === 'string'
   );
 }
 
 export const createEmailService = () => {
-  const cleanEmail = (email: string) => {
-    return email.replace(/\+.*@/, '@');
-  };
-
-  const fetcher = async (url: string | URL, init?: RequestInit) => {
-    const headers = new Headers(init?.headers || {});
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    headers.set('Mailsac-Key', process.env.MAILSAC_API_KEY as string);
-    return fetch(url, { ...init, headers });
-  };
-
   const filterMessagesByAddress = async (email: string, sub?: string) => {
-    const url = new URL('https://mailsac.com/api/inbox-filter');
-    url.searchParams.set('andTo', email);
-    if (sub) {
-      url.searchParams.set('andSubjectIncludes', sub);
-    }
+    const url = new URL(`https://mailsac.com/inbox/${encodeURIComponent(email)}`);
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
     for (let attempt = 0; attempt < 7; attempt++) {
       try {
-        const res = await fetcher(url);
+        const res = await fetch(url);
         if (!res.ok) {
           throw new Error(`Email inbox request failed with status ${res.status}`);
         }
-        const json: unknown = await res.json();
-        const messages = Array.isArray(json)
-          ? json
-          : typeof json === 'object' && json !== null && 'messages' in json && Array.isArray(json.messages)
-            ? json.messages
-            : [];
-        const message = messages.find(isMessage);
+        const html = await res.text();
+        const nextData = html.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s)?.[1];
+        if (!nextData) {
+          throw new Error('email inbox data not found');
+        }
+        const json = JSON.parse(nextData) as InboxPageData;
+        const messages = json.props?.pageProps?.seedInboxMessages ?? [];
+        const normalizedSubject = sub?.toLowerCase();
+        const message = messages.find(
+          value =>
+            isMessage(value) &&
+            !consumedMessageIds.has(value._id) &&
+            (!normalizedSubject || value.subject.toLowerCase().includes(normalizedSubject)),
+        );
         if (!message) {
           throw new Error('message not found');
         }
+        consumedMessageIds.add(message._id);
         return message;
       } catch (error) {
         if (attempt === 6) {
@@ -61,31 +68,19 @@ export const createEmailService = () => {
     throw new Error('message not found');
   };
 
-  const getMessagePlaintextForAddress = async (email: string, id: string) => {
-    const url = new URL(`https://mailsac.com/api/text/${cleanEmail(email)}/${id}`);
-    const res = await fetcher(url);
-    return res.text();
-  };
-
-  const deleteMessage = async (email: string, id: string) => {
-    // best-effort file-and-forget delete
-    const url = new URL(`https://mailsac.com/api/addresses/${cleanEmail(email)}/messages/${id}`);
-    return fetcher(url, { method: 'DELETE' });
-  };
-
   return {
     getCodeForEmailAddress: async (email: string) => {
       const message = await filterMessagesByAddress(email, 'verification code');
       const code = (message.subject.match(/\d{6}/)?.[0] || '').trim();
-      void deleteMessage(email, message._id);
       return code;
     },
     getVerificationLinkForEmailAddress: async (email: string) => {
       const message = await filterMessagesByAddress(email);
-      const body = await getMessagePlaintextForAddress(email, message._id);
-      const link = (body.match(/https:\/\/.*\/verify\?.*/) || [''])[0].trim().replace(/&amp;/g, '&');
-      void deleteMessage(email, message._id);
-      return link;
+      const verificationLink = message.links.find(link => /\/verify\?/.test(link));
+      if (!verificationLink) {
+        throw new Error('verification link not found');
+      }
+      return verificationLink;
     },
   };
 };

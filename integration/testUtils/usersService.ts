@@ -134,7 +134,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const markedHash = runMarker ? `${runMarker}_${randomHash}` : randomHash;
       const email = fictionalEmail
         ? `${markedHash}+clerk_test@clerkcookie.com`
-        : `clerkcookie+${markedHash}@mailsac.com`;
+        : `clerkcookie-${markedHash}@mailsac.com`;
       const phoneNumber = fakerPhoneNumber();
       const { file, line, title, titlePath } = test.info();
       const fakeUserEmail = withEmail ? email : undefined;
