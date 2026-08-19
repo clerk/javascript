@@ -1,4 +1,5 @@
 import type { ClerkClient } from '@clerk/backend';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 
 interface Permission {
   name: string;
@@ -51,10 +52,17 @@ export async function bulkCreateFeaturesPermissionsRoles(
 
     if (roleKey === 'admin' || roleKey === 'member') {
       for (const permissionId of desiredPermissions) {
-        await client.organizationRoles.assignPermissionToOrganizationRole({
-          organizationRoleId: roleIds[`org:${roleKey}`],
-          permissionId,
-        });
+        try {
+          await client.organizationRoles.assignPermissionToOrganizationRole({
+            organizationRoleId: roleIds[`org:${roleKey}`],
+            permissionId,
+          });
+        } catch (err: unknown) {
+          // we are okay if the error is assigning an existing permission
+          if (isClerkAPIResponseError(err) && err.code !== 'organization_role_permission_association_exists') {
+            throw err;
+          }
+        }
       }
     } else {
       await client.organizationRoles.createOrganizationRole({
