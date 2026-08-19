@@ -10,6 +10,7 @@ import type {
   UnauthenticatedState,
 } from '@clerk/backend/internal';
 import {
+  AuthErrorReason,
   AuthStatus,
   constants,
   createBootstrapSignedOutState,
@@ -31,6 +32,7 @@ import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { AuthFn } from '../app-router/server/auth';
+import { constants as nextConstants } from '../constants';
 import type { GetAuthOptions } from '../server/createGetAuth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import type { Logger, LoggerNoCommit } from '../utils/debugLogger';
@@ -49,13 +51,14 @@ import {
   isNextjsUnauthorizedError,
   isRedirectToSignInError,
   isRedirectToSignUpError,
+  isRedirectToUrlError,
   nextjsRedirectError,
   redirectToSignInError,
   redirectToSignUpError,
   unauthorized,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
-import { createProtect } from './protect';
+import { createProtect, isServerActionRequest } from './protect';
 import type {
   FrontendApiProxyOptions,
   NextMiddlewareEvtParam,
@@ -608,6 +611,55 @@ const createMiddlewareAuthHandler = (
   return authHandler as ClerkMiddlewareAuth;
 };
 
+const RECOVERABLE_SIGNED_OUT_REASONS: string[] = [
+  AuthErrorReason.ClientUATWithoutSessionToken,
+  AuthErrorReason.SessionTokenIATBeforeClientUAT,
+  AuthErrorReason.SessionTokenWithoutClientUAT,
+  AuthErrorReason.DevBrowserMissing,
+  AuthErrorReason.DevBrowserSync,
+  AuthErrorReason.SessionTokenNBF,
+  AuthErrorReason.SessionTokenIatInTheFuture,
+];
+
+const isRecoverableSignedOutReason = (reason: string | null | undefined) => {
+  if (!reason) {
+    return false;
+  }
+
+  // Expired-token reasons carry a `-refresh-<error>` suffix, see convertTokenVerificationErrorReasonToAuthErrorReason
+  if (reason.startsWith(AuthErrorReason.SessionTokenExpired)) {
+    return true;
+  }
+
+  return RECOVERABLE_SIGNED_OUT_REASONS.includes(reason);
+};
+
+const isAppRouterNavigationFetch = (req: NextRequest) => {
+  if (req.method !== 'GET') {
+    return false;
+  }
+
+  if (!req.headers.get(nextConstants.Headers.NextUrl)) {
+    return false;
+  }
+
+  if (isServerActionRequest(req) || req.headers.get(nextConstants.Headers.NextjsData)) {
+    return false;
+  }
+
+  const secFetchDest = req.headers.get(constants.Headers.SecFetchDest);
+  if (secFetchDest === 'document' || secFetchDest === 'iframe') {
+    return false;
+  }
+
+  // RSC navigation fetches set no Accept header, so the browser default `*/*` applies
+  return req.headers.get(constants.Headers.Accept)?.trim() === '*/*';
+};
+
+// An RSC navigation cannot run a handshake, so a 401 is answered with a document navigation that can
+const isRecoverableRscNavigation = (req: NextRequest, requestState: RequestState) =>
+  isRecoverableSignedOutReason(requestState.reason) && isAppRouterNavigationFetch(req);
+
 // Handle errors thrown by protect() and redirectToSignIn() calls,
 // as we want to align the APIs between middleware, pages and route handlers
 // Normally, middleware requires to explicitly return a response, but we want to
@@ -660,6 +712,15 @@ const handleControlFlowErrors = (
 
   const isRedirectToSignIn = isRedirectToSignInError(e);
   const isRedirectToSignUp = isRedirectToSignUpError(e);
+
+  if (
+    (isRedirectToSignIn || isRedirectToSignUp || isRedirectToUrlError(e)) &&
+    isRecoverableRscNavigation(nextRequest, requestState)
+  ) {
+    const response = new NextResponse(null, { status: 401 });
+    response.headers.set(constants.Headers.CacheControl, 'no-store');
+    return response;
+  }
 
   if (isRedirectToSignIn || isRedirectToSignUp) {
     const redirect = createRedirect({
