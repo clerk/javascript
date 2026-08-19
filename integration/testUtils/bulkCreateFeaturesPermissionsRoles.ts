@@ -37,17 +37,31 @@ export async function bulkCreateFeaturesPermissionsRoles(
     }
   }
 
-  const { data } = await client.organizationPermissions.getOrganizationPermissionList({ limit: 20 });
-  const permissionIds = Object.fromEntries(data.map(p => [p.key, p.id]));
+  const { data: permissions } = await client.organizationPermissions.getOrganizationPermissionList({ limit: 20 });
+  const permissionIds = Object.fromEntries(permissions.map(p => [p.key, p.id]));
+
+  const { data: roles } = await client.organizationRoles.getOrganizationRoleList({ limit: 10 });
+  const roleIds = Object.fromEntries(roles.map(r => [r.key, r.id]));
 
   for (const roleKey in config.roles) {
     const role = config.roles[roleKey];
-    await client.organizationRoles.createOrganizationRole({
-      key: `org:${roleKey}`,
-      ...role,
-      permissions: Object.entries(role.permissions)
-        .filter(([_, enabled]) => enabled)
-        .map(([permission]) => permissionIds[permission]),
-    });
+    const desiredPermissions = Object.entries(role.permissions)
+      .filter(([_, enabled]) => enabled)
+      .map(([permission]) => permissionIds[permission]);
+
+    if (roleKey === 'admin' || roleKey === 'member') {
+      for (const permissionId of desiredPermissions) {
+        await client.organizationRoles.assignPermissionToOrganizationRole({
+          organizationRoleId: roleIds[`org:${roleKey}`],
+          permissionId,
+        });
+      }
+    } else {
+      await client.organizationRoles.createOrganizationRole({
+        key: `org:${roleKey}`,
+        ...role,
+        permissions: desiredPermissions,
+      });
+    }
   }
 }
