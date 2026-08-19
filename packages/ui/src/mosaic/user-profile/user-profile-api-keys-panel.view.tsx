@@ -92,6 +92,7 @@ export function UserProfileApiKeysPanelView({
         </div>
         {onCreate ? <Button onClick={onCreate}>Create API key</Button> : null}
       </div>
+      {/* TODO: Replace this inline implementation with the Mosaic Table component. */}
       <div {...stylex.props(styles.tableShell)}>
         <div {...stylex.props(styles.tableScroller)}>
           <table {...stylex.props(styles.table)}>
@@ -101,6 +102,7 @@ export function UserProfileApiKeysPanelView({
                   scope='col'
                   {...stylex.props(styles.headerCell, styles.checkboxCell)}
                 >
+                  {/* TODO: Replace these inline selection controls with the Mosaic Checkbox component. */}
                   <input
                     aria-label='Select all API keys'
                     checked={allSelected}
@@ -190,6 +192,7 @@ export function UserProfileApiKeysPanelView({
         </div>
       </div>
       {pagination ? (
+        // TODO: Replace this inline implementation with the Mosaic Pagination component.
         <div {...stylex.props(styles.pagination)}>
           <div {...stylex.props(styles.paginationControls)}>
             <Button
@@ -230,6 +233,7 @@ export function UserProfileApiKeysPanelView({
           </div>
           <label {...stylex.props(styles.pageSizeLabel)}>
             <span>Results per page</span>
+            {/* TODO: Replace this inline implementation with the Mosaic Select component. */}
             <select
               aria-label='Results per page'
               value={pagination.pageSize}
