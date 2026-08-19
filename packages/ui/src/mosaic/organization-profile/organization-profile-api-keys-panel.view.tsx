@@ -31,6 +31,7 @@ export function OrganizationProfileApiKeysPanelView({
         API Keys
       </Heading>
       <div {...stylex.props(styles.toolbar)}>
+        {/* TODO: Temporary search composition; replace with Mosaic InputGroup while preserving the icon and controlled value. */}
         <div {...stylex.props(styles.searchWrapper)}>
           <Icon
             aria-hidden
