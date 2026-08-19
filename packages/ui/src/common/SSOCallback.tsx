@@ -23,8 +23,11 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
   const { navigate } = useRouter();
   const card = useCardState();
 
+  // Held in a ref, not a local: the cleanup below runs long before the async `.catch` assigns it,
+  // so a superseded run's bounce would otherwise never be cleared and could yank the user back.
+  const bounceTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
   React.useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
     if (__internal_setActiveInProgress !== true) {
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
@@ -38,7 +41,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
         // only as an unhandled rejection in the console. Every callback dead-end was
         // invisible for that reason, which is a bad property for a route whose whole job is
         // to be the last step of somebody's sign-in.
-        timeoutId = setTimeout(() => void navigate('../'), 4000);
+        bounceTimeoutRef.current = setTimeout(() => void navigate('../'), 4000);
         try {
           handleError(e, [], card.setError);
         } catch {
@@ -47,7 +50,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
       });
     }
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(bounceTimeoutRef.current);
   }, [handleError, handleRedirectCallback]);
 
   return (

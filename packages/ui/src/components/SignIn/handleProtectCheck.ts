@@ -90,12 +90,10 @@ export function resumeSignInAfterProtectCheck(
       return navigate('../client-trust');
     case 'needs_new_password':
       return navigate('../reset-password');
-    case 'complete':
-      // Finalization is handled by the caller via setActive; just bounce to index.
-      return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
-        ? resumeOAuthContinuation()
-        : navigate('..');
     default:
+      // `complete` falls here too: the caller finalizes a complete sign-in that carries a
+      // session id before calling this, so what reaches this arm cannot continue on its own.
+      //
       // Everything above is an interactive sign-in step the user can be shown. Anything
       // else means this sign-in cannot continue on its own, and today that is an OAuth
       // account transfer: `needs_identifier` carrying a transferable first-factor

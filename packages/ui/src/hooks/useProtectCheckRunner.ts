@@ -68,6 +68,18 @@ export interface ProtectCheckRunner {
 export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
   const card = useCardState();
 
+  // `handleError` re-throws what it does not recognise, and this runner awaits caller code that
+  // raises plain errors (a transient fetch failure, an OAuth continuation that did not complete).
+  // A throw from inside a catch escapes the void-invoked challenge run, leaving the card with no
+  // spinner, no message and no retry -- so the reporting itself must never throw.
+  const reportError = (err: any) => {
+    try {
+      handleError(err, [], card.setError);
+    } catch {
+      card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+    }
+  };
+
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
@@ -186,7 +198,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           // re-triggers this effect (keyed on the token), which then runs it.
         } catch (err: any) {
           if (mountedRef.current) {
-            handleError(err, [], card.setError);
+            reportError(err);
           }
         } finally {
           if (mountedRef.current) {
@@ -274,7 +286,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         if (cancelled) {
           return;
         }
-        handleError(err, [], card.setError);
+        reportError(err);
       } finally {
         if (timeoutId) {
           clearTimeout(timeoutId);

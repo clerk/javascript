@@ -1889,7 +1889,7 @@ describe('Clerk singleton', () => {
           }),
         );
 
-      it('completes the transfer as a SIGN-UP and finalizes on the after-sign-up url', async () => {
+      it('completes the transfer as a SIGN-UP and activates the created session', async () => {
         loadEnvironment();
         mockClientFetch.mockReturnValue(
           Promise.resolve({

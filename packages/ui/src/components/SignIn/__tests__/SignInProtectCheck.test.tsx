@@ -496,6 +496,11 @@ describe('SignInProtectCheck', () => {
           expect.any(Function),
         );
       });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
     });
 
@@ -523,6 +528,11 @@ describe('SignInProtectCheck', () => {
           expect.any(Function),
         );
       });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
     });
 
@@ -545,6 +555,28 @@ describe('SignInProtectCheck', () => {
       render(<SignInProtectCheck />, { wrapper });
 
       await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+    });
+
+    it('surfaces a message when the resumed continuation fails with a non-Clerk error', async () => {
+      // `handleError` re-throws what it does not recognise, and the continuation can raise a plain
+      // Error (a transient fetch failure, or a callback that did not complete). That throw escaped
+      // the void-invoked challenge run, leaving the card with no spinner, no message and no retry --
+      // stranding the user on the very flow this card exists to resume.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+      vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mockRejectedValue(new Error('Failed to fetch'));
+
+      const { findByText } = render(<SignInProtectCheck />, { wrapper });
+
+      expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
     });
 
     it('leaves an ordinary gated sign-in on the existing path', async () => {

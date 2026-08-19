@@ -1,7 +1,7 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/clerk-js': minor
 '@clerk/react': patch
-'@clerk/shared': patch
+'@clerk/shared': minor
 '@clerk/ui': patch
 ---
 

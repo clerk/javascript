@@ -1378,6 +1378,11 @@ export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
  */
 export type ProtectCheckContinuation = 'transfer_to_sign_up';
 
+/**
+ * Params for resuming a redirect callback that a Protect challenge interrupted.
+ *
+ * @internal
+ */
 export type ResumeAfterProtectCheckParams = HandleOAuthCallbackParams & {
   /**
    * What the flow was doing before the challenge interrupted it. See

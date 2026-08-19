@@ -246,7 +246,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
      */
     pendingOAuthTransfer?: boolean;
     /** Overrides the gated status; `needs_identifier` is what a pending transfer carries. */
-    status?: string;
+    status?: SignInJSON['status'];
   }) => {
     const {
       expiresAt,
