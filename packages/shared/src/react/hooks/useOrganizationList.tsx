@@ -51,6 +51,15 @@ export type UseOrganizationListParams = {
    * </ul>
    */
   userSuggestions?: true | PaginatedHookConfig<GetUserOrganizationSuggestionsParams>;
+  /**
+   * Whether the hook may turn organizations on for the instance. On a development instance that has
+   * them disabled, reading this hook opens a prompt offering to enable them. Set to `false` in a
+   * surface that reads organizations only when the instance already has them, so an instance that
+   * does not use organizations is never asked about them.
+   *
+   * @default true
+   */
+  enabled?: boolean;
 };
 
 const undefinedPaginatedResource = {
@@ -250,10 +259,10 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * ```
  */
 export function useOrganizationList<T extends UseOrganizationListParams>(params?: T): UseOrganizationListReturn<T> {
-  const { userMemberships, userInvitations, userSuggestions } = params || {};
+  const { userMemberships, userInvitations, userSuggestions, enabled } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
-  useAttemptToEnableOrganizations('useOrganizationList');
+  useAttemptToEnableOrganizations('useOrganizationList', enabled);
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,
