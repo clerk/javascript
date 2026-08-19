@@ -33,7 +33,7 @@ export const createEmailService = () => {
     const url = new URL(`https://mailsac.com/inbox/${encodeURIComponent(email)}`);
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
-    for (let attempt = 0; attempt < 7; attempt++) {
+    for (let attempt = 0; attempt < 20; attempt++) {
       try {
         const res = await fetch(url);
         if (!res.ok) {
@@ -59,10 +59,10 @@ export const createEmailService = () => {
         consumedMessageIds.add(message._id);
         return message;
       } catch (error) {
-        if (attempt === 6) {
+        if (attempt === 19) {
           throw error;
         }
-        await new Promise(res => setTimeout(res, 750 * 2 ** attempt));
+        await new Promise(res => setTimeout(res, Math.min(750 * 2 ** attempt, 5_000)));
       }
     }
     throw new Error('message not found');

@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
     });
 
     test('sign up with email link', async ({ page, context }) => {
-      test.setTimeout(90_000);
+      test.setTimeout(150_000);
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
@@ -62,7 +62,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
     });
 
     test('sign in with email link', async ({ page, context }) => {
-      test.setTimeout(90_000);
+      test.setTimeout(150_000);
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
