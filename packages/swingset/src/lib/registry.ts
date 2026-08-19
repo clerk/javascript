@@ -61,6 +61,19 @@ import {
 } from '../stories/item.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import { Default as OrganizationPageDefault, meta as organizationPageMeta } from '../stories/organization-page.stories';
+import {
+  Default as OrganizationProfileDangerSectionDefault,
+  meta as organizationProfileDangerSectionMeta,
+} from '../stories/organization-profile-danger-section.stories';
+import {
+  Default as OrganizationProfileDetailsSectionDefault,
+  meta as organizationProfileDetailsSectionMeta,
+} from '../stories/organization-profile-details-section.stories';
+import {
+  Default as OrganizationProfileGeneralPanelDefault,
+  meta as organizationProfileGeneralPanelMeta,
+} from '../stories/organization-profile-general-panel.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
   Alignment as PopoverComponentAlignment,
@@ -282,6 +295,23 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const organizationPageModule: StoryModule = {
+  meta: organizationPageMeta,
+  Default: OrganizationPageDefault,
+};
+const organizationProfileGeneralPanelModule: StoryModule = {
+  meta: organizationProfileGeneralPanelMeta,
+  Default: OrganizationProfileGeneralPanelDefault,
+};
+const organizationProfileDetailsSectionModule: StoryModule = {
+  meta: organizationProfileDetailsSectionMeta,
+  Default: OrganizationProfileDetailsSectionDefault,
+};
+const organizationProfileDangerSectionModule: StoryModule = {
+  meta: organizationProfileDangerSectionMeta,
+  Default: OrganizationProfileDangerSectionDefault,
+};
+
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
@@ -357,6 +387,13 @@ const userProfileDeleteSectionModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  // Organization Profile
+  organizationPageModule,
+  // Organization Profile · Panels
+  organizationProfileGeneralPanelModule,
+  // Organization Profile · Sections
+  organizationProfileDetailsSectionModule,
+  organizationProfileDangerSectionModule,
   // User Profile
   userPageModule,
   // User Profile · Panels

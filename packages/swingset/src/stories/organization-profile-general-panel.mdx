@@ -1,0 +1,23 @@
+import * as Stories from './organization-profile-general-panel.stories';
+
+# OrganizationProfileGeneralPanel
+
+The General organization panel. It composes the organization details and danger zone sections under the
+panel heading.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    {
+      name: 'Organization details',
+      href: '/organization-profile/organization-profile-details-section',
+      layer: 'Organization Profile',
+    },
+    {
+      name: 'Danger zone',
+      href: '/organization-profile/organization-profile-danger-section',
+      layer: 'Organization Profile',
+    },
+  ]}
+/>
