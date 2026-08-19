@@ -1597,11 +1597,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_resumeAfterProtectCheck = async (params?: ResumeAfterProtectCheckParams): Promise<void> => {
-    const callback = () => this.clerkjs?.__internal_resumeAfterProtectCheck(params);
+    // The rejection handler sits inside `callback` so both arms below carry it and
+    // cannot drift apart. Each needs it for its own reason: the loaded arm inherits
+    // the React 18 strict-mode double-mount caveat documented on
+    // handleRedirectCallback above, and the queued arm is replayed by
+    // replayInterceptedInvocations, which discards whatever its callbacks return --
+    // so a rejection there would surface as an unhandled rejection rather than
+    // reaching a caller that could act on it.
+    const callback = () => void this.clerkjs?.__internal_resumeAfterProtectCheck(params)?.catch(() => {});
     if (this.clerkjs && this.loaded) {
-      void callback()?.catch(() => {
-        // Same React 18 strict-mode double-mount caveat as handleRedirectCallback above.
-      });
+      callback();
     } else {
       this.premountMethodCalls.set('__internal_resumeAfterProtectCheck', callback);
     }
