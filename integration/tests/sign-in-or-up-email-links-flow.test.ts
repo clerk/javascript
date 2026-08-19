@@ -15,7 +15,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser(test);
+      fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: false });
       emailLinkOnlyUser = u.services.users.createFakeUser(test, {
         fictionalEmail: false,
         withPassword: false,
