@@ -41,12 +41,13 @@ together, and where every moving part lives.
 | clerk-ios     | `ios/ClerkExpo.podspec` (`clerk_ios_version`) | SPM `spm_dependency(:kind => 'exactVersion')`, products `ClerkKit`, `ClerkKitUI` |
 | clerk-android | `android/build.gradle` `ext` block            | `com.clerk:clerk-android-api` / `clerk-android-ui` maven coordinates             |
 
-- clerk-ios bumps are **automated**: clerk-ios's `bump-javascript-expo-ios-sdk.yml` workflow fires
-  on release, rewrites `clerk_ios_version`, writes a changeset, and opens a PR. Do not hand-bump
-  on a feature branch; let the automation land and rebase.
-- clerk-android bumps are manual. When bumping, re-verify the transitive excludes (kotlin-stdlib,
-  okhttp) and the `-Xskip-metadata-version-check` compiler arg, which exists because clerk-android
-  ships Kotlin metadata newer than Expo's Kotlin toolchain.
+- Bumps are **automated for both SDKs**: on release, the clerk-ios and clerk-android repos each
+  open a bump PR against clerk/javascript that rewrites the pin and adds a changeset (the
+  workflows live in those repos, e.g. clerk-ios's `bump-javascript-expo-ios-sdk.yml`). Do not
+  hand-bump on a feature branch; let the automation land and rebase.
+- When reviewing a clerk-android bump, re-verify the transitive excludes (kotlin-stdlib, okhttp)
+  and the `-Xskip-metadata-version-check` compiler arg, which exists because clerk-android ships
+  Kotlin metadata newer than Expo's Kotlin toolchain.
 - Platform floors set by the native layer: iOS 17.0 (podspec + `CLERK_MIN_IOS_VERSION` in
   `app.plugin.js`, which must match), Android minSdk 24 (trusted devices need API 28+), RN >= 0.75
   (the podspec raises below it), Java 17.
