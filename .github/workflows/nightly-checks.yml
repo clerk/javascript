@@ -80,6 +80,7 @@ jobs:
           E2E_REACT_DOM_VERSION: "19.2.3"
           E2E_REACT_VERSION: "19.2.3"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
       # Print error logs for immediate visibility in CI
       - name: Print App Error Logs
