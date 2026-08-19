@@ -121,6 +121,8 @@ export type {
   OrganizationProfileMembersSectionViewProps,
   OrganizationProfileMemberStatus,
 } from '../organization-profile/organization-profile-members-section.view';
+export { OrganizationProfileBillingPanelView } from '../organization-profile/organization-profile-billing-panel.view';
+export type { OrganizationProfileBillingPanelViewProps } from '../organization-profile/organization-profile-billing-panel.view';
 export { OrganizationProfileInvoicesSectionView } from '../organization-profile/organization-profile-invoices-section.view';
 export type {
   OrganizationProfileInvoice,
