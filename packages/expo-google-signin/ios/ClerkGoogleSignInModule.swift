@@ -148,7 +148,7 @@ public class ClerkGoogleSignInModule: Module {
       ?? scenes.first { $0.activationState == .foregroundInactive }
       ?? scenes.first
 
-    guard let window = scene?.windows.first(where: { $0.isKeyWindow })
+    guard let window = scene?.windows.first(where: { $0.isKeyWindow && !$0.isHidden && $0.rootViewController != nil })
             ?? scene?.windows.first(where: { !$0.isHidden && $0.rootViewController != nil }),
           let rootVC = window.rootViewController else {
       return nil
