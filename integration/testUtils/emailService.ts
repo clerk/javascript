@@ -1,5 +1,3 @@
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
-
 type Message = {
   _id: string;
   subject: string;
@@ -23,8 +21,8 @@ export const createEmailService = () => {
     }
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
-    return runWithExponentialBackOff(
-      async () => {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
         const res = await fetcher(url);
         const json = (await res.json()) as unknown as { messages: Message[] };
         const message = json.messages[0];
@@ -32,13 +30,14 @@ export const createEmailService = () => {
           throw new Error('message not found');
         }
         return message;
-      },
-      {
-        firstDelay: 750,
-        timeMultiple: 2,
-        shouldRetry: (_, iterationsCount) => iterationsCount < 5,
-      },
-    );
+      } catch (error) {
+        if (attempt === 4) {
+          throw error;
+        }
+        await new Promise(res => setTimeout(res, 750 * 2 ** attempt));
+      }
+    }
+    throw new Error('message not found');
   };
 
   const getMessagePlaintextForAddress = async (email: string, id: string) => {

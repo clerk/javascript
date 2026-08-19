@@ -2548,13 +2548,18 @@ describe('Session', () => {
 
       fetchSpy
         .mockResolvedValueOnce(response('needs_first_factor', 'unverified') as any)
+        .mockResolvedValueOnce(response('needs_first_factor', 'unverified') as any)
         .mockResolvedValueOnce(response('complete', 'verified') as any);
 
       const { startEmailLinkFlow } = session.createEmailLinkFlow();
-      const result = await startEmailLinkFlow({
+      const resultPromise = startEmailLinkFlow({
         emailAddressId: 'idn_email',
         redirectUrl: 'https://app.example.com/protected-action',
       });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1_000);
+      const result = await resultPromise;
 
       expect(result.status).toBe('complete');
       expect(result.firstFactorVerification.strategy).toBe('email_link');
@@ -2568,6 +2573,10 @@ describe('Session', () => {
         },
       });
       expect(fetchSpy).toHaveBeenNthCalledWith(2, {
+        method: 'GET',
+        path: '/client/sessions/session_1/verify',
+      });
+      expect(fetchSpy).toHaveBeenNthCalledWith(3, {
         method: 'GET',
         path: '/client/sessions/session_1/verify',
       });

@@ -1,5 +1,5 @@
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -10,11 +10,18 @@ import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
 const { createFixtures } = bindCreateFixtures('UserVerification');
 
 describe('UserVerificationFactorOne', () => {
+  let initialUrl: string;
+
   /**
    * `<UserVerificationFactorOne/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
    */
   beforeEach(() => {
+    initialUrl = window.location.href;
     clearFetchCache();
+  });
+
+  afterEach(() => {
+    window.history.replaceState({}, '', initialUrl);
   });
 
   it('renders the component for with strategy:password', async () => {
