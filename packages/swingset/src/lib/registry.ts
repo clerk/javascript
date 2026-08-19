@@ -46,6 +46,14 @@ import {
   Sizes as IconSizes,
 } from '../stories/icon.stories';
 import {
+  BrandIcons as IconFrameBrandIcons,
+  CustomSurface as IconFrameCustomSurface,
+  Default as IconFrameDefault,
+  IconSizes as IconFrameIconSizes,
+  meta as iconFrameMeta,
+  MultipleTreatments as IconFrameMultipleTreatments,
+} from '../stories/icon-frame.stories';
+import {
   Default,
   Disabled as InputDisabled,
   Invalid,
@@ -82,6 +90,7 @@ import {
   ConnectedAccounts as SectionConnectedAccounts,
   Default as SectionDefault,
   Destructive as SectionDestructive,
+  IconFrameMedia as SectionIconFrameMedia,
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
@@ -129,6 +138,7 @@ const sectionModule: StoryModule = {
   Default: SectionDefault,
   MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SectionConnectedAccounts,
+  IconFrameMedia: SectionIconFrameMedia,
   Destructive: SectionDestructive,
 };
 const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
@@ -207,6 +217,15 @@ const iconModule: StoryModule = {
   Override: IconOverride,
 };
 
+const iconFrameModule: StoryModule = {
+  meta: iconFrameMeta,
+  Default: IconFrameDefault,
+  IconSizes: IconFrameIconSizes,
+  CustomSurface: IconFrameCustomSurface,
+  MultipleTreatments: IconFrameMultipleTreatments,
+  BrandIcons: IconFrameBrandIcons,
+};
+
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
 // `<Preview>` embeds in the MDX, which import the stories module directly.
@@ -275,6 +294,7 @@ export const registry: StoryModule[] = [
   alertDialogComponentModule,
   headingModule,
   iconModule,
+  iconFrameModule,
   menuComponentModule,
   popoverComponentModule,
   sectionModule,
