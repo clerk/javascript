@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.16.9
+
+### Patch Changes
+
+- Reject JWT-template tokens where a session or handshake token is expected. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token in the `Authorization` header or `__session` cookie. Tokens with no category tag, and instances configured to omit it, are unaffected. ([#9469](https://github.com/clerk/javascript/pull/9469)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.16.8
 
 ### Patch Changes
