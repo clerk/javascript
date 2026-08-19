@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
-import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
+import type { InstanceType, OrganizationJSON, SessionJSON, SessionVerificationJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createSession, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
@@ -2531,25 +2531,41 @@ describe('Session', () => {
       const fetchSpy = vi.spyOn(BaseResource, '_fetch');
       const response = (status: 'needs_first_factor' | 'complete', verificationStatus: 'unverified' | 'verified') => ({
         response: {
+          id: 'session_verification_1',
           object: 'session_verification',
           status,
           level: 'first_factor',
           session: sessionJSON,
           first_factor_verification: {
+            id: 'verification_1',
             object: 'verification_email_link',
             strategy: 'email_link',
             status: verificationStatus,
+            verified_at_client: verificationStatus === 'verified' ? 'client_1' : '',
+            attempts: 0,
+            expire_at: Date.now() / 1_000 + 600,
+            error: { code: '', message: '' },
           },
           second_factor_verification: null,
-          supported_first_factors: status === 'complete' ? null : [{ strategy: 'email_link' }],
+          supported_first_factors:
+            status === 'complete'
+              ? null
+              : [
+                  {
+                    strategy: 'email_link',
+                    email_address_id: 'idn_email',
+                    safe_identifier: 'test@example.com',
+                    primary: true,
+                  },
+                ],
           supported_second_factors: null,
-        },
+        } satisfies SessionVerificationJSON,
       });
 
       fetchSpy
-        .mockResolvedValueOnce(response('needs_first_factor', 'unverified') as any)
-        .mockResolvedValueOnce(response('needs_first_factor', 'unverified') as any)
-        .mockResolvedValueOnce(response('complete', 'verified') as any);
+        .mockResolvedValueOnce(response('needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(response('needs_first_factor', 'unverified'))
+        .mockResolvedValueOnce(response('complete', 'verified'));
 
       const { startEmailLinkFlow } = session.createEmailLinkFlow();
       const resultPromise = startEmailLinkFlow({
