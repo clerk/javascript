@@ -121,6 +121,17 @@ export type {
   OrganizationProfileMembersSectionViewProps,
   OrganizationProfileMemberStatus,
 } from '../organization-profile/organization-profile-members-section.view';
+export { OrganizationProfileInvoicesSectionView } from '../organization-profile/organization-profile-invoices-section.view';
+export type {
+  OrganizationProfileInvoice,
+  OrganizationProfileInvoicesPagination,
+  OrganizationProfileInvoicesSectionViewProps,
+} from '../organization-profile/organization-profile-invoices-section.view';
+export { OrganizationProfilePaymentMethodsSectionView } from '../organization-profile/organization-profile-payment-methods-section.view';
+export type {
+  OrganizationProfilePaymentMethod,
+  OrganizationProfilePaymentMethodsSectionViewProps,
+} from '../organization-profile/organization-profile-payment-methods-section.view';
 export { OrganizationProfileSecurityPanelView } from '../organization-profile/organization-profile-security-panel.view';
 export type { OrganizationProfileSecurityPanelViewProps } from '../organization-profile/organization-profile-security-panel.view';
 export { OrganizationProfileSsoSectionView } from '../organization-profile/organization-profile-sso-section.view';
@@ -128,6 +139,12 @@ export type {
   OrganizationProfileSsoConnection,
   OrganizationProfileSsoSectionViewProps,
 } from '../organization-profile/organization-profile-sso-section.view';
+export { OrganizationProfileSubscriptionSectionView } from '../organization-profile/organization-profile-subscription-section.view';
+export type {
+  OrganizationProfileSeatLineItem,
+  OrganizationProfileSubscription,
+  OrganizationProfileSubscriptionSectionViewProps,
+} from '../organization-profile/organization-profile-subscription-section.view';
 export { OrganizationProfileVerifiedDomainsSectionView } from '../organization-profile/organization-profile-verified-domains-section.view';
 export type {
   OrganizationProfileVerifiedDomain,
