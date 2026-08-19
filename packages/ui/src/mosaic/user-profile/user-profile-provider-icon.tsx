@@ -7,6 +7,7 @@ import { styles } from './user-profile-profile-panel.styles';
 
 type UserProfileProviderIconProps = { iconUrl: string; name?: never } | { iconUrl?: never; name: IconName };
 
+// TODO: Replace this temporary user-profile wrapper with IconFrame.
 export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
   return (
     <Section.Media

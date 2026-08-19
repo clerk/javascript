@@ -42,6 +42,7 @@ export function UserProfileBillingHistorySectionView({
     <Section.Root aria-label='Billing history'>
       <Section.Title>History</Section.Title>
       <div {...stylex.props(styles.shell)}>
+        {/* TODO: Replace this inline implementation with the Mosaic Table component. */}
         <div {...stylex.props(styles.tableScroller)}>
           <table {...stylex.props(styles.table)}>
             <thead {...stylex.props(styles.header)}>
@@ -114,6 +115,7 @@ export function UserProfileBillingHistorySectionView({
           </table>
         </div>
         {pagination ? (
+          // TODO: Replace this inline implementation with the Mosaic Pagination component.
           <div {...stylex.props(styles.pagination)}>
             <div {...stylex.props(styles.paginationControls)}>
               <Button
@@ -154,6 +156,7 @@ export function UserProfileBillingHistorySectionView({
             </div>
             <label {...stylex.props(styles.pageSizeLabel)}>
               <span>Results per page</span>
+              {/* TODO: Replace this inline implementation with the Mosaic Select component. */}
               <select
                 aria-label='Results per page'
                 value={pagination.pageSize}
