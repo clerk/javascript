@@ -121,6 +121,18 @@ export type {
   OrganizationProfileMembersSectionViewProps,
   OrganizationProfileMemberStatus,
 } from '../organization-profile/organization-profile-members-section.view';
+export { OrganizationProfileSecurityPanelView } from '../organization-profile/organization-profile-security-panel.view';
+export type { OrganizationProfileSecurityPanelViewProps } from '../organization-profile/organization-profile-security-panel.view';
+export { OrganizationProfileSsoSectionView } from '../organization-profile/organization-profile-sso-section.view';
+export type {
+  OrganizationProfileSsoConnection,
+  OrganizationProfileSsoSectionViewProps,
+} from '../organization-profile/organization-profile-sso-section.view';
+export { OrganizationProfileVerifiedDomainsSectionView } from '../organization-profile/organization-profile-verified-domains-section.view';
+export type {
+  OrganizationProfileVerifiedDomain,
+  OrganizationProfileVerifiedDomainsSectionViewProps,
+} from '../organization-profile/organization-profile-verified-domains-section.view';
 export type { OrganizationProfilePanelId } from '../organization-profile/organization-profile-sidebar';
 export { UserPageView } from '../user-profile/user-page.view';
 export type { UserPagePanels, UserPageViewProps } from '../user-profile/user-page.view';
