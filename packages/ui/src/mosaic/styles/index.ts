@@ -106,6 +106,12 @@ export type {
 
 export { OrganizationPageView } from '../organization-profile/organization-page.view';
 export type { OrganizationPagePanels, OrganizationPageViewProps } from '../organization-profile/organization-page.view';
+export { OrganizationProfileApiKeysSectionView } from '../organization-profile/organization-profile-api-keys-section.view';
+export type {
+  OrganizationProfileApiKey,
+  OrganizationProfileApiKeysPagination,
+  OrganizationProfileApiKeysSectionViewProps,
+} from '../organization-profile/organization-profile-api-keys-section.view';
 export { OrganizationProfileDangerSectionView } from '../organization-profile/organization-profile-danger-section.view';
 export type { OrganizationProfileDangerSectionViewProps } from '../organization-profile/organization-profile-danger-section.view';
 export { OrganizationProfileDetailsSectionView } from '../organization-profile/organization-profile-details-section.view';
