@@ -1961,6 +1961,41 @@ describe('Clerk singleton', () => {
         );
       });
 
+      it('does not divert to the sign-up card when a stale gate is on the sign-up resource', async () => {
+        // The sign-in variant below covers the first short-circuit; `resuming` skips a second one
+        // keyed on the SIGN-UP resource, and that is the arm that sends the user to a different
+        // card entirely rather than back to this one.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp({
+              protect_check: { status: 'pending', token: 'stale-signup-token', sdk_url: 'https://example.com/sdk.js' },
+            } as any),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+        expect(mockNavigate).not.toHaveBeenCalledWith(expect.stringContaining('protect-check'), expect.anything());
+      });
+
       it('does not bounce back into the challenge when a stale gate is still on the resource', async () => {
         // This is the test that proves `resuming` is load-bearing rather than decorative. The
         // caller IS the challenge card; re-checking the gate here would hand control straight
