@@ -57,7 +57,7 @@ export function OrganizationProfileInvoicesSectionView({
         ) : null}
       </div>
       <div {...stylex.props(styles.shell)}>
-        {/* TODO: Replace this inline implementation with the Mosaic Table component. */}
+        {/* TODO: Temporary inline table; replace with Mosaic Table while preserving the invoice columns and overflow. */}
         <div {...stylex.props(styles.tableScroller)}>
           <table {...stylex.props(styles.table)}>
             <thead {...stylex.props(styles.header)}>
@@ -130,7 +130,7 @@ export function OrganizationProfileInvoicesSectionView({
           </table>
         </div>
         {pagination ? (
-          // TODO: Replace this inline implementation with the Mosaic Pagination component.
+          // TODO: Temporary inline pager; replace with Mosaic Pagination while preserving the callback contract.
           <div {...stylex.props(styles.pagination)}>
             <div {...stylex.props(styles.paginationControls)}>
               <Button
@@ -163,7 +163,7 @@ export function OrganizationProfileInvoicesSectionView({
             </div>
             <label {...stylex.props(styles.pageSizeLabel)}>
               <span>Results per page</span>
-              {/* TODO: Replace this inline implementation with the Mosaic Select component. */}
+              {/* TODO: Temporary native select; replace with Mosaic Select while preserving the page-size options. */}
               <select
                 aria-label='Results per page'
                 value={pagination.pageSize}

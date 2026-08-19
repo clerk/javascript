@@ -59,7 +59,7 @@ export function OrganizationProfileApiKeysSectionView({
       aria-label='API keys'
       {...mergeStyleProps(themeProps('organization-profile-api-keys-section'), stylex.props(styles.root))}
     >
-      {/* TODO: Replace this inline implementation with the Mosaic Table component. */}
+      {/* TODO: Temporary inline table; replace with Mosaic Table while preserving the key columns and overflow. */}
       <div {...stylex.props(styles.tableShell)}>
         <div {...stylex.props(styles.tableScroller)}>
           <table {...stylex.props(styles.table)}>
@@ -69,7 +69,7 @@ export function OrganizationProfileApiKeysSectionView({
                   scope='col'
                   {...stylex.props(styles.headerCell, styles.checkboxCell)}
                 >
-                  {/* TODO: Replace these inline selection controls with the Mosaic Checkbox component. */}
+                  {/* TODO: Temporary native checkboxes; replace with Mosaic Checkbox while preserving controlled selection. */}
                   <input
                     aria-label='Select all API keys'
                     checked={allSelected}
@@ -160,7 +160,7 @@ export function OrganizationProfileApiKeysSectionView({
         </div>
       </div>
       {pagination ? (
-        // TODO: Replace this inline implementation with the Mosaic Pagination component.
+        // TODO: Temporary inline pager; replace with Mosaic Pagination while preserving the callback contract.
         <div {...stylex.props(styles.pagination)}>
           <div {...stylex.props(styles.paginationControls)}>
             <Button
@@ -201,7 +201,7 @@ export function OrganizationProfileApiKeysSectionView({
           </div>
           <label {...stylex.props(styles.pageSizeLabel)}>
             <span>Results per page</span>
-            {/* TODO: Replace this inline implementation with the Mosaic Select component. */}
+            {/* TODO: Temporary native select; replace with Mosaic Select while preserving the page-size options. */}
             <select
               aria-label='Results per page'
               value={pagination.pageSize}
