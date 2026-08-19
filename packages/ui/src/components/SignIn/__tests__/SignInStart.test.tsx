@@ -153,6 +153,87 @@ describe('SignInStart', () => {
           });
         });
       });
+
+      it('skips autofill when the host reports no autofill support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        const isAutoFillSupported = vi.fn(() => Promise.resolve(false));
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = isAutoFillSupported;
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(isAutoFillSupported).toHaveBeenCalled();
+        });
+        expect(fixtures.signIn.authenticateWithPasskey).not.toHaveBeenCalled();
+      });
+
+      it('hides the passkey action when the host reports no WebAuthn support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => false;
+        render(<SignInStart />, { wrapper });
+
+        expect(screen.queryByText('Use passkey instead')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('with a host-provided WebAuthn implementation', () => {
+      it('starts autofill when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = () => Promise.resolve(true);
+        fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
+          status: 'complete',
+        } as SignInResource);
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+      });
+
+      it('shows the passkey action when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => true;
+        render(<SignInStart />, { wrapper });
+
+        screen.getByText('Use passkey instead');
+      });
     });
   });
 
