@@ -881,7 +881,7 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Yedek kodu girin',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Hesabı sil',
-  formFieldInputPlaceholder__emailAddress: 'email@example.com',
+  formFieldInputPlaceholder__emailAddress: 'ornek@email.com',
   formFieldInputPlaceholder__emailAddress_username: 'email veya kullanıcı adı',
   formFieldInputPlaceholder__emailAddresses: 'ornek@email.com, ornek2@email.com',
   formFieldInputPlaceholder__firstName: 'Adınızı girin',
@@ -2219,8 +2219,8 @@ export const trTR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Bekleme listesine katıl',
-      actionText: 'Hala bir hesabınız yok mu?',
+      actionLink: 'Giriş Yap',
+      actionText: 'Hesabınız var mı?',
       formButton: 'Kayıt Ol',
       subtitle: 'Kaydolduktan sonra erken erişim kazanabilirsiniz.',
       title: 'Bekleme Listesine Katılın',
