@@ -24,8 +24,9 @@ export const createEmailService = () => {
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
         const res = await fetcher(url);
-        const json = (await res.json()) as unknown as { messages: Message[] };
-        const message = json.messages[0];
+        const json = (await res.json()) as unknown as Message[] | { messages?: Message[] };
+        const messages = Array.isArray(json) ? json : (json.messages ?? []);
+        const message = messages[0];
         if (!message) {
           throw new Error('message not found');
         }
