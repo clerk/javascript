@@ -958,6 +958,10 @@ final class ClerkNativeBridge {
         darkTheme: darkTheme,
         logoState: logoState,
         logoMaxHeight: logoMaxHeight
+      )
+      .environment(
+        \.clerkAuthCompletionAction,
+        ClerkAuthCompletionAction { onEvent(.dismissed, [:]) }
       ),
       onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
     )
