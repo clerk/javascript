@@ -88,19 +88,23 @@ function SignInProtectCheckInternal(): JSX.Element | null {
         // No isCancelled() guard around this one: completing the transfer calls setActive,
         // which flips the withRedirectToAfterSignIn guard and blanks this card. That unmount
         // must not abort the continuation — the router owns its navigation from here.
+        // Feature-detected: @clerk/ui ships independently of the runtime, so a newer card can meet
+        // a clerk-js without this method. Degrade to the pre-existing destination rather than throw.
         resumeOAuthContinuation: () =>
-          __internal_resumeAfterProtectCheck(
-            {
-              ...buildSignInOAuthCallbackParams(ctx),
-              continuation: 'transfer_to_sign_up',
-              // Carried for the same reason the social buttons carry it: without it a
-              // completed transfer whose session has a pending task is routed with the
-              // component's base URL rather than its mounted route, which lands on
-              // `#/tasks/...` instead of `#/create/tasks/...` in the combined flow.
-              __internal_navigateOnSetActive: ctx.navigateOnSetActive,
-            },
-            navigate,
-          ),
+          typeof __internal_resumeAfterProtectCheck === 'function'
+            ? __internal_resumeAfterProtectCheck(
+                {
+                  ...buildSignInOAuthCallbackParams(ctx),
+                  continuation: 'transfer_to_sign_up',
+                  // Carried for the same reason the social buttons carry it: without it a
+                  // completed transfer whose session has a pending task is routed with the
+                  // component's base URL rather than its mounted route, which lands on
+                  // `#/tasks/...` instead of `#/create/tasks/...` in the combined flow.
+                  __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+                },
+                navigate,
+              )
+            : navigate('..'),
       });
     },
   });

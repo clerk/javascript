@@ -196,13 +196,15 @@ describe('isomorphicClerk', () => {
     } as unknown as BrowserClerk;
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
 
-    await isomorphicClerk.__internal_resumeAfterProtectCheck(params);
+    const customNavigate = vi.fn();
+
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
 
     expect(resumeAfterProtectCheck).not.toHaveBeenCalled();
 
     (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
 
-    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params);
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
     expect(catchSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -217,9 +219,13 @@ describe('isomorphicClerk', () => {
       __internal_resumeAfterProtectCheck: resumeAfterProtectCheck,
     } as unknown as BrowserClerk;
 
-    await isomorphicClerk.__internal_resumeAfterProtectCheck(params);
+    const customNavigate = vi.fn();
 
-    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params);
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
+
+    // The navigator is the component router's; dropping it falls back to Clerk.navigate,
+    // which resolves component-relative destinations against the origin instead.
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
     expect(catchSpy).toHaveBeenCalledTimes(1);
   });
 

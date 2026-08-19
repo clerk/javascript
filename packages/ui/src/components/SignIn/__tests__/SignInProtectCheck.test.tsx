@@ -526,6 +526,27 @@ describe('SignInProtectCheck', () => {
       expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
     });
 
+    it('degrades to the pre-existing destination when the runtime predates the resume method', async () => {
+      // @clerk/ui reaches apps independently of clerk-js, so a newer card can meet a runtime
+      // that has no `__internal_resumeAfterProtectCheck`. An unconditional call throws there and
+      // strands the very transfer this card exists to resume, so the call is feature-detected.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      (fixtures.clerk as unknown as Record<string, unknown>).__internal_resumeAfterProtectCheck = undefined;
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+    });
+
     it('leaves an ordinary gated sign-in on the existing path', async () => {
       // The guard above must not divert every gated sign-in into the OAuth router.
       const { wrapper, fixtures } = await createFixtures(f => {
