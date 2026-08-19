@@ -76,7 +76,7 @@ export const createEmailService = () => {
       return code;
     },
     getVerificationLinkForEmailAddress: async (email: string) => {
-      const message = await filterMessagesByAddress(email, 'link');
+      const message = await filterMessagesByAddress(email);
       const body = await getMessagePlaintextForAddress(email, message._id);
       const link = (body.match(/https:\/\/.*\/verify\?.*/) || [''])[0].trim().replace(/&amp;/g, '&');
       void deleteMessage(email, message._id);
