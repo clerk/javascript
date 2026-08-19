@@ -30,7 +30,7 @@ export function UserProfilePaymentMethodsSectionView({
   return (
     <Section.Root aria-label='Payment methods'>
       <Section.Group>
-        <Section.Row variant='list'>
+        <Section.Row>
           <Section.Item>
             <Section.Content>
               <Section.Label>Payment methods</Section.Label>

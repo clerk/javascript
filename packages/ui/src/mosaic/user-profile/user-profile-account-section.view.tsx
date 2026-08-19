@@ -266,7 +266,7 @@ function ContactRow({ kind, label, items, onAdd, onManage, onVerify, onSetPrimar
   const emptyDescription = kind === 'email' ? 'No email addresses added' : 'No phone numbers added';
 
   return (
-    <Section.Row variant='list'>
+    <Section.Row>
       <Section.Item>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
