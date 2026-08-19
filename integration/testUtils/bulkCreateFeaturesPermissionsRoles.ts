@@ -40,7 +40,7 @@ export async function bulkCreateFeaturesPermissionsRoles(
   for (const roleKey in config.roles) {
     const role = config.roles[roleKey];
     await client.organizationRoles.createOrganizationRole({
-      key: roleKey,
+      key: `org:${roleKey}`,
       ...role,
       permissions: Object.entries(role.permissions)
         .filter(([_, enabled]) => enabled)
