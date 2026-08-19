@@ -28,7 +28,7 @@ describe('redirect(redirectAdapter)', () => {
       } as any);
 
       expect(() => redirectToSignIn({ returnBackUrl })).toThrowError(
-        '@clerk/backend: Missing publishableKey. To set up Clerk for this project, run:\n\n  npx clerk@latest init',
+        '@clerk/backend: Missing publishableKey. To set up Clerk for this project, in your terminal run:\n\n  npx clerk@latest init',
       );
     });
   });
@@ -258,7 +258,7 @@ describe('redirect(redirectAdapter)', () => {
       });
 
       expect(() => redirectToSignUp({ returnBackUrl })).toThrowError(
-        '@clerk/backend: Missing publishableKey. To set up Clerk for this project, run:\n\n  npx clerk@latest init',
+        '@clerk/backend: Missing publishableKey. To set up Clerk for this project, in your terminal run:\n\n  npx clerk@latest init',
       );
     });
 

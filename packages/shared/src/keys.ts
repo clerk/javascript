@@ -98,11 +98,13 @@ function isValidDecodedPublishableKey(decoded: string): boolean {
   return withoutTrailing.includes('.');
 }
 
-const fatalKeyGuidance = `To create a Clerk application with valid keys, run:
+const fatalKeyGuidance = `To create a Clerk application with valid keys, in your terminal run:
 
   npx clerk@latest init
 
-The command is non-interactive and requires no Clerk account or login. If you already have a Clerk application, run \`npx clerk@latest env pull\` to write its keys to your env file (\`--instance prod\` for production keys), or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
+It creates a Clerk application and writes keys to your .env file. Requires no Clerk account or login and the command is non-interactive.
+
+If you have a Clerk application, run \`npx clerk@latest env pull\` to write the keys (\`--instance prod\` for production keys). Or copy them from https://dashboard.clerk.com/last-active?path=api-keys.`;
 
 export function parsePublishableKey(
   key: string | undefined,
