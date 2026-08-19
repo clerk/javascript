@@ -104,6 +104,18 @@ export type {
   PopoverTriggerProps,
 } from '../components/popover';
 
+export { OrganizationPageView } from '../organization-profile/organization-page.view';
+export type { OrganizationPagePanels, OrganizationPageViewProps } from '../organization-profile/organization-page.view';
+export { OrganizationProfileDangerSectionView } from '../organization-profile/organization-profile-danger-section.view';
+export type { OrganizationProfileDangerSectionViewProps } from '../organization-profile/organization-profile-danger-section.view';
+export { OrganizationProfileDetailsSectionView } from '../organization-profile/organization-profile-details-section.view';
+export type { OrganizationProfileDetailsSectionViewProps } from '../organization-profile/organization-profile-details-section.view';
+export { OrganizationProfileGeneralPanelView } from '../organization-profile/organization-profile-general-panel.view';
+export type { OrganizationProfileGeneralPanelViewProps } from '../organization-profile/organization-profile-general-panel.view';
+export type { OrganizationProfilePanelId } from '../organization-profile/organization-profile-sidebar';
+export { UserPageView } from '../user-profile/user-page.view';
+export type { UserPagePanels, UserPageViewProps } from '../user-profile/user-page.view';
+
 import {
   colorVars,
   durationVars,
