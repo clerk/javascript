@@ -57,7 +57,7 @@ export function OrganizationProfileDangerSectionView({
                   variant='outline'
                   onClick={onDeleteOrganization}
                 >
-                  Delete account
+                  Delete organization
                 </Button>
               </Section.Actions>
             </Section.Item>

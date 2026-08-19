@@ -33,7 +33,7 @@ describe('OrganizationProfileGeneralPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
     await user.click(screen.getByRole('button', { name: 'Copy' }));
     await user.click(screen.getByRole('button', { name: 'Leave organization' }));
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    await user.click(screen.getByRole('button', { name: 'Delete organization' }));
 
     expect(onUploadLogo).toHaveBeenCalledOnce();
     expect(onNameChange).toHaveBeenCalledWith('Clerk');
