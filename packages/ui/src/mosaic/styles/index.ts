@@ -112,6 +112,15 @@ export { OrganizationProfileDetailsSectionView } from '../organization-profile/o
 export type { OrganizationProfileDetailsSectionViewProps } from '../organization-profile/organization-profile-details-section.view';
 export { OrganizationProfileGeneralPanelView } from '../organization-profile/organization-profile-general-panel.view';
 export type { OrganizationProfileGeneralPanelViewProps } from '../organization-profile/organization-profile-general-panel.view';
+export { OrganizationProfileMembersPanelView } from '../organization-profile/organization-profile-members-panel.view';
+export type { OrganizationProfileMembersPanelViewProps } from '../organization-profile/organization-profile-members-panel.view';
+export { OrganizationProfileMembersSectionView } from '../organization-profile/organization-profile-members-section.view';
+export type {
+  OrganizationProfileMember,
+  OrganizationProfileMembersPagination,
+  OrganizationProfileMembersSectionViewProps,
+  OrganizationProfileMemberStatus,
+} from '../organization-profile/organization-profile-members-section.view';
 export type { OrganizationProfilePanelId } from '../organization-profile/organization-profile-sidebar';
 export { UserPageView } from '../user-profile/user-page.view';
 export type { UserPagePanels, UserPageViewProps } from '../user-profile/user-page.view';
