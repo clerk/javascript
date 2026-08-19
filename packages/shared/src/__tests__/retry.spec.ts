@@ -172,6 +172,109 @@ describe('retry', () => {
     expect(attempts).toBe(4);
   });
 
+  test('rejects without calling the callback when the signal is already aborted', async () => {
+    const callback = vi.fn();
+    const controller = new AbortController();
+    controller.abort(new Error('cancelled'));
+
+    await expect(retry(callback, { signal: controller.signal })).rejects.toThrow('cancelled');
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  test('aborting during a delay rejects immediately and stops retrying', async () => {
+    let attempts = 0;
+    const controller = new AbortController();
+
+    const result = retry(
+      () => {
+        attempts++;
+        throw new Error('failed');
+      },
+      {
+        initialDelay: 10_000,
+        jitter: false,
+        shouldRetry: () => true,
+        signal: controller.signal,
+      },
+    );
+    const assertion = expect(result).rejects.toThrow('cancelled');
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(attempts).toBe(1);
+
+    controller.abort(new Error('cancelled'));
+    await assertion;
+
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(attempts).toBe(1);
+  });
+
+  test('rejects with the abort reason when the signal aborts while the callback is running', async () => {
+    const controller = new AbortController();
+    const onBeforeRetry = vi.fn();
+    let attempts = 0;
+
+    const result = retry(
+      () => {
+        attempts++;
+        controller.abort(new Error('cancelled'));
+        throw new Error('failed');
+      },
+      { shouldRetry: () => true, signal: controller.signal, onBeforeRetry },
+    );
+
+    await expect(result).rejects.toThrow('cancelled');
+    expect(attempts).toBe(1);
+    expect(onBeforeRetry).not.toHaveBeenCalled();
+  });
+
+  test('the abort reason wins over an onBeforeRetry rejection', async () => {
+    const controller = new AbortController();
+    let attempts = 0;
+
+    const result = retry(
+      () => {
+        attempts++;
+        throw new Error('failed');
+      },
+      {
+        shouldRetry: () => true,
+        signal: controller.signal,
+        onBeforeRetry: () => {
+          controller.abort(new Error('cancelled'));
+          throw new Error('hook failed');
+        },
+      },
+    );
+
+    await expect(result).rejects.toThrow('cancelled');
+    expect(attempts).toBe(1);
+  });
+
+  test('a functional initialDelay derives the backoff base from the error', async () => {
+    let attempts = 0;
+    retry(
+      () => {
+        attempts++;
+        throw attempts === 1 ? new Error('fast') : new Error('slow');
+      },
+      {
+        factor: 2,
+        jitter: false,
+        shouldRetry: (_, count) => count <= 2,
+        initialDelay: error => ((error as Error).message === 'fast' ? 100 : 1000),
+      },
+    ).catch(() => {});
+
+    expect(attempts).toBe(1);
+    // First retry: base 100 * 2^0
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(2);
+    // Second retry: base 1000 * 2^1
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(attempts).toBe(3);
+  });
+
   test('applies jitter by default', async () => {
     let attempts = 0;
 
