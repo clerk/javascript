@@ -204,16 +204,61 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   );
 
   const {
-    isLoading: isLoadingOrganizationDomains,
-    data: organizationDomains,
+    isLoading: isLoadingAffiliationDomains,
+    data: affiliationDomains,
+    prepareOwnershipVerification: prepareAffiliationOwnershipVerification,
+    attemptOwnershipVerification: attemptAffiliationOwnershipVerification,
+    revalidate: revalidateAffiliationDomains,
+  } = __internal_useOrganizationDomains({
+    onOwnershipVerified: handleDomainOwnershipVerified,
+  });
+
+  const {
+    isLoading: isLoadingEnterpriseSSODomains,
+    data: enterpriseSSODomains,
     createDomain,
-    prepareOwnershipVerification,
-    attemptOwnershipVerification,
-    revalidate: revalidateDomains,
+    revalidate: revalidateEnterpriseSSODomains,
   } = __internal_useOrganizationDomains({
     enrollmentMode: 'enterprise_sso',
     onOwnershipVerified: handleDomainOwnershipVerified,
   });
+
+  const organizationDomains = useMemo(() => {
+    const domains = [...(affiliationDomains ?? []), ...(enterpriseSSODomains ?? [])];
+    if (!domains.length) {
+      return undefined;
+    }
+
+    return Array.from(new Map(domains.map(domain => [domain.id, domain])).values());
+  }, [affiliationDomains, enterpriseSSODomains]);
+
+  const revalidateDomains = useCallback(
+    () => Promise.all([revalidateAffiliationDomains(), revalidateEnterpriseSSODomains()]).then(() => undefined),
+    [revalidateAffiliationDomains, revalidateEnterpriseSSODomains],
+  );
+
+  const prepareOwnershipVerification = useCallback(
+    async (domains: OrganizationDomainResource[]) => {
+      const prepared = await prepareAffiliationOwnershipVerification(domains);
+      await revalidateEnterpriseSSODomains();
+      return prepared;
+    },
+    [prepareAffiliationOwnershipVerification, revalidateEnterpriseSSODomains],
+  );
+
+  const attemptOwnershipVerification = useCallback(
+    async (domains: OrganizationDomainResource[]) => {
+      const attempted = await attemptAffiliationOwnershipVerification(domains);
+      await revalidateEnterpriseSSODomains();
+      return attempted;
+    },
+    [attemptAffiliationOwnershipVerification, revalidateEnterpriseSSODomains],
+  );
+
+  const verifiedOwnershipDomains = useMemo(
+    () => organizationDomains?.filter(domain => domain.ownershipVerification?.status === 'verified'),
+    [organizationDomains],
+  );
 
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
@@ -229,7 +274,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     const createConnection: EnterpriseConnectionMutations['createConnection'] = provider => {
       return createEnterpriseConnection({
         provider,
-        domains: organizationDomains?.map(domain => domain.name),
+        domains: verifiedOwnershipDomains?.map(domain => domain.name),
       });
     };
 
@@ -243,7 +288,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
         await deleteEnterpriseConnection(enterpriseConnection.id);
       }
 
-      const domains = enterpriseConnection?.domains ?? organizationDomains?.map(domain => domain.name);
+      const domains = enterpriseConnection?.domains ?? verifiedOwnershipDomains?.map(domain => domain.name);
 
       return createEnterpriseConnection({
         provider,
@@ -281,7 +326,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     };
   }, [
     organization,
-    organizationDomains,
+    verifiedOwnershipDomains,
     enterpriseConnection,
     createEnterpriseConnection,
     updateEnterpriseConnection,
@@ -333,7 +378,10 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     // fresh-start path they stay dormant until the connection is configured, and
     // landing on the test step then shows table-level loading, never the global
     isLoading:
-      isLoadingEnterpriseConnections || isLoadingOrganizationDomains || (hadInitialConnection && isLoadingTestRuns),
+      isLoadingEnterpriseConnections ||
+      isLoadingAffiliationDomains ||
+      isLoadingEnterpriseSSODomains ||
+      (hadInitialConnection && isLoadingTestRuns),
     enterpriseConnection,
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,

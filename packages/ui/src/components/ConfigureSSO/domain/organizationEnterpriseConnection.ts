@@ -66,8 +66,14 @@ export const isEnterpriseConnectionConfigured = (
   return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
 };
 
-export const areAllOrganizationDomainsVerified = (domains: OrganizationDomainResource[] | null | undefined): boolean =>
-  !!domains?.length && domains.every(domain => domain.ownershipVerification?.status === 'verified');
+export const areAllOrganizationDomainsVerified = (
+  domains: OrganizationDomainResource[] | null | undefined,
+): boolean => {
+  const ownershipDomains = domains?.filter(domain => domain.ownershipVerification) ?? [];
+  return (
+    !!ownershipDomains.length && ownershipDomains.every(domain => domain.ownershipVerification?.status === 'verified')
+  );
+};
 
 const connectionStatus = ({
   hasConnection,

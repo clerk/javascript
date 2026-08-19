@@ -731,11 +731,14 @@ export const teIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'ధృవీకరించబడలేదు',
         badge__verified: 'ధృవీకరించబడింది',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -758,9 +761,13 @@ export const teIN: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
+        subtitle__activePreserveAffiliation: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'మీ సంస్థ సైన్ ఇన్ చేయడానికి ఉపయోగించే డొమైన్‌ల యాజమాన్యాన్ని జోడించి ధృవీకరించండి.',
       title: 'SSO డొమైన్‌లను జోడించండి',

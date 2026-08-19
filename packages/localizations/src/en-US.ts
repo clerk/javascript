@@ -740,12 +740,15 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: 'Affiliation',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
+        ownershipLabel: 'Ownership',
+        proveOwnershipButton: 'Prove ownership',
         removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
         removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
         txtRecord: {
@@ -767,10 +770,16 @@ export const enUS: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: 'Cancel',
         removeButton: 'Remove domain',
+        removeFromSSOButton: 'Remove from SSO',
         subtitle__active:
           "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__activePreserveAffiliation:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore, but its existing affiliation verification will remain active.",
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        subtitle__preserveAffiliation:
+          "You're about to remove {{domain}} from this enterprise connection. Its existing affiliation verification will remain active.",
         title: 'Removing domain',
+        title__preserveAffiliation: 'Remove from SSO',
       },
       subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
       title: 'Add SSO domains',

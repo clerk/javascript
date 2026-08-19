@@ -730,11 +730,14 @@ export const bnIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        affiliationLabel: undefined,
         badge__expired: undefined,
         badge__unverified: 'যাচাই করা হয়নি',
         badge__verified: 'যাচাই করা হয়েছে',
         expiredAtLabel: undefined,
         expiredLabel: undefined,
+        ownershipLabel: undefined,
+        proveOwnershipButton: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
         removeButtonTooltip__lastVerifiedDomainActive: undefined,
         txtRecord: {
@@ -757,9 +760,13 @@ export const bnIN: LocalizationResource = {
       removeDomainDialog: {
         cancelButton: undefined,
         removeButton: undefined,
+        removeFromSSOButton: undefined,
         subtitle__active: undefined,
+        subtitle__activePreserveAffiliation: undefined,
         subtitle__inactive: undefined,
+        subtitle__preserveAffiliation: undefined,
         title: undefined,
+        title__preserveAffiliation: undefined,
       },
       subtitle: 'আপনার প্রতিষ্ঠান সাইন ইন করতে যে ডোমেইনগুলি ব্যবহার করে তার মালিকানা যোগ করুন এবং যাচাই করুন।',
       title: 'SSO ডোমেইন যোগ করুন',
