@@ -1,6 +1,7 @@
 type Message = {
   _id: string;
   subject: string;
+  to: Array<{ address: string }>;
 };
 
 const isMessage = (value: unknown): value is Message => {
@@ -10,7 +11,16 @@ const isMessage = (value: unknown): value is Message => {
     '_id' in value &&
     typeof value._id === 'string' &&
     'subject' in value &&
-    typeof value.subject === 'string'
+    typeof value.subject === 'string' &&
+    'to' in value &&
+    Array.isArray(value.to) &&
+    value.to.every(
+      recipient =>
+        typeof recipient === 'object' &&
+        recipient !== null &&
+        'address' in recipient &&
+        typeof recipient.address === 'string',
+    )
   );
 };
 
@@ -25,11 +35,7 @@ export const createEmailService = () => {
   };
 
   const filterMessagesByAddress = async (email: string, sub?: string) => {
-    const url = new URL('https://mailsac.com/api/inbox-filter');
-    url.searchParams.set('andTo', email);
-    if (sub) {
-      url.searchParams.set('andSubjectIncludes', sub);
-    }
+    const url = new URL(`https://mailsac.com/api/addresses/${cleanEmail(email)}/messages`);
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
     for (let attempt = 0; attempt < 5; attempt++) {
@@ -41,8 +47,15 @@ export const createEmailService = () => {
           : typeof json === 'object' && json !== null && 'messages' in json && Array.isArray(json.messages)
             ? json.messages
             : [];
-        const message = messages[0];
-        if (!isMessage(message)) {
+        const normalizedEmail = email.toLowerCase();
+        const normalizedSubject = sub?.toLowerCase();
+        const message = messages.find(
+          value =>
+            isMessage(value) &&
+            value.to.some(recipient => recipient.address.toLowerCase() === normalizedEmail) &&
+            (!normalizedSubject || value.subject.toLowerCase().includes(normalizedSubject)),
+        );
+        if (!message) {
           throw new Error('message not found');
         }
         return message;
