@@ -3,6 +3,7 @@ import type {
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -670,6 +671,48 @@ export const OAuthConsent = withClerk(
     );
   },
   { component: 'OAuthConsent', renderWhileLoading: true },
+);
+
+/**
+ * Renders the OAuth device verification flow for a signed-in user to authorize a device or app.
+ *
+ * @example
+ * ### Add a device verification page
+ *
+ * ```tsx
+ * import { OAuthDeviceVerification } from '@clerk/react';
+ *
+ * export default function DeviceVerificationPage() {
+ *   return <OAuthDeviceVerification />;
+ * }
+ * ```
+ */
+export const OAuthDeviceVerification = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthDeviceVerificationProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountOAuthDeviceVerification}
+            unmount={clerk.unmountOAuthDeviceVerification}
+            updateProps={(clerk as any).__internal_updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'OAuthDeviceVerification', renderWhileLoading: true },
 );
 
 export const UserAvatar = withClerk(

@@ -99,6 +99,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthDeviceVerificationProps,
   OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -1532,6 +1533,36 @@ export class Clerk implements ClerkInterface {
    */
   public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
     return this.unmountOAuthConsent(node);
+  };
+
+  public mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'OAuthDeviceVerification';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'oauthDeviceVerification',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
