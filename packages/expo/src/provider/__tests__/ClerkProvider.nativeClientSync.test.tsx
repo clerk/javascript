@@ -1625,7 +1625,7 @@ describe('ClerkProvider native client sync', () => {
 
     // Bootstrap fetches the client too, and that fetch fails here, so drain its retries first.
     await act(async () => {
-      await waitForPendingJsToNativeSync().catch(() => undefined);
+      await expect(waitForPendingJsToNativeSync()).rejects.toThrow('stale session 401');
     });
 
     fetchClient.mockClear();
