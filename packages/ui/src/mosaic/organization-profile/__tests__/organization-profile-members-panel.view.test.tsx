@@ -99,6 +99,16 @@ describe('OrganizationProfileMembersPanelView', () => {
     expect(callbacks.onManageMember).toHaveBeenNthCalledWith(2, 'active');
   });
 
+  it('preserves selections outside the rendered members when selecting all', async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    renderView({ selectedIds: ['hidden'], onSelectionChange });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select all members' }));
+
+    expect(onSelectionChange).toHaveBeenCalledWith(['hidden', 'request', 'invited', 'active']);
+  });
+
   it('forwards pagination changes and renders an empty state', async () => {
     const onPageChange = vi.fn();
     const onPageSizeChange = vi.fn();

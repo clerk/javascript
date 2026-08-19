@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
+import { toggleVisibleSelection } from '../profile-selection';
 import { mergeStyleProps, themeProps } from '../props';
 import { styles } from './organization-profile-api-keys-section.styles';
 
@@ -45,7 +46,12 @@ export function OrganizationProfileApiKeysSectionView({
   const allSelected = apiKeys.length > 0 && apiKeys.every(apiKey => selectedIds.includes(apiKey.id));
 
   const toggleAll = () => {
-    onSelectionChange(allSelected ? [] : apiKeys.map(apiKey => apiKey.id));
+    onSelectionChange(
+      toggleVisibleSelection(
+        selectedIds,
+        apiKeys.map(apiKey => apiKey.id),
+      ),
+    );
   };
 
   const toggleOne = (id: string) => {

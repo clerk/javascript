@@ -4,19 +4,20 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPageViewProps } from '../organization-page.view';
 import { OrganizationPageView } from '../organization-page.view';
-import { OrganizationProfileGeneralPanelView } from '../organization-profile-general-panel.view';
 
-const general = (
-  <OrganizationProfileGeneralPanelView
-    name='Clerk'
-    slug='clerk'
-  />
-);
+const general = { name: 'Clerk', slug: 'clerk' };
+const members = {
+  members: [{ id: 'member', name: 'Ada Lovelace', emailAddress: 'ada@clerk.dev', status: 'active' as const }],
+  searchValue: '',
+  selectedIds: [],
+  onSearchChange: vi.fn(),
+  onSelectionChange: vi.fn(),
+};
 
 function renderView(overrides: Partial<OrganizationPageViewProps> = {}) {
   const props: OrganizationPageViewProps = {
     activePanel: 'general',
-    panels: { general, members: <h3>Members</h3> },
+    panels: { general, members },
     onPanelChange: vi.fn(),
     ...overrides,
   };
@@ -44,6 +45,13 @@ describe('OrganizationPageView', () => {
     await user.click(screen.getByRole('button', { name: 'Members' }));
 
     expect(onPanelChange).toHaveBeenCalledWith('members');
+  });
+
+  it('renders supplied panel data through the matching panel view', () => {
+    renderView({ activePanel: 'members' });
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeInTheDocument();
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
   });
 
   it('falls back to General when the requested panel is unavailable', () => {

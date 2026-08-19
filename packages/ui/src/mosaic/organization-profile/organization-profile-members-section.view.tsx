@@ -5,6 +5,7 @@ import { Avatar } from '../components/avatar';
 import { Badge } from '../components/badge';
 import { Button } from '../components/button';
 import { Icon } from '../components/icon';
+import { toggleVisibleSelection } from '../profile-selection';
 import { mergeStyleProps, themeProps } from '../props';
 import { styles } from './organization-profile-members-section.styles';
 
@@ -56,7 +57,12 @@ export function OrganizationProfileMembersSectionView({
   const allSelected = members.length > 0 && members.every(member => selectedIds.includes(member.id));
 
   const toggleAll = () => {
-    onSelectionChange(allSelected ? [] : members.map(member => member.id));
+    onSelectionChange(
+      toggleVisibleSelection(
+        selectedIds,
+        members.map(member => member.id),
+      ),
+    );
   };
 
   const toggleOne = (id: string) => {

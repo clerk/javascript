@@ -7,6 +7,7 @@ import { Heading } from '../components/heading';
 import { Icon } from '../components/icon';
 import { Input } from '../components/input';
 import { Menu } from '../components/menu';
+import { toggleVisibleSelection } from '../profile-selection';
 import { mergeStyleProps, themeProps } from '../props';
 import { styles } from './user-profile-api-keys-panel.styles';
 
@@ -54,7 +55,12 @@ export function UserProfileApiKeysPanelView({
   const allSelected = apiKeys.length > 0 && apiKeys.every(apiKey => selectedIds.includes(apiKey.id));
 
   const toggleAll = () => {
-    onSelectionChange(allSelected ? [] : apiKeys.map(apiKey => apiKey.id));
+    onSelectionChange(
+      toggleVisibleSelection(
+        selectedIds,
+        apiKeys.map(apiKey => apiKey.id),
+      ),
+    );
   };
 
   const toggleOne = (id: string) => {

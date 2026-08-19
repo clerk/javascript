@@ -76,6 +76,16 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(onRevoke).toHaveBeenCalledWith('primary');
   });
 
+  it('preserves selections outside the rendered API keys when selecting all', async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    renderView({ selectedIds: ['hidden'], onSelectionChange });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select all API keys' }));
+
+    expect(onSelectionChange).toHaveBeenCalledWith(['hidden', 'primary', 'legacy']);
+  });
+
   it('forwards page and results-per-page changes', async () => {
     const onPageChange = vi.fn();
     const onPageSizeChange = vi.fn();

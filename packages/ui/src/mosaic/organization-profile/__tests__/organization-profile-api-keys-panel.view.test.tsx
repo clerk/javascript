@@ -78,6 +78,16 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(callbacks.onManage).toHaveBeenCalledWith('integration');
   });
 
+  it('preserves selections outside the rendered API keys when selecting all', async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    renderView({ selectedIds: ['hidden'], onSelectionChange });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select all API keys' }));
+
+    expect(onSelectionChange).toHaveBeenCalledWith(['hidden', 'primary', 'integration']);
+  });
+
   it('forwards pagination changes and renders an empty state', async () => {
     const onPageChange = vi.fn();
     const onPageSizeChange = vi.fn();
