@@ -14,8 +14,7 @@ import { styles } from './section.styles';
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionGroupProps = MosaicComponentProps<'div'>;
-export type SectionRowVariant = 'default' | 'list';
-export type SectionRowProps = MosaicComponentProps<'div'> & { variant?: SectionRowVariant };
+export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'div'>;
 export type SectionItemProps = MosaicComponentProps<'div'>;
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -32,14 +31,7 @@ const mediaSizes = {
   xl: styles.mediaXl,
 };
 
-const rowVariants = {
-  default: styles.rowDefault,
-  list: styles.rowList,
-};
-
 const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
-const SectionItemsContext = React.createContext(false);
-const SectionRowVariantContext = React.createContext<SectionRowVariant>('default');
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
   { render, className, style, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
@@ -106,39 +98,17 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
   });
 });
 
-const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
-  { variant = 'default', render, className, style, ...rest },
-  ref,
-) {
-  const element = useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-row', { variant }),
-        stylex.props(reset.base, styles.row, rowVariants[variant]),
-        className,
-        style,
-      ),
-      ...rest,
-    },
-  });
-
-  return <SectionRowVariantContext.Provider value={variant}>{element}</SectionRowVariantContext.Provider>;
-});
-
 const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function SectionItems(
   { render, className, style, ...rest },
   ref,
 ) {
-  const element = useRender({
+  return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('section-items', { nested: true }),
+        themeProps('section-items'),
         stylex.props(reset.base, styles.items, sectionItemsMarker),
         className,
         style,
@@ -146,33 +116,33 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
       ...rest,
     },
   });
+});
 
-  return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
+const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
+  { render, className, style, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row), className, style),
+      ...rest,
+    },
+  });
 });
 
 const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
   { render, className, style, ...rest },
   ref,
 ) {
-  const nested = React.useContext(SectionItemsContext);
-  const rowVariant = React.useContext(SectionRowVariantContext);
-
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('section-item', { nested }),
-        stylex.props(
-          reset.base,
-          styles.item,
-          nested && styles.nestedItem,
-          rowVariant === 'list' && (nested ? styles.listItem : styles.listHeader),
-        ),
-        className,
-        style,
-      ),
+      ...mergeStyleProps(themeProps('section-item'), stylex.props(reset.base, styles.item), className, style),
       ...rest,
     },
   });
@@ -202,19 +172,12 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
   { render, className, style, ...rest },
   ref,
 ) {
-  const nested = React.useContext(SectionItemsContext);
-
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('section-content', { nested }),
-        stylex.props(reset.base, styles.content),
-        className,
-        style,
-      ),
+      ...mergeStyleProps(themeProps('section-content'), stylex.props(reset.base, styles.content), className, style),
       ...rest,
     },
   });

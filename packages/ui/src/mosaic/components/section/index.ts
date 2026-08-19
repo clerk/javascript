@@ -11,6 +11,5 @@ export type {
   SectionMediaSize,
   SectionRootProps,
   SectionRowProps,
-  SectionRowVariant,
   SectionTitleProps,
 } from './section';

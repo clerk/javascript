@@ -56,7 +56,7 @@ export function UserProfileActiveDevicesSectionView({
       {otherDevices.length > 0 ? (
         <Section.Root aria-label='Other devices'>
           <Section.Group>
-            <Section.Row variant='list'>
+            <Section.Row>
               <Section.Item>
                 <Section.Content>
                   <Section.Label>

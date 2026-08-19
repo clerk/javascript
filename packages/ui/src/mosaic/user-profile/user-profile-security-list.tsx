@@ -27,7 +27,7 @@ export function UserProfileSecurityList({
     <Section.Root aria-label={sectionTitle ? undefined : label}>
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Group>
-        <Section.Row variant='list'>
+        <Section.Row>
           <Section.Item>
             <Section.Content>
               <Section.Label>{label}</Section.Label>

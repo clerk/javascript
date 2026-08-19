@@ -35,55 +35,50 @@ export const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
-    width: 'auto',
-  },
-  rowDefault: {
     paddingBlockEnd: {
       default: space['4'],
-      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['1'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
     },
-    paddingBlockStart: space['4'],
+    paddingBlockStart: {
+      default: space['4'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: space['3'],
+    },
     rowGap: {
       default: space['2'],
-      [stylex.when.descendant('[data-nested]', sectionItemsMarker)]: space['3'],
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
     },
-    minHeight: `calc(${space['18.5']} + 1px)`,
-  },
-  rowList: {
-    paddingBlock: 0,
-    rowGap: 0,
-    minHeight: 0,
+    minHeight: {
+      default: `calc(${space['18.5']} + 1px)`,
+      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
+    },
+    width: 'auto',
   },
   items: {
+    backgroundColor: colorVars['--cl-color-border'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: '1px',
     display: 'flex',
     flexDirection: 'column',
+    marginBlockStart: space['3'],
+    rowGap: '1px',
     width: '100%',
   },
   item: {
+    paddingBlock: {
+      default: null,
+      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: space['4'],
+    },
     alignItems: 'center',
+    backgroundColor: {
+      default: null,
+      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: colorVars['--cl-color-card'],
+    },
     columnGap: space['3'],
     display: 'flex',
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
     width: '100%',
-  },
-  nestedItem: {
-    paddingBlock: space['1'],
-  },
-  listHeader: {
-    paddingBlock: space['3'],
-    borderBlockEndColor: colorVars['--cl-color-border'],
-    borderBlockEndStyle: 'solid',
-    borderBlockEndWidth: '1px',
-  },
-  listItem: {
-    paddingBlock: space['4'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: {
-      default: '1px',
-      ':first-child': '0px',
-    },
   },
   mediaBase: {
     alignItems: 'center',
