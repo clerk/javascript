@@ -1,47 +1,49 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, targetVars, typeScaleVars } from './tokens.stylex';
+
+const profilePageCompact = '@media (max-width: 48rem)' as const;
 
 export const styles = stylex.create({
   root: {
+    borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
     color: colorVars['--cl-color-card-foreground'],
     display: 'grid',
     gridTemplateColumns: {
       default: `calc(${space['40']} + ${space['15']}) minmax(0, 1fr)`,
-      '@media (max-width: 47.99rem)': 'minmax(0, 1fr)',
+      [profilePageCompact]: 'minmax(0, 1fr)',
     },
     gridTemplateRows: 'auto',
     maxWidth: '66rem',
-    minHeight: 0,
+    minHeight: '37.5rem',
     width: '100%',
   },
   sidebar: {
     padding: space['4'],
     borderBlockEndColor: {
       default: 'transparent',
-      '@media (max-width: 47.99rem)': colorVars['--cl-color-border'],
+      [profilePageCompact]: colorVars['--cl-color-border'],
     },
     borderBlockEndStyle: 'solid',
     borderBlockEndWidth: {
       default: '0px',
-      '@media (max-width: 47.99rem)': '1px',
+      [profilePageCompact]: '1px',
     },
     borderInlineEndColor: colorVars['--cl-color-border'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: {
       default: '1px',
-      '@media (max-width: 47.99rem)': '0px',
+      [profilePageCompact]: '0px',
     },
     display: 'flex',
     flexDirection: {
       default: 'column',
-      '@media (max-width: 47.99rem)': 'row',
+      [profilePageCompact]: 'row',
     },
     minHeight: 0,
     minWidth: 0,
@@ -51,12 +53,12 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: {
       default: 'column',
-      '@media (max-width: 47.99rem)': 'row',
+      [profilePageCompact]: 'row',
     },
     minWidth: 0,
     overflowX: {
       default: 'visible',
-      '@media (max-width: 47.99rem)': 'auto',
+      [profilePageCompact]: 'auto',
     },
   },
   navigationItem: {
@@ -74,9 +76,17 @@ export const styles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':hover': colorVars['--cl-color-border-faded'],
+      ':where([data-selected])': colorVars['--cl-color-border-faded'],
+      ':active': colorVars['--cl-color-border-faded'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-faded'],
+      },
     },
-    color: colorVars['--cl-color-neutral-faded'],
+    color: {
+      default: colorVars['--cl-color-neutral-faded'],
+      ':where([data-selected])': colorVars['--cl-color-card-foreground'],
+    },
     cursor: 'pointer',
     display: 'flex',
     flexShrink: 0,
@@ -86,14 +96,14 @@ export const styles = stylex.create({
     outlineOffset: '2px',
     textAlign: 'start',
     whiteSpace: 'nowrap',
+    minHeight: {
+      default: null,
+      '@media (pointer: coarse)': targetVars['--cl-target-coarse'],
+    },
     width: {
       default: '100%',
-      '@media (max-width: 47.99rem)': 'auto',
+      [profilePageCompact]: 'auto',
     },
-  },
-  navigationItemActive: {
-    backgroundColor: colorVars['--cl-color-border-faded'],
-    color: colorVars['--cl-color-card-foreground'],
   },
   branding: {
     gap: space['1'],
@@ -101,7 +111,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-neutral-faded'],
     display: {
       default: 'flex',
-      '@media (max-width: 47.99rem)': 'none',
+      [profilePageCompact]: 'none',
     },
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -119,9 +129,7 @@ export const styles = stylex.create({
     outlineOffset: '2px',
     height: space['4'],
   },
-  main: {
-    minWidth: 0,
-  },
+  main: { minWidth: 0 },
   content: {
     paddingBlock: space['16'],
     paddingInline: space['16'],

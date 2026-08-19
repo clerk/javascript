@@ -15,7 +15,7 @@ export const styles = stylex.create({
     width: space['5'],
   },
   providerMedia: {
-    borderColor: 'light-dark(var(--cl-color-border-faded), var(--cl-color-background))',
+    borderColor: `light-dark(${colorVars['--cl-color-border-faded']}, ${colorVars['--cl-color-background']})`,
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',

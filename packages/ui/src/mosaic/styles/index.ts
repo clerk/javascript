@@ -5,6 +5,14 @@
 // as components migrate.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
+export { ProfilePage } from '../profile-page';
+export type {
+  ProfilePageContentProps,
+  ProfilePageItem,
+  ProfilePagePanelProps,
+  ProfilePageRootProps,
+  ProfilePageSidebarProps,
+} from '../profile-page';
 
 export { AlertDialog, createConfirmHandle, useConfirmedClose } from '../components/alert-dialog';
 export type {

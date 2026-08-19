@@ -1,8 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import React from 'react';
 
-import { mergeStyleProps, themeProps } from '../props';
-import { styles } from './user-profile.styles';
+import type { ProfilePageRootProps } from '../profile-page';
+import { ProfilePage } from '../profile-page';
 import type { UserProfileApiKeysPanelViewProps } from './user-profile-api-keys-panel.view';
 import { UserProfileApiKeysPanelView } from './user-profile-api-keys-panel.view';
 import type { UserProfileBillingPanelViewProps } from './user-profile-billing-panel.view';
@@ -21,7 +20,7 @@ export interface UserPagePanels {
   apiKeys?: UserProfileApiKeysPanelViewProps;
 }
 
-export interface UserPageViewProps {
+export interface UserPageViewProps extends Omit<ProfilePageRootProps, 'children' | 'value' | 'onValueChange'> {
   activePanel: UserProfilePanelId;
   panels: UserPagePanels;
   onPanelChange: (panel: UserProfilePanelId) => void;
@@ -37,7 +36,7 @@ function getAvailablePanels(panels: UserPagePanels): UserProfilePanelId[] {
   ];
 }
 
-function Panel({ panel, panels }: { panel: UserProfilePanelId; panels: UserPagePanels }): ReactElement {
+function Panel({ panel, panels }: { panel: UserProfilePanelId; panels: UserPagePanels }): React.ReactElement {
   switch (panel) {
     case 'security':
       return panels.security ? (
@@ -62,31 +61,46 @@ function Panel({ panel, panels }: { panel: UserProfilePanelId; panels: UserPageP
   }
 }
 
-export function UserPageView({
-  activePanel,
-  panels,
-  onPanelChange,
-  renderBranding = true,
-}: UserPageViewProps): ReactElement {
+export const UserPageView = React.forwardRef<HTMLDivElement, UserPageViewProps>(function UserPageView(
+  { activePanel, panels, onPanelChange, renderBranding = true, render, className, style, ...rest },
+  ref,
+) {
   const availablePanels = getAvailablePanels(panels);
   const resolvedPanel = availablePanels.includes(activePanel) ? activePanel : 'account';
+  const handlePanelChange = (value: string) => {
+    const panel = availablePanels.find(candidate => candidate === value);
+    if (panel) {
+      onPanelChange(panel);
+    }
+  };
 
   return (
-    <div {...mergeStyleProps(themeProps('user-page'), stylex.props(styles.root))}>
+    <ProfilePage.Root
+      ref={ref}
+      value={resolvedPanel}
+      onValueChange={handlePanelChange}
+      render={render}
+      className={className}
+      style={style}
+      {...rest}
+    >
       <UserProfileSidebar
-        activePanel={resolvedPanel}
         panels={availablePanels}
         renderBranding={renderBranding}
-        onPanelChange={onPanelChange}
       />
-      <main {...stylex.props(styles.main)}>
-        <div {...stylex.props(styles.content)}>
-          <Panel
-            panel={resolvedPanel}
-            panels={panels}
-          />
-        </div>
-      </main>
-    </div>
+      <ProfilePage.Content>
+        {availablePanels.map(panel => (
+          <ProfilePage.Panel
+            key={panel}
+            value={panel}
+          >
+            <Panel
+              panel={panel}
+              panels={panels}
+            />
+          </ProfilePage.Panel>
+        ))}
+      </ProfilePage.Content>
+    </ProfilePage.Root>
   );
-}
+});
