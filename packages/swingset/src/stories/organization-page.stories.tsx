@@ -1,5 +1,6 @@
 import type { OrganizationPagePanels } from '@clerk/ui/mosaic/organization-profile/organization-page.view';
 import { OrganizationPageView } from '@clerk/ui/mosaic/organization-profile/organization-page.view';
+import { OrganizationProfileApiKeysPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-api-keys-panel.view';
 import { OrganizationProfileBillingPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-billing-panel.view';
 import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-general-panel.view';
 import { OrganizationProfileMembersPanelView } from '@clerk/ui/mosaic/organization-profile/organization-profile-members-panel.view';
@@ -9,6 +10,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { apiKeys } from './organization-profile-api-keys-section.stories';
 import { invoices } from './organization-profile-invoices-section.stories';
 import { members } from './organization-profile-members-section.stories';
 import { paymentMethods } from './organization-profile-payment-methods-section.stories';
@@ -24,15 +26,13 @@ export const meta: StoryMeta = {
   source: 'packages/ui/src/mosaic/organization-profile/organization-page.view.tsx',
 };
 
-function PlaceholderPanel({ title }: { title: string }) {
-  return <h3>{title}</h3>;
-}
-
 export function Default() {
+  const [apiKeySearch, setApiKeySearch] = useState('');
   const [activePanel, setActivePanel] = useState<OrganizationProfilePanelId>('general');
   const [name, setName] = useState('Clerk');
   const [memberSearch, setMemberSearch] = useState('');
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
+  const [selectedApiKeyIds, setSelectedApiKeyIds] = useState<string[]>([]);
 
   const panels: OrganizationPagePanels = {
     general: (
@@ -97,7 +97,20 @@ export function Default() {
         }}
       />
     ),
-    'api-keys': <PlaceholderPanel title='API Keys' />,
+    'api-keys': (
+      <OrganizationProfileApiKeysPanelView
+        apiKeys={apiKeys}
+        pagination={{ page: 1, pageCount: 2, pageSize: 10, pageSizeOptions: [10, 25, 50] }}
+        searchValue={apiKeySearch}
+        selectedIds={selectedApiKeyIds}
+        onCreate={() => undefined}
+        onManage={() => undefined}
+        onPageChange={() => undefined}
+        onPageSizeChange={() => undefined}
+        onSearchChange={setApiKeySearch}
+        onSelectionChange={setSelectedApiKeyIds}
+      />
+    ),
   };
 
   return (

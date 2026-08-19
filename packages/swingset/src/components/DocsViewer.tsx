@@ -12,6 +12,7 @@ import { ViewSource } from './ViewSource';
 const docModules: Record<string, Record<string, React.ComponentType>> = {
   'organization-profile': {
     'organization-page': dynamic(() => import('../stories/organization-page.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-billing-panel': dynamic(() => import('../stories/organization-profile-billing-panel.mdx')),
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
@@ -20,6 +21,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
       () => import('../stories/organization-profile-details-section.mdx'),
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-section': dynamic(
+      () => import('../stories/organization-profile-api-keys-section.mdx'),
+    ),
     'organization-profile-members-section': dynamic(
       () => import('../stories/organization-profile-members-section.mdx'),
     ),

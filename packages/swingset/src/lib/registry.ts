@@ -63,6 +63,15 @@ import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../s
 import { meta as menuMeta } from '../stories/menu.stories';
 import { Default as OrganizationPageDefault, meta as organizationPageMeta } from '../stories/organization-page.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
+  Default as OrganizationProfileApiKeysSectionDefault,
+  Empty as OrganizationProfileApiKeysSectionEmpty,
+  meta as organizationProfileApiKeysSectionMeta,
+} from '../stories/organization-profile-api-keys-section.stories';
+import {
   Default as OrganizationProfileBillingPanelDefault,
   meta as organizationProfileBillingPanelMeta,
 } from '../stories/organization-profile-billing-panel.stories';
@@ -344,6 +353,10 @@ const organizationProfileGeneralPanelModule: StoryModule = {
   meta: organizationProfileGeneralPanelMeta,
   Default: OrganizationProfileGeneralPanelDefault,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+};
 const organizationProfileBillingPanelModule: StoryModule = {
   meta: organizationProfileBillingPanelMeta,
   Default: OrganizationProfileBillingPanelDefault,
@@ -368,6 +381,11 @@ const organizationProfileMembersSectionModule: StoryModule = {
   meta: organizationProfileMembersSectionMeta,
   Default: OrganizationProfileMembersSectionDefault,
   Empty: OrganizationProfileMembersSectionEmpty,
+};
+const organizationProfileApiKeysSectionModule: StoryModule = {
+  meta: organizationProfileApiKeysSectionMeta,
+  Default: OrganizationProfileApiKeysSectionDefault,
+  Empty: OrganizationProfileApiKeysSectionEmpty,
 };
 const organizationProfileInvoicesSectionModule: StoryModule = {
   meta: organizationProfileInvoicesSectionMeta,
@@ -476,7 +494,9 @@ export const registry: StoryModule[] = [
   organizationProfileMembersPanelModule,
   organizationProfileSecurityPanelModule,
   organizationProfileBillingPanelModule,
+  organizationProfileApiKeysPanelModule,
   // Organization Profile · Sections
+  organizationProfileApiKeysSectionModule,
   organizationProfileDetailsSectionModule,
   organizationProfileDangerSectionModule,
   organizationProfileInvoicesSectionModule,
