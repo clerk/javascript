@@ -84,12 +84,12 @@ describe('Section', () => {
     expect(screen.getAllByText(/Edit|More/)).toHaveLength(2);
     expect(screen.getByTestId('items')).toHaveClass('cl-section-items');
     expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
-    expect(screen.getByTestId('items')).not.toHaveAttribute('data-nested');
-    expect(screen.getByTestId('nested-item')).not.toHaveAttribute('data-nested');
-    expect(screen.getByTestId('nested-content')).not.toHaveAttribute('data-nested');
+    expect(screen.getByTestId('items')).toHaveAttribute('data-nested');
+    expect(screen.getByTestId('nested-item')).toHaveAttribute('data-nested');
+    expect(screen.getByTestId('nested-content')).toHaveAttribute('data-nested');
   });
 
-  it('uses the item collection structure without public styling variants', () => {
+  it('retains public nesting hooks while deriving layout from the item collection structure', () => {
     render(
       <Section.Root>
         <Section.Group>
@@ -105,8 +105,8 @@ describe('Section', () => {
     );
 
     expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
-    expect(screen.getByText('one@example.com')).not.toHaveAttribute('data-nested');
-    expect(screen.getByText('two@example.com')).not.toHaveAttribute('data-nested');
+    expect(screen.getByText('one@example.com')).toHaveAttribute('data-nested');
+    expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
   });
 
   it('lets consumer props win and forwards refs and custom elements', () => {

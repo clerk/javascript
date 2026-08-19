@@ -32,6 +32,7 @@ const mediaSizes = {
 };
 
 const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
+const SectionItemsContext = React.createContext(false);
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
   { render, className, style, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
@@ -102,13 +103,13 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
   { render, className, style, ...rest },
   ref,
 ) {
-  return useRender({
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('section-items'),
+        themeProps('section-items', { nested: true }),
         stylex.props(reset.base, styles.items, sectionItemsMarker),
         className,
         style,
@@ -116,6 +117,8 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
       ...rest,
     },
   });
+
+  return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
 });
 
 const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow(
@@ -137,12 +140,19 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
   { render, className, style, ...rest },
   ref,
 ) {
+  const nested = React.useContext(SectionItemsContext);
+
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-item'), stylex.props(reset.base, styles.item), className, style),
+      ...mergeStyleProps(
+        themeProps('section-item', { nested }),
+        stylex.props(reset.base, styles.item),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
@@ -172,12 +182,19 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
   { render, className, style, ...rest },
   ref,
 ) {
+  const nested = React.useContext(SectionItemsContext);
+
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-content'), stylex.props(reset.base, styles.content), className, style),
+      ...mergeStyleProps(
+        themeProps('section-content', { nested }),
+        stylex.props(reset.base, styles.content),
+        className,
+        style,
+      ),
       ...rest,
     },
   });
