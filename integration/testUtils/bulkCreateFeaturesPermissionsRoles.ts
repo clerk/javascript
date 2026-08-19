@@ -37,6 +37,9 @@ export async function bulkCreateFeaturesPermissionsRoles(
     }
   }
 
+  const { data } = await client.organizationPermissions.getOrganizationPermissionList({ limit: 20 });
+  const permissionIds = Object.fromEntries(data.map(p => [p.key, p.id]));
+
   for (const roleKey in config.roles) {
     const role = config.roles[roleKey];
     await client.organizationRoles.createOrganizationRole({
@@ -44,7 +47,7 @@ export async function bulkCreateFeaturesPermissionsRoles(
       ...role,
       permissions: Object.entries(role.permissions)
         .filter(([_, enabled]) => enabled)
-        .map(([permission]) => permission),
+        .map(([permission]) => permissionIds[permission]),
     });
   }
 }
