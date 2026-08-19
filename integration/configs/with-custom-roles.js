@@ -12,16 +12,12 @@ export default defineConfig({
         captcha_widget_type: '',
       },
       email_link_require_same_client: false,
-      pii_protection_enabled: false,
       user_lockout: {
         max_attempts: 100,
       },
     },
     auth_email: {
       sign_in_strategies: [],
-    },
-    auth_passkey: {
-      satisfies_second_factor: false,
     },
     auth_password: {
       device_trust: {
