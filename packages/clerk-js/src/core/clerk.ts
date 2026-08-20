@@ -192,6 +192,7 @@ import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
+import { ProtectCheckGate } from './protectCheckGate';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -980,6 +981,25 @@ export class Clerk implements ClerkInterface {
   public __internal_closeBlankCaptchaModal = (): Promise<unknown> => {
     this.assertComponentsReady(this.#clerkUI);
     return this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('blankCaptcha'));
+  };
+
+  public __internal_openProtectCheckModal = (): Promise<unknown> => {
+    this.assertComponentsReady(this.#clerkUI);
+    return this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.openModal('protectCheck', {}));
+  };
+
+  public __internal_closeProtectCheckModal = (): Promise<unknown> => {
+    this.assertComponentsReady(this.#clerkUI);
+    return this.#clerkUI.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('protectCheck'));
+  };
+
+  /**
+   * Lets a mounted surface that renders Protect challenges itself (the prebuilt SignIn/SignUp
+   * components) suspend managed challenge handling for its flow. The inline placement marker is
+   * NOT a registrant — it only relocates where the managed gate renders. Returns a disposer.
+   */
+  public __internal_registerProtectCheckHost = (flow: 'signIn' | 'signUp'): (() => void) => {
+    return ProtectCheckGate.getInstance().registerHost(flow);
   };
 
   public __internal_loadStripeJs = async () => {

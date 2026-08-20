@@ -70,3 +70,9 @@ export const SUPPORTED_FAPI_VERSION = '2026-05-12';
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
 export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
+/**
+ * Placement marker for Protect challenges, mirroring the `clerk-captcha` contract: when an
+ * element with this id exists, challenges render inline into it instead of the managed modal.
+ * The prebuilt protect-check cards use the same id for their container.
+ */
+export const PROTECT_CHECK_ELEMENT_ID = 'clerk-protect-check';

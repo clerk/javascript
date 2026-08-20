@@ -13,6 +13,7 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
+import { findPendingProtectCheck } from '../protectCheckGate';
 import { type Clerk, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
@@ -88,7 +89,16 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts), {
+      // Lets the managed Protect challenge gate issue its own PATCH/GET with full resource-call
+      // semantics (deferred-hydration rules, ClerkAPIResponseError on 4xx) without re-entering
+      // FraudProtection.
+      rawFetch: (init, o) => this._baseFetch(init as FapiRequestInit, o),
+      // Performs the client piggyback update `_baseFetch` defers for gated payloads; the gate
+      // publishes only when a registered host owns the pending state.
+      publish: payload => this._updateClient(payload),
+      signal: requestInit.signal ?? undefined,
+    });
   }
 
   // TODO @userland-errors:
@@ -137,7 +147,13 @@ export abstract class BaseResource {
 
     // TODO: Link to Client payload piggybacking design document
     if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
-      this._updateClient<J>(payload);
+      // Gated payloads defer publication: emitting the intermediate `needs_protect_check`
+      // client state would leak the gate to listeners while the managed challenge gate is
+      // holding the caller's promise. The gate publishes the pending state itself when a
+      // registered host owns it, and every replay/PATCH publishes its own final payload here.
+      if (!findPendingProtectCheck(payload)) {
+        this._updateClient<J>(payload);
+      }
     }
 
     if (status >= 200 && status <= 299) {
