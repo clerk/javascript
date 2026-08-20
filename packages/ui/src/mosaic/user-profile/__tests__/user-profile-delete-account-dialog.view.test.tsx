@@ -1,0 +1,51 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+
+import { MosaicProvider } from '../../MosaicProvider';
+import { UserProfileDeleteAccountDialogView } from '../user-profile-delete-account-dialog.view';
+
+function Harness({ onDelete = vi.fn() }: { onDelete?: () => void }) {
+  const [confirmation, setConfirmation] = useState('');
+
+  return (
+    <MosaicProvider>
+      <UserProfileDeleteAccountDialogView
+        open
+        confirmation={confirmation}
+        onConfirmationChange={setConfirmation}
+        onDelete={onDelete}
+      />
+    </MosaicProvider>
+  );
+}
+
+describe('UserProfileDeleteAccountDialogView', () => {
+  it('renders an accessible destructive confirmation', () => {
+    render(<Harness />);
+
+    expect(screen.getByRole('alertdialog', { name: 'Delete account' })).toHaveAccessibleDescription(
+      'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
+    );
+    expect(screen.getByLabelText('Type “Delete account” below to continue')).toHaveAttribute(
+      'placeholder',
+      'Delete account',
+    );
+    expect(screen.getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('requires the exact confirmation before deleting', async () => {
+    const onDelete = vi.fn();
+    const user = userEvent.setup();
+    render(<Harness onDelete={onDelete} />);
+
+    const input = screen.getByLabelText('Type “Delete account” below to continue');
+    await user.type(input, 'delete account{Enter}');
+    expect(onDelete).not.toHaveBeenCalled();
+
+    await user.clear(input);
+    await user.type(input, 'Delete account{Enter}');
+    expect(onDelete).toHaveBeenCalledOnce();
+  });
+});

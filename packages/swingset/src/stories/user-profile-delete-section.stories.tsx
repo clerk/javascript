@@ -2,6 +2,8 @@ import { UserProfileDeleteSectionView } from '@clerk/ui/mosaic/user-profile/user
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
+
 export { default as __source } from './user-profile-delete-section.stories?raw';
 
 export const meta: StoryMeta = {
@@ -13,5 +15,12 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <UserProfileDeleteSectionView onDelete={() => undefined} />;
+  const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
+
+  return (
+    <>
+      <UserProfileDeleteSectionView onDelete={openDeleteAccountDialog} />
+      {deleteAccountDialog}
+    </>
+  );
 }

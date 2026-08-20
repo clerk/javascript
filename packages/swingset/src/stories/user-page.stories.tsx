@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 
 export { default as __source } from './user-page.stories?raw';
@@ -47,6 +48,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
 ];
 
 export function Default() {
+  const { openDeleteAccountDialog, deleteAccountDialog } = useDeleteAccountDialogStory();
   const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
   const [activePanel, setActivePanel] = useState<UserProfilePanelId>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
@@ -124,7 +126,7 @@ export function Default() {
             isVerified: true,
           },
         ]),
-      onDeleteAccount: () => undefined,
+      onDeleteAccount: openDeleteAccountDialog,
       onEditProfilePicture: () => undefined,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
@@ -165,7 +167,7 @@ export function Default() {
           { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
         ]),
       onChangePassword: openPasswordDialog,
-      onDeleteAccount: () => undefined,
+      onDeleteAccount: openDeleteAccountDialog,
       onManageDevice: () => undefined,
       onManagePasskey: () => undefined,
       onRegenerateBackupCodes: () =>
@@ -252,6 +254,7 @@ export function Default() {
         onPanelChange={setActivePanel}
       />
       {passwordDialog}
+      {deleteAccountDialog}
     </>
   );
 }
