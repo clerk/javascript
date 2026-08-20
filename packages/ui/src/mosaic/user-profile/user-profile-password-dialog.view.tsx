@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { type FormEvent, useId } from 'react';
+import { type FormEvent, type ReactNode, useId } from 'react';
 
 import { Button } from '../components/button';
 import { Card } from '../components/card';
@@ -25,6 +25,8 @@ export interface UserProfilePasswordDialogViewProps extends Pick<DialogProps, 'o
   canSubmit?: boolean;
   submitting?: boolean;
   errors?: Partial<Record<UserProfilePasswordField, string>>;
+  /** A verification prompt rendered inside the password dialog's stacking context. */
+  verificationDialog?: ReactNode;
   onValueChange: <Field extends UserProfilePasswordField>(
     field: Field,
     value: UserProfilePasswordValues[Field],
@@ -38,6 +40,7 @@ export function UserProfilePasswordDialogView({
   canSubmit = false,
   submitting = false,
   errors = {},
+  verificationDialog,
   onValueChange,
   onSubmit,
   ...dialogProps
@@ -130,6 +133,7 @@ export function UserProfilePasswordDialogView({
           </Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>
+      {verificationDialog}
     </Dialog.Root>
   );
 }
@@ -151,6 +155,7 @@ function SignOutOfOtherSessionsField({ checked, disabled, onChange }: SignOutOfO
         htmlFor={id}
         {...stylex.props(styles.checkboxRow, disabled && styles.checkboxRowDisabled)}
       >
+        {/* TODO: Replace the native checkbox with Mosaic Checkbox once it is available. */}
         <input
           id={id}
           name='signOutOfOtherSessions'
