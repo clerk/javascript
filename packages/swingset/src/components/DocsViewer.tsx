@@ -16,6 +16,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-profile': {
     'user-page': dynamic(() => import('../stories/user-page.mdx')),
     'user-profile-account-section-flow': dynamic(() => import('../stories/user-profile-account-section-flow.mdx')),
+    'security-flows': dynamic(() => import('../stories/user-profile-security-flows.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
@@ -37,11 +38,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     ),
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
-    'user-profile-password-dialog': dynamic(() => import('../stories/user-profile-password-dialog.mdx')),
-    'user-profile-delete-account-dialog': dynamic(() => import('../stories/user-profile-delete-account-dialog.mdx')),
-    'user-profile-sign-out-all-devices-dialog': dynamic(
-      () => import('../stories/user-profile-sign-out-all-devices-dialog.mdx'),
-    ),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),

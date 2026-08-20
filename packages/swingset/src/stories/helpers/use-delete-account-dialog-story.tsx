@@ -15,7 +15,7 @@ export function useDeleteAccountDialogStory({ onDelete }: { onDelete?: () => voi
     deleteAccountDialog: (
       <UserProfileDeleteAccountDialogView
         open={open}
-        confirmation={confirmation}
+        state={{ confirmation, isSubmitting: false, errors: {} }}
         onOpenChange={nextOpen => {
           setOpen(nextOpen);
           if (!nextOpen) {

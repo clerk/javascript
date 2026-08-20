@@ -1,9 +1,5 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
 import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Input } from '@clerk/ui/mosaic/components/input';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import type {
   UserProfilePasswordField,
   UserProfilePasswordMode,
@@ -27,6 +23,7 @@ export function usePasswordDialogStory({
 } = {}) {
   const [open, setOpen] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
+  const [code, setCode] = useState('');
   const [values, setValues] = useState(emptyValues);
   const canSubmit = Boolean(values.newPassword) && values.newPassword === values.confirmPassword;
 
@@ -39,6 +36,7 @@ export function usePasswordDialogStory({
 
   const complete = () => {
     setVerificationOpen(false);
+    setCode('');
     setOpen(false);
     setValues(emptyValues);
   };
@@ -54,14 +52,16 @@ export function usePasswordDialogStory({
             setVerificationOpen(false);
           }
         }}
-        values={values}
-        mode={mode}
         canSubmit={canSubmit}
-        errors={
-          values.confirmPassword && values.newPassword !== values.confirmPassword
-            ? { confirmPassword: 'Passwords do not match.' }
-            : undefined
-        }
+        state={{
+          mode,
+          values,
+          isSubmitting: false,
+          errors:
+            values.confirmPassword && values.newPassword !== values.confirmPassword
+              ? { confirmPassword: 'Passwords do not match.' }
+              : {},
+        }}
         onValueChange={updateValue}
         onSubmit={() => {
           if (withVerification) {
@@ -72,78 +72,33 @@ export function usePasswordDialogStory({
         }}
         verificationDialog={
           withVerification ? (
-            <OtpVerificationPrompt
+            <Dialog
               open={verificationOpen}
-              onOpenChange={setVerificationOpen}
-              onVerify={complete}
-            />
+              onOpenChange={nextOpen => {
+                setVerificationOpen(nextOpen);
+                if (!nextOpen) {
+                  setCode('');
+                }
+              }}
+            >
+              <ReverificationDialogView
+                state={{
+                  strategy: 'email_code',
+                  identifier: 'i••••@clerk.dev',
+                  value: code,
+                  status: 'idle',
+                  errors: {},
+                  resend: { isResending: false, secondsRemaining: 0 },
+                }}
+                onCancel={() => setVerificationOpen(false)}
+                onResend={() => undefined}
+                onSubmit={complete}
+                onValueChange={setCode}
+              />
+            </Dialog>
           ) : null
         }
       />
     ),
   };
-}
-
-// TODO: Replace this dummy OTP prompt with the full User Verification dialog implementation.
-function OtpVerificationPrompt({
-  open,
-  onOpenChange,
-  onVerify,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onVerify: () => void;
-}) {
-  const [code, setCode] = useState('');
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={nextOpen => {
-        onOpenChange(nextOpen);
-        if (!nextOpen) {
-          setCode('');
-        }
-      }}
-      closedBy='closerequest'
-    >
-      <Dialog.CloseButton />
-      <Dialog.Title render={<Heading size='sm' />}>Verify your identity</Dialog.Title>
-      <Dialog.Description render={<Text />}>Enter the verification code sent to your email address.</Dialog.Description>
-      <form
-        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-        onSubmit={event => {
-          event.preventDefault();
-          if (code.length === 6) {
-            onVerify();
-          }
-        }}
-      >
-        <Field.Root
-          required
-          style={{ display: 'grid', gap: '0.5rem' }}
-        >
-          <Field.Label>Verification code</Field.Label>
-          <Input
-            name='code'
-            autoComplete='one-time-code'
-            inputMode='numeric'
-            maxLength={6}
-            value={code}
-            onChange={event => setCode(event.target.value.replace(/\D/g, ''))}
-          />
-        </Field.Root>
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-          <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-          <Button
-            type='submit'
-            disabled={code.length !== 6}
-            focusableWhenDisabled
-          >
-            Verify
-          </Button>
-        </div>
-      </form>
-    </Dialog>
-  );
 }

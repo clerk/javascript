@@ -3,11 +3,13 @@ import { Section } from '../components/section';
 
 export interface UserProfilePasswordSectionViewProps {
   sectionTitle?: string;
+  hasPassword?: boolean;
   onChangePassword?: () => void;
 }
 
 export function UserProfilePasswordSectionView({
   sectionTitle = 'Authentication',
+  hasPassword = true,
   onChangePassword,
 }: UserProfilePasswordSectionViewProps) {
   return (
@@ -18,7 +20,7 @@ export function UserProfilePasswordSectionView({
           <Section.Item>
             <Section.Content>
               <Section.Label>Password</Section.Label>
-              <Section.Description>••••••••••••••••••</Section.Description>
+              {hasPassword ? <Section.Description>••••••••••••••••••</Section.Description> : null}
             </Section.Content>
             {onChangePassword ? (
               <Section.Actions>
@@ -28,7 +30,7 @@ export function UserProfilePasswordSectionView({
                   variant='outline'
                   onClick={onChangePassword}
                 >
-                  Change password
+                  {hasPassword ? 'Change password' : 'Set password'}
                 </Button>
               </Section.Actions>
             ) : null}

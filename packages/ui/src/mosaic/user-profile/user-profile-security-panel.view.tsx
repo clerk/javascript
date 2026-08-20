@@ -20,6 +20,8 @@ export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMeth
 
 export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
   hasPassword?: boolean;
+  /** Whether this instance allows the user to set a password. Defaults to `hasPassword`. */
+  passwordAvailable?: boolean;
   passkeys?: UserProfilePasskey[];
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
@@ -35,6 +37,7 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
 
 export function UserProfileSecurityPanelView({
   hasPassword = false,
+  passwordAvailable = hasPassword,
   passkeys,
   mfaMethods,
   devices,
@@ -50,7 +53,7 @@ export function UserProfileSecurityPanelView({
   onSignOutAllOtherDevices,
   onDeleteAccount,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const hasAuthentication = hasPassword || passkeys !== undefined || mfaMethods !== undefined;
+  const hasAuthentication = passwordAvailable || passkeys !== undefined || mfaMethods !== undefined;
 
   return (
     <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(styles.root))}>
@@ -63,11 +66,16 @@ export function UserProfileSecurityPanelView({
       <div {...stylex.props(styles.sections)}>
         {hasAuthentication ? (
           <div {...stylex.props(styles.sectionCards)}>
-            {hasPassword ? <UserProfilePasswordSectionView onChangePassword={onChangePassword} /> : null}
+            {passwordAvailable ? (
+              <UserProfilePasswordSectionView
+                hasPassword={hasPassword}
+                onChangePassword={onChangePassword}
+              />
+            ) : null}
             {passkeys !== undefined ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}
-                sectionTitle={hasPassword ? undefined : 'Authentication'}
+                sectionTitle={passwordAvailable ? undefined : 'Authentication'}
                 onAdd={onAddPasskey}
                 onManage={onManagePasskey}
                 onRemove={onRemovePasskey}
@@ -76,7 +84,7 @@ export function UserProfileSecurityPanelView({
             {mfaMethods !== undefined ? (
               <UserProfileMfaSectionView
                 methods={mfaMethods}
-                sectionTitle={!hasPassword && passkeys === undefined ? 'Authentication' : undefined}
+                sectionTitle={!passwordAvailable && passkeys === undefined ? 'Authentication' : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}
                 onRemove={onRemoveMfaMethod}

@@ -136,10 +136,6 @@ import {
   meta as userProfileConnectedAccountsSectionMeta,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
-  Default as UserProfileDeleteAccountDialogDefault,
-  meta as userProfileDeleteAccountDialogMeta,
-} from '../stories/user-profile-delete-account-dialog.stories';
-import {
   Default as UserProfileDeleteSectionDefault,
   meta as userProfileDeleteSectionMeta,
 } from '../stories/user-profile-delete-section.stories';
@@ -154,12 +150,6 @@ import {
   meta as userProfilePasskeysSectionMeta,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
-  Change as UserProfilePasswordDialogChange,
-  meta as userProfilePasswordDialogMeta,
-  Set as UserProfilePasswordDialogSet,
-  Verification as UserProfilePasswordDialogVerification,
-} from '../stories/user-profile-password-dialog.stories';
-import {
   Default as UserProfilePasswordSectionDefault,
   meta as userProfilePasswordSectionMeta,
 } from '../stories/user-profile-password-section.stories';
@@ -173,13 +163,14 @@ import {
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
 import {
+  Default as UserProfileSecurityFlowsDefault,
+  meta as userProfileSecurityFlowsMeta,
+  States as UserProfileSecurityFlowsStates,
+} from '../stories/user-profile-security-flows.stories';
+import {
   Default as UserProfileSecurityPanelDefault,
   meta as userProfileSecurityPanelMeta,
 } from '../stories/user-profile-security-panel.stories';
-import {
-  Default as UserProfileSignOutAllDevicesDialogDefault,
-  meta as userProfileSignOutAllDevicesDialogMeta,
-} from '../stories/user-profile-sign-out-all-devices-dialog.stories';
 import {
   Default as UserProfileSubscriptionSectionDefault,
   meta as userProfileSubscriptionSectionMeta,
@@ -379,19 +370,10 @@ const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
 };
-const userProfileDeleteAccountDialogModule: StoryModule = {
-  meta: userProfileDeleteAccountDialogMeta,
-  Default: UserProfileDeleteAccountDialogDefault,
-};
-const userProfileSignOutAllDevicesDialogModule: StoryModule = {
-  meta: userProfileSignOutAllDevicesDialogMeta,
-  Default: UserProfileSignOutAllDevicesDialogDefault,
-};
-const userProfilePasswordDialogModule: StoryModule = {
-  meta: userProfilePasswordDialogMeta,
-  Change: UserProfilePasswordDialogChange,
-  Set: UserProfilePasswordDialogSet,
-  Verification: UserProfilePasswordDialogVerification,
+const userProfileSecurityFlowsModule: StoryModule = {
+  meta: userProfileSecurityFlowsMeta,
+  Default: UserProfileSecurityFlowsDefault,
+  States: UserProfileSecurityFlowsStates,
 };
 
 export const registry: StoryModule[] = [
@@ -400,6 +382,7 @@ export const registry: StoryModule[] = [
   // User Profile
   userPageModule,
   userProfileAccountSectionFlowModule,
+  userProfileSecurityFlowsModule,
   // User Profile · Panels
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
@@ -417,10 +400,6 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
-  // User Profile · Dialogs
-  userProfileDeleteAccountDialogModule,
-  userProfilePasswordDialogModule,
-  userProfileSignOutAllDevicesDialogModule,
   // Components
   avatarModule,
   badgeModule,

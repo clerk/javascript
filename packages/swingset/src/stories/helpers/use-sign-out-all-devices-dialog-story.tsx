@@ -9,6 +9,7 @@ export function useSignOutAllDevicesDialogStory({ onSignOut }: { onSignOut?: () 
     signOutAllDevicesDialog: (
       <UserProfileSignOutAllDevicesDialogView
         open={open}
+        state={{ isSubmitting: false, errors: {} }}
         onOpenChange={setOpen}
         onSignOut={() => {
           onSignOut?.();

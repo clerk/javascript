@@ -13,7 +13,7 @@ function Harness({ onDelete = vi.fn() }: { onDelete?: () => void }) {
     <MosaicProvider>
       <UserProfileDeleteAccountDialogView
         open
-        confirmation={confirmation}
+        state={{ confirmation, isSubmitting: false, errors: {} }}
         onConfirmationChange={setConfirmation}
         onDelete={onDelete}
       />
@@ -32,7 +32,7 @@ describe('UserProfileDeleteAccountDialogView', () => {
       'placeholder',
       'Delete account',
     );
-    expect(screen.getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Delete account' })).toBeDisabled();
   });
 
   it('requires the exact confirmation before deleting', async () => {
@@ -47,5 +47,40 @@ describe('UserProfileDeleteAccountDialogView', () => {
     await user.clear(input);
     await user.type(input, 'Delete account{Enter}');
     expect(onDelete).toHaveBeenCalledOnce();
+  });
+
+  it('renders an unattributed form error', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileDeleteAccountDialogView
+          open
+          state={{
+            confirmation: 'Delete account',
+            isSubmitting: false,
+            errors: { form: 'Something went wrong. Please try again.' },
+          }}
+          onConfirmationChange={vi.fn()}
+          onDelete={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+  });
+
+  it('announces a pending deletion without changing the button label', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileDeleteAccountDialogView
+          open
+          state={{ confirmation: 'Delete account', isSubmitting: true, errors: {} }}
+          onConfirmationChange={vi.fn()}
+          onDelete={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Deleting account' })).toBeInTheDocument();
   });
 });

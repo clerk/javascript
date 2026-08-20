@@ -5,7 +5,6 @@ import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
-import type { ReverificationChallengeActions, ReverificationChallengeState } from './flow.types';
 import {
   CodeInput,
   DialogBody,
@@ -18,6 +17,7 @@ import {
   ResendButton,
 } from './flow-dialog-chrome';
 import { styles } from './flow-dialogs.styles';
+import type { ReverificationChallengeActions, ReverificationChallengeState } from './flow.types';
 
 export interface ReverificationDialogViewProps extends ReverificationChallengeActions {
   state: ReverificationChallengeState;
@@ -39,55 +39,72 @@ export function ReverificationDialogView({
   onCancel,
 }: ReverificationDialogViewProps) {
   const fieldId = React.useId();
-  const isCode = state.strategy !== 'password';
+  const isDeliveredCode = state.strategy === 'email_code' || state.strategy === 'phone_code';
+  const isCode = isDeliveredCode || state.strategy === 'totp';
+  const isPasskey = state.strategy === 'passkey';
+  const isPassword = state.strategy === 'password';
   const inert = state.status === 'verifying';
-  const canSubmit = state.value.length > 0 && !inert;
+  const canSubmit = isPasskey || state.value.length > 0;
+
+  const description = (() => {
+    if (isDeliveredCode) {
+      return (
+        <>
+          Enter the verification code sent to <Identifier>{state.identifier}</Identifier>
+        </>
+      );
+    }
+    if (state.strategy === 'totp') {
+      return 'Enter the code from your authenticator app.';
+    }
+    if (state.strategy === 'backup_code') {
+      return 'Enter one of your backup codes.';
+    }
+    if (isPasskey) {
+      return 'Use your passkey to verify your identity.';
+    }
+    return 'Enter your password to continue.';
+  })();
+
+  const fieldLabel = isPassword ? 'Password' : state.strategy === 'backup_code' ? 'Backup code' : 'Verification code';
 
   return (
     <>
       <Dialog.CloseButton />
       <DialogHeader
-        description={
-          isCode ? (
-            <>
-              Enter the verification code sent to <Identifier>{state.identifier}</Identifier>
-            </>
-          ) : (
-            'Enter your password to continue.'
-          )
-        }
+        description={description}
         title='Verify it’s you'
       />
       <DialogForm onSubmit={onSubmit}>
         <DialogBody>
           <FormAlert>{state.errors.form}</FormAlert>
-          <Field.Root invalid={state.status === 'error'}>
-            <Field.Label htmlFor={fieldId}>{isCode ? 'Verification code' : 'Password'}</Field.Label>
-            {isCode ? (
-              <CodeInput
-                autoFocus
-                id={fieldId}
-                status={state.status === 'error' ? 'error' : state.status === 'verifying' ? 'verifying' : 'idle'}
-                value={state.value}
-                onChange={onValueChange}
-                onComplete={onSubmit}
-              />
-            ) : (
-              // TODO: Replace with a Mosaic PasswordInput once one exists — this has no reveal
-              // toggle and no strength meter.
-              <Input
-                autoComplete='current-password'
-                autoFocus
-                disabled={inert}
-                id={fieldId}
-                type='password'
-                value={state.value}
-                onChange={event => onValueChange(event.target.value)}
-              />
-            )}
-            {state.status === 'error' && state.errors.field ? <Field.Error>{state.errors.field}</Field.Error> : null}
-          </Field.Root>
-          {isCode ? (
+          {!isPasskey ? (
+            <Field.Root invalid={state.status === 'error'}>
+              <Field.Label htmlFor={fieldId}>{fieldLabel}</Field.Label>
+              {isCode ? (
+                <CodeInput
+                  autoFocus
+                  id={fieldId}
+                  status={state.status === 'error' ? 'error' : state.status === 'verifying' ? 'verifying' : 'idle'}
+                  value={state.value}
+                  onChange={onValueChange}
+                  onComplete={onSubmit}
+                />
+              ) : (
+                <Input
+                  autoComplete={isPassword ? 'current-password' : 'one-time-code'}
+                  autoFocus
+                  disabled={inert}
+                  id={fieldId}
+                  type={isPassword ? 'password' : 'text'}
+                  value={state.value}
+                  onChange={event => onValueChange(event.target.value)}
+                />
+              )}
+              {state.status === 'error' && state.errors.field ? <Field.Error>{state.errors.field}</Field.Error> : null}
+            </Field.Root>
+          ) : null}
+          {isDeliveredCode ? (
             <div {...stylex.props(styles.resendRow)}>
               <MutedText>Didn&apos;t receive a code?</MutedText>
               <ResendButton
@@ -113,10 +130,10 @@ export function ReverificationDialogView({
           <SubmitButton
             disabled={!canSubmit}
             isPending={inert}
-            pendingLabel='Verifying'
+            pendingLabel='Verifying identity'
             {...stylex.props(styles.footerButton)}
           >
-            Continue
+            {isPasskey ? 'Verify with passkey' : 'Continue'}
           </SubmitButton>
         </DialogFooter>
       </DialogForm>

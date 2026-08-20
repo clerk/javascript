@@ -16,9 +16,11 @@ const emptyValues: UserProfilePasswordValues = {
 function Harness({
   onSubmit = vi.fn(),
   mode = 'change',
+  isSubmitting = false,
 }: {
   onSubmit?: (values: UserProfilePasswordValues) => void;
   mode?: UserProfilePasswordMode;
+  isSubmitting?: boolean;
 }) {
   const [values, setValues] = useState(emptyValues);
   const canSubmit = Boolean(values.newPassword) && values.newPassword === values.confirmPassword;
@@ -27,8 +29,7 @@ function Harness({
     <MosaicProvider>
       <UserProfilePasswordDialogView
         open
-        values={values}
-        mode={mode}
+        state={{ mode, values, isSubmitting, errors: {} }}
         canSubmit={canSubmit}
         onValueChange={(field, value) => setValues(current => ({ ...current, [field]: value }))}
         onSubmit={onSubmit}
@@ -54,7 +55,7 @@ describe('UserProfilePasswordDialogView', () => {
       'It is recommended to sign out of all other devices which may have used your old password.',
     );
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Change password' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Change password' })).toBeDisabled();
   });
 
   it('submits the controlled password values with Enter', async () => {
@@ -81,13 +82,24 @@ describe('UserProfilePasswordDialogView', () => {
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
   });
 
+  it('announces a pending password submission without changing the button label', () => {
+    render(<Harness isSubmitting />);
+
+    expect(screen.getByRole('button', { name: 'Change password' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('progressbar', { name: 'Changing password' })).toBeInTheDocument();
+  });
+
   it('associates field errors with their inputs', () => {
     render(
       <MosaicProvider>
         <UserProfilePasswordDialogView
           open
-          values={emptyValues}
-          errors={{ confirmPassword: 'Passwords do not match.' }}
+          state={{
+            mode: 'change',
+            values: emptyValues,
+            isSubmitting: false,
+            errors: { confirmPassword: 'Passwords do not match.' },
+          }}
           onValueChange={vi.fn()}
           onSubmit={vi.fn()}
         />
@@ -96,5 +108,25 @@ describe('UserProfilePasswordDialogView', () => {
 
     expect(screen.getByLabelText('Confirm password')).toHaveAccessibleDescription('Passwords do not match.');
     expect(screen.getByLabelText('Confirm password')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('renders an unattributed form error', () => {
+    render(
+      <MosaicProvider>
+        <UserProfilePasswordDialogView
+          open
+          state={{
+            mode: 'change',
+            values: emptyValues,
+            isSubmitting: false,
+            errors: { form: 'Something went wrong. Please try again.' },
+          }}
+          onValueChange={vi.fn()}
+          onSubmit={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
   });
 });
