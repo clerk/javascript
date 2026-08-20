@@ -6,10 +6,10 @@ import {
   registerNativeToJsSyncHandler,
   trackPendingJsToNativeSync,
 } from '../../provider/nativeClientSyncCoordinator';
-import { isTrustedDeviceError } from '../errors';
-import { useTrustedDevices as useTrustedDevicesOnUnsupportedPlatform } from '../useTrustedDevices';
-import { useTrustedDevices as useTrustedDevicesOnAndroid } from '../useTrustedDevices.android';
-import { useTrustedDevices as useTrustedDevicesOnIos } from '../useTrustedDevices.ios';
+import { isBiometricCredentialError } from '../errors';
+import { useBiometricCredentials as useBiometricCredentialsOnUnsupportedPlatform } from '../useBiometricCredentials';
+import { useBiometricCredentials as useBiometricCredentialsOnAndroid } from '../useBiometricCredentials.android';
+import { useBiometricCredentials as useBiometricCredentialsOnIos } from '../useBiometricCredentials.ios';
 
 const mocks = vi.hoisted(() => ({
   jsSignIn: {
@@ -47,7 +47,7 @@ vi.mock('react-native', () => ({
   },
 }));
 
-const nativeTrustedDevice = {
+const nativeBiometricCredential = {
   id: 'td_123',
   object: 'trusted_device' as const,
   platform: 'ios' as const,
@@ -61,7 +61,7 @@ const nativeTrustedDevice = {
   revokedAt: null,
 };
 
-function renderTrustedDevices(useHook = useTrustedDevicesOnIos) {
+function renderBiometricCredentials(useHook = useBiometricCredentialsOnIos) {
   return renderHook(() => useHook()).result.current;
 }
 
@@ -88,7 +88,7 @@ afterEach(() => {
   unregisterNativeToJsSyncHandler?.();
 });
 
-describe('useTrustedDevices on iOS', () => {
+describe('useBiometricCredentials on iOS', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -99,8 +99,8 @@ describe('useTrustedDevices on iOS', () => {
       unavailableReason: null,
     });
 
-    const trustedDevices = renderTrustedDevices();
-    const availability = await trustedDevices.getAvailability({
+    const biometricCredentials = renderBiometricCredentials();
+    const availability = await biometricCredentials.getAvailability({
       id: 'td_123',
       identifierHint: 'sean@example.com',
     });
@@ -120,7 +120,7 @@ describe('useTrustedDevices on iOS', () => {
       unavailableReason: null,
     });
 
-    const availability = renderTrustedDevices().getAvailability();
+    const availability = renderBiometricCredentials().getAvailability();
     await Promise.resolve();
 
     expect(mocks.nativeModule.getTrustedDeviceAvailability).not.toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe('useTrustedDevices on iOS', () => {
     });
     trackPendingJsToNativeSync(nativeSync);
 
-    const availability = expect(renderTrustedDevices().getAvailability()).rejects.toMatchObject({
+    const availability = expect(renderBiometricCredentials().getAvailability()).rejects.toMatchObject({
       code: 'environment_unavailable',
     });
 
@@ -148,16 +148,16 @@ describe('useTrustedDevices on iOS', () => {
     finishNativeSync();
   });
 
-  test('lists trusted devices and converts native timestamps to dates', async () => {
-    mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeTrustedDevice]);
+  test('lists biometric credentials and converts native timestamps to dates', async () => {
+    mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeBiometricCredential]);
 
-    const [trustedDevice] = await renderTrustedDevices().list();
+    const [biometricCredential] = await renderBiometricCredentials().list();
 
-    expect(trustedDevice).toEqual({
-      ...nativeTrustedDevice,
-      createdAt: new Date(nativeTrustedDevice.createdAt),
-      updatedAt: new Date(nativeTrustedDevice.updatedAt),
-      lastUsedAt: new Date(nativeTrustedDevice.lastUsedAt),
+    expect(biometricCredential).toEqual({
+      ...nativeBiometricCredential,
+      createdAt: new Date(nativeBiometricCredential.createdAt),
+      updatedAt: new Date(nativeBiometricCredential.updatedAt),
+      lastUsedAt: new Date(nativeBiometricCredential.lastUsedAt),
       revokedAt: null,
     });
   });
@@ -165,27 +165,27 @@ describe('useTrustedDevices on iOS', () => {
   test('maps omitted optional native timestamps to null', async () => {
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([
       {
-        ...nativeTrustedDevice,
+        ...nativeBiometricCredential,
         lastUsedAt: undefined,
         revokedAt: undefined,
       },
     ]);
 
-    const [trustedDevice] = await renderTrustedDevices().list();
+    const [biometricCredential] = await renderBiometricCredentials().list();
 
-    expect(trustedDevice.lastUsedAt).toBeNull();
-    expect(trustedDevice.revokedAt).toBeNull();
+    expect(biometricCredential.lastUsedAt).toBeNull();
+    expect(biometricCredential.revokedAt).toBeNull();
   });
 
-  test('waits for native client synchronization before listing trusted devices', async () => {
+  test('waits for native client synchronization before listing biometric credentials', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
     trackPendingJsToNativeSync(nativeSync);
-    mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeTrustedDevice]);
+    mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeBiometricCredential]);
 
-    const listing = renderTrustedDevices().list();
+    const listing = renderBiometricCredentials().list();
     await Promise.resolve();
 
     expect(mocks.nativeModule.listTrustedDevices).not.toHaveBeenCalled();
@@ -196,19 +196,19 @@ describe('useTrustedDevices on iOS', () => {
   });
 
   test('returns stable operation identities', () => {
-    const { result, rerender } = renderHook(() => useTrustedDevicesOnIos());
-    const initialTrustedDevices = result.current;
+    const { result, rerender } = renderHook(() => useBiometricCredentialsOnIos());
+    const initialBiometricCredentials = result.current;
 
     rerender();
 
-    expect(result.current).toBe(initialTrustedDevices);
+    expect(result.current).toBe(initialBiometricCredentials);
   });
 
   test('enrolls with the safe default authentication policy', async () => {
-    mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeTrustedDevice);
+    mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeBiometricCredential);
 
-    const trustedDevice = await renderTrustedDevices().enroll({
-      deviceName: "Sean's iPhone",
+    const biometricCredential = await renderBiometricCredentials().enroll({
+      name: "Sean's iPhone",
       identifierHint: 'sean@example.com',
       reason: 'Use Face ID to trust this device.',
     });
@@ -219,7 +219,7 @@ describe('useTrustedDevices on iOS', () => {
       'Use Face ID to trust this device.',
       'biometry_or_device_passcode',
     );
-    expect(trustedDevice.createdAt).toEqual(new Date(nativeTrustedDevice.createdAt));
+    expect(biometricCredential.createdAt).toEqual(new Date(nativeBiometricCredential.createdAt));
   });
 
   test('waits for native client synchronization before enrollment', async () => {
@@ -228,9 +228,9 @@ describe('useTrustedDevices on iOS', () => {
       finishNativeSync = resolve;
     });
     trackPendingJsToNativeSync(nativeSync);
-    mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeTrustedDevice);
+    mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeBiometricCredential);
 
-    const enrollment = renderTrustedDevices().enroll();
+    const enrollment = renderBiometricCredentials().enroll();
     await Promise.resolve();
 
     expect(mocks.nativeModule.enrollTrustedDevice).not.toHaveBeenCalled();
@@ -240,32 +240,32 @@ describe('useTrustedDevices on iOS', () => {
     expect(mocks.nativeModule.enrollTrustedDevice).toHaveBeenCalledTimes(1);
   });
 
-  test('revokes a trusted device by ID', async () => {
+  test('revokes a biometric credential by ID', async () => {
     mocks.nativeModule.revokeTrustedDevice.mockResolvedValue({
-      ...nativeTrustedDevice,
+      ...nativeBiometricCredential,
       status: 'revoked',
       revokedAt: 1_700_000_300_000,
     });
 
-    const trustedDevice = await renderTrustedDevices().revoke('td_123');
+    const biometricCredential = await renderBiometricCredentials().revoke('td_123');
 
     expect(mocks.nativeModule.revokeTrustedDevice).toHaveBeenCalledWith('td_123');
-    expect(trustedDevice.status).toBe('revoked');
-    expect(trustedDevice.revokedAt).toEqual(new Date(1_700_000_300_000));
+    expect(biometricCredential.status).toBe('revoked');
+    expect(biometricCredential.revokedAt).toEqual(new Date(1_700_000_300_000));
   });
 
-  test('waits for native client synchronization before revoking a trusted device', async () => {
+  test('waits for native client synchronization before revoking a biometric credential', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
     trackPendingJsToNativeSync(nativeSync);
     mocks.nativeModule.revokeTrustedDevice.mockResolvedValue({
-      ...nativeTrustedDevice,
+      ...nativeBiometricCredential,
       status: 'revoked',
     });
 
-    const revocation = renderTrustedDevices().revoke('td_123');
+    const revocation = renderBiometricCredentials().revoke('td_123');
     await Promise.resolve();
 
     expect(mocks.nativeModule.revokeTrustedDevice).not.toHaveBeenCalled();
@@ -275,14 +275,14 @@ describe('useTrustedDevices on iOS', () => {
     expect(mocks.nativeModule.revokeTrustedDevice).toHaveBeenCalledWith('td_123');
   });
 
-  test('signs in through the native one-shot trusted-device flow', async () => {
+  test('signs in through the native one-shot biometric-credential flow', async () => {
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
       status: 'complete',
       createdSessionId: 'sess_123',
     });
 
-    const result = await renderTrustedDevices().signIn({
+    const result = await renderBiometricCredentials().signIn({
       identifierHint: 'sean@example.com',
       reason: 'Use Face ID to sign in.',
     });
@@ -312,7 +312,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_other',
     });
 
-    const result = await renderTrustedDevices().signIn();
+    const result = await renderBiometricCredentials().signIn();
 
     expect(result).toMatchObject({
       status: 'complete',
@@ -333,7 +333,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    const result = await renderTrustedDevices().signIn();
+    const result = await renderBiometricCredentials().signIn();
 
     expect(result).toMatchObject({
       status: 'complete',
@@ -349,12 +349,12 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_missing',
     });
 
-    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the created session is missing.',
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Unable to synchronize biometric sign-in with the Clerk JS client: the created session is missing.',
     );
   });
 
-  test('waits for native client synchronization before trusted-device sign-in', async () => {
+  test('waits for native client synchronization before biometric sign-in', async () => {
     let finishNativeSync!: () => void;
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
@@ -366,7 +366,7 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: 'sess_123',
     });
 
-    const signIn = renderTrustedDevices().signIn();
+    const signIn = renderBiometricCredentials().signIn();
     await Promise.resolve();
 
     expect(mocks.nativeModule.signInWithTrustedDevice).not.toHaveBeenCalled();
@@ -395,7 +395,7 @@ describe('useTrustedDevices on iOS', () => {
       return Promise.resolve();
     });
 
-    const result = await renderTrustedDevices().signIn();
+    const result = await renderBiometricCredentials().signIn();
 
     expect(result).toMatchObject({
       status,
@@ -419,7 +419,7 @@ describe('useTrustedDevices on iOS', () => {
     );
 
     let didResolve = false;
-    const signIn = renderTrustedDevices()
+    const signIn = renderBiometricCredentials()
       .signIn()
       .then(result => {
         didResolve = true;
@@ -444,8 +444,8 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the sign-in attempt does not match.',
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Unable to synchronize biometric sign-in with the Clerk JS client: the sign-in attempt does not match.',
     );
   });
 
@@ -468,7 +468,7 @@ describe('useTrustedDevices on iOS', () => {
       setActive: providerSetActive,
     });
 
-    const result = await renderTrustedDevices().signIn();
+    const result = await renderBiometricCredentials().signIn();
 
     expect(result.signIn).toBe(providerSignIn);
     expect(result.setActive).toBe(providerSetActive);
@@ -485,15 +485,15 @@ describe('useTrustedDevices on iOS', () => {
       setActive: mocks.setActive,
     });
 
-    await expect(renderTrustedDevices().signIn()).rejects.toThrow(
-      'Unable to synchronize the trusted-device sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Unable to synchronize biometric sign-in with the Clerk JS client: the client sign-in resource is unavailable.',
     );
   });
 
   test('normalizes unknown resource values and preserves the synchronized JS sign-in status', async () => {
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([
       {
-        ...nativeTrustedDevice,
+        ...nativeBiometricCredential,
         platform: 'visionos',
         algorithm: 'ES384',
         status: 'pending_review',
@@ -510,9 +510,9 @@ describe('useTrustedDevices on iOS', () => {
       createdSessionId: null,
     });
 
-    const trustedDevices = renderTrustedDevices();
-    const [device] = await trustedDevices.list();
-    const signIn = await trustedDevices.signIn();
+    const biometricCredentials = renderBiometricCredentials();
+    const [device] = await biometricCredentials.list();
+    const signIn = await biometricCredentials.signIn();
 
     expect(device).toMatchObject({
       platform: 'unknown',
@@ -528,12 +528,12 @@ describe('useTrustedDevices on iOS', () => {
     });
     mocks.nativeModule.signInWithTrustedDevice.mockRejectedValue(nativeError);
 
-    const operation = renderTrustedDevices().signIn();
+    const operation = renderBiometricCredentials().signIn();
 
     await expect(operation).rejects.toBe(nativeError);
     await operation.catch(error => {
-      expect(isTrustedDeviceError(error)).toBe(true);
-      if (isTrustedDeviceError(error)) {
+      expect(isBiometricCredentialError(error)).toBe(true);
+      if (isBiometricCredentialError(error)) {
         expect(error.code).toBe('biometric_authentication_canceled');
       }
     });
@@ -544,8 +544,8 @@ describe('useTrustedDevices on iOS', () => {
     Object.assign(mocks.nativeModule, { signInWithTrustedDevice: undefined });
 
     try {
-      await expect(renderTrustedDevices().signIn()).rejects.toThrow(
-        'Biometric trusted devices require a development build containing a compatible version of @clerk/expo.',
+      await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+        'Biometric credentials require a development build containing a compatible version of @clerk/expo.',
       );
     } finally {
       Object.assign(mocks.nativeModule, { signInWithTrustedDevice });
@@ -553,12 +553,12 @@ describe('useTrustedDevices on iOS', () => {
   });
 });
 
-describe('useTrustedDevices on Android', () => {
+describe('useBiometricCredentials on Android', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  test('uses the native trusted-device bridge', async () => {
+  test('uses the native biometric-credential bridge', async () => {
     mocks.nativeModule.getTrustedDeviceAvailability.mockResolvedValue({
       isAvailable: true,
       unavailableReason: null,
@@ -575,13 +575,13 @@ describe('useTrustedDevices on Android', () => {
     });
     mocks.jsSignedInSessions.splice(0, mocks.jsSignedInSessions.length, { id: 'sess_android' });
 
-    const trustedDevices = renderTrustedDevices(useTrustedDevicesOnAndroid);
+    const biometricCredentials = renderBiometricCredentials(useBiometricCredentialsOnAndroid);
 
-    await expect(trustedDevices.getAvailability({ identifierHint: 'sean@example.com' })).resolves.toEqual({
+    await expect(biometricCredentials.getAvailability({ identifierHint: 'sean@example.com' })).resolves.toEqual({
       isAvailable: true,
       unavailableReason: null,
     });
-    await expect(trustedDevices.signIn({ reason: 'Confirm your identity to sign in.' })).resolves.toMatchObject({
+    await expect(biometricCredentials.signIn({ reason: 'Confirm your identity to sign in.' })).resolves.toMatchObject({
       status: 'complete',
       createdSessionId: 'sess_android',
       signIn: mocks.jsSignIn,
@@ -595,13 +595,13 @@ describe('useTrustedDevices on Android', () => {
   });
 });
 
-describe('useTrustedDevices on unsupported platforms', () => {
+describe('useBiometricCredentials on unsupported platforms', () => {
   test('returns stable operation identities', () => {
-    expect(useTrustedDevicesOnUnsupportedPlatform()).toBe(useTrustedDevicesOnUnsupportedPlatform());
+    expect(useBiometricCredentialsOnUnsupportedPlatform()).toBe(useBiometricCredentialsOnUnsupportedPlatform());
   });
 
   test('reports unsupported availability without invoking native code', async () => {
-    const availability = await useTrustedDevicesOnUnsupportedPlatform().getAvailability();
+    const availability = await useBiometricCredentialsOnUnsupportedPlatform().getAvailability();
 
     expect(availability).toEqual({
       isAvailable: false,
@@ -610,8 +610,8 @@ describe('useTrustedDevices on unsupported platforms', () => {
   });
 
   test('rejects operations that require the native implementation', async () => {
-    await expect(useTrustedDevicesOnUnsupportedPlatform().enroll()).rejects.toThrow(
-      'Biometric trusted devices are currently only available on iOS and Android.',
+    await expect(useBiometricCredentialsOnUnsupportedPlatform().enroll()).rejects.toThrow(
+      'Biometric credentials are currently only available on iOS and Android.',
     );
   });
 });

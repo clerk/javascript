@@ -48,15 +48,15 @@ You'll learn how to create an Expo application, install `@clerk/expo`, set up yo
 
 For further information, guides, and examples visit the [Expo reference documentation](https://clerk.com/docs/references/expo/overview?utm_source=github&utm_medium=clerk_expo).
 
-### Biometric trusted devices
+### Biometric sign-in
 
-Biometric trusted-device enrollment and sign-in are supported in development builds on iOS and Android. Android requires Android 9 (API 28) or later and an enrolled Class 3 biometric.
+Biometric credential enrollment and sign-in are supported in development builds on iOS and Android. Android requires Android 9 (API 28) or later and an enrolled Class 3 biometric.
 
-Trusted-device operations preserve Clerk API and native biometric error codes. Use `isTrustedDeviceError(error)` to safely inspect `error.code`; unrecognized error codes remain available for forward compatibility, while unfamiliar platform and status values are normalized to `unknown`.
+Biometric credential operations preserve Clerk API and native biometric error codes. Use `isBiometricCredentialError(error)` to safely inspect `error.code`; unrecognized error codes remain available for forward compatibility, while unfamiliar platform and status values are normalized to `unknown`.
 
 #### Face ID on iOS
 
-Apps that use Face ID for trusted-device enrollment or sign-in must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
+Apps that use Face ID for biometric credential enrollment or sign-in must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
 
 ```json
 {

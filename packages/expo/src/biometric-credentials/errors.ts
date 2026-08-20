@@ -1,4 +1,4 @@
-export type TrustedDeviceErrorCode =
+export type BiometricCredentialErrorCode =
   | 'environment_unavailable'
   | 'unsupported_platform'
   | 'biometric_authentication_unavailable'
@@ -20,10 +20,10 @@ export type TrustedDeviceErrorCode =
   | 'E_TRUSTED_DEVICE_SIGN_IN_FAILED'
   | (string & {});
 
-export type TrustedDeviceError = Error & {
-  code: TrustedDeviceErrorCode;
+export type BiometricCredentialError = Error & {
+  code: BiometricCredentialErrorCode;
 };
 
-export function isTrustedDeviceError(error: unknown): error is TrustedDeviceError {
+export function isBiometricCredentialError(error: unknown): error is BiometricCredentialError {
   return error instanceof Error && 'code' in error && typeof error.code === 'string';
 }

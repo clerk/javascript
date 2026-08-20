@@ -1,5 +1,5 @@
 import { errorThrower } from '../utils/errors';
-import type { UseTrustedDevicesReturn } from './types';
+import type { UseBiometricCredentialsReturn } from './types';
 
 const unsupportedAvailability = {
   isAvailable: false,
@@ -7,14 +7,14 @@ const unsupportedAvailability = {
 } as const;
 
 function unsupported(): never {
-  return errorThrower.throw('Biometric trusted devices are currently only available on iOS and Android.');
+  return errorThrower.throw('Biometric credentials are currently only available on iOS and Android.');
 }
 
 function rejectUnsupported(): Promise<never> {
   return Promise.resolve().then(unsupported);
 }
 
-const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
+const biometricCredentials: UseBiometricCredentialsReturn = Object.freeze({
   getAvailability: () => Promise.resolve(unsupportedAvailability),
   list: rejectUnsupported,
   enroll: rejectUnsupported,
@@ -23,10 +23,10 @@ const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
 });
 
 /**
- * Accesses biometric trusted-device enrollment and sign-in.
+ * Accesses biometric credential enrollment and sign-in.
  *
- * Trusted devices are currently supported on iOS and Android.
+ * Biometric credentials are currently supported on iOS and Android.
  */
-export function useTrustedDevices(): UseTrustedDevicesReturn {
-  return trustedDevices;
+export function useBiometricCredentials(): UseBiometricCredentialsReturn {
+  return biometricCredentials;
 }
