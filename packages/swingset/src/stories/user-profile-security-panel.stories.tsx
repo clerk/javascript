@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { useDeviceDialogStory } from './helpers/use-device-dialog-story';
 import { useMfaDialogStory } from './helpers/use-mfa-dialog-story';
+import { usePasskeyDialogStory } from './helpers/use-passkey-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
 import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
 
@@ -35,6 +36,8 @@ export function Default() {
       lastUsedAtLabel: 'Last used 1h ago',
     },
   ]);
+  const { openAddPasskeyDialog, openRenamePasskeyDialog, openRemovePasskeyDialog, passkeyDialogs } =
+    usePasskeyDialogStory({ passkeys, onChange: setPasskeys });
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
   ]);
@@ -105,18 +108,13 @@ export function Default() {
         mfaMethods={mfaMethods}
         passkeys={passkeys}
         onAddMfaMethod={openAddMfaDialog}
-        onAddPasskey={() =>
-          setPasskeys(current => [
-            ...current,
-            { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-          ])
-        }
+        onAddPasskey={openAddPasskeyDialog}
         onChangePassword={openPasswordDialog}
         onDeleteAccount={openDeleteAccountDialog}
         onManageDevice={openDevice}
-        onManagePasskey={() => undefined}
+        onManagePasskey={openRenamePasskeyDialog}
         onRemoveMfaMethod={openRemoveMfaDialog}
-        onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
+        onRemovePasskey={openRemovePasskeyDialog}
         onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
         onSignOutDevice={openDevice}
       />
@@ -125,6 +123,7 @@ export function Default() {
       {signOutAllDevicesDialog}
       {deviceDialog}
       {mfaDialogs}
+      {passkeyDialogs}
     </>
   );
 }

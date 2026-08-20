@@ -350,3 +350,23 @@ export interface UserProfileMfaRemoveFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
 }
+
+export interface UserProfilePasskeyAddFlowState {
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRenameFlowState {
+  id: string;
+  originalName: string;
+  name: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfilePasskeyRemoveFlowState {
+  id: string;
+  name: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}

@@ -6,6 +6,9 @@ import type {
   UserProfileDeviceDetailsFlowState,
   UserProfileMfaAddFlowState,
   UserProfileMfaRemoveFlowState,
+  UserProfilePasskeyAddFlowState,
+  UserProfilePasskeyRemoveFlowState,
+  UserProfilePasskeyRenameFlowState,
   UserProfilePasswordFlowState,
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
@@ -16,6 +19,11 @@ import {
   UserProfileMfaAddDialogView,
   UserProfileMfaRemoveDialogView,
 } from '@clerk/ui/mosaic/user-profile/user-profile-mfa-dialog.view';
+import {
+  UserProfilePasskeyAddDialogView,
+  UserProfilePasskeyRemoveDialogView,
+  UserProfilePasskeyRenameDialogView,
+} from '@clerk/ui/mosaic/user-profile/user-profile-passkey-dialog.view';
 import { UserProfilePasswordDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-password-dialog.view';
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
@@ -72,7 +80,16 @@ const INITIAL_DEVICES: UserProfileDevice[] = [
 
 function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow> }) {
   const verificationDialog = (
-    operation: 'password' | 'add-mfa' | 'remove-mfa' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices',
+    operation:
+      | 'password'
+      | 'add-passkey'
+      | 'rename-passkey'
+      | 'remove-passkey'
+      | 'add-mfa'
+      | 'remove-mfa'
+      | 'delete-account'
+      | 'sign-out-device'
+      | 'sign-out-all-devices',
   ) => {
     const challenge = flow.reverification?.operation === operation ? flow.reverification.state : null;
     return (
@@ -117,6 +134,46 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
           onValueChange={flow.updatePasswordValue}
           onSubmit={flow.submitPassword}
           verificationDialog={verificationDialog('password')}
+        />
+      ) : null}
+      {flow.addPasskey ? (
+        <UserProfilePasskeyAddDialogView
+          open
+          state={flow.addPasskey}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeAddPasskey();
+            }
+          }}
+          onAdd={flow.submitAddPasskey}
+          verificationDialog={verificationDialog('add-passkey')}
+        />
+      ) : null}
+      {flow.renamePasskey ? (
+        <UserProfilePasskeyRenameDialogView
+          open
+          state={flow.renamePasskey}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeRenamePasskey();
+            }
+          }}
+          onNameChange={flow.updatePasskeyName}
+          onRename={flow.submitRenamePasskey}
+          verificationDialog={verificationDialog('rename-passkey')}
+        />
+      ) : null}
+      {flow.removePasskey ? (
+        <UserProfilePasskeyRemoveDialogView
+          open
+          state={flow.removePasskey}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeRemovePasskey();
+            }
+          }}
+          onRemove={flow.submitRemovePasskey}
+          verificationDialog={verificationDialog('remove-passkey')}
         />
       ) : null}
       {flow.addMfa ? (
@@ -296,6 +353,29 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
       </label>
       <label style={controlLabel}>
         <input
+          checked={config.passkeysAvailable}
+          type='checkbox'
+          onChange={event =>
+            onChange({
+              ...config,
+              passkeysAvailable: event.target.checked,
+              hasPasskey: event.target.checked ? config.hasPasskey : false,
+            })
+          }
+        />
+        <span style={controlName}>Passkey authentication</span>
+      </label>
+      <label style={{ ...controlLabel, opacity: config.passkeysAvailable ? 1 : 0.5 }}>
+        <input
+          checked={config.hasPasskey}
+          disabled={!config.passkeysAvailable}
+          type='checkbox'
+          onChange={event => onChange({ ...config, hasPasskey: event.target.checked })}
+        />
+        <span style={controlName}>Passkey already added</span>
+      </label>
+      <label style={controlLabel}>
+        <input
           checked={config.hasMfaPhone}
           type='checkbox'
           onChange={event => onChange({ ...config, hasMfaPhone: event.target.checked })}
@@ -358,6 +438,7 @@ export function Default() {
     config,
     initialDevices: INITIAL_DEVICES,
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
+    onHasPasskeyChange: hasPasskey => setConfig(current => ({ ...current, hasPasskey })),
     onMfaMethodChange: (method, enabled) =>
       setConfig(current => ({
         ...current,
@@ -375,12 +456,16 @@ export function Default() {
         devices={flow.devices}
         hasPassword={flow.hasPassword}
         mfaMethods={flow.mfaMethods}
+        passkeys={config.passkeysAvailable ? flow.passkeys : undefined}
         passwordAvailable={config.passwordAvailable}
+        onAddPasskey={config.passkeysAvailable ? flow.openAddPasskey : undefined}
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
         onAddMfaMethod={flow.openAddMfa}
         onDeleteAccount={flow.openDeleteAccount}
         onManageDevice={flow.openDevice}
+        onManagePasskey={flow.openRenamePasskey}
         onRemoveMfaMethod={flow.openRemoveMfa}
+        onRemovePasskey={flow.openRemovePasskey}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
         onSignOutDevice={flow.openDevice}
       />
@@ -398,6 +483,9 @@ interface Snapshot<State> {
 
 type SecuritySnapshot =
   | ({ flow: 'password' } & Snapshot<UserProfilePasswordFlowState>)
+  | ({ flow: 'add-passkey' } & Snapshot<UserProfilePasskeyAddFlowState>)
+  | ({ flow: 'rename-passkey' } & Snapshot<UserProfilePasskeyRenameFlowState>)
+  | ({ flow: 'remove-passkey' } & Snapshot<UserProfilePasskeyRemoveFlowState>)
   | ({ flow: 'add-mfa' } & Snapshot<UserProfileMfaAddFlowState>)
   | ({ flow: 'remove-mfa' } & Snapshot<UserProfileMfaRemoveFlowState>)
   | ({ flow: 'delete-account' } & Snapshot<UserProfileDeleteAccountFlowState>)
@@ -587,6 +675,122 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
       status: 'error',
       errors: { form: 'Something went wrong. Please try again.' },
     },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'idle',
+    state: { isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'submitting',
+    state: { isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'server error',
+    state: { isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } },
+  },
+  {
+    flow: 'add-passkey',
+    step: 'add passkey',
+    variant: 'reverification',
+    state: { isSubmitting: true, errors: {} },
+    reverification: idleVerification,
+  },
+  {
+    flow: 'rename-passkey',
+    step: 'rename passkey',
+    variant: 'unchanged',
+    state: {
+      id: 'passkey',
+      originalName: 'Passkey',
+      name: 'Passkey',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'rename-passkey',
+    step: 'rename passkey',
+    variant: 'ready',
+    state: {
+      id: 'passkey',
+      originalName: 'Passkey',
+      name: 'Chrome on macOS',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'rename-passkey',
+    step: 'rename passkey',
+    variant: 'submitting',
+    state: {
+      id: 'passkey',
+      originalName: 'Passkey',
+      name: 'Chrome on macOS',
+      isSubmitting: true,
+      errors: {},
+    },
+  },
+  {
+    flow: 'rename-passkey',
+    step: 'rename passkey',
+    variant: 'server error',
+    state: {
+      id: 'passkey',
+      originalName: 'Passkey',
+      name: 'Chrome on macOS',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'rename-passkey',
+    step: 'rename passkey',
+    variant: 'reverification',
+    state: {
+      id: 'passkey',
+      originalName: 'Passkey',
+      name: 'Chrome on macOS',
+      isSubmitting: true,
+      errors: {},
+    },
+    reverification: idleVerification,
+  },
+  {
+    flow: 'remove-passkey',
+    step: 'remove passkey',
+    variant: 'idle',
+    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'remove-passkey',
+    step: 'remove passkey',
+    variant: 'submitting',
+    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'remove-passkey',
+    step: 'remove passkey',
+    variant: 'server error',
+    state: {
+      id: 'passkey',
+      name: 'Chrome on macOS',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'remove-passkey',
+    step: 'remove passkey',
+    variant: 'reverification',
+    state: { id: 'passkey', name: 'Chrome on macOS', isSubmitting: true, errors: {} },
+    reverification: idleVerification,
   },
   {
     flow: 'add-mfa',
@@ -929,6 +1133,34 @@ export function States() {
           onOpenChange={setOpen}
           onValueChange={noop}
           onSubmit={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'add-passkey' ? (
+        <UserProfilePasskeyAddDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onAdd={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'rename-passkey' ? (
+        <UserProfilePasskeyRenameDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onNameChange={noop}
+          onRename={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'remove-passkey' ? (
+        <UserProfilePasskeyRemoveDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onRemove={noop}
           verificationDialog={verification}
         />
       ) : null}
