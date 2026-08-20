@@ -2,6 +2,8 @@ import { UserProfilePasswordSectionView } from '@clerk/ui/mosaic/user-profile/us
 
 import type { StoryMeta } from '@/lib/types';
 
+import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
+
 export { default as __source } from './user-profile-password-section.stories?raw';
 
 export const meta: StoryMeta = {
@@ -13,5 +15,12 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  return <UserProfilePasswordSectionView onChangePassword={() => undefined} />;
+  const { openPasswordDialog, passwordDialog } = usePasswordDialogStory();
+
+  return (
+    <>
+      <UserProfilePasswordSectionView onChangePassword={openPasswordDialog} />
+      {passwordDialog}
+    </>
+  );
 }
