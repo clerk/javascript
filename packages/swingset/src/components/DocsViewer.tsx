@@ -39,6 +39,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
     'user-profile-password-dialog': dynamic(() => import('../stories/user-profile-password-dialog.mdx')),
     'user-profile-delete-account-dialog': dynamic(() => import('../stories/user-profile-delete-account-dialog.mdx')),
+    'user-profile-sign-out-all-devices-dialog': dynamic(
+      () => import('../stories/user-profile-sign-out-all-devices-dialog.mdx'),
+    ),
   },
   components: {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
