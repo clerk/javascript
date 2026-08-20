@@ -20,16 +20,19 @@ test.describe('Keyless mode | middleware authorization @nextjs', () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
     await app.teardown();
   });
 
-  test('auth.protect() in middleware redirects to sign-in during keyless bootstrap', async ({ page }) => {
-    await page.goto(`${app.serverUrl}/protected`);
-    await page.waitForURL(/\/sign-in/);
-    await expect(page.getByTestId('protected')).not.toBeVisible();
+  test('requests without keys fail with the missing env vars error instead of keyless bootstrap', async ({ page }) => {
+    const response = await page.goto(`${app.serverUrl}/protected`);
+    expect(response?.status()).toBe(500);
+    const content = await page.content();
+    expect(content).toContain('Missing publishableKey');
+    expect(content).toContain('npx clerk@latest init');
   });
 });
