@@ -6,51 +6,50 @@ import { MosaicProvider } from '../../MosaicProvider';
 import { UserProfileBackupCodesDialogView } from '../user-profile-backup-codes-dialog.view';
 
 const actions = {
-  onGenerate: vi.fn(),
+  onRetry: vi.fn(),
   onCopy: vi.fn(),
   onDownload: vi.fn(),
   onPrint: vi.fn(),
 };
 
 describe('UserProfileBackupCodesDialogView', () => {
-  it('confirms before regenerating codes', async () => {
-    const onGenerate = vi.fn();
-    const user = userEvent.setup();
+  it('opens in the generating state', () => {
     render(
       <MosaicProvider>
         <UserProfileBackupCodesDialogView
           open
-          state={{ step: 'confirm', isSubmitting: false, errors: {} }}
+          state={{ step: 'generating', isSubmitting: true, errors: {} }}
           {...actions}
-          onGenerate={onGenerate}
         />
       </MosaicProvider>,
     );
 
     const dialog = screen.getByRole('dialog', { name: 'Backup codes' });
-    expect(dialog).toHaveAccessibleDescription('Regenerating your backup codes invalidates your existing codes.');
-    await user.click(within(dialog).getByRole('button', { name: 'Regenerate codes' }));
-    expect(onGenerate).toHaveBeenCalledOnce();
+    expect(dialog).toHaveAccessibleDescription('Creating a new set of backup codes.');
+    expect(within(dialog).getByRole('status')).toHaveTextContent('Generating new backup codes');
   });
 
-  it('shows generation pending and server error states', () => {
+  it('announces generation errors and retries', async () => {
+    const onRetry = vi.fn();
+    const user = userEvent.setup();
     render(
       <MosaicProvider>
         <UserProfileBackupCodesDialogView
           open
           state={{
             step: 'generating',
-            isSubmitting: true,
+            isSubmitting: false,
             errors: { form: 'Something went wrong. Please try again.' },
           }}
           {...actions}
+          onRetry={onRetry}
         />
       </MosaicProvider>,
     );
 
-    expect(screen.getByRole('status')).toHaveTextContent('Generating new backup codes');
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
-    expect(screen.getByRole('button', { name: 'Try again' })).toHaveAttribute('aria-busy', 'true');
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(onRetry).toHaveBeenCalledOnce();
   });
 
   it('renders and exposes actions for new backup codes', async () => {

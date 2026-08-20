@@ -8,7 +8,8 @@ export function useBackupCodesDialogStory() {
   const [state, setState] = useState<UserProfileBackupCodesFlowState | null>(null);
 
   return {
-    openBackupCodesDialog: () => setState({ step: 'confirm', isSubmitting: false, errors: {} }),
+    openBackupCodesDialog: () =>
+      setState({ step: 'codes', codes: CODES, copied: false, isSubmitting: false, errors: {} }),
     backupCodesDialog: state ? (
       <UserProfileBackupCodesDialogView
         open
@@ -18,7 +19,7 @@ export function useBackupCodesDialogStory() {
             setState(null);
           }
         }}
-        onGenerate={() => setState({ step: 'codes', codes: CODES, copied: false, isSubmitting: false, errors: {} })}
+        onRetry={() => setState({ step: 'codes', codes: CODES, copied: false, isSubmitting: false, errors: {} })}
         onCopy={() => {
           void navigator.clipboard?.writeText(CODES.join('\n'));
           setState(current => (current?.step === 'codes' ? { ...current, copied: true } : current));

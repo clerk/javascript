@@ -16,7 +16,7 @@ export interface UserProfileBackupCodesDialogViewProps extends Pick<
 > {
   state: UserProfileBackupCodesFlowState;
   verificationDialog?: ReactNode;
-  onGenerate: () => void;
+  onRetry: () => void;
   onCopy: () => void;
   onDownload: () => void;
   onPrint: () => void;
@@ -25,7 +25,7 @@ export interface UserProfileBackupCodesDialogViewProps extends Pick<
 export function UserProfileBackupCodesDialogView({
   state,
   verificationDialog,
-  onGenerate,
+  onRetry,
   onCopy,
   onDownload,
   onPrint,
@@ -33,8 +33,8 @@ export function UserProfileBackupCodesDialogView({
 }: UserProfileBackupCodesDialogViewProps) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (state.step !== 'codes' && !state.isSubmitting) {
-      onGenerate();
+    if (state.step === 'generating' && !state.isSubmitting) {
+      onRetry();
     }
   };
 
@@ -65,15 +65,10 @@ export function UserProfileBackupCodesDialogView({
                 <Dialog.Description render={<Text />}>
                   {state.step === 'codes'
                     ? 'Save these backup codes somewhere safe. Each code can only be used once.'
-                    : 'Regenerating your backup codes invalidates your existing codes.'}
+                    : 'Creating a new set of backup codes.'}
                 </Dialog.Description>
               </Card.Header>
               <Card.Content {...stylex.props(styles.content)}>
-                {state.step === 'confirm' ? (
-                  <Text>
-                    You can use a backup code to sign in when another two-step verification method is unavailable.
-                  </Text>
-                ) : null}
                 {state.step === 'generating' && state.isSubmitting ? (
                   <div
                     role='status'
@@ -132,41 +127,37 @@ export function UserProfileBackupCodesDialogView({
                   </Text>
                 ) : null}
               </Card.Content>
-              <Card.Footer>
-                {state.step === 'codes' ? (
-                  <Dialog.Close
-                    render={props => (
-                      <Button
-                        {...props}
-                        {...stylex.props(styles.footerButton)}
-                      >
-                        Done
-                      </Button>
-                    )}
-                  />
-                ) : (
-                  <>
+              {state.step === 'codes' || !state.isSubmitting ? (
+                <Card.Footer>
+                  {state.step === 'codes' ? (
                     <Dialog.Close
                       render={props => (
                         <Button
                           {...props}
                           {...stylex.props(styles.footerButton)}
-                          variant='outline'
                         >
-                          Cancel
+                          Done
                         </Button>
                       )}
                     />
-                    <SubmitButton
-                      isPending={state.isSubmitting}
-                      pendingLabel='Generating codes'
-                      {...stylex.props(styles.footerButton)}
-                    >
-                      {state.step === 'generating' ? 'Try again' : 'Regenerate codes'}
-                    </SubmitButton>
-                  </>
-                )}
-              </Card.Footer>
+                  ) : (
+                    <>
+                      <Dialog.Close
+                        render={props => (
+                          <Button
+                            {...props}
+                            {...stylex.props(styles.footerButton)}
+                            variant='outline'
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      />
+                      <SubmitButton {...stylex.props(styles.footerButton)}>Try again</SubmitButton>
+                    </>
+                  )}
+                </Card.Footer>
+              ) : null}
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

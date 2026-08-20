@@ -227,7 +227,7 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
               flow.closeBackupCodes();
             }
           }}
-          onGenerate={flow.generateBackupCodes}
+          onRetry={flow.regenerateBackupCodes}
           onCopy={() => {
             if (flow.backupCodes?.step === 'codes') {
               void navigator.clipboard?.writeText(flow.backupCodes.codes.join('\n'));
@@ -355,9 +355,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
     ...(config.hasMfaPhone ? (['phone_code'] as const) : []),
     ...(config.hasPasskey ? (['passkey'] as const) : []),
     ...(config.hasMfaAuthenticator ? (['totp'] as const) : []),
-    ...(config.backupCodesEnabled && (config.hasMfaPhone || config.hasMfaAuthenticator)
-      ? (['backup_code'] as const)
-      : []),
+    ...(config.hasBackupCodes && (config.hasMfaPhone || config.hasMfaAuthenticator) ? (['backup_code'] as const) : []),
   ];
 
   return (
@@ -454,8 +452,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
             onChange({
               ...config,
               hasMfaPhone: event.target.checked,
-              backupCodesEnabled:
-                event.target.checked || config.hasMfaAuthenticator ? config.backupCodesEnabled : false,
+              hasBackupCodes: event.target.checked || config.hasMfaAuthenticator ? config.hasBackupCodes : false,
               reverificationStrategy:
                 !event.target.checked &&
                 (config.reverificationStrategy === 'phone_code' ||
@@ -475,7 +472,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
             onChange({
               ...config,
               hasMfaAuthenticator: event.target.checked,
-              backupCodesEnabled: event.target.checked || config.hasMfaPhone ? config.backupCodesEnabled : false,
+              hasBackupCodes: event.target.checked || config.hasMfaPhone ? config.hasBackupCodes : false,
               reverificationStrategy:
                 !event.target.checked &&
                 (config.reverificationStrategy === 'totp' ||
@@ -489,13 +486,13 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
       </label>
       <label style={{ ...controlLabel, opacity: config.hasMfaPhone || config.hasMfaAuthenticator ? 1 : 0.5 }}>
         <input
-          checked={config.backupCodesEnabled}
+          checked={config.hasBackupCodes}
           disabled={!config.hasMfaPhone && !config.hasMfaAuthenticator}
           type='checkbox'
           onChange={event =>
             onChange({
               ...config,
-              backupCodesEnabled: event.target.checked,
+              hasBackupCodes: event.target.checked,
               reverificationStrategy:
                 !event.target.checked && config.reverificationStrategy === 'backup_code'
                   ? 'email_code'
@@ -503,7 +500,7 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
             })
           }
         />
-        <span style={controlName}>Backup codes</span>
+        <span style={controlName}>Backup codes exist</span>
       </label>
       <label style={controlLabel}>
         <input
@@ -562,7 +559,7 @@ export function Default() {
           ...current,
           hasMfaPhone,
           hasMfaAuthenticator,
-          backupCodesEnabled: hasMfaPhone || hasMfaAuthenticator ? current.backupCodesEnabled : false,
+          hasBackupCodes: hasMfaPhone || hasMfaAuthenticator ? current.hasBackupCodes : false,
           reverificationStrategy:
             !enabled &&
             (current.reverificationStrategy === (method === 'sms' ? 'phone_code' : 'totp') ||
@@ -1125,12 +1122,6 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
   {
     flow: 'backup-codes',
     step: 'backup codes',
-    variant: 'confirm',
-    state: { step: 'confirm', isSubmitting: false, errors: {} },
-  },
-  {
-    flow: 'backup-codes',
-    step: 'backup codes',
     variant: 'generating',
     state: { step: 'generating', isSubmitting: true, errors: {} },
   },
@@ -1373,7 +1364,7 @@ export function States() {
           open={open}
           state={snapshot.state}
           onOpenChange={setOpen}
-          onGenerate={noop}
+          onRetry={noop}
           onCopy={noop}
           onDownload={noop}
           onPrint={noop}
