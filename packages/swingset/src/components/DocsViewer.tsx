@@ -15,6 +15,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   'user-profile': {
     'user-page': dynamic(() => import('../stories/user-page.mdx')),
+    'user-profile-account-section-flow': dynamic(() => import('../stories/user-profile-account-section-flow.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
