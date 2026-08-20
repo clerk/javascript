@@ -144,6 +144,11 @@ import {
   meta as userProfilePasskeysSectionMeta,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
+  Change as UserProfilePasswordDialogChange,
+  meta as userProfilePasswordDialogMeta,
+  Set as UserProfilePasswordDialogSet,
+} from '../stories/user-profile-password-dialog.stories';
+import {
   Default as UserProfilePasswordSectionDefault,
   meta as userProfilePasswordSectionMeta,
 } from '../stories/user-profile-password-section.stories';
@@ -353,6 +358,11 @@ const userProfileDeleteSectionModule: StoryModule = {
   meta: userProfileDeleteSectionMeta,
   Default: UserProfileDeleteSectionDefault,
 };
+const userProfilePasswordDialogModule: StoryModule = {
+  meta: userProfilePasswordDialogMeta,
+  Change: UserProfilePasswordDialogChange,
+  Set: UserProfilePasswordDialogSet,
+};
 
 export const registry: StoryModule[] = [
   // User Button
@@ -376,6 +386,8 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // User Profile · Dialogs
+  userProfilePasswordDialogModule,
   // Components
   avatarModule,
   badgeModule,
