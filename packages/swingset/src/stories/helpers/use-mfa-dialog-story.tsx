@@ -66,12 +66,24 @@ export function useMfaDialogStory({
       });
       return;
     }
+    if (
+      add.step === 'select-phone' ||
+      add.step === 'preparing' ||
+      add.step === 'backup-codes' ||
+      add.step === 'success'
+    ) {
+      return;
+    }
     const nextMethod: UserProfileMfaMethod =
       add.method === 'sms'
         ? { id: `sms-${Date.now()}`, type: 'sms', description: add.identifier }
         : { id: `authenticator-${Date.now()}`, type: 'authenticator' };
-    onChange([...methods.filter(method => method.type !== add.method), nextMethod]);
-    setAdd(null);
+    onChange([...methods.filter(method => add.method === 'sms' || method.type !== add.method), nextMethod]);
+    setAdd(
+      add.method === 'authenticator'
+        ? { method: 'authenticator', step: 'success', isSubmitting: false, errors: {} }
+        : null,
+    );
   };
 
   const openRemoveMfaDialog = (id: string) => {
@@ -107,6 +119,10 @@ export function useMfaDialogStory({
                 current && current.step === 'verify' ? { ...current, code, status: 'idle', errors: {} } : current,
               )
             }
+            onAddPhone={() =>
+              setAdd({ method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} })
+            }
+            onSelectPhone={() => undefined}
             onPhoneNumberChange={phoneNumber =>
               setAdd(current => (current && current.step === 'phone' ? { ...current, phoneNumber } : current))
             }
@@ -119,6 +135,10 @@ export function useMfaDialogStory({
                   : current,
               )
             }
+            onCopyBackupCodes={() => undefined}
+            onDownloadBackupCodes={() => undefined}
+            onPrintBackupCodes={() => window.print()}
+            onFinish={() => setAdd(null)}
           />
         ) : null}
         {remove ? (

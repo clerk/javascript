@@ -25,6 +25,36 @@ export const mfaDialogStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  pending: {
+    gap: space['2'],
+    alignItems: 'center',
+    display: 'flex',
+  },
+  phoneOptions: {
+    gap: space['2'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  phoneOption: {
+    justifyContent: 'flex-start',
+    width: '100%',
+  },
+  codes: {
+    padding: space['4'],
+    borderRadius: radiusVars['--cl-radius-md'],
+    gap: space['2'],
+    backgroundColor: colorVars['--cl-color-neutral-faded'],
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  },
+  code: {
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+  },
+  backupActions: {
+    gap: space['2'],
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
   qrPlaceholder: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-md'],

@@ -8,33 +8,51 @@ import { Card } from '../components/card';
 import { Dialog, type DialogProps } from '../components/dialog';
 import { Field } from '../components/field';
 import { Heading } from '../components/heading';
+import { Spinner } from '../components/spinner';
 import { Text } from '../components/text';
 import { themeProps } from '../props';
-import { CodeInput, PhoneInput, ResendButton } from './dialogs/security-dialog-chrome';
 import type { UserProfileMfaAddFlowState, UserProfileMfaRemoveFlowState } from './dialogs/flow.types';
+import { CodeInput, PhoneInput, ResendButton } from './dialogs/security-dialog-chrome';
 import { mfaDialogStyles as styles } from './user-profile-mfa-dialog.styles';
 
 export interface UserProfileMfaAddDialogViewProps extends Pick<DialogProps, 'open' | 'defaultOpen' | 'onOpenChange'> {
   state: UserProfileMfaAddFlowState;
   verificationDialog?: ReactNode;
   onPhoneNumberChange: (value: string) => void;
+  onAddPhone: () => void;
+  onSelectPhone: (id: string) => void;
   onCodeChange: (value: string) => void;
   onSubmit: (completedCode?: string) => void;
   onResend: () => void;
   onToggleDisplayFormat: () => void;
+  onCopyBackupCodes: () => void;
+  onDownloadBackupCodes: () => void;
+  onPrintBackupCodes: () => void;
+  onFinish: () => void;
 }
 
 export function UserProfileMfaAddDialogView({
   state,
   verificationDialog,
   onPhoneNumberChange,
+  onAddPhone,
+  onSelectPhone,
   onCodeChange,
   onSubmit,
   onResend,
   onToggleDisplayFormat,
+  onCopyBackupCodes,
+  onDownloadBackupCodes,
+  onPrintBackupCodes,
+  onFinish,
   ...dialogProps
 }: UserProfileMfaAddDialogViewProps) {
-  const title = state.method === 'sms' ? 'Add phone number' : 'Add authenticator app';
+  const title =
+    state.step === 'backup-codes'
+      ? 'Save your backup codes'
+      : state.method === 'sms'
+        ? 'Add phone number'
+        : 'Add authenticator app';
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!state.isSubmitting) {
@@ -75,9 +93,13 @@ export function UserProfileMfaAddDialogView({
                   state={state}
                   onCodeChange={onCodeChange}
                   onPhoneNumberChange={onPhoneNumberChange}
+                  onSelectPhone={onSelectPhone}
                   onResend={onResend}
                   onSubmit={onSubmit}
                   onToggleDisplayFormat={onToggleDisplayFormat}
+                  onCopyBackupCodes={onCopyBackupCodes}
+                  onDownloadBackupCodes={onDownloadBackupCodes}
+                  onPrintBackupCodes={onPrintBackupCodes}
                 />
                 {state.errors.form ? (
                   <Text
@@ -88,27 +110,47 @@ export function UserProfileMfaAddDialogView({
                   </Text>
                 ) : null}
               </Card.Content>
-              <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
-                <Dialog.Close
-                  render={props => (
+              {state.step !== 'preparing' || !state.isSubmitting ? (
+                <Card.Footer {...themeProps('user-profile-mfa-add-dialog-actions')}>
+                  <Dialog.Close
+                    render={props => (
+                      <Button
+                        {...props}
+                        {...stylex.props(styles.footerButton)}
+                        variant='outline'
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  />
+                  {state.step === 'backup-codes' || state.step === 'success' ? (
                     <Button
-                      {...props}
                       {...stylex.props(styles.footerButton)}
-                      variant='outline'
+                      type='button'
+                      onClick={onFinish}
                     >
-                      Cancel
+                      Done
                     </Button>
+                  ) : state.step === 'select-phone' ? (
+                    <Button
+                      {...stylex.props(styles.footerButton)}
+                      type='button'
+                      onClick={onAddPhone}
+                    >
+                      Add phone number
+                    </Button>
+                  ) : (
+                    <SubmitButton
+                      disabled={!canSubmit(state)}
+                      isPending={state.isSubmitting || (state.step === 'verify' && state.status === 'verifying')}
+                      pendingLabel={state.step === 'verify' ? 'Verifying code' : 'Continuing'}
+                      {...stylex.props(styles.footerButton)}
+                    >
+                      {state.step === 'verify' ? 'Verify' : state.step === 'preparing' ? 'Try again' : 'Continue'}
+                    </SubmitButton>
                   )}
-                />
-                <SubmitButton
-                  disabled={!canSubmit(state)}
-                  isPending={state.isSubmitting || (state.step === 'verify' && state.status === 'verifying')}
-                  pendingLabel={state.step === 'verify' ? 'Verifying code' : 'Continuing'}
-                  {...stylex.props(styles.footerButton)}
-                >
-                  {state.step === 'verify' ? 'Verify' : 'Continue'}
-                </SubmitButton>
-              </Card.Footer>
+                </Card.Footer>
+              ) : null}
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>
@@ -119,6 +161,18 @@ export function UserProfileMfaAddDialogView({
 }
 
 function AddDescription({ state }: { state: UserProfileMfaAddFlowState }) {
+  if (state.step === 'select-phone') {
+    return <>Choose an existing phone number or add a new one.</>;
+  }
+  if (state.step === 'preparing') {
+    return <>Preparing your authenticator setup.</>;
+  }
+  if (state.step === 'backup-codes') {
+    return <>Store these somewhere safe. Each backup code can only be used once.</>;
+  }
+  if (state.step === 'success') {
+    return <>Your authenticator app has been added.</>;
+  }
   if (state.step === 'phone') {
     return <>We&apos;ll send a verification code to this phone number.</>;
   }
@@ -134,15 +188,108 @@ function AddDescription({ state }: { state: UserProfileMfaAddFlowState }) {
 function AddContent({
   state,
   onPhoneNumberChange,
+  onSelectPhone,
   onCodeChange,
   onSubmit,
   onResend,
   onToggleDisplayFormat,
+  onCopyBackupCodes,
+  onDownloadBackupCodes,
+  onPrintBackupCodes,
 }: Pick<
   UserProfileMfaAddDialogViewProps,
-  'state' | 'onPhoneNumberChange' | 'onCodeChange' | 'onSubmit' | 'onResend' | 'onToggleDisplayFormat'
+  | 'state'
+  | 'onPhoneNumberChange'
+  | 'onSelectPhone'
+  | 'onCodeChange'
+  | 'onSubmit'
+  | 'onResend'
+  | 'onToggleDisplayFormat'
+  | 'onCopyBackupCodes'
+  | 'onDownloadBackupCodes'
+  | 'onPrintBackupCodes'
 >) {
   const fieldId = useId();
+
+  if (state.step === 'select-phone') {
+    return (
+      <div {...stylex.props(styles.phoneOptions)}>
+        {state.phones.map(phone => (
+          <SubmitButton
+            key={phone.id}
+            disabled={state.isSubmitting}
+            isPending={state.loadingPhoneId === phone.id}
+            pendingLabel={`Adding ${phone.label}`}
+            type='button'
+            variant='outline'
+            {...stylex.props(styles.phoneOption)}
+            onClick={() => onSelectPhone(phone.id)}
+          >
+            {phone.label}
+          </SubmitButton>
+        ))}
+      </div>
+    );
+  }
+
+  if (state.step === 'preparing') {
+    return state.isSubmitting ? (
+      <div
+        role='status'
+        {...stylex.props(styles.pending)}
+      >
+        <Spinner />
+        <Text>Preparing authenticator setup…</Text>
+      </div>
+    ) : null;
+  }
+
+  if (state.step === 'backup-codes') {
+    return (
+      <>
+        <div
+          aria-label='Backup codes'
+          {...stylex.props(styles.codes)}
+        >
+          {state.codes.map(code => (
+            <Text
+              key={code}
+              {...stylex.props(styles.code)}
+            >
+              {code}
+            </Text>
+          ))}
+        </div>
+        <div {...stylex.props(styles.backupActions)}>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onCopyBackupCodes}
+          >
+            {state.copied ? 'Copied' : 'Copy'}
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onDownloadBackupCodes}
+          >
+            Download
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onPrintBackupCodes}
+          >
+            Print
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (state.step === 'success') {
+    return <Text>You can now use codes from your authenticator app when you sign in.</Text>;
+  }
 
   if (state.step === 'phone') {
     return (
@@ -230,6 +377,12 @@ function AddContent({
 }
 
 function canSubmit(state: UserProfileMfaAddFlowState) {
+  if (state.step === 'preparing') {
+    return !state.isSubmitting;
+  }
+  if (state.step === 'select-phone' || state.step === 'backup-codes' || state.step === 'success') {
+    return false;
+  }
   if (state.step === 'phone') {
     return state.phoneNumber.length > 3;
   }

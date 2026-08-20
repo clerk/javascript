@@ -43,10 +43,11 @@ export function UserProfilePasswordDialogView({
   ...dialogProps
 }: UserProfilePasswordDialogViewProps) {
   const { values, mode, isSubmitting, errors } = state;
+  const locked = Boolean(state.isReadOnly) || isSubmitting;
   const title = mode === 'set' ? 'Set password' : 'Change password';
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isSubmitting) {
+    if (canSubmit && !isSubmitting && !state.isReadOnly) {
       onSubmit(values);
     }
   };
@@ -80,13 +81,16 @@ export function UserProfilePasswordDialogView({
                 <div
                   {...mergeStyleProps(themeProps('user-profile-password-dialog-fields'), stylex.props(styles.fields))}
                 >
+                  {state.isReadOnly ? (
+                    <Text color='neutral'>Your password is managed by your enterprise connection.</Text>
+                  ) : null}
                   <PasswordField
                     name='newPassword'
                     label='New password'
                     autoComplete='new-password'
                     value={values.newPassword}
                     error={errors.newPassword}
-                    disabled={isSubmitting}
+                    disabled={locked}
                     onChange={value => onValueChange('newPassword', value)}
                   />
                   <PasswordField
@@ -95,12 +99,12 @@ export function UserProfilePasswordDialogView({
                     autoComplete='new-password'
                     value={values.confirmPassword}
                     error={errors.confirmPassword}
-                    disabled={isSubmitting}
+                    disabled={locked}
                     onChange={value => onValueChange('confirmPassword', value)}
                   />
                   <SignOutOfOtherSessionsField
                     checked={values.signOutOfOtherSessions}
-                    disabled={isSubmitting}
+                    disabled={locked}
                     onChange={checked => onValueChange('signOutOfOtherSessions', checked)}
                   />
                   {errors.form ? (
@@ -125,14 +129,16 @@ export function UserProfilePasswordDialogView({
                     </Button>
                   )}
                 />
-                <SubmitButton
-                  disabled={!canSubmit}
-                  isPending={isSubmitting}
-                  pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
-                  {...stylex.props(styles.footerButton)}
-                >
-                  {title}
-                </SubmitButton>
+                {state.isReadOnly ? null : (
+                  <SubmitButton
+                    disabled={!canSubmit}
+                    isPending={isSubmitting}
+                    pendingLabel={mode === 'set' ? 'Setting password' : 'Changing password'}
+                    {...stylex.props(styles.footerButton)}
+                  >
+                    {title}
+                  </SubmitButton>
+                )}
               </Card.Footer>
             </form>
           </Dialog.Popup>

@@ -104,7 +104,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.queryByRole('menuitem', { name: 'Phone number' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Phone number' })).toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
@@ -144,6 +144,19 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('button', { name: 'Add verification method' })).toBeInTheDocument();
     expect(screen.getByText('No current device available')).toBeInTheDocument();
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
+  });
+
+  it('only offers verification methods enabled by the instance', async () => {
+    const user = userEvent.setup();
+    renderView({
+      mfaMethods: [],
+      mfaAddableMethods: ['sms'],
+      onAddMfaMethod: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(screen.getByRole('menuitem', { name: 'Phone number' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Authenticator app' })).not.toBeInTheDocument();
   });
 
   it('offers to set a password when password authentication is available', () => {
@@ -199,5 +212,14 @@ describe('UserProfileSecurityPanelView', () => {
 
     expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
+  });
+
+  it('hides removal when a verification method is required', () => {
+    renderView({
+      mfaMethods: [{ id: 'sms_1', type: 'sms', removable: false }],
+      onRemoveMfaMethod: vi.fn(),
+    });
+
+    expect(screen.queryByRole('button', { name: 'Manage Phone number' })).not.toBeInTheDocument();
   });
 });

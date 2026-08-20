@@ -279,6 +279,7 @@ export type UserProfilePasswordMode = 'change' | 'set';
 export interface UserProfilePasswordFlowState {
   mode: UserProfilePasswordMode;
   values: UserProfilePasswordValues;
+  isReadOnly?: boolean;
   isSubmitting: boolean;
   errors: FlowErrors & Partial<Record<UserProfilePasswordField, string>>;
 }
@@ -315,6 +316,12 @@ export interface UserProfileDeviceDetailsFlowState {
 
 export type UserProfileMfaMethodType = 'sms' | 'authenticator';
 
+export interface UserProfileMfaPhoneOption {
+  id: string;
+  label: string;
+  isVerified: boolean;
+}
+
 interface UserProfileMfaAddBaseState {
   method: UserProfileMfaMethodType;
   isSubmitting: boolean;
@@ -325,6 +332,18 @@ export interface UserProfileMfaPhoneStep extends UserProfileMfaAddBaseState {
   method: 'sms';
   step: 'phone';
   phoneNumber: string;
+}
+
+export interface UserProfileMfaPhoneSelectStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'select-phone';
+  phones: UserProfileMfaPhoneOption[];
+  loadingPhoneId?: string;
+}
+
+export interface UserProfileMfaAuthenticatorPreparingStep extends UserProfileMfaAddBaseState {
+  method: 'authenticator';
+  step: 'preparing';
 }
 
 export interface UserProfileMfaAuthenticatorSetupStep extends UserProfileMfaAddBaseState {
@@ -342,10 +361,24 @@ export interface UserProfileMfaVerificationStep extends UserProfileMfaAddBaseSta
   resend: ResendState;
 }
 
+export interface UserProfileMfaBackupCodesStep extends UserProfileMfaAddBaseState {
+  step: 'backup-codes';
+  codes: string[];
+  copied: boolean;
+}
+
+export interface UserProfileMfaSuccessStep extends UserProfileMfaAddBaseState {
+  step: 'success';
+}
+
 export type UserProfileMfaAddFlowState =
+  | UserProfileMfaPhoneSelectStep
   | UserProfileMfaPhoneStep
+  | UserProfileMfaAuthenticatorPreparingStep
   | UserProfileMfaAuthenticatorSetupStep
-  | UserProfileMfaVerificationStep;
+  | UserProfileMfaVerificationStep
+  | UserProfileMfaBackupCodesStep
+  | UserProfileMfaSuccessStep;
 
 export interface UserProfileMfaRemoveFlowState {
   method: UserProfileMfaMethodType;
