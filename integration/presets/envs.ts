@@ -112,6 +112,8 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
  */
 async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
   const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
+  // if we're not testing against staging, and the keyName provided matches a config file on disk, and we have a PLAPI
+  // key, create an application and obtain its keys, otherwise use the existing instance keys
   const keys =
     process.env.E2E_STAGING !== '1' && (await fs.pathExists(configPath)) && constants.CLERK_PLATFORM_API_KEY
       ? await getPlatformApplication(keyName, await loadPlatformApplicationConfig(configPath))

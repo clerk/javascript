@@ -315,8 +315,24 @@ If you need a fake user to login to the test site, use `createTestUtils`.
 
 If you need to run a test suite inside a different environment (e.g. a different first factor or optional/new features) you can create a new [environment config](#environment-configs) inside [`presets/envs.ts`](../integration/presets/envs.ts).
 
+#### Using the Platform API (recommended)
+
+1. Create a new JavaScript file inside the `integration/configs` folder with a descriptive name such as `with-new-feature.js`.
+1. Import the `defineConfig` helper, and provide a valid PLAPI configuration object. (You can export a complete configuration object with the Clerk CLI by running `clerk config pull`)
+
+   ```js
+   import { defineConfig } from '../presets/platformApplication';
+   export default defineConfig({
+     config: {
+       /* ... */
+     },
+   });
+   ```
+
+#### Using a manually created instance
+
 1. Create a new instance inside the **Integration testing** organization on Clerk
-1. Add its secret and publishable key to the 1Password note with the name **JS SDKs integration tests**
+1. Add its secret and publishable key to the 1Password note with the name **JS SDKs integration tests**. Also ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run. If you also have staging keys, add them to `INTEGRATION_STAGING_INSTANCE_KEYS`.
 1. Add a new key to `.keys.json` (with a concise name) and add your keys to `sk` and `pk` respectively. Also add a placeholder to `.keys.json.sample`. For example:
 
    ```json
@@ -327,6 +343,8 @@ If you need to run a test suite inside a different environment (e.g. a different
      }
    }
    ```
+
+#### Configuring the test suite
 
 1. Inside `presets/envs.ts`, create a new environment config wrapped with `withInstanceKeys`:
 
@@ -344,8 +362,6 @@ If you need to run a test suite inside a different environment (e.g. a different
      yourConciseName,
    } as const;
    ```
-
-1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run. If you also have staging keys, add them to `INTEGRATION_STAGING_INSTANCE_KEYS`.
 
 ## Debugging tests
 
@@ -574,24 +590,29 @@ const withCustomRoles = await withInstanceKeys(
 
 For non-staging tests, when `CLERK_PLATFORM_API_KEY` is set and `integration/configs/<key-name>.js` exists, `withInstanceKeys` creates a development application through the Platform API. It applies the exported configuration and uses the keys from the new application. If the file does not exist, the wrapper uses the existing instance keys map.
 
-Use `defineConfig` for configuration files. JavaScript configuration files can read environment variables. The optional `setup` function receives a `ClerkClient` after the instance configuration is applied. Omit `setup` when no additional operations are required.
+Use `defineConfig` for configuration files. JavaScript configuration files can read environment variables. The optional `setup` function receives a `ClerkClient` after the instance configuration is applied, along with a `patchConfig` method that can be used to make subsequent PATCH requests to the Platform API. Omit `setup` when no additional operations are required.
 
 ```js
 import { defineConfig } from '../presets/platformApplication.js';
 
 export default defineConfig({
   config: {
-    session: {
-      lifetime: Number(process.env.CLERK_E2E_SESSION_LIFETIME || 3600),
+    auth_attack_protection: {
+      user_lockout: {
+        max_attempts: Number(process.env.CLERK_E2E_USER_LOCKOUT_MAX_ATTEMPTS || 10),
+      },
     },
   },
-  setup: async clerkClient => {
-    await clerkClient.allowlistIdentifiers.createAllowlistIdentifier({ identifier: 'allowed@example.com' });
+  setup: async ({ clerkClient, patchConfig }) => {
+    await clerkClient.instance.update({ allowedOrigins: ['clerk://app'] });
+    await patchConfig({
+      organization_settings: {
+        domains_default_role: 'org:viewer',
+      },
+    });
   },
 });
 ```
-
-The application name includes a deterministic, letter-only token derived from `INTEGRATION_TEST_RUN_KEY` when it is available. Otherwise, it uses a random letter-only suffix. Application keys are cached during `E2E_APP_ID` runs because their setup and test workers must use the same instance. Global teardown removes the cache file.
 
 When `E2E_STAGING=1`, this will automatically look up `clerkstage-with-custom-roles` from the staging keys and swap the PK, SK, and API URL. If the staging key doesn't exist, the config will not be staging-ready and any long running apps using it will be gracefully skipped.
 
