@@ -105,7 +105,7 @@
     "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
     "@emotion/react": "11.14.0",
-    "@rsdoctor/rspack-plugin": "^1.5.9",
+    "@rsdoctor/rspack-plugin": "^1.6.1",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
     "@rspack/dev-server": "catalog:rspack",
@@ -114,7 +114,7 @@
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.2",
     "jsdom": "26.1.0",
-    "minimatch": "^10.2.5",
+    "minimatch": "^10.2.6",
     "webpack-merge": "^5.10.0"
   },
   "engines": {
