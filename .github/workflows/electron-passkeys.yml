@@ -2,6 +2,15 @@ name: Electron Passkeys Native Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/electron-passkeys/src/**'
+      - 'packages/electron-passkeys/Cargo.toml'
+      - 'packages/electron-passkeys/Cargo.lock'
+      - 'packages/electron-passkeys/build.rs'
+      - '.github/workflows/electron-passkeys.yml'
 
 concurrency:
   group: electron-passkeys-${{ github.head_ref || github.ref }}
@@ -101,10 +110,17 @@ jobs:
         run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
         working-directory: .
 
+      - name: Record the source hash the binaries were built from
+        run: node scripts/electron-passkeys-source-hash.mjs write
+        working-directory: .
+
       - name: Upload assembled platform binaries
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: electron-passkeys-npm
-          path: packages/electron-passkeys/npm/**/*.node
+          path: |
+            packages/electron-passkeys/npm/**/*.node
+            packages/electron-passkeys/npm/.source-hash
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 90

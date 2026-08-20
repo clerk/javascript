@@ -59,8 +59,8 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Release uses --force, so turbo cache is not needed
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
@@ -90,18 +90,22 @@ jobs:
         if: ${{ steps.detect-native.outputs.should-build == 'true' }}
         run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
 
+      - name: Verify electron-passkeys binaries match the current native sources
+        if: ${{ steps.detect-native.outputs.should-build == 'true' }}
+        run: node scripts/electron-passkeys-source-hash.mjs verify
+
       - name: Create Release PR
         id: changesets
         uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
         with:
-          commit: "ci(repo): Version packages"
-          title: "ci(repo): Version packages"
+          commit: 'ci(repo): Version packages'
+          title: 'ci(repo): Version packages'
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          HUSKY: "0"
+          HUSKY: '0'
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
@@ -269,8 +273,10 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    # Longer than the other jobs so it can wait for an in-flight electron-passkeys native build on the same commit.
+    timeout-minutes: 30
     permissions:
+      actions: read
       contents: read
       id-token: write
     steps:
@@ -288,8 +294,8 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
@@ -301,6 +307,54 @@ jobs:
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
         run: pnpm turbo build $TURBO_ARGS
+
+      - name: Wait for an in-flight electron-passkeys native build on this commit
+        if: steps.version-packages.outputs.success == '1'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const deadline = Date.now() + 20 * 60 * 1000;
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+            while (true) {
+              const { data } = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'electron-passkeys.yml',
+                head_sha: context.sha,
+                per_page: 10,
+              });
+              const pending = data.workflow_runs.filter(run => run.status !== 'completed');
+              if (pending.length === 0) {
+                return;
+              }
+              if (Date.now() > deadline) {
+                core.setFailed(`electron-passkeys native build ${pending[0].html_url} is still running; re-run this job once it finishes`);
+                return;
+              }
+              core.info(`Waiting for ${pending[0].html_url} (${pending[0].status})...`);
+              await sleep(30_000);
+            }
+
+      - name: Download electron-passkeys native binaries
+        if: steps.version-packages.outputs.success == '1'
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
+        with:
+          github_token: ${{ github.token }}
+          workflow: electron-passkeys.yml
+          name: electron-passkeys-npm
+          path: packages/electron-passkeys/npm
+          branch: main
+          workflow_conclusion: success
+          search_artifacts: true
+          allow_forks: false
+
+      - name: Verify electron-passkeys binaries are present
+        if: steps.version-packages.outputs.success == '1'
+        run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
+
+      - name: Verify electron-passkeys binaries match the current native sources
+        if: steps.version-packages.outputs.success == '1'
+        run: node scripts/electron-passkeys-source-hash.mjs verify
 
       - name: Canary release
         id: publish
@@ -372,6 +426,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     permissions:
+      actions: read
       contents: read
       id-token: write
       pull-requests: write
@@ -437,8 +492,8 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
@@ -463,6 +518,28 @@ jobs:
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
         run: pnpm turbo build $TURBO_ARGS
+
+      - name: Download electron-passkeys native binaries
+        if: steps.version-packages.outputs.success == '1'
+        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
+        with:
+          github_token: ${{ github.token }}
+          workflow: electron-passkeys.yml
+          name: electron-passkeys-npm
+          path: packages/electron-passkeys/npm
+          branch: main
+          workflow_conclusion: success
+          search_artifacts: true
+          allow_forks: false
+
+      - name: Verify electron-passkeys binaries are present
+        if: steps.version-packages.outputs.success == '1'
+        run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
+
+      # Snapshots always ship main's binaries; a PR with native changes cannot be verified here, so only warn.
+      - name: Check electron-passkeys binaries against this branch's native sources
+        if: steps.version-packages.outputs.success == '1'
+        run: node scripts/electron-passkeys-source-hash.mjs verify --warn
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
@@ -570,7 +647,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
@@ -579,5 +656,5 @@ jobs:
           cache-enabled: true
           node-version: ${{ matrix.version }}
           turbo-enabled: false
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''
