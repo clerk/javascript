@@ -68,12 +68,16 @@ export const createApplicationFromConfig = async (
     getE2EApplicationRunMarker(runKey) ||
     `random-${Array.from(randomBytes(10), byte => String.fromCharCode(97 + (byte % 26))).join('')}`;
   const applicationName = `e2e-${keyName}-${applicationRunMarker}`;
-  const createUrl = new URL('/v1/platform/applications', PLATFORM_API_URL);
-  const createResponse = await platformApiRequest(platformApiKey, createUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: applicationName, from_source: 'javascript_e2e' }),
-  });
+
+  const createResponse = await platformApiRequest(
+    platformApiKey,
+    new URL('/v1/platform/applications', PLATFORM_API_URL),
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: applicationName, from_source: 'javascript_e2e' }),
+    },
+  );
   const created = (await createResponse.json()) as { application_id?: string };
 
   if (!created.application_id) {
@@ -81,8 +85,11 @@ export const createApplicationFromConfig = async (
   }
 
   const applicationPath = `/v1/platform/applications/${encodeURIComponent(created.application_id)}`;
-  const applicationUrl = new URL(`${applicationPath}?include_secret_keys=true`, PLATFORM_API_URL);
-  const applicationResponse = await platformApiRequest(platformApiKey, applicationUrl);
+
+  const applicationResponse = await platformApiRequest(
+    platformApiKey,
+    new URL(`${applicationPath}?include_secret_keys=true`, PLATFORM_API_URL),
+  );
   const application = (await applicationResponse.json()) as {
     instances?: Array<{
       environment_type?: string;
