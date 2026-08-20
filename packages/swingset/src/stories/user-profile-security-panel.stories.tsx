@@ -10,6 +10,7 @@ import type { StoryMeta } from '@/lib/types';
 
 import { useDeleteAccountDialogStory } from './helpers/use-delete-account-dialog-story';
 import { usePasswordDialogStory } from './helpers/use-password-dialog-story';
+import { useSignOutAllDevicesDialogStory } from './helpers/use-sign-out-all-devices-dialog-story';
 
 export { default as __source } from './user-profile-security-panel.stories?raw';
 
@@ -57,6 +58,9 @@ export function Default() {
       type: 'desktop',
     },
   ]);
+  const { openSignOutAllDevicesDialog, signOutAllDevicesDialog } = useSignOutAllDevicesDialogStory({
+    onSignOut: () => setDevices(current => current.filter(device => device.isCurrent)),
+  });
 
   return (
     <>
@@ -98,11 +102,12 @@ export function Default() {
         }
         onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
         onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-        onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
+        onSignOutAllOtherDevices={openSignOutAllDevicesDialog}
         onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
       />
       {passwordDialog}
       {deleteAccountDialog}
+      {signOutAllDevicesDialog}
     </>
   );
 }

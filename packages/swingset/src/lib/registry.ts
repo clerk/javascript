@@ -177,6 +177,10 @@ import {
   meta as userProfileSecurityPanelMeta,
 } from '../stories/user-profile-security-panel.stories';
 import {
+  Default as UserProfileSignOutAllDevicesDialogDefault,
+  meta as userProfileSignOutAllDevicesDialogMeta,
+} from '../stories/user-profile-sign-out-all-devices-dialog.stories';
+import {
   Default as UserProfileSubscriptionSectionDefault,
   meta as userProfileSubscriptionSectionMeta,
 } from '../stories/user-profile-subscription-section.stories';
@@ -379,6 +383,10 @@ const userProfileDeleteAccountDialogModule: StoryModule = {
   meta: userProfileDeleteAccountDialogMeta,
   Default: UserProfileDeleteAccountDialogDefault,
 };
+const userProfileSignOutAllDevicesDialogModule: StoryModule = {
+  meta: userProfileSignOutAllDevicesDialogMeta,
+  Default: UserProfileSignOutAllDevicesDialogDefault,
+};
 const userProfilePasswordDialogModule: StoryModule = {
   meta: userProfilePasswordDialogMeta,
   Change: UserProfilePasswordDialogChange,
@@ -412,6 +420,7 @@ export const registry: StoryModule[] = [
   // User Profile · Dialogs
   userProfileDeleteAccountDialogModule,
   userProfilePasswordDialogModule,
+  userProfileSignOutAllDevicesDialogModule,
   // Components
   avatarModule,
   badgeModule,
