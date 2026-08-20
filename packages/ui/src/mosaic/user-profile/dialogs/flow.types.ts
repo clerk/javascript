@@ -312,3 +312,45 @@ export interface UserProfileDeviceDetailsFlowState {
   isSubmitting: boolean;
   errors: FlowErrors;
 }
+
+export type UserProfileMfaMethodType = 'sms' | 'authenticator';
+
+interface UserProfileMfaAddBaseState {
+  method: UserProfileMfaMethodType;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}
+
+export interface UserProfileMfaPhoneStep extends UserProfileMfaAddBaseState {
+  method: 'sms';
+  step: 'phone';
+  phoneNumber: string;
+}
+
+export interface UserProfileMfaAuthenticatorSetupStep extends UserProfileMfaAddBaseState {
+  method: 'authenticator';
+  step: 'setup';
+  displayFormat: 'qr' | 'key';
+  secret: string;
+}
+
+export interface UserProfileMfaVerificationStep extends UserProfileMfaAddBaseState {
+  step: 'verify';
+  identifier?: string;
+  code: string;
+  status: 'idle' | 'verifying' | 'error';
+  resend: ResendState;
+}
+
+export type UserProfileMfaAddFlowState =
+  | UserProfileMfaPhoneStep
+  | UserProfileMfaAuthenticatorSetupStep
+  | UserProfileMfaVerificationStep;
+
+export interface UserProfileMfaRemoveFlowState {
+  method: UserProfileMfaMethodType;
+  id: string;
+  label: string;
+  isSubmitting: boolean;
+  errors: FlowErrors;
+}

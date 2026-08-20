@@ -2,20 +2,28 @@ import type {
   ReverificationChallengeState,
   UserProfileDeleteAccountFlowState,
   UserProfileDeviceDetailsFlowState,
+  UserProfileMfaAddFlowState,
+  UserProfileMfaMethodType,
+  UserProfileMfaRemoveFlowState,
   UserProfilePasswordField,
   UserProfilePasswordFlowState,
   UserProfilePasswordValues,
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
-import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
+import type {
+  UserProfileDevice,
+  UserProfileMfaMethod,
+} from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface SecurityFlowConfig {
   latencyMs: number;
   passwordAvailable: boolean;
   hasPassword: boolean;
+  hasMfaPhone: boolean;
+  hasMfaAuthenticator: boolean;
   requireReverification: boolean;
-  reverificationStrategy: ReverificationChallengeState['strategy'];
+  reverificationStrategy: Exclude<ReverificationChallengeState['strategy'], 'backup_code'>;
   failurePoint: 'none' | 'initial-request' | 'reverification' | 'retried-mutation';
   validCode: string;
   validPassword: string;
@@ -25,6 +33,8 @@ export const DEFAULT_SECURITY_FLOW_CONFIG: SecurityFlowConfig = {
   latencyMs: 900,
   passwordAvailable: true,
   hasPassword: true,
+  hasMfaPhone: false,
+  hasMfaAuthenticator: false,
   requireReverification: false,
   reverificationStrategy: 'email_code',
   failurePoint: 'none',
@@ -38,7 +48,13 @@ const EMPTY_PASSWORD_VALUES: UserProfilePasswordValues = {
   signOutOfOtherSessions: true,
 };
 
-type SecurityOperation = 'password' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices';
+type SecurityOperation =
+  | 'password'
+  | 'add-mfa'
+  | 'remove-mfa'
+  | 'delete-account'
+  | 'sign-out-device'
+  | 'sign-out-all-devices';
 
 interface ReverificationState {
   operation: SecurityOperation;
@@ -53,17 +69,24 @@ export function useSecurityFlow({
   config = DEFAULT_SECURITY_FLOW_CONFIG,
   initialDevices,
   onHasPasswordChange,
+  onMfaMethodChange,
 }: {
   config?: SecurityFlowConfig;
   initialDevices: UserProfileDevice[];
   onHasPasswordChange?: (hasPassword: boolean) => void;
+  onMfaMethodChange?: (method: UserProfileMfaMethodType, enabled: boolean) => void;
 }) {
   const settingsRef = useRef(config);
   settingsRef.current = config;
 
   const [hasPassword, setHasPassword] = useState(config.hasPassword);
   const [devices, setDevices] = useState(initialDevices);
+  const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>(() =>
+    methodsFromConfig(config.hasMfaPhone, config.hasMfaAuthenticator),
+  );
   const [password, setPassword] = useState<UserProfilePasswordFlowState | null>(null);
+  const [addMfa, setAddMfa] = useState<UserProfileMfaAddFlowState | null>(null);
+  const [removeMfa, setRemoveMfa] = useState<UserProfileMfaRemoveFlowState | null>(null);
   const [deleteAccount, setDeleteAccount] = useState<UserProfileDeleteAccountFlowState | null>(null);
   const [device, setDevice] = useState<UserProfileDeviceDetailsFlowState | null>(null);
   const [signOutAllDevices, setSignOutAllDevices] = useState<UserProfileSignOutAllDevicesFlowState | null>(null);
@@ -71,6 +94,10 @@ export function useSecurityFlow({
   const verificationGate = useRef<{ operation: SecurityOperation; resolve: (verified: boolean) => void } | null>(null);
 
   useEffect(() => setHasPassword(config.hasPassword), [config.hasPassword]);
+  useEffect(
+    () => setMfaMethods(current => methodsFromConfig(config.hasMfaPhone, config.hasMfaAuthenticator, current)),
+    [config.hasMfaAuthenticator, config.hasMfaPhone],
+  );
 
   const cancelReverification = useCallback(() => {
     verificationGate.current?.resolve(false);
@@ -85,6 +112,10 @@ export function useSecurityFlow({
       }
       if (operation === 'password') {
         setPassword(null);
+      } else if (operation === 'add-mfa') {
+        setAddMfa(null);
+      } else if (operation === 'remove-mfa') {
+        setRemoveMfa(null);
       } else if (operation === 'delete-account') {
         setDeleteAccount(null);
       } else if (operation === 'sign-out-device') {
@@ -99,6 +130,21 @@ export function useSecurityFlow({
   const setSubmitting = useCallback((operation: SecurityOperation, isSubmitting: boolean, formError?: string) => {
     if (operation === 'password') {
       setPassword(current =>
+        current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
+      );
+    } else if (operation === 'add-mfa') {
+      setAddMfa(current =>
+        current
+          ? {
+              ...current,
+              isSubmitting,
+              ...(current.step === 'verify' && formError ? { status: 'error' as const } : {}),
+              errors: formError ? { form: formError } : {},
+            }
+          : current,
+      );
+    } else if (operation === 'remove-mfa') {
+      setRemoveMfa(current =>
         current ? { ...current, isSubmitting, errors: formError ? { form: formError } : {} } : current,
       );
     } else if (operation === 'delete-account') {
@@ -207,6 +253,135 @@ export function useSecurityFlow({
       closeOperation('password');
     });
   }, [closeOperation, onHasPasswordChange, password, runMutation]);
+
+  const openAddMfa = useCallback((method: UserProfileMfaMethodType) => {
+    if (method === 'sms') {
+      setAddMfa({ method, step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} });
+      return;
+    }
+    setAddMfa({
+      method,
+      step: 'setup',
+      displayFormat: 'qr',
+      secret: 'JBSWY3DPEHPK3PXP',
+      isSubmitting: false,
+      errors: {},
+    });
+  }, []);
+
+  const submitAddMfa = useCallback(
+    async (completedCode?: string) => {
+      const current = addMfa;
+      if (!current) {
+        return;
+      }
+
+      if (current.step === 'phone') {
+        setAddMfa(value => (value ? { ...value, isSubmitting: true, errors: {} } : value));
+        await sleep(settingsRef.current.latencyMs);
+        if (settingsRef.current.failurePoint === 'initial-request') {
+          setAddMfa(value =>
+            value
+              ? { ...value, isSubmitting: false, errors: { form: 'Something went wrong. Please try again.' } }
+              : value,
+          );
+          return;
+        }
+        setAddMfa({
+          method: 'sms',
+          step: 'verify',
+          identifier: current.phoneNumber,
+          code: '',
+          status: 'idle',
+          resend: IDLE_RESEND,
+          isSubmitting: false,
+          errors: {},
+        });
+        return;
+      }
+
+      if (current.step === 'setup') {
+        setAddMfa({
+          method: 'authenticator',
+          step: 'verify',
+          code: '',
+          status: 'idle',
+          resend: IDLE_RESEND,
+          isSubmitting: false,
+          errors: {},
+        });
+        return;
+      }
+
+      setAddMfa(value => (value && value.step === 'verify' ? { ...value, status: 'verifying', errors: {} } : value));
+      await sleep(settingsRef.current.latencyMs);
+      if ((completedCode ?? current.code) !== settingsRef.current.validCode) {
+        setAddMfa(value =>
+          value && value.step === 'verify'
+            ? {
+                ...value,
+                code: '',
+                status: 'error',
+                errors: { field: 'Incorrect code. Please try again.' },
+              }
+            : value,
+        );
+        return;
+      }
+
+      void runMutation('add-mfa', () => {
+        const method: UserProfileMfaMethod =
+          current.method === 'sms'
+            ? { id: 'sms', type: 'sms', description: current.identifier }
+            : { id: 'authenticator', type: 'authenticator' };
+        setMfaMethods(methods => [...methods.filter(candidate => candidate.type !== current.method), method]);
+        onMfaMethodChange?.(current.method, true);
+        closeOperation('add-mfa');
+      });
+    },
+    [addMfa, closeOperation, onMfaMethodChange, runMutation],
+  );
+
+  const openRemoveMfa = useCallback(
+    (id: string) => {
+      const method = mfaMethods.find(candidate => candidate.id === id);
+      if (!method || method.type === 'backup-codes') {
+        return;
+      }
+      setRemoveMfa({
+        method: method.type,
+        id: method.id,
+        label: method.description ?? (method.type === 'sms' ? 'This phone number' : 'Authenticator app'),
+        isSubmitting: false,
+        errors: {},
+      });
+    },
+    [mfaMethods],
+  );
+
+  const submitRemoveMfa = useCallback(() => {
+    if (!removeMfa) {
+      return;
+    }
+    const { id, method } = removeMfa;
+    void runMutation('remove-mfa', () => {
+      setMfaMethods(methods => methods.filter(candidate => candidate.id !== id));
+      onMfaMethodChange?.(method, false);
+      closeOperation('remove-mfa');
+    });
+  }, [closeOperation, onMfaMethodChange, removeMfa, runMutation]);
+
+  const resendMfaCode = useCallback(async () => {
+    setAddMfa(current =>
+      current && current.step === 'verify' ? { ...current, resend: { ...current.resend, isResending: true } } : current,
+    );
+    await sleep(settingsRef.current.latencyMs);
+    setAddMfa(current =>
+      current && current.step === 'verify'
+        ? { ...current, resend: { ...current.resend, isResending: false } }
+        : current,
+    );
+  }, []);
 
   const openDeleteAccount = useCallback(() => {
     setDeleteAccount({ confirmation: '', isSubmitting: false, errors: {} });
@@ -354,8 +529,11 @@ export function useSecurityFlow({
   return {
     config,
     hasPassword,
+    mfaMethods,
     devices,
     password,
+    addMfa,
+    removeMfa,
     deleteAccount,
     device,
     signOutAllDevices,
@@ -364,6 +542,25 @@ export function useSecurityFlow({
     closePassword: () => closeOperation('password'),
     updatePasswordValue,
     submitPassword,
+    openAddMfa,
+    closeAddMfa: () => closeOperation('add-mfa'),
+    updateMfaPhoneNumber: (phoneNumber: string) =>
+      setAddMfa(current => (current && current.step === 'phone' ? { ...current, phoneNumber, errors: {} } : current)),
+    updateMfaCode: (code: string) =>
+      setAddMfa(current =>
+        current && current.step === 'verify' ? { ...current, code, status: 'idle', errors: {} } : current,
+      ),
+    toggleMfaDisplayFormat: () =>
+      setAddMfa(current =>
+        current && current.step === 'setup'
+          ? { ...current, displayFormat: current.displayFormat === 'qr' ? 'key' : 'qr' }
+          : current,
+      ),
+    submitAddMfa,
+    resendMfaCode,
+    openRemoveMfa,
+    closeRemoveMfa: () => closeOperation('remove-mfa'),
+    submitRemoveMfa,
     openDeleteAccount,
     closeDeleteAccount: () => closeOperation('delete-account'),
     updateDeleteConfirmation: (confirmation: string) =>
@@ -382,4 +579,13 @@ export function useSecurityFlow({
     resendReverification,
     cancelReverification,
   };
+}
+
+function methodsFromConfig(hasMfaPhone: boolean, hasMfaAuthenticator: boolean, current: UserProfileMfaMethod[] = []) {
+  const phone = current.find(method => method.type === 'sms');
+  const authenticator = current.find(method => method.type === 'authenticator');
+  return [
+    ...(hasMfaPhone ? [phone ?? { id: 'sms', type: 'sms' as const, description: '+1 801-888-8181' }] : []),
+    ...(hasMfaAuthenticator ? [authenticator ?? { id: 'authenticator', type: 'authenticator' as const }] : []),
+  ];
 }

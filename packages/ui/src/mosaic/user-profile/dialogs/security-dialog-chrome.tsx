@@ -51,10 +51,12 @@ export function DialogForm({ onSubmit, children }: { onSubmit: () => void; child
 }
 
 export function ResendButton({
+  label = 'Resend',
   resend,
   onResend,
   disabled = false,
 }: {
+  label?: string;
   resend: { isResending: boolean; secondsRemaining: number };
   onResend: () => void;
   disabled?: boolean;
@@ -70,7 +72,7 @@ export function ResendButton({
       variant='link'
       onClick={onResend}
     >
-      {waiting ? `Resend (${resend.secondsRemaining}s)` : 'Resend'}
+      {waiting ? `${label} (${resend.secondsRemaining}s)` : label}
     </Button>
   );
 }
@@ -87,13 +89,17 @@ export function CodeInput({
   id,
   value,
   status,
+  disabled = false,
+  autoFocus = false,
   onComplete,
   onChange,
 }: {
   id?: string;
   value: string;
-  status: 'idle' | 'verifying' | 'error';
-  onComplete: () => void;
+  status: 'idle' | 'verifying' | 'error' | 'success';
+  disabled?: boolean;
+  autoFocus?: boolean;
+  onComplete: (value: string) => void;
   onChange: (value: string) => void;
 }) {
   const completedRef = React.useRef(false);
@@ -102,7 +108,7 @@ export function CodeInput({
     onChange(digits);
     if (digits.length === 6 && !completedRef.current) {
       completedRef.current = true;
-      onComplete();
+      onComplete(digits);
     } else if (digits.length < 6) {
       completedRef.current = false;
     }
@@ -111,8 +117,8 @@ export function CodeInput({
   return (
     <Input
       autoComplete='one-time-code'
-      autoFocus
-      disabled={status === 'verifying'}
+      autoFocus={autoFocus}
+      disabled={disabled || status === 'verifying' || status === 'success'}
       id={id}
       inputMode='numeric'
       placeholder='······'
@@ -120,5 +126,65 @@ export function CodeInput({
       {...stylex.props(styles.codeInput, status === 'error' && styles.codeInputInvalid)}
       onChange={event => handleChange(event.target.value)}
     />
+  );
+}
+
+const COUNTRIES = [
+  { code: 'US', dialCode: '+1', label: '🇺🇸 US' },
+  { code: 'GB', dialCode: '+44', label: '🇬🇧 UK' },
+  { code: 'GR', dialCode: '+30', label: '🇬🇷 GR' },
+  { code: 'DE', dialCode: '+49', label: '🇩🇪 DE' },
+] as const;
+
+export function PhoneInput({
+  id,
+  value,
+  disabled = false,
+  autoFocus = false,
+  onChange,
+}: {
+  id?: string;
+  value: string;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const matched = COUNTRIES.find(country => value.startsWith(country.dialCode)) ?? COUNTRIES[0];
+  const national = value.slice(matched.dialCode.length);
+
+  return (
+    <div {...stylex.props(styles.phoneRow)}>
+      <select
+        aria-label='Country'
+        disabled={disabled}
+        value={matched.code}
+        {...stylex.props(styles.countrySelect)}
+        onChange={event => {
+          const next = COUNTRIES.find(country => country.code === event.target.value) ?? COUNTRIES[0];
+          onChange(`${next.dialCode}${national}`);
+        }}
+      >
+        {COUNTRIES.map(country => (
+          <option
+            key={country.code}
+            value={country.code}
+          >
+            {country.label} {country.dialCode}
+          </option>
+        ))}
+      </select>
+      <Input
+        autoComplete='tel'
+        autoFocus={autoFocus}
+        disabled={disabled}
+        id={id}
+        inputMode='tel'
+        placeholder='201 555 0123'
+        type='tel'
+        value={national}
+        {...stylex.props(styles.phoneInput)}
+        onChange={event => onChange(`${matched.dialCode}${event.target.value}`)}
+      />
+    </div>
   );
 }

@@ -4,12 +4,18 @@ import type {
   ReverificationChallengeState,
   UserProfileDeleteAccountFlowState,
   UserProfileDeviceDetailsFlowState,
+  UserProfileMfaAddFlowState,
+  UserProfileMfaRemoveFlowState,
   UserProfilePasswordFlowState,
   UserProfileSignOutAllDevicesFlowState,
 } from '@clerk/ui/mosaic/user-profile/dialogs/flow.types';
 import { ReverificationDialogView } from '@clerk/ui/mosaic/user-profile/dialogs/reverification-dialog.view';
 import { UserProfileDeleteAccountDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-delete-account-dialog.view';
 import { UserProfileDeviceDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-device-dialog.view';
+import {
+  UserProfileMfaAddDialogView,
+  UserProfileMfaRemoveDialogView,
+} from '@clerk/ui/mosaic/user-profile/user-profile-mfa-dialog.view';
 import { UserProfilePasswordDialogView } from '@clerk/ui/mosaic/user-profile/user-profile-password-dialog.view';
 import type { UserProfileDevice } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/ui/mosaic/user-profile/user-profile-security-panel.view';
@@ -66,7 +72,7 @@ const INITIAL_DEVICES: UserProfileDevice[] = [
 
 function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow> }) {
   const verificationDialog = (
-    operation: 'password' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices',
+    operation: 'password' | 'add-mfa' | 'remove-mfa' | 'delete-account' | 'sign-out-device' | 'sign-out-all-devices',
   ) => {
     const challenge = flow.reverification?.operation === operation ? flow.reverification.state : null;
     return (
@@ -111,6 +117,36 @@ function SecurityFlowDialogs({ flow }: { flow: ReturnType<typeof useSecurityFlow
           onValueChange={flow.updatePasswordValue}
           onSubmit={flow.submitPassword}
           verificationDialog={verificationDialog('password')}
+        />
+      ) : null}
+      {flow.addMfa ? (
+        <UserProfileMfaAddDialogView
+          open
+          state={flow.addMfa}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeAddMfa();
+            }
+          }}
+          onCodeChange={flow.updateMfaCode}
+          onPhoneNumberChange={flow.updateMfaPhoneNumber}
+          onResend={() => void flow.resendMfaCode()}
+          onSubmit={code => void flow.submitAddMfa(code)}
+          onToggleDisplayFormat={flow.toggleMfaDisplayFormat}
+          verificationDialog={verificationDialog('add-mfa')}
+        />
+      ) : null}
+      {flow.removeMfa ? (
+        <UserProfileMfaRemoveDialogView
+          open
+          state={flow.removeMfa}
+          onOpenChange={open => {
+            if (!open) {
+              flow.closeRemoveMfa();
+            }
+          }}
+          onRemove={flow.submitRemoveMfa}
+          verificationDialog={verificationDialog('remove-mfa')}
         />
       ) : null}
       {flow.deleteAccount ? (
@@ -218,7 +254,7 @@ function RadioGroup<Value extends string>({
   );
 }
 
-const REVERIFICATION_STRATEGIES = ['password', 'email_code', 'phone_code', 'passkey', 'totp', 'backup_code'] as const;
+const REVERIFICATION_STRATEGIES = ['password', 'email_code', 'phone_code', 'passkey', 'totp'] as const;
 
 function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: (next: SecurityFlowConfig) => void }) {
   return (
@@ -257,6 +293,22 @@ function Controls({ config, onChange }: { config: SecurityFlowConfig; onChange: 
           onChange={event => onChange({ ...config, hasPassword: event.target.checked })}
         />
         <span style={controlName}>Password already set</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.hasMfaPhone}
+          type='checkbox'
+          onChange={event => onChange({ ...config, hasMfaPhone: event.target.checked })}
+        />
+        <span style={controlName}>Phone number verification</span>
+      </label>
+      <label style={controlLabel}>
+        <input
+          checked={config.hasMfaAuthenticator}
+          type='checkbox'
+          onChange={event => onChange({ ...config, hasMfaAuthenticator: event.target.checked })}
+        />
+        <span style={controlName}>Authenticator app</span>
       </label>
       <label style={controlLabel}>
         <input
@@ -306,6 +358,11 @@ export function Default() {
     config,
     initialDevices: INITIAL_DEVICES,
     onHasPasswordChange: hasPassword => setConfig(current => ({ ...current, hasPassword })),
+    onMfaMethodChange: (method, enabled) =>
+      setConfig(current => ({
+        ...current,
+        ...(method === 'sms' ? { hasMfaPhone: enabled } : { hasMfaAuthenticator: enabled }),
+      })),
   });
 
   return (
@@ -317,10 +374,13 @@ export function Default() {
       <UserProfileSecurityPanelView
         devices={flow.devices}
         hasPassword={flow.hasPassword}
+        mfaMethods={flow.mfaMethods}
         passwordAvailable={config.passwordAvailable}
         onChangePassword={config.passwordAvailable ? flow.openPassword : undefined}
+        onAddMfaMethod={flow.openAddMfa}
         onDeleteAccount={flow.openDeleteAccount}
         onManageDevice={flow.openDevice}
+        onRemoveMfaMethod={flow.openRemoveMfa}
         onSignOutAllOtherDevices={flow.openSignOutAllDevices}
         onSignOutDevice={flow.openDevice}
       />
@@ -338,6 +398,8 @@ interface Snapshot<State> {
 
 type SecuritySnapshot =
   | ({ flow: 'password' } & Snapshot<UserProfilePasswordFlowState>)
+  | ({ flow: 'add-mfa' } & Snapshot<UserProfileMfaAddFlowState>)
+  | ({ flow: 'remove-mfa' } & Snapshot<UserProfileMfaRemoveFlowState>)
   | ({ flow: 'delete-account' } & Snapshot<UserProfileDeleteAccountFlowState>)
   | ({ flow: 'device' } & Snapshot<UserProfileDeviceDetailsFlowState>)
   | ({ flow: 'sign-out-all-devices' } & Snapshot<UserProfileSignOutAllDevicesFlowState>);
@@ -527,6 +589,207 @@ const SNAPSHOTS: readonly SecuritySnapshot[] = [
     },
   },
   {
+    flow: 'add-mfa',
+    step: 'add phone',
+    variant: 'phone number',
+    state: { method: 'sms', step: 'phone', phoneNumber: '+1', isSubmitting: false, errors: {} },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add phone',
+    variant: 'submitting',
+    state: { method: 'sms', step: 'phone', phoneNumber: '+1 801 555 0100', isSubmitting: true, errors: {} },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
+    variant: 'code',
+    state: {
+      method: 'sms',
+      step: 'verify',
+      identifier: '+1 801 555 0100',
+      code: '',
+      status: 'idle',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
+    variant: 'verifying',
+    state: {
+      method: 'sms',
+      step: 'verify',
+      identifier: '+1 801 555 0100',
+      code: '424242',
+      status: 'verifying',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: true,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify phone',
+    variant: 'wrong code',
+    state: {
+      method: 'sms',
+      step: 'verify',
+      identifier: '+1 801 555 0100',
+      code: '',
+      status: 'error',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: false,
+      errors: { field: 'Incorrect code. Please try again.' },
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add authenticator',
+    variant: 'QR code',
+    state: {
+      method: 'authenticator',
+      step: 'setup',
+      displayFormat: 'qr',
+      secret: 'JBSWY3DPEHPK3PXP',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'add authenticator',
+    variant: 'setup key',
+    state: {
+      method: 'authenticator',
+      step: 'setup',
+      displayFormat: 'key',
+      secret: 'JBSWY3DPEHPK3PXP',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify authenticator',
+    variant: 'code',
+    state: {
+      method: 'authenticator',
+      step: 'verify',
+      code: '',
+      status: 'idle',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify authenticator',
+    variant: 'wrong code',
+    state: {
+      method: 'authenticator',
+      step: 'verify',
+      code: '',
+      status: 'error',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: false,
+      errors: { field: 'Incorrect code. Please try again.' },
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify authenticator',
+    variant: 'server error',
+    state: {
+      method: 'authenticator',
+      step: 'verify',
+      code: '424242',
+      status: 'error',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'add-mfa',
+    step: 'verify authenticator',
+    variant: 'reverification',
+    state: {
+      method: 'authenticator',
+      step: 'verify',
+      code: '424242',
+      status: 'verifying',
+      resend: { isResending: false, secondsRemaining: 0 },
+      isSubmitting: true,
+      errors: {},
+    },
+    reverification: idleVerification,
+  },
+  {
+    flow: 'remove-mfa',
+    step: 'remove method',
+    variant: 'phone number',
+    state: {
+      method: 'sms',
+      id: 'sms',
+      label: '+1 801-888-8181',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'remove-mfa',
+    step: 'remove method',
+    variant: 'submitting',
+    state: {
+      method: 'authenticator',
+      id: 'authenticator',
+      label: 'Authenticator app',
+      isSubmitting: true,
+      errors: {},
+    },
+  },
+  {
+    flow: 'remove-mfa',
+    step: 'remove method',
+    variant: 'authenticator',
+    state: {
+      method: 'authenticator',
+      id: 'authenticator',
+      label: 'Authenticator app',
+      isSubmitting: false,
+      errors: {},
+    },
+  },
+  {
+    flow: 'remove-mfa',
+    step: 'remove method',
+    variant: 'server error',
+    state: {
+      method: 'authenticator',
+      id: 'authenticator',
+      label: 'Authenticator app',
+      isSubmitting: false,
+      errors: { form: 'Something went wrong. Please try again.' },
+    },
+  },
+  {
+    flow: 'remove-mfa',
+    step: 'remove method',
+    variant: 'reverification',
+    state: {
+      method: 'authenticator',
+      id: 'authenticator',
+      label: 'Authenticator app',
+      isSubmitting: true,
+      errors: {},
+    },
+    reverification: idleVerification,
+  },
+  {
     flow: 'delete-account',
     step: 'delete account',
     variant: 'idle',
@@ -666,6 +929,28 @@ export function States() {
           onOpenChange={setOpen}
           onValueChange={noop}
           onSubmit={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'add-mfa' ? (
+        <UserProfileMfaAddDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onCodeChange={noop}
+          onPhoneNumberChange={noop}
+          onResend={noop}
+          onSubmit={noop}
+          onToggleDisplayFormat={noop}
+          verificationDialog={verification}
+        />
+      ) : null}
+      {snapshot.flow === 'remove-mfa' ? (
+        <UserProfileMfaRemoveDialogView
+          open={open}
+          state={snapshot.state}
+          onOpenChange={setOpen}
+          onRemove={noop}
           verificationDialog={verification}
         />
       ) : null}
